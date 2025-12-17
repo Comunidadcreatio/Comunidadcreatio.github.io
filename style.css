@@ -1,0 +1,198 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+:root {
+    --bg-dark: #050a14;
+    --accent-gold: #f1de95;
+    --text-white: #ffffff;
+}
+
+.main-header {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    height: 110px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo */
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.main-logo-img {
+    width: 45px;
+    height: auto;
+}
+
+.brand-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.brand-name span { font-weight: 400; }
+
+/* Navegación */
+.nav-menu ul {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+}
+
+.nav-menu ul li a {
+    text-decoration: none;
+    color: var(--text-white);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.nav-menu ul li a:hover, .nav-menu ul li a.active {
+    color: var(--accent-gold);
+}
+
+/* --- CARRITO Y ANIMACIÓN EXPLOSIVA --- */
+.cart-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+}
+
+.cart-wrapper.hidden {
+    display: none;
+}
+
+/* Animación rápida: 0.6 segundos */
+.cart-wrapper.show-anim {
+    display: flex;
+    animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* --- ANIMACIÓN DEL CÍRCULO (DESAPARECE TRAS 1.5s) --- */
+.show-anim .cart-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
+    z-index: 1;
+    /* Aplicamos dos animaciones: una para rotar y otra para desaparecer */
+    animation: 
+        rotateCircle 1.5s linear infinite, 
+        fadeOutCircle 0.5s ease forwards 1.5s; /* Inicia a los 1.5s y dura 0.5s */
+}
+
+.cart-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
+    animation: rotateCircle 1.5s linear infinite;
+    z-index: 1;
+}
+
+.cart-icon {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-dark);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.cart-badge {
+    background-color: #e91e63;
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    border: 2px solid var(--bg-dark);
+    z-index: 3;
+}
+
+/* Keyframes Rápidos */
+@keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.4); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes rotateCircle {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Animación para desvanecer el círculo */
+@keyframes fadeOutCircle {
+    0% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+/* Mantenemos el resto de tus animaciones rápidas */
+@keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.4); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes rotateCircle {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Ocultar el menú de hamburguesa en web */
+.mobile-menu-btn { display: none; }
+@media (max-width: 1024px) { .mobile-menu-btn { display: block; } }
+
+/* Iconos de Usuario */
+.user-actions { display: flex; gap: 20px; align-items: center; }
+.user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
+.user-actions a:hover { color: var(--accent-gold); }
+
+/* --- RESPONSIVIDAD --- */
+.mobile-menu-btn {
+    display: none; /* Oculto en Web */
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+}
+
+@media (max-width: 1024px) {
+    .nav-menu {
+        display: none; 
+    }
+    .mobile-menu-btn {
+        display: block; /* Solo visible en móvil */
+    }
+}
