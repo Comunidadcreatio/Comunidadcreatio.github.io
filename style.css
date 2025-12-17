@@ -119,24 +119,28 @@
     position: relative;
     z-index: 2;
     background: var(--bg-dark);
-    width: 38px;
-    height: 38px;
+    /* Ajustamos el tamaño para que sea un poco más pequeño que el fondo de colores */
+    width: 44px; /* Bajamos de 38px a 34px */
+    height: 44px; /* Bajamos de 38px a 34px */
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
+    text-decoration: none;
+    /* Esto ayuda a que el ícono de la rueda no "toque" el borde del círculo oscuro */
+    font-size: 1.1rem;
 }
 
 .cart-badge {
     background-color: #e91e63;
     color: white;
     font-size: 0.65rem;
-    padding: 2px 6px;
+    padding: 2px 5px;
     border-radius: 50%;
     position: absolute;
-    top: -5px;
-    right: -5px;
+    top: -8px; /* Ajustado para que no tape el carrito */
+    right: -8px;
     border: 2px solid var(--bg-dark);
     z-index: 3;
 }
@@ -180,19 +184,75 @@
 .user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
 .user-actions a:hover { color: var(--accent-gold); }
 
-/* --- RESPONSIVIDAD --- */
-.mobile-menu-btn {
-    display: none; /* Oculto en Web */
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: white;
+
+
+/* --- AJUSTES PARA MÓVIL (Imagen Referencia) --- */
+@media (max-width: 1024px) {
+    .main-header {
+        height: auto; 
+        padding: 15px 0;
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap; /* Permite que las acciones de usuario bajen */
+        align-items: center;
+        justify-content: space-between; /* Logo a la izq, Menú a la derecha */
+    }
+
+    /* 1. Logo a la izquierda */
+    .logo-container {
+        order: 1;
+        flex: 1; 
+    }
+
+    /* 2. Botón de menú a la derecha */
+    .mobile-menu-btn {
+        display: block;
+        order: 2;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    /* 3. Acciones (Carrito/User) abajo y centradas */
+    .user-actions {
+        order: 3;
+        width: 100%; /* Obliga a saltar de línea */
+        justify-content: center;
+        margin-top: 15px;
+        gap: 25px;
+    }
+
+    /* 3. Acciones (Carrito/User) abajo y centradas */
+    .user-actions {
+        order: 3;
+        width: 100%; /* Obliga a saltar de línea */
+        justify-content: center;
+        margin-top: 15px;
+        gap: 25px;
+    }
+
+    /* Ocultamos la navegación principal en móvil */
+    .nav-menu {
+        display: none;
+    }
 }
 
 @media (max-width: 1024px) {
-    .nav-menu {
-        display: none; 
+    /* Reducimos el tamaño del contenedor para que sea sutil como en la foto */
+    .cart-wrapper {
+        width: 40px;
+        height: 40px;
     }
-    .mobile-menu-btn {
-        display: block; /* Solo visible en móvil */
+
+    .cart-icon {
+        width: 34px; /* Proporción para que el borde se vea fino */
+        height: 34px;
+        font-size: 0.9rem;
+    }
+
+    .cart-circle {
+        width: 100%;
+        height: 100%;
     }
 }
