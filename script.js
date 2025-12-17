@@ -1,26 +1,37 @@
-// Ejemplo de interacción para el menú móvil
+// Seleccionamos los elementos
 const menuBtn = document.querySelector('.mobile-menu-btn');
-menuBtn.addEventListener('click', () => {
-    alert('Menú móvil activado');
-});
-
-// Seleccionamos los elementos necesarios
+const navMenu = document.querySelector('.nav-menu');
 const navLinks = document.querySelectorAll('.nav-menu a');
 const cartContainer = document.getElementById('cart-container');
 
-navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-        // Opcional: e.preventDefault(); si no quieres que la página recargue aún
-        
-        // Obtenemos el texto del enlace (sin espacios y en minúsculas para comparar)
-        const linkText = this.textContent.trim().toLowerCase();
+// Función para abrir/cerrar el menú
+menuBtn.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+});
 
+// Manejo de clicks en los enlaces (Cerrar menú y lógica de galería)
+navLinks.forEach(link => {
+    link.addEventListener('click', function() {
+        // 1. Cerramos el menú al hacer click en una opción
+        navMenu.classList.remove('active');
+
+        // 2. Gestionar clase active visual
+        navLinks.forEach(el => el.classList.remove('active'));
+        this.classList.add('active');
+
+        // 3. Lógica del carrito (Tu función original de Galería)
+        const linkText = this.textContent.trim().toLowerCase();
         if (linkText === 'galería' || linkText === 'galeria') {
-            // Mostramos el carrito si es Galería
-            cartContainer.classList.remove('hidden');
-        } else {
-            // Ocultamos el carrito si es cualquier otro link
             cartContainer.classList.add('hidden');
+            cartContainer.classList.remove('show-anim');
+            
+            setTimeout(() => {
+                cartContainer.classList.remove('hidden');
+                cartContainer.classList.add('show-anim');
+            }, 10);
+        } else {
+            cartContainer.classList.add('hidden');
+            cartContainer.classList.remove('show-anim');
         }
     });
 });
