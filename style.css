@@ -224,16 +224,24 @@
         gap: 20px;
     }
 
-    /* Fila 3: Menú desplegable (Estilo Movil2.png) */
     .nav-menu {
-        display: none; /* Oculto por defecto */
+        display: block; /* Cambiamos de none a block para que la animación funcione */
         order: 4;
         width: 100%;
-        background-color: #050a14; /* Color oscuro del header */
+        background-color: #050a14;
+        
+        /* Estado inicial: oculto y contraído */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.4s ease-out, opacity 0.3s ease;
     }
 
     .nav-menu.active {
-        display: block; /* Se muestra al hacer click */
+        /* Estado activo: expandido */
+        max-height: 500px; /* Un valor lo suficientemente grande para cubrir el contenido */
+        opacity: 1;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .nav-menu ul {
@@ -243,14 +251,20 @@
 
     .nav-menu ul li {
         width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Línea divisoria */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .nav-menu ul li a {
         display: block;
         padding: 15px 20px;
         width: 100%;
-        text-align: left;
+        text-decoration: none;
+        color: white;
+        transition: background 0.3s;
+    }
+
+    .nav-menu ul li a:active {
+        background-color: rgba(255, 255, 255, 0.05);
     }
 }
 

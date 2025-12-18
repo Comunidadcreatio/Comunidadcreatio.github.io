@@ -11,7 +11,7 @@ menuBtn.addEventListener('click', () => {
 
 // Manejo de clicks en los enlaces (Cerrar menú y lógica de galería)
 navLinks.forEach(link => {
-    link.addEventListener('click', function() {
+    link.addEventListener('click', () => {
         // 1. Cerramos el menú al hacer click en una opción
         navMenu.classList.remove('active');
 
