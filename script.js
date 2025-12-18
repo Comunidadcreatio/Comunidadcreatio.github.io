@@ -24,53 +24,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. LÓGICA DE LOGIN CORREGIDA
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Efecto visual de carga
             const originalText = btnLogin.innerHTML;
             btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
             btnLogin.disabled = true;
 
-            // CAPTURA DE DATOS: Usamos selectores genéricos porque tus inputs no tienen ID
-            const userValue = loginForm.querySelector('input[type="text"]').value.trim();
-            const passValue = loginForm.querySelector('input[type="password"]').value.trim();
+            // SELECCIÓN INFALIBLE: Primer input es usuario, segundo es contraseña
+            const inputs = loginForm.querySelectorAll('input');
+            const userValue = inputs[0].value.trim(); 
+            const passValue = inputs[1].value.trim();
+
+            console.log("Intentando login con:", userValue); // Para que veas en consola si captura bien
 
             try {
-                // Llamada a tu API en Render
                 const response = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json' 
-                    },
-                    // ENVIAMOS: user y pass (exactamente como pide tu index.js línea 34)
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         user: userValue, 
                         pass: passValue 
                     })
                 });
 
-                // Verificamos si la respuesta es correcta antes de convertir a JSON
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-
                 const result = await response.json();
 
                 if (result.success) {
-                    alert("¡Acceso concedido! Bienvenido Administrador.");
+                    alert("¡Acceso concedido!");
                     loginPanel.classList.add('hidden');
-                    // Aquí podrías mostrar un botón de "Cerrar Sesión" o habilitar edición
                 } else {
-                    // El mensaje que viene de tu servidor
-                    alert("Error: " + (result.message || "Usuario o contraseña incorrectos"));
+                    // Si llega aquí, es que el servidor respondió pero NO encontró al usuario
+                    alert("Credenciales incorrectas en la base de datos.");
                 }
             } catch (error) {
-                console.error("Error de conexión:", error);
-                // Si el servidor está en "Sleep" (Plan Free), el fetch fallará por tiempo
-                alert("El servidor gratuito de Render está despertando. Por favor, espera 30 segundos e intenta de nuevo.");
+                alert("El servidor está despertando. Reintenta en 10 segundos.");
             } finally {
                 btnLogin.innerHTML = originalText;
                 btnLogin.disabled = false;
