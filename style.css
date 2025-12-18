@@ -178,33 +178,59 @@ body {
 /* CORRECCIÓN: Agregado el punto (.) a la clase */
 .login-overlay {
     position: fixed;
-    top: 110px; /* Ajuste para que empiece debajo del header */
+    top: 0; /* Cambiado a 0 para cubrir toda la pantalla, incluido el header */
     left: 0;
     width: 100%;
-    height: calc(100vh - 110px);
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('FondoPrueba1.png') no-repeat center center/cover;
-    display: flex;
+    height: 100vh;
+    /* Fondo: gradiente oscuro + imagen */
+    background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.95)), url('FondoPrueba1.png') no-repeat center center/cover;
+    display: flex; /* Siempre es flex */
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 3000; /* Z-index muy alto para tapar todo, incluido el header */
+    
+    /* --- PROPIEDADES DE ANIMACIÓN (ESTADO VISIBLE) --- */
     opacity: 1;
-    transition: 0.3s ease;
+    visibility: visible;
+    /* Transición suave para el fondo oscuro */
+    transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+    backdrop-filter: blur(5px); /* OPCIONAL: Añade un desenfoque elegante al fondo */
 }
 
 .login-overlay.hidden {
-    display: none; /* JS controla la visibilidad con esta clase */
+    /* En lugar de display: none, usamos opacidad y visibilidad */
+    opacity: 0;
+    visibility: hidden; /* Hace que no se pueda clickar mientras no se ve */
+    transition-delay: 0.1s; /* Esperamos un poco antes de desvanecer el fondo */
+}
+
+/* Transformación de la tarjeta cuando el padre está oculto */
+.login-overlay.hidden .login-card {
+    /* Empieza pequeña (0.7) y ligeramente desplazada hacia abajo */
+    transform: scale(0.7) translateY(30px); 
+    opacity: 0;
+    /* La transición de salida es diferente: más rápida y sin rebote */
+    transition: transform 0.3s ease-in, opacity 0.3s ease-in;
 }
 
 .login-card {
-    background: rgba(10, 15, 26, 0.6);
+    background: rgba(15, 23, 36, 0.95); /* Un poco más claro para contraste */
     padding: 40px;
     border-radius: 30px;
     width: 90%;
     max-width: 450px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     text-align: center;
     color: white;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+
+    /* --- ANIMACIÓN CREATIVA DE ENTRADA (BOUNCE/POP) --- */
+    transform: scale(1) translateY(0); /* Tamaño normal y posición centrada */
+    opacity: 1;
+    /* Usamos cubic-bezier para el efecto "rebote". 
+       Los números > 1 crean el efecto de "pasarse" y volver.
+    */
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
 }
 
 .main-icon {
@@ -340,7 +366,7 @@ body {
 
     /* --- 4. NUEVO: AJUSTES DEL PANEL LOGIN MÓVIL --- */
     .login-card {
-        width: 70%;        /* Reducimos del 90% al 80% para dar aire a los lados */
+        width: 60%;        /* Reducimos del 90% al 80% para dar aire a los lados */
         max-width: 360px;  /* Limitamos el ancho máximo para que no se vea gigante */
         padding: 25px;     /* Reducimos el padding (antes 40px) para ganar espacio interno */
         border-radius: 20px; /* Bordes un poco menos redondeados para armonía visual */
@@ -360,3 +386,4 @@ body {
         margin-bottom: 20px;
     }
 }
+
