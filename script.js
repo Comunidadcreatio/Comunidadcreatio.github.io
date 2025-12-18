@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionamos los elementos existentes
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
@@ -51,17 +52,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Lógica de Menú y Navegación ---
+    // --- Lógica del Menú Móvil ---
     if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => navMenu.classList.toggle('active'));
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            if(loginPanel) loginPanel.classList.add('hidden');
+        });
     }
 
+    // --- Lógica de Navegación Unificada ---
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
             if(loginPanel) loginPanel.classList.add('hidden');
             if(navMenu) navMenu.classList.remove('active');
+
             navLinks.forEach(el => el.classList.remove('active'));
             this.classList.add('active');
+
+            const linkText = this.textContent.trim().toLowerCase();
+            
+            if (linkText === 'galería' || linkText === 'galeria') {
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                    
+                    setTimeout(() => {
+                        cartContainer.classList.remove('hidden');
+                        cartContainer.classList.add('show-anim');
+                    }, 10);
+                }
+            } else {
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                }
+            }
         });
     });
 });
