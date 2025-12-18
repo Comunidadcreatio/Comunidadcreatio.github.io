@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Header Fundación Extramuros</title>
+    <title>Fundación Extramuros</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
     <div class="container">
         <div class="logo-container">
             <a href="index.html" class="logo-link">
-                <img src="Logo.svg" alt="Logo" class="main-logo-img">
+                <img src="Logo.svg" alt="Logo Fundación Extramuros" class="main-logo-img">
                 <h1 class="brand-name">Fundación<span>Extramuros</span></h1>
             </a>
         </div>
@@ -50,40 +50,40 @@
 </header>
 
 <main class="main-content">
-    <div id="login-panel" class="login-overlay hidden">
-        <div class="login-card">
-            <div class="login-header">
-                <i class="fa-solid fa-user-shield main-icon"></i>
-                <h2>Panel de Administración</h2>
-                <p>Ingresa tus credenciales para gestionar los productos</p>
+    <h2>Bienvenido a Fundación Extramuros</h2>
+</main>
+
+<div id="login-panel" class="login-overlay hidden">
+    <div class="login-card">
+        <div class="login-header">
+            <i class="fa-solid fa-user-shield main-icon"></i>
+            <h2>Panel de Administración</h2>
+            <p>Ingresa tus credenciales para gestionar los productos</p>
+        </div>
+        
+        <form class="login-form">
+            <div class="input-group">
+                <label><i class="fa-solid fa-user"></i> Usuario</label>
+                <input type="text" placeholder="Ingresa tu Usuario">
             </div>
             
-            <form class="login-form">
-                <div class="input-group">
-                    <label><i class="fa-solid fa-user"></i> Usuario</label>
-                    <input type="text" placeholder="Ingresa tu Usuario">
-                </div>
-                
-                <div class="input-group">
-                    <label><i class="fa-solid fa-lock"></i> Contraseña</label>
-                    <input type="password" placeholder="Ingresa tu contraseña">
-                </div>
-                
-                <div class="form-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox">
-                        <span class="checkmark"></span>
-                        Recordar sesión
-                    </label>
-                </div>
-                
-                <button type="submit" class="btn-login">
-                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
-                </button>
-            </form>
-        </div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                <input type="password" placeholder="Ingresa tu contraseña">
+            </div>
+            
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox"> Recordar sesión
+                </label>
+            </div>
+            
+            <button type="submit" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+            </button>
+        </form>
     </div>
-</main>
+</div>
 
 <script src="script.js"></script>
 </body>

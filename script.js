@@ -1,82 +1,70 @@
-// Seleccionamos los elementos
-const menuBtn = document.querySelector('.mobile-menu-btn');
-const navMenu = document.querySelector('.nav-menu');
-const navLinks = document.querySelectorAll('.nav-menu a');
-const cartContainer = document.getElementById('cart-container');
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionamos los elementos
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navMenu = document.querySelector('.nav-menu');
+    const navLinks = document.querySelectorAll('.nav-menu a');
+    const cartContainer = document.getElementById('cart-container');
+    const adminBtn = document.getElementById('admin-btn');
+    const loginPanel = document.getElementById('login-panel');
 
+    // --- Lógica del Panel Admin ---
+    if(adminBtn && loginPanel) {
+        adminBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Alternar visibilidad del panel de login
+            loginPanel.classList.toggle('hidden');
+            // Si el menú móvil está abierto, cerrarlo
+            navMenu.classList.remove('active');
+        });
 
-// Elementos nuevos del Admin Panel
-const adminBtn = document.getElementById('admin-btn');
-const loginPanel = document.getElementById('login-panel');
-
-// Mostrar/Ocultar Panel Admin
-adminBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginPanel.classList.toggle('hidden');
-});
-
-// Cerrar panel si haces clic fuera de la tarjeta blanca
-loginPanel.addEventListener('click', (e) => {
-    if (e.target === loginPanel) {
-        loginPanel.classList.add('hidden');
+        // Cerrar panel al hacer clic fuera de la tarjeta (overlay)
+        loginPanel.addEventListener('click', (e) => {
+            if (e.target === loginPanel) {
+                loginPanel.classList.add('hidden');
+            }
+        });
     }
-});
 
+    // --- Lógica del Menú Móvil ---
+    if(menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            // Si abrimos el menú, nos aseguramos que el login esté cerrado
+            loginPanel.classList.add('hidden');
+        });
+    }
 
-// Función para abrir/cerrar el menú
-menuBtn.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-});
+    // --- Lógica de Navegación Unificada ---
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // 1. Cerrar el Panel Admin si está abierto
+            if(loginPanel) loginPanel.classList.add('hidden');
 
-// Manejo de clicks en los enlaces (Cerrar menú y lógica de galería)
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        // 1. Cerramos el menú al hacer click en una opción
-        navMenu.classList.remove('active');
+            // 2. Cerrar menú móvil
+            if(navMenu) navMenu.classList.remove('active');
 
-        // 2. Gestionar clase active visual
-        navLinks.forEach(el => el.classList.remove('active'));
-        this.classList.add('active');
+            // 3. Gestionar clase 'active' visual en los enlaces
+            navLinks.forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
 
-        // 3. Lógica del carrito (Tu función original de Galería)
-        const linkText = this.textContent.trim().toLowerCase();
-        if (linkText === 'galería' || linkText === 'galeria') {
-            cartContainer.classList.add('hidden');
-            cartContainer.classList.remove('show-anim');
+            // 4. Lógica de la Galería / Carrito
+            const linkText = this.textContent.trim().toLowerCase();
             
-            setTimeout(() => {
-                cartContainer.classList.remove('hidden');
-                cartContainer.classList.add('show-anim');
-            }, 10);
-        } else {
-            cartContainer.classList.add('hidden');
-            cartContainer.classList.remove('show-anim');
-        }
-    });
-});
-
-
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', function(e) {
-        document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
-        this.classList.add('active');
-
-        const cartContainer = document.getElementById('cart-container');
-        const linkText = this.textContent.trim().toLowerCase();
-
-        if (linkText === 'galería' || linkText === 'galeria') {
-            // Reiniciamos la animación: quitamos y ponemos la clase
-            cartContainer.classList.add('hidden');
-            cartContainer.classList.remove('show-anim');
-            
-            // Un pequeño timeout para que el navegador procese el reinicio
-            setTimeout(() => {
-                cartContainer.classList.remove('hidden');
-                cartContainer.classList.add('show-anim');
-            }, 10);
-        } else {
-            cartContainer.classList.add('hidden');
-            cartContainer.classList.remove('show-anim');
-        }
+            if (linkText === 'galería' || linkText === 'galeria') {
+                // Reinicio de animación del carrito (Reflow Hack)
+                cartContainer.classList.add('hidden');
+                cartContainer.classList.remove('show-anim');
+                
+                // Pequeño timeout para permitir que el navegador procese el cambio de clase
+                setTimeout(() => {
+                    cartContainer.classList.remove('hidden');
+                    cartContainer.classList.add('show-anim');
+                }, 10);
+            } else {
+                // En cualquier otra opción, ocultamos el carrito
+                cartContainer.classList.add('hidden');
+                cartContainer.classList.remove('show-anim');
+            }
+        });
     });
 });

@@ -1,3 +1,4 @@
+/* --- RESET & GENERAL --- */
 * {
     margin: 0;
     padding: 0;
@@ -11,119 +12,11 @@
     --text-white: #ffffff;
 }
 
-/* ... (Mantén todo tu código anterior de :root y .main-header) ... */
-
-/* --- CONTENIDO PRINCIPAL --- */
-.main-content {
-    min-height: calc(100vh - 110px);
-    background: url('FondoPrueba1.png') no-repeat center center/cover;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body {
+    background-color: white;
 }
 
-/* --- PANEL DE LOGIN (ESTILO BODY.JPG) --- */
-.login-overlay {
-    position: fixed;
-    top: 110px; /* Inicia justo debajo del header */
-    left: 0;
-    width: 100%;
-    height: calc(100vh - 110px);
-    /* Imagen de fondo SOLO aquí */
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('FondoPrueba1.png') no-repeat center center/cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 1;
-    transition: 0.3s ease;
-}
-
-.login-overlay.hidden {
-    display: none;
-}
-
-.login-card {
-    background: rgba(10, 15, 26, 0.85); /* Fondo oscuro semitransparente */
-    padding: 40px;
-    border-radius: 30px;
-    width: 90%;
-    max-width: 450px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: center;
-    color: white;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-}
-
-.main-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    color: white;
-}
-
-.login-header h2 {
-    font-size: 1.8rem;
-    margin-bottom: 5px;
-}
-
-.login-header p {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 30px;
-}
-
-/* Formularios */
-.input-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    border: none;
-    background: white;
-    font-size: 1rem;
-}
-
-.form-options {
-    text-align: left;
-    margin-bottom: 25px;
-    font-size: 0.9rem;
-}
-
-.btn-login {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background-color: var(--accent-gold);
-    color: var(--bg-dark);
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-login:hover {
-    background-color: #e5cf7d;
-    transform: translateY(-2px);
-}
-
-/* ... (Mantén tu bloque @media anterior de navegación móvil) ... */
-
+/* --- HEADER --- */
 .main-header {
     background-color: var(--bg-dark);
     color: var(--text-white);
@@ -132,7 +25,7 @@
     align-items: center;
     position: sticky;
     top: 0;
-    z-index: 2100; /* Mayor que el overlay del panel */
+    z-index: 2100;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -166,7 +59,7 @@
 
 .brand-name span { font-weight: 400; }
 
-/* Navegación */
+/* Navegación PC */
 .nav-menu ul {
     display: flex;
     list-style: none;
@@ -184,7 +77,14 @@
     color: var(--accent-gold);
 }
 
-/* --- CARRITO Y ANIMACIÓN EXPLOSIVA --- */
+/* Iconos de Usuario y Menú Móvil */
+.user-actions { display: flex; gap: 20px; align-items: center; }
+.user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
+.user-actions a:hover { color: var(--accent-gold); }
+
+.mobile-menu-btn { display: none; } /* Oculto en PC */
+
+/* --- CARRITO Y ANIMACIONES --- */
 .cart-wrapper {
     position: relative;
     display: flex;
@@ -194,28 +94,12 @@
     height: 50px;
 }
 
-.cart-wrapper.hidden {
-    display: none;
-}
+.cart-wrapper.hidden { display: none; }
 
-/* Animación rápida: 0.6 segundos */
+/* Animación de entrada */
 .cart-wrapper.show-anim {
     display: flex;
     animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-/* --- ANIMACIÓN DEL CÍRCULO (DESAPARECE TRAS 1.5s) --- */
-.show-anim .cart-circle {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
-    z-index: 1;
-    /* Aplicamos dos animaciones: una para rotar y otra para desaparecer */
-    animation: 
-        rotateCircle 1.5s linear infinite, 
-        fadeOutCircle 0.5s ease forwards 1.5s; /* Inicia a los 1.5s y dura 0.5s */
 }
 
 .cart-circle {
@@ -224,24 +108,29 @@
     height: 100%;
     border-radius: 50%;
     background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
-    animation: rotateCircle 1.5s linear infinite;
     z-index: 1;
+    animation: rotateCircle 1.5s linear infinite;
+}
+
+/* Cuando se activa la animación, el círculo rota y luego se desvanece */
+.show-anim .cart-circle {
+    animation: 
+        rotateCircle 1.5s linear infinite, 
+        fadeOutCircle 0.5s ease forwards 1.5s; 
 }
 
 .cart-icon {
     position: relative;
     z-index: 2;
     background: var(--bg-dark);
-    /* Ajustamos el tamaño para que sea un poco más pequeño que el fondo de colores */
-    width: 44px; /* Bajamos de 38px a 34px */
-    height: 44px; /* Bajamos de 38px a 34px */
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     text-decoration: none;
-    /* Esto ayuda a que el ícono de la rueda no "toque" el borde del círculo oscuro */
     font-size: 1.1rem;
 }
 
@@ -252,13 +141,13 @@
     padding: 2px 5px;
     border-radius: 50%;
     position: absolute;
-    top: -8px; /* Ajustado para que no tape el carrito */
+    top: -8px;
     right: -8px;
     border: 2px solid var(--bg-dark);
     z-index: 3;
 }
 
-/* Keyframes Rápidos */
+/* Keyframes */
 @keyframes bounceIn {
     0% { transform: scale(0); opacity: 0; }
     60% { transform: scale(1.4); }
@@ -270,37 +159,105 @@
     to { transform: rotate(360deg); }
 }
 
-/* Animación para desvanecer el círculo */
 @keyframes fadeOutCircle {
     0% { opacity: 1; transform: scale(1.1); }
     100% { opacity: 0; transform: scale(1); }
 }
 
-/* Mantenemos el resto de tus animaciones rápidas */
-@keyframes bounceIn {
-    0% { transform: scale(0); opacity: 0; }
-    60% { transform: scale(1.4); }
-    100% { transform: scale(1); opacity: 1; }
+/* --- CONTENIDO PRINCIPAL --- */
+.main-content {
+    min-height: calc(100vh - 110px);
+    background: white;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@keyframes rotateCircle {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+/* --- PANEL DE LOGIN (MODAL) --- */
+/* CORRECCIÓN: Agregado el punto (.) a la clase */
+.login-overlay {
+    position: fixed;
+    top: 110px; /* Ajuste para que empiece debajo del header */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 110px);
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('FondoPrueba1.png') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 1;
+    transition: 0.3s ease;
 }
 
-/* Ocultar el menú de hamburguesa en web */
-.mobile-menu-btn { display: none; }
-@media (max-width: 1024px) { .mobile-menu-btn { display: block; } }
+.login-overlay.hidden {
+    display: none; /* JS controla la visibilidad con esta clase */
+}
 
-/* Iconos de Usuario */
-.user-actions { display: flex; gap: 20px; align-items: center; }
-.user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
-.user-actions a:hover { color: var(--accent-gold); }
+.login-card {
+    background: rgba(10, 15, 26, 0.6);
+    padding: 40px;
+    border-radius: 30px;
+    width: 90%;
+    max-width: 450px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
 
+.main-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    color: white;
+}
 
+.login-header h2 { font-size: 1.8rem; margin-bottom: 5px; }
+.login-header p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 30px; }
 
-/* --- AJUSTES PARA MÓVIL (Imagen Referencia) --- */
+/* Formularios */
+.input-group { text-align: left; margin-bottom: 20px; }
+.input-group label { display: block; font-size: 0.9rem; margin-bottom: 8px; }
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: none;
+    background: white;
+    font-size: 1rem;
+    color: #333;
+}
+
+.form-options { text-align: left; margin-bottom: 25px; font-size: 0.9rem; }
+.checkbox-container input { margin-right: 5px; }
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--accent-gold);
+    color: var(--bg-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-login:hover {
+    background-color: #e5cf7d;
+    transform: translateY(-2px);
+}
+
+/* --- MEDIA QUERIES (MÓVIL) --- */
+/* Unificación de bloques media query */
 @media (max-width: 1024px) {
+    /* Header ajustes */
     .main-header {
         height: auto; 
         padding: 10px 0;
@@ -308,18 +265,13 @@
 
     .container {
         display: flex;
-        flex-wrap: wrap; /* Permite que las acciones de usuario bajen */
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between; /* Logo a la izq, Menú a la derecha */
+        justify-content: space-between;
     }
 
-    /* 1. Logo a la izquierda */
-    .logo-container {
-        order: 1;
-        flex: 1; 
-    }
-
-    /* 2. Botón de menú a la derecha */
+    .logo-container { order: 1; flex: 1; }
+    
     .mobile-menu-btn {
         display: block;
         order: 2;
@@ -328,22 +280,20 @@
         padding: 5px;   
     }
 
-    /* 3. Acciones (Carrito/User) abajo y centradas */
     .user-actions {
         order: 3;
-        width: 100%; /* Obliga a saltar de línea */
+        width: 100%;
         justify-content: center;
         margin: 10px 0;
         gap: 20px;
     }
 
+    /* Menú desplegable */
     .nav-menu {
-        display: block; /* Cambiamos de none a block para que la animación funcione */
+        display: block;
         order: 4;
         width: 100%;
         background-color: #050a14;
-        
-        /* Estado inicial: oculto y contraído */
         max-height: 0;
         overflow: hidden;
         opacity: 0;
@@ -351,8 +301,7 @@
     }
 
     .nav-menu.active {
-        /* Estado activo: expandido */
-        max-height: 500px; /* Un valor lo suficientemente grande para cubrir el contenido */
+        max-height: 500px;
         opacity: 1;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -371,32 +320,21 @@
         display: block;
         padding: 15px 20px;
         width: 100%;
-        text-decoration: none;
-        color: white;
-        transition: background 0.3s;
     }
 
     .nav-menu ul li a:active {
         background-color: rgba(255, 255, 255, 0.05);
     }
-}
 
-@media (max-width: 1024px) {
-    /* Reducimos el tamaño del contenedor para que sea sutil como en la foto */
+    /* Ajustes del carrito en móvil */
     .cart-wrapper {
         width: 40px;
         height: 40px;
     }
 
     .cart-icon {
-        width: 34px; /* Proporción para que el borde se vea fino */
+        width: 34px;
         height: 34px;
         font-size: 0.9rem;
     }
-
-    .cart-circle {
-        width: 100%;
-        height: 100%;
-    }
 }
-
