@@ -26,16 +26,18 @@
 /* --- PANEL DE LOGIN (ESTILO BODY.JPG) --- */
 .login-overlay {
     position: fixed;
-    top: 0;
+    top: 110px; /* Inicia justo debajo del header */
     left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    height: calc(100vh - 110px);
+    /* Imagen de fondo SOLO aquí */
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('FondoPrueba1.png') no-repeat center center/cover;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
-    backdrop-filter: blur(5px); /* Desenfoque de fondo */
+    opacity: 1;
+    transition: 0.3s ease;
 }
 
 .login-overlay.hidden {
@@ -130,7 +132,7 @@
     align-items: center;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 2100; /* Mayor que el overlay del panel */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
