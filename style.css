@@ -187,7 +187,7 @@ body {
     display: flex; /* Siempre es flex */
     justify-content: center;
     align-items: center;
-    z-index: 3000; /* Z-index muy alto para tapar todo, incluido el header */
+    /*z-index: 3000; /* Z-index muy alto para tapar todo, incluido el header */
     
     /* --- PROPIEDADES DE ANIMACIÓN (ESTADO VISIBLE) --- */
     opacity: 1;
