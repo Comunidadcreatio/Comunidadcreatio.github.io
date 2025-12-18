@@ -1,106 +1,67 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionamos los elementos existentes
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
     const cartContainer = document.getElementById('cart-container');
     const adminBtn = document.getElementById('admin-btn');
     const loginPanel = document.getElementById('login-panel');
-
-    // --- NUEVA LÓGICA: Selección del formulario de login ---
     const loginForm = document.querySelector('.login-form');
 
-    // --- Lógica del Panel Admin (Apertura/Cierre) ---
     if(adminBtn && loginPanel) {
         adminBtn.addEventListener('click', (e) => {
             e.preventDefault();
             loginPanel.classList.toggle('hidden');
             if(navMenu) navMenu.classList.remove('active');
         });
-
         loginPanel.addEventListener('click', (e) => {
-            if (e.target === loginPanel) {
-                loginPanel.classList.add('hidden');
-            }
+            if (e.target === loginPanel) loginPanel.classList.add('hidden');
         });
     }
 
-    // --- NUEVA LÓGICA: Envío de datos al Servidor en Render ---
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Extraemos los valores de los inputs definidos en index.html
+            // Seleccionamos los inputs correctamente
             const userValue = loginForm.querySelector('input[type="text"]').value;
             const passValue = loginForm.querySelector('input[type="password"]').value;
 
             try {
-                // Hacemos la petición a tu URL de Render
+                // URL de tu servidor en Render
                 const response = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user: userValue,
-                        pass: passValue
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: userValue, pass: passValue })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    alert("¡Acceso concedido! Bienvenido al sistema.");
-                    // Ocultamos el panel tras el éxito
+                    alert("¡Acceso concedido!");
                     loginPanel.classList.add('hidden');
-                    
-                    // Aquí podrías redirigir al usuario o mostrar opciones de edición
-                    console.log("Sesión iniciada correctamente");
                 } else {
-                    alert("Error: " + result.message);
+                    // Si el servidor responde pero el login falla
+                    alert("Error: " + (result.message || "Usuario o contraseña incorrectos"));
                 }
             } catch (error) {
-                console.error("Error en la conexión:", error);
-                alert("No se pudo conectar con el servidor. Verifica tu conexión.");
+                // Si el servidor de Render está "dormido" (tarda ~50s en despertar en plan free)
+                console.error("Detalle del error:", error);
+                alert("El servidor está despertando. Por favor, espera 30 segundos e intenta de nuevo.");
             }
         });
     }
 
-    // --- Lógica del Menú Móvil ---
+    // --- Lógica de Menú y Navegación ---
     if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            if(loginPanel) loginPanel.classList.add('hidden');
-        });
+        menuBtn.addEventListener('click', () => navMenu.classList.toggle('active'));
     }
 
-    // --- Lógica de Navegación Unificada ---
     navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function() {
             if(loginPanel) loginPanel.classList.add('hidden');
             if(navMenu) navMenu.classList.remove('active');
-
             navLinks.forEach(el => el.classList.remove('active'));
             this.classList.add('active');
-
-            const linkText = this.textContent.trim().toLowerCase();
-            
-            if (linkText === 'galería' || linkText === 'galeria') {
-                if (cartContainer) {
-                    cartContainer.classList.add('hidden');
-                    cartContainer.classList.remove('show-anim');
-                    
-                    setTimeout(() => {
-                        cartContainer.classList.remove('hidden');
-                        cartContainer.classList.add('show-anim');
-                    }, 10);
-                }
-            } else {
-                if (cartContainer) {
-                    cartContainer.classList.add('hidden');
-                    cartContainer.classList.remove('show-anim');
-                }
-            }
         });
     });
 });
