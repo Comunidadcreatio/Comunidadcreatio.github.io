@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionamos los elementos
+    // Seleccionamos los elementos existentes
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
@@ -7,20 +7,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminBtn = document.getElementById('admin-btn');
     const loginPanel = document.getElementById('login-panel');
 
-    // --- Lógica del Panel Admin ---
+    // --- NUEVA LÓGICA: Selección del formulario de login ---
+    const loginForm = document.querySelector('.login-form');
+
+    // --- Lógica del Panel Admin (Apertura/Cierre) ---
     if(adminBtn && loginPanel) {
         adminBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // Alternar visibilidad del panel de login
             loginPanel.classList.toggle('hidden');
-            // Si el menú móvil está abierto, cerrarlo
-            navMenu.classList.remove('active');
+            if(navMenu) navMenu.classList.remove('active');
         });
 
-        // Cerrar panel al hacer clic fuera de la tarjeta (overlay)
         loginPanel.addEventListener('click', (e) => {
             if (e.target === loginPanel) {
                 loginPanel.classList.add('hidden');
+            }
+        });
+    }
+
+    // --- NUEVA LÓGICA: Envío de datos al Servidor en Render ---
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Extraemos los valores de los inputs definidos en index.html
+            const userValue = loginForm.querySelector('input[type="text"]').value;
+            const passValue = loginForm.querySelector('input[type="password"]').value;
+
+            try {
+                // Hacemos la petición a tu URL de Render
+                const response = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user: userValue,
+                        pass: passValue
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("¡Acceso concedido! Bienvenido al sistema.");
+                    // Ocultamos el panel tras el éxito
+                    loginPanel.classList.add('hidden');
+                    
+                    // Aquí podrías redirigir al usuario o mostrar opciones de edición
+                    console.log("Sesión iniciada correctamente");
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error en la conexión:", error);
+                alert("No se pudo conectar con el servidor. Verifica tu conexión.");
             }
         });
     }
@@ -29,41 +70,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if(menuBtn && navMenu) {
         menuBtn.addEventListener('click', () => {
             navMenu.classList.toggle('active');
-            // Si abrimos el menú, nos aseguramos que el login esté cerrado
-            loginPanel.classList.add('hidden');
+            if(loginPanel) loginPanel.classList.add('hidden');
         });
     }
 
     // --- Lógica de Navegación Unificada ---
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // 1. Cerrar el Panel Admin si está abierto
             if(loginPanel) loginPanel.classList.add('hidden');
-
-            // 2. Cerrar menú móvil
             if(navMenu) navMenu.classList.remove('active');
 
-            // 3. Gestionar clase 'active' visual en los enlaces
             navLinks.forEach(el => el.classList.remove('active'));
             this.classList.add('active');
 
-            // 4. Lógica de la Galería / Carrito
             const linkText = this.textContent.trim().toLowerCase();
             
             if (linkText === 'galería' || linkText === 'galeria') {
-                // Reinicio de animación del carrito (Reflow Hack)
-                cartContainer.classList.add('hidden');
-                cartContainer.classList.remove('show-anim');
-                
-                // Pequeño timeout para permitir que el navegador procese el cambio de clase
-                setTimeout(() => {
-                    cartContainer.classList.remove('hidden');
-                    cartContainer.classList.add('show-anim');
-                }, 10);
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                    
+                    setTimeout(() => {
+                        cartContainer.classList.remove('hidden');
+                        cartContainer.classList.add('show-anim');
+                    }, 10);
+                }
             } else {
-                // En cualquier otra opción, ocultamos el carrito
-                cartContainer.classList.add('hidden');
-                cartContainer.classList.remove('show-anim');
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                }
             }
         });
     });
