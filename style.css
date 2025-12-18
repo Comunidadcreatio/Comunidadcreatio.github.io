@@ -366,9 +366,9 @@ body {
 
     /* --- 4. NUEVO: AJUSTES DEL PANEL LOGIN MÓVIL --- */
     .login-card {
-        width: 60%;        /* Reducimos del 90% al 80% para dar aire a los lados */
-        max-width: 360px;  /* Limitamos el ancho máximo para que no se vea gigante */
-        padding: 25px;     /* Reducimos el padding (antes 40px) para ganar espacio interno */
+        width: 75%;        /* Reducimos del 90% al 80% para dar aire a los lados */
+        max-width: 300px;  /* Limitamos el ancho máximo para que no se vea gigante */
+        padding: 20px;     /* Reducimos el padding (antes 40px) para ganar espacio interno */
         border-radius: 20px; /* Bordes un poco menos redondeados para armonía visual */
     }
 
