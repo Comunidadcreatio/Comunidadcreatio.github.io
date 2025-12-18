@@ -337,4 +337,26 @@ body {
         height: 34px;
         font-size: 0.9rem;
     }
+
+    /* --- 4. NUEVO: AJUSTES DEL PANEL LOGIN MÓVIL --- */
+    .login-card {
+        width: 70%;        /* Reducimos del 90% al 80% para dar aire a los lados */
+        max-width: 360px;  /* Limitamos el ancho máximo para que no se vea gigante */
+        padding: 25px;     /* Reducimos el padding (antes 40px) para ganar espacio interno */
+        border-radius: 20px; /* Bordes un poco menos redondeados para armonía visual */
+    }
+
+    .main-icon {
+        font-size: 50px;   /* Icono más pequeño (antes 80px) */
+        margin-bottom: 15px;
+    }
+
+    .login-header h2 {
+        font-size: 1.4rem; /* Título un poco más pequeño */
+    }
+    
+    .login-header p {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+    }
 }
