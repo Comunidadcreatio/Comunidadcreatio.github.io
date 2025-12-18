@@ -11,6 +11,117 @@
     --text-white: #ffffff;
 }
 
+/* ... (Mantén todo tu código anterior de :root y .main-header) ... */
+
+/* --- CONTENIDO PRINCIPAL --- */
+.main-content {
+    min-height: calc(100vh - 110px);
+    background: url('FondoPrueba1.png') no-repeat center center/cover;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- PANEL DE LOGIN (ESTILO BODY.JPG) --- */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px); /* Desenfoque de fondo */
+}
+
+.login-overlay.hidden {
+    display: none;
+}
+
+.login-card {
+    background: rgba(10, 15, 26, 0.85); /* Fondo oscuro semitransparente */
+    padding: 40px;
+    border-radius: 30px;
+    width: 90%;
+    max-width: 450px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.main-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.login-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.login-header p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 30px;
+}
+
+/* Formularios */
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: none;
+    background: white;
+    font-size: 1rem;
+}
+
+.form-options {
+    text-align: left;
+    margin-bottom: 25px;
+    font-size: 0.9rem;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--accent-gold);
+    color: var(--bg-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-login:hover {
+    background-color: #e5cf7d;
+    transform: translateY(-2px);
+}
+
+/* ... (Mantén tu bloque @media anterior de navegación móvil) ... */
+
 .main-header {
     background-color: var(--bg-dark);
     color: var(--text-white);
@@ -286,3 +397,4 @@
         height: 100%;
     }
 }
+

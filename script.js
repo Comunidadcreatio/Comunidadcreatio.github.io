@@ -4,6 +4,25 @@ const navMenu = document.querySelector('.nav-menu');
 const navLinks = document.querySelectorAll('.nav-menu a');
 const cartContainer = document.getElementById('cart-container');
 
+
+// Elementos nuevos del Admin Panel
+const adminBtn = document.getElementById('admin-btn');
+const loginPanel = document.getElementById('login-panel');
+
+// Mostrar/Ocultar Panel Admin
+adminBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginPanel.classList.toggle('hidden');
+});
+
+// Cerrar panel si haces clic fuera de la tarjeta blanca
+loginPanel.addEventListener('click', (e) => {
+    if (e.target === loginPanel) {
+        loginPanel.classList.add('hidden');
+    }
+});
+
+
 // Función para abrir/cerrar el menú
 menuBtn.addEventListener('click', () => {
     navMenu.classList.toggle('active');
