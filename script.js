@@ -418,3 +418,41 @@ async function eliminarObra(id) {
         alert("Error de conexión.");
     }
 }
+
+// Función para mostrar la vista previa en el slot correspondiente
+function previewImage(event, index) {
+    const reader = new FileReader();
+    const file = event.target.files[0];
+    const slot = document.getElementById(`slot-${index}`);
+    const imgPreview = slot.querySelector('.preview-img');
+
+    reader.onload = function() {
+        imgPreview.src = reader.result;
+        imgPreview.classList.remove('hidden');
+        slot.classList.add('has-image'); // Oculta el icono de "+"
+    }
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+
+// Modifica tu función resetFormulario para limpiar también las imágenes
+window.resetFormulario = function() {
+    const form = document.getElementById('artwork-form');
+    if(form) form.reset();
+    
+    // Limpiar todas las vistas previas de imágenes
+    document.querySelectorAll('.image-slot').forEach(slot => {
+        slot.classList.remove('has-image');
+        const img = slot.querySelector('.preview-img');
+        if(img) {
+            img.src = "";
+            img.classList.add('hidden');
+        }
+    });
+
+    // Reset de botones
+    document.getElementById('btn-save').style.display = 'flex';
+    document.getElementById('btn-update').style.display = 'none';
+};
