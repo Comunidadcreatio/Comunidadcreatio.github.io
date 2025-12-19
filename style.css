@@ -597,20 +597,27 @@ body {
     .full-width { grid-column: span 1; }
 }
 
+/* Contenedor relativo para posicionar la flecha */
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
 /* Unificar el estilo del select con los inputs del dashboard */
 .dash-input-select {
     width: 100%;
-    padding: 10px 15px; /* Ajusta según el padding de tus otros inputs */
-    border-radius: 20px; /* Esto da el efecto redondeado que tienes en la imagen */
+    padding: 8px 35px 8px 15px; /* Más compacto y espacio para la flecha a la derecha */
+    border-radius: 25px; /* Coincide con tu diseño redondeado */
     border: 1px solid #ddd;
     background-color: #fff;
     font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    outline: none;
-    appearance: none; /* Quita la flecha por defecto de algunos navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    font-size: 0.9rem;
+    color: #333;
     cursor: pointer;
+    appearance: none; /* Quitamos lo nativo */
+    -webkit-appearance: none;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
 /* Opcional: Añadir una flecha personalizada si deseas que se note que es un select */
@@ -618,8 +625,30 @@ body {
     position: relative;
 }
 
-/* Estilo para cuando el campo recibe foco */
+/* Estetica de la flecha personalizada */
+.select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Para que al clickar la flecha se abra el select */
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Efecto al pasar el mouse o enfocar */
 .dash-input-select:focus {
-    border-color: #2ecc71; /* El verde que usas en el botón */
-    box-shadow: 0 0 5px rgba(46, 204, 113, 0.3);
+    border-color: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.2);
+}
+
+.dash-input-select:hover {
+    border-color: #bbb;
+}
+
+/* Estetica de las opciones (limita lo que permite el navegador) */
+.dash-input-select option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
 }
