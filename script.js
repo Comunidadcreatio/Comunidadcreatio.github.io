@@ -103,7 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 6. NAVEGACIÓN Y MENÚ ---
     if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => navMenu.classList.toggle('active'));
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
     }
 
     navLinks.forEach(link => {
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 7. PANELES Y LOGIN ---
+    // 4. GESTIÓN DE PANELES (LOGIN / DASHBOARD)
     function togglePanels(showDashboard) {
         if (showDashboard && window.isLoggedIn) {
             loginPanel.classList.add('hidden');
@@ -146,13 +148,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if(adminBtn) {
         adminBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.isLoggedIn ? togglePanels(true) : togglePanels(false);
+            if (window.isLoggedIn) {
+                adminDashboard.classList.toggle('hidden');
+                loginPanel.classList.add('hidden');
+            } else {
+                loginPanel.classList.remove('hidden');
+                adminDashboard.classList.add('hidden');
+            }
         });
     }
 
     // Cerrar click fuera
     [loginPanel, adminDashboard].forEach(panel => {
-        if(panel) panel.addEventListener('click', (e) => { if (e.target === panel) panel.classList.add('hidden'); });
+        if(panel) {
+            panel.addEventListener('click', (e) => {
+                if (e.target === panel) panel.classList.add('hidden');
+            });
+        }
     });
 
     // PROCESO LOGIN
