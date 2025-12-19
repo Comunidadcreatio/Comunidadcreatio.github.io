@@ -114,9 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnLogin.disabled = false;
             }
         });
-    }
 
-    // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
+        // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
 async function cargarTablaObras() {
     const tbody = document.querySelector('.dash-table tbody');
     if (!tbody) return;
@@ -201,6 +200,8 @@ if (artworkForm) {
 // if(result.success) { ... cargarTablaObras(); ... }
 
 
+
+    }
 
     // 4. LÓGICA DE CERRAR SESIÓN
     if (btnLogout) {
