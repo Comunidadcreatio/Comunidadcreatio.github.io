@@ -327,9 +327,14 @@ document.addEventListener('DOMContentLoaded', () => {
             nameDisplay.style.color = "#3498db";
         }
 
-        // Cambiar botones
-        if(btnSave) btnSave.style.display = 'none';      // Ocultar Guardar
-        if(btnUpdate) btnUpdate.style.display = 'block'; // Mostrar Refrescar
+        if (btnSave && btnUpdate) {
+        btnSave.style.setProperty('display', 'none', 'important'); // Oculta Guardar
+        btnUpdate.style.setProperty('display', 'block', 'important'); // Muestra Refrescar
+        }
+    
+        // Opcional: Hacer scroll hacia arriba para ver el formulario lleno
+        document.getElementById('admin-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
+
     };
 
     // Logout
