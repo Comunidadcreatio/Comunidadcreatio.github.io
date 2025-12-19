@@ -82,6 +82,151 @@
                 <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
             </button>
         </form>
+
+        </div> <div id="admin-dashboard" class="login-overlay hidden" style="align-items: flex-start; padding-top: 5vh; overflow-y: auto;">
+    <div class="login-card dashboard-wide">
+        
+        <div class="dash-header-top">
+            <div class="dash-welcome">
+                <i class="fa-solid fa-palette main-icon-dash"></i>
+                <div>
+                    <h2>Panel de Administración</h2>
+                    <p>Bienvenido, <span id="admin-username">(Nombre de Usuario)</span></p>
+                </div>
+            </div>
+            <button id="btn-logout" class="btn-logout-dash">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+            </button>
+        </div>
+
+        <div class="dashboard-layout">
+            <div class="dash-column-left">
+                <h3>Agregar Nueva Obra</h3>
+                <form id="artwork-form" class="artwork-form-grid">
+                    <div class="input-group-dash">
+                        <label>Título de la Obra</label>
+                        <input type="text" id="dash-titulo">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Nombre del Artista</label>
+                        <input type="text" id="dash-artista">
+                    </div>
+
+                    <div class="input-group-dash">
+                        <label>Año de Creación</label>
+                        <input type="text" id="dash-ano">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Descripción Técnica</label>
+                        <input type="text" id="dash-tec-desc">
+                    </div>
+
+                    <div class="input-group-dash full-width">
+                        <label>Descripción artística/conceptual</label>
+                        <textarea id="dash-art-desc" rows="3"></textarea>
+                    </div>
+
+                    <div class="input-group-dash">
+                        <label>Estado de la Obra</label>
+                        <input type="text" id="dash-estado-obra">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Procedencia</label>
+                        <input type="text" id="dash-procedencia">
+                    </div>
+
+                    <div class="input-group-dash">
+                        <label>Certificado</label>
+                        <input type="text" id="dash-certificado">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Marcos y montaje</label>
+                        <input type="text" id="dash-marcos">
+                    </div>
+
+                    <div class="input-group-dash">
+                        <label>Precio</label>
+                        <input type="text" id="dash-precio">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Etiqueta</label>
+                        <input type="text" id="dash-etiqueta">
+                    </div>
+
+                    <div class="input-group-dash">
+                        <label>ID</label>
+                        <input type="text" id="dash-id">
+                    </div>
+                    <div class="input-group-dash">
+                        <label>Estado (Disponibilidad)</label>
+                        <input type="text" id="dash-status">
+                    </div>
+
+                    <div class="input-group-dash full-width checkbox-group">
+                        <label class="checkbox-container-dash">
+                            <input type="checkbox" id="dash-featured">
+                            <span class="checkmark"></span>
+                            Obra Destacada
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dash-column-right">
+                
+                <div class="image-upload-section">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imagen</label>
+                    <div class="image-slots-container">
+                        <div class="image-slot"><i class="fa-solid fa-plus"></i></div>
+                        <div class="image-slot"><i class="fa-solid fa-plus"></i></div>
+                        <div class="image-slot"><i class="fa-solid fa-plus"></i></div>
+                        <div class="image-slot"><i class="fa-solid fa-plus"></i></div>
+                        <div class="image-slot"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                </div>
+
+                <button type="submit" form="artwork-form" class="btn-save-artwork">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Obra
+                </button>
+
+                <div class="table-section">
+                    <h3>Gestión de Productos</h3>
+                    <div class="table-container">
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título</th>
+                                    <th>Etiqueta</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Imagen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Título de Obra</td>
+                                    <td>Etiqueta de la Obra</td>
+                                    <td>1000$</td>
+                                    <td><span class="badge-active">Activo</span></td>
+                                    <td><div class="img-placeholder">+</div></td>
+                                    <td>
+                                        <div class="actions-cell">
+                                            <button class="btn-icon-edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <button class="btn-icon-delete"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div> </div> </div>
+</div>
+
     </div>
 </div>
 
