@@ -128,8 +128,15 @@
                     </div>
 
                     <div class="input-group-dash">
-                        <label>Estado de la Obra</label>
-                        <input type="text" id="dash-estado-obra">
+                        <label>Status</label>
+                        <div class="select-wrapper">
+                            <select id="dash-status" class="dash-input-select">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Activo">Activo (Visible en Galería)</option>
+                                <option value="Inactivo">Inactivo (Oculto)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
                     </div>
                     <div class="input-group-dash">
                         <label>Procedencia</label>
@@ -161,14 +168,6 @@
                     <div class="input-group-dash">
                         <label>Estado (Disponibilidad)</label>
                         <input type="text" id="dash-status">
-                    </div>
-
-                    <div class="input-group-dash full-width checkbox-group">
-                        <label class="checkbox-container-dash">
-                            <input type="checkbox" id="dash-featured">
-                            <span class="checkmark"></span>
-                            Obra Destacada
-                        </label>
                     </div>
                 </form>
             </div>

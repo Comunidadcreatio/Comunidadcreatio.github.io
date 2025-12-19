@@ -606,23 +606,16 @@ body {
 /* Unificar el estilo del select con los inputs del dashboard */
 .dash-input-select {
     width: 100%;
-    padding: 8px 35px 8px 15px; /* Más compacto y espacio para la flecha a la derecha */
-    border-radius: 25px; /* Coincide con tu diseño redondeado */
+    padding: 10px 35px 10px 15px; /* Compacto y con espacio para la flecha */
+    border-radius: 20px; /* Redondeado igual a tus otros inputs */
     border: 1px solid #ddd;
     background-color: #fff;
     font-family: 'Open Sans', sans-serif;
-    font-size: 0.9rem;
-    color: #333;
-    cursor: pointer;
-    appearance: none; /* Quitamos lo nativo */
+    font-size: 14px;
+    appearance: none; /* Elimina el estilo nativo */
     -webkit-appearance: none;
     outline: none;
-    transition: all 0.3s ease;
-}
-
-/* Opcional: Añadir una flecha personalizada si deseas que se note que es un select */
-.input-group-dash {
-    position: relative;
+    cursor: pointer;
 }
 
 /* Estetica de la flecha personalizada */
@@ -631,24 +624,7 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; /* Para que al clickar la flecha se abra el select */
+    pointer-events: none; /* Permite que el click pase al select */
     color: #888;
     font-size: 0.8rem;
-}
-
-/* Efecto al pasar el mouse o enfocar */
-.dash-input-select:focus {
-    border-color: #2ecc71;
-    box-shadow: 0 0 8px rgba(46, 204, 113, 0.2);
-}
-
-.dash-input-select:hover {
-    border-color: #bbb;
-}
-
-/* Estetica de las opciones (limita lo que permite el navegador) */
-.dash-input-select option {
-    padding: 10px;
-    background-color: #fff;
-    color: #333;
 }
