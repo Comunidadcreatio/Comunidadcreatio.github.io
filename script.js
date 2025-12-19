@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Transición: Ocultar Login -> Mostrar Dashboard
                     togglePanels(true);
+                    cargarTablaObras();
                     loginForm.reset();
                 } else {
                     alert("Credenciales incorrectas.");
@@ -129,24 +130,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
 async function cargarTablaObras() {
-    const tbody = document.querySelector('.dash-table tbody');
+    const tbody = document.getElementById('tabla-obras-body');
     if (!tbody) return;
 
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
         const obras = await response.json();
 
-        tbody.innerHTML = ''; // Limpiar tabla actual
+        tbody.innerHTML = ''; // Borra todo lo que haya antes
+
+        if (obras.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No hay obras registradas aún.</td></tr>';
+            return;
+        }
 
         obras.forEach(obra => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
                 <td>${obra.id_personalizado || obra.id}</td>
                 <td>${obra.titulo}</td>
-                <td>${obra.etiqueta || 'N/A'}</td>
-                <td>${obra.precio || '0'}$</td>
-                <td><span class="badge-active">${obra.status || 'Activo'}</span></td>
-                <td><img src="${obra.imagen_url}" style="width:30px; height:30px; border-radius:5px; object-fit:cover;"></td>
+                <td>${obra.etiqueta}</td>
+                <td>${obra.precio}$</td>
+                <td><span class="badge-active">${obra.status}</span></td>
+                <td><img src="${obra.imagen_url}" style="width:35px; height:35px; border-radius:5px; object-fit:cover;"></td>
                 <td>
                     <div class="actions-cell">
                         <button class="btn-icon-edit"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -157,7 +163,7 @@ async function cargarTablaObras() {
             tbody.appendChild(fila);
         });
     } catch (error) {
-        console.error("Error cargando tabla:", error);
+        console.error("Error al cargar la tabla:", error);
     }
 }
 
@@ -282,4 +288,21 @@ if (artworkForm) {
             }
         });
     });
+
+    async function eliminarObra(id) {
+    if (!confirm("¿Estás seguro de que deseas borrar esta obra de forma permanente?")) return;
+
+    try {
+        const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert("Obra eliminada.");
+            cargarTablaObras(); // Recargar la tabla para mostrar que ya no está
+        }
+    } catch (error) {
+        alert("Error al intentar eliminar.");
+    }
+}
 });
