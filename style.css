@@ -634,48 +634,36 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 20px;
-    flex-wrap: wrap;
+    flex-wrap: 100%;
 }
 
-/* Botón Guardar (Verde) */
-.btn-save-artwork {
-    background-color: #2ecc71;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    flex: 1;
-    transition: 0.3s;
-}
-.btn-save-artwork:hover { background-color: #27ae60; }
-
-/* Botón Refrescar (Azul) */
-.btn-update-artwork {
-    background-color: #3498db; /* Azul para editar */
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    flex: 1;
-    transition: 0.3s;
-}
-.btn-update-artwork:hover { background-color: #2980b9; }
-
-/* Botón Limpiar (Gris/Rojo suave) */
+/* Estilo unificado para los 3 botones */
+.btn-save-artwork, 
+.btn-update-artwork, 
 .btn-clear-form {
-    background-color: #95a5a6;
-    color: white;
-    padding: 12px 24px;
+    height: 48px;        /* Forzamos la misma altura para todos */
+    padding: 0 24px;     /* Espaciado interno horizontal */
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 600;    /* El mismo grosor de letra */
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     transition: 0.3s;
+    flex: 1;             /* <--- ESTO hace que todos tengan el mismo ancho */
 }
+
+/* Colores específicos que ya tienes */
+.btn-save-artwork { background-color: #2ecc71; color: white; }
+.btn-update-artwork { background-color: #3498db; color: white; }
+.btn-clear-form { background-color: #95a5a6; color: white; }
+
+/* Efectos hover */
+.btn-save-artwork:hover { background-color: #27ae60; }
+.btn-update-artwork:hover { background-color: #2980b9; }
 .btn-clear-form:hover { background-color: #7f8c8d; }
 
 /* Clase utilitaria para ocultar elementos */
