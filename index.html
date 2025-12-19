@@ -227,45 +227,36 @@
                 </form>
             </div>
 
-            <div class="dash-column-right">
-                
-                <div class="image-upload-section">
-    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imagen</label>
-    
-    <input type="file" id="dash-input-file" accept="image/*" style="display: none;">
-
             <div class="image-upload-container">
-            <label>Subir Imágenes de la Obra</label>
-            <div class="image-upload-grid">
-                <div class="image-slot" id="slot-0" onclick="document.getElementById('file-input-0').click()">
-                    <i class="fa-solid fa-camera"></i>
-                    <span>Portada</span>
-                    <input type="file" id="file-input-0" hidden accept="image/*" onchange="previewImage(event, 0)">
-                    <img src="" class="preview-img hidden">
-                </div>
-                <div class="image-slot" id="slot-1" onclick="document.getElementById('file-input-1').click()">
-                    <i class="fa-solid fa-plus"></i>
-                    <input type="file" id="file-input-1" hidden accept="image/*" onchange="previewImage(event, 1)">
-                    <img src="" class="preview-img hidden">
-                </div>
-                <div class="image-slot" id="slot-2" onclick="document.getElementById('file-input-2').click()">
-                    <input type="file" id="file-input-2" hidden accept="image/*" onchange="previewImage(event, 2)">
-                    <img src="" class="preview-img hidden">
-                    <i class="fa-solid fa-plus"></i>
-                </div>
-                <div class="image-slot" id="slot-3" onclick="document.getElementById('file-input-3').click()">
-                    <input type="file" id="file-input-3" hidden accept="image/*" onchange="previewImage(event, 3)">
-                    <img src="" class="preview-img hidden">
-                    <i class="fa-solid fa-plus"></i>
-                </div>
-                <div class="image-slot" id="slot-4" onclick="document.getElementById('file-input-4').click()">
-                    <input type="file" id="file-input-4" hidden accept="image/*" onchange="previewImage(event, 4)">
-                    <img src="" class="preview-img hidden">
-                    <i class="fa-solid fa-plus"></i>
-                </div>
-            </div>
-            </div>
-    <small id="file-name-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
+    <label>Subir Imágenes de la Obra</label>
+    <div class="image-upload-grid">
+        <div class="image-slot" id="slot-0" onclick="document.getElementById('file-input-0').click()">
+            <i class="fa-solid fa-camera"></i>
+            <span>Portada</span>
+            <input type="file" id="file-input-0" hidden accept="image/*" onchange="previewImage(event, 0)">
+            <img src="" class="preview-img hidden">
+        </div>
+        <div class="image-slot" id="slot-1" onclick="document.getElementById('file-input-1').click()">
+            <i class="fa-solid fa-plus"></i>
+            <input type="file" id="file-input-1" hidden accept="image/*" onchange="previewImage(event, 1)">
+            <img src="" class="preview-img hidden">
+        </div>
+        <div class="image-slot" id="slot-2" onclick="document.getElementById('file-input-2').click()">
+            <input type="file" id="file-input-2" hidden accept="image/*" onchange="previewImage(event, 2)">
+            <img src="" class="preview-img hidden">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="image-slot" id="slot-3" onclick="document.getElementById('file-input-3').click()">
+            <input type="file" id="file-input-3" hidden accept="image/*" onchange="previewImage(event, 3)">
+            <img src="" class="preview-img hidden">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="image-slot" id="slot-4" onclick="document.getElementById('file-input-4').click()">
+            <input type="file" id="file-input-4" hidden accept="image/*" onchange="previewImage(event, 4)">
+            <img src="" class="preview-img hidden">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+    </div>
 </div>
 
                 <div class="form-actions-group">

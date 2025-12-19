@@ -706,7 +706,3 @@ body {
 .image-slot.has-image span {
     display: none;
 }
-
-.hidden {
-    display: none !important;
-}
