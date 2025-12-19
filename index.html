@@ -139,10 +139,21 @@
                         </div>
                     </div>
                     <div class="input-group-dash">
-                        <label>Procedencia</label>
-                        <input type="text" id="dash-procedencia">
+                        <label>Estado</label>
+                        <div class="select-wrapper"></div>
+                            <select id="dash-estado-obra" class="dash-input">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Disponible">Disponible (en venta)</option>
+                                <option value="Reservado">Reservado</option>
+                                <option value="Vendido">Vendido</option>
+                                <option value="No disponible">No disponible temporalmente</option>
+                                <option value="En préstamo">En préstamo (fuera de galería)</option>
+                                <option value="Solo exhibición">Solo para exhibición (no venta)</option>
+                                <option value="Retirado">Retirado del inventario</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
                     </div>
-
                     <div class="input-group-dash">
                         <label>Certificado</label>
                         <input type="text" id="dash-certificado">
@@ -166,8 +177,8 @@
                         <input type="text" id="dash-id">
                     </div>
                     <div class="input-group-dash">
-                        <label>Estado (Disponibilidad)</label>
-                        <input type="text" id="dash-estado-obra">
+                        <label>Procedencia</label>
+                        <input type="text" id="dash-procedencia">
                     </div>
                 </form>
             </div>
