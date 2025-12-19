@@ -198,8 +198,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnSave.innerHTML = originalBtnText;
                 btnSave.disabled = false;
             }
+
+                const estadoSeleccionado = document.getElementById('dash-estado-obra').value;
+
+            if (estadoSeleccionado === "") {
+                alert("Por favor, selecciona un Estado para la obra.");
+                btnSave.innerHTML = originalBtnText; // Restaurar botón
+                btnSave.disabled = false;
+            return; // Detiene el envío
+
+            }
         });
     }
+
 
     // 7. CERRAR SESIÓN
     if (btnLogout) {
