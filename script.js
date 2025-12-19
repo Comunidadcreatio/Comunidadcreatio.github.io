@@ -20,11 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elementos de Admin y Paneles
     const adminBtn = document.getElementById('admin-btn');
     const loginPanel = document.getElementById('login-panel');
-    const adminDashboard = document.getElementById('admin-dashboard'); // El nuevo panel grande
+    const adminDashboard = document.getElementById('admin-dashboard'); 
     const loginForm = document.querySelector('.login-form');
-    const btnLogout = document.getElementById('btn-logout'); // El botón de cerrar sesión dentro del dash
-    const adminUsernameSpan = document.getElementById('admin-username'); // Para poner el nombre
-    const adminIcon = adminBtn ? adminBtn.querySelector('i') : null;
+    const btnLogout = document.getElementById('btn-logout'); 
+    const adminUsernameSpan = document.getElementById('admin-username'); 
 
     // Estado de sesión
     let isLoggedIn = false;
@@ -41,24 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(navMenu) navMenu.classList.remove('active');
     }
 
-    // Evento del botón del header (escudo)
     if(adminBtn) {
-    adminBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        if (isLoggedIn) {
-            // Si ya entró, mostramos el dashboard con su margen
-            adminDashboard.classList.toggle('hidden');
-            loginPanel.classList.add('hidden');
-        } else {
-            // Si no ha entrado, forzamos que vea el Login primero
-            loginPanel.classList.remove('hidden');
-            adminDashboard.classList.add('hidden');
-        }
-    });
+        adminBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isLoggedIn) {
+                adminDashboard.classList.toggle('hidden');
+                loginPanel.classList.add('hidden');
+            } else {
+                loginPanel.classList.remove('hidden');
+                adminDashboard.classList.add('hidden');
+            }
+        });
     }   
 
-    // Cerrar paneles al hacer clic fuera (en el overlay oscuro)
     [loginPanel, adminDashboard].forEach(panel => {
         if(panel) {
             panel.addEventListener('click', (e) => {
@@ -67,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. LÓGICA DE LOGIN (CONEXIÓN AL SERVIDOR)
+    // 3. LÓGICA DE LOGIN
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -77,17 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
             btnLogin.disabled = true;
 
-            // Selección segura de inputs
             const inputs = loginForm.querySelectorAll('input');
             const userValue = inputs[0]?.value.trim();
             const passValue = inputs[1]?.value.trim();
-
-            if (!userValue || !passValue) {
-                alert("Por favor, completa ambos campos.");
-                btnLogin.innerHTML = originalText;
-                btnLogin.disabled = false;
-                return;
-            }
 
             try {
                 const response = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
@@ -99,52 +85,118 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.success) {
-                    // --- ÉXITO ---
                     isLoggedIn = true;
                     if(adminUsernameSpan) adminUsernameSpan.textContent = userValue;
                     
-                    // CORRECCIÓN: Definimos bien el elemento del icono antes de usarlo
                     const iconElement = adminBtn.querySelector('i'); 
                     if(iconElement) {
                         iconElement.className = "fa-solid fa-user-check";
-                        iconElement.style.color = "#2ecc71"; // Verde esmeralda
+                        iconElement.style.color = "#2ecc71";
                     }  
 
                     alert("¡Bienvenido al Panel de Gestión!");
                     
-                    // Transición: Ocultar Login -> Mostrar Dashboard
-                    await cargarTablaObras();
+                    await cargarTablaObras(); // Carga los datos antes de mostrar el panel
                     togglePanels(true);
                     loginForm.reset();
                 } else {
                     alert("Credenciales incorrectas.");
                 }
             } catch (error) {
-                console.error(error);
-                alert("Error de conexión. Si es la primera vez, el servidor puede estar despertando. Reintenta en 20s.");
+                alert("Error de conexión. Reintenta en 20s.");
             } finally {
                 btnLogin.innerHTML = originalText;
                 btnLogin.disabled = false;
             }
         });
+    }
 
-        // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
+    // --- EVENTO GUARDAR OBRA ---
+    const artworkForm = document.getElementById('artwork-form');
+    if (artworkForm) {
+        artworkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btnSave = document.querySelector('.btn-save-artwork');
+            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            btnSave.disabled = true;
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('dash-input-file');
+            if (fileInput && fileInput.files[0]) {
+                formData.append('imagen', fileInput.files[0]);
+            }
+
+            formData.append('titulo', document.getElementById('dash-titulo').value);
+            formData.append('artista', document.getElementById('dash-artista').value);
+            formData.append('ano', document.getElementById('dash-ano').value);
+            formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
+            formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
+            formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+            formData.append('procedencia', document.getElementById('dash-procedencia').value);
+            formData.append('certificado', document.getElementById('dash-certificado').value);
+            formData.append('marcos', document.getElementById('dash-marcos').value);
+            formData.append('precio', document.getElementById('dash-precio').value);
+            formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
+            formData.append('id_obra', document.getElementById('dash-id').value);
+            formData.append('status', document.getElementById('dash-status').value);
+
+            try {
+                const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
+                    method: 'POST',
+                    body: formData 
+                });
+
+                if (response.ok) {
+                    alert("¡Obra registrada con éxito!");
+                    artworkForm.reset();
+                    if(nameDisplay) nameDisplay.textContent = "";
+                    cargarTablaObras(); 
+                }
+            } catch (error) {
+                alert("Error al conectar con el servidor");
+            } finally {
+                btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+                btnSave.disabled = false;
+            }
+        });
+    }
+
+    // 4. LÓGICA DE CERRAR SESIÓN
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            isLoggedIn = false;
+            togglePanels(false);
+            const iconElement = adminBtn.querySelector('i');
+            if(iconElement) {
+                iconElement.className = "fa-solid fa-user-shield";
+                iconElement.style.color = "";
+            }
+            alert("Sesión cerrada correctamente.");
+        });
+    }
+
+    // 5. MENÚ MÓVIL
+    if(menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+});
+
+// --- FUNCIONES GLOBALES (FUERA DE DOMCONTENTLOADED PARA QUE EL HTML LAS VEA) ---
+
 async function cargarTablaObras() {
     const tbody = document.getElementById('tabla-obras-body');
-    if (!tbody) {
-        console.error("No se encontró el elemento tabla-obras-body");
-        return;
-    }
+    if (!tbody) return;
 
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
-        if (!response.ok) throw new Error("Error al obtener obras");
-        
         const obras = await response.json();
         tbody.innerHTML = ''; 
 
         if (obras.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No hay obras registradas aún.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">No hay obras registradas.</td></tr>';
             return;
         }
 
@@ -156,7 +208,7 @@ async function cargarTablaObras() {
                 <td>${obra.etiqueta}</td>
                 <td>${obra.precio}$</td>
                 <td><span class="badge-active">${obra.status}</span></td>
-                <td><img src="${obra.imagen_url}" style="width:35px; height:35px; border-radius:5px; object-fit:cover;"></td>
+                <td><img src="${obra.imagen_url}" style="width:35px; height:35px; border-radius:5px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/35'"></td>
                 <td>
                     <div class="actions-cell">
                         <button class="btn-icon-edit"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -167,150 +219,21 @@ async function cargarTablaObras() {
             tbody.appendChild(fila);
         });
     } catch (error) {
-        console.error("Error al cargar la tabla:", error);
+        console.error("Error al cargar tabla:", error);
     }
 }
 
-// --- EVENTO GUARDAR OBRA ---
-const artworkForm = document.getElementById('artwork-form');
-if (artworkForm) {
-    artworkForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const btnSave = document.querySelector('.btn-save-artwork');
-        const originalBtnText = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
-        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
-        btnSave.disabled = true;
-
-        // --- CLAVE: Usamos FormData para enviar el archivo ---
-        const formData = new FormData();
-        
-        // 1. Capturamos el archivo del input oculto
-        const fileInput = document.getElementById('dash-input-file');
-        if (fileInput && fileInput.files[0]) {
-            formData.append('imagen', fileInput.files[0]);
-        }
-
-        // 2. Capturamos todos los campos de texto
-        formData.append('titulo', document.getElementById('dash-titulo').value);
-        formData.append('artista', document.getElementById('dash-artista').value);
-        formData.append('ano', document.getElementById('dash-ano').value);
-        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-        formData.append('procedencia', document.getElementById('dash-procedencia').value);
-        formData.append('certificado', document.getElementById('dash-certificado').value);
-        formData.append('marcos', document.getElementById('dash-marcos').value);
-        formData.append('precio', document.getElementById('dash-precio').value);
-        formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
-        formData.append('id_obra', document.getElementById('dash-id').value);
-        formData.append('status', document.getElementById('dash-status').value);
-
-        try {
-            // --- IMPORTANTE: Al usar FormData, NO se pone el header 'Content-Type' ---
-            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
-                method: 'POST',
-                body: formData 
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                alert("¡Obra e imagen registradas con éxito!");
-                artworkForm.reset();
-                // Limpiamos el texto del archivo seleccionado si existe
-                const nameDisplay = document.getElementById('file-name-display');
-                if(nameDisplay) nameDisplay.textContent = "";
-                
-                cargarTablaObras(); 
-            } else {
-                alert("Error del servidor: " + (result.error || "Desconocido"));
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error al conectar con el servidor");
-        } finally {
-            btnSave.innerHTML = originalBtnText;
-            btnSave.disabled = false;
-        }
-    });
-}
-
-// Llamar a la tabla cuando se inicie el panel
-// (Añade esto dentro de la lógica del éxito del login)
-// if(result.success) { ... cargarTablaObras(); ... }
-
-
-
-    }
-
-    // 4. LÓGICA DE CERRAR SESIÓN
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            isLoggedIn = false;
-            togglePanels(false); // Vuelve a mostrar el login la próxima vez
-            adminDashboard.classList.add('hidden'); // Cierra el dash actual
-            
-            // Restaurar icono original
-            if(iconElement) {
-                iconElement.className = "fa-solid fa-user-shield";
-                iconElement.style.color = ""; // Reset color
-            }
-            alert("Sesión cerrada correctamente.");
-        });
-    }
-
-    // 5. LÓGICA DE MENÚ Y NAVEGACIÓN (EXISTENTE)
-    if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            loginPanel.classList.add('hidden');
-            adminDashboard.classList.add('hidden');
-        });
-    }
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            loginPanel.classList.add('hidden');
-            adminDashboard.classList.add('hidden');
-            navMenu.classList.remove('active');
-            navLinks.forEach(el => el.classList.remove('active'));
-            this.classList.add('active');
-
-            const linkText = this.textContent.trim().toLowerCase();
-            if (linkText === 'galería' || linkText === 'galeria') {
-                if (cartContainer) {
-                    cartContainer.classList.add('hidden');
-                    cartContainer.classList.remove('show-anim');
-                    setTimeout(() => {
-                        cartContainer.classList.remove('hidden');
-                        cartContainer.classList.add('show-anim');
-                    }, 10);
-                }
-            } else if (cartContainer) {
-                cartContainer.classList.add('hidden');
-            }
-        });
-    });
-
-    async function eliminarObra(id) {
-    if (!confirm("¿Estás seguro de que deseas borrar esta obra de forma permanente?")) return;
-
+async function eliminarObra(id) {
+    if (!confirm("¿Deseas eliminar esta obra?")) return;
     try {
-        // Asegúrate de usar comillas inclinadas ` para que el ${id} funcione
         const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
             method: 'DELETE'
         });
-
         if (response.ok) {
-            alert("Obra eliminada.");
-            cargarTablaObras(); // Recarga la tabla para que desaparezca la fila
-        } else {
-            alert("No se pudo eliminar la obra del servidor.");
+            alert("Eliminado.");
+            cargarTablaObras();
         }
     } catch (error) {
-        console.error("Error al eliminar:", error);
-        alert("Error de conexión al intentar eliminar.");
+        alert("Error de conexión.");
     }
-    }
-});
+}
