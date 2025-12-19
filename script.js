@@ -173,7 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const btnLogin = loginForm.querySelector('.btn-login');
             const originalText = btnLogin.innerHTML;
-            btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ...';
+            
+            btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
             btnLogin.disabled = true;
 
             const user = loginForm.querySelectorAll('input')[0].value.trim();
