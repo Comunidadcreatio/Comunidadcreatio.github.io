@@ -89,11 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.success) {
                     // --- ÉXITO ---
                     isLoggedIn = true;
-                    if(adminUsernameSpan) adminUsernameSpan.textContent = userValue; // Mostrar nombre
+                    if(adminUsernameSpan) adminUsernameSpan.textContent = userValue;
                     
-                    // Cambiar icono a verde
-                    if(iconElement) iconElement.className = "fa-solid fa-user-check";
-                    iconElement.style.color = "#2ecc71"; 
+                    // CORRECCIÓN: Definimos bien el elemento del icono antes de usarlo
+                    const iconElement = adminBtn.querySelector('i'); 
+                    if(iconElement) {
+                        iconElement.className = "fa-solid fa-user-check";
+                        iconElement.style.color = "#2ecc71"; // Verde esmeralda
+                    }  
 
                     alert("¡Bienvenido al Panel de Gestión!");
                     
