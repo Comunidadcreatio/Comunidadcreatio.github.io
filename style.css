@@ -391,9 +391,13 @@ body {
 
 /* Ajuste para que el overlay permita scroll si el contenido es muy alto */
 #admin-dashboard.login-overlay {
-    align-items: flex-start; /* Alineación superior */
-    padding: 40px 20px;
-    overflow-y: auto; /* Scroll si es necesario */
+    display: flex;
+    align-items: flex-start; 
+    padding-top: 130px; /* Aumentado para que baje más respecto al header de 110px */
+    padding-bottom: 50px;
+    z-index: 3000; /* Asegura que esté por encima de todo */
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.85); /* Fondo un poco más oscuro para resaltar el panel */
 }
 
 /* Tarjeta ancha para el dashboard */
@@ -402,6 +406,8 @@ body {
     width: 95%;
     text-align: left; /* Texto alineado a la izquierda */
     padding: 30px;
+    margin-top: 20px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 /* Header superior con botón de cerrar sesión */

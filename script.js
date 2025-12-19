@@ -31,19 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Evento del botón del header (escudo)
     if(adminBtn) {
-        adminBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Si el dashboard está visible, lo cerramos. Si no, decidimos qué abrir.
-            if (!adminDashboard.classList.contains('hidden')) {
-                adminDashboard.classList.add('hidden');
-            } else if (!loginPanel.classList.contains('hidden')) {
-                loginPanel.classList.add('hidden');
-            } else {
-                // Si ambos están cerrados, abrimos el que corresponda según el estado de login
-                togglePanels(isLoggedIn);
-            }
-        });
-    }
+    adminBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        if (isLoggedIn) {
+            // Si ya entró, mostramos el dashboard con su margen
+            adminDashboard.classList.toggle('hidden');
+            loginPanel.classList.add('hidden');
+        } else {
+            // Si no ha entrado, forzamos que vea el Login primero
+            loginPanel.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+        }
+    });
+    }   
 
     // Cerrar paneles al hacer clic fuera (en el overlay oscuro)
     [loginPanel, adminDashboard].forEach(panel => {
