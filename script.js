@@ -1,65 +1,110 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SELECCIÓN DE ELEMENTOS
+    // 1. SELECCIÓN DE ELEMENTOS PRINCIPALES
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
     const cartContainer = document.getElementById('cart-container');
+    
+    // Elementos de Admin y Paneles
     const adminBtn = document.getElementById('admin-btn');
     const loginPanel = document.getElementById('login-panel');
+    const adminDashboard = document.getElementById('admin-dashboard'); // El nuevo panel grande
     const loginForm = document.querySelector('.login-form');
-    const btnLogin = loginForm ? loginForm.querySelector('.btn-login') : null;
+    const btnLogout = document.getElementById('btn-logout'); // El botón de cerrar sesión dentro del dash
+    const adminUsernameSpan = document.getElementById('admin-username'); // Para poner el nombre
+    const adminIcon = adminBtn ? adminBtn.querySelector('i') : null;
 
-    // 2. PANEL DE ADMINISTRACIÓN
-    if(adminBtn && loginPanel) {
+    // Estado de sesión
+    let isLoggedIn = false;
+
+    // 2. FUNCIÓN PARA ABRIR/CERRAR PANELES
+    function togglePanels(showDashboard) {
+        if (showDashboard && isLoggedIn) {
+            loginPanel.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+        } else {
+            loginPanel.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+        }
+        if(navMenu) navMenu.classList.remove('active');
+    }
+
+    // Evento del botón del header (escudo)
+    if(adminBtn) {
         adminBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            loginPanel.classList.toggle('hidden');
-            if(navMenu) navMenu.classList.remove('active');
-        });
-
-        loginPanel.addEventListener('click', (e) => {
-            if (e.target === loginPanel) {
+            // Si el dashboard está visible, lo cerramos. Si no, decidimos qué abrir.
+            if (!adminDashboard.classList.contains('hidden')) {
+                adminDashboard.classList.add('hidden');
+            } else if (!loginPanel.classList.contains('hidden')) {
                 loginPanel.classList.add('hidden');
+            } else {
+                // Si ambos están cerrados, abrimos el que corresponda según el estado de login
+                togglePanels(isLoggedIn);
             }
         });
     }
 
+    // Cerrar paneles al hacer clic fuera (en el overlay oscuro)
+    [loginPanel, adminDashboard].forEach(panel => {
+        if(panel) {
+            panel.addEventListener('click', (e) => {
+                if (e.target === panel) panel.classList.add('hidden');
+            });
+        }
+    });
+
+    // 3. LÓGICA DE LOGIN (CONEXIÓN AL SERVIDOR)
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
+            const btnLogin = loginForm.querySelector('.btn-login');
             const originalText = btnLogin.innerHTML;
+            
             btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
             btnLogin.disabled = true;
 
-            // SELECCIÓN INFALIBLE: Primer input es usuario, segundo es contraseña
+            // Selección segura de inputs
             const inputs = loginForm.querySelectorAll('input');
-            const userValue = inputs[0].value.trim(); 
-            const passValue = inputs[1].value.trim();
+            const userValue = inputs[0]?.value.trim();
+            const passValue = inputs[1]?.value.trim();
 
-            console.log("Intentando login con:", userValue); // Para que veas en consola si captura bien
+            if (!userValue || !passValue) {
+                alert("Por favor, completa ambos campos.");
+                btnLogin.innerHTML = originalText;
+                btnLogin.disabled = false;
+                return;
+            }
 
             try {
                 const response = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user: userValue, 
-                        pass: passValue 
-                    })
+                    body: JSON.stringify({ user: userValue, pass: passValue })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    alert("¡Acceso concedido!");
-                    loginPanel.classList.add('hidden');
+                    // --- ÉXITO ---
+                    isLoggedIn = true;
+                    if(adminUsernameSpan) adminUsernameSpan.textContent = userValue; // Mostrar nombre
+                    
+                    // Cambiar icono a verde
+                    if(iconElement) iconElement.className = "fa-solid fa-user-check";
+                    iconElement.style.color = "#2ecc71"; 
+
+                    alert("¡Bienvenido al Panel de Gestión!");
+                    
+                    // Transición: Ocultar Login -> Mostrar Dashboard
+                    togglePanels(true);
+                    loginForm.reset();
                 } else {
-                    // Si llega aquí, es que el servidor respondió pero NO encontró al usuario
-                    alert("Credenciales incorrectas en la base de datos.");
+                    alert("Credenciales incorrectas.");
                 }
             } catch (error) {
-                alert("El servidor está despertando. Reintenta en 10 segundos.");
+                console.error(error);
+                alert("Error de conexión. Si es la primera vez, el servidor puede estar despertando. Reintenta en 20s.");
             } finally {
                 btnLogin.innerHTML = originalText;
                 btnLogin.disabled = false;
@@ -67,20 +112,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. MENÚ MÓVIL
-    if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            if(loginPanel) loginPanel.classList.add('hidden');
+    // 4. LÓGICA DE CERRAR SESIÓN
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            isLoggedIn = false;
+            togglePanels(false); // Vuelve a mostrar el login la próxima vez
+            adminDashboard.classList.add('hidden'); // Cierra el dash actual
+            
+            // Restaurar icono original
+            if(iconElement) {
+                iconElement.className = "fa-solid fa-user-shield";
+                iconElement.style.color = ""; // Reset color
+            }
+            alert("Sesión cerrada correctamente.");
         });
     }
 
-    // 5. NAVEGACIÓN Y GALERÍA
+    // 5. LÓGICA DE MENÚ Y NAVEGACIÓN (EXISTENTE)
+    if(menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            loginPanel.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+        });
+    }
+
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            if(loginPanel) loginPanel.classList.add('hidden');
-            if(navMenu) navMenu.classList.remove('active');
-
+            loginPanel.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+            navMenu.classList.remove('active');
             navLinks.forEach(el => el.classList.remove('active'));
             this.classList.add('active');
 

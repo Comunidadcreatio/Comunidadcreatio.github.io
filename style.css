@@ -387,3 +387,206 @@ body {
     }
 }
 
+/* --- ESTILOS DEL NUEVO PANEL DE ADMINISTRACIÓN (TIPO DASHBOARD) --- */
+
+/* Ajuste para que el overlay permita scroll si el contenido es muy alto */
+#admin-dashboard.login-overlay {
+    align-items: flex-start; /* Alineación superior */
+    padding: 40px 20px;
+    overflow-y: auto; /* Scroll si es necesario */
+}
+
+/* Tarjeta ancha para el dashboard */
+.dashboard-wide {
+    max-width: 1200px; /* Mucho más ancho que el login */
+    width: 95%;
+    text-align: left; /* Texto alineado a la izquierda */
+    padding: 30px;
+}
+
+/* Header superior con botón de cerrar sesión */
+.dash-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.dash-welcome {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.main-icon-dash { font-size: 40px; color: var(--accent-gold); }
+.dash-header-top h2 { font-size: 1.5rem; margin: 0; }
+.dash-header-top p { font-size: 0.9rem; opacity: 0.8; margin: 0; }
+
+/* Botón Cerrar Sesión (Naranja/Dorado en la imagen) */
+.btn-logout-dash {
+    background-color: var(--accent-gold);
+    color: var(--bg-dark);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+.btn-logout-dash:hover { transform: translateY(-2px); background-color: #e5cf7d; }
+
+/* --- LAYOUT DE DOS COLUMNAS --- */
+.dashboard-layout {
+    display: flex;
+    gap: 40px;
+}
+
+.dash-column-left { flex: 3; /* La columna izquierda es más ancha */ }
+.dash-column-right { flex: 2; }
+
+.dashboard-layout h3 { margin-bottom: 20px; font-size: 1.2rem; }
+
+/* --- FORMULARIO EN CUADRÍCULA (GRID) --- */
+.artwork-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 15px;
+}
+
+.input-group-dash label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* Estilo de los inputs del dashboard (redondeados y fondo blanco) */
+.input-group-dash input,
+.input-group-dash textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px; /* Bordes muy redondeados como la imagen */
+    border: none;
+    background: white;
+    color: #333;
+    font-family: inherit;
+}
+.input-group-dash textarea {
+    border-radius: 15px; /* Textarea un poco menos redondeado */
+    resize: vertical;
+}
+
+/* Elementos que ocupan todo el ancho */
+.full-width { grid-column: span 2; }
+
+/* Checkbox estilo personalizado */
+.checkbox-container-dash {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.checkbox-container-dash input { /* Ocultar checkbox nativo */
+    position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
+}
+.checkmark {
+    height: 20px; width: 20px; background-color: white; border-radius: 5px; display: inline-block; position: relative;
+}
+.checkbox-container-dash input:checked ~ .checkmark { background-color: var(--accent-gold); }
+.checkmark:after {
+    content: ""; position: absolute; display: none;
+    left: 7px; top: 3px; width: 5px; height: 10px;
+    border: solid var(--bg-dark); border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.checkbox-container-dash input:checked ~ .checkmark:after { display: block; }
+
+/* --- COLUMNA DERECHA: IMÁGENES Y TABLA --- */
+.image-slots-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.image-slot {
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; color: rgba(255,255,255,0.5);
+    cursor: pointer; transition: 0.3s;
+}
+.image-slot:hover { background: rgba(255,255,255,0.3); color: white; }
+
+/* Botón Guardar Obra (Verde Grande) */
+.btn-save-artwork {
+    width: 100%;
+    padding: 15px;
+    background-color: #2ecc71; /* Verde brillante */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem; font-weight: 700;
+    cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+    margin-bottom: 30px; transition: 0.3s;
+}
+.btn-save-artwork:hover { background-color: #27ae60; }
+
+/* --- TABLA DE GESTIÓN --- */
+.table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    overflow-x: auto;
+}
+
+.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #333; /* Texto oscuro para fondo blanco */
+    font-size: 0.9rem;
+}
+
+.dash-table th {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #eee;
+    color: #666; font-weight: 600;
+}
+
+.dash-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+/* Badges y Acciones */
+.badge-active {
+    background: #d4edda; color: #155724;
+    padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;
+}
+.img-placeholder {
+    width: 30px; height: 30px; background: #ddd;
+    border-radius: 5px; display: flex; justify-content: center; align-items: center; color: #888;
+}
+.actions-cell { display: flex; gap: 10px; }
+.btn-icon-edit, .btn-icon-delete {
+    width: 30px; height: 30px; border: none; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+}
+.btn-icon-edit { background: #dbeafe; color: #1e40af; }
+.btn-icon-delete { background: #fee2e2; color: #991b1b; }
+.btn-icon-edit:hover { background: #bfdbfe; }
+.btn-icon-delete:hover { background: #fecaca; }
+
+/* --- RESPONSIVE PARA EL DASHBOARD --- */
+@media (max-width: 900px) {
+    .dashboard-layout { flex-direction: column; }
+    .artwork-form-grid { grid-template-columns: 1fr; /* 1 columna en móvil */ }
+    .full-width { grid-column: span 1; }
+}
