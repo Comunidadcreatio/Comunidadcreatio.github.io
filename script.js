@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("¡Bienvenido al Panel de Gestión!");
                     
                     // Transición: Ocultar Login -> Mostrar Dashboard
+                    await cargarTablaObras();
                     togglePanels(true);
-                    cargarTablaObras();
                     loginForm.reset();
                 } else {
                     alert("Credenciales incorrectas.");
@@ -131,13 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
 async function cargarTablaObras() {
     const tbody = document.getElementById('tabla-obras-body');
-    if (!tbody) return;
+    if (!tbody) {
+        console.error("No se encontró el elemento tabla-obras-body");
+        return;
+    }
 
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        if (!response.ok) throw new Error("Error al obtener obras");
+        
         const obras = await response.json();
-
-        tbody.innerHTML = ''; // Borra todo lo que haya antes
+        tbody.innerHTML = ''; 
 
         if (obras.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No hay obras registradas aún.</td></tr>';
