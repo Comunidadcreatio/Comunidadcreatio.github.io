@@ -628,3 +628,57 @@ body {
     color: #888;
     font-size: 0.8rem;
 }
+
+/* --- ESTILOS PARA LOS BOTONES DEL FORMULARIO --- */
+.form-actions-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* Botón Guardar (Verde) */
+.btn-save-artwork {
+    background-color: #2ecc71;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1;
+    transition: 0.3s;
+}
+.btn-save-artwork:hover { background-color: #27ae60; }
+
+/* Botón Refrescar (Azul) */
+.btn-update-artwork {
+    background-color: #3498db; /* Azul para editar */
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1;
+    transition: 0.3s;
+}
+.btn-update-artwork:hover { background-color: #2980b9; }
+
+/* Botón Limpiar (Gris/Rojo suave) */
+.btn-clear-form {
+    background-color: #95a5a6;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.btn-clear-form:hover { background-color: #7f8c8d; }
+
+/* Clase utilitaria para ocultar elementos */
+.hidden {
+    display: none !important;
+}

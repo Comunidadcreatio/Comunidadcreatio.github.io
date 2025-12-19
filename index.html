@@ -115,7 +115,7 @@
 
                     <div class="input-group-dash">
                         <label>Año de Creación</label>
-                        <input type="text" id="dash-ano">
+                        <input type="number" id="dash-ano" class="dash-input" placeholder="Ej: 2024">
                     </div>
                     <div class="input-group-dash">
                         <label>Técnica</label>
@@ -209,7 +209,7 @@
 
                     <div class="input-group-dash">
                         <label>Precio</label>
-                        <input type="text" id="dash-precio">
+                        <input type="number" id="dash-precio" class="dash-input" placeholder="Solo números">
                     </div>
                     <div class="input-group-dash">
                         <label>Etiqueta</label>
@@ -250,9 +250,19 @@
     <small id="file-name-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
 </div>
 
-                <button type="submit" form="artwork-form" class="btn-save-artwork">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar Obra
-                </button>
+                <div class="form-actions-group">
+                    <button type="submit" form="artwork-form" id="btn-save" class="btn-save-artwork">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Obra
+                    </button>
+
+                    <button type="button" id="btn-update" class="btn-update-artwork hidden">
+                        <i class="fa-solid fa-rotate"></i> Refrescar Obra
+                    </button>
+    
+                    <button type="button" id="btn-clear" class="btn-clear-form">
+                        <i class="fa-solid fa-eraser"></i> Limpiar Campos
+                    </button>
+                </div>
 
                 <div class="table-section">
                     <h3>Gestión de Productos</h3>
