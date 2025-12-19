@@ -297,16 +297,20 @@ if (artworkForm) {
     if (!confirm("¿Estás seguro de que deseas borrar esta obra de forma permanente?")) return;
 
     try {
+        // Asegúrate de usar comillas inclinadas ` para que el ${id} funcione
         const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
             alert("Obra eliminada.");
-            cargarTablaObras(); // Recargar la tabla para mostrar que ya no está
+            cargarTablaObras(); // Recarga la tabla para que desaparezca la fila
+        } else {
+            alert("No se pudo eliminar la obra del servidor.");
         }
     } catch (error) {
-        alert("Error al intentar eliminar.");
+        console.error("Error al eliminar:", error);
+        alert("Error de conexión al intentar eliminar.");
     }
-}
+    }
 });
