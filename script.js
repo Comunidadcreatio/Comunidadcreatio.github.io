@@ -108,14 +108,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
+            // Manejo de clases activas
             navLinks.forEach(el => el.classList.remove('active'));
             this.classList.add('active');
+
+            // Cerrar menú móvil al hacer click
             if(navMenu) navMenu.classList.remove('active');
 
+            // Lógica específica para Galería
             const linkText = this.textContent.trim().toLowerCase();
-            if ((linkText === 'galería' || linkText === 'galeria') && cartContainer) {
-                cartContainer.classList.remove('show-anim');
-                setTimeout(() => cartContainer.classList.add('show-anim'), 10);
+            if (linkText === 'galería' || linkText === 'galeria') {
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                    setTimeout(() => {
+                        cartContainer.classList.remove('hidden');
+                        cartContainer.classList.add('show-anim');
+                    }, 10);
+                }
+            } else if (cartContainer) {
+                cartContainer.classList.add('hidden');
             }
         });
     });
