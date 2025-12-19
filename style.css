@@ -620,10 +620,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Opcional: Añadir una flecha personalizada si deseas que se note que es un select */
-.input-group-dash {
-    position: relative;
-}
 
 /* Estetica de la flecha personalizada */
 .select-arrow {

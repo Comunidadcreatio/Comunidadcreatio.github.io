@@ -129,19 +129,7 @@
 
                     <div class="input-group-dash">
                         <label>Estado de la Obra</label>
-                        <div class="select-wrapper">
-                         <select id="dash-estado-obra" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Disponible">Disponible (en venta)</option>
-                                <option value="Reservado">Reservado</option>
-                                <option value="Vendido">Vendido</option>
-                                <option value="No disponible">No disponible temporalmente</option>
-                                <option value="En préstamo">En préstamo (fuera de galería)</option>
-                                <option value="Solo exhibición">Solo para exhibición (no venta)</option>
-                                <option value="Retirado">Retirado del inventario</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                     </div>
+                        <input type="text" id="dash-estado-obra">
                     </div>
                     <div class="input-group-dash">
                         <label>Procedencia</label>
@@ -171,9 +159,20 @@
                         <input type="text" id="dash-id">
                     </div>
                     <div class="input-group-dash">
-                        <label>Estado (Disponibilidad)</label>
-                        <input type="text" id="dash-status">
-                    </div>
+                        <label>Estado</label>
+                        <div class="select-wrapper">
+                         <select id="dash-estado-obra" class="dash-input-select">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Disponible">Disponible (en venta)</option>
+                                <option value="Reservado">Reservado</option>
+                                <option value="Vendido">Vendido</option>
+                                <option value="No disponible">No disponible temporalmente</option>
+                                <option value="En préstamo">En préstamo (fuera de galería)</option>
+                                <option value="Solo exhibición">Solo para exhibición (no venta)</option>
+                                <option value="Retirado">Retirado del inventario</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                     </div>
 
                     <div class="input-group-dash full-width checkbox-group">
                         <label class="checkbox-container-dash">
