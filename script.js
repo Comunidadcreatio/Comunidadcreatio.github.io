@@ -167,14 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('ano', document.getElementById('dash-ano').value);
             formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
             formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-            formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+            formData.append('status', document.getElementById('dash-status').value);
             formData.append('procedencia', document.getElementById('dash-procedencia').value);
             formData.append('certificado', document.getElementById('dash-certificado').value);
             formData.append('marcos', document.getElementById('dash-marcos').value);
             formData.append('precio', document.getElementById('dash-precio').value);
             formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
             formData.append('id_obra', document.getElementById('dash-id').value);
-            formData.append('status', document.getElementById('dash-status').value);
+            formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
 
             try {
                 const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
