@@ -5,18 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-menu a');
     const cartContainer = document.getElementById('cart-container');
 
-    // Mostrar el nombre del archivo seleccionado
-    const fileInput = document.getElementById('dash-input-file');
-    const nameDisplay = document.getElementById('file-name-display');
-
-    if(fileInput) {
-        fileInput.addEventListener('change', function() {
-            if(this.files && this.files[0]) {
-                nameDisplay.textContent = "Archivo listo: " + this.files[0].name;
-            }
-        });
-    }
-    
     // Elementos de Admin y Paneles
     const adminBtn = document.getElementById('admin-btn');
     const loginPanel = document.getElementById('login-panel');
@@ -25,25 +13,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btn-logout'); 
     const adminUsernameSpan = document.getElementById('admin-username'); 
 
-    // Estado de sesión
-    let isLoggedIn = false;
+    // Input de archivos y visualización de nombre
+    const fileInput = document.getElementById('dash-input-file');
+    const nameDisplay = document.getElementById('file-name-display');
 
-    // 2. FUNCIÓN PARA ABRIR/CERRAR PANELES
+    // Estado de sesión (Global para este bloque)
+    window.isLoggedIn = false;
+
+    // 2. LÓGICA DE ARCHIVOS (SUBIDA)
+    if(fileInput) {
+        fileInput.addEventListener('change', function() {
+            if(this.files && this.files[0]) {
+                nameDisplay.textContent = "Archivo listo: " + this.files[0].name;
+            }
+        });
+    }
+
+    // 3. NAVEGACIÓN Y MENÚ MÓVIL
+    if(menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Manejo de clases activas
+            navLinks.forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+
+            // Cerrar menú móvil al hacer click
+            if(navMenu) navMenu.classList.remove('active');
+
+            // Lógica específica para Galería
+            const linkText = this.textContent.trim().toLowerCase();
+            if (linkText === 'galería' || linkText === 'galeria') {
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                    cartContainer.classList.remove('show-anim');
+                    setTimeout(() => {
+                        cartContainer.classList.remove('hidden');
+                        cartContainer.classList.add('show-anim');
+                    }, 10);
+                }
+            } else if (cartContainer) {
+                cartContainer.classList.add('hidden');
+            }
+        });
+    });
+
+    // 4. GESTIÓN DE PANELES (LOGIN / DASHBOARD)
     function togglePanels(showDashboard) {
-        if (showDashboard && isLoggedIn) {
+        if (showDashboard && window.isLoggedIn) {
             loginPanel.classList.add('hidden');
             adminDashboard.classList.remove('hidden');
         } else {
             loginPanel.classList.remove('hidden');
             adminDashboard.classList.add('hidden');
         }
-        if(navMenu) navMenu.classList.remove('active');
     }
 
     if(adminBtn) {
         adminBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (isLoggedIn) {
+            if (window.isLoggedIn) {
                 adminDashboard.classList.toggle('hidden');
                 loginPanel.classList.add('hidden');
             } else {
@@ -51,8 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 adminDashboard.classList.add('hidden');
             }
         });
-    }   
+    }
 
+    // Cerrar paneles al hacer click fuera del contenido
     [loginPanel, adminDashboard].forEach(panel => {
         if(panel) {
             panel.addEventListener('click', (e) => {
@@ -61,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. LÓGICA DE LOGIN
+    // 5. PROCESO DE LOGIN
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnLogin = loginForm.querySelector('.btn-login');
-            const originalText = btnLogin.innerHTML;
-            
+            const originalBtnText = btnLogin.innerHTML;
+
             btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
             btnLogin.disabled = true;
 
@@ -85,48 +119,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.success) {
-                    isLoggedIn = true;
+                    window.isLoggedIn = true;
                     if(adminUsernameSpan) adminUsernameSpan.textContent = userValue;
                     
                     const iconElement = adminBtn.querySelector('i'); 
                     if(iconElement) {
                         iconElement.className = "fa-solid fa-user-check";
                         iconElement.style.color = "#2ecc71";
-                    }  
+                    }
 
                     alert("¡Bienvenido al Panel de Gestión!");
                     
-                    await cargarTablaObras(); // Carga los datos antes de mostrar el panel
+                    await cargarTablaObras(); // Carga real de datos
                     togglePanels(true);
                     loginForm.reset();
                 } else {
                     alert("Credenciales incorrectas.");
                 }
             } catch (error) {
-                alert("Error de conexión. Reintenta en 20s.");
+                alert("Error de conexión con el servidor.");
             } finally {
-                btnLogin.innerHTML = originalText;
+                btnLogin.innerHTML = originalBtnText;
                 btnLogin.disabled = false;
             }
         });
     }
 
-    // --- EVENTO GUARDAR OBRA ---
+    // 6. GUARDAR NUEVA OBRA (FORMULARIO)
     const artworkForm = document.getElementById('artwork-form');
     if (artworkForm) {
         artworkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btnSave = document.querySelector('.btn-save-artwork');
+            const originalBtnText = btnSave.innerHTML;
             btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
             btnSave.disabled = true;
 
             const formData = new FormData();
-            const fileInput = document.getElementById('dash-input-file');
             if (fileInput && fileInput.files[0]) {
                 formData.append('imagen', fileInput.files[0]);
             }
 
+            // Mapeo de campos del formulario
             formData.append('titulo', document.getElementById('dash-titulo').value);
             formData.append('artista', document.getElementById('dash-artista').value);
             formData.append('ano', document.getElementById('dash-ano').value);
@@ -147,44 +182,42 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData 
                 });
 
-                if (response.ok) {
+                const result = await response.json();
+
+                if (response.ok && result.success) {
                     alert("¡Obra registrada con éxito!");
                     artworkForm.reset();
                     if(nameDisplay) nameDisplay.textContent = "";
                     cargarTablaObras(); 
+                } else {
+                    alert("Error: " + (result.error || "No se pudo guardar"));
                 }
             } catch (error) {
-                alert("Error al conectar con el servidor");
+                alert("Error de red al intentar guardar.");
             } finally {
-                btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+                btnSave.innerHTML = originalBtnText;
                 btnSave.disabled = false;
             }
         });
     }
 
-    // 4. LÓGICA DE CERRAR SESIÓN
+    // 7. CERRAR SESIÓN
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            isLoggedIn = false;
+            window.isLoggedIn = false;
             togglePanels(false);
             const iconElement = adminBtn.querySelector('i');
             if(iconElement) {
                 iconElement.className = "fa-solid fa-user-shield";
                 iconElement.style.color = "";
             }
-            alert("Sesión cerrada correctamente.");
-        });
-    }
-
-    // 5. MENÚ MÓVIL
-    if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+            alert("Has salido del sistema.");
         });
     }
 });
 
-// --- FUNCIONES GLOBALES (FUERA DE DOMCONTENTLOADED PARA QUE EL HTML LAS VEA) ---
+// --- FUNCIONES GLOBALES (FUERA DEL DOMCONTENTLOADED) ---
+// Es vital que estén aquí para que los botones generados dinámicamente las encuentren.
 
 async function cargarTablaObras() {
     const tbody = document.getElementById('tabla-obras-body');
@@ -192,11 +225,13 @@ async function cargarTablaObras() {
 
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        if (!response.ok) throw new Error("Error al obtener datos");
+        
         const obras = await response.json();
         tbody.innerHTML = ''; 
 
-        if (obras.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">No hay obras registradas.</td></tr>';
+        if (!obras || obras.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No hay obras registradas aún.</td></tr>';
             return;
         }
 
@@ -205,35 +240,40 @@ async function cargarTablaObras() {
             fila.innerHTML = `
                 <td>${obra.id_personalizado || obra.id}</td>
                 <td>${obra.titulo}</td>
-                <td>${obra.etiqueta}</td>
-                <td>${obra.precio}$</td>
-                <td><span class="badge-active">${obra.status}</span></td>
+                <td>${obra.etiqueta || 'N/A'}</td>
+                <td>${obra.precio || '0'}$</td>
+                <td><span class="badge-active">${obra.status || 'Activo'}</span></td>
                 <td><img src="${obra.imagen_url}" style="width:35px; height:35px; border-radius:5px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/35'"></td>
                 <td>
                     <div class="actions-cell">
-                        <button class="btn-icon-edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn-icon-edit" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
             `;
             tbody.appendChild(fila);
         });
     } catch (error) {
-        console.error("Error al cargar tabla:", error);
+        console.error("Error en cargarTablaObras:", error);
     }
 }
 
 async function eliminarObra(id) {
-    if (!confirm("¿Deseas eliminar esta obra?")) return;
+    if (!confirm("¿Estás seguro de eliminar esta obra permanentemente?")) return;
+
     try {
         const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
             method: 'DELETE'
         });
+
         if (response.ok) {
-            alert("Eliminado.");
-            cargarTablaObras();
+            alert("Obra eliminada.");
+            cargarTablaObras(); 
+        } else {
+            alert("No se pudo eliminar en el servidor.");
         }
     } catch (error) {
-        alert("Error de conexión.");
+        console.error("Error al eliminar:", error);
+        alert("Error de conexión al eliminar.");
     }
 }
