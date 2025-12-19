@@ -4,6 +4,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
     const cartContainer = document.getElementById('cart-container');
+
+    // Mostrar el nombre del archivo seleccionado
+    const fileInput = document.getElementById('dash-input-file');
+    const nameDisplay = document.getElementById('file-name-display');
+
+    if(fileInput) {
+        fileInput.addEventListener('change', function() {
+            if(this.files && this.files[0]) {
+                nameDisplay.textContent = "Archivo listo: " + this.files[0].name;
+            }
+        });
+    }
     
     // Elementos de Admin y Paneles
     const adminBtn = document.getElementById('admin-btn');
@@ -156,41 +168,60 @@ if (artworkForm) {
         e.preventDefault();
         
         const btnSave = document.querySelector('.btn-save-artwork');
+        const originalBtnText = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
         btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+        btnSave.disabled = true;
 
-        const datos = {
-            titulo: document.getElementById('dash-titulo').value,
-            artista: document.getElementById('dash-artista').value,
-            ano: document.getElementById('dash-ano').value,
-            descripcion_tecnica: document.getElementById('dash-tec-desc').value,
-            descripcion_artistica: document.getElementById('dash-art-desc').value,
-            estado_obra: document.getElementById('dash-estado-obra').value,
-            procedencia: document.getElementById('dash-procedencia').value,
-            certificado: document.getElementById('dash-certificado').value,
-            marcos: document.getElementById('dash-marcos').value,
-            precio: document.getElementById('dash-precio').value,
-            etiqueta: document.getElementById('dash-etiqueta').value,
-            id_obra: document.getElementById('dash-id').value,
-            status: document.getElementById('dash-status').value,
-            imagen_url: "https://via.placeholder.com/150" // Aquí luego integraremos la subida real
-        };
+        // --- CLAVE: Usamos FormData para enviar el archivo ---
+        const formData = new FormData();
+        
+        // 1. Capturamos el archivo del input oculto
+        const fileInput = document.getElementById('dash-input-file');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('imagen', fileInput.files[0]);
+        }
+
+        // 2. Capturamos todos los campos de texto
+        formData.append('titulo', document.getElementById('dash-titulo').value);
+        formData.append('artista', document.getElementById('dash-artista').value);
+        formData.append('ano', document.getElementById('dash-ano').value);
+        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
+        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
+        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+        formData.append('procedencia', document.getElementById('dash-procedencia').value);
+        formData.append('certificado', document.getElementById('dash-certificado').value);
+        formData.append('marcos', document.getElementById('dash-marcos').value);
+        formData.append('precio', document.getElementById('dash-precio').value);
+        formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
+        formData.append('id_obra', document.getElementById('dash-id').value);
+        formData.append('status', document.getElementById('dash-status').value);
 
         try {
+            // --- IMPORTANTE: Al usar FormData, NO se pone el header 'Content-Type' ---
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
+                body: formData 
             });
 
-            if (response.ok) {
-                alert("Obra registrada con éxito");
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert("¡Obra e imagen registradas con éxito!");
                 artworkForm.reset();
-                cargarTablaObras(); // <--- REFRESCAR TABLA AUTOMÁTICAMENTE
+                // Limpiamos el texto del archivo seleccionado si existe
+                const nameDisplay = document.getElementById('file-name-display');
+                if(nameDisplay) nameDisplay.textContent = "";
+                
+                cargarTablaObras(); 
+            } else {
+                alert("Error del servidor: " + (result.error || "Desconocido"));
             }
         } catch (error) {
+            console.error("Error:", error);
             alert("Error al conectar con el servidor");
         } finally {
-            btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+            btnSave.innerHTML = originalBtnText;
+            btnSave.disabled = false;
         }
     });
 }
