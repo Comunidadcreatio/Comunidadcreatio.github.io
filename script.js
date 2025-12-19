@@ -116,6 +116,92 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- FUNCIÓN PARA REFRESCAR LA TABLA ---
+async function cargarTablaObras() {
+    const tbody = document.querySelector('.dash-table tbody');
+    if (!tbody) return;
+
+    try {
+        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        const obras = await response.json();
+
+        tbody.innerHTML = ''; // Limpiar tabla actual
+
+        obras.forEach(obra => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${obra.id_personalizado || obra.id}</td>
+                <td>${obra.titulo}</td>
+                <td>${obra.etiqueta || 'N/A'}</td>
+                <td>${obra.precio || '0'}$</td>
+                <td><span class="badge-active">${obra.status || 'Activo'}</span></td>
+                <td><img src="${obra.imagen_url}" style="width:30px; height:30px; border-radius:5px; object-fit:cover;"></td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="btn-icon-edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(fila);
+        });
+    } catch (error) {
+        console.error("Error cargando tabla:", error);
+    }
+}
+
+// --- EVENTO GUARDAR OBRA ---
+const artworkForm = document.getElementById('artwork-form');
+if (artworkForm) {
+    artworkForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btnSave = document.querySelector('.btn-save-artwork');
+        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+
+        const datos = {
+            titulo: document.getElementById('dash-titulo').value,
+            artista: document.getElementById('dash-artista').value,
+            ano: document.getElementById('dash-ano').value,
+            descripcion_tecnica: document.getElementById('dash-tec-desc').value,
+            descripcion_artistica: document.getElementById('dash-art-desc').value,
+            estado_obra: document.getElementById('dash-estado-obra').value,
+            procedencia: document.getElementById('dash-procedencia').value,
+            certificado: document.getElementById('dash-certificado').value,
+            marcos: document.getElementById('dash-marcos').value,
+            precio: document.getElementById('dash-precio').value,
+            etiqueta: document.getElementById('dash-etiqueta').value,
+            id_obra: document.getElementById('dash-id').value,
+            status: document.getElementById('dash-status').value,
+            imagen_url: "https://via.placeholder.com/150" // Aquí luego integraremos la subida real
+        };
+
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            if (response.ok) {
+                alert("Obra registrada con éxito");
+                artworkForm.reset();
+                cargarTablaObras(); // <--- REFRESCAR TABLA AUTOMÁTICAMENTE
+            }
+        } catch (error) {
+            alert("Error al conectar con el servidor");
+        } finally {
+            btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+        }
+    });
+}
+
+// Llamar a la tabla cuando se inicie el panel
+// (Añade esto dentro de la lógica del éxito del login)
+// if(result.success) { ... cargarTablaObras(); ... }
+
+
+
     // 4. LÓGICA DE CERRAR SESIÓN
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
