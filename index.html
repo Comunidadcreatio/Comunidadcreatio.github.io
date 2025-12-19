@@ -193,8 +193,18 @@
                         <input type="text" id="dash-dimenciones">
                     </div>
                     <div class="input-group-dash">
-                        <label>Marcos y montaje</label>
-                        <input type="text" id="dash-marcos">
+                        <label>Enmarcado</label>
+                        <div class="select-wrapper">
+                            <select id="dash-marcos" class="dash-input-select">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Ya enmarcada">Ya enmarcada (listo para colgar)</option>
+                                <option value="Sin enmarcar">Sin enmarcar (solo lienzo/bastidor)</option>
+                                <option value="Enmarcado opcional">Enmarcado opcional (el cliente elige después)</option>
+                                <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
+                                <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
                     </div>
 
                     <div class="input-group-dash">
