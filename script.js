@@ -234,7 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
             formData.append('status', document.getElementById('dash-status').value);
             formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-            formData.append('dimenciones', document.getElementById('dash-dimenciones').value);
+            formData.append('ancho', document.getElementById('dash-ancho').value);
+            formData.append('alto', document.getElementById('dash-alto').value);
+            formData.append('peso', document.getElementById('dash-peso').value);
             formData.append('marcos', document.getElementById('dash-marcos').value);
             formData.append('precio', document.getElementById('dash-precio').value);
             formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
@@ -287,7 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
             formData.append('status', document.getElementById('dash-status').value);
             formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-            formData.append('dimenciones', document.getElementById('dash-dimenciones').value);
+            formData.append('ancho', document.getElementById('dash-ancho').value);
+            formData.append('alto', document.getElementById('dash-alto').value);
+            formData.append('peso', document.getElementById('dash-peso').value);
             formData.append('marcos', document.getElementById('dash-marcos').value);
             formData.append('precio', document.getElementById('dash-precio').value);
             formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
@@ -339,7 +343,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dash-art-desc').value = obra.descripcion_artistica || '';
         document.getElementById('dash-status').value = obra.status || '';
         document.getElementById('dash-estado-obra').value = obra.estado_obra || '';
-        document.getElementById('dash-dimenciones').value = obra.dimenciones || ''; // Ojo con la ortografía en tu HTML (dimenciones vs dimensiones)
+        document.getElementById('dash-ancho').value = obra.ancho || '';
+        document.getElementById('dash-alto').value = obra.alto || '';
+        document.getElementById('dash-peso').value = obra.peso || ''; // Ojo con la ortografía en tu HTML (dimenciones vs dimensiones)
         document.getElementById('dash-marcos').value = obra.marcos || '';
         document.getElementById('dash-precio').value = obra.precio || '';
         document.getElementById('dash-etiqueta').value = obra.etiqueta || '';
