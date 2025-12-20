@@ -267,61 +267,86 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 9. ACTUALIZAR OBRA (PUT) - BOTÓN REFRESCAR ---
-    if (btnUpdate) {
-        btnUpdate.addEventListener('click', async (e) => {
-            e.preventDefault();
+if (btnUpdate) {
+    btnUpdate.addEventListener('click', async (e) => {
+        e.preventDefault();
 
-            if (!validarFormulario()) return;
-            if (!editingId) { alert("Error: No se ha seleccionado ninguna obra."); return; }
+        if (!validarFormulario()) return;
+        if (!editingId) { 
+            alert("Error: No se ha seleccionado ninguna obra."); 
+            return; 
+        }
 
-            const originalText = btnUpdate.innerHTML;
-            btnUpdate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...';
-            btnUpdate.disabled = true;
+        const originalText = btnUpdate.innerHTML;
+        btnUpdate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...';
+        btnUpdate.disabled = true;
 
-            const formData = new FormData();
-            if (fileInput && fileInput.files[0]) formData.append('imagen', fileInput.files[0]);
+        const formData = new FormData();
+        
+        // 1. Manejo de la imagen: Usamos el ID correcto del input de archivo
+        const fileInput = document.getElementById('dash-imagen'); 
+        if (fileInput && fileInput.files[0]) {
+            formData.append('imagen', fileInput.files[0]);
+        }
 
-            // Mapeo idéntico al Guardar
-            formData.append('titulo', document.getElementById('dash-titulo').value);
-            formData.append('artista', document.getElementById('dash-artista').value);
-            formData.append('ano', document.getElementById('dash-ano').value);
-            formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-            formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-            formData.append('status', document.getElementById('dash-status').value);
-            formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-            formData.append('ancho', document.getElementById('dash-ancho').value);
-            formData.append('alto', document.getElementById('dash-alto').value);
-            formData.append('peso', document.getElementById('dash-peso').value);
-            formData.append('marcos', document.getElementById('dash-marcos').value);
-            formData.append('precio', document.getElementById('dash-precio').value);
-            formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
-            formData.append('id_obra', document.getElementById('dash-id').value);
-            formData.append('procedencia', document.getElementById('dash-procedencia').value);
+        // 2. Mapeo de campos (Asegúrate de que los IDs coincidan con tu index.html)
+        formData.append('titulo', document.getElementById('dash-titulo').value);
+        formData.append('artista', document.getElementById('dash-artista').value);
+        formData.append('ano', document.getElementById('dash-ano').value);
+        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
+        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
+        formData.append('status', document.getElementById('dash-status').value);
+        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+        
+        // Campos de dimensiones corregidos (Sincronizados con la DB)
+        formData.append('ancho', document.getElementById('dash-ancho').value);
+        formData.append('alto', document.getElementById('dash-alto').value);
+        formData.append('peso', document.getElementById('dash-peso').value);
+        
+        formData.append('marcos', document.getElementById('dash-marcos').value);
+        formData.append('precio', document.getElementById('dash-precio').value);
+        formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
+        
+        // Importante: El backend espera 'id_obra' para mapearlo a 'id_personalizado'
+        formData.append('id_obra', document.getElementById('dash-id').value);
+        formData.append('procedencia', document.getElementById('dash-procedencia').value);
 
-            try {
-                // IMPORTANTE: Asegúrate que tu backend tenga la ruta app.put('/obras/:id')
-                const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${editingId}`, {
-                    method: 'PUT',
-                    body: formData 
-                });
-                const result = await response.json();
+        try {
+            // Usamos la URL de tu backend en Render
+            const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${editingId}`, {
+                method: 'PUT',
+                body: formData 
+                // Nota: No se pone Header de Content-Type, el navegador lo pone solo al ver FormData
+            });
+            
+            const result = await response.json();
 
-                if (response.ok && result.success) {
-                    alert("¡Obra actualizada correctamente!");
-                    window.resetFormulario(); // Limpia y devuelve el botón Guardar
+            if (response.ok && result.success) {
+                alert("¡Obra actualizada correctamente!");
+                
+                // Limpiamos el formulario y los slots de imagen
+                if (typeof window.resetFormulario === 'function') {
+                    window.resetFormulario();
+                }
+                
+                // Recargamos la tabla para ver los cambios
+                if (typeof cargarTablaObras === 'function') {
                     cargarTablaObras(); 
                 } else {
-                    alert("Error al actualizar: " + (result.error || "Desconocido"));
+                    location.reload(); // Opción de respaldo si la función no está disponible
                 }
-            } catch (error) {
-                console.error(error);
-                alert("Error de conexión al actualizar.");
-            } finally {
-                btnUpdate.innerHTML = originalText;
-                btnUpdate.disabled = false;
+            } else {
+                alert("Error al actualizar: " + (result.error || result.message || "Desconocido"));
             }
-        });
-    }
+        } catch (error) {
+            console.error("Error en la petición PUT:", error);
+            alert("Error de conexión al actualizar.");
+        } finally {
+            btnUpdate.innerHTML = originalText;
+            btnUpdate.disabled = false;
+        }
+    });
+}
 
     // --- 10. PREPARAR EDICIÓN (Global para acceder desde editingId interno) ---
     // Esta función conecta el botón de la tabla con el formulario
@@ -351,6 +376,32 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dash-etiqueta').value = obra.etiqueta || '';
         document.getElementById('dash-id').value = obra.id_personalizado || '';
         document.getElementById('dash-procedencia').value = obra.procedencia || '';
+
+        // --- NUEVA LÓGICA PARA LA IMAGEN ---
+        const slot0 = document.getElementById('slot-0');
+        const imgPreview = slot0.querySelector('.preview-img');
+
+        if (obra.imagen_url) {
+            // Si la obra tiene imagen, la mostramos en el primer slot
+            // IMPORTANTE: Asegúrate de que la ruta coincida con tu backend (ej: http://localhost:3000/uploads/...)
+            const baseUrl = 'http://localhost:3000'; // Ajusta esto a tu URL real
+            imgPreview.src = obra.imagen_url.startsWith('http') ? obra.imagen_url : `${baseUrl}${obra.imagen_url}`;
+        
+            imgPreview.classList.remove('hidden');
+            slot0.classList.add('has-image');
+        } else {
+            // Si no tiene, limpiamos el slot
+            imgPreview.src = '';
+            imgPreview.classList.add('hidden');
+            slot0.classList.remove('has-image');
+        }
+
+        // Cambiar visibilidad de botones (esto ya deberías tenerlo)
+        document.getElementById('btn-save').classList.add('hidden');
+        document.getElementById('btn-update').classList.remove('hidden');
+    
+        editingId = id; // Guardamos el ID que estamos editando
+
 
         // Feedback visual
         if(nameDisplay) {
@@ -484,6 +535,6 @@ window.resetFormulario = function() {
     });
 
     // Reset de botones
-    document.getElementById('btn-save').style.display = 'flex';
-    document.getElementById('btn-update').style.display = 'none';
+    document.getElementById('btn-save').classList.remove('hidden');
+    document.getElementById('btn-update').classList.add('hidden');
 };
