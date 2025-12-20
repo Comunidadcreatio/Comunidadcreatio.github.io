@@ -706,3 +706,53 @@ body {
 .image-slot.has-image span {
     display: none;
 }
+
+/* Nueva regla para alinear Ancho, Alto y Peso en una fila */
+.triple-column {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Crea 3 columnas iguales */
+    gap: 15px; /* Espacio entre los 3 inputs */
+}
+
+.form-group-item {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajuste para que en móviles (pantallas pequeñas) se apilen si no caben */
+@media (max-width: 600px) {
+    .triple-column {
+        grid-template-columns: 1fr; /* Se vuelven una sola columna en móviles muy pequeños */
+    }
+}
+
+/* Contenedor principal del grupo */
+.triple-row-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Grilla interna para los 3 inputs */
+.triple-field-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Divide el espacio en 3 partes iguales */
+    gap: 10px; /* Espacio entre los inputs */
+    width: 100%;
+}
+
+/* Estilo para asegurar que los inputs mantengan el diseño redondeado */
+.triple-field-grid input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px; /* Mantiene la estética de los otros campos */
+    border: none;
+    background: white;
+    color: #333;
+}
+
+/* Ajuste para móviles: si el espacio es muy pequeño, se apilan */
+@media (max-width: 600px) {
+    .triple-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
