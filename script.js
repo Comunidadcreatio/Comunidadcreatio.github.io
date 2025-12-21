@@ -25,7 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSave = document.getElementById('btn-save');   // Botón verde
     const btnUpdate = document.getElementById('btn-update'); // Botón azul (nuevo)
     const btnClear = document.getElementById('btn-clear');   // Botón gris (nuevo)
-
+    // Evento para el botón Limpiar
+    if (btnClear) {
+        btnClear.addEventListener('click', function(e) {
+            e.preventDefault(); // <--- MUY IMPORTANTE
+            window.resetFormulario();
+        });
+    }
     // Inputs de archivo
     const fileInput = document.getElementById('dash-input-file');
     const nameDisplay = document.getElementById('file-name-display');
@@ -72,33 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
         return true;
-    }
-
-    // --- 5. FUNCIÓN RESETEAR (LIMPIAR CAMPOS) ---
-    // Esta función se expone globalmente para reusarla
-    window.resetFormulario = function() {
-        if(artworkForm) artworkForm.reset();
-        editingId = null;
-        if(nameDisplay) {
-            nameDisplay.textContent = "";
-            nameDisplay.style.color = "";
-        }
-
-        // Restaurar botones a estado inicial
-        if(btnSave) btnSave.style.display = 'block';     // Mostrar Guardar
-        if(btnUpdate) btnUpdate.style.display = 'none';  // Ocultar Refrescar
-
-        // Quitar bordes rojos
-        const inputs = artworkForm.querySelectorAll('input, select, textarea');
-        inputs.forEach(i => i.style.border = "none");
-    };
-
-    // Evento para el botón Limpiar
-    if(btnClear) {
-        btnClear.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevenir submit accidental
-            window.resetFormulario();
-        });
     }
 
     // --- 6. NAVEGACIÓN Y MENÚ ---
@@ -324,16 +303,21 @@ if (btnUpdate) {
             if (response.ok && result.success) {
                 alert("¡Obra actualizada correctamente!");
                 
-                // Limpiamos el formulario y los slots de imagen
+                // 1. CAMBIO DE BOTONES: Mostrar Guardar, Ocultar Refrescar // <--- NUEVO
+                const btnSave = document.getElementById('btn-save');
+                if (btnSave) btnSave.classList.remove('hidden');
+                btnUpdate.classList.add('hidden');
+                
+                // 2. Limpiamos el formulario y los slots de imagen
                 if (typeof window.resetFormulario === 'function') {
                     window.resetFormulario();
                 }
                 
-                // Recargamos la tabla para ver los cambios
+                // 3. Recargamos la tabla
                 if (typeof cargarTablaObras === 'function') {
                     cargarTablaObras(); 
                 } else {
-                    location.reload(); // Opción de respaldo si la función no está disponible
+                    location.reload();
                 }
             } else {
                 alert("Error al actualizar: " + (result.error || result.message || "Desconocido"));
@@ -382,18 +366,16 @@ if (btnUpdate) {
         const imgPreview = slot0.querySelector('.preview-img');
 
         if (obra.imagen_url) {
-            // Si la obra tiene imagen, la mostramos en el primer slot
-            // IMPORTANTE: Asegúrate de que la ruta coincida con tu backend (ej: http://localhost:3000/uploads/...)
-            const baseUrl = 'http://localhost:3000'; // Ajusta esto a tu URL real
-            imgPreview.src = obra.imagen_url.startsWith('http') ? obra.imagen_url : `${baseUrl}${obra.imagen_url}`;
+        // CAMBIO AQUÍ: Usamos tu URL de Render en lugar de localhost
+        const baseUrl = 'https://backend-fundacion-atpe.onrender.com';
         
-            imgPreview.classList.remove('hidden');
-            slot0.classList.add('has-image');
-        } else {
-            // Si no tiene, limpiamos el slot
-            imgPreview.src = '';
-            imgPreview.classList.add('hidden');
-            slot0.classList.remove('has-image');
+        // Verificamos si la URL ya es completa o es relativa
+        imgPreview.src = obra.imagen_url.startsWith('http') 
+            ? obra.imagen_url 
+            : `${baseUrl}${obra.imagen_url}`;
+        
+        imgPreview.classList.remove('hidden');
+        slot0.classList.add('has-image');
         }
 
         // Cambiar visibilidad de botones (esto ya deberías tenerlo)
@@ -403,11 +385,7 @@ if (btnUpdate) {
         editingId = id; // Guardamos el ID que estamos editando
 
 
-        // Feedback visual
-        if(nameDisplay) {
-            nameDisplay.textContent = "Modo Edición: Sube imagen solo si quieres cambiar la actual.";
-            nameDisplay.style.color = "#3498db";
-        }
+        // Feedback visua
 
         if (btnSave && btnUpdate) {
         btnSave.style.setProperty('display', 'none', 'important'); // Oculta Guardar
@@ -453,26 +431,50 @@ async function cargarTablaObras() {
         }
 
         obras.forEach(obra => {
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-                <td>${obra.id_personalizado || obra.id}</td>
-                <td>${obra.titulo}</td>
-                <td>${obra.etiqueta || 'N/A'}</td>
-                <td>${obra.precio || '0'}$</td>
-                <td><span class="badge-active">${obra.status || 'Activo'}</span></td>
-                <td><img src="${obra.imagen_url}" style="width:35px; height:35px; border-radius:5px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/35'"></td>
-                <td>
-                    <div class="actions-cell">
-                        <button class="btn-icon-edit" onclick="window.prepararEdicion(${obra.id})" title="Editar">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(fila);
+    // 1. Limpiamos la URL de la imagen para evitar duplicados
+    let urlFinal = '';
+    const valorImagen = obra.imagen_url;
+
+    if (!valorImagen) {
+        // Si no hay nada en la DB, usamos un placeholder
+        urlFinal = 'https://placehold.co/35';
+    } else if (valorImagen.startsWith('http')) {
+        // Si ya empieza con http, no le sumamos nada más
+        urlFinal = valorImagen;
+    } else {
+        // Si es una ruta relativa (ej: /uploads/foto.png), le sumamos el dominio
+        // Asegurándonos de que haya una sola barra entre el dominio y la ruta
+        const dominio = 'https://backend-fundacion-atpe.onrender.com';
+        urlFinal = valorImagen.startsWith('/') ? `${dominio}${valorImagen}` : `${dominio}/${valorImagen}`;
+    }
+
+    // 2. Creamos la clase para el estado (Badge)
+    const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
+
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+        <td>${obra.id_personalizado || obra.id}</td>
+        <td>${obra.titulo}</td>
+        <td>${obra.etiqueta || 'N/A'}</td>
+        <td>${obra.precio || '0'}$</td>
+        <td><span class="${statusClass}">${obra.status || 'Activo'}</span></td>
+        <td>
+            <img src="${urlFinal}" 
+                 style="width:35px; height:35px; border-radius:5px; object-fit:cover;" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/35'">
+        </td>
+        <td>
+            <div class="actions-cell">
+                <button class="btn-icon-edit" onclick="window.prepararEdicion(${obra.id})" title="Editar">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </td>
+    `;
+    tbody.appendChild(fila);
         });
     } catch (error) {
         console.error("Error cargando tabla:", error);
@@ -521,20 +523,56 @@ function previewImage(event, index) {
 
 // Modifica tu función resetFormulario para limpiar también las imágenes
 window.resetFormulario = function() {
+    console.log("Iniciando limpieza del formulario...");
+    
+    // 1. Limpiar campos de texto y selección
     const form = document.getElementById('artwork-form');
     if(form) form.reset();
     
-    // Limpiar todas las vistas previas de imágenes
-    document.querySelectorAll('.image-slot').forEach(slot => {
+    // 2. Resetear el ID de edición
+    editingId = null; 
+
+    const fileInputReal = document.getElementById('dash-imagen');
+    if(fileInputReal) fileInputReal.value = "";
+    // 3. LIMPIEZA DE IMAGEN (Forzada)
+    const slots = document.querySelectorAll('.image-slot');
+    slots.forEach(slot => {
+        // Quitamos la clase que oculta el icono "+"
         slot.classList.remove('has-image');
-        const img = slot.querySelector('.preview-img');
+        
+        // Buscamos la imagen y forzamos su ocultación y vaciado
+        const img = slot.querySelector('img.preview-img');
         if(img) {
-            img.src = "";
-            img.classList.add('hidden');
+            img.src = ""; 
+            img.classList.add('hidden'); // Oculta la imagen
         }
+
+        // Aseguramos que el icono "+" vuelva a ser visible
+        const icon = slot.querySelector('i');
+        if(icon) icon.style.display = 'block';
+        
     });
 
-    // Reset de botones
-    document.getElementById('btn-save').classList.remove('hidden');
-    document.getElementById('btn-update').classList.add('hidden');
+    // 4. Limpiar el texto de feedback de archivo
+    const nameDisplay = document.getElementById('file-name-display');
+    if(nameDisplay) nameDisplay.textContent = "";
+
+    // 5. Volver botones a la normalidad (Estado "Guardar")
+    const btnSave = document.getElementById('btn-save');
+    const btnUpdate = document.getElementById('btn-update');
+    
+    if(btnSave) {
+        btnSave.style.display = 'block'; 
+        btnSave.classList.remove('hidden');
+    }
+    if(btnUpdate) {
+        btnUpdate.style.display = 'none';
+        btnUpdate.classList.add('hidden');
+    }
+
+    // 6. Quitar bordes rojos de validación si existen
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(i => i.style.border = "none");
+
+    console.log("Limpieza completada con éxito.");
 };

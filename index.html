@@ -247,26 +247,19 @@
     
     <input type="file" id="dash-input-file" accept="image/*" style="display: none;">
 
-    <div class="image-slots-container">
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-        <div class="image-slot" onclick="document.getElementById('dash-input-file').click()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
+    <div class="image-upload-container">
+    <div class="image-slot" id="slot-0" onclick="document.getElementById('dash-imagen').click()">
+        <img src="" class="preview-img hidden" alt="Vista previa">
+        <i class="fa-solid fa-plus"></i>
     </div>
+    <div class="image-slot" id="slot-1"><i class="fa-solid fa-plus"></i></div>
+    <div class="image-slot" id="slot-2"><i class="fa-solid fa-plus"></i></div>
+    <div class="image-slot" id="slot-3"><i class="fa-solid fa-plus"></i></div>
+    <div class="image-slot" id="slot-4"><i class="fa-solid fa-plus"></i></div>
+</div>
+
+<input type="file" id="dash-imagen" name="imagen" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
+
     <small id="file-name-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
 </div>
 

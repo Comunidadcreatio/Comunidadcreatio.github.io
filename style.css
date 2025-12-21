@@ -480,7 +480,7 @@ body {
     border: none;
     background: white;
     color: #333;
-    font-family: inherit;
+    font-family: 'Open Sans', sans-serif;
 }
 .input-group-dash textarea {
     border-radius: 15px; /* Textarea un poco menos redondeado */
@@ -513,22 +513,39 @@ body {
 .checkbox-container-dash input:checked ~ .checkmark:after { display: block; }
 
 /* --- COLUMNA DERECHA: IMÁGENES Y TABLA --- */
-.image-slots-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+
+.image-upload-container {
+    display: flex;          /* Activa el alineamiento en fila */
+    flex-direction: row;    /* Asegura que sea horizontal */
+    gap: 10px;              /* Espacio entre cada cuadro */
+    flex-wrap: nowrap;      /* Evita que se bajen a la siguiente línea */
+    overflow-x: auto;       /* Si no caben, permite hacer scroll lateral en móvil */
+    padding: 10px 0;
 }
 
 .image-slot {
-    width: 60px; height: 60px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 10px;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 1.5rem; color: rgba(255,255,255,0.5);
-    cursor: pointer; transition: 0.3s;
+    flex: 0 0 80px;         /* No crecen, no se encogen, base de 80px */
+    height: 80px;
+    background-color: #1a1a1a08;
+    border: 2px dashed #727272;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
 }
-.image-slot:hover { background: rgba(255,255,255,0.3); color: white; }
+.image-slot:hover {
+    border-color: var(--accent-gold);
+    background-color: #25252576;
+}
 
+/* Asegurar que cuando NO tenga has-image, el icono se vea */
+.image-slot:not(.has-image) i, 
+.image-slot:not(.has-image) span {
+    display: block !important;
+}
 /* Botón Guardar Obra (Verde Grande) */
 .btn-save-artwork {
     width: 100%;
@@ -666,39 +683,19 @@ body {
 .btn-update-artwork:hover { background-color: #2980b9; }
 .btn-clear-form:hover { background-color: #7f8c8d; }
 
-/* Clase utilitaria para ocultar elementos */
-.hidden {
-    display: none !important;
-}
-
-/* Estilos para los slots de imagen */
-.image-slot {
-    position: relative;
-    overflow: hidden; /* Para que la imagen no se salga del borde redondeado */
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f8f9fa;
-    border: 2px dashed #ddd;
-    transition: 0.3s;
-}
-
-.image-slot:hover {
-    border-color: #3498db;
-    background-color: #f1f7ff;
+/* Ocultar el icono de "+" cuando el slot tiene la clase has-image */
+.image-slot.has-image i {
+    display: none;
 }
 
 /* La imagen de vista previa */
 .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajusta la imagen al cuadro sin deformarla */
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ajusta la imagen sin deformarla */
-    z-index: 2;
 }
 
 /* Ocultar iconos cuando la imagen está presente */
@@ -755,4 +752,50 @@ body {
     .triple-field-grid {
         grid-template-columns: 1fr;
     }
+}
+/* Este es el contenedor que envuelve los 5 cuadros */
+
+/* Estilos para los Badges de Estado */
+.badge-active, .badge-inactive {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+}
+
+/* Estado Activo (Verde suave) */
+.badge-active {
+    background-color: #e6f4ea;
+    color: #1e7e34;
+    border: 1px solid #c3e6cb;
+}
+
+/* Estado Inactivo (Gris/Rojo suave) */
+.badge-inactive {
+    background-color: #fce8e6;
+    color: #c53030;
+    border: 1px solid #f5c6cb;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Ajuste para móviles (cuando el ancho es pequeño) */
+@media (max-width: 700px) {
+    .dash-header-top {
+        flex-direction: column; /* Apila el saludo y el botón */
+        margin: 17px;
+        align-items: stretch;   /* Hace que el botón ocupe todo el ancho si prefieres */
+    }
+
+    .btn-logout-dash {
+        width: 100%;           /* En móviles, el botón se ve genial ocupando todo el ancho */
+        justify-content: center;
+        margin: 17px;
+    }
+    
 }
