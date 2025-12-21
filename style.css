@@ -738,7 +738,7 @@ body {
 }
 
 /* Estilo para asegurar que los inputs mantengan el diseño redondeado */
-.triple-field-grid input {
+.triple-field-grid select {
     width: 100%;
     padding: 12px;
     border-radius: 25px; /* Mantiene la estética de los otros campos */
