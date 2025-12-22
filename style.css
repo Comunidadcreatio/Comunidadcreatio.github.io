@@ -568,6 +568,7 @@ body {
     overflow-x: auto;
 }
 
+
 .dash-table {
     width: 100%;
     border-collapse: collapse;
@@ -646,12 +647,14 @@ body {
     font-size: 0.8rem;
 }
 
+
 /* --- ESTILOS PARA LOS BOTONES DEL FORMULARIO --- */
 .form-actions-group {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     margin-top: 20px;
-    flex-wrap: 100%;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* <--- Esta es la clave del espacio */
 }
 
 /* Estilo unificado para los 3 botones */

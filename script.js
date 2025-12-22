@@ -204,7 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 3. Recopilar datos
             const formData = new FormData();
-            if (fileInput && fileInput.files[0]) formData.append('imagen', fileInput.files[0]);
+            const inputArchivo = document.getElementById('dash-imagen'); // <--- Asegúrate que este sea el ID en tu HTML
+            if (inputArchivo && inputArchivo.files[0]) {
+                formData.append('imagen', inputArchivo.files[0]);
+            } else {
+                console.warn("No se detectó ningún archivo seleccionado.");
+            }
 
             formData.append('titulo', document.getElementById('dash-titulo').value);
             formData.append('artista', document.getElementById('dash-artista').value);
@@ -385,7 +390,8 @@ if (btnUpdate) {
         editingId = id; // Guardamos el ID que estamos editando
 
 
-        // Feedback visua
+        // Feedback visual
+
 
         if (btnSave && btnUpdate) {
         btnSave.style.setProperty('display', 'none', 'important'); // Oculta Guardar
