@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('peso', document.getElementById('dash-peso').value);
             formData.append('marcos', document.getElementById('dash-marcos').value);
             formData.append('precio', document.getElementById('dash-precio').value);
-            formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
+            formData.append('certificado', document.getElementById('dash-certificado').value);
             formData.append('id_obra', document.getElementById('dash-id').value);
             formData.append('procedencia', document.getElementById('dash-procedencia').value);
 
@@ -289,7 +289,7 @@ if (btnUpdate) {
         
         formData.append('marcos', document.getElementById('dash-marcos').value);
         formData.append('precio', document.getElementById('dash-precio').value);
-        formData.append('etiqueta', document.getElementById('dash-etiqueta').value);
+        formData.append('certificado', document.getElementById('dash-certificado').value);
         
         // Importante: El backend espera 'id_obra' para mapearlo a 'id_personalizado'
         formData.append('id_obra', document.getElementById('dash-id').value);
@@ -362,7 +362,7 @@ if (btnUpdate) {
         document.getElementById('dash-peso').value = obra.peso || ''; // Ojo con la ortografía en tu HTML (dimenciones vs dimensiones)
         document.getElementById('dash-marcos').value = obra.marcos || '';
         document.getElementById('dash-precio').value = obra.precio || '';
-        document.getElementById('dash-etiqueta').value = obra.etiqueta || '';
+        document.getElementById('dash-certificado').value = obra.certificado || '';
         document.getElementById('dash-id').value = obra.id_personalizado || '';
         document.getElementById('dash-procedencia').value = obra.procedencia || '';
 
@@ -418,74 +418,107 @@ if (btnUpdate) {
 // --- FUNCIONES GLOBALES (FUERA DE DOMCONTENTLOADED) ---
 
 // Cargar Tabla
-async function cargarTablaObras() {
+// --- NUEVA LÓGICA: RENDERIZADO Y BUSCADOR ---
+
+// 1. Función reutilizable para pintar la tabla (sirve para cargar y para buscar)
+function renderizarTabla(listaObras) {
     const tbody = document.getElementById('tabla-obras-body');
     if (!tbody) return;
 
+    tbody.innerHTML = ''; // Limpiar tabla
+
+    if (!listaObras || listaObras.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No se encontraron coincidencias.</td></tr>';
+        return;
+    }
+
+    listaObras.forEach(obra => {
+        // Lógica de URL de imagen
+        let urlFinal = '';
+        const valorImagen = obra.imagen_url;
+        const dominio = 'https://backend-fundacion-atpe.onrender.com';
+
+        if (!valorImagen) {
+            urlFinal = 'https://placehold.co/35';
+        } else if (valorImagen.startsWith('http')) {
+            urlFinal = valorImagen;
+        } else {
+            urlFinal = valorImagen.startsWith('/') ? `${dominio}${valorImagen}` : `${dominio}/${valorImagen}`;
+        }
+
+        // Estado (Badge)
+        const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
+
+        // Crear Fila
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${obra.id_personalizado || obra.id}</td>
+            <td>${obra.titulo}</td>
+            <td>${obra.artista}</td>
+            <td>${obra.certificado || 'N/A'}</td>
+            <td>${obra.precio || '0'}$</td>
+            <td><span class="${statusClass}">${obra.status || 'Activo'}</span></td>
+            <td>
+                <img src="${urlFinal}" 
+                     style="width:35px; height:35px; border-radius:5px; object-fit:cover;" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/35'">
+            </td>
+            <td>
+                <div class="actions-cell">
+                    <button class="btn-icon-edit" onclick="window.prepararEdicion(${obra.id})" title="Editar">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(fila);
+    });
+}
+
+// 2. Función Cargar Tabla (Actualizada)
+async function cargarTablaObras() {
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
         const obras = await response.json();
         
-        // GUARDAMOS DATOS EN MEMORIA PARA PODER EDITARLOS LUEGO
+        // Guardamos en variable global para el buscador
         window.obrasData = obras; 
 
-        tbody.innerHTML = ''; 
-
-        if (!obras || obras.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No hay obras registradas aún.</td></tr>';
-            return;
-        }
-
-        obras.forEach(obra => {
-    // 1. Limpiamos la URL de la imagen para evitar duplicados
-    let urlFinal = '';
-    const valorImagen = obra.imagen_url;
-
-    if (!valorImagen) {
-        // Si no hay nada en la DB, usamos un placeholder
-        urlFinal = 'https://placehold.co/35';
-    } else if (valorImagen.startsWith('http')) {
-        // Si ya empieza con http, no le sumamos nada más
-        urlFinal = valorImagen;
-    } else {
-        // Si es una ruta relativa (ej: /uploads/foto.png), le sumamos el dominio
-        // Asegurándonos de que haya una sola barra entre el dominio y la ruta
-        const dominio = 'https://backend-fundacion-atpe.onrender.com';
-        urlFinal = valorImagen.startsWith('/') ? `${dominio}${valorImagen}` : `${dominio}/${valorImagen}`;
-    }
-
-    // 2. Creamos la clase para el estado (Badge)
-    const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
-
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-        <td>${obra.id_personalizado || obra.id}</td>
-        <td>${obra.titulo}</td>
-        <td>${obra.etiqueta || 'N/A'}</td>
-        <td>${obra.precio || '0'}$</td>
-        <td><span class="${statusClass}">${obra.status || 'Activo'}</span></td>
-        <td>
-            <img src="${urlFinal}" 
-                 style="width:35px; height:35px; border-radius:5px; object-fit:cover;" 
-                 onerror="this.onerror=null; this.src='https://placehold.co/35'">
-        </td>
-        <td>
-            <div class="actions-cell">
-                <button class="btn-icon-edit" onclick="window.prepararEdicion(${obra.id})" title="Editar">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-                <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </td>
-    `;
-    tbody.appendChild(fila);
-        });
+        // Pintamos usando la nueva función
+        renderizarTabla(obras);
     } catch (error) {
         console.error("Error cargando tabla:", error);
+        const tbody = document.getElementById('tabla-obras-body');
+        if(tbody) tbody.innerHTML = '<tr><td colspan="7">Error de conexión.</td></tr>';
     }
 }
+
+// 3. Activación del Buscador (Se ejecuta al iniciar)
+document.addEventListener('DOMContentLoaded', () => {
+    const inputBuscador = document.getElementById('buscador-obras');
+    if (inputBuscador) {
+        inputBuscador.addEventListener('input', (e) => {
+            const texto = e.target.value.toLowerCase().trim();
+            
+            // Si no hay datos cargados aún, salir
+            if (!window.obrasData) return;
+
+            const filtrados = window.obrasData.filter(obra => {
+                const titulo = (obra.titulo || '').toLowerCase();
+                const artista = (obra.artista || '').toLowerCase();
+                const idP = (obra.id_personalizado || '').toString().toLowerCase();
+                
+                // Busca coincidencias en Título, Artista o ID
+                return titulo.includes(texto) || artista.includes(texto) || idP.includes(texto);
+            });
+
+            renderizarTabla(filtrados);
+        });
+    }
+});
 
 // Eliminar Obra
 async function eliminarObra(id) {

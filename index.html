@@ -193,7 +193,7 @@
                             <div class="field-item">
                                 <label>Ancho</label>
                                 <select type="number" id="dash-ancho" name="ancho">
-                                    <option value="" disabled selected>5 cm</option>
+                                    <option value="" disabled selected>cm</option>
                                     <option value="S/N">S/N</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -600,7 +600,7 @@
                             <div class="field-item">
                                 <label>Alto</label>
                                 <select type="number" id="dash-alto" name="alto">
-                                    <option value="" disabled selected>9 cm</option>
+                                    <option value="" disabled selected>cm</option>
                                     <option value="S/N">S/N</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -1007,7 +1007,7 @@
                             <div class="field-item">
                                 <label>Peso</label>
                                 <select type="number" id="dash-peso" name="peso">
-                                    <option value="" disabled selected>9 kg</option>
+                                    <option value="" disabled selected>kg</option>
                                     <option value="S/N">S/N</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -1433,8 +1433,18 @@
                         <input type="number" id="dash-precio" class="dash-input" placeholder="Precio Total">
                     </div>
                     <div class="input-group-dash">
-                        <label>Etiqueta</label>
-                        <input type="text" id="dash-etiqueta">
+                        <label>Certificado</label>
+                        <div class="select-wrapper">
+                            <select id="dash-certificado" class="dash-input-select">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Si">Sí (autenticado)</option>
+                                <option value="No">No</option>
+                                <option value="En trámite">En trámite</option>
+                                <option value="Certificado digital disponible">Certificado digital disponible</option>
+                                <option value="Certificado físico disponible">Certificado físico disponible</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>   
                     </div>
 
                     <div class="input-group-dash">
@@ -1443,7 +1453,20 @@
                     </div>
                     <div class="input-group-dash">
                         <label>Procedencia</label>
-                        <input type="text" id="dash-procedencia">
+                        <div class="select-wrapper">
+                            <select id="dash-procedencia" class="dash-input-select">
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="Colección privada">Colección privada</option>
+                                <option value="Taller del artista">Taller del artista</option>
+                                <option value="Herencia familiar">Herencia familiar</option>
+                                <option value="Compra directa al artista">Compra directa al artista</option>
+                                <option value="Adquisición en subasta">Adquisición en subasta</option>
+                                <option value="Donación">Donación</option>
+                                <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
+                                <option value="Desconocida">Desconocida</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -1488,12 +1511,20 @@
                 <div class="table-section">
                     <h3>Gestión de Productos</h3>
                     <div class="table-container">
+
+                        <div class="dash-header">
+                            <div class="search-box">
+                                <input type="text" id="buscador-obras" placeholder=" Buscar por título, autor o ID...">
+                            </div>
+                        </div>
+
                         <table class="dash-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Título</th>
-                                    <th>Etiqueta</th>
+                                    <th>Autor</th>
+                                    <th>Certficado</th>
                                     <th>Precio</th>
                                     <th>Estatus</th>
                                     <th>Imagen</th>
