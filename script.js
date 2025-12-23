@@ -204,51 +204,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 3. Recopilar datos
             const formData = new FormData();
-            const inputArchivo = document.getElementById('dash-imagen'); // <--- Asegúrate que este sea el ID en tu HTML
+            // Agregar múltiples imágenes (hasta 5)
+        for (let i = 0; i < 5; i++) {
+            const inputArchivo = document.getElementById(`dash-imagen-${i}`);
             if (inputArchivo && inputArchivo.files[0]) {
-                formData.append('imagen', inputArchivo.files[0]);
+                formData.append(`imagen_${i}`, inputArchivo.files[0]);
+            }
+        }
+
+        // Agregar el resto de campos
+        formData.append('titulo', document.getElementById('dash-titulo').value);
+        formData.append('artista', document.getElementById('dash-artista').value);
+        formData.append('ano', document.getElementById('dash-ano').value);
+        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
+        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
+        formData.append('status', document.getElementById('dash-status').value);
+        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+        formData.append('ancho', document.getElementById('dash-ancho').value);
+        formData.append('alto', document.getElementById('dash-alto').value);
+        formData.append('peso', document.getElementById('dash-peso').value);
+        formData.append('marcos', document.getElementById('dash-marcos').value);
+        formData.append('precio', document.getElementById('dash-precio').value);
+        formData.append('certificado', document.getElementById('dash-certificado').value);
+        formData.append('id_obra', document.getElementById('dash-id').value);
+        formData.append('procedencia', document.getElementById('dash-procedencia').value);
+
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
+                method: 'POST',
+                body: formData 
+            });
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert("¡Obra registrada con éxito!");
+                window.resetFormulario();
+                cargarTablaObras(); 
             } else {
-                console.warn("No se detectó ningún archivo seleccionado.");
+                alert("Error: " + (result.error || "No se pudo guardar"));
             }
-
-            formData.append('titulo', document.getElementById('dash-titulo').value);
-            formData.append('artista', document.getElementById('dash-artista').value);
-            formData.append('ano', document.getElementById('dash-ano').value);
-            formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-            formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-            formData.append('status', document.getElementById('dash-status').value);
-            formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-            formData.append('ancho', document.getElementById('dash-ancho').value);
-            formData.append('alto', document.getElementById('dash-alto').value);
-            formData.append('peso', document.getElementById('dash-peso').value);
-            formData.append('marcos', document.getElementById('dash-marcos').value);
-            formData.append('precio', document.getElementById('dash-precio').value);
-            formData.append('certificado', document.getElementById('dash-certificado').value);
-            formData.append('id_obra', document.getElementById('dash-id').value);
-            formData.append('procedencia', document.getElementById('dash-procedencia').value);
-
-            try {
-                const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
-                    method: 'POST',
-                    body: formData 
-                });
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    alert("¡Obra registrada con éxito!");
-                    window.resetFormulario();
-                    cargarTablaObras(); 
-                } else {
-                    alert("Error: " + (result.error || "No se pudo guardar"));
-                }
-            } catch (error) {
-                alert("Error al conectar con el servidor.");
-            } finally {
-                btnSave.innerHTML = originalText;
-                btnSave.disabled = false;
-            }
-        });
-    }
+        } catch (error) {
+            alert("Error al conectar con el servidor.");
+        } finally {
+            btnSave.innerHTML = originalText;
+            btnSave.disabled = false;
+        }
+    });
+}
 
     // --- 9. ACTUALIZAR OBRA (PUT) - BOTÓN REFRESCAR ---
 if (btnUpdate) {
@@ -267,10 +269,12 @@ if (btnUpdate) {
 
         const formData = new FormData();
         
-        // 1. Manejo de la imagen: Usamos el ID correcto del input de archivo
-        const fileInput = document.getElementById('dash-imagen'); 
-        if (fileInput && fileInput.files[0]) {
-            formData.append('imagen', fileInput.files[0]);
+        // Agregar múltiples imágenes para actualización
+        for (let i = 0; i < 5; i++) {
+            const inputArchivo = document.getElementById(`dash-imagen-${i}`);
+            if (inputArchivo && inputArchivo.files[0]) {
+                formData.append(`imagen_${i}`, inputArchivo.files[0]);
+            }
         }
 
         // 2. Mapeo de campos (Asegúrate de que los IDs coincidan con tu index.html)
@@ -366,28 +370,32 @@ if (btnUpdate) {
         document.getElementById('dash-id').value = obra.id_personalizado || '';
         document.getElementById('dash-procedencia').value = obra.procedencia || '';
 
-        // --- NUEVA LÓGICA PARA LA IMAGEN ---
-        const slot0 = document.getElementById('slot-0');
-        const imgPreview = slot0.querySelector('.preview-img');
-
+        if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+        obra.todas_imagenes.forEach((url, index) => {
+            if (index < 5 && url) { // Máximo 5 imágenes
+                const slot = document.getElementById(`slot-${index}`);
+                const imgPreview = slot.querySelector('.preview-img');
+                
+                imgPreview.src = url;
+                imgPreview.classList.remove('hidden');
+                slot.classList.add('has-image');
+            }
+        });
+    } else {
+        // Para compatibilidad con obras antiguas que solo tienen imagen_url
         if (obra.imagen_url) {
-        // CAMBIO AQUÍ: Usamos tu URL de Render en lugar de localhost
-        const baseUrl = 'https://backend-fundacion-atpe.onrender.com';
-        
-        // Verificamos si la URL ya es completa o es relativa
-        imgPreview.src = obra.imagen_url.startsWith('http') 
-            ? obra.imagen_url 
-            : `${baseUrl}${obra.imagen_url}`;
-        
-        imgPreview.classList.remove('hidden');
-        slot0.classList.add('has-image');
+            const slot0 = document.getElementById('slot-0');
+            const imgPreview = slot0.querySelector('.preview-img');
+            
+            const baseUrl = 'https://backend-fundacion-atpe.onrender.com';
+            imgPreview.src = obra.imagen_url.startsWith('http') 
+                ? obra.imagen_url 
+                : `${baseUrl}${obra.imagen_url}`;
+            
+            imgPreview.classList.remove('hidden');
+            slot0.classList.add('has-image');
         }
-
-        // Cambiar visibilidad de botones (esto ya deberías tenerlo)
-        document.getElementById('btn-save').classList.add('hidden');
-        document.getElementById('btn-update').classList.remove('hidden');
-    
-        editingId = id; // Guardamos el ID que estamos editando
+    }
 
 
         // Feedback visual
@@ -612,6 +620,105 @@ window.resetFormulario = function() {
     // 6. Quitar bordes rojos de validación si existen
     const inputs = form.querySelectorAll('input, select, textarea');
     inputs.forEach(i => i.style.border = "none");
+
+    console.log("Limpieza completada con éxito.");
+};
+
+// Función para activar el input file correspondiente
+function activarInput(slotIndex) {
+    document.getElementById(`dash-imagen-${slotIndex}`).click();
+}
+
+// Función para mostrar vista previa en el slot correspondiente
+function previewImage(event, slotIndex) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    const slot = document.getElementById(`slot-${slotIndex}`);
+    const imgPreview = slot.querySelector('.preview-img');
+    
+    reader.onload = function(e) {
+        imgPreview.src = e.target.result;
+        imgPreview.classList.remove('hidden');
+        slot.classList.add('has-image');
+        
+        // Mostrar nombres de archivos seleccionados
+        actualizarNombresArchivos();
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// Función para actualizar la lista de nombres de archivos
+function actualizarNombresArchivos() {
+    const display = document.getElementById('file-names-display');
+    let archivos = [];
+    
+    for (let i = 0; i < 5; i++) {
+        const input = document.getElementById(`dash-imagen-${i}`);
+        if (input.files[0]) {
+            archivos.push(input.files[0].name);
+        }
+    }
+    
+    if (archivos.length > 0) {
+        display.textContent = `Archivos (${archivos.length}/5): ${archivos.join(', ')}`;
+        display.style.color = "#2ecc71";
+    } else {
+        display.textContent = '';
+    }
+}
+
+// Modificar la función resetFormulario para limpiar todos los slots
+window.resetFormulario = function() {
+    console.log("Iniciando limpieza del formulario...");
+    
+    // 1. Limpiar campos de texto y selección
+    const form = document.getElementById('artwork-form');
+    if(form) form.reset();
+    
+    // 2. Resetear el ID de edición
+    editingId = null; 
+
+    // 3. Limpiar todos los inputs de archivo y slots
+    for (let i = 0; i < 5; i++) {
+        const input = document.getElementById(`dash-imagen-${i}`);
+        if (input) input.value = "";
+        
+        const slot = document.getElementById(`slot-${i}`);
+        if (slot) {
+            slot.classList.remove('has-image');
+            const img = slot.querySelector('.preview-img');
+            if (img) {
+                img.src = "";
+                img.classList.add('hidden');
+            }
+        }
+    }
+
+    // 4. Limpiar el texto de feedback de archivo
+    const nameDisplay = document.getElementById('file-names-display');
+    if(nameDisplay) nameDisplay.textContent = "";
+
+    // 5. Volver botones a la normalidad
+    const btnSave = document.getElementById('btn-save');
+    const btnUpdate = document.getElementById('btn-update');
+    
+    if(btnSave) {
+        btnSave.style.display = 'block'; 
+        btnSave.classList.remove('hidden');
+    }
+    if(btnUpdate) {
+        btnUpdate.style.display = 'none';
+        btnUpdate.classList.add('hidden');
+    }
+
+    // 6. Quitar bordes rojos de validación
+    if(form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => i.style.border = "none");
+    }
 
     console.log("Limpieza completada con éxito.");
 };

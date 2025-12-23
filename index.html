@@ -84,7 +84,7 @@
         </form>
     </div>
 </div>
-<div id="admin-dashboard" class="login-overlay hidden" style="align-items: flex-start; padding-top: 5vh; overflow-y: auto;">
+<div id="admin-dashboard" class="login-overlay hidden">
     <div class="login-card dashboard-wide">
         
         <div class="dash-header-top">
@@ -1473,26 +1473,41 @@
 
             <div class="dash-column-right">
                 
-                <div class="image-upload-section">
-    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imagen</label>
-    
-    <input type="file" id="dash-input-file" accept="image/*" style="display: none;">
+            <div class="image-upload-section">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imagenes de la Obra (Máx. 5)</label>
+                    
+                    <div class="image-upload-container">
+                        <div class="image-slot" id="slot-0" onclick="activarInput(0)">
+                            <img src="" class="preview-img hidden" alt="Vista previa">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="image-slot" id="slot-1" onclick="activarInput(1)">
+                            <img src="" class="preview-img hidden" alt="Vista previa">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="image-slot" id="slot-2" onclick="activarInput(2)">
+                            <img src="" class="preview-img hidden" alt="Vista previa">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="image-slot" id="slot-3" onclick="activarInput(3)">
+                            <img src="" class="preview-img hidden" alt="Vista previa">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="image-slot" id="slot-4" onclick="activarInput(4)">
+                            <img src="" class="preview-img hidden" alt="Vista previa">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                    </div>
 
-    <div class="image-upload-container">
-    <div class="image-slot" id="slot-0" onclick="document.getElementById('dash-imagen').click()">
-        <img src="" class="preview-img hidden" alt="Vista previa">
-        <i class="fa-solid fa-plus"></i>
-    </div>
-    <div class="image-slot" id="slot-1"><i class="fa-solid fa-plus"></i></div>
-    <div class="image-slot" id="slot-2"><i class="fa-solid fa-plus"></i></div>
-    <div class="image-slot" id="slot-3"><i class="fa-solid fa-plus"></i></div>
-    <div class="image-slot" id="slot-4"><i class="fa-solid fa-plus"></i></div>
-</div>
-
-<input type="file" id="dash-imagen" name="imagen" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
-
-    <small id="file-name-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
-</div>
+                    <!-- Inputs ocultos para cada slot -->
+                    <input type="file" id="dash-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
+                    <input type="file" id="dash-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
+                    <input type="file" id="dash-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
+                    <input type="file" id="dash-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
+                    <input type="file" id="dash-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
+                    
+                <small id="file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
+        </div>
 
                 <div class="form-actions-group">
                     <button type="submit" form="artwork-form" id="btn-save" class="btn-save-artwork">
