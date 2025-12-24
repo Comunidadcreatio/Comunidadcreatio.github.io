@@ -984,3 +984,15 @@ body {
 .btn-ver-detalle {
     display: none; /* Si quieres que sea idéntico a la imagen 2, ocúltalo o cámbialo por un link de texto */
 }
+
+@media (max-width: 1024px) {
+    .galeria-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablets */
+    }
+}
+
+@media (max-width: 600px) {
+    .galeria-container {
+        grid-template-columns: 1fr; /* 1 sola columna en celulares */
+    }
+}
