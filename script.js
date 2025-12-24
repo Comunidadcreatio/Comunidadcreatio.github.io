@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. VARIABLES Y SELECTORES ---
     window.isLoggedIn = false; // Estado de sesión
     let editingId = null;      // ID de la obra que se está editando actualmente
+    cargarGaleriaPublica();
 
     // Elementos principales UI
     const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -737,3 +738,66 @@ window.resetFormulario = function() {
 
     console.log("Limpieza completada con éxito.");
 };
+
+async function cargarGaleriaPublica() {
+    const galleryContainer = document.getElementById('gallery-grid');
+    if (!galleryContainer) return; // Si no estamos en la página correcta, salir
+
+    try {
+        // 1. Pedir datos al servidor
+        // Asegúrate de que la URL coincida con tu puerto (ej: http://localhost:3000/obras)
+        const response = await fetch('http://localhost:3000/obras'); 
+        const obras = await response.json();
+
+        // 2. Limpiar contenedor
+        galleryContainer.innerHTML = '';
+
+        // 3. Filtrar obras ACTIVAS (Status)
+        // Nota: Asumo que en la BD guardas "activo" o "Activo". Ajustamos a minúsculas para asegurar.
+        const obrasActivas = obras.filter(obra => 
+            obra.estatus && obra.estatus.toLowerCase() === 'activo'
+        );
+
+        if (obrasActivas.length === 0) {
+            galleryContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay obras disponibles por el momento.</p>';
+            return;
+        }
+
+        // 4. Generar HTML por cada obra
+        obrasActivas.forEach(obra => {
+            // Usar la primera imagen (imagen_url)
+            // Si la ruta viene solo como nombre de archivo, le agregamos '/uploads/'
+            const imagenSrc = obra.imagen_url ? `http://localhost:3000/uploads/${obra.imagen_url}` : 'placeholder.jpg';
+
+            const card = document.createElement('div');
+            card.className = 'artwork-card';
+
+            // Formatear precio (ej: $1,000.00)
+            const precioFormateado = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(obra.precio);
+
+            // Construcción del HTML según tu imagen de referencia
+            card.innerHTML = `
+                <div class="art-img-container">
+                    <img src="${imagenSrc}" alt="${obra.titulo}" loading="lazy">
+                </div>
+                
+                <div class="art-author">${obra.autor}</div>
+                <div class="art-title">${obra.titulo}</div>
+                
+                <div class="art-details">
+                    <span>${obra.anio} • ${obra.tecnica}</span>
+                    <span>${obra.alto} x ${obra.ancho} cm</span>
+                    ${obra.peso ? `<span>${obra.peso} kg</span>` : ''}
+                </div>
+                
+                <div class="art-price">${precioFormateado}</div>
+            `;
+
+            galleryContainer.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error cargando la galería:", error);
+        galleryContainer.innerHTML = '<p>Error al cargar las obras. Intente más tarde.</p>';
+    }
+}
