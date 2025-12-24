@@ -228,6 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('certificado', document.getElementById('dash-certificado').value);
         formData.append('id_obra', document.getElementById('dash-id').value);
         formData.append('procedencia', document.getElementById('dash-procedencia').value);
+        formData.append('firma', document.getElementById('dash-firma').value);
+        formData.append('soporte', document.getElementById('dash-soporte').value);
+        formData.append('conservacion', document.getElementById('dash-conservacion').value);
+        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
+        formData.append('localizacion', document.getElementById('dash-localizacion').value);
 
         try {
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
@@ -298,6 +303,11 @@ if (btnUpdate) {
         // Importante: El backend espera 'id_obra' para mapearlo a 'id_personalizado'
         formData.append('id_obra', document.getElementById('dash-id').value);
         formData.append('procedencia', document.getElementById('dash-procedencia').value);
+        formData.append('firma', document.getElementById('dash-firma').value);
+        formData.append('soporte', document.getElementById('dash-soporte').value);
+        formData.append('conservacion', document.getElementById('dash-conservacion').value);
+        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
+        formData.append('localizacion', document.getElementById('dash-localizacion').value);
 
         try {
             // Usamos la URL de tu backend en Render
@@ -363,12 +373,17 @@ if (btnUpdate) {
         document.getElementById('dash-estado-obra').value = obra.estado_obra || '';
         document.getElementById('dash-ancho').value = obra.ancho || '';
         document.getElementById('dash-alto').value = obra.alto || '';
-        document.getElementById('dash-peso').value = obra.peso || ''; // Ojo con la ortografía en tu HTML (dimenciones vs dimensiones)
+        document.getElementById('dash-peso').value = obra.peso || '';
         document.getElementById('dash-marcos').value = obra.marcos || '';
         document.getElementById('dash-precio').value = obra.precio || '';
         document.getElementById('dash-certificado').value = obra.certificado || '';
         document.getElementById('dash-id').value = obra.id_personalizado || '';
         document.getElementById('dash-procedencia').value = obra.procedencia || '';
+        document.getElementById('dash-firma').value = obra.firma || '';
+        document.getElementById('dash-soporte').value = obra.soporte || ''; 
+        document.getElementById('dash-conservacion').value = obra.conservacion || '';
+        document.getElementById('dash-etiquetas').value = obra.etiquetas || '';
+        document.getElementById('dash-localizacion').value = obra.localizacion || '';
 
         if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
         obra.todas_imagenes.forEach((url, index) => {
