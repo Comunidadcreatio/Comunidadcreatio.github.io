@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. VARIABLES Y SELECTORES ---
     window.isLoggedIn = false; // Estado de sesión
     let editingId = null;      // ID de la obra que se está editando actualmente
-    cargarGaleriaPublica();
 
     // Elementos principales UI
     const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -89,30 +88,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Manejo de clases activas
-            navLinks.forEach(el => el.classList.remove('active'));
-            this.classList.add('active');
-
-            // Cerrar menú móvil al hacer click
-            if(navMenu) navMenu.classList.remove('active');
-
-            // Lógica específica para Galería
-            const linkText = this.textContent.trim().toLowerCase();
-            if (linkText === 'galería' || linkText === 'galeria') {
-                if (cartContainer) {
-                    cartContainer.classList.add('hidden');
-                    cartContainer.classList.remove('show-anim');
-                    setTimeout(() => {
-                        cartContainer.classList.remove('hidden');
-                        cartContainer.classList.add('show-anim');
-                    }, 10);
-                }
-            } else if (cartContainer) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const linkText = this.textContent.trim().toLowerCase();
+        
+        // Manejo de la galería
+        if (linkText === 'galería' || linkText === 'galeria') {
+            // Mostrar galería, ocultar main
+            document.querySelector('.main-content').classList.add('hidden');
+            document.getElementById('galeria').classList.remove('hidden');
+            
+            // Cargar galería si es necesario
+            cargarGaleria();
+            
+            // Mostrar carrito si está oculto
+            if (cartContainer) {
+                cartContainer.classList.remove('hidden');
+                cartContainer.classList.add('show-anim');
+            }
+        } else if (linkText === 'inicio') {
+            // Mostrar main, ocultar galería
+            document.querySelector('.main-content').classList.remove('hidden');
+            document.getElementById('galeria').classList.add('hidden');
+            
+            // Ocultar carrito en inicio
+            if (cartContainer) {
                 cartContainer.classList.add('hidden');
             }
-        });
+        }
+        
+        // Manejo de clases activas
+        navLinks.forEach(el => el.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Cerrar menú móvil
+        if(navMenu) navMenu.classList.remove('active');
     });
+});
 
     // 4. GESTIÓN DE PANELES (LOGIN / DASHBOARD)
     function togglePanels(showDashboard) {
@@ -739,65 +752,280 @@ window.resetFormulario = function() {
     console.log("Limpieza completada con éxito.");
 };
 
-async function cargarGaleriaPublica() {
-    const galleryContainer = document.getElementById('gallery-grid');
-    if (!galleryContainer) return; // Si no estamos en la página correcta, salir
+// --- GALERÍA DE OBRAS ---
 
+// Función para cargar la galería desde el backend
+async function cargarGaleria() {
     try {
-        // 1. Pedir datos al servidor
-        // Asegúrate de que la URL coincida con tu puerto (ej: http://localhost:3000/obras)
-        const response = await fetch('http://localhost:3000/obras'); 
+        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
         const obras = await response.json();
-
-        // 2. Limpiar contenedor
-        galleryContainer.innerHTML = '';
-
-        // 3. Filtrar obras ACTIVAS (Status)
-        // Nota: Asumo que en la BD guardas "activo" o "Activo". Ajustamos a minúsculas para asegurar.
+        
+        // Filtrar solo obras activas
         const obrasActivas = obras.filter(obra => 
-            obra.estatus && obra.estatus.toLowerCase() === 'activo'
+            obra.status === 'Activo' && obra.imagen_url
         );
-
-        if (obrasActivas.length === 0) {
-            galleryContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay obras disponibles por el momento.</p>';
-            return;
-        }
-
-        // 4. Generar HTML por cada obra
-        obrasActivas.forEach(obra => {
-            // Usar la primera imagen (imagen_url)
-            // Si la ruta viene solo como nombre de archivo, le agregamos '/uploads/'
-            const imagenSrc = obra.imagen_url ? `http://localhost:3000/uploads/${obra.imagen_url}` : 'placeholder.jpg';
-
-            const card = document.createElement('div');
-            card.className = 'artwork-card';
-
-            // Formatear precio (ej: $1,000.00)
-            const precioFormateado = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(obra.precio);
-
-            // Construcción del HTML según tu imagen de referencia
-            card.innerHTML = `
-                <div class="art-img-container">
-                    <img src="${imagenSrc}" alt="${obra.titulo}" loading="lazy">
-                </div>
-                
-                <div class="art-author">${obra.autor}</div>
-                <div class="art-title">${obra.titulo}</div>
-                
-                <div class="art-details">
-                    <span>${obra.anio} • ${obra.tecnica}</span>
-                    <span>${obra.alto} x ${obra.ancho} cm</span>
-                    ${obra.peso ? `<span>${obra.peso} kg</span>` : ''}
-                </div>
-                
-                <div class="art-price">${precioFormateado}</div>
-            `;
-
-            galleryContainer.appendChild(card);
-        });
-
+        
+        mostrarGaleria(obrasActivas);
     } catch (error) {
-        console.error("Error cargando la galería:", error);
-        galleryContainer.innerHTML = '<p>Error al cargar las obras. Intente más tarde.</p>';
+        console.error("Error cargando galería:", error);
+        document.getElementById('galeria-container').innerHTML = 
+            '<div class="error">Error al cargar la galería. Intenta nuevamente.</div>';
     }
 }
+
+// Función para mostrar las obras en la galería
+function mostrarGaleria(obras) {
+    const container = document.getElementById('galeria-container');
+    const sinResultados = document.querySelector('.sin-resultados');
+    
+    if (!obras || obras.length === 0) {
+        container.innerHTML = '';
+        sinResultados.classList.remove('hidden');
+        return;
+    }
+    
+    sinResultados.classList.add('hidden');
+    
+    container.innerHTML = obras.map(obra => {
+        // Formatear dimensiones
+        const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+        
+        // Formatear técnica
+        const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
+        
+        // Formatear precio
+        const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
+        
+        return `
+            <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
+                <div class="obra-imagen">
+                    <img src="${obra.imagen_url}" 
+                         alt="${obra.titulo}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x250?text=Imagen+no+disponible'">
+                    <span class="obra-badge">${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}</span>
+                </div>
+                <div class="obra-info">
+                    <h3 class="obra-titulo">${obra.titulo}</h3>
+                    <p class="obra-artista">${obra.artista}</p>
+                    
+                    <div class="obra-detalles">
+                        <div class="detalle-item">
+                            <span class="detalle-label">Dimensiones:</span>
+                            <span class="detalle-valor">${dimensiones}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="detalle-label">Peso:</span>
+                            <span class="detalle-valor">${obra.peso || 'S/N'}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="detalle-label">Año:</span>
+                            <span class="detalle-valor">${obra.ano || 'N/A'}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="detalle-label">Técnica:</span>
+                            <span class="detalle-valor">${tecnica}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="obra-precio">
+                        <div class="precio-monto">${precio}</div>
+                        <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
+                    </div>
+                    
+                    <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
+                        <i class="fa-solid fa-eye"></i> Ver detalles
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Función para ver detalles de una obra (modal)
+async function verDetalleObra(id) {
+    try {
+        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        const obras = await response.json();
+        const obra = obras.find(o => o.id === id);
+        
+        if (!obra) return;
+        
+        const modal = document.getElementById('obra-modal');
+        const modalBody = document.querySelector('.modal-body');
+        
+        // Formatear todos los detalles
+        const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+        const tecnica = obra.descripcion_tecnica || 'No especificada';
+        const descripcion = obra.descripcion_artistica || 'Sin descripción disponible.';
+        const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
+        
+        modalBody.innerHTML = `
+            <div class="modal-imagen">
+                <img src="${obra.imagen_url}" 
+                     alt="${obra.titulo}"
+                     onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Imagen+no+disponible'">
+            </div>
+            <div class="modal-info">
+                <h2 class="modal-titulo">${obra.titulo}</h2>
+                <p class="modal-artista">${obra.artista}</p>
+                
+                <div class="modal-descripcion">
+                    <p>${descripcion}</p>
+                </div>
+                
+                <div class="modal-detalles">
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Dimensiones</div>
+                        <div class="modal-detalle-valor">${dimensiones}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Peso</div>
+                        <div class="modal-detalle-valor">${obra.peso || 'S/N'}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Año</div>
+                        <div class="modal-detalle-valor">${obra.ano || 'N/A'}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Técnica</div>
+                        <div class="modal-detalle-valor">${tecnica}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Estado</div>
+                        <div class="modal-detalle-valor">${obra.estado_obra || 'N/A'}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Certificado</div>
+                        <div class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Procedencia</div>
+                        <div class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</div>
+                    </div>
+                    <div class="modal-detalle">
+                        <div class="modal-detalle-label">Estado Conservación</div>
+                        <div class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</div>
+                    </div>
+                </div>
+                
+                <div class="modal-precio" style="background: linear-gradient(135deg, var(--accent-gold), #e5cf7d); padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--bg-dark);">${precio}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">${obra.estado_obra === 'Disponible' ? 'Disponible para compra' : obra.estado_obra || 'Consultar disponibilidad'}</div>
+                </div>
+                
+                ${obra.estado_obra === 'Disponible' ? 
+                    `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px;" onclick="agregarAlCarrito(${id})">
+                        <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                    </button>` : 
+                    ''
+                }
+            </div>
+        `;
+        
+        modal.classList.remove('hidden');
+    } catch (error) {
+        console.error("Error cargando detalles:", error);
+        alert("Error al cargar los detalles de la obra.");
+    }
+}
+
+// Función para agregar al carrito (puedes expandir esto después)
+function agregarAlCarrito(id) {
+    const cartBadge = document.querySelector('.cart-badge');
+    let count = parseInt(cartBadge.textContent) || 0;
+    cartBadge.textContent = count + 1;
+    
+    // Aquí puedes agregar lógica para guardar en localStorage o enviar al backend
+    alert("Obra agregada al carrito");
+}
+
+// Función para filtrar obras
+function filtrarGaleria() {
+    const tecnica = document.getElementById('filtro-tecnica').value;
+    const precioFiltro = document.getElementById('filtro-precio').value;
+    const obras = document.querySelectorAll('.obra-card');
+    
+    obras.forEach(obra => {
+        const obraTecnica = obra.dataset.tecnica;
+        const obraPrecio = parseInt(obra.dataset.precio) || 0;
+        
+        let mostrar = true;
+        
+        // Filtrar por técnica
+        if (tecnica && !obraTecnica.includes(tecnica)) {
+            mostrar = false;
+        }
+        
+        // Filtrar por precio
+        if (precioFiltro) {
+            switch(precioFiltro) {
+                case '0-500':
+                    if (obraPrecio > 500) mostrar = false;
+                    break;
+                case '501-1000':
+                    if (obraPrecio < 501 || obraPrecio > 1000) mostrar = false;
+                    break;
+                case '1001-2000':
+                    if (obraPrecio < 1001 || obraPrecio > 2000) mostrar = false;
+                    break;
+                case '2001+':
+                    if (obraPrecio < 2001) mostrar = false;
+                    break;
+            }
+        }
+        
+        obra.style.display = mostrar ? 'block' : 'none';
+    });
+    
+    // Mostrar mensaje si no hay resultados
+    const obrasVisibles = [...obras].filter(o => o.style.display !== 'none');
+    const sinResultados = document.querySelector('.sin-resultados');
+    
+    if (obrasVisibles.length === 0) {
+        sinResultados.classList.remove('hidden');
+    } else {
+        sinResultados.classList.add('hidden');
+    }
+}
+
+// Inicializar galería cuando se carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    // ... tu código existente ...
+    
+    // Agregar evento al botón de galería en el menú
+    const btnGaleria = document.getElementById('btn-galeria');
+    if (btnGaleria) {
+        btnGaleria.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Mostrar galería y ocultar main content
+            document.querySelector('.main-content').classList.add('hidden');
+            document.getElementById('galeria').classList.remove('hidden');
+            
+            // Cargar galería si no está cargada
+            const container = document.getElementById('galeria-container');
+            if (container.innerHTML.includes('loading')) {
+                cargarGaleria();
+            }
+            
+            // Scroll suave a la galería
+            window.scrollTo({ top: 110, behavior: 'smooth' });
+        });
+    }
+    
+    // Eventos para filtros
+    document.getElementById('filtro-tecnica')?.addEventListener('change', filtrarGaleria);
+    document.getElementById('filtro-precio')?.addEventListener('change', filtrarGaleria);
+    
+    // Evento para cerrar modal
+    document.querySelector('.close-modal')?.addEventListener('click', () => {
+        document.getElementById('obra-modal').classList.add('hidden');
+    });
+    
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('obra-modal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('obra-modal')) {
+            document.getElementById('obra-modal').classList.add('hidden');
+        }
+    });
+});

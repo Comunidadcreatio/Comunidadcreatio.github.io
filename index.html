@@ -23,7 +23,7 @@
             <ul>
                 <li><a href="#">Inicio</a></li>
                 <li><a href="#">Sobre Nosotros</a></li>
-                <li><a href="#public-gallery-section" id="btn-galeria">Galería</a></li>
+                <li><a href="#" id="btn-galeria">Galería</a></li>
                 <li><a href="#">Eventos</a></li>
                 <li><a href="#">Programa Educativo</a></li>
                 <li><a href="#">Donaciones</a></li>
@@ -49,18 +49,55 @@
     </div>
 </header>
 
-<main id="public-gallery-section" class="gallery-section">
-    <div class="container">
-        <h2 class="section-title">Galería de Obras</h2>
-        
-        <div id="gallery-grid" class="gallery-grid">
-            </div>
-    </div>
-</main>
+
 
 <main class="main-content">
     <h2>Bienvenido a Fundación Extramuros</h2>
 </main>
+
+<!-- Sección Galería -->
+<section id="galeria" class="galeria-section hidden">
+    <div class="galeria-header">
+
+       <!-- <h2>Galería de Obras</h2>
+        <div class="filtros">
+            <select id="filtro-tecnica">
+                <option value="">Todas las técnicas</option>
+                <option value="Óleo">Óleo sobre lienzo</option>
+                <option value="Acrílico">Acrílico sobre lienzo</option>
+                <!-- Agrega otras técnicas según tu base de datos -->
+           <!--  </select>
+            <select id="filtro-precio">
+                <option value="">Todos los precios</option>
+                <option value="0-500">Hasta $500</option>
+                <option value="501-1000">$501 - $1000</option>
+                <option value="1001-2000">$1001 - $2000</option>
+                <option value="2001+">Más de $2000</option>
+            </select>
+        </div>
+    </div>-->
+    
+    <div class="galeria-container" id="galeria-container">
+        <!-- Las tarjetas de obras se cargarán aquí dinámicamente -->
+        <div class="loading">Cargando galería...</div>
+    </div>
+    
+    <div class="sin-resultados hidden">
+        <i class="fa-solid fa-palette"></i>
+        <p>No se encontraron obras en la galería</p>
+    </div>
+</section>
+
+<!-- Modal para vista detallada -->
+<div id="obra-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="modal-body">
+            <!-- Contenido se carga dinámicamente -->
+        </div>
+    </div>
+</div>
+
 
 <div id="login-panel" class="login-overlay hidden">
     <div class="login-card">
@@ -1829,6 +1866,10 @@
 
             </div> </div> </div>
 </div>
+
+
+
+
 
 <script src="script.js"></script>
 </body>

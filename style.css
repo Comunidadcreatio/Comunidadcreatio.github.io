@@ -849,122 +849,138 @@ body {
     background-color: #fff;
 }
 
-/* --- ESTILOS DE LA GALERÍA PÚBLICA (Mesa de trabajo 9) --- */
+/* --- GALERÍA DE OBRAS (ESTILO SEGUNDA IMAGEN) --- */
 
-.gallery-section {
-    padding: 140px 0 60px 0; /* Espacio superior porque el header es fixed */
-    background-color: #fff;
-    min-height: 80vh;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 40px;
-    color: var(--bg-dark);
-    font-weight: 300;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* GRID RESPONSIVO: Se adapta a móviles y escritorio automáticamente */
-.gallery-grid {
+.galeria-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 50px; /* Espacio entre tarjetas */
-    width: 100%;
+    grid-template-columns: repeat(4, 1fr);
+    /* Espacio lateral y entre tarjetas */
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-/* TARJETA DE OBRA */
-.artwork-card {
-    background: transparent;
+/* 1. Ajuste del contenedor de la sección completa */
+.galeria-section {
+    /* Aumentamos el padding superior para separar las imágenes del header */
+    padding: 180px 20px 80px; 
+    background: #ffffff;
+    min-height: 100vh;
+}
+
+/* 2. Ajuste del encabezado (Título y Filtros) */
+.galeria-header {
+    text-align: center;
+    /* Un margen inferior generoso crea el espacio de aire antes de las fotos */
+    margin-bottom: 60px; 
+}
+
+
+/* Tarjeta de obra - Estilo Limpio */
+.obra-card {
+    background: transparent; /* Eliminamos el fondo blanco */
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none; /* Eliminamos la sombra pesada */
+    transition: transform 0.3s ease;
+    height: auto;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar contenido */
-    text-align: center;
-    transition: transform 0.3s ease;
+    border: none; /* Eliminamos el borde */
 }
 
-.artwork-card:hover {
-    transform: translateY(-5px); /* Pequeño efecto al pasar el mouse */
+.obra-card:hover {
+    transform: translateY(-5px);
+    box-shadow: none; /* Mantener limpio en hover */
 }
 
-/* CONTENEDOR DE IMAGEN */
-.art-img-container {
+.obra-imagen {
+    height: 280px; /* Ajustamos a un formato más cuadrado/vertical según la obra */
     width: 100%;
-    margin-bottom: 20px;
     overflow: hidden;
-    /* Mantiene las imágenes ordenadas aunque tengan tamaños distintos */
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; 
+    margin-bottom: 15px; /* Espacio entre imagen y texto */
 }
 
-.art-img-container img {
-    max-width: 100%;
-    height: auto;
-    max-height: 400px; /* Altura máxima para que no se descuadre */
-    object-fit: contain;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.obra-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* TEXTOS Y DETALLES (Según tu imagen) */
+/* Info de la obra */
+.obra-info {
+    padding: 0; /* Quitamos el padding interno de la tarjeta */
+    text-align: left;
+}
 
-/* 1. Autor */
-.art-author {
-    font-family: 'Open Sans', sans-serif;
+.obra-titulo {
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #000;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.obra-artista {
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Icono de check verde para el artista como en tu boceto */
+.obra-artista::before {
+    content: 'check_circle'; /* Si usas Material Icons */
+    /* O puedes usar un emoji o imagen si no tienes iconos configurados: */
+    content: '✔'; 
+    color: #2ecc71;
+    font-size: 0.9rem;
+}
+
+/* Detalles en una sola línea gris como el boceto */
+.obra-detalles {
+    display: flex;
+    gap: 10px;
+    color: #888;
+    font-size: 0.85rem;
     margin-bottom: 5px;
 }
 
-/* 2. Título */
-.art-title {
-    font-family: 'Times New Roman', serif; /* Serif para darle elegancia como en la foto */
-    font-style: italic;
-    font-size: 1.1rem;
-    color: #444;
-    margin-bottom: 10px;
-}
-
-/* 3. Detalles técnicos (Año, Técnica, Dimensiones) */
-.art-details {
-    font-size: 0.85rem;
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 10px;
+.detalle-item {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    justify-content: flex-start;
 }
 
-.art-details span {
-    display: block;
+.detalle-label { display: none; } /* Ocultamos etiquetas como "Dimensiones:" */
+
+/* Técnica (ej: Acrílico sobre lienzo) */
+.tecnica-texto {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
 
-/* 4. Precio */
-.art-price {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #000;
+/* Precio Estilo Texto */
+.obra-precio {
+    background: transparent;
+    padding: 0;
+    text-align: left;
     margin-top: 5px;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-    width: 50%;
 }
 
-/* RESPONSIVE MÓVIL */
-@media (max-width: 768px) {
-    .gallery-grid {
-        grid-template-columns: 1fr; /* Una sola columna en celular */
-        gap: 40px;
-        padding: 0 20px;
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
-    }
+.precio-monto {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #000;
+}
+
+.precio-monto::after {
+    content: ' $'; /* Colocamos el signo de dólar al final */
+}
+
+/* Botón Ver Detalles (en el boceto no se ve, pero si lo mantienes, que sea discreto) */
+.btn-ver-detalle {
+    display: none; /* Si quieres que sea idéntico a la imagen 2, ocúltalo o cámbialo por un link de texto */
 }
