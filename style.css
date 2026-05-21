@@ -966,7 +966,7 @@ body {
 }
 
 .modal-content {
-    /*max-width: 1300px; /* <--- Aumentamos el ancho máximo */
+    max-width: 1300px; /* <--- Aumentamos el ancho máximo */
     width: 95%;
     padding: 40px;
 }
