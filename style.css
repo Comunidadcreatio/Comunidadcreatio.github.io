@@ -1308,19 +1308,20 @@ body {
 
 /* Botones del mini carrusel */
 .mini-carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-    opacity: 0;
+    background: transparent !important;  /* Sin fondo */
+    border: none !important;            /* Sin borde */
+    box-shadow: none !important;        /* Sin sombra */
+    border-radius: 0 !important;        /* Sin redondeado */
+    
+    /* Color y tamaño de la flecha */
+    color: rgba(255, 255, 255, 0.7);    /* Blanco semitransparente */
+    font-size: 1.5rem;                  /* Flechas un poco más grandes */
+    width: auto;                        /* Se ajusta al tamaño del icono */
+    height: auto;
+    padding: 5px;                       /* Un poco de área táctil */
+    
+    /* Transición suave */
+    transition: all 0.2s ease;
 }
 
 .mini-carousel:hover .mini-carousel-btn {
@@ -1328,8 +1329,8 @@ body {
 }
 
 .mini-carousel-btn:hover {
-    background: var(--accent-gold);
-    color: var(--bg-dark);
+    color: #ffffff;                     /* Blanco sólido */
+    transform: scale(1.1);              /* Un pequeño zoom */
 }
 
 .mini-carousel-btn.prev { left: 5px; }
