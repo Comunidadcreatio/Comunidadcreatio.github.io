@@ -540,14 +540,17 @@ body {
     flex: 2;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Ocupa toda la altura que le da el padre */
+    height: 100%;
     
-    /* Opcional: Dale un fondo suave para que el espacio vacío se vea intencional */
-    background: rgba(255, 255, 255, 0.05); 
-    border-radius: 15px;
+    /* Esto es nuevo: Fondo y bordes para que parezca una tarjeta panel */
+    background: rgba(255, 255, 255, 0.03); 
+    border-radius: 20px;
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-sizing: border-box; /* Asegura que el padding no rompa el layout */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    
+    /* Centra el contenido vertical y horizontalmente */
+    justify-content: center; 
+    align-items: center;
 }
 
 /* 3. Alinea el contenido de la derecha arriba */
@@ -659,14 +662,13 @@ body {
 
 /* --- SUBIDA DE IMÁGENES --- */
 /* 2. Mejoramos el estilo del contenedor de los slots */
+/* Ajuste de la grilla de imágenes para que se vea perfecta */
 .image-upload-container {
-    display: grid;                     /* Usamos Grid para que se vea ordenado */
-    grid-template-columns: repeat(5, 1fr); /* 5 columnas iguales */
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
     width: 100%;
-    max-width: 400px;                 /* Ancho máximo para que no se vea gigante */
-    justify-content: center;
-    padding: 10px;
+    max-width: 450px; /* Un ancho controlado */
 }
 .image-slot {
     aspect-ratio: 1 / 1;  /* Fuerza que los cuadros sean perfectamente cuadrados */
