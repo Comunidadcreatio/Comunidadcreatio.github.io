@@ -562,6 +562,12 @@ body {
     width: 100%;
 }
 
+/* Agrega esto para separar el título del borde */
+.image-upload-section label {
+    margin-bottom: 10px;
+    display: block;
+}
+
 /* Opcional: Mejorar el aspecto de los botones */
 .form-actions-group {
     display: flex;
@@ -664,8 +670,10 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 cuadros en línea */
     gap: 15px;
-    max-width: 100%;
+    max-width: 600px; /* <--- Esto limita el ancho para que no se vean gigantes */
     margin-top: 10px;
+    margin-left: auto; /* Centra el contenedor */
+    margin-right: auto; /* Centra el contenedor */
     padding: 10px 0;
 }
 
@@ -746,6 +754,8 @@ body {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+    margin-top: 25px; /* <--- Un poco más de aire arriba */
+    margin-bottom: 10px; /* <--- Un poco de aire abajo */
 }
 
 .btn-save-artwork, 
