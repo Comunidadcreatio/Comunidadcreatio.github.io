@@ -841,12 +841,9 @@ function mostrarGaleria(obras) {
     }).join('');
 }
 
-// Función para ver detalles de una obra (modal)
-// Función para ver detalles de una obra (modal con carrusel)
+// --- NUEVA FUNCIÓN VER DETALLE CON MINIATURAS ---
 async function verDetalleObra(id) {
-    // 1. Buscar la obra en los datos ya cargados (más rápido)
     if (!window.obrasData || window.obrasData.length === 0) {
-        // Si no hay datos, cargamos desde el backend
         try {
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
             window.obrasData = await response.json();
@@ -859,36 +856,32 @@ async function verDetalleObra(id) {
     const obra = window.obrasData.find(o => o.id === id);
     if (!obra) return;
 
-    // 2. Seleccionar elementos del DOM
     const modal = document.getElementById('obra-modal');
     const modalBody = document.querySelector('.modal-body');
 
-    // 3. Preparar todas las imágenes (si existe 'todas_imagenes' usar ese array, si no, 'imagen_url')
+    // --- 1. Preparar todas las imágenes ---
     let imagenes = [];
     if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
         imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
     }
-    // Fallback: si solo hay imagen_url
     if (imagenes.length === 0 && obra.imagen_url) {
         imagenes = [obra.imagen_url];
     }
-    // Si aún no hay imágenes, poner placeholder
     if (imagenes.length === 0) {
         imagenes = ['https://placehold.co/600x400?text=Sin+Imagen'];
     }
 
-    // 4. Generar HTML del Carrusel de Imágenes
+    // --- 2. Generar HTML del Carrusel + Miniaturas ---
     let carouselHTML = `
         <div class="image-carousel">
             <div class="carousel-container" id="carousel-container">
     `;
     
-    imagenes.forEach((imgUrl, index) => {
-        // Asegurar URL completa
+    imagenes.forEach((imgUrl) => {
         const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
         carouselHTML += `
             <div class="carousel-slide">
-                <img src="${urlFinal}" alt="Imagen ${index + 1} de ${obra.titulo}" 
+                <img src="${urlFinal}" alt="Imagen de ${obra.titulo}" 
                      onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Imagen+no+disponible'">
             </div>
         `;
@@ -896,105 +889,55 @@ async function verDetalleObra(id) {
     
     carouselHTML += `
             </div>
-            ${imagenes.length > 1 ? `
-                <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
-                <div class="carousel-indicators">
-                    ${imagenes.map((_, i) => `<button class="carousel-indicator ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})"></button>`).join('')}
-                </div>
-            ` : ''}
+            <!-- Botones de navegación -->
+            <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            
+            <!-- MINIATURAS (Reemplazan a los puntos) -->
+            <div class="carousel-thumbnails" id="carousel-thumbnails">
+                ${imagenes.map((imgUrl, i) => {
+                    const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
+                    return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/60x60'">`;
+                }).join('')}
+            </div>
         </div>
     `;
 
-    // 5. Formatear todos los detalles
+    // --- 3. Generar HTML de la información ---
     const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-    const tecnica = obra.descripcion_tecnica || 'No especificada';
-    const descripcion = obra.descripcion_artistica || 'Sin descripción disponible.';
-    const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
-    const certificado = obra.certificado === 'Si' ? 'Sí ✓' : (obra.certificado || 'No');
-    const estado = obra.estado_obra || 'N/A';
-    const procedencia = obra.procedencia || 'No especificada';
-    const conservacion = obra.conservacion || 'No especificado';
-    const enmarcado = obra.marcos || 'No especificado';
-    const firma = obra.firma || 'No especificada';
-    const soporte = obra.soporte || 'No especificado';
-    const etiquetas = obra.etiquetas || 'Sin etiquetas';
-    const localizacion = obra.localizacion || 'No especificada';
-
-    // 6. Generar HTML de la información
     const infoHTML = `
         <h2 class="modal-titulo">${obra.titulo}</h2>
         <p class="modal-artista">${obra.artista} (${obra.ano || 'N/A'})</p>
         
-        <div class="modal-descripcion">
-            <p>${descripcion}</p>
-        </div>
+        <div class="modal-descripcion">${obra.descripcion_artistica || 'Sin descripción disponible.'}</div>
         
         <div class="modal-detalles">
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Dimensiones</span>
-                <span class="modal-detalle-valor">${dimensiones}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Peso</span>
-                <span class="modal-detalle-valor">${obra.peso || 'S/N'}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Técnica</span>
-                <span class="modal-detalle-valor">${tecnica}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Soporte</span>
-                <span class="modal-detalle-valor">${soporte}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Enmarcado</span>
-                <span class="modal-detalle-valor">${enmarcado}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Firma</span>
-                <span class="modal-detalle-valor">${firma}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Estado</span>
-                <span class="modal-detalle-valor">${estado}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Certificado</span>
-                <span class="modal-detalle-valor">${certificado}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Procedencia</span>
-                <span class="modal-detalle-valor">${procedencia}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Conservación</span>
-                <span class="modal-detalle-valor">${conservacion}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Localización</span>
-                <span class="modal-detalle-valor">${localizacion}</span>
-            </div>
-            <div class="modal-detalle">
-                <span class="modal-detalle-label">Etiquetas</span>
-                <span class="modal-detalle-valor">${etiquetas}</span>
-            </div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Dimensiones</span><span class="modal-detalle-valor">${dimensiones}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Peso</span><span class="modal-detalle-valor">${obra.peso || 'S/N'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Técnica</span><span class="modal-detalle-valor">${obra.descripcion_tecnica || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Soporte</span><span class="modal-detalle-valor">${obra.soporte || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Enmarcado</span><span class="modal-detalle-valor">${obra.marcos || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Firma</span><span class="modal-detalle-valor">${obra.firma || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Estado</span><span class="modal-detalle-valor">${obra.estado_obra || 'N/A'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Certificado</span><span class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Procedencia</span><span class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Conservación</span><span class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${obra.localizacion || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Etiquetas</span><span class="modal-detalle-valor">${obra.etiquetas || 'Sin etiquetas'}</span></div>
         </div>
         
         <div class="modal-precio">
-            <div class="precio-monto-modal">${precio}</div>
-            <div class="precio-estado-modal">${estado === 'Disponible' ? 'Disponible para compra' : estado}</div>
+            <div class="precio-monto-modal">${obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar'}</div>
+            <div class="precio-estado-modal">${obra.estado_obra === 'Disponible' ? 'Disponible para compra' : obra.estado_obra || 'Estado no disponible'}</div>
         </div>
 
-        ${estado === 'Disponible' ? 
+        ${obra.estado_obra === 'Disponible' ? 
             `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px; width: 100%;" onclick="agregarAlCarrito(${id})">
                 <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
-            </button>` : 
-            ''
+            </button>` : ''
         }
     `;
 
-    // 7. Insertar en el modal
     modalBody.innerHTML = `
         ${carouselHTML}
         <div class="modal-info">
@@ -1002,15 +945,42 @@ async function verDetalleObra(id) {
         </div>
     `;
 
-    // 8. Resetear carrusel a la primera imagen
+    // Resetear carrusel
     window.currentSlide = 0;
     const container = document.getElementById('carousel-container');
-    if (container) {
-        container.style.transform = 'translateX(0)';
-    }
-
-    // 9. Mostrar modal
+    if (container) container.style.transform = 'translateX(0)';
+    
     modal.classList.remove('hidden');
+}
+
+// --- ACTUALIZAR FUNCIONES DEL CARRUSEL ---
+window.currentSlide = 0;
+
+function moverCarrusel(direction) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    const slides = container.children;
+    const totalSlides = slides.length;
+    
+    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
+    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function irAImagen(index) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    
+    window.currentSlide = index;
+    container.style.transform = `translateX(-${index * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function actualizarMiniaturas() {
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
+    thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === window.currentSlide);
+    });
 }
 
 // --- Funciones del Carrusel ---
