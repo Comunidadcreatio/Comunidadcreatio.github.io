@@ -40,7 +40,6 @@ body {
     align-items: center;
 }
 
-/* Logo */
 .logo-link {
     display: flex;
     align-items: center;
@@ -58,10 +57,8 @@ body {
     font-size: 1.4rem;
     font-weight: 700;
 }
-
 .brand-name span { font-weight: 400; }
 
-/* Navegación PC */
 .nav-menu ul {
     display: flex;
     list-style: none;
@@ -79,11 +76,9 @@ body {
     color: var(--accent-gold);
 }
 
-/* Iconos de Usuario y Menú Móvil */
 .user-actions { display: flex; gap: 20px; align-items: center; }
 .user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
 .user-actions a:hover { color: var(--accent-gold); }
-
 .mobile-menu-btn { display: none; }
 
 /* --- CARRITO Y ANIMACIONES --- */
@@ -95,9 +90,7 @@ body {
     width: 50px;
     height: 50px;
 }
-
 .cart-wrapper.hidden { display: none; }
-
 .cart-wrapper.show-anim {
     display: flex;
     animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -181,7 +174,7 @@ body {
     width: 100%;
     height: 100vh;
     background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.95)), url('FondoPrueba1.png') no-repeat center center/cover;
-    z-index: 2500 !important; /* Menor que el header (3000), pero mayor que el resto */
+    z-index: 2500 !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -218,12 +211,7 @@ body {
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
 }
 
-.main-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    color: white;
-}
-
+.main-icon { font-size: 80px; margin-bottom: 20px; color: white; }
 .login-header h2 { font-size: 1.8rem; margin-bottom: 5px; }
 .login-header p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 30px; }
 
@@ -258,108 +246,9 @@ body {
     align-items: center;
     gap: 10px;
 }
-
 .btn-login:hover {
     background-color: #e5cf7d;
     transform: translateY(-2px);
-}
-
-/* --- MEDIA QUERIES (MÓVIL) --- */
-@media (max-width: 1024px) {
-    .main-header {
-        height: auto; 
-        padding: 10px 0;
-    }
-
-    .container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .logo-container { order: 1; flex: 1; }
-    
-    .mobile-menu-btn {
-        display: block;
-        order: 2;
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 5px;   
-    }
-
-    .user-actions {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        margin: 10px 0;
-        gap: 20px;
-    }
-
-    .nav-menu {
-        display: block;
-        order: 4;
-        width: 100%;
-        background-color: #050a14;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: max-height 0.4s ease-out, opacity 0.3s ease;
-    }
-
-    .nav-menu.active {
-        max-height: 500px;
-        opacity: 1;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-menu ul {
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .nav-menu ul li {
-        width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-menu ul li a {
-        display: block;
-        padding: 15px 20px;
-        width: 100%;
-    }
-
-    .cart-wrapper {
-        width: 40px;
-        height: 40px;
-    }
-
-    .cart-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 0.9rem;
-    }
-
-    .login-card {
-        width: 80%;
-        max-width: 600px;
-        padding: 20px;
-        border-radius: 20px;
-    }
-
-    .main-icon {
-        font-size: 50px;
-        margin-bottom: 15px;
-    }
-
-    .login-header h2 {
-        font-size: 1.4rem;
-    }
-    
-    .login-header p {
-        font-size: 0.85rem;
-        margin-bottom: 20px;
-    }
 }
 
 /* ========================================== */
@@ -380,7 +269,6 @@ body {
     overflow-y: auto;
 }
 
-/* --- TARJETA PRINCIPAL --- */
 .dashboard-wide {
     max-width: 1600px;
     width: 95%;
@@ -388,8 +276,6 @@ body {
     padding: 30px;
     margin: 20px auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    
-    /* CAMBIO IMPORTANTE: DISPLAY FLEX EN COLUMNA */
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -404,12 +290,7 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.dash-welcome {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
+.dash-welcome { display: flex; align-items: center; gap: 15px; }
 .main-icon-dash { font-size: 40px; color: var(--accent-gold); }
 .dash-header-top h2 { font-size: 1.5rem; margin: 0; }
 .dash-header-top p { font-size: 0.9rem; opacity: 0.8; margin: 0; }
@@ -429,7 +310,7 @@ body {
 }
 .btn-logout-dash:hover { transform: translateY(-2px); background-color: #e5cf7d; }
 
-/* --- TABLA DE GESTIÓN (NUEVO WRAPPER) --- */
+/* --- TABLA DE GESTIÓN --- */
 .dash-table-wrapper {
     width: 100%;
     display: flex;
@@ -444,14 +325,9 @@ body {
     flex-wrap: wrap;
     gap: 15px;
 }
-
 .table-header-container h3 { font-size: 1.2rem; margin: 0; }
 
-.search-box {
-    flex-grow: 1;
-    max-width: 400px;
-}
-
+.search-box { flex-grow: 1; max-width: 400px; }
 #buscador-obras {
     width: 100%;
     padding: 10px 15px;
@@ -462,7 +338,6 @@ body {
     transition: box-shadow 0.3s ease;
     background-color: #f9f9f9;
 }
-
 #buscador-obras:focus {
     border-color: #d4af37;
     box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
@@ -482,14 +357,12 @@ body {
     color: #333;
     font-size: 0.9rem;
 }
-
 .dash-table th {
     text-align: left;
     padding: 10px;
     border-bottom: 2px solid #eee;
     color: #666; font-weight: 600;
 }
-
 .dash-table td {
     padding: 15px 10px;
     border-bottom: 1px solid #eee;
@@ -524,65 +397,71 @@ body {
 /* --- LAYOUT INFERIOR (FORMULARIO E IMÁGENES) --- */
 .dashboard-layout {
     display: flex;
-    flex-direction: column; /* Ahora es una columna única */
+    flex-direction: column;
     gap: 30px;
     width: 100%;
     margin-top: 20px;
 }
 
 .dash-column-left {
-    width: 100%;  /* Ocupa todo el ancho */
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* 2. La columna derecha debe estirarse completamente */
 .dash-column-right {
     flex: 2;
     display: flex;
     flex-direction: column;
     height: 100%;
-    
-    /* Esto es nuevo: Fondo y bordes para que parezca una tarjeta panel */
     background: rgba(255, 255, 255, 0.03); 
     border-radius: 20px;
     padding: 20px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    
-    /* Centra el contenido vertical y horizontalmente */
     justify-content: center; 
     align-items: center;
 }
 
-/* 3. Alinea el contenido de la derecha arriba */
-/* 1. Hacemos que el contenedor de imágenes ocupe todo el espacio vertical */
 .image-upload-section {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Línea separadora opcional */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
 }
+.image-upload-section label { margin-bottom: 10px; display: block; }
 
-/* Agrega esto para separar el título del borde */
-.image-upload-section label {
-    margin-bottom: 10px;
-    display: block;
-}
-
-/* Opcional: Mejorar el aspecto de los botones */
 .form-actions-group {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    margin-top: 20px; /* Un poco de aire después del formulario */
+    margin-top: 25px;
+    margin-bottom: 10px;
 }
 
-/* Si quieres que los botones sean igual de anchos */
 .btn-save-artwork, 
+.btn-update-artwork, 
 .btn-clear-form {
-    width: 100%;
-    margin: 0; /* Quitar márgenes innecesarios */
+    height: 48px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.3s;
+    flex: 1;
 }
+.btn-save-artwork { background-color: #2ecc71; color: white; width: 100%; }
+.btn-update-artwork { background-color: #3498db; color: white; }
+.btn-clear-form { background-color: #95a5a6; color: white; }
+
+.btn-save-artwork:hover { background-color: #27ae60; }
+.btn-update-artwork:hover { background-color: #2980b9; }
+.btn-clear-form:hover { background-color: #7f8c8d; }
 
 .dashboard-layout h3 { margin-bottom: 20px; font-size: 1.2rem; }
 
@@ -593,14 +472,12 @@ body {
     gap: 15px;
     width: 100%;
 }
-
 .input-group-dash label {
     display: block;
     font-size: 0.85rem;
     margin-bottom: 8px;
     font-weight: 600;
 }
-
 .input-group-dash input,
 .input-group-dash textarea {
     width: 100%;
@@ -616,14 +493,10 @@ body {
     resize: vertical;
     min-height: 120px;
 }
-
 .full-width { grid-column: span 2; }
 
 /* Triple Input (Ancho, Alto, Peso) */
-.triple-row-container {
-    display: flex;
-    flex-direction: column;
-}
+.triple-row-container { display: flex; flex-direction: column; }
 .triple-field-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -638,10 +511,7 @@ body {
 }
 
 /* Selects */
-.select-wrapper {
-    position: relative;
-    width: 100%;
-}
+.select-wrapper { position: relative; width: 100%; }
 .dash-input-select {
     width: 100%;
     padding: 10px 35px 10px 15px;
@@ -666,21 +536,17 @@ body {
 }
 
 /* --- SUBIDA DE IMÁGENES --- */
-
 .image-upload-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 cuadros en línea */
+    grid-template-columns: repeat(5, 1fr);
     gap: 15px;
-    max-width: 600px; /* <--- Esto limita el ancho para que no se vean gigantes */
-    margin-top: 10px;
-    margin-left: auto; /* Centra el contenedor */
-    margin-right: auto; /* Centra el contenedor */
+    max-width: 600px;
+    margin: 10px auto 0;
     padding: 10px 0;
 }
 
-/* CORRECCIÓN PRINCIPAL AQUÍ */
 .image-slot {
-    position: relative; /* <--- ESTO ES LO QUE FALTABA */
+    position: relative;
     aspect-ratio: 1/1;
     width: 100%;
     height: auto;
@@ -695,25 +561,16 @@ body {
     color: #888;
     cursor: pointer;
     transition: all 0.3s ease;
-    overflow: hidden; /* Para que la imagen no se salga del borde redondeado */
+    overflow: hidden;
 }
-
 .image-slot:hover {
     border-color: var(--accent-gold);
     background: rgba(255, 255, 255, 0.1);
 }
-
-/* Control de iconos */
 .image-slot:not(.has-image) i, 
-.image-slot:not(.has-image) span {
-    display: block !important;
-}
+.image-slot:not(.has-image) span { display: block !important; }
+.image-slot.has-image i { display: none; }
 
-.image-slot.has-image i {
-    display: none;
-}
-
-/* CORRECCIÓN DE LA IMAGEN PREVIEW */
 .preview-img {
     width: 100%;
     height: 100%;
@@ -721,15 +578,10 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    border-radius: 12px; /* Hereda el borde redondeado */
+    border-radius: 12px;
 }
+.image-slot.has-image { border-style: solid; border-color: #2ecc71; }
 
-.image-slot.has-image {
-    border-style: solid; /* Cambia el borde a sólido cuando hay imagen */
-    border-color: #2ecc71;
-}
-
-/* Ajuste de la etiqueta de texto */
 #file-names-display {
     text-align: center;
     margin-top: 5px;
@@ -739,76 +591,10 @@ body {
 
 /* --- RESPONSIVE DE IMÁGENES --- */
 @media (max-width: 1100px) {
-    .image-upload-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    .image-upload-container { grid-template-columns: repeat(3, 1fr); }
 }
-
 @media (max-width: 600px) {
-    .image-upload-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* --- BOTONES --- */
-.form-actions-group {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 25px; /* <--- Un poco más de aire arriba */
-    margin-bottom: 10px; /* <--- Un poco de aire abajo */
-}
-
-.btn-save-artwork, 
-.btn-update-artwork, 
-.btn-clear-form {
-    height: 48px;
-    padding: 0 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: 0.3s;
-    flex: 1;
-}
-
-.btn-save-artwork { background-color: #2ecc71; color: white; width: 100%; margin-bottom: 0; }
-.btn-update-artwork { background-color: #3498db; color: white; }
-.btn-clear-form { background-color: #95a5a6; color: white; }
-
-.btn-save-artwork:hover { background-color: #27ae60; }
-.btn-update-artwork:hover { background-color: #2980b9; }
-.btn-clear-form:hover { background-color: #7f8c8d; }
-
-/* --- RESPONSIVE --- */
-@media (max-width: 1100px) {
-    .dashboard-layout { flex-direction: column; }
-    .dash-column-left, .dash-column-right { flex: 1; width: 100%; }
-    .artwork-form-grid { grid-template-columns: 1fr; }
-    .full-width { grid-column: span 1; }
-}
-
-@media (max-width: 700px) {
-    .dash-header-top {
-        flex-direction: column;
-        margin: 17px;
-        align-items: stretch;
-    }
-    .btn-logout-dash {
-        width: 100%;
-        justify-content: center;
-        margin: 17px 0;
-    }
-    .table-header-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .search-box { max-width: 100%; }
+    .image-upload-container { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* --- GALERÍA DE OBRAS --- */
@@ -826,11 +612,7 @@ body {
     background: #ffffff;
     min-height: 100vh;
 }
-
-.galeria-header {
-    text-align: center;
-    margin-bottom: 60px; 
-}
+.galeria-header { text-align: center; margin-bottom: 60px; }
 
 .obra-card {
     background: transparent;
@@ -843,40 +625,30 @@ body {
     flex-direction: column;
     border: none;
 }
-
-.obra-card:hover {
-    transform: translateY(-5px);
-    box-shadow: none;
-}
+.obra-card:hover { transform: translateY(-5px); box-shadow: none; }
 
 .obra-imagen {
-    height: 400px; /* Aumentamos la altura de la imagen */
+    height: 400px;
     width: 100%;
     overflow: hidden;
-    position: relative; /* Necesario para posicionar los botones y el badge */
+    position: relative;
     margin-bottom: 15px;
-    border-radius: 8px; /* Opcional: un borde redondeado sutil */
+    border-radius: 8px;
     cursor: pointer;
 }
-
 .obra-imagen img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.obra-info {
-    padding: 0;
-    text-align: left;
-}
-
+.obra-info { padding: 0; text-align: left; }
 .obra-titulo {
     font-size: 1.1rem;
     font-weight: 600;
     color: #000;
     margin-bottom: 4px;
 }
-
 .obra-artista {
     font-size: 0.95rem;
     color: #444;
@@ -885,7 +657,6 @@ body {
     align-items: center;
     gap: 5px;
 }
-
 .obra-artista::before {
     content: '✔'; 
     color: #2ecc71;
@@ -899,7 +670,6 @@ body {
     font-size: 0.85rem;
     margin-bottom: 5px;
 }
-
 .detalle-item { display: flex; justify-content: flex-start; }
 .detalle-label { display: none; }
 
@@ -915,13 +685,11 @@ body {
     text-align: left;
     margin-top: 5px;
 }
-
 .precio-monto {
     font-size: 1.6rem;
     font-weight: 500;
     color: #000;
 }
-
 .precio-monto::after { content: ' $'; }
 
 .btn-ver-detalle {
@@ -937,18 +705,9 @@ body {
     transition: 0.3s;
     margin-top: 10px;
 }
-
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
     background: #e5cf7d;
-}
-
-@media (max-width: 1024px) {
-    .galeria-container { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 600px) {
-    .galeria-container { grid-template-columns: 1fr; }
 }
 
 .hidden { display: none !important; }
@@ -970,7 +729,7 @@ body {
 }
 
 .modal-content {
-    max-width: 1300px; /* <--- Aumentamos el ancho máximo */
+    max-width: 1300px;
     width: 95%;
     padding: 40px;
 }
@@ -986,7 +745,6 @@ body {
     z-index: 10;
     line-height: 1;
 }
-
 .close-modal:hover {
     color: var(--accent-gold);
     transform: rotate(90deg);
@@ -996,7 +754,7 @@ body {
 .image-carousel {
     position: relative;
     width: 100%;
-    height: 480px; /* Fijamos una altura para la imagen principal */
+    height: 480px;
     overflow: hidden;
     border-radius: 15px;
     margin-bottom: 10px;
@@ -1008,7 +766,6 @@ body {
     height: 100%;
     transition: transform 0.4s ease;
 }
-
 .carousel-slide {
     min-width: 100%;
     height: 100%;
@@ -1017,7 +774,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 .carousel-slide img {
     width: 100%;
     height: 100%;
@@ -1039,60 +795,34 @@ body {
     transition: 0.3s;
     font-size: 1.2rem;
 }
-
 .carousel-btn:hover {
     background: var(--accent-gold);
     color: #1a1a2e;
 }
-
 .carousel-btn.prev { left: 10px; }
 .carousel-btn.next { right: 10px; }
-
-.carousel-indicators {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.carousel-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #555;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.carousel-indicator.active {
-    background: var(--accent-gold);
-    transform: scale(1.2);
-}
 
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
-    gap: 40px; /* Más aire entre la imagen y la info */
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
     margin-top: 10px;
 }
 
-/* Columna izquierda (Carrusel + Miniaturas) */
 .modal-left-column {
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-/* --- NUEVO: ZONA DE MINIATURAS --- */
 .carousel-thumbnails {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    width: 100%; /* Ocupa todo el ancho de la columna */
-    margin-top: auto; /* Esto es clave: empuja las miniaturas hasta el fondo */
+    width: 100%;
+    margin-top: auto; /* Empuja las miniaturas al fondo */
 }
 
 .thumbnail-img {
@@ -1104,22 +834,16 @@ body {
     cursor: pointer;
     transition: 0.3s;
     opacity: 0.7;
-    flex-shrink: 0; /* Evita que las miniaturas se encojan */
+    flex-shrink: 0;
 }
-
 .thumbnail-img:hover {
     opacity: 1;
     transform: scale(1.05);
 }
-
 .thumbnail-img.active {
     border-color: var(--accent-gold);
     opacity: 1;
     box-shadow: 0 0 10px rgba(241, 222, 149, 0.3);
-}
-
-.carousel-slide img {
-    object-fit: contain; /* La imagen no se recorta, se ajusta */
 }
 
 .modal-titulo {
@@ -1128,7 +852,6 @@ body {
     margin-bottom: 5px;
     color: var(--accent-gold);
 }
-
 .modal-artista {
     font-size: 1.1rem;
     color: #aaa;
@@ -1138,7 +861,7 @@ body {
 }
 
 .modal-descripcion {
-    color: #e0e0e0; /* Blanco suave para contraste */
+    color: #e0e0e0;
     font-size: 0.95rem;
     line-height: 1.6;
     background: rgba(255, 255, 255, 0.05);
@@ -1148,14 +871,14 @@ body {
 
 .modal-detalles {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 15px 30px; /* Espacio vertical y horizontal entre los campos */
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 30px;
     margin-bottom: 25px;
 }
 
 .modal-detalle {
     display: flex;
-    flex-direction: column; /* Etiqueta arriba, valor abajo */
+    flex-direction: column;
     gap: 2px;
     padding: 4px 0;
     border-bottom: none;
@@ -1167,7 +890,24 @@ body {
     letter-spacing: 1px;
     color: #888;
     font-weight: 600;
-    text-align: left; /* Asegura que la etiqueta esté a la izquierda */
+    text-align: left;
+}
+
+.modal-detalle-valor {
+    font-size: 1rem;
+    color: #f0f0f0;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+.modal-detalle-valor span, 
+.modal-detalle-valor img {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .modal-precio {
@@ -1177,83 +917,15 @@ body {
     text-align: center;
     margin-top: 10px;
 }
-
 .precio-monto-modal {
     font-size: 2rem;
     font-weight: 700;
     color: var(--bg-dark);
 }
-
 .precio-estado-modal {
     font-size: 0.9rem;
     opacity: 0.9;
     margin-top: 5px;
-}
-
-/* --- AJUSTES EXCLUSIVOS PARA MÓVILES (Pantallas pequeñas) --- */
-@media (max-width: 800px) {
-
-    /* 1. Hacer que el modal ocupe toda la pantalla y permita scroll */
-    .modal-content {
-        width: 100%;
-        height: 100%;
-        max-height: 100vh; /* Usa toda la altura disponible */
-        border-radius: 0;  /* Sin bordes redondeados en móvil para aprovechar el espacio */
-        padding: 20px;     /* Menos padding */
-        overflow-y: auto;  /* Permite hacer scroll vertical si el contenido es largo */
-    }
-    
-    .modal {
-        align-items: flex-start; /* El modal arranca desde arriba */
-        padding-top: 20px;       /* Un poco de aire arriba */
-    }
-
-    /* 2. Reorganizar el contenido en una sola columna */
-    .modal-body {
-        grid-template-columns: 1fr; /* Una sola columna */
-        gap: 20px;                  /* Espacio entre la imagen y la info */
-        margin-top: 10px;
-    }
-
-    /* 3. Reducir la altura del carrusel para que se vea bien en el teléfono */
-    .image-carousel {
-        height: 250px; /* Altura mucho más pequeña para la pantalla del móvil */
-        margin-bottom: 5px;
-    }
-
-    /* 4. Ajustar el tamaño de las miniaturas para que no ocupen tanto espacio */
-    .carousel-thumbnails {
-        gap: 5px;
-        margin-top: 5px;
-    }
-
-    .thumbnail-img {
-        width: 50px;  /* Miniaturas más pequeñas */
-        height: 50px;
-    }
-
-    /* 5. Ajustar la cuadrícula de detalles para que sea más fácil de leer */
-    .modal-detalles {
-        grid-template-columns: 1fr; /* Información en una sola columna */
-        gap: 8px 0;
-    }
-
-    /* 6. Asegurar que la imagen principal esté centrada y no se corte */
-    .carousel-slide {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-
-    .carousel-slide img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain; /* Asegura que la imagen se vea completa sin recortes */
-        width: auto;
-        height: auto;
-        padding: 5px; /* Un pequeño margen para que no pegue al borde */
-    }
 }
 
 /* --- MINI CARRUSEL PARA LA GALERÍA --- */
@@ -1284,48 +956,38 @@ body {
     align-items: center;
     background: #f5f5f5;
 }
-
-.mini-slide.active {
-    opacity: 1;
-    z-index: 1;
-}
-
+.mini-slide.active { opacity: 1; z-index: 1; }
 .mini-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Botones del mini carrusel */
+/* --- ESTILO MINIMALISTA PARA LAS FLECHAS DEL CARRUSEL --- */
 .mini-carousel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-    opacity: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 2rem;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    transition: color 0.2s ease, font-size 0.2s ease;
 }
-
-.mini-carousel:hover .mini-carousel-btn {
-    opacity: 1;
-}
-
+.mini-carousel-btn.prev { left: 10px; }
+.mini-carousel-btn.next { right: 10px; }
 .mini-carousel-btn:hover {
-    background: var(--accent-gold);
-    color: var(--bg-dark);
+    color: #ffffff;
+    font-size: 2.4rem;
 }
 
-.mini-carousel-btn.prev { left: 5px; }
-.mini-carousel-btn.next { right: 5px; }
-
-/* Indicadores (puntos abajo) */
+/* Indicadores (puntos abajo) - Solo si no usas miniaturas en galería */
 .mini-indicators {
     position: absolute;
     bottom: 5px;
@@ -1335,7 +997,6 @@ body {
     gap: 4px;
     z-index: 2;
 }
-
 .mini-indicator {
     width: 6px;
     height: 6px;
@@ -1343,13 +1004,11 @@ body {
     background: rgba(255, 255, 255, 0.5);
     transition: 0.3s;
 }
-
 .mini-indicator.active {
     background: var(--accent-gold);
     transform: scale(1.2);
 }
 
-/* Badge posicionado sobre la imagen */
 .obra-badge {
     position: absolute;
     top: 10px;
@@ -1363,81 +1022,65 @@ body {
     font-weight: 700;
 }
 
-/* --- ESTILO MINIMALISTA PARA LAS FLECHAS DEL CARRUSEL --- */
-
-/* Quitamos el fondo circular y el borde */
-.mini-carousel-btn {
-     /* Sin fondo ni borde */
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    
-    /* Estilo de la flecha */
-    color: rgba(255, 255, 255, 0.8); /* Un poco más visible */
-    font-size: 2rem;                 /* Tamaño base más grande */
-    width: auto;
-    height: auto;
-    padding: 10px;                   /* Área táctil más generosa */
-    
-    /* Transición suave */
-    transition: color 0.2s ease, font-size 0.2s ease;
-    
-    /* Asegura que no tenga posicionamiento extraño */
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%); /* Centra la flecha verticalmente */
-    z-index: 2;
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
+@media (max-width: 1024px) {
+    .galeria-container { grid-template-columns: repeat(2, 1fr); }
 }
 
-.mini-carousel-btn.prev { left: 10px; }
-.mini-carousel-btn.next { right: 10px; }
-
-/* Efecto al pasar el mouse: la flecha crece y se vuelve blanca */
-.mini-carousel-btn:hover {
-    color: #ffffff;
-    font-size: 2.4rem; /* Crece sin moverse */
+@media (max-width: 900px) {
+    .modal-body { grid-template-columns: 1fr; }
+    .image-carousel { height: 300px; }
+    .thumbnail-img { width: 60px; height: 60px; }
 }
 
-/* --- AJUSTES PARA MÓVILES --- */
-@media (max-width: 600px) {
-    .mini-carousel-btn {
-        font-size: 1.5rem;     /* Un poco más pequeña en móvil */
-        padding: 8px;          /* Suficiente área táctil */
+@media (max-width: 800px) {
+    /* Ajustes del modal en móviles */
+    .modal-content {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        padding: 20px;
+        overflow-y: auto;
     }
-    
-    .mini-carousel-btn:hover {
-        font-size: 1.8rem;     /* Efecto de crecimiento sutil */
+    .modal { align-items: flex-start; padding-top: 20px; }
+    .modal-body { gap: 20px; }
+    .image-carousel { height: 250px; margin-bottom: 5px; }
+    .carousel-thumbnails { gap: 5px; margin-top: 5px; }
+    .thumbnail-img { width: 50px; height: 50px; }
+    .modal-detalles { grid-template-columns: 1fr; gap: 8px 0; }
+    .carousel-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        width: auto;
+        height: auto;
+        padding: 5px;
     }
-    
-    /* En móviles, las flechas deben ser más fáciles de tocar */
+    .mini-carousel-btn { font-size: 1.5rem; padding: 8px; }
+    .mini-carousel-btn:hover { font-size: 1.8rem; }
     .mini-carousel-btn.prev { left: 2px; }
     .mini-carousel-btn.next { right: 2px; }
 }
 
-/* --- ALINEACIÓN CORRECTA DE LOS VALORES EN EL MODAL --- */
-.modal-detalle-valor {
-    font-size: 1rem;
-    color: #f0f0f0;
-    font-weight: 500;
-    
-    /* CAMBIO IMPORTANTE: Alineación a la izquierda */
-    text-align: left;
-    display: flex;
-    justify-content: flex-start; /* El contenido se alinea a la izquierda */
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap; /* Para que se adapte en móviles */
+@media (max-width: 700px) {
+    .dash-header-top {
+        flex-direction: column;
+        margin: 17px;
+        align-items: stretch;
+    }
+    .btn-logout-dash {
+        width: 100%;
+        justify-content: center;
+        margin: 17px 0;
+    }
+    .table-header-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-box { max-width: 100%; }
 }
 
-/* Asegurarnos de que la etiqueta se mantenga a la izquierda */
-.modal-detalle-label {
-    text-align: left;
-}
-
-/* Para que el texto de la localización (VE) tenga el mismo tamaño que los otros valores */
-.modal-detalle-valor span, 
-.modal-detalle-valor img {
-    display: inline-block;
-    vertical-align: middle;
+@media (max-width: 600px) {
+    .galeria-container { grid-template-columns: 1fr; }
 }
