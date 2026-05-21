@@ -523,16 +523,16 @@ body {
 /* --- LAYOUT INFERIOR (FORMULARIO E IMÁGENES) --- */
 .dashboard-layout {
     display: flex;
-    gap: 40px;
+    flex-direction: column; /* Ahora es una columna única */
+    gap: 30px;
     width: 100%;
-    align-items: stretch; /* Vuelve a usar 'stretch' para igualar alturas */
+    margin-top: 20px;
 }
 
 .dash-column-left {
-    flex: 3;
+    width: 100%;  /* Ocupa todo el ancho */
     display: flex;
     flex-direction: column;
-    height: auto;
 }
 
 /* 2. La columna derecha debe estirarse completamente */
@@ -556,12 +556,10 @@ body {
 /* 3. Alinea el contenido de la derecha arriba */
 /* 1. Hacemos que el contenedor de imágenes ocupe todo el espacio vertical */
 .image-upload-section {
-    display: flex;
-    flex-direction: column;
-    height: 100%;               /* Ocupa toda la altura de la columna derecha */
-    justify-content: center;    /* Centra el contenido verticalmente */
-    align-items: center;        /* Centra el contenido horizontalmente */
-    gap: 20px;                  /* Espacio entre los elementos */
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Línea separadora opcional */
+    width: 100%;
 }
 
 /* Opcional: Mejorar el aspecto de los botones */
@@ -586,7 +584,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    flex-grow: 1;
+    width: 100%;
 }
 
 .input-group-dash label {
@@ -665,28 +663,41 @@ body {
 /* Ajuste de la grilla de imágenes para que se vea perfecta */
 .image-upload-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    width: 100%;
-    max-width: 450px; /* Un ancho controlado */
+    grid-template-columns: repeat(5, 1fr); /* 5 cuadros en línea */
+    gap: 15px;
+    max-width: 100%; /* Ocupa todo el ancho disponible */
+    margin-top: 10px;
+    padding: 10px 0;
 }
 .image-slot {
-    aspect-ratio: 1 / 1;  /* Fuerza que los cuadros sean perfectamente cuadrados */
-    width: 100%;          /* Ocupa todo el ancho de su celda en la grilla */
-    height: auto;         /* La altura se ajusta automáticamente */
-    min-height: 60px;     /* Altura mínima para que se vean bien */
-    
-    background-color: rgba(255, 255, 255, 0.05);
+    aspect-ratio: 1/1; /* Cuadrados perfectos */
+    width: 100%;
+    height: auto;
+    min-height: 80px;
+    background: rgba(255, 255, 255, 0.05);
     border: 2px dashed #555;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
     font-size: 1.5rem;
     color: #888;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.image-slot:hover {
+    border-color: var(--accent-gold);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 900px) {
+    .artwork-form-grid {
+        grid-template-columns: 1fr; /* En móvil, una columna */
+    }
+    .image-upload-container {
+        grid-template-columns: repeat(3, 1fr); /* En móvil, 3 cuadros */
+    }
 }
 
 /* 4. Ajuste de la etiqueta de texto */
