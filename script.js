@@ -962,7 +962,7 @@ async function verDetalleObra(id) {
     if (localizacionTexto.length === 2 && localizacionTexto !== 'No especificada') {
         const codigoPais = localizacionTexto.toLowerCase();
         localizacionHTML = `
-            <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+             <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-start;">
                 <img src="https://flagcdn.com/16x12/${codigoPais}.png" 
                      alt="Bandera ${localizacionTexto}" 
                      style="border-radius: 2px; display: inline-block;">
