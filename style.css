@@ -966,16 +966,9 @@ body {
 }
 
 .modal-content {
-    background: #1a1a2e;
-    color: white;
+    max-width: 1300px; /* <--- Aumentamos el ancho máximo */
     width: 95%;
-    max-width: 1400px;
-    max-height: 90vh;
-    border-radius: 20px;
-    overflow-y: auto;
     padding: 40px;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
 }
 
 .close-modal {
