@@ -952,8 +952,27 @@ async function verDetalleObra(id) {
         </div>
     `;
 
-    // --- 4. Generar HTML de la información ---
+        // --- 4. Generar HTML de la información ---
     const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+    
+    // --- Lógica para la localización con bandera ---
+    let localizacionTexto = obra.localizacion || 'No especificada';
+    let localizacionHTML = '';
+    
+    if (localizacionTexto.length === 2 && localizacionTexto !== 'No especificada') {
+        const codigoPais = localizacionTexto.toLowerCase();
+        localizacionHTML = `
+            <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                <img src="https://flagcdn.com/16x12/${codigoPais}.png" 
+                     alt="Bandera ${localizacionTexto}" 
+                     style="border-radius: 2px; display: inline-block;">
+                <span>${localizacionTexto.toUpperCase()}</span>
+            </div>
+        `;
+    } else {
+        localizacionHTML = localizacionTexto;
+    }
+
     const infoHTML = `
         <h2 class="modal-titulo">${obra.titulo}</h2>
         <p class="modal-artista">${obra.artista} (${obra.ano || 'N/A'})</p>
@@ -971,7 +990,7 @@ async function verDetalleObra(id) {
             <div class="modal-detalle"><span class="modal-detalle-label">Certificado</span><span class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</span></div>
             <div class="modal-detalle"><span class="modal-detalle-label">Procedencia</span><span class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</span></div>
             <div class="modal-detalle"><span class="modal-detalle-label">Conservación</span><span class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${obra.localizacion || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${localizacionHTML}</span></div>
             <div class="modal-detalle"><span class="modal-detalle-label">Etiquetas</span><span class="modal-detalle-valor">${obra.etiquetas || 'Sin etiquetas'}</span></div>
         </div>
         
@@ -1137,23 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// --- LÓGICA PARA LA BANDERA ---
-let localizacion = obra.localizacion || 'No especificada';
-let localizacionHtml = '';
 
-if (localizacion && localizacion.length === 2 && localizacion !== 'No especificada') {
-    // Convertimos el código a minúsculas para la URL de la bandera
-    const paisCodigo = localizacion.toLowerCase();
-    // Generamos HTML con la bandera de FlagCDN
-    localizacionHtml = `
-        <div style="display: flex; align-items: center; gap: 6px;">
-            <img src="https://flagcdn.com/20x15/${paisCodigo}.png" alt="Bandera ${localizacion}" style="border-radius: 2px;">
-            <span>${localizacion.toUpperCase()}</span>
-        </div>
-    `;
-} else {
-    localizacionHtml = localizacion; // Si no es un país válido, solo se muestra el texto
-}
 
 // Lista completa de países (código ISO 3166-1 alfa-2 y nombre en español)
 const paises = [
