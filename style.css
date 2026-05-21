@@ -551,11 +551,14 @@ body {
 }
 
 /* 3. Alinea el contenido de la derecha arriba */
+/* 1. Hacemos que el contenedor de imágenes ocupe todo el espacio vertical */
 .image-upload-section {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    flex-grow: 1; /* Opcional: Si quieres que el espacio vacío esté abajo */
+    height: 100%;               /* Ocupa toda la altura de la columna derecha */
+    justify-content: center;    /* Centra el contenido verticalmente */
+    align-items: center;        /* Centra el contenido horizontalmente */
+    gap: 20px;                  /* Espacio entre los elementos */
 }
 
 /* Opcional: Mejorar el aspecto de los botones */
@@ -655,28 +658,51 @@ body {
 }
 
 /* --- SUBIDA DE IMÁGENES --- */
+/* 2. Mejoramos el estilo del contenedor de los slots */
 .image-upload-container {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 10px 0;
+    display: grid;                     /* Usamos Grid para que se vea ordenado */
+    grid-template-columns: repeat(5, 1fr); /* 5 columnas iguales */
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;                 /* Ancho máximo para que no se vea gigante */
+    justify-content: center;
+    padding: 10px;
 }
-
 .image-slot {
-    flex: 0 0 80px;
-    height: 80px;
-    background-color: #1a1a1a08;
-    border: 2px dashed #727272;
-    border-radius: 8px;
+    aspect-ratio: 1 / 1;  /* Fuerza que los cuadros sean perfectamente cuadrados */
+    width: 100%;          /* Ocupa todo el ancho de su celda en la grilla */
+    height: auto;         /* La altura se ajusta automáticamente */
+    min-height: 60px;     /* Altura mínima para que se vean bien */
+    
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 2px dashed #555;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    font-size: 1.5rem;
+    color: #888;
 }
+
+/* 4. Ajuste de la etiqueta de texto */
+#file-names-display {
+    text-align: center;
+    margin-top: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* 5. Ajuste responsivo para la columna derecha */
+@media (max-width: 1100px) {
+    .image-upload-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 columnas en pantallas medianas */
+        max-width: 100%;
+    }
+}
+
 .image-slot:hover {
     border-color: var(--accent-gold);
     background-color: #25252576;
