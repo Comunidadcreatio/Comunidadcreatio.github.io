@@ -957,6 +957,95 @@ async function verDetalleObra(id) {
     modal.classList.remove('hidden');
 }
 
+// --- ACTUALIZAR FUNCIONES DEL CARRUSEL ---
+window.currentSlide = 0;
+
+function moverCarrusel(direction) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    const slides = container.children;
+    const totalSlides = slides.length;
+    
+    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
+    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function irAImagen(index) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    
+    window.currentSlide = index;
+    container.style.transform = `translateX(-${index * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function actualizarMiniaturas() {
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
+    thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === window.currentSlide);
+    });
+}
+
+// Función para agregar al carrito (puedes expandir esto después)
+function agregarAlCarrito(id) {
+    const cartBadge = document.querySelector('.cart-badge');
+    let count = parseInt(cartBadge.textContent) || 0;
+    cartBadge.textContent = count + 1;
+    
+    // Aquí puedes agregar lógica para guardar en localStorage o enviar al backend
+    alert("Obra agregada al carrito");
+}
+
+// Función para filtrar obras
+function filtrarGaleria() {
+    const tecnica = document.getElementById('filtro-tecnica').value;
+    const precioFiltro = document.getElementById('filtro-precio').value;
+    const obras = document.querySelectorAll('.obra-card');
+    
+    obras.forEach(obra => {
+        const obraTecnica = obra.dataset.tecnica;
+        const obraPrecio = parseInt(obra.dataset.precio) || 0;
+        
+        let mostrar = true;
+        
+        // Filtrar por técnica
+        if (tecnica && !obraTecnica.includes(tecnica)) {
+            mostrar = false;
+        }
+        
+        // Filtrar por precio
+        if (precioFiltro) {
+            switch(precioFiltro) {
+                case '0-500':
+                    if (obraPrecio > 500) mostrar = false;  
+                    break;
+                case '501-1000':
+                    if (obraPrecio < 501 || obraPrecio > 1000) mostrar = false;
+                    break;
+                case '1001-2000':
+                    if (obraPrecio < 1001 || obraPrecio > 2000) mostrar = false;
+                    break;
+                case '2001+':
+                    if (obraPrecio < 2001) mostrar = false;
+                    break;
+            }
+        }
+        
+        obra.style.display = mostrar ? 'block' : 'none';
+    });
+    
+    // Mostrar mensaje si no hay resultados
+    const obrasVisibles = [...obras].filter(o => o.style.display !== 'none');
+    const sinResultados = document.querySelector('.sin-resultados');
+    
+    if (obrasVisibles.length === 0) {
+        sinResultados.classList.remove('hidden');
+    } else {
+        sinResultados.classList.add('hidden');
+    }
+}
+
 // Inicializar galería cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
     // ... tu código existente ...
