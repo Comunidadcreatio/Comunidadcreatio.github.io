@@ -1069,7 +1069,7 @@ body {
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 1r 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
+    grid-template-columns: 1fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
     gap: 40px; /* Más aire entre la imagen y la info */
     margin-top: 10px;
 }
