@@ -897,13 +897,13 @@ async function verDetalleObra(id) {
             <div class="carousel-thumbnails" id="carousel-thumbnails">
                 ${imagenes.map((imgUrl, i) => {
                     const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
-                    return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/60x60'">`;
+                    return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/70x70'">`;
                 }).join('')}
             </div>
         </div>
     `;
 
-    // --- 3. Generar HTML de la información ---
+    // --- 3. Generar HTML de la información (igual que antes) ---
     const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
     const infoHTML = `
         <h2 class="modal-titulo">${obra.titulo}</h2>
@@ -980,37 +980,6 @@ function actualizarMiniaturas() {
     const thumbnails = document.querySelectorAll('.thumbnail-img');
     thumbnails.forEach((thumb, i) => {
         thumb.classList.toggle('active', i === window.currentSlide);
-    });
-}
-
-// --- Funciones del Carrusel ---
-window.currentSlide = 0;
-
-function moverCarrusel(direction) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    const slides = container.children;
-    const totalSlides = slides.length;
-    
-    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
-    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
-    
-    actualizarIndicadores();
-}
-
-function irAImagen(index) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    
-    window.currentSlide = index;
-    container.style.transform = `translateX(-${index * 100}%)`;
-    actualizarIndicadores();
-}
-
-function actualizarIndicadores() {
-    const indicators = document.querySelectorAll('.carousel-indicator');
-    indicators.forEach((ind, i) => {
-        ind.classList.toggle('active', i === window.currentSlide);
     });
 }
 
