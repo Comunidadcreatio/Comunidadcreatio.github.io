@@ -966,7 +966,7 @@ body {
 }
 
 .modal-content {
-    max-width: 1300px; /* <--- Aumentamos el ancho máximo */
+    /*max-width: 1300px; /* <--- Aumentamos el ancho máximo */
     width: 95%;
     padding: 40px;
 }
@@ -1069,7 +1069,7 @@ body {
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 1.2fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
+    grid-template-columns: 1fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
     gap: 40px; /* Más aire entre la imagen y la info */
     margin-top: 10px;
 }
@@ -1092,7 +1092,7 @@ body {
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    width: 100%;
+    width: 100%; /* Ocupa todo el ancho de la columna */
     margin-top: 10px;
 }
 
@@ -1103,8 +1103,9 @@ body {
     border-radius: 8px;
     border: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: 0.3s;
     opacity: 0.7;
+    flex-shrink: 0; /* Evita que las miniaturas se encojan */
 }
 
 .thumbnail-img:hover {
