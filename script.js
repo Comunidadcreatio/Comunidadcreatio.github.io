@@ -1137,6 +1137,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// --- LÓGICA PARA LA BANDERA ---
+let localizacion = obra.localizacion || 'No especificada';
+let localizacionHtml = '';
+
+if (localizacion && localizacion.length === 2 && localizacion !== 'No especificada') {
+    // Convertimos el código a minúsculas para la URL de la bandera
+    const paisCodigo = localizacion.toLowerCase();
+    // Generamos HTML con la bandera de FlagCDN
+    localizacionHtml = `
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <img src="https://flagcdn.com/20x15/${paisCodigo}.png" alt="Bandera ${localizacion}" style="border-radius: 2px;">
+            <span>${localizacion.toUpperCase()}</span>
+        </div>
+    `;
+} else {
+    localizacionHtml = localizacion; // Si no es un país válido, solo se muestra el texto
+}
+
 // Lista completa de países (código ISO 3166-1 alfa-2 y nombre en español)
 const paises = [
     { code: 'AF', name: 'Afganistán' },
