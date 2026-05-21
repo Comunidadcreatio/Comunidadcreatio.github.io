@@ -387,8 +387,15 @@
                         <input type="text" id="dash-etiquetas" placeholder="Ej: Azul, realista, figurativo, renacimiento...">
                     </div>
 
-                    
-                    <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${localizacionHtml}</span></div>
+                    <div class="input-group-dash">
+                        <label for="dash-localizacion">Localización de la Obra</label>
+                        <div class="select-wrapper">
+                            <select id="dash-localizacion" class="dash-input-select">
+                                <option value="" disabled selected>Selecciona un País</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
                 </form>
 
                 <div class="form-actions-group">
