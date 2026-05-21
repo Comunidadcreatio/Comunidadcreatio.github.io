@@ -1084,10 +1084,12 @@ body {
 /* --- NUEVO: ZONA DE MINIATURAS --- */
 .carousel-thumbnails {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    margin-top: 15px;
-    flex-wrap: wrap;
+    margin-top: 10px;
+    padding: 0 10px;
+    width: 100%;
 }
 
 .thumbnail-img {
@@ -1099,7 +1101,6 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 0.7;
-    background: #111;
 }
 
 .thumbnail-img:hover {
