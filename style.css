@@ -181,6 +181,7 @@ body {
     width: 100%;
     height: 100vh;
     background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.95)), url('FondoPrueba1.png') no-repeat center center/cover;
+    z-index: 2500 !important; /* Menor que el header (3000), pero mayor que el resto */
     display: flex;
     justify-content: center;
     align-items: center;
