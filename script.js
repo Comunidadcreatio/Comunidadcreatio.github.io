@@ -842,91 +842,206 @@ function mostrarGaleria(obras) {
 }
 
 // Función para ver detalles de una obra (modal)
+// Función para ver detalles de una obra (modal con carrusel)
 async function verDetalleObra(id) {
-    try {
-        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
-        const obras = await response.json();
-        const obra = obras.find(o => o.id === id);
-        
-        if (!obra) return;
-        
-        const modal = document.getElementById('obra-modal');
-        const modalBody = document.querySelector('.modal-body');
-        
-        // Formatear todos los detalles
-        const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-        const tecnica = obra.descripcion_tecnica || 'No especificada';
-        const descripcion = obra.descripcion_artistica || 'Sin descripción disponible.';
-        const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
-        
-        modalBody.innerHTML = `
-            <div class="modal-imagen">
-                <img src="${obra.imagen_url}" 
-                     alt="${obra.titulo}"
+    // 1. Buscar la obra en los datos ya cargados (más rápido)
+    if (!window.obrasData || window.obrasData.length === 0) {
+        // Si no hay datos, cargamos desde el backend
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+            window.obrasData = await response.json();
+        } catch (error) {
+            alert("Error al cargar los detalles.");
+            return;
+        }
+    }
+
+    const obra = window.obrasData.find(o => o.id === id);
+    if (!obra) return;
+
+    // 2. Seleccionar elementos del DOM
+    const modal = document.getElementById('obra-modal');
+    const modalBody = document.querySelector('.modal-body');
+
+    // 3. Preparar todas las imágenes (si existe 'todas_imagenes' usar ese array, si no, 'imagen_url')
+    let imagenes = [];
+    if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+        imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
+    }
+    // Fallback: si solo hay imagen_url
+    if (imagenes.length === 0 && obra.imagen_url) {
+        imagenes = [obra.imagen_url];
+    }
+    // Si aún no hay imágenes, poner placeholder
+    if (imagenes.length === 0) {
+        imagenes = ['https://placehold.co/600x400?text=Sin+Imagen'];
+    }
+
+    // 4. Generar HTML del Carrusel de Imágenes
+    let carouselHTML = `
+        <div class="image-carousel">
+            <div class="carousel-container" id="carousel-container">
+    `;
+    
+    imagenes.forEach((imgUrl, index) => {
+        // Asegurar URL completa
+        const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
+        carouselHTML += `
+            <div class="carousel-slide">
+                <img src="${urlFinal}" alt="Imagen ${index + 1} de ${obra.titulo}" 
                      onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Imagen+no+disponible'">
             </div>
-            <div class="modal-info">
-                <h2 class="modal-titulo">${obra.titulo}</h2>
-                <p class="modal-artista">${obra.artista}</p>
-                
-                <div class="modal-descripcion">
-                    <p>${descripcion}</p>
-                </div>
-                
-                <div class="modal-detalles">
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Dimensiones</div>
-                        <div class="modal-detalle-valor">${dimensiones}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Peso</div>
-                        <div class="modal-detalle-valor">${obra.peso || 'S/N'}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Año</div>
-                        <div class="modal-detalle-valor">${obra.ano || 'N/A'}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Técnica</div>
-                        <div class="modal-detalle-valor">${tecnica}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Estado</div>
-                        <div class="modal-detalle-valor">${obra.estado_obra || 'N/A'}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Certificado</div>
-                        <div class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Procedencia</div>
-                        <div class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</div>
-                    </div>
-                    <div class="modal-detalle">
-                        <div class="modal-detalle-label">Estado Conservación</div>
-                        <div class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</div>
-                    </div>
-                </div>
-                
-                <div class="modal-precio" style="background: linear-gradient(135deg, var(--accent-gold), #e5cf7d); padding: 20px; border-radius: 10px; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--bg-dark);">${precio}</div>
-                    <div style="font-size: 0.9rem; opacity: 0.9;">${obra.estado_obra === 'Disponible' ? 'Disponible para compra' : obra.estado_obra || 'Consultar disponibilidad'}</div>
-                </div>
-                
-                ${obra.estado_obra === 'Disponible' ? 
-                    `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px;" onclick="agregarAlCarrito(${id})">
-                        <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
-                    </button>` : 
-                    ''
-                }
-            </div>
         `;
+    });
+    
+    carouselHTML += `
+            </div>
+            ${imagenes.length > 1 ? `
+                <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="carousel-indicators">
+                    ${imagenes.map((_, i) => `<button class="carousel-indicator ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})"></button>`).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    // 5. Formatear todos los detalles
+    const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+    const tecnica = obra.descripcion_tecnica || 'No especificada';
+    const descripcion = obra.descripcion_artistica || 'Sin descripción disponible.';
+    const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
+    const certificado = obra.certificado === 'Si' ? 'Sí ✓' : (obra.certificado || 'No');
+    const estado = obra.estado_obra || 'N/A';
+    const procedencia = obra.procedencia || 'No especificada';
+    const conservacion = obra.conservacion || 'No especificado';
+    const enmarcado = obra.marcos || 'No especificado';
+    const firma = obra.firma || 'No especificada';
+    const soporte = obra.soporte || 'No especificado';
+    const etiquetas = obra.etiquetas || 'Sin etiquetas';
+    const localizacion = obra.localizacion || 'No especificada';
+
+    // 6. Generar HTML de la información
+    const infoHTML = `
+        <h2 class="modal-titulo">${obra.titulo}</h2>
+        <p class="modal-artista">${obra.artista} (${obra.ano || 'N/A'})</p>
         
-        modal.classList.remove('hidden');
-    } catch (error) {
-        console.error("Error cargando detalles:", error);
-        alert("Error al cargar los detalles de la obra.");
+        <div class="modal-descripcion">
+            <p>${descripcion}</p>
+        </div>
+        
+        <div class="modal-detalles">
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Dimensiones</span>
+                <span class="modal-detalle-valor">${dimensiones}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Peso</span>
+                <span class="modal-detalle-valor">${obra.peso || 'S/N'}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Técnica</span>
+                <span class="modal-detalle-valor">${tecnica}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Soporte</span>
+                <span class="modal-detalle-valor">${soporte}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Enmarcado</span>
+                <span class="modal-detalle-valor">${enmarcado}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Firma</span>
+                <span class="modal-detalle-valor">${firma}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Estado</span>
+                <span class="modal-detalle-valor">${estado}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Certificado</span>
+                <span class="modal-detalle-valor">${certificado}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Procedencia</span>
+                <span class="modal-detalle-valor">${procedencia}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Conservación</span>
+                <span class="modal-detalle-valor">${conservacion}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Localización</span>
+                <span class="modal-detalle-valor">${localizacion}</span>
+            </div>
+            <div class="modal-detalle">
+                <span class="modal-detalle-label">Etiquetas</span>
+                <span class="modal-detalle-valor">${etiquetas}</span>
+            </div>
+        </div>
+        
+        <div class="modal-precio">
+            <div class="precio-monto-modal">${precio}</div>
+            <div class="precio-estado-modal">${estado === 'Disponible' ? 'Disponible para compra' : estado}</div>
+        </div>
+
+        ${estado === 'Disponible' ? 
+            `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px; width: 100%;" onclick="agregarAlCarrito(${id})">
+                <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+            </button>` : 
+            ''
+        }
+    `;
+
+    // 7. Insertar en el modal
+    modalBody.innerHTML = `
+        ${carouselHTML}
+        <div class="modal-info">
+            ${infoHTML}
+        </div>
+    `;
+
+    // 8. Resetear carrusel a la primera imagen
+    window.currentSlide = 0;
+    const container = document.getElementById('carousel-container');
+    if (container) {
+        container.style.transform = 'translateX(0)';
     }
+
+    // 9. Mostrar modal
+    modal.classList.remove('hidden');
+}
+
+// --- Funciones del Carrusel ---
+window.currentSlide = 0;
+
+function moverCarrusel(direction) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    const slides = container.children;
+    const totalSlides = slides.length;
+    
+    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
+    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
+    
+    actualizarIndicadores();
+}
+
+function irAImagen(index) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    
+    window.currentSlide = index;
+    container.style.transform = `translateX(-${index * 100}%)`;
+    actualizarIndicadores();
+}
+
+function actualizarIndicadores() {
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    indicators.forEach((ind, i) => {
+        ind.classList.toggle('active', i === window.currentSlide);
+    });
 }
 
 // Función para agregar al carrito (puedes expandir esto después)
