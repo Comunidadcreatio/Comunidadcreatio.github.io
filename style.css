@@ -418,12 +418,42 @@ body {
 
 /* Tarjeta ancha para el dashboard */
 .dashboard-wide {
-    max-width: 1600px; /* Mucho más ancho que el login */
+    max-width: 1600px;
     width: 95%;
-    text-align: left; /* Texto alineado a la izquierda */
+    text-align: left;
     padding: 30px;
-    margin-top: 20px; 
+    margin: 20px auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+    /* NUEVO: Grid con 2 columnas arriba y 1 fila abajo */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales arriba */
+    grid-template-rows: auto 1fr;   /* Fila 1: automática, Fila 2: resto del espacio */
+    gap: 30px; /* Espacio entre bloques */
+}
+
+/* Asignamos posición a los elementos */
+.dash-column-left {
+    grid-column: 1 / 2; /* Primera columna */
+    grid-row: 1 / 2;    /* Primera fila */
+    display: flex;
+    flex-direction: column;
+    height: 100%;       /* Importante: Ocupa toda la altura de su celda */
+}
+
+.dash-column-right {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* NUEVO: Contenedor para la tabla (que irá debajo) */
+.dash-table-wrapper {
+    grid-column: 1 / -1; /* Abarca desde la primera hasta la última columna (todo el ancho) */
+    grid-row: 2 / 3;     /* Segunda fila */
+    margin-top: 10px;
 }
 
 /* Header superior con botón de cerrar sesión */
@@ -476,8 +506,9 @@ body {
 /* --- FORMULARIO EN CUADRÍCULA (GRID) --- */
 .artwork-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
+    flex-grow: 1; /* ¡Esto es clave! Hace que el grid crezca para llenar el espacio vertical */
 }
 
 .input-group-dash label {
@@ -501,6 +532,8 @@ body {
 .input-group-dash textarea {
     border-radius: 15px; /* Textarea un poco menos redondeado */
     resize: vertical;
+    min-height: 120px; /* Aumentamos la altura mínima */
+
 }
 
 /* Elementos que ocupan todo el ancho */

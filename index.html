@@ -147,6 +147,36 @@
         </div>
 
         <div class="dashboard-layout">
+
+            <div class="table-section">
+                    <h3>Gestión de Productos</h3>
+                    <div class="table-container">
+
+                        <div class="dash-header">
+                            <div class="search-box">
+                                <input type="text" id="buscador-obras" placeholder=" Buscar por título, autor o ID...">
+                            </div>
+                        </div>
+
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Certficado</th>
+                                    <th>Precio</th>
+                                    <th>Estatus</th>
+                                    <th>Imagen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-obras-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             <div class="dash-column-left">
                 <h3>Agregar Nueva Obra</h3>
                 <form id="artwork-form" class="artwork-form-grid">
@@ -444,35 +474,6 @@
                     <button type="button" id="btn-clear" class="btn-clear-form">
                         <i class="fa-solid fa-eraser"></i> Limpiar Campos
                     </button>
-                </div>
-
-                <div class="table-section">
-                    <h3>Gestión de Productos</h3>
-                    <div class="table-container">
-
-                        <div class="dash-header">
-                            <div class="search-box">
-                                <input type="text" id="buscador-obras" placeholder=" Buscar por título, autor o ID...">
-                            </div>
-                        </div>
-
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Título</th>
-                                    <th>Autor</th>
-                                    <th>Certficado</th>
-                                    <th>Precio</th>
-                                    <th>Estatus</th>
-                                    <th>Imagen</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-obras-body">
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
             </div> </div> </div>
