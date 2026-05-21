@@ -1069,7 +1069,7 @@ body {
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
+    grid-template-columns: 1.2fr 1fr; /* AMBOS LADOS IGUAL DE ANCHOS */
     gap: 40px; /* Más aire entre la imagen y la info */
     margin-top: 10px;
 }
@@ -1083,6 +1083,7 @@ body {
     align-items: stretch; 
     
     width: 100%;
+    min-width: 0; /* Evita que el contenido se desborde y mantiene el ajuste */
 }
 
 /* --- NUEVO: ZONA DE MINIATURAS --- */
@@ -1091,9 +1092,8 @@ body {
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
+    width: 100%;
     margin-top: 10px;
-    width: 100%; /* Las miniaturas se adaptan al ancho disponible */
-    max-width: 100%;
 }
 
 .thumbnail-img {
