@@ -841,7 +841,6 @@ function mostrarGaleria(obras) {
     }).join('');
 }
 
-// --- NUEVA FUNCIÓN VER DETALLE CON MINIATURAS ---
 async function verDetalleObra(id) {
     if (!window.obrasData || window.obrasData.length === 0) {
         try {
@@ -871,7 +870,7 @@ async function verDetalleObra(id) {
         imagenes = ['https://placehold.co/600x400?text=Sin+Imagen'];
     }
 
-    // --- 2. Generar HTML del Carrusel + Miniaturas ---
+    // --- 2. Generar HTML del Carrusel (sin miniaturas dentro) ---
     let carouselHTML = `
         <div class="image-carousel">
             <div class="carousel-container" id="carousel-container">
@@ -889,21 +888,22 @@ async function verDetalleObra(id) {
     
     carouselHTML += `
             </div>
-            <!-- Botones de navegación -->
             <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
             <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
-            
-            <!-- MINIATURAS (Reemplazan a los puntos) -->
-            <div class="carousel-thumbnails" id="carousel-thumbnails">
-                ${imagenes.map((imgUrl, i) => {
-                    const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
-                    return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/70x70'">`;
-                }).join('')}
-            </div>
         </div>
     `;
 
-    // --- 3. Generar HTML de la información (igual que antes) ---
+    // --- 3. HTML de las miniaturas (FUERA del carrusel) ---
+    let thumbnailsHTML = `
+        <div class="carousel-thumbnails" id="carousel-thumbnails">
+            ${imagenes.map((imgUrl, i) => {
+                const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
+                return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/80x80'">`;
+            }).join('')}
+        </div>
+    `;
+
+    // --- 4. Generar HTML de la información ---
     const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
     const infoHTML = `
         <h2 class="modal-titulo">${obra.titulo}</h2>
@@ -938,8 +938,12 @@ async function verDetalleObra(id) {
         }
     `;
 
+    // --- 5. Ensamblar todo en el modal ---
     modalBody.innerHTML = `
-        ${carouselHTML}
+        <div class="modal-left-column">
+            ${carouselHTML}
+            ${thumbnailsHTML}
+        </div>
         <div class="modal-info">
             ${infoHTML}
         </div>
@@ -951,95 +955,6 @@ async function verDetalleObra(id) {
     if (container) container.style.transform = 'translateX(0)';
     
     modal.classList.remove('hidden');
-}
-
-// --- ACTUALIZAR FUNCIONES DEL CARRUSEL ---
-window.currentSlide = 0;
-
-function moverCarrusel(direction) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    const slides = container.children;
-    const totalSlides = slides.length;
-    
-    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
-    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
-    actualizarMiniaturas();
-}
-
-function irAImagen(index) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    
-    window.currentSlide = index;
-    container.style.transform = `translateX(-${index * 100}%)`;
-    actualizarMiniaturas();
-}
-
-function actualizarMiniaturas() {
-    const thumbnails = document.querySelectorAll('.thumbnail-img');
-    thumbnails.forEach((thumb, i) => {
-        thumb.classList.toggle('active', i === window.currentSlide);
-    });
-}
-
-// Función para agregar al carrito (puedes expandir esto después)
-function agregarAlCarrito(id) {
-    const cartBadge = document.querySelector('.cart-badge');
-    let count = parseInt(cartBadge.textContent) || 0;
-    cartBadge.textContent = count + 1;
-    
-    // Aquí puedes agregar lógica para guardar en localStorage o enviar al backend
-    alert("Obra agregada al carrito");
-}
-
-// Función para filtrar obras
-function filtrarGaleria() {
-    const tecnica = document.getElementById('filtro-tecnica').value;
-    const precioFiltro = document.getElementById('filtro-precio').value;
-    const obras = document.querySelectorAll('.obra-card');
-    
-    obras.forEach(obra => {
-        const obraTecnica = obra.dataset.tecnica;
-        const obraPrecio = parseInt(obra.dataset.precio) || 0;
-        
-        let mostrar = true;
-        
-        // Filtrar por técnica
-        if (tecnica && !obraTecnica.includes(tecnica)) {
-            mostrar = false;
-        }
-        
-        // Filtrar por precio
-        if (precioFiltro) {
-            switch(precioFiltro) {
-                case '0-500':
-                    if (obraPrecio > 500) mostrar = false;
-                    break;
-                case '501-1000':
-                    if (obraPrecio < 501 || obraPrecio > 1000) mostrar = false;
-                    break;
-                case '1001-2000':
-                    if (obraPrecio < 1001 || obraPrecio > 2000) mostrar = false;
-                    break;
-                case '2001+':
-                    if (obraPrecio < 2001) mostrar = false;
-                    break;
-            }
-        }
-        
-        obra.style.display = mostrar ? 'block' : 'none';
-    });
-    
-    // Mostrar mensaje si no hay resultados
-    const obrasVisibles = [...obras].filter(o => o.style.display !== 'none');
-    const sinResultados = document.querySelector('.sin-resultados');
-    
-    if (obrasVisibles.length === 0) {
-        sinResultados.classList.remove('hidden');
-    } else {
-        sinResultados.classList.add('hidden');
-    }
 }
 
 // Inicializar galería cuando se carga la página
