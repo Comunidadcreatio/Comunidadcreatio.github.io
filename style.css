@@ -991,6 +991,8 @@ body {
 /* --- Carrusel de imágenes --- */
 .image-carousel {
     position: relative;
+    width: 100%;
+    height: 400px;
     
 }
 
