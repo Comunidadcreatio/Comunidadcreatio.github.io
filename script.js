@@ -18,7 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminDashboard = document.getElementById('admin-dashboard'); 
     const loginForm = document.querySelector('.login-form');
     const btnLogout = document.getElementById('btn-logout'); 
-    const adminUsernameSpan = document.getElementById('admin-username'); 
+    const adminUsernameSpan = document.getElementById('admin-username');
+
+    if(adminBtn) {
+    adminBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Si no está logueado, abrimos el panel de login
+        if (!window.isLoggedIn) {
+            loginPanel.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+            
+            // NUEVO: Ocultar la galería al abrir el login
+            const galeria = document.getElementById('galeria');
+            if (galeria) galeria.classList.add('hidden');
+            
+        } else {
+            // Si está logueado, abrimos el dashboard
+            adminDashboard.classList.toggle('hidden');
+            loginPanel.classList.add('hidden');
+        }
+    });
+    }
 
     // Formulario de Obras y Botones
     const artworkForm = document.getElementById('artwork-form');
