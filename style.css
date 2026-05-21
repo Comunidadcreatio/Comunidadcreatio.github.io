@@ -1155,25 +1155,19 @@ body {
 
 .modal-detalle {
     display: flex;
-    flex-direction: column; /* Coloca la etiqueta arriba y el valor abajo */
-    gap: 4px; /* Pequeño espacio entre la etiqueta y su valor */
-    padding: 5px 0; /* Espacio interno para que respire mejor */
-    border-bottom: none; /* Quitamos la línea separadora para un look más limpio */
+    flex-direction: column; /* Etiqueta arriba, valor abajo */
+    gap: 2px;
+    padding: 4px 0;
+    border-bottom: none;
 }
 
 .modal-detalle-label {
     font-size: 0.75rem;
-    text-transform: uppercase; /* En mayúsculas para que destaque menos */
+    text-transform: uppercase;
     letter-spacing: 1px;
-    color: #888; /* Color más suave */
+    color: #888;
     font-weight: 600;
-}
-
-.modal-detalle-valor {
-    font-size: 1rem;
-    color: #f0f0f0; /* Blanco/Claro para que resalte */
-    font-weight: 500;
-    padding-left: 2px; /* Un pequeño margen para que no esté pegado al borde */
+    text-align: left; /* Asegura que la etiqueta esté a la izquierda */
 }
 
 .modal-precio {
@@ -1423,12 +1417,17 @@ body {
 
 /* --- ALINEACIÓN CORRECTA DE LOS VALORES EN EL MODAL --- */
 .modal-detalle-valor {
-    text-align: right; /* Todos los valores a la derecha */
-    display: flex;     /* Permite alinear contenido interno */
-    justify-content: flex-end; /* El contenido se alinea a la derecha */
-    align-items: center; /* Centrado vertical */
-    gap: 5px;          /* Espacio entre la bandera y el texto */
-    flex-wrap: wrap;   /* Para que se adapte en móviles */
+    font-size: 1rem;
+    color: #f0f0f0;
+    font-weight: 500;
+    
+    /* CAMBIO IMPORTANTE: Alineación a la izquierda */
+    text-align: left;
+    display: flex;
+    justify-content: flex-start; /* El contenido se alinea a la izquierda */
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap; /* Para que se adapte en móviles */
 }
 
 /* Asegurarnos de que la etiqueta se mantenga a la izquierda */
@@ -1439,5 +1438,6 @@ body {
 /* Para que el texto de la localización (VE) tenga el mismo tamaño que los otros valores */
 .modal-detalle-valor span, 
 .modal-detalle-valor img {
+    display: inline-block;
     vertical-align: middle;
 }
