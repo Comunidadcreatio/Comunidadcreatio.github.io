@@ -525,7 +525,7 @@ body {
     display: flex;
     gap: 40px;
     width: 100%;
-    align-items: flex-start; /* <--- CAMBIO IMPORTANTE: Esto evita que se estiren para igualar altura */
+    align-items: stretch; /* Vuelve a usar 'stretch' para igualar alturas */
 }
 
 .dash-column-left {
@@ -535,21 +535,35 @@ body {
     height: auto;
 }
 
+/* 2. La columna derecha debe estirarse completamente */
 .dash-column-right {
     flex: 2;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    /* Alinea el contenido arriba */
-    justify-content: flex-start; 
+    height: 100%; /* Ocupa toda la altura que le da el padre */
+    
+    /* Opcional: Dale un fondo suave para que el espacio vacío se vea intencional */
+    background: rgba(255, 255, 255, 0.05); 
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box; /* Asegura que el padding no rompa el layout */
+}
+
+/* 3. Alinea el contenido de la derecha arriba */
+.image-upload-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-grow: 1; /* Opcional: Si quieres que el espacio vacío esté abajo */
 }
 
 /* Opcional: Mejorar el aspecto de los botones */
 .form-actions-group {
     display: flex;
-    flex-direction: column; /* Los botones uno encima del otro */
-    gap: 10px;
-    width: 100%;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px; /* Un poco de aire después del formulario */
 }
 
 /* Si quieres que los botones sean igual de anchos */
