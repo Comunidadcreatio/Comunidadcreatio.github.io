@@ -1312,9 +1312,12 @@ body {
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
     border: none;
     width: 30px;
     height: 30px;
+    border-radius: 50%;
     cursor: pointer;
     transition: 0.3s;
     opacity: 0;
@@ -1368,4 +1371,30 @@ body {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 700;
+}
+
+/* --- ESTILO MINIMALISTA PARA LAS FLECHAS DEL CARRUSEL --- */
+
+/* Quitamos el fondo circular y el borde */
+.mini-carousel-btn {
+    background: transparent !important;  /* Sin fondo */
+    border: none !important;            /* Sin borde */
+    box-shadow: none !important;        /* Sin sombra */
+    border-radius: 0 !important;        /* Sin redondeado */
+    
+    /* Color y tamaño de la flecha */
+    color: rgba(255, 255, 255, 0.7);    /* Blanco semitransparente */
+    font-size: 1.5rem;                  /* Flechas un poco más grandes */
+    width: auto;                        /* Se ajusta al tamaño del icono */
+    height: auto;
+    padding: 5px;                       /* Un poco de área táctil */
+    
+    /* Transición suave */
+    transition: all 0.2s ease;
+}
+
+/* Al pasar el mouse o tocar, se vuelven más visibles */
+.mini-carousel-btn:hover {
+    color: #ffffff;                     /* Blanco sólido */
+    transform: scale(1.1);              /* Un pequeño zoom */
 }
