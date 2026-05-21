@@ -787,23 +787,80 @@ function mostrarGaleria(obras) {
     sinResultados.classList.add('hidden');
     
     container.innerHTML = obras.map(obra => {
-        // Formatear dimensiones
+        // --- 1. Preparar todas las imágenes de la obra ---
+        let imagenes = [];
+        
+        // Verificamos si la obra tiene 'todas_imagenes' (array) y lo usamos
+        if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+            imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
+        }
+        
+        // Si no tiene el array, usamos 'imagen_url'
+        if (imagenes.length === 0 && obra.imagen_url) {
+            imagenes = [obra.imagen_url];
+        }
+        
+        // Si no hay ninguna, ponemos un placeholder
+        if (imagenes.length === 0) {
+            imagenes = ['https://placehold.co/400x400?text=Sin+Imagen'];
+        }
+
+        // Formateamos las URLs para que funcionen correctamente
+        const imagenesCompletas = imagenes.map(imgUrl => 
+            imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`
+        );
+
+        // --- 2. Generar el HTML del mini-carrusel ---
+        // Solamente mostramos los controles si hay más de una imagen
+        const mostrarControles = imagenesCompletas.length > 1;
+        
+        // Generamos los indicadores (puntos) para mostrar cuántas imágenes hay
+        const indicadoresHTML = imagenesCompletas.map((_, i) => 
+            `<span class="mini-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`
+        ).join('');
+
+        const carruselHTML = `
+            <div class="mini-carousel">
+                <div class="mini-carousel-track" data-id="${obra.id}">
+                    ${imagenesCompletas.map((url, i) => `
+                        <div class="mini-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+                            <img src="${url}" alt="${obra.titulo}" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Error'">
+                        </div>
+                    `).join('')}
+                </div>
+                
+                ${mostrarControles ? `
+                    <button class="mini-carousel-btn prev" onclick="cambiarImagenGaleria(this, -1)" aria-label="Anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="mini-carousel-btn next" onclick="cambiarImagenGaleria(this, 1)" aria-label="Siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                ` : ''}
+                
+                <div class="mini-indicators">
+                    ${indicadoresHTML}
+                </div>
+                
+                <span class="obra-badge">
+                    ${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}
+                </span>
+            </div>
+        `;
+
+        // --- 3. Formatear dimensiones, precio, etc. ---
         const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-        
-        // Formatear técnica
         const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
-        
-        // Formatear precio
         const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
-        
+
+        // --- 4. Ensamblar la tarjeta completa ---
         return `
             <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
                 <div class="obra-imagen">
-                    <img src="${obra.imagen_url}" 
-                         alt="${obra.titulo}" 
-                         onerror="this.onerror=null; this.src='https://placehold.co/400x250?text=Imagen+no+disponible'">
-                    <span class="obra-badge">${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}</span>
+                    ${carruselHTML}
                 </div>
+                
                 <div class="obra-info">
                     <h3 class="obra-titulo">${obra.titulo}</h3>
                     <p class="obra-artista">${obra.artista}</p>
@@ -812,14 +869,6 @@ function mostrarGaleria(obras) {
                         <div class="detalle-item">
                             <span class="detalle-label">Dimensiones:</span>
                             <span class="detalle-valor">${dimensiones}</span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Peso:</span>
-                            <span class="detalle-valor">${obra.peso || 'S/N'}</span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Año:</span>
-                            <span class="detalle-valor">${obra.ano || 'N/A'}</span>
                         </div>
                         <div class="detalle-item">
                             <span class="detalle-label">Técnica:</span>
@@ -1304,3 +1353,40 @@ function llenarListaPaises() {
 
 // Ejecutar cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', llenarListaPaises);
+
+// Función para navegar entre imágenes dentro de la galería
+function cambiarImagenGaleria(btn, direction) {
+    // Encontrar el contenedor del carrusel padre
+    const carousel = btn.closest('.mini-carousel');
+    if (!carousel) return;
+    
+    // Encontrar el track (la pista de imágenes)
+    const track = carousel.querySelector('.mini-carousel-track');
+    if (!track) return;
+    
+    // Encontrar todos los slides
+    const slides = track.querySelectorAll('.mini-slide');
+    if (slides.length <= 1) return;
+    
+    // Encontrar el slide actualmente activo
+    let currentIndex = 0;
+    slides.forEach((slide, index) => {
+        if (slide.classList.contains('active')) {
+            currentIndex = index;
+        }
+    });
+    
+    // Calcular el nuevo índice
+    let newIndex = (currentIndex + direction + slides.length) % slides.length;
+    
+    // Actualizar clases de los slides
+    slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === newIndex);
+    });
+    
+    // Actualizar los indicadores (puntos)
+    const indicators = carousel.querySelectorAll('.mini-indicator');
+    indicators.forEach((ind, index) => {
+        ind.classList.toggle('active', index === newIndex);
+    });
+}
