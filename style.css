@@ -1084,11 +1084,7 @@ body {
     flex-wrap: wrap;
 }
 
-.thumbnail-img {
-    width: 60px;
-    height: 60px;
-    
-}
+
 
 .thumbnail-img:hover {
     opacity: 1;
