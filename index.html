@@ -49,8 +49,6 @@
     </div>
 </header>
 
-
-
 <main class="main-content">
     <h2>Bienvenido a Fundación Extramuros</h2>
 </main>
@@ -58,30 +56,10 @@
 <!-- Sección Galería -->
 <section id="galeria" class="galeria-section hidden">
     <div class="galeria-header">
-
-       <!-- <h2>Galería de Obras</h2>
-        <div class="filtros">
-            <select id="filtro-tecnica">
-                <option value="">Todas las técnicas</option>
-                <option value="Óleo">Óleo sobre lienzo</option>
-                <option value="Acrílico">Acrílico sobre lienzo</option>
-                <!-- Agrega otras técnicas según tu base de datos -->
-           <!--  </select>
-            <select id="filtro-precio">
-                <option value="">Todos los precios</option>
-                <option value="0-500">Hasta $500</option>
-                <option value="501-1000">$501 - $1000</option>
-                <option value="1001-2000">$1001 - $2000</option>
-                <option value="2001+">Más de $2000</option>
-            </select>
+        <div class="galeria-container" id="galeria-container">
+            <div class="loading">Cargando galería...</div>
         </div>
-    </div>-->
-    
-    <div class="galeria-container" id="galeria-container">
-        <!-- Las tarjetas de obras se cargarán aquí dinámicamente -->
-        <div class="loading">Cargando galería...</div>
     </div>
-    
     <div class="sin-resultados hidden">
         <i class="fa-solid fa-palette"></i>
         <p>No se encontraron obras en la galería</p>
@@ -93,12 +71,11 @@
     <div class="modal-content">
         <span class="close-modal">&times;</span>
         <div class="modal-body">
-            <!-- Contenido se carga dinámicamente -->
         </div>
     </div>
 </div>
 
-
+<!-- Login -->
 <div id="login-panel" class="login-overlay hidden">
     <div class="login-card">
         <div class="login-header">
@@ -106,33 +83,34 @@
             <h2>Panel de Administración</h2>
             <p>Ingresa tus credenciales para gestionar los productos</p>
         </div>
-        
         <form class="login-form">
             <div class="input-group">
                 <label><i class="fa-solid fa-user"></i> Usuario</label>
                 <input type="text" placeholder="Ingresa tu Usuario">
             </div>
-            
             <div class="input-group">
                 <label><i class="fa-solid fa-lock"></i> Contraseña</label>
                 <input type="password" placeholder="Ingresa tu contraseña">
             </div>
-            
             <div class="form-options">
                 <label class="checkbox-container">
                     <input type="checkbox"> Recordar sesión
                 </label>
             </div>
-            
             <button type="submit" class="btn-login">
                 <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
             </button>
         </form>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- NUEVO PANEL DE ADMINISTRACIÓN REESTRUCTURADO -->
+<!-- ========================================== -->
 <div id="admin-dashboard" class="login-overlay hidden">
     <div class="login-card dashboard-wide">
         
+        <!-- 1. HEADER SUPERIOR -->
         <div class="dash-header-top">
             <div class="dash-welcome">
                 <i class="fa-solid fa-palette main-icon-dash"></i>
@@ -146,37 +124,40 @@
             </button>
         </div>
 
-        <div class="dashboard-layout">
-
-            <div class="table-section">
-                    <h3>Gestión de Productos</h3>
-                    <div class="table-container">
-
-                        <div class="dash-header">
-                            <div class="search-box">
-                                <input type="text" id="buscador-obras" placeholder=" Buscar por título, autor o ID...">
-                            </div>
-                        </div>
-
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Título</th>
-                                    <th>Autor</th>
-                                    <th>Certficado</th>
-                                    <th>Precio</th>
-                                    <th>Estatus</th>
-                                    <th>Imagen</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-obras-body">
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- 2. TABLA DE GESTIÓN (Nuevo contenedor independiente) -->
+        <div class="dash-table-wrapper">
+            <div class="table-header-container">
+                <h3>Gestión de Productos</h3>
+                <div class="search-box">
+                    <input type="text" id="buscador-obras" placeholder="Buscar por título, autor o ID...">
                 </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Certificado</th>
+                            <th>Precio</th>
+                            <th>Estatus</th>
+                            <th>Imagen</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-obras-body">
+                        <!-- Contenido dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <!-- 3. FORMULARIO Y SUBIDA DE IMÁGENES -->
+        <div class="dashboard-layout">
+            
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
             <div class="dash-column-left">
                 <h3>Agregar Nueva Obra</h3>
                 <form id="artwork-form" class="artwork-form-grid">
@@ -232,9 +213,9 @@
                         </div>
                     </div>
 
-                    <div class="input-group-dash full-width" >
+                    <div class="input-group-dash full-width">
                         <label>Acerca de la Obra</label>
-                        <textarea id="dash-art-desc" rows="3" placeholder="Comparte la historia detrás de esta obra. ¿Qué inspiró al artista? ¿Qué técnicas o materiales se utilizaron? ¿Qué emociones o ideas busca transmitir? ¿Por qué esta pieza es especial?"></textarea>
+                        <textarea id="dash-art-desc" rows="3" placeholder="Comparte la historia detrás de esta obra..."></textarea>
                     </div>
 
                     <div class="input-group-dash">
@@ -264,30 +245,28 @@
                             <i class="fa-solid fa-chevron-down select-arrow"></i>
                         </div>
                     </div>
-                    <div class="input-group-dash triple-row-container">
+                    
+                    <!-- Triple input: Ancho, Alto, Peso -->
+                    <div class="input-group-dash triple-row-container full-width">
                         <div class="triple-field-grid">
                             <div class="field-item">
-                            <label for="dash-ancho">Ancho</label>
-                            <input type="number" id="dash-ancho" name="ancho" 
-                                    min="0" max="400" step="1" placeholder="0" 
-                                    class="dash-input">
-                            <span class="unit-suffix">cm</span>
+                                <label for="dash-ancho">Ancho</label>
+                                <input type="number" id="dash-ancho" name="ancho" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <span class="unit-suffix">cm</span>
                             </div>
                             <div class="field-item">
                                 <label for="dash-alto">Alto</label>
-                                <input type="number" id="dash-alto" name="alto" 
-                                    min="0" max="400" step="1" placeholder="0" 
-                                    class="dash-input">
-                            <span class="unit-suffix">cm</span>
+                                <input type="number" id="dash-alto" name="alto" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <span class="unit-suffix">cm</span>
                             </div>  
                             <div class="field-item">
                                 <label for="dash-peso">Peso</label>
-                            <input type="number" id="dash-peso" name="peso" 
-                                min="0" max="400" step="1" placeholder="0" 
-                                class="dash-input">
-                            <span class="unit-suffix">kg</span>            
+                                <input type="number" id="dash-peso" name="peso" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <span class="unit-suffix">kg</span>            
                             </div>
+                        </div>
                     </div>  
+
                     <div class="input-group-dash">
                         <label>Enmarcado</label>
                         <div class="select-wrapper">
@@ -411,24 +390,20 @@
                     <div class="input-group-dash">
                         <label for="dash-localizacion">Localización de la Obra</label>
                         <div class="select-wrapper">
-                        <select id="dash-localizacion" class="dash-input-select">
-                            <option value="" disabled selected>Selecciona un País</option>
-                            <!-- Se llenará dinámicamente -->
-                        </select>
-                        <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                            <select id="dash-localizacion" class="dash-input-select">
+                                <option value="" disabled selected>Selecciona un País</option>
+                            </select>
                             <i class="fa-solid fa-chevron-down select-arrow"></i>
                         </div>
                     </div>
-
                 </form>
             </div>
 
+            <!-- COLUMNA DERECHA: IMÁGENES Y BOTONES -->
             <div class="dash-column-right">
-                
-            <div class="image-upload-section">
-                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imagenes de la Obra (Máx. 5)</label>
-                    
+                <div class="image-upload-section">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imágenes de la Obra (Máx. 5)</label>
+                        
                     <div class="image-upload-container">
                         <div class="image-slot" id="slot-0" onclick="activarInput(0)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
@@ -452,15 +427,14 @@
                         </div>
                     </div>
 
-                    <!-- Inputs ocultos para cada slot -->
                     <input type="file" id="dash-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
                     <input type="file" id="dash-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
                     <input type="file" id="dash-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
                     <input type="file" id="dash-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
                     <input type="file" id="dash-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
-                    
-                <small id="file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
-        </div>
+                        
+                    <small id="file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
+                </div>
 
                 <div class="form-actions-group">
                     <button type="submit" form="artwork-form" id="btn-save" class="btn-save-artwork">
@@ -475,14 +449,10 @@
                         <i class="fa-solid fa-eraser"></i> Limpiar Campos
                     </button>
                 </div>
-
-            </div> </div> </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
-
-
-
 <script src="script.js"></script>
 </body>
 </html>

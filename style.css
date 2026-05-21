@@ -23,14 +23,11 @@ body {
     height: 110px;
     display: flex;
     align-items: center;
-    
-    /* CAMBIOS AQUÍ */
-    position: fixed !important; /* Forzamos que sea fijo */
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 3000; /* Subimos el nivel para que esté por encima de TODO */
-    
+    z-index: 3000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -87,7 +84,7 @@ body {
 .user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
 .user-actions a:hover { color: var(--accent-gold); }
 
-.mobile-menu-btn { display: none; } /* Oculto en PC */
+.mobile-menu-btn { display: none; }
 
 /* --- CARRITO Y ANIMACIONES --- */
 .cart-wrapper {
@@ -101,7 +98,6 @@ body {
 
 .cart-wrapper.hidden { display: none; }
 
-/* Animación de entrada */
 .cart-wrapper.show-anim {
     display: flex;
     animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -117,7 +113,6 @@ body {
     animation: rotateCircle 1.5s linear infinite;
 }
 
-/* Cuando se activa la animación, el círculo rota y luego se desvanece */
 .show-anim .cart-circle {
     animation: 
         rotateCircle 1.5s linear infinite, 
@@ -152,7 +147,6 @@ body {
     z-index: 3;
 }
 
-/* Keyframes */
 @keyframes bounceIn {
     0% { transform: scale(0); opacity: 0; }
     60% { transform: scale(1.4); }
@@ -179,50 +173,37 @@ body {
     align-items: center;
 }
 
-
-
 /* --- PANEL DE LOGIN (MODAL) --- */
-/* CORRECCIÓN: Agregado el punto (.) a la clase */
 .login-overlay {
     position: fixed;
-    top: 0; /* Cambiado a 0 para cubrir toda la pantalla, incluido el header */
+    top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    /* Fondo: gradiente oscuro + imagen */
     background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.95)), url('FondoPrueba1.png') no-repeat center center/cover;
-    display: flex; /* Siempre es flex */
+    display: flex;
     justify-content: center;
     align-items: center;
-    /*z-index: 3000; /* Z-index muy alto para tapar todo, incluido el header */
-    
-    /* --- PROPIEDADES DE ANIMACIÓN (ESTADO VISIBLE) --- */
     opacity: 1;
     visibility: visible;
-    /* Transición suave para el fondo oscuro */
     transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
-    backdrop-filter: blur(5px); /* OPCIONAL: Añade un desenfoque elegante al fondo */
-    
+    backdrop-filter: blur(5px);
 }
 
 .login-overlay.hidden {
-    /* En lugar de display: none, usamos opacidad y visibilidad */
     opacity: 0;
-    visibility: hidden; /* Hace que no se pueda clickar mientras no se ve */
-    transition-delay: 0.1s; /* Esperamos un poco antes de desvanecer el fondo */
+    visibility: hidden;
+    transition-delay: 0.1s;
 }
 
-/* Transformación de la tarjeta cuando el padre está oculto */
 .login-overlay.hidden .login-card {
-    /* Empieza pequeña (0.7) y ligeramente desplazada hacia abajo */
     transform: scale(0.7) translateY(30px); 
     opacity: 0;
-    /* La transición de salida es diferente: más rápida y sin rebote */
     transition: transform 0.3s ease-in, opacity 0.3s ease-in;
 }
 
 .login-card {
-    background: rgba(15, 23, 36, 0.95); /* Un poco más claro para contraste */
+    background: rgba(15, 23, 36, 0.95);
     padding: 40px;
     border-radius: 30px;
     width: 90%;
@@ -231,13 +212,8 @@ body {
     text-align: center;
     color: white;
     box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-
-    /* --- ANIMACIÓN CREATIVA DE ENTRADA (BOUNCE/POP) --- */
-    transform: scale(1) translateY(0); /* Tamaño normal y posición centrada */
+    transform: scale(1) translateY(0);
     opacity: 1;
-    /* Usamos cubic-bezier para el efecto "rebote". 
-       Los números > 1 crean el efecto de "pasarse" y volver.
-    */
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
 }
 
@@ -250,7 +226,6 @@ body {
 .login-header h2 { font-size: 1.8rem; margin-bottom: 5px; }
 .login-header p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 30px; }
 
-/* Formularios */
 .input-group { text-align: left; margin-bottom: 20px; }
 .input-group label { display: block; font-size: 0.9rem; margin-bottom: 8px; }
 .input-group input {
@@ -289,9 +264,7 @@ body {
 }
 
 /* --- MEDIA QUERIES (MÓVIL) --- */
-/* Unificación de bloques media query */
 @media (max-width: 1024px) {
-    /* Header ajustes */
     .main-header {
         height: auto; 
         padding: 10px 0;
@@ -322,7 +295,6 @@ body {
         gap: 20px;
     }
 
-    /* Menú desplegable */
     .nav-menu {
         display: block;
         order: 4;
@@ -356,11 +328,6 @@ body {
         width: 100%;
     }
 
-    .nav-menu ul li a:active {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Ajustes del carrito en móvil */
     .cart-wrapper {
         width: 40px;
         height: 40px;
@@ -372,21 +339,20 @@ body {
         font-size: 0.9rem;
     }
 
-    /* --- 4. NUEVO: AJUSTES DEL PANEL LOGIN MÓVIL --- */
     .login-card {
-        width: 80%;        /* Reducimos del 90% al 80% para dar aire a los lados */
-        max-width: 600px;  /* Limitamos el ancho máximo para que no se vea gigante */
-        padding: 20px;     /* Reducimos el padding (antes 40px) para ganar espacio interno */
-        border-radius: 20px; /* Bordes un poco menos redondeados para armonía visual */
+        width: 80%;
+        max-width: 600px;
+        padding: 20px;
+        border-radius: 20px;
     }
 
     .main-icon {
-        font-size: 50px;   /* Icono más pequeño (antes 80px) */
+        font-size: 50px;
         margin-bottom: 15px;
     }
 
     .login-header h2 {
-        font-size: 1.4rem; /* Título un poco más pequeño */
+        font-size: 1.4rem;
     }
     
     .login-header p {
@@ -395,28 +361,25 @@ body {
     }
 }
 
-/* --- ESTILOS DEL NUEVO PANEL DE ADMINISTRACIÓN (TIPO DASHBOARD) --- */
+/* ========================================== */
+/* ESTILOS DEL NUEVO PANEL DE ADMINISTRACIÓN   */
+/* ========================================== */
 
-/* Ajuste para que el overlay permita scroll si el contenido es muy alto */
 #admin-dashboard.login-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2500; /* Menor que el header (3000) */
-    
-    /* EL ESPACIO DE AIRE */
-    /* 110px del header + 40px de aire = 150px */
+    z-index: 2500;
     padding-top: 150px !important; 
-    
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Para que el formulario empiece arriba y use el padding */
-    overflow-y: auto; /* Para poder bajar si el formulario es largo */
+    align-items: flex-start;
+    overflow-y: auto;
 }
 
-/* Tarjeta ancha para el dashboard */
+/* --- TARJETA PRINCIPAL --- */
 .dashboard-wide {
     max-width: 1600px;
     width: 95%;
@@ -425,43 +388,17 @@ body {
     margin: 20px auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     
-    /* NUEVO: Grid con 2 columnas arriba y 1 fila abajo */
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales arriba */
-    grid-template-rows: auto 1fr;   /* Fila 1: automática, Fila 2: resto del espacio */
-    gap: 30px; /* Espacio entre bloques */
-}
-
-/* Asignamos posición a los elementos */
-.dash-column-left {
-    grid-column: 1 / 2; /* Primera columna */
-    grid-row: 1 / 2;    /* Primera fila */
+    /* CAMBIO IMPORTANTE: DISPLAY FLEX EN COLUMNA */
     display: flex;
     flex-direction: column;
-    height: 100%;       /* Importante: Ocupa toda la altura de su celda */
+    gap: 30px;
 }
 
-.dash-column-right {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* NUEVO: Contenedor para la tabla (que irá debajo) */
-.dash-table-wrapper {
-    grid-column: 1 / -1; /* Abarca desde la primera hasta la última columna (todo el ancho) */
-    grid-row: 2 / 3;     /* Segunda fila */
-    margin-top: 10px;
-}
-
-/* Header superior con botón de cerrar sesión */
+/* --- HEADER SUPERIOR --- */
 .dash-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -476,7 +413,6 @@ body {
 .dash-header-top h2 { font-size: 1.5rem; margin: 0; }
 .dash-header-top p { font-size: 0.9rem; opacity: 0.8; margin: 0; }
 
-/* Botón Cerrar Sesión (Naranja/Dorado en la imagen) */
 .btn-logout-dash {
     background-color: var(--accent-gold);
     color: var(--bg-dark);
@@ -492,124 +428,46 @@ body {
 }
 .btn-logout-dash:hover { transform: translateY(-2px); background-color: #e5cf7d; }
 
-/* --- LAYOUT DE DOS COLUMNAS --- */
-.dashboard-layout {
+/* --- TABLA DE GESTIÓN (NUEVO WRAPPER) --- */
+.dash-table-wrapper {
+    width: 100%;
     display: flex;
-    gap: 40px;
-}
-
-.dash-column-left { flex: 3; /* La columna izquierda es más ancha */ }
-.dash-column-right { flex: 2; }
-
-.dashboard-layout h3 { margin-bottom: 20px; font-size: 1.2rem; }
-
-/* --- FORMULARIO EN CUADRÍCULA (GRID) --- */
-.artwork-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
     gap: 15px;
-    flex-grow: 1; /* ¡Esto es clave! Hace que el grid crezca para llenar el espacio vertical */
 }
 
-.input-group-dash label {
-    display: block;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-/* Estilo de los inputs del dashboard (redondeados y fondo blanco) */
-.input-group-dash input,
-.input-group-dash textarea {
-    width: 100%;
-    padding: 12px;
-    border-radius: 25px; /* Bordes muy redondeados como la imagen */
-    border: none;
-    background: white;
-    color: #333;
-    font-family: 'Open Sans', sans-serif;
-}
-.input-group-dash textarea {
-    border-radius: 15px; /* Textarea un poco menos redondeado */
-    resize: vertical;
-    min-height: 120px; /* Aumentamos la altura mínima */
-
-}
-
-/* Elementos que ocupan todo el ancho */
-.full-width { grid-column: span 2; }
-
-/* Checkbox estilo personalizado */
-.checkbox-container-dash {
+.table-header-container {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-.checkbox-container-dash input { /* Ocultar checkbox nativo */
-    position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
-}
-.checkmark {
-    height: 20px; width: 20px; background-color: white; border-radius: 5px; display: inline-block; position: relative;
-}
-.checkbox-container-dash input:checked ~ .checkmark { background-color: var(--accent-gold); }
-.checkmark:after {
-    content: ""; position: absolute; display: none;
-    left: 7px; top: 3px; width: 5px; height: 10px;
-    border: solid var(--bg-dark); border-width: 0 2px 2px 0; transform: rotate(45deg);
-}
-.checkbox-container-dash input:checked ~ .checkmark:after { display: block; }
-
-/* --- COLUMNA DERECHA: IMÁGENES Y TABLA --- */
-
-.image-upload-container {
-    display: flex;          /* Activa el alineamiento en fila */
-    flex-direction: row;    /* Asegura que sea horizontal */
-    gap: 10px;              /* Espacio entre cada cuadro */
-    flex-wrap: nowrap;      /* Evita que se bajen a la siguiente línea */
-    overflow-x: auto;       /* Si no caben, permite hacer scroll lateral en móvil */
-    padding: 10px 0;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
-.image-slot {
-    flex: 0 0 80px;         /* No crecen, no se encogen, base de 80px */
-    height: 80px;
-    background-color: #1a1a1a08;
-    border: 2px dashed #727272;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
-.image-slot:hover {
-    border-color: var(--accent-gold);
-    background-color: #25252576;
+.table-header-container h3 { font-size: 1.2rem; margin: 0; }
+
+.search-box {
+    flex-grow: 1;
+    max-width: 400px;
 }
 
-/* Asegurar que cuando NO tenga has-image, el icono se vea */
-.image-slot:not(.has-image) i, 
-.image-slot:not(.has-image) span {
-    display: block !important;
-}
-/* Botón Guardar Obra (Verde Grande) */
-.btn-save-artwork {
+#buscador-obras {
     width: 100%;
-    padding: 15px;
-    background-color: #2ecc71; /* Verde brillante */
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem; font-weight: 700;
-    cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
-    margin-bottom: 30px; transition: 0.3s;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+    background-color: #f9f9f9;
 }
-.btn-save-artwork:hover { background-color: #27ae60; }
 
-/* --- TABLA DE GESTIÓN --- */
+#buscador-obras:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+    background-color: #fff;
+}
+
 .table-container {
     background: white;
     border-radius: 15px;
@@ -617,11 +475,10 @@ body {
     overflow-x: auto;
 }
 
-
 .dash-table {
     width: 100%;
     border-collapse: collapse;
-    color: #333; /* Texto oscuro para fondo blanco */
+    color: #333;
     font-size: 0.9rem;
 }
 
@@ -638,11 +495,17 @@ body {
     vertical-align: middle;
 }
 
-/* Badges y Acciones */
 .badge-active {
     background: #d4edda; color: #155724;
     padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;
 }
+.badge-inactive {
+    background-color: #fce8e6;
+    color: #c53030;
+    border: 1px solid #f5c6cb;
+    padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;
+}
+
 .img-placeholder {
     width: 30px; height: 30px; background: #ddd;
     border-radius: 5px; display: flex; justify-content: center; align-items: center; color: #888;
@@ -657,289 +520,254 @@ body {
 .btn-icon-edit:hover { background: #bfdbfe; }
 .btn-icon-delete:hover { background: #fecaca; }
 
-/* --- RESPONSIVE PARA EL DASHBOARD --- */
-@media (max-width: 900px) {
-    .dashboard-layout { flex-direction: column; }
-    .artwork-form-grid { grid-template-columns: 1fr; /* 1 columna en móvil */ }
-    .full-width { grid-column: span 1; }
+/* --- LAYOUT INFERIOR (FORMULARIO E IMÁGENES) --- */
+.dashboard-layout {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    align-items: stretch; /* Asegura que ambas columnas tengan la misma altura */
 }
 
-/* Contenedor relativo para posicionar la flecha */
+.dash-column-left {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+
+.dash-column-right {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espacio entre imágenes y botones */
+}
+
+.dashboard-layout h3 { margin-bottom: 20px; font-size: 1.2rem; }
+
+/* --- FORMULARIO EN CUADRÍCULA --- */
+.artwork-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.input-group-dash label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.input-group-dash input,
+.input-group-dash textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    background: white;
+    color: #333;
+    font-family: 'Open Sans', sans-serif;
+}
+.input-group-dash textarea {
+    border-radius: 15px;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.full-width { grid-column: span 2; }
+
+/* Triple Input (Ancho, Alto, Peso) */
+.triple-row-container {
+    display: flex;
+    flex-direction: column;
+}
+.triple-field-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+.field-item .unit-suffix {
+    display: inline-block;
+    margin-left: 0.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Selects */
 .select-wrapper {
     position: relative;
     width: 100%;
 }
-
-/* Unificar el estilo del select con los inputs del dashboard */
 .dash-input-select {
     width: 100%;
-    padding: 10px 35px 10px 15px; /* Compacto y con espacio para la flecha */
-    border-radius: 20px; /* Redondeado igual a tus otros inputs */
+    padding: 10px 35px 10px 15px;
+    border-radius: 20px;
     border: 1px solid #ddd;
     background-color: #fff;
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
-    appearance: none; /* Elimina el estilo nativo */
+    appearance: none;
     -webkit-appearance: none;
     outline: none;
     cursor: pointer;
 }
-
-/* Estetica de la flecha personalizada */
 .select-arrow {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; /* Permite que el click pase al select */
+    pointer-events: none;
     color: #888;
     font-size: 0.8rem;
 }
 
+/* --- SUBIDA DE IMÁGENES --- */
+.image-upload-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 10px 0;
+}
 
-/* --- ESTILOS PARA LOS BOTONES DEL FORMULARIO --- */
+.image-slot {
+    flex: 0 0 80px;
+    height: 80px;
+    background-color: #1a1a1a08;
+    border: 2px dashed #727272;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.image-slot:hover {
+    border-color: var(--accent-gold);
+    background-color: #25252576;
+}
+.image-slot:not(.has-image) i, 
+.image-slot:not(.has-image) span {
+    display: block !important;
+}
+.image-slot.has-image i {
+    display: none;
+}
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* --- BOTONES --- */
 .form-actions-group {
     display: flex;
     gap: 15px;
-    margin-top: 20px;
     flex-wrap: wrap;
-    margin-bottom: 20px; /* <--- Esta es la clave del espacio */
 }
 
-/* Estilo unificado para los 3 botones */
 .btn-save-artwork, 
 .btn-update-artwork, 
 .btn-clear-form {
-    height: 48px;        /* Forzamos la misma altura para todos */
-    padding: 0 24px;     /* Espaciado interno horizontal */
+    height: 48px;
+    padding: 0 24px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;    /* El mismo grosor de letra */
+    font-weight: 600;
     font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     transition: 0.3s;
-    flex: 1;             /* <--- ESTO hace que todos tengan el mismo ancho */
+    flex: 1;
 }
 
-.field-item .unit-suffix {
-  display: inline-block;
-  margin-left: 0.25rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-/* Colores específicos que ya tienes */
-.btn-save-artwork { background-color: #2ecc71; color: white; }
+.btn-save-artwork { background-color: #2ecc71; color: white; width: 100%; margin-bottom: 0; }
 .btn-update-artwork { background-color: #3498db; color: white; }
 .btn-clear-form { background-color: #95a5a6; color: white; }
 
-/* Efectos hover */
 .btn-save-artwork:hover { background-color: #27ae60; }
 .btn-update-artwork:hover { background-color: #2980b9; }
 .btn-clear-form:hover { background-color: #7f8c8d; }
 
-/* Ocultar el icono de "+" cuando el slot tiene la clase has-image */
-.image-slot.has-image i {
-    display: none;
+/* --- RESPONSIVE --- */
+@media (max-width: 1100px) {
+    .dashboard-layout { flex-direction: column; }
+    .dash-column-left, .dash-column-right { flex: 1; width: 100%; }
+    .artwork-form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
 }
 
-/* La imagen de vista previa */
-.preview-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ajusta la imagen al cuadro sin deformarla */
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-/* Ocultar iconos cuando la imagen está presente */
-.image-slot.has-image i, 
-.image-slot.has-image span {
-    display: none;
-}
-
-/* Nueva regla para alinear Ancho, Alto y Peso en una fila */
-.triple-column {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Crea 3 columnas iguales */
-    gap: 15px; /* Espacio entre los 3 inputs */
-}
-
-.form-group-item {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Ajuste para que en móviles (pantallas pequeñas) se apilen si no caben */
-@media (max-width: 600px) {
-    .triple-column {
-        grid-template-columns: 1fr; /* Se vuelven una sola columna en móviles muy pequeños */
-    }
-}
-
-/* Contenedor principal del grupo */
-.triple-row-container {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Grilla interna para los 3 inputs */
-.triple-field-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Divide el espacio en 3 partes iguales */
-    gap: 10px; /* Espacio entre los inputs */
-    width: 100%;
-}
-
-/* Estilo para asegurar que los inputs mantengan el diseño redondeado */
-.triple-field-grid select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 25px; /* Mantiene la estética de los otros campos */
-    border: none;
-    background: white;
-    color: #333;
-}
-
-/* Ajuste para móviles: si el espacio es muy pequeño, se apilan */
-@media (max-width: 600px) {
-    .triple-field-grid {
-        grid-template-columns: 1fr;
-    }
-}
-/* Este es el contenedor que envuelve los 5 cuadros */
-
-/* Estilos para los Badges de Estado */
-.badge-active, .badge-inactive {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-block;
-    text-align: center;
-    min-width: 80px;
-}
-
-/* Estado Activo (Verde suave) */
-.badge-active {
-    background-color: #e6f4ea;
-    color: #1e7e34;
-    border: 1px solid #c3e6cb;
-}
-
-/* Estado Inactivo (Gris/Rojo suave) */
-.badge-inactive {
-    background-color: #fce8e6;
-    color: #c53030;
-    border: 1px solid #f5c6cb;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Ajuste para móviles (cuando el ancho es pequeño) */
 @media (max-width: 700px) {
     .dash-header-top {
-        flex-direction: column; /* Apila el saludo y el botón */
+        flex-direction: column;
         margin: 17px;
-        align-items: stretch;   /* Hace que el botón ocupe todo el ancho si prefieres */
+        align-items: stretch;
     }
-
     .btn-logout-dash {
-        width: 100%;           /* En móviles, el botón se ve genial ocupando todo el ancho */
+        width: 100%;
         justify-content: center;
-        margin: 17px;
+        margin: 17px 0;
     }
-    
+    .table-header-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-box { max-width: 100%; }
 }
 
-/* Estilos para el buscador en el Dashboard */
-.dash-header {
-    display: flex;
-    justify-content: space-between; /* Separa título, buscador y botón */
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.search-box {
-    flex-grow: 1; /* Ocupa el espacio disponible */
-}
-
-#buscador-obras {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 25px; /* Bordes redondeados modernos */
-    font-size: 1rem;
-    outline: none;
-    transition: box-shadow 0.3s ease;
-    background-color: #f9f9f9;
-}
-
-#buscador-obras:focus {
-    border-color: #d4af37; /* Tu color dorado/acento */
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
-    background-color: #fff;
-}
-
-/* --- GALERÍA DE OBRAS (ESTILO SEGUNDA IMAGEN) --- */
-
+/* --- GALERÍA DE OBRAS --- */
 .galeria-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    /* Espacio lateral y entre tarjetas */
     gap: 30px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* 1. Ajuste del contenedor de la sección completa */
 .galeria-section {
-    /* Aumentamos el padding superior para separar las imágenes del header */
     padding: 180px 20px 80px; 
     background: #ffffff;
     min-height: 100vh;
 }
 
-/* 2. Ajuste del encabezado (Título y Filtros) */
 .galeria-header {
     text-align: center;
-    /* Un margen inferior generoso crea el espacio de aire antes de las fotos */
     margin-bottom: 60px; 
 }
 
-
-/* Tarjeta de obra - Estilo Limpio */
 .obra-card {
-    background: transparent; /* Eliminamos el fondo blanco */
+    background: transparent;
     border-radius: 0;
     overflow: visible;
-    box-shadow: none; /* Eliminamos la sombra pesada */
+    box-shadow: none;
     transition: transform 0.3s ease;
     height: auto;
     display: flex;
     flex-direction: column;
-    border: none; /* Eliminamos el borde */
+    border: none;
 }
 
 .obra-card:hover {
     transform: translateY(-5px);
-    box-shadow: none; /* Mantener limpio en hover */
+    box-shadow: none;
 }
 
 .obra-imagen {
-    height: 280px; /* Ajustamos a un formato más cuadrado/vertical según la obra */
+    height: 280px;
     width: 100%;
     overflow: hidden;
-    margin-bottom: 15px; /* Espacio entre imagen y texto */
+    margin-bottom: 15px;
 }
 
 .obra-imagen img {
@@ -948,9 +776,8 @@ body {
     object-fit: cover;
 }
 
-/* Info de la obra */
 .obra-info {
-    padding: 0; /* Quitamos el padding interno de la tarjeta */
+    padding: 0;
     text-align: left;
 }
 
@@ -970,16 +797,12 @@ body {
     gap: 5px;
 }
 
-/* Icono de check verde para el artista como en tu boceto */
 .obra-artista::before {
-    content: 'check_circle'; /* Si usas Material Icons */
-    /* O puedes usar un emoji o imagen si no tienes iconos configurados: */
     content: '✔'; 
     color: #2ecc71;
     font-size: 0.9rem;
 }
 
-/* Detalles en una sola línea gris como el boceto */
 .obra-detalles {
     display: flex;
     gap: 10px;
@@ -988,21 +811,15 @@ body {
     margin-bottom: 5px;
 }
 
-.detalle-item {
-    display: flex;
-    justify-content: flex-start;
-}
+.detalle-item { display: flex; justify-content: flex-start; }
+.detalle-label { display: none; }
 
-.detalle-label { display: none; } /* Ocultamos etiquetas como "Dimensiones:" */
-
-/* Técnica (ej: Acrílico sobre lienzo) */
 .tecnica-texto {
     color: #888;
     font-size: 0.9rem;
     margin-bottom: 10px;
 }
 
-/* Precio Estilo Texto */
 .obra-precio {
     background: transparent;
     padding: 0;
@@ -1016,23 +833,16 @@ body {
     color: #000;
 }
 
-.precio-monto::after {
-    content: ' $'; /* Colocamos el signo de dólar al final */
-}
+.precio-monto::after { content: ' $'; }
 
-/* Botón Ver Detalles (en el boceto no se ve, pero si lo mantienes, que sea discreto) */
-.btn-ver-detalle {
-    display: none; /* Si quieres que sea idéntico a la imagen 2, ocúltalo o cámbialo por un link de texto */
-}
+.btn-ver-detalle { display: none; }
 
 @media (max-width: 1024px) {
-    .galeria-container {
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablets */
-    }
+    .galeria-container { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 600px) {
-    .galeria-container {
-        grid-template-columns: 1fr; /* 1 sola columna en celulares */
-    }
+    .galeria-container { grid-template-columns: 1fr; }
 }
+
+.hidden { display: none !important; }
