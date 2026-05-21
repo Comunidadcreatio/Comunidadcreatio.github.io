@@ -1074,6 +1074,13 @@ body {
     margin-top: 10px;
 }
 
+/* Columna izquierda (Carrusel + Miniaturas) */
+.modal-left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* --- NUEVO: ZONA DE MINIATURAS --- */
 .carousel-thumbnails {
     display: flex;
