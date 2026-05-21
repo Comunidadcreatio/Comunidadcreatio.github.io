@@ -992,11 +992,11 @@ body {
 .image-carousel {
     position: relative;
     width: 100%;
-    height: 400px;
+    height: 450px; /* Fijamos una altura para la imagen principal */
     overflow: hidden;
     border-radius: 15px;
-    margin-bottom: 25px;
-    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .carousel-container {
