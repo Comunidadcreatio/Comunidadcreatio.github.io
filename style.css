@@ -1197,18 +1197,68 @@ body {
     margin-top: 5px;
 }
 
-/* --- Responsive Modal --- */
+/* --- AJUSTES EXCLUSIVOS PARA MÓVILES (Pantallas pequeñas) --- */
 @media (max-width: 800px) {
-    .modal-body {
-        grid-template-columns: 1fr;
-    }
-    .image-carousel {
-        height: 300px;
-    }
-}
 
-@media (max-width: 500px) {
-    .modal-content { padding: 15px; }
-    .image-carousel { height: 200px; }
-    .modal-detalles { grid-template-columns: 1fr; }
+    /* 1. Hacer que el modal ocupe toda la pantalla y permita scroll */
+    .modal-content {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh; /* Usa toda la altura disponible */
+        border-radius: 0;  /* Sin bordes redondeados en móvil para aprovechar el espacio */
+        padding: 20px;     /* Menos padding */
+        overflow-y: auto;  /* Permite hacer scroll vertical si el contenido es largo */
+    }
+    
+    .modal {
+        align-items: flex-start; /* El modal arranca desde arriba */
+        padding-top: 20px;       /* Un poco de aire arriba */
+    }
+
+    /* 2. Reorganizar el contenido en una sola columna */
+    .modal-body {
+        grid-template-columns: 1fr; /* Una sola columna */
+        gap: 20px;                  /* Espacio entre la imagen y la info */
+        margin-top: 10px;
+    }
+
+    /* 3. Reducir la altura del carrusel para que se vea bien en el teléfono */
+    .image-carousel {
+        height: 250px; /* Altura mucho más pequeña para la pantalla del móvil */
+        margin-bottom: 5px;
+    }
+
+    /* 4. Ajustar el tamaño de las miniaturas para que no ocupen tanto espacio */
+    .carousel-thumbnails {
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .thumbnail-img {
+        width: 50px;  /* Miniaturas más pequeñas */
+        height: 50px;
+    }
+
+    /* 5. Ajustar la cuadrícula de detalles para que sea más fácil de leer */
+    .modal-detalles {
+        grid-template-columns: 1fr; /* Información en una sola columna */
+        gap: 8px 0;
+    }
+
+    /* 6. Asegurar que la imagen principal esté centrada y no se corte */
+    .carousel-slide {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .carousel-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Asegura que la imagen se vea completa sin recortes */
+        width: auto;
+        height: auto;
+        padding: 5px; /* Un pequeño margen para que no pegue al borde */
+    }
 }
