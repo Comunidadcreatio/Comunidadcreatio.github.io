@@ -1420,3 +1420,24 @@ body {
     .mini-carousel-btn.prev { left: 2px; }
     .mini-carousel-btn.next { right: 2px; }
 }
+
+/* --- ALINEACIÓN CORRECTA DE LOS VALORES EN EL MODAL --- */
+.modal-detalle-valor {
+    text-align: right; /* Todos los valores a la derecha */
+    display: flex;     /* Permite alinear contenido interno */
+    justify-content: flex-end; /* El contenido se alinea a la derecha */
+    align-items: center; /* Centrado vertical */
+    gap: 5px;          /* Espacio entre la bandera y el texto */
+    flex-wrap: wrap;   /* Para que se adapte en móviles */
+}
+
+/* Asegurarnos de que la etiqueta se mantenga a la izquierda */
+.modal-detalle-label {
+    text-align: left;
+}
+
+/* Para que el texto de la localización (VE) tenga el mismo tamaño que los otros valores */
+.modal-detalle-valor span, 
+.modal-detalle-valor img {
+    vertical-align: middle;
+}
