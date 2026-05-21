@@ -990,8 +990,13 @@ body {
 
 /* --- Carrusel de imágenes --- */
 .image-carousel {
-    height: auto; /* Altura flexible */
-    min-height: 400px; /* Altura mínima para la imagen principal */
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .carousel-container {
