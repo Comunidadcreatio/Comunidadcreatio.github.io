@@ -1108,25 +1108,32 @@ body {
 
 .modal-detalles {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 20px;
-    margin-bottom: 20px;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 15px 30px; /* Espacio vertical y horizontal entre los campos */
+    margin-bottom: 25px;
 }
 
 .modal-detalle {
     display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-direction: column; /* Coloca la etiqueta arriba y el valor abajo */
+    gap: 4px; /* Pequeño espacio entre la etiqueta y su valor */
+    padding: 5px 0; /* Espacio interno para que respire mejor */
+    border-bottom: none; /* Quitamos la línea separadora para un look más limpio */
 }
 
 .modal-detalle-label {
+    font-size: 0.75rem;
+    text-transform: uppercase; /* En mayúsculas para que destaque menos */
+    letter-spacing: 1px;
+    color: #888; /* Color más suave */
     font-weight: 600;
-    color: #888;
 }
 
 .modal-detalle-valor {
-    text-align: right;
+    font-size: 1rem;
+    color: #f0f0f0; /* Blanco/Claro para que resalte */
+    font-weight: 500;
+    padding-left: 2px; /* Un pequeño margen para que no esté pegado al borde */
 }
 
 .modal-precio {
