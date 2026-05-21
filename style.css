@@ -1085,15 +1085,9 @@ body {
 }
 
 .thumbnail-img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0.7;
-    background: #111;
+    width: 60px;
+    height: 60px;
+    
 }
 
 .thumbnail-img:hover {
@@ -1107,6 +1101,10 @@ body {
     box-shadow: 0 0 10px rgba(241, 222, 149, 0.3);
 }
 
+/* Ajuste para que la imagen grande se adapte al nuevo tamaño */
+.image-carousel {
+    height: 500px; /* Un poco más alta para que se vea imponente */
+}
 
 .carousel-slide img {
     object-fit: contain; /* La imagen no se recorta, se ajusta */
