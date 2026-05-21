@@ -525,7 +525,7 @@ body {
     display: flex;
     gap: 40px;
     width: 100%;
-    align-items: stretch; /* Asegura que ambas columnas tengan la misma altura */
+    align-items: flex-start; /* <--- CAMBIO IMPORTANTE: Esto evita que se estiren para igualar altura */
 }
 
 .dash-column-left {
@@ -539,7 +539,24 @@ body {
     flex: 2;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espacio entre imágenes y botones */
+    gap: 20px;
+    /* Alinea el contenido arriba */
+    justify-content: flex-start; 
+}
+
+/* Opcional: Mejorar el aspecto de los botones */
+.form-actions-group {
+    display: flex;
+    flex-direction: column; /* Los botones uno encima del otro */
+    gap: 10px;
+    width: 100%;
+}
+
+/* Si quieres que los botones sean igual de anchos */
+.btn-save-artwork, 
+.btn-clear-form {
+    width: 100%;
+    margin: 0; /* Quitar márgenes innecesarios */
 }
 
 .dashboard-layout h3 { margin-bottom: 20px; font-size: 1.2rem; }
