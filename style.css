@@ -1377,24 +1377,50 @@ body {
 
 /* Quitamos el fondo circular y el borde */
 .mini-carousel-btn {
-    background: transparent !important;  /* Sin fondo */
-    border: none !important;            /* Sin borde */
-    box-shadow: none !important;        /* Sin sombra */
-    border-radius: 0 !important;        /* Sin redondeado */
+     /* Sin fondo ni borde */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
     
-    /* Color y tamaño de la flecha */
-    color: rgba(255, 255, 255, 0.7);    /* Blanco semitransparente */
-    font-size: 1.5rem;                  /* Flechas un poco más grandes */
-    width: auto;                        /* Se ajusta al tamaño del icono */
+    /* Estilo de la flecha */
+    color: rgba(255, 255, 255, 0.8); /* Un poco más visible */
+    font-size: 2rem;                 /* Tamaño base más grande */
+    width: auto;
     height: auto;
-    padding: 5px;                       /* Un poco de área táctil */
+    padding: 10px;                   /* Área táctil más generosa */
     
     /* Transición suave */
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, font-size 0.2s ease;
+    
+    /* Asegura que no tenga posicionamiento extraño */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%); /* Centra la flecha verticalmente */
+    z-index: 2;
 }
 
-/* Al pasar el mouse o tocar, se vuelven más visibles */
+.mini-carousel-btn.prev { left: 10px; }
+.mini-carousel-btn.next { right: 10px; }
+
+/* Efecto al pasar el mouse: la flecha crece y se vuelve blanca */
 .mini-carousel-btn:hover {
-    color: #ffffff;                     /* Blanco sólido */
-    transform: scale(1.1);              /* Un pequeño zoom */
+    color: #ffffff;
+    font-size: 2.4rem; /* Crece sin moverse */
+}
+
+/* --- AJUSTES PARA MÓVILES --- */
+@media (max-width: 600px) {
+    .mini-carousel-btn {
+        font-size: 1.5rem;     /* Un poco más pequeña en móvil */
+        padding: 8px;          /* Suficiente área táctil */
+    }
+    
+    .mini-carousel-btn:hover {
+        font-size: 1.8rem;     /* Efecto de crecimiento sutil */
+    }
+    
+    /* En móviles, las flechas deben ser más fáciles de tocar */
+    .mini-carousel-btn.prev { left: 2px; }
+    .mini-carousel-btn.next { right: 2px; }
 }
