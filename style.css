@@ -182,7 +182,7 @@ body {
     height: 100vh;
     
     /* CAMBIO: Aumentamos la opacidad a 1 (completamente opaco) */
-    background: rgba(5, 10, 20, 0.99) url('FondoPrueba1.png') no-repeat center center/cover;
+    background: rgba(5, 10, 20, 0.301) url('FondoPrueba1.png') no-repeat center center/cover;
     
     /* CAMBIO: Aseguramos que esté por encima de todo */
     z-index: 9999 !important; 
