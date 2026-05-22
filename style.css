@@ -940,7 +940,7 @@ body {
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 4fr 2fr; /* La imagen (izquierda) ocupa un 30% más de espacio */
+    grid-template-columns: 5fr 1.5fr; /* La imagen (izquierda) ocupa un 30% más de espacio */
     gap: 40px;
     margin-top: 10px;
 }
