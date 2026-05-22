@@ -932,7 +932,7 @@ body {
 }
 .carousel-btn:hover {
     background: var(--accent-gold);
-    color: #1a1a2e00;
+    color: #1919d3;
 }
 .carousel-btn.prev { left: 10px; }
 .carousel-btn.next { right: 10px; }
