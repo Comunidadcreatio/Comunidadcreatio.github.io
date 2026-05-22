@@ -690,7 +690,6 @@ body {
     font-weight: 500;
     color: #000;
 }
-.precio-monto::after { content: ' $'; }
 
 .btn-ver-detalle {
     display: block;
