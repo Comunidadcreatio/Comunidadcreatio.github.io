@@ -1030,7 +1030,16 @@ body {
 }
 
 .modal-detalle-valor {
-        word-break: break-word; /* Permite que las palabras largas bajen de línea si es necesario */
+    font-size: 1rem;
+    color: #f0f0f0;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    word-break: break-word; /* Permite que las palabras largas bajen de línea si es necesario */
 
 }
 .modal-detalle-valor span, 
