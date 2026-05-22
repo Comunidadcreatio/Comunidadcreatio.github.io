@@ -776,7 +776,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     
     /* Esto crea el borde de 4px */
-    padding: 4px; 
+    padding: 2px; 
     
     /* El gradiente cónico que rota gracias a la variable --angle */
     background: conic-gradient(
@@ -1072,10 +1072,10 @@ body {
     box-shadow: none !important;
     border-radius: 0 !important;
     color: rgba(255, 255, 255, 0.8);
-    font-size: 2rem;
+    font-size: 1.2rem;
     width: auto;
     height: auto;
-    padding: 10px;
+    padding: 6px;
     transition: color 0.2s ease, font-size 0.2s ease;
 }
 .mini-carousel-btn.prev { left: 10px; }
