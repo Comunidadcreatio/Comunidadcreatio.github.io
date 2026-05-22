@@ -3,17 +3,42 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif; /* Fuente principal para todo */
 }
 
 :root {
     --bg-dark: #050a14;
     --accent-gold: #f1de95;
     --text-white: #ffffff;
+    /* Nueva variable para títulos destacados */
+    --font-titulo: 'Playfair Display', serif;
 }
 
 body {
     background-color: white;
+}
+
+/* --- APLICAR PLAYFAIR DISPLAY A TÍTULOS Y DESTACADOS --- */
+
+/* Header */
+.brand-name { font-family: var(--font-titulo); }
+
+/* Tarjetas de galería */
+.obra-titulo { font-family: var(--font-titulo); }
+.precio-monto { font-family: var(--font-titulo); }
+
+/* Modal */
+.modal-titulo { font-family: var(--font-titulo); }
+.precio-monto-modal { font-family: var(--font-titulo); }
+.modal-artista { font-family: var(--font-titulo); }
+
+/* Dashboard */
+.dash-welcome h2 { font-family: var(--font-titulo); }
+.dash-header-top h2 { font-family: var(--font-titulo); }
+
+/* Botones (para darles un toque más distinguido) */
+.btn-login, .btn-ver-detalle, .btn-save-artwork, .btn-update-artwork, .btn-clear-form {
+    font-family: var(--font-titulo);
 }
 
 /* --- HEADER --- */
