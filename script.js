@@ -263,10 +263,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error: " + (result.error || "No se pudo guardar"));
             }
         } catch (error) {
-            alert("Error al conectar con el servidor.");
-        } finally {
-            btnSave.innerHTML = originalText;
-            btnSave.disabled = false;
+            console.error("Error al guardar obra:", error);
+            // Si el backend devuelve un JSON con error, lo mostramos
+            if (error.response && error.response.data) {
+                alert("Error del servidor: " + error.response.data.error);
+            } else {
+                alert("Error de conexión. Verifica que tu imagen no sea demasiado grande.");
+            }
         }
     });
 }
