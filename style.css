@@ -1270,15 +1270,21 @@ body {
     .galeria-container { grid-template-columns: 1fr; }
 }
 
-/* --- ELIMINAR EL FONDO NEGRO DEL CARRITO --- */
+/* --- CÍRCULO DEL CARRITO EN BLANCO --- */
 .cart-icon {
-    /* Cambia el fondo negro por transparente */
-    background: transparent !important; 
+    /* Fondo blanco */
+    background: #ffffff !important;
     
-    /* Cambia el color del icono a negro/gris oscuro para el nuevo header claro */
-    color: #1a1a1a; 
+    /* Color del icono (oscuro para contraste) */
+    color: #1a1a1a;
     
-    /* Mantiene el tamaño y la forma */
+    /* Borde sutil para que el círculo se note sobre el fondo blanco */
+    border: 1px solid #e0e0e0;
+    
+    /* Sombra muy suave para darle profundidad */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    
+    /* Mantener el resto de propiedades */
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -1289,10 +1295,12 @@ body {
     font-size: 1.1rem;
     position: relative;
     z-index: 2;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-/* Pequeño detalle: Al pasar el mouse, el icono se vuelve dorado */
+/* Al pasar el mouse, el círculo se oscurece un poco */
 .cart-icon:hover {
+    background: #f5f5f5 !important;
     color: var(--accent-gold);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
