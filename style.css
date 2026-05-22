@@ -10,8 +10,6 @@
     --bg-dark: #050a14;
     --accent-gold: #F7D117;
     --text-white: #ffffff;
-    /* Nueva variable para títulos destacados */
-    --font-titulo: 'Playfair Display', serif;
 }
 
 body {
