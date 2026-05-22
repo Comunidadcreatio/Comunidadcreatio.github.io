@@ -891,7 +891,7 @@ body {
     height: 900px; /* Altura fija para que la imagen se vea grande pero controlada */
     overflow: hidden;
     border-radius: 15px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.0);
     margin-bottom: 0; /* Para que quede pegada a las miniaturas */
 }
 
@@ -932,7 +932,7 @@ body {
 }
 .carousel-btn:hover {
     background: var(--accent-gold);
-    color: #1919d3;
+    color: #1a1a2e00;
 }
 .carousel-btn.prev { left: 10px; }
 .carousel-btn.next { right: 10px; }
