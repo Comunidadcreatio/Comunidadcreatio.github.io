@@ -783,10 +783,7 @@ body {
         from var(--angle), 
         #e6e6e6,    /* Magenta */
         #f0d805,    /* Naranja */
-        #141414,    /* Cian */
-        #f30707,    /* Verde neón */
-        #1f07f3,    /* Verde neón */
-        #e6e6e6     /* Magenta */
+        
     );
     
     /* Animación para que --angle pase de 0deg a 360deg */
