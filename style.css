@@ -650,27 +650,48 @@ body {
     margin-bottom: 4px;
 }
 .obra-artista {
-    font-size: 0.95rem;
-    color: #444;
-    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px; /* Aumenta el espacio entre el check y el nombre */
+    color: #444;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
 }
 .obra-artista::before {
-    content: '✔'; 
+    content: '✔';
     color: #2ecc71;
     font-size: 0.9rem;
+    /* Opcional: un fondo circular sutil */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 50%;
 }
 
 .obra-detalles {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     color: #888;
     font-size: 0.85rem;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
-.detalle-item { display: flex; justify-content: flex-start; }
+.detalle-item {
+    display: flex;
+    align-items: center;
+}
+
+/* Añadir un pequeño separador entre items */
+.detalle-item:not(:last-child)::after {
+    content: "·";
+    margin: 0 8px;
+    color: #ccc;
+}
+
+
 .detalle-label { display: none; }
 
 .tecnica-texto {
@@ -680,32 +701,41 @@ body {
 }
 
 .obra-precio {
-    background: transparent;
-    padding: 0;
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Espacio entre el precio y el estado */
     margin-top: 5px;
 }
 .precio-monto {
-    font-size: 1.6rem;
-    font-weight: 500;
+    font-size: 1.8rem; /* Un poco más grande */
+    font-weight: 600;
     color: #000;
+    /* El signo $ ahora viene de tu JS, no del CSS, así que hemos quitado el ::after */
+}
+
+.precio-etiqueta {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 500;
 }
 
 .btn-ver-detalle {
     display: block;
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: none;
-    border-radius: 25px;
+    border-radius: 30px;
     background: var(--accent-gold);
     color: var(--bg-dark);
     font-weight: 700;
     cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra sutil */
 }
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra más fuerte al pasar el mouse */
     background: #e5cf7d;
 }
 
