@@ -1025,7 +1025,87 @@ body {
 /* --- MEDIA QUERIES (RESPONSIVE) --- */
 @media (max-width: 1024px) {
     .galeria-container { grid-template-columns: repeat(2, 1fr); }
+
+/* Ajustes del header */
+    .main-header {
+        height: auto; 
+        padding: 10px 0;
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo-container { order: 1; flex: 1; }
+
+    /* --- ESTO ES LO QUE FALTABA --- */
+    .mobile-menu-btn {
+        display: block !important; /* Fuerza que aparezca */
+        order: 2;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        z-index: 10; /* Asegura que quede encima de todo */
+    }
+
+    .user-actions {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin: 10px 0;
+        gap: 20px;
+    }
+
+    /* --- MENÚ DESPLEGABLE --- */
+    .nav-menu {
+        display: block;
+        order: 4;
+        width: 100%;
+        background-color: #050a14;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.4s ease-out, opacity 0.3s ease;
+    }
+
+    .nav-menu.active {
+        max-height: 500px;
+        opacity: 1;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-menu ul {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .nav-menu ul li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-menu ul li a {
+        display: block;
+        padding: 15px 20px;
+        width: 100%;
+    }
+
+    .cart-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cart-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
+    }
 }
+
+
 
 @media (max-width: 900px) {
     .modal-body { grid-template-columns: 1fr; }
