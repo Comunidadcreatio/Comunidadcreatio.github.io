@@ -782,7 +782,7 @@ body {
     background: conic-gradient(
         from var(--angle), 
         #e6e6e6,    /* Magenta */
-        #f0d805,    /* Naranja */
+        #f00505,    /* Naranja */
         
     );
     
@@ -792,7 +792,7 @@ body {
 
 /* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
 .btn-ver-detalle:hover span {
-    background: #d4b878; 
+    background: #ffffff; 
 }
 
 /* --- ANIMACIÓN DE ROTACIÓN DEL BORDE --- */
