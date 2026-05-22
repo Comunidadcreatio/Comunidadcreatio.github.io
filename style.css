@@ -1269,3 +1269,30 @@ body {
 @media (max-width: 600px) {
     .galeria-container { grid-template-columns: 1fr; }
 }
+
+/* --- ELIMINAR EL FONDO NEGRO DEL CARRITO --- */
+.cart-icon {
+    /* Cambia el fondo negro por transparente */
+    background: transparent !important; 
+    
+    /* Cambia el color del icono a negro/gris oscuro para el nuevo header claro */
+    color: #1a1a1a; 
+    
+    /* Mantiene el tamaño y la forma */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1.1rem;
+    position: relative;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+/* Pequeño detalle: Al pasar el mouse, el icono se vuelve dorado */
+.cart-icon:hover {
+    color: var(--accent-gold);
+}
