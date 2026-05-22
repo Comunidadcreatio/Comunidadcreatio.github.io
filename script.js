@@ -882,7 +882,7 @@ function mostrarGaleria(obras) {
                     </div>
                     
                     <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
-                        <i class="fa-solid fa-eye"></i> Ver detalles
+                        <span><i class="fa-solid fa-eye"></i> Ver detalles</span>
                     </button>
                 </div>
             </div>

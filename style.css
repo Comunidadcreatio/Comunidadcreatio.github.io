@@ -722,23 +722,27 @@ body {
 .btn-ver-detalle {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: 0; /* Quitamos el padding del botón */
     border: none;
     border-radius: 30px;
-    background: var(--accent-gold);
+    background: var(--accent-gold); /* El color de fondo por defecto */
     color: var(--bg-dark);
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 12px;
-    
-    /* ESTO ES NUEVO: Preparamos el borde */
     position: relative;
-    z-index: 1;
-    /* Un borde transparente para que no se vea el fondo blanco por debajo */
-    border: 2px solid transparent; 
-    background-clip: padding-box; /* El fondo dorado solo cubre el interior */
 }
+
+/* El contenido interno (el span) */
+.btn-ver-detalle span {
+    display: block;
+    padding: 12px; /* El padding ahora está aquí */
+    border-radius: 30px;
+    background: var(--accent-gold); /* Fondo dorado para el texto */
+    transition: background 0.3s ease;
+}
+
 
 /* El efecto del borde de colores */
 .btn-ver-detalle::before {
@@ -760,18 +764,26 @@ body {
 
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
-    background: #e5cf7d; /* Un toque más oscuro al fondo */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    
+    /* Creamos el gradiente de colores y el borde de 2px */
+    background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
+    padding: 2px; /* El espacio para el borde de colores */
+    animation: moverLuces 1.5s linear infinite;
 }
 
-.btn-ver-detalle:hover::before {
-    opacity: 1; /* Aparece el borde */
-    animation: rotateBorder 2s linear infinite; /* El borde gira */
+/* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
+
+/* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
+.btn-ver-detalle:hover span {
+    background: #e5cf7d;
 }
 
-/* Animación para que el gradiente se mueva */
-@keyframes rotateBorder {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+/* Animación para que las luces se muevan */
+@keyframes moverLuces {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .hidden { display: none !important; }
