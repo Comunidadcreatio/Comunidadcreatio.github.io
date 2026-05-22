@@ -722,25 +722,28 @@ body {
 .btn-ver-detalle {
     display: block;
     width: 100%;
-    padding: 0; /* Quitamos el padding del botón */
+    padding: 0; /* El botón padre no tiene relleno */
     border: none;
     border-radius: 30px;
-    background: var(--accent-gold); /* El color de fondo por defecto */
+    background: var(--accent-gold);
     color: var(--bg-dark);
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 12px;
     position: relative;
+    z-index: 0; /* Contexto de apilamiento para el gradiente */
 }
 
 /* El contenido interno (el span) */
 .btn-ver-detalle span {
     display: block;
-    padding: 12px; /* El padding ahora está aquí */
+    padding: 12px;
     border-radius: 30px;
-    background: var(--accent-gold); /* Fondo dorado para el texto */
-    transition: background 0.3s ease;
+    background: var(--accent-gold); /* Color de fondo del texto */
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
 
 
@@ -764,26 +767,40 @@ body {
 
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     
-    /* Creamos el gradiente de colores y el borde de 2px */
-    background: conic-gradient(#ff0080, #ff8c00, #40e0d0, #9932cc, #ff0080);
-    padding: 2px; /* El espacio para el borde de colores */
-    animation: moverLuces 1.5s linear infinite;
+    /* 1. Borde de 4px con colores muy brillantes */
+    padding: 4px; 
+    
+    /* 2. Gradiente cónico con colores neón saturados */
+    background: conic-gradient(from 0deg, 
+        #ff00ff,    /* Magenta */
+        #ffaa00,    /* Naranja */
+        #00ffff,    /* Cian */
+        #00ff00,    /* Verde neón */
+        #ff00ff     /* Magenta */
+    );
+    
+    /* 3. Animación fluida para que los colores se muevan como una mezcla */
+    animation: fluirColores 2.5s linear infinite;
 }
-
-/* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
 
 /* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
 .btn-ver-detalle:hover span {
-    background: #e5cf7d;
+    background: #d4b878; 
 }
 
-/* Animación para que las luces se muevan */
-@keyframes moverLuces {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* --- ANIMACIÓN DE FLUJO DE COLORES --- */
+@keyframes fluirColores {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .hidden { display: none !important; }
