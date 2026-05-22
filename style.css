@@ -203,13 +203,26 @@ body {
 }
 
 /* --- PANEL DE LOGIN (MODAL) --- */
+/* Fondo blanco animado */
 .login-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.95)), url('FondoPrueba1.png') no-repeat center center/cover;
+    
+    /* 1. Fondo blanco puro */
+    background: #ffffff;
+    
+    /* 2. Puntos dorados sutiles que flotan */
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(241, 222, 149, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(241, 222, 149, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 50% 50%, rgba(241, 222, 149, 0.05) 0%, transparent 50%);
+    
+    /* 3. Animación de pulsación lenta para dar vida */
+    animation: pulseBackground 6s ease-in-out infinite alternate;
+    
     z-index: 2500 !important;
     display: flex;
     justify-content: center;
@@ -217,7 +230,21 @@ body {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
-    backdrop-filter: blur(5px);
+    
+    /* Quitamos el backdrop-filter porque ya no es necesario sobre el fondo blanco */
+    backdrop-filter: none;
+}
+
+/* Animación de pulsación suave */
+@keyframes pulseBackground {
+    0% {
+        background-size: 100% 100%;
+        background-position: 0% 0%;
+    }
+    100% {
+        background-size: 150% 150%;
+        background-position: 30% 30%;
+    }
 }
 
 .login-overlay.hidden {
@@ -241,7 +268,11 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.15);
     text-align: center;
     color: white;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    
+    /* Sombra más suave y elegante para el fondo blanco */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    
+    /* Animación de entrada */
     transform: scale(1) translateY(0);
     opacity: 1;
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
