@@ -952,20 +952,17 @@ async function verDetalleObra(id) {
         </div>
     `;
 
-        // --- 4. Generar HTML de la información ---
+    // --- 4. Generar HTML de la información (ACTUALIZADO) ---
     const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
     
     // --- Lógica para la localización con bandera ---
     let localizacionTexto = obra.localizacion || 'No especificada';
     let localizacionHTML = '';
-    
     if (localizacionTexto.length === 2 && localizacionTexto !== 'No especificada') {
         const codigoPais = localizacionTexto.toLowerCase();
         localizacionHTML = `
-             <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-start;">
-                <img src="https://flagcdn.com/16x12/${codigoPais}.png" 
-                     alt="Bandera ${localizacionTexto}" 
-                     style="border-radius: 2px; display: inline-block;">
+            <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-start;">
+                <img src="https://flagcdn.com/16x12/${codigoPais}.png" alt="Bandera ${localizacionTexto}" style="border-radius: 2px; display: inline-block;">
                 <span>${localizacionTexto.toUpperCase()}</span>
             </div>
         `;
@@ -994,16 +991,17 @@ async function verDetalleObra(id) {
             <div class="modal-detalle"><span class="modal-detalle-label">Etiquetas</span><span class="modal-detalle-valor">${obra.etiquetas || 'Sin etiquetas'}</span></div>
         </div>
         
-        <div class="modal-precio">
-            <div class="precio-monto-modal">${obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar'}</div>
-            <div class="precio-estado-modal">${obra.estado_obra === 'Disponible' ? 'Disponible para compra' : obra.estado_obra || 'Estado no disponible'}</div>
+        <!-- NUEVO BLOQUE DE COMPRA -->
+        <div class="modal-compra">
+            <div class="modal-precio">
+                <span class="precio-monto-modal">${obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar'}</span>
+                <span class="precio-estado-modal">${obra.estado_obra === 'Disponible' ? 'Disponible' : obra.estado_obra || 'N/A'}</span>
+            </div>
+            ${obra.estado_obra === 'Disponible' ? 
+                `<button class="btn-comprar" onclick="agregarAlCarrito(${id})"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</button>` : 
+                `<button class="btn-comprar" style="background: #888; cursor: not-allowed;" disabled>No disponible</button>`
+            }
         </div>
-
-        ${obra.estado_obra === 'Disponible' ? 
-            `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px; width: 100%;" onclick="agregarAlCarrito(${id})">
-                <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
-            </button>` : ''
-        }
     `;
 
     // --- 5. Ensamblar todo en el modal ---
