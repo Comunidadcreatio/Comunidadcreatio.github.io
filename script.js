@@ -756,55 +756,20 @@ window.resetFormulario = function() {
 
 // Función para cargar la galería desde el backend
 async function cargarGaleria() {
-    const container = document.getElementById('galeria-container');
-    const sinResultados = document.querySelector('.sin-resultados');
-    
-    // Mostrar estado de carga
-    container.innerHTML = '<div class="loading">Cargando galería...</div>';
-    
-    // 1. Hacer un "ping" para despertar el servidor
-    try {
-        await fetch('https://backend-fundacion-atpe.onrender.com/obras', { method: 'HEAD' });
-    } catch (e) {
-        // Silencioso, solo para despertar al servidor
-    }
-
     try {
         const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        const obras = await response.json();
         
-        // 2. Verificar si el servidor respondió correctamente (código 200)
-        if (!response.ok) {
-            throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-        }
-
-        // 3. Obtener los datos como JSON
-        const data = await response.json();
-        
-        // 4. VERIFICACIÓN CRÍTICA: Asegurar que 'data' es un array
-        if (!Array.isArray(data)) {
-            console.error("El servidor no devolvió un array de obras:", data);
-            throw new Error("El servidor no devolvió datos válidos");
-        }
-
-        // Filtrar solo obras activas (con imagen_url)
-        const obrasActivas = data.filter(obra => 
+        // Filtrar solo obras activas
+        const obrasActivas = obras.filter(obra => 
             obra.status === 'Activo' && obra.imagen_url
         );
-
-        // Mostrar la galería o el mensaje de "sin resultados"
+        
         mostrarGaleria(obrasActivas);
-
     } catch (error) {
         console.error("Error cargando galería:", error);
-        
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #888;">
-                <i class="fa-solid fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 15px;"></i>
-                <p>Error al cargar la galería. El servidor está tardando en responder.</p>
-                <p style="font-size: 0.8rem; margin-top: 10px;">Intenta recargar la página en unos segundos.</p>
-            </div>
-        `;
-        sinResultados.classList.add('hidden');
+        document.getElementById('galeria-container').innerHTML = 
+            '<div class="error">Error al cargar la galería. Intenta nuevamente.</div>';
     }
 }
 
