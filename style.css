@@ -888,7 +888,7 @@ body {
 .image-carousel {
     position: relative;
     width: 100%;
-    height: 760px; /* Altura fija para que la imagen se vea grande pero controlada */
+    height: 960px; /* Altura fija para que la imagen se vea grande pero controlada */
     overflow: hidden;
     border-radius: 15px;
     background: rgba(0, 0, 0, 0.3);
