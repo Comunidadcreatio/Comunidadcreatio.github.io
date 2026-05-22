@@ -1007,8 +1007,8 @@ body {
 
 .modal-detalles {
     display: grid;
-    grid-template-columns: 1fr; /* UNA SOLA COLUMNA */
-    gap: 8px 0; /* Espacio vertical entre cada campo */
+    grid-template-columns: 1fr 1fr; /* Divide en 2 columnas iguales */
+    gap: 8px 20px; /* Espacio vertical y horizontal entre los campos */
     margin-bottom: 20px;
 }
 
@@ -1030,15 +1030,8 @@ body {
 }
 
 .modal-detalle-valor {
-    font-size: 1rem;
-    color: #f0f0f0;
-    font-weight: 500;
-    text-align: left;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
+        word-break: break-word; /* Permite que las palabras largas bajen de línea si es necesario */
+
 }
 .modal-detalle-valor span, 
 .modal-detalle-valor img {
