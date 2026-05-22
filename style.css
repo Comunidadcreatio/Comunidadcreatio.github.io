@@ -781,8 +781,11 @@ body {
     /* El gradiente cónico que rota gracias a la variable --angle */
     background: conic-gradient(
         from var(--angle), 
-        #e6e6e6,    /* Magenta */
-        #f00505,    /* Naranja */
+        #ff00ff,    /* Magenta */
+        #ffaa00,    /* Naranja */
+        #00ffff,    /* Cian */
+        #00ff00,    /* Verde neón */
+        #ff00ff     /* Magenta */
         
     );
     
