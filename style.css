@@ -939,7 +939,7 @@ body {
 /* --- Información de la obra --- */
 .modal-body {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.3fr 1fr; /* La imagen (izquierda) ocupa un 30% más de espacio */
     gap: 40px;
     margin-top: 10px;
 }
@@ -1005,17 +1005,17 @@ body {
 
 .modal-detalles {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px 30px;
-    margin-bottom: 25px;
+    grid-template-columns: 1fr; /* UNA SOLA COLUMNA */
+    gap: 8px 0; /* Espacio vertical entre cada campo */
+    margin-bottom: 20px;
 }
 
 .modal-detalle {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Etiqueta arriba, valor abajo */
     gap: 2px;
     padding: 4px 0;
-    border-bottom: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Línea separadora sutil */
 }
 
 .modal-detalle-label {
@@ -1045,11 +1045,9 @@ body {
 }
 
 .modal-precio {
-    background: linear-gradient(135deg, var(--accent-gold), #e5cf7d);
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
+    
     margin-top: 10px;
+    width: 100%;
 }
 .precio-monto-modal {
     font-size: 2rem;
