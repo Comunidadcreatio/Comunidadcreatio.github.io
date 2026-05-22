@@ -18,8 +18,16 @@ body {
 
 /* --- HEADER --- */
 .main-header {
-    background-color: var(--bg-dark);
-    color: var(--text-white);
+    /* 1. Fondo claro (blanco casi puro) */
+    background-color: #ffffff !important; 
+    
+    /* 2. Texto oscuro para el logo y el menú */
+    color: #1a1a1a; 
+    
+    /* 3. Una línea separadora sutil en la parte inferior */
+    border-bottom: 1px solid #e5e5e5; 
+    
+    /* Mantenemos el resto de sus propiedades originales */
     height: 110px;
     display: flex;
     align-items: center;
@@ -28,7 +36,7 @@ body {
     left: 0;
     width: 100%;
     z-index: 3000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra mucho más suave */
 }
 
 .container {
@@ -49,13 +57,13 @@ body {
 }
 
 .main-logo-img {
-    width: 45px;
-    height: auto;
+    filter: invert(1); 
 }
 
 .brand-name {
     font-size: 1.4rem;
     font-weight: 700;
+    color: #1a1a1a; /* Color oscuro */
 }
 .brand-name span { font-weight: 400; }
 
@@ -67,17 +75,20 @@ body {
 
 .nav-menu ul li a {
     text-decoration: none;
-    color: var(--text-white);
+    color: #333333; /* Color gris oscuro para los enlaces */
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .nav-menu ul li a:hover, .nav-menu ul li a.active {
-    color: var(--accent-gold);
+    color: var(--accent-gold); /* El dorado de acento se mantiene para el hover */
 }
 
 .user-actions { display: flex; gap: 20px; align-items: center; }
-.user-actions a { color: white; font-size: 1.2rem; transition: 0.3s; }
+.user-actions a {
+    color: #333333; /* Color gris oscuro para los iconos */
+    font-size: 1.2rem;
+    transition: 0.3s; }
 .user-actions a:hover { color: var(--accent-gold); }
 .mobile-menu-btn { display: none; }
 
