@@ -731,12 +731,47 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra sutil */
+    
+    /* ESTO ES NUEVO: Preparamos el borde */
+    position: relative;
+    z-index: 1;
+    /* Un borde transparente para que no se vea el fondo blanco por debajo */
+    border: 2px solid transparent; 
+    background-clip: padding-box; /* El fondo dorado solo cubre el interior */
 }
+
+/* El efecto del borde de colores */
+.btn-ver-detalle::before {
+    content: "";
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border-radius: 30px;
+    background: conic-gradient(
+        #ff0080, 
+        #ff8c00, 
+        #40e0d0, 
+        #9932cc, 
+        #ff0080
+    );
+    z-index: -1;
+    opacity: 0; /* Oculto por defecto */
+    transition: opacity 0.3s ease;
+}
+
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra más fuerte al pasar el mouse */
-    background: #e5cf7d;
+    background: #e5cf7d; /* Un toque más oscuro al fondo */
+}
+
+.btn-ver-detalle:hover::before {
+    opacity: 1; /* Aparece el borde */
+    animation: rotateBorder 2s linear infinite; /* El borde gira */
+}
+
+/* Animación para que el gradiente se mueva */
+@keyframes rotateBorder {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .hidden { display: none !important; }
