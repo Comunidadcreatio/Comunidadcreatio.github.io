@@ -1087,13 +1087,7 @@ body {
 
 /* Indicadores (puntos abajo) - Solo si no usas miniaturas en galería */
 .mini-indicators {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 4px;
-    z-index: 2;
+    display: none !important;
 }
 .mini-indicator {
     width: 6px;
