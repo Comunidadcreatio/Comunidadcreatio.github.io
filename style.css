@@ -719,20 +719,26 @@ body {
     font-weight: 500;
 }
 
+/* --- DEFINIR LA VARIABLE DE ÁNGULO PARA ANIMACIÓN --- */
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
 .btn-ver-detalle {
     display: block;
     width: 100%;
-    padding: 0; /* El botón padre no tiene relleno */
+    padding: 0;
     border: none;
     border-radius: 30px;
-    background: var(--accent-gold);
+    background: var(--accent-gold); /* Fondo normal (sin borde) */
     color: var(--bg-dark);
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 12px;
     position: relative;
-    z-index: 0; /* Contexto de apilamiento para el gradiente */
 }
 
 /* El contenido interno (el span) */
@@ -740,7 +746,7 @@ body {
     display: block;
     padding: 12px;
     border-radius: 30px;
-    background: var(--accent-gold); /* Color de fondo del texto */
+    background: var(--accent-gold); /* Fondo del texto */
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
@@ -769,11 +775,12 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     
-    /* 1. Borde de 4px con colores muy brillantes */
+    /* Esto crea el borde de 4px */
     padding: 4px; 
     
-    /* 2. Gradiente cónico con colores neón saturados */
-    background: conic-gradient(from 0deg, 
+    /* El gradiente cónico que rota gracias a la variable --angle */
+    background: conic-gradient(
+        from var(--angle), 
         #ff00ff,    /* Magenta */
         #ffaa00,    /* Naranja */
         #00ffff,    /* Cian */
@@ -781,8 +788,8 @@ body {
         #ff00ff     /* Magenta */
     );
     
-    /* 3. Animación fluida para que los colores se muevan como una mezcla */
-    animation: fluirColores 2.5s linear infinite;
+    /* Animación para que --angle pase de 0deg a 360deg */
+    animation: rotarBorde 2s linear infinite;
 }
 
 /* Hacemos que el fondo interior se oscurezca un poco para que resalte el borde */
@@ -790,16 +797,13 @@ body {
     background: #d4b878; 
 }
 
-/* --- ANIMACIÓN DE FLUJO DE COLORES --- */
-@keyframes fluirColores {
-    0% {
-        background-position: 0% 50%;
+/* --- ANIMACIÓN DE ROTACIÓN DEL BORDE --- */
+@keyframes rotarBorde {
+    from {
+        --angle: 0deg;
     }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
+    to {
+        --angle: 360deg;
     }
 }
 
