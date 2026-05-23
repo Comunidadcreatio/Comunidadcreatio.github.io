@@ -25,6 +25,7 @@ export function renderizarTabla(obras, container, onEditar, onEliminar) {
             <td>
                 <button class="btn-editar" data-id="${obra.id}">Editar</button>
                 <button class="btn-eliminar" data-id="${obra.id}">Eliminar</button>
+                <button class="btn-duplicar" data-id="${obra.id}">Duplicar</button> <!-- <--- Agregar esto -->
             </td>
         `;
         tr.querySelector('.btn-editar').addEventListener('click', (e) => {
@@ -36,6 +37,10 @@ export function renderizarTabla(obras, container, onEditar, onEliminar) {
             if (confirm('¿Estás seguro de eliminar esta obra?')) {
                 onEliminar(id);
             }
+        });
+        tr.querySelector('.btn-duplicar').addEventListener('click', (e) => { // <--- Evento Duplicar
+            const id = e.target.dataset.id;
+            onDuplicar(id);
         });
         container.appendChild(tr);
     });
