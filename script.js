@@ -320,6 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="btn-icon-edit" onclick="prepararEdicionArtista(${obra.id})" title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
+                        <button class="btn-icon-duplicate" onclick="window.duplicarObra(${obra.id})" title="Duplicar">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
                         <button class="btn-icon-delete" onclick="eliminarObraArtista(${obra.id})" title="Eliminar">
                             <i class="fa-solid fa-trash"></i>
                         </button>
