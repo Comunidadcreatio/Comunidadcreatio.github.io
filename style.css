@@ -679,9 +679,8 @@ body {
 .galeria-col {
     display: flex;
     flex-direction: column;
-    flex: 1 1 25%; /* Asegura que todas las columnas tengan el mismo ancho */
-    gap: 15px;
-    width: 100%; /* Importante para que se alineen */
+    flex: 1 1 25%; /* Las columnas ocupan el 25% del ancho total */
+    gap: 15px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
@@ -705,19 +704,17 @@ body {
 .obra-card:hover { transform: translateY(-5px); box-shadow: none; }
 
 .obra-imagen {
-    height: 400px;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    margin-bottom: 15px;
+    width: 100%; /* Siempre ocupa el 100% del ancho de la columna */
+    height: auto; /* La altura se ajusta automáticamente */
+    aspect-ratio: 4 / 3; /* Proporción fija (ancho : alto) para todas las obras */
     border-radius: 0 !important;
-    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 .obra-imagen img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Recorta la imagen para llenar la caja sin deformarse */
-    border-radius: 0 !important;
+    object-fit: cover;
 }
 
 .obra-info { padding: 0; text-align: left; }
@@ -1426,8 +1423,6 @@ body {
 
 /* 1. Contenedor principal de la tarjeta */
 .obra-card {
-    width: 100%; /* La tarjeta ocupa todo el ancho de la columna */
-    border-radius: 0 !important;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -1441,11 +1436,11 @@ body {
 
 /* 2. La imagen de la obra */
 .obra-imagen {
-    width: 100%; /* Siempre ocupa el 100% del ancho de la columna */
-    height: auto; /* La altura se ajusta automáticamente */
-    aspect-ratio: 4 / 3; /* Proporción fija (ancho : alto) para todas las obras */
-    border-radius: 0 !important;
+    width: 100%;
+    height: 400px;
+    border-radius: 12px;
     position: relative;
+    z-index: 1;
     overflow: hidden;
 }
 
