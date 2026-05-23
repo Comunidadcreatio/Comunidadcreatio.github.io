@@ -427,61 +427,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Preparar Edición (Artista)
     window.prepararEdicionArtista = function(id) {
-        // Petición al backend para obtener la obra completa
-        fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
-            headers: { 'Authorization': `Bearer ${artistaToken}` }
-        })
-        .then(res => res.json())
-        .then(obra => {
-            if (!obra) return;
-            window.editingId = id;
-            document.getElementById('artist-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
+    if (!artistaToken) return;
+    fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
+        headers: { 'Authorization': `Bearer ${artistaToken}` }
+    })
+    .then(res => res.json())
+    .then(obra => {
+        if (!obra) return;
+        window.editingId = id;
+        document.getElementById('artist-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Llenar el formulario con los datos de la obra
-            document.getElementById('artista-titulo').value = obra.titulo || '';
-            document.getElementById('artista-artista').value = obra.artista || '';
-            document.getElementById('artista-ano').value = obra.ano || '';
-            document.getElementById('artista-tec-desc').value = obra.descripcion_tecnica || '';
-            document.getElementById('artista-art-desc').value = obra.descripcion_artistica || '';
-            document.getElementById('artista-status').value = obra.status || '';
-            document.getElementById('artista-estado-obra').value = obra.estado_obra || '';
-            document.getElementById('artista-ancho').value = obra.ancho || '';
-            document.getElementById('artista-alto').value = obra.alto || '';
-            document.getElementById('artista-peso').value = obra.peso || '';
-            document.getElementById('artista-marcos').value = obra.marcos || '';
-            document.getElementById('artista-precio').value = obra.precio || '';
-            document.getElementById('artista-certificado').value = obra.certificado || '';
-            document.getElementById('artista-id').value = obra.id_personalizado || '';
-            document.getElementById('artista-procedencia').value = obra.procedencia || '';
-            document.getElementById('artista-firma').value = obra.firma || '';
-            document.getElementById('artista-soporte').value = obra.soporte || '';
-            document.getElementById('artista-conservacion').value = obra.conservacion || '';
-            document.getElementById('artista-etiquetas').value = obra.etiquetas || '';
-            document.getElementById('artista-localizacion').value = obra.localizacion || '';
+        // Llenar campos de texto
+        document.getElementById('artista-titulo').value = obra.titulo || '';
+        document.getElementById('artista-artista').value = obra.artista || '';
+        document.getElementById('artista-ano').value = obra.ano || '';
+        document.getElementById('artista-art-desc').value = obra.descripcion_artistica || '';
+        document.getElementById('artista-ancho').value = obra.ancho || '';
+        document.getElementById('artista-alto').value = obra.alto || '';
+        document.getElementById('artista-peso').value = obra.peso || '';
+        document.getElementById('artista-precio').value = obra.precio || '';
+        document.getElementById('artista-id').value = obra.id_personalizado || '';
+        document.getElementById('artista-etiquetas').value = obra.etiquetas || '';
 
-            // Cargar las imágenes de la obra
-            const imagenes = obra.todas_imagenes || [];
-            for (let i = 0; i < 5; i++) {
-                const slot = document.getElementById(`artista-slot-${i}`);
-                const imgPreview = slot.querySelector('.preview-img');
-                if (imagenes[i]) {
-                    imgPreview.src = imagenes[i];
-                    imgPreview.classList.remove('hidden');
-                    slot.classList.add('has-image');
-                } else {
-                    imgPreview.src = '';
-                    imgPreview.classList.add('hidden');
-                    slot.classList.remove('has-image');
+        // 🌟 CORRECCIÓN PARA SELECTS (Técnica y Estado):
+        // Buscamos la opción que coincida con el valor de la base de datos.
+        function seleccionarOpcion(selectId, valor) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            let encontrado = false;
+            for (let option of select.options) {
+                if (option.value === valor) {
+                    option.selected = true;
+                    encontrado = true;
+                    break;
                 }
             }
+            // Si no se encontró, seleccionar la primera opción (la que dice "Seleccione una opción")
+            if (!encontrado) {
+                select.selectedIndex = 0;
+            }
+        }
 
-            // Mostrar botón de actualizar, ocultar guardar
-            btnArtistaSave.style.display = 'none';
-            btnArtistaUpdate.style.display = 'block';
-            btnArtistaUpdate.classList.remove('hidden');
-        })
-        .catch(err => console.error("Error al cargar obra para editar:", err));
-    };
+        seleccionarOpcion('artista-tec-desc', obra.descripcion_tecnica || '');
+        seleccionarOpcion('artista-status', obra.status || '');
+        seleccionarOpcion('artista-estado-obra', obra.estado_obra || '');
+        seleccionarOpcion('artista-certificado', obra.certificado || '');
+        seleccionarOpcion('artista-marcos', obra.marcos || '');
+        seleccionarOpcion('artista-procedencia', obra.procedencia || '');
+        seleccionarOpcion('artista-firma', obra.firma || '');
+        seleccionarOpcion('artista-soporte', obra.soporte || '');
+        seleccionarOpcion('artista-conservacion', obra.conservacion || '');
+        seleccionarOpcion('artista-localizacion', obra.localizacion || '');
+
+        // 🌟 CORRECCIÓN PARA LAS IMÁGENES (Cargar las imágenes existentes en los slots)
+        // El backend envía las imágenes en columnas separadas: imagen_url, imagen_url_1, imagen_url_2...
+        // Construimos un array manualmente:
+        const imagenes = [];
+        if (obra.imagen_url) imagenes.push(obra.imagen_url);
+        if (obra.imagen_url_1) imagenes.push(obra.imagen_url_1);
+        if (obra.imagen_url_2) imagenes.push(obra.imagen_url_2);
+        if (obra.imagen_url_3) imagenes.push(obra.imagen_url_3);
+        if (obra.imagen_url_4) imagenes.push(obra.imagen_url_4);
+
+        for (let i = 0; i < 5; i++) {
+            const slot = document.getElementById(`artista-slot-${i}`);
+            const imgPreview = slot.querySelector('.preview-img');
+            if (imagenes[i]) {
+                imgPreview.src = imagenes[i];
+                imgPreview.classList.remove('hidden');
+                slot.classList.add('has-image');
+            } else {
+                imgPreview.src = '';
+                imgPreview.classList.add('hidden');
+                slot.classList.remove('has-image');
+            }
+        }
+
+        // Mostrar botón de actualizar, ocultar guardar
+        document.getElementById('btn-artista-save').style.display = 'none';
+        document.getElementById('btn-artista-update').style.display = 'block';
+        document.getElementById('btn-artista-update').classList.remove('hidden');
+    })
+    .catch(err => console.error("Error al cargar obra para editar:", err));
+};
 
     window.duplicarObra = function(id) {
     if (!artistaToken) return;
