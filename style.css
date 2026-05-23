@@ -1413,7 +1413,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* --- EFECTO REVEAL CON EMPUJE DE TARJETAS --- */
+/* --- EFECTO REVEAL CON EMPUJE POR COLUMNA --- */
 
 /* 1. Contenedor principal de la tarjeta */
 .obra-card {
@@ -1425,13 +1425,14 @@ body {
     transition: all 0.4s ease;
     cursor: pointer;
     overflow: visible;
-    margin-bottom: 20px; /* Espacio base entre tarjetas */
+    height: 400px; /* Altura fija para la imagen */
+    margin-bottom: 0;
 }
 
 /* 2. La imagen de la obra (siempre visible) */
 .obra-imagen {
     width: 100%;
-    height: 400px;
+    height: 100%;
     border-radius: 12px;
     position: relative;
     z-index: 1;
@@ -1458,7 +1459,8 @@ body {
 
 /* 4. Al pasar el mouse, la tarjeta se expande y la info aparece */
 .obra-card:hover {
-    margin-bottom: 40px; /* Empuja a las otras tarjetas hacia abajo */
+    height: auto; /* La tarjeta crece para abarcar la info */
+    padding-bottom: 20px; /* Espacio extra al final */
 }
 
 .obra-card:hover .obra-imagen {
