@@ -1413,7 +1413,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* --- EFECTO REVEAL POR COLUMNA --- */
+/* --- EFECTO REVEAL CON EMPUJE DE TARJETAS --- */
 
 /* 1. Contenedor principal de la tarjeta */
 .obra-card {
@@ -1429,7 +1429,7 @@ body {
     margin-bottom: 0; /* Sin margen inferior */
 }
 
-/* 2. La imagen de la obra */
+/* 2. La imagen de la obra (siempre visible) */
 .obra-imagen {
     width: 100%;
     height: 100%;
@@ -1440,7 +1440,7 @@ body {
     transition: all 0.4s ease;
 }
 
-/* 3. El contenedor de la información (oculto inicialmente) */
+/* 3. La información (oculta inicialmente) */
 .obra-info {
     width: 100%;
     padding: 20px;
@@ -1457,10 +1457,18 @@ body {
     transition: all 0.4s ease;
 }
 
+/* 4. Al pasar el mouse, la tarjeta se expande y la info aparece */
+.obra-card:hover {
+    height: auto; /* La tarjeta se expande para abarcar la info */
+    margin-bottom: 20px; /* Empuja solo a la tarjeta de abajo en la misma columna */
+    transform: translateY(0); /* Sin elevación */
+}
+
 /* 4. Al pasar el mouse, la información se despliega */
 .obra-card:hover .obra-imagen {
     border-radius: 12px 12px 0 0;
 }
+
 
 .obra-card:hover .obra-info {
     max-height: 300px;
@@ -1468,9 +1476,69 @@ body {
     opacity: 1;
 }
 
-/* 5. Ajuste de altura de la tarjeta en hover */
-.obra-card:hover {
-    height: auto; /* La tarjeta se expande para abarcar la info */
-    margin-bottom: 20px; /* Empuja solo a la tarjeta de abajo en la misma columna */
-    transform: translateY(0); /* Sin elevación */
+/* --- Ajustes internos de la información --- */
+.obra-titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 2px;
+}
+
+.obra-artista {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.obra-artista::before {
+    content: '✔';
+    color: #2ecc71;
+    font-size: 0.9rem;
+}
+
+.obra-detalles {
+    display: flex;
+    gap: 8px;
+    color: #666;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.obra-precio {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.precio-monto {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #000;
+}
+
+.precio-etiqueta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.btn-ver-detalle {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 25px;
+    background: var(--accent-gold);
+    color: var(--bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-ver-detalle:hover {
+    background: #e5cf7d;
 }
