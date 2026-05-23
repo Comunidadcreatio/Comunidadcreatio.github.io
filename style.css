@@ -1488,3 +1488,36 @@ body {
 @media (max-width: 600px) {
     .galeria-col { flex: 1 1 100%; /* 1 columna en móviles */ }
 }
+
+/* --- CUADRÍCULA SUTIL EN EL FONDO DE LAS COLUMNAS --- */
+
+/* 1. Aplicamos la cuadrícula al contenedor de la columna */
+.galeria-col {
+    /* Creamos una cuadrícula con líneas grises muy sutiles */
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px; /* Tamaño de los cuadros */
+    
+    /* Aseguramos que la cuadrícula cubra toda el área */
+    background-position: 0 0, 0 0;
+    background-repeat: repeat;
+    
+    /* Un pequeño padding para que la cuadrícula se vea en los bordes */
+    padding: 10px;
+    
+    /* Mantenemos el resto de propiedades */
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 25%;
+    gap: 15px;
+    width: 100%;
+}
+
+/* 2. Las tarjetas necesitan un fondo blanco para que la info sea legible */
+.obra-card {
+    background: #ffffff; /* Fondo blanco para la tarjeta */
+    /* ... resto de propiedades ... */
+}
+
+/* 3. Si quieres que la cuadrícula sea aún más sutil, puedes reducir la opacidad a 0.02 */
