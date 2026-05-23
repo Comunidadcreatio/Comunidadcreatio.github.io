@@ -1449,3 +1449,166 @@ function cambiarImagenGaleria(btn, direction) {
         ind.classList.toggle('active', index === newIndex);
     });
 }
+
+// --- LÓGICA DE AUTENTICACIÓN DE ARTISTAS ---
+
+const perfilBtn = document.querySelector('.user-actions a[title="Perfil"]');
+const loginArtistaModal = document.getElementById('login-artista-modal');
+const registroArtistaModal = document.getElementById('registro-artista-modal');
+const loginArtistaForm = document.getElementById('login-artista-form');
+const registroArtistaForm = document.getElementById('registro-artista-form');
+
+// Variables de sesión
+let artistaToken = localStorage.getItem('artistaToken');
+let artistaActual = null;
+
+// Si hay un token guardado, intentamos obtener los datos del artista
+if (artistaToken) {
+    try {
+        artistaActual = JSON.parse(localStorage.getItem('artistaData'));
+        actualizarInterfazArtista();
+    } catch (e) {
+        // Si los datos son inválidos, limpiamos el almacenamiento
+        localStorage.removeItem('artistaToken');
+        localStorage.removeItem('artistaData');
+    }
+}
+
+// Abrir modal de login al hacer clic en el icono de perfil
+if (perfilBtn) {
+    perfilBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (artistaToken && artistaActual) {
+            // Si ya está logueado, ofrecer cerrar sesión
+            if (confirm("¿Quieres cerrar sesión como " + artistaActual.nombre_artista + "?")) {
+                localStorage.removeItem('artistaToken');
+                localStorage.removeItem('artistaData');
+                artistaToken = null;
+                artistaActual = null;
+                actualizarInterfazArtista();
+                alert("Sesión cerrada.");
+            }
+        } else {
+            // Mostrar modal de login
+            loginArtistaModal.classList.remove('hidden');
+        }
+    });
+}
+
+// Cerrar modales al hacer clic en la X
+document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', function() {
+        this.closest('.modal').classList.add('hidden');
+    });
+});
+
+// Cerrar modales al hacer clic fuera del contenido
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+});
+
+// Ir al registro desde el login
+document.getElementById('ir-a-registro')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginArtistaModal.classList.add('hidden');
+    registroArtistaModal.classList.remove('hidden');
+});
+
+// --- REGISTRO DE ARTISTA ---
+if (registroArtistaForm) {
+    registroArtistaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = registroArtistaForm.querySelector('button[type="submit"]');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+        btnSubmit.disabled = true;
+
+        const nombre_artista = document.getElementById('reg-nombre-artista').value;
+        const nombre_real = document.getElementById('reg-nombre-real').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/registro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre_artista, nombre_real, email, password })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+                registroArtistaModal.classList.add('hidden');
+                loginArtistaModal.classList.remove('hidden');
+                registroArtistaForm.reset();
+            } else {
+                alert("Error: " + (result.error || "Ocurrió un error"));
+            }
+        } catch (error) {
+            console.error("Error en registro:", error);
+            alert("Error de conexión. Por favor, intenta de nuevo.");
+        } finally {
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+        }
+    });
+}
+
+// --- LOGIN DE ARTISTA ---
+if (loginArtistaForm) {
+    loginArtistaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = loginArtistaForm.querySelector('button[type="submit"]');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando sesión...';
+        btnSubmit.disabled = true;
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert("¡Bienvenido/a, " + result.artista.nombre_artista + "!");
+                artistaToken = result.token;
+                artistaActual = result.artista;
+                localStorage.setItem('artistaToken', artistaToken);
+                localStorage.setItem('artistaData', JSON.stringify(artistaActual));
+                loginArtistaModal.classList.add('hidden');
+                actualizarInterfazArtista();
+                loginArtistaForm.reset();
+            } else {
+                alert("Error: " + (result.error || "Credenciales incorrectas"));
+            }
+        } catch (error) {
+            console.error("Error en login:", error);
+            alert("Error de conexión. Por favor, intenta de nuevo.");
+        } finally {
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+        }
+    });
+}
+
+// --- FUNCIÓN PARA ACTUALIZAR LA INTERFAZ ---
+function actualizarInterfazArtista() {
+    const perfilIcon = document.querySelector('.user-actions a[title="Perfil"] i');
+    if (artistaToken && artistaActual) {
+        perfilIcon.className = "fa-solid fa-user-check";
+        perfilIcon.style.color = "#2ecc71";
+        perfilIcon.parentElement.title = "Panel de " + artistaActual.nombre_artista;
+        // Opcional: cambiar el texto del botón de perfil o mostrar un mensaje
+    } else {
+        perfilIcon.className = "fa-solid fa-user";
+        perfilIcon.style.color = "";
+        perfilIcon.parentElement.title = "Iniciar sesión como Artista";
+    }
+}
