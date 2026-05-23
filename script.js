@@ -863,7 +863,7 @@ function mostrarGaleria(obras) {
                             <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
                         </div>
                         <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
-                            <i class="fa-solid fa-eye"></i> Ver detalles
+                                <span><i class="fa-solid fa-eye"></i> Ver detalles</span>
                         </button>
                     </div>
                 </div>
