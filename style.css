@@ -670,7 +670,7 @@ body {
 .galeria-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 15px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
@@ -679,8 +679,8 @@ body {
 .galeria-col {
     display: flex;
     flex-direction: column;
-    flex: 1 1 25%; /* Las columnas ocupan el 25% del ancho total */
-    gap: 15px; /* Espacio entre obras en la misma columna */
+    flex: 1 1 calc(25% - 30px); /* 4 columnas iguales */
+    gap: 20px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
@@ -692,7 +692,7 @@ body {
 
 .obra-card {
     background: transparent;
-    border-radius: 0 !important;
+    border-radius: 0;
     overflow: visible;
     box-shadow: none;
     transition: transform 0.3s ease;
@@ -704,12 +704,13 @@ body {
 .obra-card:hover { transform: translateY(-5px); box-shadow: none; }
 
 .obra-imagen {
-    width: 100%; /* Siempre ocupa el 100% del ancho de la columna */
-    height: auto; /* La altura se ajusta automáticamente */
-    aspect-ratio: 4 / 3; /* Proporción fija (ancho : alto) para todas las obras */
-    border-radius: 0 !important;
-    position: relative;
+    height: 400px;
+    width: 100%;
     overflow: hidden;
+    position: relative;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 .obra-imagen img {
     width: 100%;
