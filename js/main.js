@@ -162,7 +162,7 @@ function ocultarPanelArtista() {
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
     
-    // Agregamos el 4to parámetro: una función para manejar el botón Duplicar
+    // ⚠️ IMPORTANTE: 4 argumentos
     renderizarTabla(obras, tablaBody, 
         async (id) => { 
             // EDITAR
@@ -194,37 +194,29 @@ async function refrescarTabla() {
                 alert("Error al eliminar la obra.");
             }
         },
+        // 🟢 AQUÍ ESTÁ EL CUARTO ARGUMENTO (DUPLICAR)
         async (id) => {
-            // DUPLICAR (NUEVO)
             try {
                 const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const obra = await res.json();
                 
-                // Llenar el formulario con los datos de la obra original
-                document.getElementById('input-id-edicion').value = ''; // Sin ID de edición (será POST)
+                document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
                 document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = ''; // ID personalizado vacío para que el usuario lo escriba
-                
-                // Limpiar la selección de imagen (obligatorio, porque se debe subir una nueva imagen)
+                document.getElementById('input-id-personalizado').value = '';
                 document.getElementById('input-imagen').value = '';
                 
-                // Ocultar el botón cancelar (si existe) y mostrar el botón guardar
                 document.getElementById('btn-cancelar').classList.add('hidden');
-                
-                // Scroll al formulario
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                
-                // Enfocar el campo ID personalizado para que el usuario lo escriba
                 document.getElementById('input-id-personalizado').focus();
                 
-                alert("Datos de la obra copiados. Solo escribe un nuevo ID personalizado y selecciona una imagen.");
+                alert("Datos copiados. Escribe un nuevo ID personalizado y selecciona una imagen.");
             } catch (error) {
-                console.error("Error al duplicar la obra:", error);
-                alert("Error al cargar los datos de la obra para duplicar.");
+                console.error("Error al duplicar:", error);
+                alert("Error al duplicar.");
             }
         }
     );
