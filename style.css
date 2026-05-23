@@ -1462,14 +1462,12 @@ body {
     margin-bottom: 40px; /* Empuja a las otras tarjetas hacia abajo */
 }
 
-/* 4. Al pasar el mouse, la información se despliega */
 .obra-card:hover .obra-imagen {
-    border-radius: 12px 12px 0 0;
+    border-radius: 12px 12px 0 0; /* Solo esquinas superiores redondeadas */
 }
 
-
 .obra-card:hover .obra-info {
-    max-height: 300px;
+    max-height: 300px; /* Altura suficiente para la info */
     padding: 20px;
     opacity: 1;
 }
