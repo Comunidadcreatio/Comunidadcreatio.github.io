@@ -1230,6 +1230,7 @@ body {
 }
 
 .obra-badge {
+    display: none !important;
     position: absolute;
     top: 10px;
     right: 10px;
