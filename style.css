@@ -668,12 +668,19 @@ body {
 
 /* --- GALERÍA DE OBRAS --- */
 .galeria-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 30px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
+}
+
+.galeria-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(25% - 30px); /* 4 columnas iguales */
+    gap: 20px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
@@ -1424,8 +1431,8 @@ body {
     background: transparent;
     cursor: pointer;
     overflow: visible;
-    margin-bottom: 20px; /* Espacio base entre filas */
-    transition: transform 0.3s ease, margin-bottom 0.3s ease; /* Transición suave */
+    transition: transform 0.3s ease, margin-bottom 0.3s ease;
+    margin-bottom: 0; /* El espacio entre obras lo maneja el gap de .galeria-col */
 }
 
 /* 2. La imagen de la obra */
@@ -1446,21 +1453,22 @@ body {
     border-radius: 0 0 12px 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     position: absolute;
-    top: 100%; /* Coloca la info justo debajo de la imagen */
+    top: 100%;
     left: 0;
-    z-index: 0;
+    z-index: 2;
     
     /* Oculto inicialmente */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-20px); /* Un poco desplazado hacia arriba */
+    transform: translateY(-20px);
     transition: all 0.3s ease;
 }
 
 /* 4. El efecto al pasar el mouse */
 .obra-card:hover {
-    margin-bottom: 220px; /* Aumenta el margen inferior, empujando la FILA COMPLETA hacia abajo */
-    transform: translateY(-5px); /* La tarjeta se eleva */
+    margin-bottom: 220px; /* Empuja SOLO LA COLUMNA hacia abajo */
+    transform: translateY(-5px);
+    z-index: 10;
 }
 
 .obra-card:hover .obra-imagen {
@@ -1470,6 +1478,13 @@ body {
 .obra-card:hover .obra-info {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0); /* La info se desliza hacia abajo */
-    z-index: 2;
+    transform: translateY(0);
+}
+
+/* --- Ajustes responsivos --- */
+@media (max-width: 1024px) {
+    .galeria-col { flex: 1 1 calc(50% - 30px); /* 2 columnas en tablets */ }
+}
+@media (max-width: 600px) {
+    .galeria-col { flex: 1 1 100%; /* 1 columna en móviles */ }
 }

@@ -776,7 +776,7 @@ async function cargarGaleria() {
     }
 }
 
-// Función para mostrar las obras en la galería
+// Función para mostrar las obras en la galería (Versión Columnas Independientes)
 function mostrarGaleria(obras) {
     const container = document.getElementById('galeria-container');
     const sinResultados = document.querySelector('.sin-resultados');
@@ -789,110 +789,90 @@ function mostrarGaleria(obras) {
     
     sinResultados.classList.add('hidden');
     
-    container.innerHTML = obras.map(obra => {
-        // --- 1. Preparar todas las imágenes de la obra ---
-        let imagenes = [];
-        
-        // Verificamos si la obra tiene 'todas_imagenes' (array) y lo usamos
-        if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
-            imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
-        }
-        
-        // Si no tiene el array, usamos 'imagen_url'
-        if (imagenes.length === 0 && obra.imagen_url) {
-            imagenes = [obra.imagen_url];
-        }
-        
-        // Si no hay ninguna, ponemos un placeholder
-        if (imagenes.length === 0) {
-            imagenes = ['https://placehold.co/400x400?text=Sin+Imagen'];
-        }
+    // 1. Agrupar las obras en 4 columnas
+    const cols = [[], [], [], []];
+    obras.forEach((obra, index) => {
+        cols[index % 4].push(obra);
+    });
 
-        // Formateamos las URLs para que funcionen correctamente
-        const imagenesCompletas = imagenes.map(imgUrl => 
-            imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`
-        );
+    // 2. Generar el HTML de cada columna
+    let html = '';
+    for (let i = 0; i < 4; i++) {
+        html += `<div class="galeria-col">`;
+        for (const obra of cols[i]) {
+            // --- Generar la tarjeta de la obra ---
+            let imagenes = [];
+            if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+                imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
+            }
+            if (imagenes.length === 0 && obra.imagen_url) {
+                imagenes = [obra.imagen_url];
+            }
+            if (imagenes.length === 0) {
+                imagenes = ['https://placehold.co/400x400?text=Sin+Imagen'];
+            }
+            const imagenesCompletas = imagenes.map(imgUrl => 
+                imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`
+            );
+            const mostrarControles = imagenesCompletas.length > 1;
+            const indicadoresHTML = imagenesCompletas.map((_, i) => 
+                `<span class="mini-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`
+            ).join('');
+            const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+            const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
+            const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
 
-        // --- 2. Generar el HTML del mini-carrusel ---
-        // Solamente mostramos los controles si hay más de una imagen
-        const mostrarControles = imagenesCompletas.length > 1;
-        
-        // Generamos los indicadores (puntos) para mostrar cuántas imágenes hay
-        const indicadoresHTML = imagenesCompletas.map((_, i) => 
-            `<span class="mini-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`
-        ).join('');
-
-        const carruselHTML = `
-            <div class="mini-carousel">
-                <div class="mini-carousel-track" data-id="${obra.id}">
-                    ${imagenesCompletas.map((url, i) => `
-                        <div class="mini-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
-                            <img src="${url}" alt="${obra.titulo}" 
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Error'">
-                        </div>
-                    `).join('')}
-                </div>
-                
-                ${mostrarControles ? `
-                    <button class="mini-carousel-btn prev" onclick="cambiarImagenGaleria(this, -1)" aria-label="Anterior">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button class="mini-carousel-btn next" onclick="cambiarImagenGaleria(this, 1)" aria-label="Siguiente">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                ` : ''}
-                
-                <div class="mini-indicators">
-                    ${indicadoresHTML}
-                </div>
-                
-                <span class="obra-badge">
-                    ${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}
-                </span>
-            </div>
-        `;
-
-        // --- 3. Formatear dimensiones, precio, etc. ---
-        const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-        const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
-        const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
-
-        // --- 4. Ensamblar la tarjeta completa ---
-        return `
-            <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
-                <div class="obra-imagen">
-                    ${carruselHTML}
-                </div>
-                
-                <div class="obra-info">
-                    <h3 class="obra-titulo">${obra.titulo}</h3>
-                    <p class="obra-artista">${obra.artista}</p>
-                    
-                    <div class="obra-detalles">
-                        <div class="detalle-item">
-                            <span class="detalle-label">Dimensiones:</span>
-                            <span class="detalle-valor">${dimensiones}</span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Técnica:</span>
-                            <span class="detalle-valor">${tecnica}</span>
+            html += `
+                <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
+                    <div class="obra-imagen">
+                        <div class="mini-carousel">
+                            <div class="mini-carousel-track" data-id="${obra.id}">
+                                ${imagenesCompletas.map((url, i) => `
+                                    <div class="mini-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+                                        <img src="${url}" alt="${obra.titulo}" 
+                                             onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Error'">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${mostrarControles ? `
+                                <button class="mini-carousel-btn prev" onclick="cambiarImagenGaleria(this, -1)" aria-label="Anterior">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button class="mini-carousel-btn next" onclick="cambiarImagenGaleria(this, 1)" aria-label="Siguiente">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            ` : ''}
+                            <div class="mini-indicators">
+                                ${indicadoresHTML}
+                            </div>
+                            <span class="obra-badge">
+                                ${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}
+                            </span>
                         </div>
                     </div>
                     
-                    <div class="obra-precio">
-                        <div class="precio-monto">${precio}</div>
-                        <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
+                    <div class="obra-info">
+                        <h3 class="obra-titulo">${obra.titulo}</h3>
+                        <p class="obra-artista">${obra.artista}</p>
+                        <div class="obra-detalles">
+                            <div class="detalle-item"><span class="detalle-label">Dimensiones:</span><span class="detalle-valor">${dimensiones}</span></div>
+                            <div class="detalle-item"><span class="detalle-label">Técnica:</span><span class="detalle-valor">${tecnica}</span></div>
+                        </div>
+                        <div class="obra-precio">
+                            <div class="precio-monto">${precio}</div>
+                            <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
+                        </div>
+                        <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
+                            <i class="fa-solid fa-eye"></i> Ver detalles
+                        </button>
                     </div>
-                    
-                    <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
-                        <span><i class="fa-solid fa-eye"></i> Ver detalles</span>
-                    </button>
                 </div>
-
-                <div class="obra-spacer"></div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }
+        html += `</div>`;
+    }
+    
+    container.innerHTML = html;
 }
 
 async function verDetalleObra(id) {
