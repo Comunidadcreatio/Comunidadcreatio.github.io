@@ -302,8 +302,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
+            const displayId = obra.id_personalizado || obra.id; // Muestra el ID personalizado si existe, sino el interno
             const fila = document.createElement('tr');
             fila.innerHTML = `
+                <td>${displayId}</td>
                 <td>${obra.id_personalizado || obra.id}</td>
                 <td>${obra.titulo}</td>
                 <td>${obra.artista}</td>
@@ -387,12 +389,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const campos = [
-                'titulo', 'artista', 'ano', 'tec-desc', 'art-desc',
-                'status', 'estado-obra', 'ancho', 'alto', 'peso', 'marcos', 'precio',
-                'certificado', 'id', 'procedencia', 'firma', 'soporte', 'conservacion',
-                'etiquetas', 'localizacion'
-            ];
+            // Crear un mapa para enlazar los IDs del HTML con los nombres que espera el backend
+            const fieldMap = {
+                'titulo': 'artista-titulo',
+                'artista': 'artista-artista',
+                'ano': 'artista-ano',
+                'descripcion_tecnica': 'artista-tec-desc', // 🔥 Corregido
+                'descripcion_artistica': 'artista-art-desc', // 🔥 Corregido
+                'status': 'artista-status',
+                'estado_obra': 'artista-estado-obra',
+                'ancho': 'artista-ancho',
+                'alto': 'artista-alto',
+                'peso': 'artista-peso',
+                'marcos': 'artista-marcos',
+                'precio': 'artista-precio',
+                'certificado': 'artista-certificado',
+                'id_obra': 'artista-id', // 🔥 Corregido (El backend espera 'id_obra')
+                'procedencia': 'artista-procedencia',
+                'firma': 'artista-firma',
+                'soporte': 'artista-soporte',
+                'conservacion': 'artista-conservacion',
+                'etiquetas': 'artista-etiquetas',
+                'localizacion': 'artista-localizacion'
+            };
+            // Recorrer el mapa para obtener los valores y asignarlos al FormData
+            Object.keys(fieldMap).forEach(backendField => {
+                const inputId = fieldMap[backendField];
+                const element = document.getElementById(inputId);
+                if (element) {
+                    formData.append(backendField, element.value);
+                }
+            });
             campos.forEach(campo => {
                 const el = document.getElementById(`artista-${campo}`);
                 if (el) formData.append(campo, el.value);
