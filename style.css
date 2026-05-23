@@ -1413,52 +1413,66 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* --- EFECTO HOVER REVEAL PARA TARJETAS DE GALERÍA --- */
+/* --- EFECTO HOVER REVEAL (INFO FLOTANDO DEBAJO) --- */
 
 /* 1. Contenedor principal de la tarjeta */
 .obra-card {
     position: relative;
-    overflow: hidden; /* Importante para ocultar la info que se desliza */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     border-radius: 12px;
     background: transparent;
     transition: transform 0.3s ease;
-    height: auto;
+    height: 400px; /* Altura fija para la imagen */
     cursor: pointer;
+    overflow: visible; /* Permite que la info se salga de la tarjeta */
 }
 
 /* 2. La imagen de la obra (siempre visible) */
 .obra-imagen {
     width: 100%;
-    height: 400px;
+    height: 100%;
+    border-radius: 12px;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 }
 
-/* 3. El contenedor de la información (oculto inicialmente) */
+/* 3. La información (oculta inicialmente, flotando abajo) */
 .obra-info {
     position: absolute;
-    bottom: 0;
+    top: 100%; /* Justo debajo de la tarjeta */
     left: 0;
     width: 100%;
     padding: 20px;
-    background: linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 100%);
-    transform: translateY(100%); /* Oculto abajo */
-    transition: transform 0.4s ease;
-    z-index: 2;
-    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    
+    /* Oculto inicialmente (desplazado hacia abajo) */
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    
+    transition: all 0.4s ease;
+    z-index: 0;
 }
 
-/* 4. Al pasar el mouse, la información se desliza hacia arriba */
+/* 4. Al pasar el mouse, la info aparece */
 .obra-card:hover .obra-info {
-    transform: translateY(0); /* Se muestra */
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
 }
 
-/* 5. La tarjeta entera se eleva ligeramente al pasar el mouse */
+/* 5. La tarjeta se eleva un poco */
 .obra-card:hover {
     transform: translateY(-5px);
+    margin-bottom: 20px; /* Espacio para que la info no choque con la tarjeta de abajo */
 }
 
-/* 6. Ajustes de los elementos internos de la info */
+/* --- Ajustes internos de la información --- */
 .obra-titulo {
     font-size: 1.1rem;
     font-weight: 600;
@@ -1507,7 +1521,6 @@ body {
     color: #888;
 }
 
-/* 7. Botón Ver detalles (estilo limpio) */
 .btn-ver-detalle {
     display: block;
     width: 100%;
