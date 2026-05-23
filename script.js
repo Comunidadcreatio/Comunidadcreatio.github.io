@@ -758,7 +758,6 @@ function actualizarNombresArchivos() {
     }
 }
 
-// Modificar la función resetFormulario para limpiar todos los slots
 window.resetFormulario = function() {
     console.log("Iniciando limpieza del formulario...");
     
@@ -767,7 +766,7 @@ window.resetFormulario = function() {
     if(form) form.reset();
     
     // 2. Resetear el ID de edición
-    editingId = null; 
+    window.editingId = null; 
 
     // 3. Limpiar todos los inputs de archivo y slots
     for (let i = 0; i < 5; i++) {
@@ -789,17 +788,16 @@ window.resetFormulario = function() {
     const nameDisplay = document.getElementById('file-names-display');
     if(nameDisplay) nameDisplay.textContent = "";
 
-    // 5. Volver botones a la normalidad
-    const btnSave = document.getElementById('btn-save');
-    const btnUpdate = document.getElementById('btn-update');
-    
-    if(btnSave) {
-        btnSave.style.display = 'block'; 
-        btnSave.classList.remove('hidden');
+    // 5. RESTAURAR BOTONES A SU ESTADO NORMAL
+    if (window.btnSave) {
+        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+        window.btnSave.disabled = false;
+        window.btnSave.style.display = 'block'; 
+        window.btnSave.classList.remove('hidden');
     }
-    if(btnUpdate) {
-        btnUpdate.style.display = 'none';
-        btnUpdate.classList.add('hidden');
+    if (window.btnUpdate) {
+        window.btnUpdate.style.display = 'none';
+        window.btnUpdate.classList.add('hidden');
     }
 
     // 6. Quitar bordes rojos de validación
