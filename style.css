@@ -683,10 +683,6 @@ body {
         linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
     background-size: 40px 40px; /* Tamaño de los cuadros */
     
-    /* Aseguramos que la cuadrícula cubra toda el área */
-    background-position: 0 0, 0 0;
-    background-repeat: repeat;
-    
     /* Un pequeño padding para que la cuadrícula se vea en los bordes */
     padding: 10px;
 
