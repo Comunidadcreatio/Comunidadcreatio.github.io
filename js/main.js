@@ -92,12 +92,14 @@ function setupEvents() {
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
         const idEdicion = document.getElementById('input-id-edicion').value;
+        const idPersonalizado = document.getElementById('input-id-personalizado').value; // <--- Agregar esto
         const imagenInput = document.getElementById('input-imagen');
 
         const formData = new FormData();
         formData.append('titulo', titulo);
         formData.append('artista', artista);
         formData.append('precio', precio);
+        formData.append('id_obra', idPersonalizado); // <--- Agregar esto (el backend espera 'id_obra')
         if (imagenInput.files[0]) {
             formData.append('imagen_0', imagenInput.files[0]);
         }
@@ -158,10 +160,31 @@ function ocultarPanelArtista() {
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
     renderizarTabla(obras, tablaBody, (id) => {
-        // Lógica para cargar datos al formulario cuando se edita una obra
-        console.log("Editar obra con ID:", id);
-        // Aquí deberías hacer un fetch a /obras/${id} para llenar el formulario
+        // --- Lógica para editar (Ahora con fetch real) ---
+        try {
+            const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const obra = await res.json();
+            
+            // Llenar el formulario con los datos de la obra
+            document.getElementById('input-id-edicion').value = obra.id;
+            document.getElementById('input-titulo').value = obra.titulo;
+            document.getElementById('input-artista').value = obra.artista;
+            document.getElementById('input-precio').value = obra.precio;
+            document.getElementById('input-id-personalizado').value = obra.id_personalizado; // <--- Cargar el ID personalizado
+            
+            // El botón cancelar (opcional) se puede mostrar/ocultar aquí
+            document.getElementById('btn-cancelar').classList.remove('hidden');
+            
+            // Hacer scroll al formulario
+            document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error("Error al cargar datos de la obra:", error);
+            alert("Error al cargar la obra para editar");
+        }
     }, async (id) => {
+        // (Lógica de eliminar, ya la tienes)
         const exito = await eliminarObra(token, id);
         if (exito) {
             await refrescarTabla();

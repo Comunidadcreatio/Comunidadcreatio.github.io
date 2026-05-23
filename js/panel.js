@@ -18,7 +18,7 @@ export function renderizarTabla(obras, container, onEditar, onEliminar) {
     obras.forEach(obra => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${obra.id}</td>
+            <td>${obra.id_personalizado || obra.id}</td>
             <td>${obra.titulo}</td>
             <td>${obra.precio}</td>
             <td><img src="${obra.imagen_url}" width="50"></td>
