@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- HEADER -->
     <header id="main-header">
         <h1 id="brand-name">Galería de Arte</h1>
@@ -22,6 +21,7 @@
         <!-- SECCIÓN PÚBLICA: GALERÍA -->
         <section id="galeria-publica">
             <div id="galeria-container">
+                <!-- Las tarjetas de obras se cargarán aquí -->
                 <p>Cargando galería...</p>
             </div>
         </section>
@@ -29,207 +29,34 @@
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
         <section id="panel-artista" class="hidden">
             <h2>Mi Panel</h2>
+            <!-- Tabla de obras -->
             <div id="tabla-obras-container">
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Título</th>
-                            <th>Autor</th>
-                            <th>Certificado</th>
                             <th>Precio</th>
-                            <th>Estatus</th>
                             <th>Imagen</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-obras-body">
+                        <!-- Filas de obras -->
                     </tbody>
                 </table>
             </div>
-
+            <!-- Formulario para agregar/editar obra -->
             <div id="formulario-obra">
                 <h3>Agregar / Editar Obra</h3>
-                <form id="artista-artwork-form" class="artwork-form-grid">
-                    
-                    <!-- Campos Básicos -->
-                    <div class="input-group-dash">
-                        <label>Título de la Obra</label>
-                        <input type="text" id="artista-titulo" placeholder="Título">
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Nombre del Artista</label>
-                        <input type="text" id="artista-artista" placeholder="Artista">
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Año de Creación</label>
-                        <input type="number" id="artista-ano" placeholder="2024">
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Técnica</label>
-                        <select id="artista-tec-desc">
-                            <option value="" disabled selected>Seleccione una opción</option>
-                            <option value="Óleo">Óleo sobre lienzo</option>
-                            <option value="Acrílico">Acrílico sobre lienzo</option>
-                            <option value="Acuarela">Acuarela</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash full-width">
-                        <label>Acerca de la Obra</label>
-                        <textarea id="artista-art-desc" rows="3" placeholder="Comparte la historia detrás de esta obra..."></textarea>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Status</label>
-                        <select id="artista-status">
-                            <option value="Activo">Activo (Visible en Galería)</option>
-                            <option value="Inactivo">Inactivo (Oculto)</option>
-                        </select>
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Estado</label>
-                        <select id="artista-estado-obra">
-                            <option value="Disponible">Disponible (en venta)</option>
-                            <option value="Reservado">Reservado</option>
-                            <option value="Vendido">Vendido</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Dimensiones -->
-                    <div class="input-group-dash triple-row-container full-width">
-                        <div class="triple-field-grid">
-                            <div class="field-item">
-                                <label for="artista-ancho">Ancho (cm)</label>
-                                <input type="number" id="artista-ancho" placeholder="0">
-                            </div>
-                            <div class="field-item">
-                                <label for="artista-alto">Alto (cm)</label>
-                                <input type="number" id="artista-alto" placeholder="0">
-                            </div>  
-                            <div class="field-item">
-                                <label for="artista-peso">Peso (kg)</label>
-                                <input type="number" id="artista-peso" placeholder="0">
-                            </div>
-                        </div>
-                    </div>  
-
-                    <div class="input-group-dash">
-                        <label>Enmarcado</label>
-                        <select id="artista-marcos">
-                            <option value="Sin enmarcar">Sin enmarcar</option>
-                            <option value="Ya enmarcada">Ya enmarcada</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Precio</label>
-                        <input type="number" id="artista-precio" placeholder="Precio Total">
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Certificado</label>
-                        <select id="artista-certificado">
-                            <option value="Si">Sí (autenticado)</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>ID</label>
-                        <input type="text" id="artista-id" placeholder="Código interno de la Obra">
-                    </div>
-                    <div class="input-group-dash">
-                        <label>Procedencia</label>
-                        <select id="artista-procedencia">
-                            <option value="Taller del artista">Taller del artista</option>
-                            <option value="Colección privada">Colección privada</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Firma</label>
-                        <select id="artista-firma">
-                            <option value="Firmada al frente">Firmada al frente</option>
-                            <option value="No firmada">No firmada</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Soporte</label>
-                        <select id="artista-soporte">
-                            <option value="Lienzo">Lienzo</option>
-                            <option value="Papel">Papel</option>
-                        </select>
-                    </div>
-
-                     <div class="input-group-dash">
-                        <label>Estado de Conservación</label>
-                        <select id="artista-conservacion">
-                            <option value="Excelente">Excelente (como nuevo)</option>
-                            <option value="Bueno">Bueno (ligeros signos de edad)</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Etiquetas</label>
-                        <input type="text" id="artista-etiquetas" placeholder="Etiquetas separadas por comas">
-                    </div>
-
-                    <div class="input-group-dash">
-                        <label>Localización de la Obra</label>
-                        <select id="artista-localizacion">
-                            <option value="" disabled selected>Selecciona un País</option>
-                        </select>
-                    </div>
-
-                    <!-- 🌟 CAMPO OCULTO PARA EL ID DE EDICIÓN -->
+                <form id="obra-form">
+                    <input type="text" id="input-titulo" placeholder="Título">
+                    <input type="text" id="input-artista" placeholder="Artista">
+                    <input type="number" id="input-precio" placeholder="Precio">
+                    <input type="file" id="input-imagen" accept="image/*">
                     <input type="hidden" id="input-id-edicion">
-
-                    <!-- 🌟 BOTONES DE ACCIÓN (Los que faltaban) -->
-                    <div class="form-actions-group">
-                        <button type="submit" id="btn-artista-save" class="btn-save-artwork">
-                            💾 Guardar Obra
-                        </button>
-                        <button type="button" id="btn-artista-update" class="btn-update-artwork hidden">
-                            🔄 Refrescar Obra
-                        </button>
-                        <button type="button" id="btn-artista-clear" class="btn-clear-form">
-                            🧹 Limpiar Campos
-                        </button>
-                    </div>
-
-                    <!-- 🌟 SECCIÓN DE SUBIR IMÁGENES (Los 5 cuadros) -->
-                    <div class="image-upload-section">
-                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imágenes de la Obra (Máx. 5)</label>
-                        <div class="image-upload-container">
-                            <div class="image-slot" id="artista-slot-0" onclick="activarInput(0)">
-                                <img src="" class="preview-img hidden" alt="Vista previa">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <div class="image-slot" id="artista-slot-1" onclick="activarInput(1)">
-                                <img src="" class="preview-img hidden" alt="Vista previa">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <div class="image-slot" id="artista-slot-2" onclick="activarInput(2)">
-                                <img src="" class="preview-img hidden" alt="Vista previa">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <div class="image-slot" id="artista-slot-3" onclick="activarInput(3)">
-                                <img src="" class="preview-img hidden" alt="Vista previa">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <div class="image-slot" id="artista-slot-4" onclick="activarInput(4)">
-                                <img src="" class="preview-img hidden" alt="Vista previa">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                        </div>
-                        <input type="file" id="artista-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
-                        <input type="file" id="artista-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
-                        <input type="file" id="artista-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
-                        <input type="file" id="artista-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
-                        <input type="file" id="artista-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
-                        <small id="artista-file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
-                    </div>
+                    <button type="submit" id="btn-guardar">Guardar Obra</button>
+                    <button type="button" id="btn-cancelar" class="hidden">Cancelar Edición</button>
                 </form>
             </div>
         </section>
@@ -271,6 +98,7 @@
         </div>
     </div>
 
+    <!-- JS PRINCIPAL (type="module") -->
     <script src="js/main.js" type="module"></script>
 </body>
 </html>
