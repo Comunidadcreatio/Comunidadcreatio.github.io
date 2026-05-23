@@ -38,10 +38,17 @@ export function renderizarTabla(obras, container, onEditar, onEliminar) {
                 onEliminar(id);
             }
         });
-        tr.querySelector('.btn-duplicar').addEventListener('click', (e) => { // <--- Evento Duplicar
+        // js/panel.js - Línea donde está el listener del botón duplicar
+        tr.querySelector('.btn-duplicar').addEventListener('click', (e) => {
             const id = e.target.dataset.id;
-            onDuplicar(id);
-        });
+            // ✅ ESTA ES LA SOLUCIÓN: Verificar que sea una función antes de ejecutarla
+            if (typeof onDuplicar === 'function') {
+                onDuplicar(id);
+            } else {
+                console.warn('El botón duplicar no está configurado. Revisa tu main.js');
+                // Opcional: alert('Función duplicar no disponible');
+            }
+});
         container.appendChild(tr);
     });
 }
