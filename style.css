@@ -1468,7 +1468,7 @@ body {
 /* 4. El efecto al pasar el mouse */
 .obra-card:hover {
     margin-bottom: 220px; /* Empuja SOLO LA COLUMNA hacia abajo */
-    transform: translateY(-5px);
+    transform: translateY(-1px);
     z-index: 10;
 }
 
