@@ -177,40 +177,51 @@ async function refrescarTabla() {
 }
 
 function llenarFormulario(obra) {
-    document.getElementById('artista-titulo').value = obra.titulo || '';
-    document.getElementById('artista-artista').value = obra.artista || '';
-    document.getElementById('artista-ano').value = obra.ano || '';
-    document.getElementById('artista-tec-desc').value = obra.descripcion_tecnica || '';
-    document.getElementById('artista-art-desc').value = obra.descripcion_artistica || '';
-    document.getElementById('artista-status').value = obra.status || '';
-    document.getElementById('artista-estado-obra').value = obra.estado_obra || '';
-    document.getElementById('artista-ancho').value = obra.ancho || '';
-    document.getElementById('artista-alto').value = obra.alto || '';
-    document.getElementById('artista-peso').value = obra.peso || '';
-    document.getElementById('artista-marcos').value = obra.marcos || '';
-    document.getElementById('artista-precio').value = obra.precio || '';
-    document.getElementById('artista-certificado').value = obra.certificado || '';
-    document.getElementById('artista-id').value = obra.id_personalizado || '';
-    document.getElementById('artista-procedencia').value = obra.procedencia || '';
-    document.getElementById('artista-firma').value = obra.firma || '';
-    document.getElementById('artista-soporte').value = obra.soporte || '';
-    document.getElementById('artista-conservacion').value = obra.conservacion || '';
-    document.getElementById('artista-etiquetas').value = obra.etiquetas || '';
-    document.getElementById('artista-localizacion').value = obra.localizacion || '';
+    if (!obra) return;
+
+    function setValue(id, value) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = value || '';
+        } else {
+            console.warn(`Elemento con ID '${id}' no encontrado.`);
+        }
+    }
+
+    setValue('artista-titulo', obra.titulo);
+    setValue('artista-artista', obra.artista);
+    setValue('artista-ano', obra.ano);
+    setValue('artista-tec-desc', obra.descripcion_tecnica);
+    setValue('artista-art-desc', obra.descripcion_artistica);
+    setValue('artista-status', obra.status);
+    setValue('artista-estado-obra', obra.estado_obra);
+    setValue('artista-ancho', obra.ancho);
+    setValue('artista-alto', obra.alto);
+    setValue('artista-peso', obra.peso);
+    setValue('artista-marcos', obra.marcos);
+    setValue('artista-precio', obra.precio);
+    setValue('artista-certificado', obra.certificado);
+    setValue('artista-id', obra.id_personalizado);
+    setValue('artista-procedencia', obra.procedencia);
+    setValue('artista-firma', obra.firma);
+    setValue('artista-soporte', obra.soporte);
+    setValue('artista-conservacion', obra.conservacion);
+    setValue('artista-etiquetas', obra.etiquetas);
+    setValue('artista-localizacion', obra.localizacion);
 
     // Cargar imágenes
     const imagenes = obra.todas_imagenes || [];
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`artista-slot-${i}`);
-        const imgPreview = slot.querySelector('.preview-img');
-        if (imagenes[i]) {
+        const imgPreview = slot ? slot.querySelector('.preview-img') : null;
+        if (imagenes[i] && imgPreview) {
             imgPreview.src = imagenes[i];
             imgPreview.classList.remove('hidden');
             slot.classList.add('has-image');
-        } else {
+        } else if (imgPreview) {
             imgPreview.src = '';
             imgPreview.classList.add('hidden');
-            slot.classList.remove('has-image');
+            if (slot) slot.classList.remove('has-image');
         }
     }
 }
