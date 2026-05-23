@@ -41,17 +41,6 @@ function setupEvents() {
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
         }
-
-        // Botones de cerrar modal (la X)
-        document.querySelectorAll('.cerrar-modal').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Buscar el modal padre más cercano y ocultarlo
-                const modal = this.closest('.modal');
-                if (modal) {
-            modal.classList.add('hidden');
-                }
-            });
-        });
     });
 
     // Logout
@@ -139,6 +128,17 @@ function setupEvents() {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('hidden');
     });
+
+    // Botones de cerrar modal (la X)
+        document.querySelectorAll('.cerrar-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Buscar el modal padre más cercano y ocultarlo
+                const modal = this.closest('.modal');
+                if (modal) {
+            modal.classList.add('hidden');
+                }
+            });
+        });
 }
 
 // ============================================
