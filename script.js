@@ -3,7 +3,6 @@
 // ============================================
 window.obrasData = [];
 window.editingId = null;
-window.isLoggedIn = false;
 window.currentSlide = 0;
 
 // Variables de autenticación de artista
@@ -28,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnArtistaUpdate = document.getElementById('btn-artista-update');
     const btnArtistaClear = document.getElementById('btn-artista-clear');
     const btnArtistLogout = document.getElementById('btn-artist-logout');
+    const artistaBuscador = document.getElementById('artista-buscador-obras');
 
     // --- MODALES DE LOGIN Y REGISTRO ---
     const loginModal = document.getElementById('login-artista-modal');
@@ -57,9 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     cartContainer.classList.remove('hidden');
                     cartContainer.classList.add('show-anim');
                 }
+                // Cerrar panel de artista si está abierto
+                artistDashboard.classList.add('hidden');
             } else if (linkText === 'inicio') {
                 document.querySelector('.main-content').classList.remove('hidden');
                 document.getElementById('galeria').classList.add('hidden');
+                artistDashboard.classList.add('hidden');
                 if (cartContainer) {
                     cartContainer.classList.add('hidden');
                 }
@@ -85,6 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             localStorage.removeItem('artistaToken');
             localStorage.removeItem('artistaData');
+            artistaToken = null;
+            artistaActual = null;
         }
     }
 
@@ -185,6 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginModal.classList.add('hidden');
                     actualizarInterfazArtista();
                     loginForm.reset();
+                    // Ir al panel automáticamente después del login
+                    irAlPanelDeArtista();
                 } else {
                     alert("Error: " + (result.error || "Credenciales incorrectas"));
                 }
@@ -323,7 +330,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Validar Formulario (Artista)
+    // 3. Buscador en el panel de artista
+    if (artistaBuscador) {
+        artistaBuscador.addEventListener('input', (e) => {
+            const texto = e.target.value.toLowerCase().trim();
+            const filas = document.querySelectorAll('#artista-tabla-obras-body tr');
+            filas.forEach(fila => {
+                const celdas = fila.querySelectorAll('td');
+                let coincide = false;
+                celdas.forEach(celda => {
+                    if (celda.textContent.toLowerCase().includes(texto)) coincide = true;
+                });
+                fila.style.display = coincide ? '' : 'none';
+            });
+        });
+    }
+
+    // 4. Validar Formulario (Artista)
     function validarFormularioArtista() {
         const inputs = artistArtworkForm.querySelectorAll('input:not([type="file"]), select, textarea');
         let hayVacios = false;
@@ -342,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // 4. Guardar Obra (Artista)
+    // 5. Guardar Obra (Artista)
     if (artistArtworkForm) {
         artistArtworkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -398,10 +421,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Preparar Edición (Artista)
+    // 6. Preparar Edición (Artista)
     window.prepararEdicionArtista = function(id) {
-        // Obtener la obra de la tabla (como ya tenemos los datos renderizados, podemos usar la variable global o pedirla al backend)
-        // Aquí pedimos la obra al backend para tener los datos frescos
+        // Petición al backend para obtener la obra completa
         fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
             headers: { 'Authorization': `Bearer ${artistaToken}` }
         })
@@ -409,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(obra => {
             if (!obra) return;
             window.editingId = id;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('artist-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
 
             // Llenar el formulario con los datos de la obra
             document.getElementById('artista-titulo').value = obra.titulo || '';
@@ -457,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error("Error al cargar obra para editar:", err));
     };
 
-    // 6. Actualizar Obra (Artista)
+    // 7. Actualizar Obra (Artista)
     if (btnArtistaUpdate) {
         btnArtistaUpdate.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -514,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. Limpiar Formulario (Artista)
+    // 8. Limpiar Formulario (Artista)
     if (btnArtistaClear) {
         btnArtistaClear.addEventListener('click', (e) => {
             e.preventDefault();
@@ -522,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 8. Resetear Formulario (Artista)
+    // 9. Resetear Formulario (Artista)
     function resetFormularioArtista() {
         const form = document.getElementById('artista-artwork-form');
         if (form) form.reset();
@@ -560,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 9. Eliminar Obra (Artista)
+    // 10. Eliminar Obra (Artista)
     window.eliminarObraArtista = async function(id) {
         if (!confirm("¿Estás seguro de eliminar esta obra permanentemente?")) return;
         if (!artistaToken) return;
@@ -584,12 +606,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 10. Funciones de imágenes
-    window.activarInputArtista = function(slotIndex) {
+    // ==========================================
+    // FUNCIONES DE IMÁGENES DEL PANEL DE ARTISTA
+    // ==========================================
+    window.activarInput = function(slotIndex) {
         document.getElementById(`artista-imagen-${slotIndex}`).click();
     };
 
-    window.previewImageArtista = function(event, slotIndex) {
+    window.previewImage = function(event, slotIndex) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -599,12 +623,12 @@ document.addEventListener('DOMContentLoaded', () => {
             imgPreview.src = e.target.result;
             imgPreview.classList.remove('hidden');
             slot.classList.add('has-image');
-            actualizarNombresArchivosArtista();
+            actualizarNombresArchivos();
         };
         reader.readAsDataURL(file);
     };
 
-    function actualizarNombresArchivosArtista() {
+    function actualizarNombresArchivos() {
         const display = document.getElementById('artista-file-names-display');
         let archivos = [];
         for (let i = 0; i < 5; i++) {
@@ -649,398 +673,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// FUNCIONES GLOBALES (GALERÍA Y OTROS)
+// FUNCIONES GLOBALES (GALERÍA, MODAL, ETC.)
 // ==========================================
 
-// ... (aquí van tus funciones de cargarGaleria, mostrarGaleria, verDetalleObra, etc.) ...
-
-// --- GALERÍA DE OBRAS ---
-
-// Función para cargar la galería desde el backend
-async function cargarGaleria() {
-    try {
-        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
-        const obras = await response.json();
-        
-        // Filtrar solo obras activas
-        const obrasActivas = obras.filter(obra => 
-            obra.status === 'Activo' && obra.imagen_url
-        );
-        
-        mostrarGaleria(obrasActivas);
-    } catch (error) {
-        console.error("Error cargando galería:", error);
-        document.getElementById('galeria-container').innerHTML = 
-            '<div class="error">Error al cargar la galería. Intenta nuevamente.</div>';
-    }
-}
-
-// Función para mostrar las obras en la galería (Versión Columnas Independientes)
-function mostrarGaleria(obras) {
-    const container = document.getElementById('galeria-container');
-    const sinResultados = document.querySelector('.sin-resultados');
-    
-    if (!obras || obras.length === 0) {
-        container.innerHTML = '';
-        sinResultados.classList.remove('hidden');
-        return;
-    }
-    
-    sinResultados.classList.add('hidden');
-    
-    // 1. Agrupar las obras en 4 columnas
-    const cols = [[], [], [], []];
-    obras.forEach((obra, index) => {
-        cols[index % 4].push(obra);
-    });
-
-    // 2. Generar el HTML de cada columna
-    let html = '';
-    for (let i = 0; i < 4; i++) {
-        html += `<div class="galeria-col">`;
-        for (const obra of cols[i]) {
-            // --- Generar la tarjeta de la obra ---
-            let imagenes = [];
-            if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
-                imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
-            }
-            if (imagenes.length === 0 && obra.imagen_url) {
-                imagenes = [obra.imagen_url];
-            }
-            if (imagenes.length === 0) {
-                imagenes = ['https://placehold.co/400x400?text=Sin+Imagen'];
-            }
-            const imagenesCompletas = imagenes.map(imgUrl => 
-                imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`
-            );
-            const mostrarControles = imagenesCompletas.length > 1;
-            const indicadoresHTML = imagenesCompletas.map((_, i) => 
-                `<span class="mini-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`
-            ).join('');
-            const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-            const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
-            const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
-
-            html += `
-                <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
-                    <div class="obra-imagen">
-                        <div class="mini-carousel">
-                            <div class="mini-carousel-track" data-id="${obra.id}">
-                                ${imagenesCompletas.map((url, i) => `
-                                    <div class="mini-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
-                                        <img src="${url}" alt="${obra.titulo}" 
-                                             onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Error'">
-                                    </div>
-                                `).join('')}
-                            </div>
-                            ${mostrarControles ? `
-                                <button class="mini-carousel-btn prev" onclick="cambiarImagenGaleria(this, -1)" aria-label="Anterior">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <button class="mini-carousel-btn next" onclick="cambiarImagenGaleria(this, 1)" aria-label="Siguiente">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
-                            ` : ''}
-                            <div class="mini-indicators">
-                                ${indicadoresHTML}
-                            </div>
-                            <span class="obra-badge">
-                                ${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="obra-info">
-                        <h3 class="obra-titulo">${obra.titulo}</h3>
-                        <p class="obra-artista">${obra.artista}</p>
-                        <div class="obra-detalles">
-                            <div class="detalle-item"><span class="detalle-label">Dimensiones:</span><span class="detalle-valor">${dimensiones}</span></div>
-                            <div class="detalle-item"><span class="detalle-label">Técnica:</span><span class="detalle-valor">${tecnica}</span></div>
-                        </div>
-                        <div class="obra-precio">
-                            <div class="precio-monto">${precio}</div>
-                            <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
-                        </div>
-                        <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})">
-                                <span><i class="fa-solid fa-eye"></i> Ver detalles</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-        html += `</div>`;
-    }
-    
-    container.innerHTML = html;
-}
-
-async function verDetalleObra(id) {
-    if (!window.obrasData || window.obrasData.length === 0) {
-        try {
-            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
-            window.obrasData = await response.json();
-        } catch (error) {
-            alert("Error al cargar los detalles.");
-            return;
-        }
-    }
-
-    const obra = window.obrasData.find(o => o.id === id);
-    if (!obra) return;
-
-    const modal = document.getElementById('obra-modal');
-    const modalBody = document.querySelector('.modal-body');
-
-    // --- 1. Preparar todas las imágenes ---
-    let imagenes = [];
-    if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
-        imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
-    }
-    if (imagenes.length === 0 && obra.imagen_url) {
-        imagenes = [obra.imagen_url];
-    }
-    if (imagenes.length === 0) {
-        imagenes = ['https://placehold.co/600x400?text=Sin+Imagen'];
-    }
-
-    // --- 2. Generar HTML del Carrusel (sin miniaturas dentro) ---
-    let carouselHTML = `
-        <div class="image-carousel">
-            <div class="carousel-container" id="carousel-container">
-    `;
-    
-    imagenes.forEach((imgUrl) => {
-        const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
-        carouselHTML += `
-            <div class="carousel-slide">
-                <img src="${urlFinal}" alt="Imagen de ${obra.titulo}" 
-                     onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Imagen+no+disponible'">
-            </div>
-        `;
-    });
-    
-    carouselHTML += `
-            </div>
-            <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-    `;
-
-    // --- 3. HTML de las miniaturas (FUERA del carrusel) ---
-    let thumbnailsHTML = `
-        <div class="carousel-thumbnails" id="carousel-thumbnails">
-            ${imagenes.map((imgUrl, i) => {
-                const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
-                return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/80x80'">`;
-            }).join('')}
-        </div>
-    `;
-
-    // --- 4. Generar HTML de la información (ACTUALIZADO) ---
-    const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
-    
-    // --- Lógica para la localización con bandera ---
-    let localizacionTexto = obra.localizacion || 'No especificada';
-    let localizacionHTML = '';
-    if (localizacionTexto.length === 2 && localizacionTexto !== 'No especificada') {
-        const codigoPais = localizacionTexto.toLowerCase();
-        localizacionHTML = `
-            <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-start;">
-                <img src="https://flagcdn.com/16x12/${codigoPais}.png" alt="Bandera ${localizacionTexto}" style="border-radius: 2px; display: inline-block;">
-                <span>${localizacionTexto.toUpperCase()}</span>
-            </div>
-        `;
-    } else {
-        localizacionHTML = localizacionTexto;
-    }
-
-    const infoHTML = `
-        <h2 class="modal-titulo">${obra.titulo}</h2>
-        <p class="modal-artista">${obra.artista} (${obra.ano || 'N/A'})</p>
-        
-        <div class="modal-descripcion">${obra.descripcion_artistica || 'Sin descripción disponible.'}</div>
-        
-        <div class="modal-detalles">
-            <div class="modal-detalle"><span class="modal-detalle-label">Dimensiones</span><span class="modal-detalle-valor">${dimensiones}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Peso</span><span class="modal-detalle-valor">${obra.peso || 'S/N'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Técnica</span><span class="modal-detalle-valor">${obra.descripcion_tecnica || 'No especificada'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Soporte</span><span class="modal-detalle-valor">${obra.soporte || 'No especificado'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Enmarcado</span><span class="modal-detalle-valor">${obra.marcos || 'No especificado'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Firma</span><span class="modal-detalle-valor">${obra.firma || 'No especificada'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Estado</span><span class="modal-detalle-valor">${obra.estado_obra || 'N/A'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Certificado</span><span class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Procedencia</span><span class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Conservación</span><span class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${localizacionHTML}</span></div>
-            <div class="modal-detalle"><span class="modal-detalle-label">Etiquetas</span><span class="modal-detalle-valor">${obra.etiquetas || 'Sin etiquetas'}</span></div>
-        </div>
-        
-        <!-- NUEVO BLOQUE DE COMPRA -->
-        <div class="modal-compra">
-            <div class="modal-precio">
-                <span class="precio-monto-modal">${obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar'}</span>
-                <span class="precio-estado-modal">${obra.estado_obra === 'Disponible' ? 'Disponible' : obra.estado_obra || 'N/A'}</span>
-            </div>
-            ${obra.estado_obra === 'Disponible' ? 
-                `<button class="btn-comprar" onclick="agregarAlCarrito(${id})"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</button>` : 
-                `<button class="btn-comprar" style="background: #888; cursor: not-allowed;" disabled>No disponible</button>`
-            }
-        </div>
-    `;
-
-    // --- 5. Ensamblar todo en el modal ---
-    modalBody.innerHTML = `
-        <div class="modal-left-column">
-            ${carouselHTML}
-            ${thumbnailsHTML}
-        </div>
-        <div class="modal-info">
-            ${infoHTML}
-        </div>
-    `;
-
-    // Resetear carrusel
-    window.currentSlide = 0;
-    const container = document.getElementById('carousel-container');
-    if (container) container.style.transform = 'translateX(0)';
-    
-    modal.classList.remove('hidden');
-}
-
-// --- ACTUALIZAR FUNCIONES DEL CARRUSEL ---
-window.currentSlide = 0;
-
-function moverCarrusel(direction) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    const slides = container.children;
-    const totalSlides = slides.length;
-    
-    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
-    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
-    actualizarMiniaturas();
-}
-
-function irAImagen(index) {
-    const container = document.getElementById('carousel-container');
-    if (!container) return;
-    
-    window.currentSlide = index;
-    container.style.transform = `translateX(-${index * 100}%)`;
-    actualizarMiniaturas();
-}
-
-function actualizarMiniaturas() {
-    const thumbnails = document.querySelectorAll('.thumbnail-img');
-    thumbnails.forEach((thumb, i) => {
-        thumb.classList.toggle('active', i === window.currentSlide);
-    });
-}
-
-// Función para agregar al carrito (puedes expandir esto después)
-function agregarAlCarrito(id) {
-    const cartBadge = document.querySelector('.cart-badge');
-    let count = parseInt(cartBadge.textContent) || 0;
-    cartBadge.textContent = count + 1;
-    
-    // Aquí puedes agregar lógica para guardar en localStorage o enviar al backend
-    alert("Obra agregada al carrito");
-}
-
-// Función para filtrar obras
-function filtrarGaleria() {
-    const tecnica = document.getElementById('filtro-tecnica').value;
-    const precioFiltro = document.getElementById('filtro-precio').value;
-    const obras = document.querySelectorAll('.obra-card');
-    
-    obras.forEach(obra => {
-        const obraTecnica = obra.dataset.tecnica;
-        const obraPrecio = parseInt(obra.dataset.precio) || 0;
-        
-        let mostrar = true;
-        
-        // Filtrar por técnica
-        if (tecnica && !obraTecnica.includes(tecnica)) {
-            mostrar = false;
-        }
-        
-        // Filtrar por precio
-        if (precioFiltro) {
-            switch(precioFiltro) {
-                case '0-500':
-                    if (obraPrecio > 500) mostrar = false;  
-                    break;
-                case '501-1000':
-                    if (obraPrecio < 501 || obraPrecio > 1000) mostrar = false;
-                    break;
-                case '1001-2000':
-                    if (obraPrecio < 1001 || obraPrecio > 2000) mostrar = false;
-                    break;
-                case '2001+':
-                    if (obraPrecio < 2001) mostrar = false;
-                    break;
-            }
-        }
-        
-        obra.style.display = mostrar ? 'block' : 'none';
-    });
-    
-    // Mostrar mensaje si no hay resultados
-    const obrasVisibles = [...obras].filter(o => o.style.display !== 'none');
-    const sinResultados = document.querySelector('.sin-resultados');
-    
-    if (obrasVisibles.length === 0) {
-        sinResultados.classList.remove('hidden');
-    } else {
-        sinResultados.classList.add('hidden');
-    }
-}
-
-// Inicializar galería cuando se carga la página
-document.addEventListener('DOMContentLoaded', () => {
-    // ... tu código existente ...
-    
-    // Agregar evento al botón de galería en el menú
-    const btnGaleria = document.getElementById('btn-galeria');
-    if (btnGaleria) {
-        btnGaleria.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Mostrar galería y ocultar main content
-            document.querySelector('.main-content').classList.add('hidden');
-            document.getElementById('galeria').classList.remove('hidden');
-            
-            // Cargar galería si no está cargada
-            const container = document.getElementById('galeria-container');
-            if (container.innerHTML.includes('loading')) {
-                cargarGaleria();
-            }
-            
-            // Scroll suave a la galería
-            window.scrollTo({ top: 110, behavior: 'smooth' });
-        });
-    }
-    
-    // Eventos para filtros
-    document.getElementById('filtro-tecnica')?.addEventListener('change', filtrarGaleria);
-    document.getElementById('filtro-precio')?.addEventListener('change', filtrarGaleria);
-    
-    // Evento para cerrar modal
-    document.querySelector('.close-modal')?.addEventListener('click', () => {
-        document.getElementById('obra-modal').classList.add('hidden');
-    });
-    
-    // Cerrar modal al hacer clic fuera
-    document.getElementById('obra-modal')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('obra-modal')) {
-            document.getElementById('obra-modal').classList.add('hidden');
-        }
-    });
-});
-
-
-
-// Lista completa de países (código ISO 3166-1 alfa-2 y nombre en español)
+// --- LISTA DE PAÍSES ---
 const paises = [
     { code: 'AF', name: 'Afganistán' },
     { code: 'AL', name: 'Albania' },
@@ -1235,264 +871,262 @@ const paises = [
     { code: 'ZW', name: 'Zimbabue' }
 ];
 
-// Función que llena el select con los países
 function llenarListaPaises() {
-    const select = document.getElementById('dash-localizacion');
+    const select = document.getElementById('artista-localizacion');
     if (!select) return;
-
-    // Limpiar opciones previas (excepto la primera "Selecciona un País")
     while (select.options.length > 1) {
         select.remove(1);
     }
-
-    // Agregar cada país
     paises.forEach(pais => {
         const option = document.createElement('option');
-        option.value = pais.code;      // código de país, tal cual estaba en tu HTML original
+        option.value = pais.code;
         option.textContent = pais.name;
         select.appendChild(option);
     });
 }
 
-// Ejecutar cuando el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', llenarListaPaises);
+// --- CARGAR GALERÍA PÚBLICA ---
+async function cargarGaleria() {
+    const container = document.getElementById('galeria-container');
+    try {
+        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+        const obras = await response.json();
+        window.obrasData = obras;
+        const obrasActivas = obras.filter(obra => obra.status === 'Activo' && obra.imagen_url);
+        mostrarGaleria(obrasActivas);
+    } catch (error) {
+        console.error("Error cargando galería:", error);
+        container.innerHTML = '<div class="error">Error al cargar la galería.</div>';
+    }
+}
 
-// Función para navegar entre imágenes dentro de la galería
+function mostrarGaleria(obras) {
+    const container = document.getElementById('galeria-container');
+    const sinResultados = document.querySelector('.sin-resultados');
+    if (!obras || obras.length === 0) {
+        container.innerHTML = '';
+        sinResultados.classList.remove('hidden');
+        return;
+    }
+    sinResultados.classList.add('hidden');
+
+    container.innerHTML = obras.map(obra => {
+        let imagenes = [];
+        if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+            imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
+        }
+        if (imagenes.length === 0 && obra.imagen_url) {
+            imagenes = [obra.imagen_url];
+        }
+        if (imagenes.length === 0) {
+            imagenes = ['https://placehold.co/400x400?text=Sin+Imagen'];
+        }
+        const imagenesCompletas = imagenes.map(imgUrl => 
+            imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`
+        );
+        const mostrarControles = imagenesCompletas.length > 1;
+        const indicadoresHTML = imagenesCompletas.map((_, i) => 
+            `<span class="mini-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`
+        ).join('');
+        const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+        const tecnica = obra.descripcion_tecnica || 'Técnica no especificada';
+        const precio = obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar';
+
+        return `
+            <div class="obra-card" data-id="${obra.id}" data-precio="${obra.precio || 0}" data-tecnica="${obra.descripcion_tecnica || ''}">
+                <div class="obra-imagen">
+                    <div class="mini-carousel">
+                        <div class="mini-carousel-track" data-id="${obra.id}">
+                            ${imagenesCompletas.map((url, i) => `
+                                <div class="mini-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+                                    <img src="${url}" alt="${obra.titulo}" onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Error'">
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${mostrarControles ? `
+                            <button class="mini-carousel-btn prev" onclick="cambiarImagenGaleria(this, -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="mini-carousel-btn next" onclick="cambiarImagenGaleria(this, 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                        ` : ''}
+                        <div class="mini-indicators">${indicadoresHTML}</div>
+                        <span class="obra-badge" style="display:none;">${obra.certificado === 'Si' ? 'Certificada ✓' : 'Original'}</span>
+                    </div>
+                </div>
+                <div class="obra-info">
+                    <h3 class="obra-titulo">${obra.titulo}</h3>
+                    <p class="obra-artista">${obra.artista}</p>
+                    <div class="obra-detalles">
+                        <div class="detalle-item"><span class="detalle-label">Dimensiones:</span><span class="detalle-valor">${dimensiones}</span></div>
+                        <div class="detalle-item"><span class="detalle-label">Técnica:</span><span class="detalle-valor">${tecnica}</span></div>
+                    </div>
+                    <div class="obra-precio">
+                        <div class="precio-monto">${precio}</div>
+                        <div class="precio-etiqueta">${obra.estado_obra === 'Disponible' ? 'Disponible para venta' : obra.estado_obra || 'Consultar'}</div>
+                    </div>
+                    <button class="btn-ver-detalle" onclick="verDetalleObra(${obra.id})"><i class="fa-solid fa-eye"></i> Ver detalles</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// --- VER DETALLE (MODAL DE GALERÍA) ---
+async function verDetalleObra(id) {
+    if (!window.obrasData || window.obrasData.length === 0) {
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
+            window.obrasData = await response.json();
+        } catch (error) {
+            alert("Error al cargar los detalles.");
+            return;
+        }
+    }
+    const obra = window.obrasData.find(o => o.id === id);
+    if (!obra) return;
+    const modal = document.getElementById('obra-modal');
+    const modalBody = document.querySelector('.modal-body');
+
+    let imagenes = [];
+    if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
+        imagenes = obra.todas_imagenes.filter(img => img && img.trim() !== '');
+    }
+    if (imagenes.length === 0 && obra.imagen_url) {
+        imagenes = [obra.imagen_url];
+    }
+    if (imagenes.length === 0) {
+        imagenes = ['https://placehold.co/600x400?text=Sin+Imagen'];
+    }
+
+    let carouselHTML = `
+        <div class="image-carousel">
+            <div class="carousel-container" id="carousel-container">
+    `;
+    imagenes.forEach((imgUrl) => {
+        const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
+        carouselHTML += `<div class="carousel-slide"><img src="${urlFinal}" alt="Imagen de ${obra.titulo}" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Imagen+no+disponible'"></div>`;
+    });
+    carouselHTML += `
+            </div>
+            <button class="carousel-btn prev" onclick="moverCarrusel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="carousel-btn next" onclick="moverCarrusel(1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    `;
+
+    let thumbnailsHTML = `
+        <div class="carousel-thumbnails" id="carousel-thumbnails">
+            ${imagenes.map((imgUrl, i) => {
+                const urlFinal = imgUrl.startsWith('http') ? imgUrl : `https://backend-fundacion-atpe.onrender.com${imgUrl}`;
+                return `<img src="${urlFinal}" class="thumbnail-img ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})" onerror="this.src='https://placehold.co/80x80'">`;
+            }).join('')}
+        </div>
+    `;
+
+    const dimensiones = `${obra.ancho || 'S/N'} × ${obra.alto || 'S/N'}`;
+    let localizacionTexto = obra.localizacion || 'No especificada';
+    let localizacionHTML = '';
+    if (localizacionTexto.length === 2 && localizacionTexto !== 'No especificada') {
+        const codigoPais = localizacionTexto.toLowerCase();
+        localizacionHTML = `
+            <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-start;">
+                <img src="https://flagcdn.com/16x12/${codigoPais}.png" alt="Bandera ${localizacionTexto}" style="border-radius: 2px; display: inline-block;">
+                <span>${localizacionTexto.toUpperCase()}</span>
+            </div>
+        `;
+    } else {
+        localizacionHTML = localizacionTexto;
+    }
+
+    const infoHTML = `
+        <h2 class="modal-titulo">${obra.titulo}</h2>
+        <p class="modal-artista">${obra.artista} (${obra.ano || 'N/A'})</p>
+        <div class="modal-descripcion">${obra.descripcion_artistica || 'Sin descripción disponible.'}</div>
+        <div class="modal-detalles">
+            <div class="modal-detalle"><span class="modal-detalle-label">Dimensiones</span><span class="modal-detalle-valor">${dimensiones}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Peso</span><span class="modal-detalle-valor">${obra.peso || 'S/N'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Técnica</span><span class="modal-detalle-valor">${obra.descripcion_tecnica || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Soporte</span><span class="modal-detalle-valor">${obra.soporte || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Enmarcado</span><span class="modal-detalle-valor">${obra.marcos || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Firma</span><span class="modal-detalle-valor">${obra.firma || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Estado</span><span class="modal-detalle-valor">${obra.estado_obra || 'N/A'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Certificado</span><span class="modal-detalle-valor">${obra.certificado === 'Si' ? 'Sí ✓' : 'No'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Procedencia</span><span class="modal-detalle-valor">${obra.procedencia || 'No especificada'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Conservación</span><span class="modal-detalle-valor">${obra.conservacion || 'No especificado'}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Localización</span><span class="modal-detalle-valor">${localizacionHTML}</span></div>
+            <div class="modal-detalle"><span class="modal-detalle-label">Etiquetas</span><span class="modal-detalle-valor">${obra.etiquetas || 'Sin etiquetas'}</span></div>
+        </div>
+        <div class="modal-precio">
+            <div class="precio-monto-modal">${obra.precio ? `$${parseInt(obra.precio).toLocaleString()}` : 'Consultar'}</div>
+            <div class="precio-estado-modal">${obra.estado_obra === 'Disponible' ? 'Disponible para compra' : obra.estado_obra || 'Estado no disponible'}</div>
+        </div>
+        ${obra.estado_obra === 'Disponible' ? `<button class="btn-ver-detalle" style="background: #2ecc71; margin-top: 20px; width: 100%;" onclick="agregarAlCarrito(${id})"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</button>` : ''}
+    `;
+
+    modalBody.innerHTML = `
+        <div class="modal-left-column">
+            ${carouselHTML}
+            ${thumbnailsHTML}
+        </div>
+        <div class="modal-info">
+            ${infoHTML}
+        </div>
+    `;
+    window.currentSlide = 0;
+    const container = document.getElementById('carousel-container');
+    if (container) container.style.transform = 'translateX(0)';
+    modal.classList.remove('hidden');
+}
+
+// --- FUNCIONES DE CARRUSEL DEL MODAL ---
+function moverCarrusel(direction) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    const slides = container.children;
+    const totalSlides = slides.length;
+    window.currentSlide = (window.currentSlide + direction + totalSlides) % totalSlides;
+    container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function irAImagen(index) {
+    const container = document.getElementById('carousel-container');
+    if (!container) return;
+    window.currentSlide = index;
+    container.style.transform = `translateX(-${index * 100}%)`;
+    actualizarMiniaturas();
+}
+
+function actualizarMiniaturas() {
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
+    thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === window.currentSlide);
+    });
+}
+
+// --- FUNCIONES DE MINI CARRUSEL DE GALERÍA ---
 function cambiarImagenGaleria(btn, direction) {
-    // Encontrar el contenedor del carrusel padre
     const carousel = btn.closest('.mini-carousel');
     if (!carousel) return;
-    
-    // Encontrar el track (la pista de imágenes)
     const track = carousel.querySelector('.mini-carousel-track');
     if (!track) return;
-    
-    // Encontrar todos los slides
     const slides = track.querySelectorAll('.mini-slide');
     if (slides.length <= 1) return;
-    
-    // Encontrar el slide actualmente activo
     let currentIndex = 0;
     slides.forEach((slide, index) => {
-        if (slide.classList.contains('active')) {
-            currentIndex = index;
-        }
+        if (slide.classList.contains('active')) currentIndex = index;
     });
-    
-    // Calcular el nuevo índice
     let newIndex = (currentIndex + direction + slides.length) % slides.length;
-    
-    // Actualizar clases de los slides
     slides.forEach((slide, index) => {
         slide.classList.toggle('active', index === newIndex);
     });
-    
-    // Actualizar los indicadores (puntos)
     const indicators = carousel.querySelectorAll('.mini-indicator');
     indicators.forEach((ind, index) => {
         ind.classList.toggle('active', index === newIndex);
     });
 }
 
-// --- LÓGICA DE AUTENTICACIÓN DE ARTISTAS ---
-
-const perfilBtn = document.querySelector('.user-actions a[title="Perfil"]');
-const loginArtistaModal = document.getElementById('login-artista-modal');
-const registroArtistaModal = document.getElementById('registro-artista-modal');
-const loginArtistaForm = document.getElementById('login-artista-form');
-const registroArtistaForm = document.getElementById('registro-artista-form');
-
-// Variables de sesión
-let artistaToken = localStorage.getItem('artistaToken');
-let artistaActual = null;
-
-// Si hay un token guardado, intentamos obtener los datos del artista
-if (artistaToken) {
-    try {
-        artistaActual = JSON.parse(localStorage.getItem('artistaData'));
-        actualizarInterfazArtista();
-    } catch (e) {
-        // Si los datos son inválidos, limpiamos el almacenamiento
-        localStorage.removeItem('artistaToken');
-        localStorage.removeItem('artistaData');
-    }
-}
-
-// Abrir modal de login al hacer clic en el icono de perfil
-if (perfilBtn) {
-    perfilBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (artistaToken && artistaActual) {
-            // Si ya está logueado, ofrecer cerrar sesión
-            if (confirm("¿Quieres cerrar sesión como " + artistaActual.nombre_artista + "?")) {
-                localStorage.removeItem('artistaToken');
-                localStorage.removeItem('artistaData');
-                artistaToken = null;
-                artistaActual = null;
-                actualizarInterfazArtista();
-                alert("Sesión cerrada.");
-            }
-        } else {
-            // Mostrar modal de login
-            loginArtistaModal.classList.remove('hidden');
-        }
-    });
-}
-
-// Cerrar modales al hacer clic en la X
-document.querySelectorAll('.close-modal').forEach(btn => {
-    btn.addEventListener('click', function() {
-        this.closest('.modal').classList.add('hidden');
-    });
-});
-
-// Cerrar modales al hacer clic fuera del contenido
-document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.add('hidden');
-        }
-    });
-});
-
-// Ir al registro desde el login
-document.getElementById('ir-a-registro')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginArtistaModal.classList.add('hidden');
-    registroArtistaModal.classList.remove('hidden');
-});
-
-if (registroArtistaForm) {
-    registroArtistaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btnSubmit = registroArtistaForm.querySelector('button[type="submit"]');
-        const originalText = btnSubmit.innerHTML;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
-        btnSubmit.disabled = true;
-
-        // Capturar todos los campos del formulario
-        const nombre_artista = document.getElementById('reg-nombre-artista').value;
-        const nombre_real = document.getElementById('reg-nombre-real').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
-        const telefono = document.getElementById('reg-telefono')?.value || '';
-        const pais = document.getElementById('reg-pais')?.value || '';
-        const ciudad = document.getElementById('reg-ciudad')?.value || '';
-        const biografia = document.getElementById('reg-biografia')?.value || '';
-        const instagram = document.getElementById('reg-instagram')?.value || '';
-        const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento')?.value || '';
-        const tipo_artista = document.getElementById('reg-tipo-artista')?.value || '';
-        const genero = document.getElementById('reg-genero')?.value || '';
-        const pref_contacto = document.getElementById('reg-pref-contacto')?.value || 'Email';
-
-        try {
-            const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/registro', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nombre_artista, 
-                    nombre_real, 
-                    email, 
-                    password,
-                    telefono,
-                    pais,
-                    ciudad,
-                    biografia,
-                    instagram,
-                    fecha_nacimiento,
-                    tipo_artista,
-                    genero,
-                    pref_contacto
-                })
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
-                registroArtistaModal.classList.add('hidden');
-                loginArtistaModal.classList.remove('hidden');
-                registroArtistaForm.reset();
-            } else {
-                alert("Error: " + (result.error || "Ocurrió un error"));
-            }
-        } catch (error) {
-            console.error("Error en registro:", error);
-            alert("Error de conexión. Por favor, intenta de nuevo.");
-        } finally {
-            btnSubmit.innerHTML = originalText;
-            btnSubmit.disabled = false;
-        }
-    });
-}
-
-// --- LOGIN DE ARTISTA ---
-if (loginArtistaForm) {
-    loginArtistaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btnSubmit = loginArtistaForm.querySelector('button[type="submit"]');
-        const originalText = btnSubmit.innerHTML;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando sesión...';
-        btnSubmit.disabled = true;
-
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        try {
-            const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert("¡Bienvenido/a, " + result.artista.nombre_artista + "!");
-                artistaToken = result.token;
-                artistaActual = result.artista;
-                localStorage.setItem('artistaToken', artistaToken);
-                localStorage.setItem('artistaData', JSON.stringify(artistaActual));
-                loginArtistaModal.classList.add('hidden');
-                actualizarInterfazArtista();
-                loginArtistaForm.reset();
-            } else {
-                alert("Error: " + (result.error || "Credenciales incorrectas"));
-            }
-        } catch (error) {
-            console.error("Error en login:", error);
-            alert("Error de conexión. Por favor, intenta de nuevo.");
-        } finally {
-            btnSubmit.innerHTML = originalText;
-            btnSubmit.disabled = false;
-        }
-    });
-}
-
-// --- FUNCIÓN PARA ACTUALIZAR LA INTERFAZ ---
-function actualizarInterfazArtista() {
-    const perfilIcon = document.querySelector('.user-actions a[title="Perfil"] i');
-    if (artistaToken && artistaActual) {
-        perfilIcon.className = "fa-solid fa-user-check";
-        perfilIcon.style.color = "#2ecc71";
-        perfilIcon.parentElement.title = "Panel de " + artistaActual.nombre_artista;
-        // Opcional: cambiar el texto del botón de perfil o mostrar un mensaje
-    } else {
-        perfilIcon.className = "fa-solid fa-user";
-        perfilIcon.style.color = "";
-        perfilIcon.parentElement.title = "Iniciar sesión como Artista";
-    }
-}
-
-async function cargarMisObras() {
-    const token = localStorage.getItem('artistaToken');
-    if (!token) return;
-
-    try {
-        const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/mis-obras', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const obras = await response.json();
-        renderizarTabla(obras); // Usa tu función existente para renderizar la tabla
-    } catch (error) {
-        console.error("Error cargando mis obras:", error);
-    }
+// --- AGREGAR AL CARRITO ---
+function agregarAlCarrito(id) {
+    const cartBadge = document.querySelector('.cart-badge');
+    let count = parseInt(cartBadge.textContent) || 0;
+    cartBadge.textContent = count + 1;
+    alert("Obra agregada al carrito");
 }
