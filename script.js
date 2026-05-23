@@ -1,78 +1,340 @@
-// Variable global para almacenar los datos de las obras y poder editarlas sin volver a pedir al servidor
+// ============================================
+// VARIABLES GLOBALES
+// ============================================
 window.obrasData = [];
+window.editingId = null;
+window.isLoggedIn = false;
+window.currentSlide = 0;
 
+// Variables de autenticación de artista
+let artistaToken = localStorage.getItem('artistaToken');
+let artistaActual = null;
+
+// ============================================
+// CONFIGURACIÓN INICIAL
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. VARIABLES Y SELECTORES ---
-    window.isLoggedIn = false; // Estado de sesión
-    let editingId = null;      // ID de la obra que se está editando actualmente
-
-    // Elementos principales UI
+    // --- SELECTORES ---
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
     const cartContainer = document.getElementById('cart-container');
+    const perfilBtn = document.getElementById('perfil-btn');
 
-    // Paneles y Login
-    const adminBtn = document.getElementById('admin-btn');
-    const loginPanel = document.getElementById('login-panel');
-    const adminDashboard = document.getElementById('admin-dashboard'); 
-    const loginForm = document.querySelector('.login-form');
-    const btnLogout = document.getElementById('btn-logout'); 
-    const adminUsernameSpan = document.getElementById('admin-username');
+    // --- PANEL DE ARTISTA ---
+    const artistDashboard = document.getElementById('artist-dashboard');
+    const artistArtworkForm = document.getElementById('artista-artwork-form');
+    const btnArtistaSave = document.getElementById('btn-artista-save');
+    const btnArtistaUpdate = document.getElementById('btn-artista-update');
+    const btnArtistaClear = document.getElementById('btn-artista-clear');
+    const btnArtistLogout = document.getElementById('btn-artist-logout');
 
-    // Formulario de Obras y Botones
-    const artworkForm = document.getElementById('artwork-form');
-    const btnSave = document.getElementById('btn-save');   // Botón verde
-    const btnUpdate = document.getElementById('btn-update'); // Botón azul (nuevo)
-    const btnClear = document.getElementById('btn-clear');   // Botón gris (nuevo)
-    // Evento para el botón Limpiar
-    if (btnClear) {
-        btnClear.addEventListener('click', function(e) {
-            e.preventDefault(); // <--- MUY IMPORTANTE
-            window.resetFormulario();
+    // --- MODALES DE LOGIN Y REGISTRO ---
+    const loginModal = document.getElementById('login-artista-modal');
+    const registroModal = document.getElementById('registro-artista-modal');
+    const loginForm = document.getElementById('login-artista-form');
+    const registroForm = document.getElementById('registro-artista-form');
+
+    // ==========================================
+    // VALIDACIÓN Y NAVEGACIÓN
+    // ==========================================
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
         });
     }
-    // Inputs de archivo
-    const fileInput = document.getElementById('dash-input-file');
-    const nameDisplay = document.getElementById('file-name-display');
 
-    // --- 2. VALIDACIÓN: SOLO NÚMEROS (Año y Precio) ---
-    const inputAno = document.getElementById('dash-ano');
-    const inputPrecio = document.getElementById('dash-precio');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const linkText = this.textContent.trim().toLowerCase();
+            
+            if (linkText === 'galería' || linkText === 'galeria') {
+                document.querySelector('.main-content').classList.add('hidden');
+                document.getElementById('galeria').classList.remove('hidden');
+                cargarGaleria();
+                if (cartContainer) {
+                    cartContainer.classList.remove('hidden');
+                    cartContainer.classList.add('show-anim');
+                }
+            } else if (linkText === 'inicio') {
+                document.querySelector('.main-content').classList.remove('hidden');
+                document.getElementById('galeria').classList.add('hidden');
+                if (cartContainer) {
+                    cartContainer.classList.add('hidden');
+                }
+            }
+            
+            navLinks.forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+            if (navMenu) navMenu.classList.remove('active');
+        });
+    });
 
-    // Función para bloquear letras
-    function soloNumeros(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
+    // ==========================================
+    // AUTENTICACIÓN DE ARTISTA
+    // ==========================================
+
+    // 1. Verificar si hay token guardado
+    if (artistaToken) {
+        try {
+            artistaActual = JSON.parse(localStorage.getItem('artistaData'));
+            if (artistaActual) {
+                actualizarInterfazArtista();
+            }
+        } catch (e) {
+            localStorage.removeItem('artistaToken');
+            localStorage.removeItem('artistaData');
+        }
     }
 
-    if(inputAno) inputAno.addEventListener('input', soloNumeros);
-    if(inputPrecio) inputPrecio.addEventListener('input', soloNumeros);
+    // 2. Cerrar modales al hacer clic fuera
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    });
 
-    // --- 3. LOGICA DE ARCHIVOS ---
-    if(fileInput) {
-        fileInput.addEventListener('change', function() {
-            if(this.files && this.files[0]) {
-                nameDisplay.textContent = "Archivo listo: " + this.files[0].name;
-                nameDisplay.style.color = "#2ecc71";
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal').classList.add('hidden');
+        });
+    });
+
+    // 3. Ir al registro desde el login
+    document.getElementById('ir-a-registro')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.add('hidden');
+        registroModal.classList.remove('hidden');
+    });
+
+    // 4. Registrar Artista
+    if (registroForm) {
+        registroForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = registroForm.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+            btnSubmit.disabled = true;
+
+            const data = {
+                nombre_artista: document.getElementById('reg-nombre-artista').value,
+                nombre_real: document.getElementById('reg-nombre-real').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value,
+                telefono: document.getElementById('reg-telefono').value,
+                fecha_nacimiento: document.getElementById('reg-fecha-nacimiento').value,
+                pais: document.getElementById('reg-pais').value,
+                ciudad: document.getElementById('reg-ciudad').value,
+                instagram: document.getElementById('reg-instagram').value,
+                genero: document.getElementById('reg-genero').value
+            };
+
+            try {
+                const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+                    registroModal.classList.add('hidden');
+                    loginModal.classList.remove('hidden');
+                    registroForm.reset();
+                } else {
+                    alert("Error: " + (result.error || "Ocurrió un error"));
+                }
+            } catch (error) {
+                console.error("Error en registro:", error);
+                alert("Error de conexión. Por favor, intenta de nuevo.");
+            } finally {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
             }
         });
     }
 
-    // --- 4. FUNCIÓN PARA VALIDAR CAMPOS VACÍOS ---
-    function validarFormulario() {
-        // Seleccionamos todos los inputs y selects del formulario
-        const inputs = artworkForm.querySelectorAll('input:not([type="file"]), select, textarea');
-        let hayVacios = false;
+    // 5. Login de Artista
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = loginForm.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando sesión...';
+            btnSubmit.disabled = true;
 
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert("¡Bienvenido/a, " + result.artista.nombre_artista + "!");
+                    artistaToken = result.token;
+                    artistaActual = result.artista;
+                    localStorage.setItem('artistaToken', artistaToken);
+                    localStorage.setItem('artistaData', JSON.stringify(artistaActual));
+                    loginModal.classList.add('hidden');
+                    actualizarInterfazArtista();
+                    loginForm.reset();
+                } else {
+                    alert("Error: " + (result.error || "Credenciales incorrectas"));
+                }
+            } catch (error) {
+                console.error("Error en login:", error);
+                alert("Error de conexión. Por favor, intenta de nuevo.");
+            } finally {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
+            }
+        });
+    }
+
+    // ==========================================
+    // NAVEGACIÓN AL PANEL DE ARTISTA
+    // ==========================================
+
+    if (perfilBtn) {
+        perfilBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (artistaToken && artistaActual) {
+                // Ya está logueado, ir al panel
+                irAlPanelDeArtista();
+            } else {
+                // No está logueado, abrir modal de login
+                loginModal.classList.remove('hidden');
+            }
+        });
+    }
+
+    function irAlPanelDeArtista() {
+        if (!artistaToken || !artistaActual) return;
+
+        // 1. Ocultar la galería y main content
+        document.querySelector('.main-content').classList.add('hidden');
+        document.getElementById('galeria').classList.add('hidden');
+        
+        // 2. Mostrar el panel de artista
+        artistDashboard.classList.remove('hidden');
+        
+        // 3. Actualizar el nombre de bienvenida
+        document.getElementById('artist-username').textContent = artistaActual.nombre_artista;
+        
+        // 4. Cargar las obras del artista
+        cargarMisObras();
+    }
+
+    // ==========================================
+    // CERRAR SESIÓN
+    // ==========================================
+
+    if (btnArtistLogout) {
+        btnArtistLogout.addEventListener('click', () => {
+            localStorage.removeItem('artistaToken');
+            localStorage.removeItem('artistaData');
+            artistaToken = null;
+            artistaActual = null;
+            artistDashboard.classList.add('hidden');
+            document.querySelector('.main-content').classList.remove('hidden');
+            actualizarInterfazArtista();
+            alert("Sesión cerrada.");
+        });
+    }
+
+    // ==========================================
+    // FUNCIONES DEL PANEL DE ARTISTA
+    // ==========================================
+
+    // 1. Cargar Mis Obras
+    async function cargarMisObras() {
+        if (!artistaToken) return;
+
+        try {
+            const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/mis-obras', {
+                headers: {
+                    'Authorization': `Bearer ${artistaToken}`
+                }
+            });
+            const obras = await response.json();
+            renderizarTablaArtista(obras);
+        } catch (error) {
+            console.error("Error cargando mis obras:", error);
+        }
+    }
+
+    // 2. Renderizar Tabla de Artista
+    function renderizarTablaArtista(listaObras) {
+        const tbody = document.getElementById('artista-tabla-obras-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!listaObras || listaObras.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#888;">No tienes obras registradas.</td></tr>';
+            return;
+        }
+
+        listaObras.forEach(obra => {
+            let urlFinal = '';
+            const valorImagen = obra.imagen_url;
+            const dominio = 'https://backend-fundacion-atpe.onrender.com';
+
+            if (!valorImagen) {
+                urlFinal = 'https://placehold.co/35';
+            } else if (valorImagen.startsWith('http')) {
+                urlFinal = valorImagen;
+            } else {
+                urlFinal = valorImagen.startsWith('/') ? `${dominio}${valorImagen}` : `${dominio}/${valorImagen}`;
+            }
+
+            const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${obra.id_personalizado || obra.id}</td>
+                <td>${obra.titulo}</td>
+                <td>${obra.artista}</td>
+                <td>${obra.certificado || 'N/A'}</td>
+                <td>${obra.precio || '0'}$</td>
+                <td><span class="${statusClass}">${obra.status || 'Activo'}</span></td>
+                <td>
+                    <img src="${urlFinal}" 
+                         style="width:35px; height:35px; border-radius:5px; object-fit:cover;" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/35'">
+                </td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="btn-icon-edit" onclick="prepararEdicionArtista(${obra.id})" title="Editar">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="btn-icon-delete" onclick="eliminarObraArtista(${obra.id})" title="Eliminar">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(fila);
+        });
+    }
+
+    // 3. Validar Formulario (Artista)
+    function validarFormularioArtista() {
+        const inputs = artistArtworkForm.querySelectorAll('input:not([type="file"]), select, textarea');
+        let hayVacios = false;
         inputs.forEach(input => {
             if (input.value.trim() === "") {
                 hayVacios = true;
-                input.style.border = "2px solid #e74c3c"; // Marcar en rojo
+                input.style.border = "2px solid #e74c3c";
             } else {
-                input.style.border = "none"; // Restaurar (o al estilo original)
+                input.style.border = "none";
             }
         });
-
         if (hayVacios) {
             alert("⚠️ Por favor, llena todos los campos vacíos antes de continuar.");
             return false;
@@ -80,735 +342,317 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // --- 6. NAVEGACIÓN Y MENÚ ---
-    if(menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-    }
-
-    navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const linkText = this.textContent.trim().toLowerCase();
-        
-        // Manejo de la galería
-        if (linkText === 'galería' || linkText === 'galeria') {
-            // Mostrar galería, ocultar main
-            document.querySelector('.main-content').classList.add('hidden');
-            document.getElementById('galeria').classList.remove('hidden');
-            
-            // Cargar galería si es necesario
-            cargarGaleria();
-            
-            // Mostrar carrito si está oculto
-            if (cartContainer) {
-                cartContainer.classList.remove('hidden');
-                cartContainer.classList.add('show-anim');
-            }
-        } else if (linkText === 'inicio') {
-            // Mostrar main, ocultar galería
-            document.querySelector('.main-content').classList.remove('hidden');
-            document.getElementById('galeria').classList.add('hidden');
-            
-            // Ocultar carrito en inicio
-            if (cartContainer) {
-                cartContainer.classList.add('hidden');
-            }
-        }
-        
-        // Manejo de clases activas
-        navLinks.forEach(el => el.classList.remove('active'));
-        this.classList.add('active');
-        
-        // Cerrar menú móvil
-        if(navMenu) navMenu.classList.remove('active');
-    });
-});
-
-    // 4. GESTIÓN DE PANELES (LOGIN / DASHBOARD)
-    function togglePanels(showDashboard) {
-        if (showDashboard && window.isLoggedIn) {
-            loginPanel.classList.add('hidden');
-            adminDashboard.classList.remove('hidden');
-        } else {
-            loginPanel.classList.remove('hidden');
-            adminDashboard.classList.add('hidden');
-        }
-    }
-
-    if(adminBtn) {
-        adminBtn.addEventListener('click', (e) => {
+    // 4. Guardar Obra (Artista)
+    if (artistArtworkForm) {
+        artistArtworkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (window.isLoggedIn) {
-                adminDashboard.classList.toggle('hidden');
-                loginPanel.classList.add('hidden');
-            } else {
-                loginPanel.classList.remove('hidden');
-                adminDashboard.classList.add('hidden');
-            }
-        });
-    }
+            if (!validarFormularioArtista()) return;
+            if (!artistaToken) return;
 
-    // Cerrar click fuera
-    [loginPanel, adminDashboard].forEach(panel => {
-        if(panel) {
-            panel.addEventListener('click', (e) => {
-                if (e.target === panel) panel.classList.add('hidden');
+            const originalText = btnArtistaSave.innerHTML;
+            btnArtistaSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            btnArtistaSave.disabled = true;
+
+            const formData = new FormData();
+            for (let i = 0; i < 5; i++) {
+                const inputArchivo = document.getElementById(`artista-imagen-${i}`);
+                if (inputArchivo && inputArchivo.files[0]) {
+                    formData.append(`imagen_${i}`, inputArchivo.files[0]);
+                }
+            }
+
+            const campos = [
+                'titulo', 'artista', 'ano', 'tec-desc', 'art-desc',
+                'status', 'estado-obra', 'ancho', 'alto', 'peso', 'marcos', 'precio',
+                'certificado', 'id', 'procedencia', 'firma', 'soporte', 'conservacion',
+                'etiquetas', 'localizacion'
+            ];
+            campos.forEach(campo => {
+                const el = document.getElementById(`artista-${campo}`);
+                if (el) formData.append(campo, el.value);
             });
-        }
-    });
-
-    // PROCESO LOGIN
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btnLogin = loginForm.querySelector('.btn-login');
-            const originalText = btnLogin.innerHTML;
-            
-            btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
-            btnLogin.disabled = true;
-
-            const user = loginForm.querySelectorAll('input')[0].value.trim();
-            const pass = loginForm.querySelectorAll('input')[1].value.trim();
 
             try {
-                const res = await fetch('https://backend-fundacion-atpe.onrender.com/login', {
+                const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user, pass })
+                    headers: {
+                        'Authorization': `Bearer ${artistaToken}`
+                    },
+                    body: formData
                 });
-                const result = await res.json();
-
-                if (result.success) {
-                    window.isLoggedIn = true;
-                    if(adminUsernameSpan) adminUsernameSpan.textContent = user;
-                    const icon = adminBtn.querySelector('i');
-                    if(icon) { icon.className = "fa-solid fa-user-check"; icon.style.color = "#2ecc71"; }
-                    
-                    alert("¡Bienvenido!");
-                    await cargarTablaObras();
-                    togglePanels(true);
-                    loginForm.reset();
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert("¡Obra guardada exitosamente!");
+                    resetFormularioArtista();
+                    cargarMisObras();
                 } else {
-                    alert("Credenciales incorrectas.");
+                    alert("Error: " + (result.error || "No se pudo guardar"));
                 }
             } catch (error) {
+                console.error("Error al guardar obra:", error);
                 alert("Error de conexión.");
             } finally {
-                btnLogin.innerHTML = originalText;
-                btnLogin.disabled = false;
+                btnArtistaSave.innerHTML = originalText;
+                btnArtistaSave.disabled = false;
             }
         });
     }
 
-    // --- 8. GUARDAR NUEVA OBRA (POST) ---
-    if (artworkForm) {
-    artworkForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // 1. Validar vacíos
-        if (!validarFormulario()) return;
+    // 5. Preparar Edición (Artista)
+    window.prepararEdicionArtista = function(id) {
+        // Obtener la obra de la tabla (como ya tenemos los datos renderizados, podemos usar la variable global o pedirla al backend)
+        // Aquí pedimos la obra al backend para tener los datos frescos
+        fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
+            headers: { 'Authorization': `Bearer ${artistaToken}` }
+        })
+        .then(res => res.json())
+        .then(obra => {
+            if (!obra) return;
+            window.editingId = id;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // 2. Preparar UI (Guardando...)
-        const originalText = btnSave.innerHTML;
-        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
-        btnSave.disabled = true;
+            // Llenar el formulario con los datos de la obra
+            document.getElementById('artista-titulo').value = obra.titulo || '';
+            document.getElementById('artista-artista').value = obra.artista || '';
+            document.getElementById('artista-ano').value = obra.ano || '';
+            document.getElementById('artista-tec-desc').value = obra.descripcion_tecnica || '';
+            document.getElementById('artista-art-desc').value = obra.descripcion_artistica || '';
+            document.getElementById('artista-status').value = obra.status || '';
+            document.getElementById('artista-estado-obra').value = obra.estado_obra || '';
+            document.getElementById('artista-ancho').value = obra.ancho || '';
+            document.getElementById('artista-alto').value = obra.alto || '';
+            document.getElementById('artista-peso').value = obra.peso || '';
+            document.getElementById('artista-marcos').value = obra.marcos || '';
+            document.getElementById('artista-precio').value = obra.precio || '';
+            document.getElementById('artista-certificado').value = obra.certificado || '';
+            document.getElementById('artista-id').value = obra.id_personalizado || '';
+            document.getElementById('artista-procedencia').value = obra.procedencia || '';
+            document.getElementById('artista-firma').value = obra.firma || '';
+            document.getElementById('artista-soporte').value = obra.soporte || '';
+            document.getElementById('artista-conservacion').value = obra.conservacion || '';
+            document.getElementById('artista-etiquetas').value = obra.etiquetas || '';
+            document.getElementById('artista-localizacion').value = obra.localizacion || '';
 
-        // 3. Recopilar datos
-        const formData = new FormData();
-        // Agregar múltiples imágenes (hasta 5)
-        for (let i = 0; i < 5; i++) {
-            const inputArchivo = document.getElementById(`dash-imagen-${i}`);
-            if (inputArchivo && inputArchivo.files[0]) {
-                formData.append(`imagen_${i}`, inputArchivo.files[0]);
-            }
-        }
-
-        // 🔥 RECOPILACIÓN ORIGINAL CAMPO POR CAMPO (Sin cambios en tu lógica)
-        formData.append('titulo', document.getElementById('dash-titulo').value);
-        formData.append('artista', document.getElementById('dash-artista').value);
-        formData.append('ano', document.getElementById('dash-ano').value);
-        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-        formData.append('status', document.getElementById('dash-status').value);
-        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-        formData.append('ancho', document.getElementById('dash-ancho').value);
-        formData.append('alto', document.getElementById('dash-alto').value);
-        formData.append('peso', document.getElementById('dash-peso').value);
-        formData.append('marcos', document.getElementById('dash-marcos').value);
-        formData.append('precio', document.getElementById('dash-precio').value);
-        formData.append('certificado', document.getElementById('dash-certificado').value);
-        formData.append('id_obra', document.getElementById('dash-id').value);
-        formData.append('procedencia', document.getElementById('dash-procedencia').value);
-        formData.append('firma', document.getElementById('dash-firma').value);
-        formData.append('soporte', document.getElementById('dash-soporte').value);
-        formData.append('conservacion', document.getElementById('dash-conservacion').value);
-        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
-        formData.append('localizacion', document.getElementById('dash-localizacion').value);
-
-        try {
-            const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                alert("¡Obra registrada con éxito!");
-                window.resetFormulario();
-                cargarTablaObras(); 
-            } else {
-                alert("Error: " + (result.error || "No se pudo guardar"));
-            }
-        } catch (error) {
-            console.error("Error al guardar obra:", error);
-            alert("Error de conexión. Verifica que tu imagen no sea demasiado grande.");
-        } finally {
-            // 🔥 ESTO SIEMPRE SE EJECUTA: Restaura el botón a su estado original
-            btnSave.innerHTML = originalText;
-            btnSave.disabled = false;
-        }
-    });
-}
-
-    // --- 9. ACTUALIZAR OBRA (PUT) - BOTÓN REFRESCAR ---
-if (btnUpdate) {
-    btnUpdate.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        if (!validarFormulario()) return;
-        if (!editingId) { 
-            alert("Error: No se ha seleccionado ninguna obra."); 
-            return; 
-        }
-
-        const originalText = btnUpdate.innerHTML;
-        btnUpdate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...';
-        btnUpdate.disabled = true;
-
-        const formData = new FormData();
-        
-        // Agregar múltiples imágenes para actualización
-        for (let i = 0; i < 5; i++) {
-            const inputArchivo = document.getElementById(`dash-imagen-${i}`);
-            if (inputArchivo && inputArchivo.files[0]) {
-                formData.append(`imagen_${i}`, inputArchivo.files[0]);
-            }
-        }
-
-        // 2. Mapeo de campos (Asegúrate de que los IDs coincidan con tu index.html)
-        formData.append('titulo', document.getElementById('dash-titulo').value);
-        formData.append('artista', document.getElementById('dash-artista').value);
-        formData.append('ano', document.getElementById('dash-ano').value);
-        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-        formData.append('status', document.getElementById('dash-status').value);
-        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-        
-        // Campos de dimensiones corregidos (Sincronizados con la DB)
-        formData.append('ancho', document.getElementById('dash-ancho').value);
-        formData.append('alto', document.getElementById('dash-alto').value);
-        formData.append('peso', document.getElementById('dash-peso').value);
-        
-        formData.append('marcos', document.getElementById('dash-marcos').value);
-        formData.append('precio', document.getElementById('dash-precio').value);
-        formData.append('certificado', document.getElementById('dash-certificado').value);
-        
-        // Importante: El backend espera 'id_obra' para mapearlo a 'id_personalizado'
-        formData.append('id_obra', document.getElementById('dash-id').value);
-        formData.append('procedencia', document.getElementById('dash-procedencia').value);
-        formData.append('firma', document.getElementById('dash-firma').value);
-        formData.append('soporte', document.getElementById('dash-soporte').value);
-        formData.append('conservacion', document.getElementById('dash-conservacion').value);
-        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
-        formData.append('localizacion', document.getElementById('dash-localizacion').value);
-
-        try {
-            // Usamos la URL de tu backend en Render
-            const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${editingId}`, {
-                method: 'PUT',
-                body: formData 
-                // Nota: No se pone Header de Content-Type, el navegador lo pone solo al ver FormData
-            });
-            
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                alert("¡Obra actualizada correctamente!");
-                
-                // 1. CAMBIO DE BOTONES: Mostrar Guardar, Ocultar Refrescar // <--- NUEVO
-                const btnSave = document.getElementById('btn-save');
-                if (btnSave) btnSave.classList.remove('hidden');
-                btnUpdate.classList.add('hidden');
-                
-                // 2. Limpiamos el formulario y los slots de imagen
-                if (typeof window.resetFormulario === 'function') {
-                    window.resetFormulario();
-                }
-                
-                // 3. Recargamos la tabla
-                if (typeof cargarTablaObras === 'function') {
-                    cargarTablaObras(); 
-                } else {
-                    location.reload();
-                }
-            } else {
-                alert("Error al actualizar: " + (result.error || result.message || "Desconocido"));
-            }
-        } catch (error) {
-            console.error("Error en la petición PUT:", error);
-            alert("Error de conexión al actualizar.");
-        } finally {
-            btnUpdate.innerHTML = originalText;
-            btnUpdate.disabled = false;
-        }
-    });
-}
-
-    // --- 10. PREPARAR EDICIÓN (Global para acceder desde editingId interno) ---
-    // Esta función conecta el botón de la tabla con el formulario
-    window.prepararEdicion = function(id) {
-        const obra = window.obrasData.find(o => o.id === id);
-        if (!obra) return;
-
-        editingId = id; // Guardamos el ID que estamos editando
-
-        // Subir scroll al formulario
-        const dash = document.getElementById('admin-dashboard');
-        if(dash) dash.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Llenar campos (Usamos los IDs de tu HTML actual)
-        document.getElementById('dash-titulo').value = obra.titulo || '';
-        document.getElementById('dash-artista').value = obra.artista || '';
-        document.getElementById('dash-ano').value = obra.ano || '';
-        document.getElementById('dash-tec-desc').value = obra.descripcion_tecnica || '';
-        document.getElementById('dash-art-desc').value = obra.descripcion_artistica || '';
-        document.getElementById('dash-status').value = obra.status || '';
-        document.getElementById('dash-estado-obra').value = obra.estado_obra || '';
-        document.getElementById('dash-ancho').value = obra.ancho || '';
-        document.getElementById('dash-alto').value = obra.alto || '';
-        document.getElementById('dash-peso').value = obra.peso || '';
-        document.getElementById('dash-marcos').value = obra.marcos || '';
-        document.getElementById('dash-precio').value = obra.precio || '';
-        document.getElementById('dash-certificado').value = obra.certificado || '';
-        document.getElementById('dash-id').value = obra.id_personalizado || '';
-        document.getElementById('dash-procedencia').value = obra.procedencia || '';
-        document.getElementById('dash-firma').value = obra.firma || '';
-        document.getElementById('dash-soporte').value = obra.soporte || ''; 
-        document.getElementById('dash-conservacion').value = obra.conservacion || '';
-        document.getElementById('dash-etiquetas').value = obra.etiquetas || '';
-        document.getElementById('dash-localizacion').value = obra.localizacion || '';
-
-        if (obra.todas_imagenes && Array.isArray(obra.todas_imagenes)) {
-        obra.todas_imagenes.forEach((url, index) => {
-            if (index < 5 && url) { // Máximo 5 imágenes
-                const slot = document.getElementById(`slot-${index}`);
+            // Cargar las imágenes de la obra
+            const imagenes = obra.todas_imagenes || [];
+            for (let i = 0; i < 5; i++) {
+                const slot = document.getElementById(`artista-slot-${i}`);
                 const imgPreview = slot.querySelector('.preview-img');
-                
-                imgPreview.src = url;
-                imgPreview.classList.remove('hidden');
-                slot.classList.add('has-image');
+                if (imagenes[i]) {
+                    imgPreview.src = imagenes[i];
+                    imgPreview.classList.remove('hidden');
+                    slot.classList.add('has-image');
+                } else {
+                    imgPreview.src = '';
+                    imgPreview.classList.add('hidden');
+                    slot.classList.remove('has-image');
+                }
             }
-        });
-    } else {
-        // Para compatibilidad con obras antiguas que solo tienen imagen_url
-        if (obra.imagen_url) {
-            const slot0 = document.getElementById('slot-0');
-            const imgPreview = slot0.querySelector('.preview-img');
-            
-            const baseUrl = 'https://backend-fundacion-atpe.onrender.com';
-            imgPreview.src = obra.imagen_url.startsWith('http') 
-                ? obra.imagen_url 
-                : `${baseUrl}${obra.imagen_url}`;
-            
-            imgPreview.classList.remove('hidden');
-            slot0.classList.add('has-image');
-        }
-    }
 
-
-        // Feedback visual
-
-
-        if (btnSave && btnUpdate) {
-        btnSave.style.setProperty('display', 'none', 'important'); // Oculta Guardar
-        btnUpdate.style.setProperty('display', 'block', 'important'); // Muestra Refrescar
-        }
-    
-        // Opcional: Hacer scroll hacia arriba para ver el formulario lleno
-        document.getElementById('admin-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
-
+            // Mostrar botón de actualizar, ocultar guardar
+            btnArtistaSave.style.display = 'none';
+            btnArtistaUpdate.style.display = 'block';
+            btnArtistaUpdate.classList.remove('hidden');
+        })
+        .catch(err => console.error("Error al cargar obra para editar:", err));
     };
 
-    // Logout
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            window.isLoggedIn = false;
-            togglePanels(false);
-            const icon = adminBtn.querySelector('i');
-            if(icon) { icon.className = "fa-solid fa-user-shield"; icon.style.color = ""; }
-            alert("Has salido del sistema.");
-        });
-    }
-});
+    // 6. Actualizar Obra (Artista)
+    if (btnArtistaUpdate) {
+        btnArtistaUpdate.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!validarFormularioArtista()) return;
+            if (!window.editingId) { alert("Selecciona una obra para actualizar."); return; }
+            if (!artistaToken) return;
 
-// --- FUNCIONES GLOBALES (FUERA DE DOMCONTENTLOADED) ---
+            const originalText = btnArtistaUpdate.innerHTML;
+            btnArtistaUpdate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...';
+            btnArtistaUpdate.disabled = true;
 
-// Cargar Tabla
-// --- NUEVA LÓGICA: RENDERIZADO Y BUSCADOR ---
+            const formData = new FormData();
+            for (let i = 0; i < 5; i++) {
+                const inputArchivo = document.getElementById(`artista-imagen-${i}`);
+                if (inputArchivo && inputArchivo.files[0]) {
+                    formData.append(`imagen_${i}`, inputArchivo.files[0]);
+                }
+            }
 
-// 1. Función reutilizable para pintar la tabla (sirve para cargar y para buscar)
-function renderizarTabla(listaObras) {
-    const tbody = document.getElementById('tabla-obras-body');
-    if (!tbody) return;
-
-    tbody.innerHTML = ''; // Limpiar tabla
-
-    if (!listaObras || listaObras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No se encontraron coincidencias.</td></tr>';
-        return;
-    }
-
-    listaObras.forEach(obra => {
-        // Lógica de URL de imagen
-        let urlFinal = '';
-        const valorImagen = obra.imagen_url;
-        const dominio = 'https://backend-fundacion-atpe.onrender.com';
-
-        if (!valorImagen) {
-            urlFinal = 'https://placehold.co/35';
-        } else if (valorImagen.startsWith('http')) {
-            urlFinal = valorImagen;
-        } else {
-            urlFinal = valorImagen.startsWith('/') ? `${dominio}${valorImagen}` : `${dominio}/${valorImagen}`;
-        }
-
-        // Estado (Badge)
-        const statusClass = (obra.status === 'Inactivo') ? 'badge-inactive' : 'badge-active';
-
-        // Crear Fila
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${obra.id_personalizado || obra.id}</td>
-            <td>${obra.titulo}</td>
-            <td>${obra.artista}</td>
-            <td>${obra.certificado || 'N/A'}</td>
-            <td>${obra.precio || '0'}$</td>
-            <td><span class="${statusClass}">${obra.status || 'Activo'}</span></td>
-            <td>
-                <img src="${urlFinal}" 
-                     style="width:35px; height:35px; border-radius:5px; object-fit:cover;" 
-                     onerror="this.onerror=null; this.src='https://placehold.co/35'">
-            </td>
-            <td>
-                <div class="actions-cell">
-                    <button class="btn-icon-edit" onclick="window.prepararEdicion(${obra.id})" title="Editar">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button class="btn-icon-duplicate" onclick="window.duplicarObra(${obra.id})" title="Duplicar">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
-                    <button class="btn-icon-delete" onclick="eliminarObra(${obra.id})" title="Eliminar">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        tbody.appendChild(fila);
-    });
-}
-
-// 2. Función Cargar Tabla (Actualizada)
-async function cargarTablaObras() {
-    try {
-        const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras');
-        const obras = await response.json();
-        
-        // Guardamos en variable global para el buscador
-        window.obrasData = obras; 
-
-        // Pintamos usando la nueva función
-        renderizarTabla(obras);
-    } catch (error) {
-        console.error("Error cargando tabla:", error);
-        const tbody = document.getElementById('tabla-obras-body');
-        if(tbody) tbody.innerHTML = '<tr><td colspan="7">Error de conexión.</td></tr>';
-    }
-}
-
-// 3. Activación del Buscador (Se ejecuta al iniciar)
-document.addEventListener('DOMContentLoaded', () => {
-    const inputBuscador = document.getElementById('buscador-obras');
-    if (inputBuscador) {
-        inputBuscador.addEventListener('input', (e) => {
-            const texto = e.target.value.toLowerCase().trim();
-            
-            // Si no hay datos cargados aún, salir
-            if (!window.obrasData) return;
-
-            const filtrados = window.obrasData.filter(obra => {
-                const titulo = (obra.titulo || '').toLowerCase();
-                const artista = (obra.artista || '').toLowerCase();
-                const idP = (obra.id_personalizado || '').toString().toLowerCase();
-                
-                // Busca coincidencias en Título, Artista o ID
-                return titulo.includes(texto) || artista.includes(texto) || idP.includes(texto);
+            const campos = [
+                'titulo', 'artista', 'ano', 'tec-desc', 'art-desc',
+                'status', 'estado-obra', 'ancho', 'alto', 'peso', 'marcos', 'precio',
+                'certificado', 'id', 'procedencia', 'firma', 'soporte', 'conservacion',
+                'etiquetas', 'localizacion'
+            ];
+            campos.forEach(campo => {
+                const el = document.getElementById(`artista-${campo}`);
+                if (el) formData.append(campo, el.value);
             });
 
-            renderizarTabla(filtrados);
+            try {
+                const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${window.editingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${artistaToken}`
+                    },
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert("¡Obra actualizada correctamente!");
+                    resetFormularioArtista();
+                    cargarMisObras();
+                } else {
+                    alert("Error al actualizar: " + (result.error || "Desconocido"));
+                }
+            } catch (error) {
+                console.error("Error en actualización:", error);
+                alert("Error de conexión.");
+            } finally {
+                btnArtistaUpdate.innerHTML = originalText;
+                btnArtistaUpdate.disabled = false;
+            }
         });
+    }
+
+    // 7. Limpiar Formulario (Artista)
+    if (btnArtistaClear) {
+        btnArtistaClear.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetFormularioArtista();
+        });
+    }
+
+    // 8. Resetear Formulario (Artista)
+    function resetFormularioArtista() {
+        const form = document.getElementById('artista-artwork-form');
+        if (form) form.reset();
+        window.editingId = null;
+
+        for (let i = 0; i < 5; i++) {
+            const input = document.getElementById(`artista-imagen-${i}`);
+            if (input) input.value = "";
+            const slot = document.getElementById(`artista-slot-${i}`);
+            if (slot) {
+                slot.classList.remove('has-image');
+                const img = slot.querySelector('.preview-img');
+                if (img) {
+                    img.src = "";
+                    img.classList.add('hidden');
+                }
+            }
+        }
+
+        const nameDisplay = document.getElementById('artista-file-names-display');
+        if (nameDisplay) nameDisplay.textContent = "";
+
+        if (btnArtistaSave) {
+            btnArtistaSave.style.display = 'block';
+            btnArtistaSave.classList.remove('hidden');
+        }
+        if (btnArtistaUpdate) {
+            btnArtistaUpdate.style.display = 'none';
+            btnArtistaUpdate.classList.add('hidden');
+        }
+
+        if (form) {
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(i => i.style.border = "none");
+        }
+    }
+
+    // 9. Eliminar Obra (Artista)
+    window.eliminarObraArtista = async function(id) {
+        if (!confirm("¿Estás seguro de eliminar esta obra permanentemente?")) return;
+        if (!artistaToken) return;
+
+        try {
+            const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${artistaToken}`
+                }
+            });
+            if (response.ok) {
+                alert("Obra eliminada.");
+                cargarMisObras();
+                resetFormularioArtista();
+            } else {
+                alert("No se pudo eliminar.");
+            }
+        } catch (error) {
+            alert("Error de conexión.");
+        }
+    };
+
+    // 10. Funciones de imágenes
+    window.activarInputArtista = function(slotIndex) {
+        document.getElementById(`artista-imagen-${slotIndex}`).click();
+    };
+
+    window.previewImageArtista = function(event, slotIndex) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        const slot = document.getElementById(`artista-slot-${slotIndex}`);
+        const imgPreview = slot.querySelector('.preview-img');
+        reader.onload = function (e) {
+            imgPreview.src = e.target.result;
+            imgPreview.classList.remove('hidden');
+            slot.classList.add('has-image');
+            actualizarNombresArchivosArtista();
+        };
+        reader.readAsDataURL(file);
+    };
+
+    function actualizarNombresArchivosArtista() {
+        const display = document.getElementById('artista-file-names-display');
+        let archivos = [];
+        for (let i = 0; i < 5; i++) {
+            const input = document.getElementById(`artista-imagen-${i}`);
+            if (input && input.files[0]) {
+                archivos.push(input.files[0].name);
+            }
+        }
+        if (archivos.length > 0) {
+            display.textContent = `Archivos (${archivos.length}/5): ${archivos.join(', ')}`;
+            display.style.color = "#2ecc71";
+        } else {
+            display.textContent = '';
+        }
+    }
+
+    // ==========================================
+    // ACTUALIZAR INTERFAZ DE ARTISTA
+    // ==========================================
+    function actualizarInterfazArtista() {
+        const perfilIcon = document.querySelector('#perfil-btn i');
+        if (artistaToken && artistaActual) {
+            perfilIcon.className = "fa-solid fa-user-check";
+            perfilIcon.style.color = "#2ecc71";
+            document.querySelector('#perfil-btn').title = "Panel de " + artistaActual.nombre_artista;
+        } else {
+            perfilIcon.className = "fa-solid fa-user";
+            perfilIcon.style.color = "";
+            document.querySelector('#perfil-btn').title = "Iniciar sesión como Artista";
+        }
+    }
+
+    // ==========================================
+    // INICIALIZACIÓN
+    // ==========================================
+    llenarListaPaises();
+
+    // Si el artista ya está logueado al cargar la página, ir directamente al panel
+    if (artistaToken && artistaActual) {
+        irAlPanelDeArtista();
     }
 });
 
-// Eliminar Obra
-async function eliminarObra(id) {
-    if (!confirm("¿Estás seguro de eliminar esta obra permanentemente?")) return;
+// ==========================================
+// FUNCIONES GLOBALES (GALERÍA Y OTROS)
+// ==========================================
 
-    try {
-        const response = await fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            alert("Obra eliminada.");
-            cargarTablaObras(); // Refrescar tabla
-            // Si estábamos editando esa obra, limpiamos el form
-            if (typeof window.resetFormulario === 'function') window.resetFormulario();
-        } else {
-            alert("No se pudo eliminar.");
-        }
-    } catch (error) {
-        alert("Error de conexión.");
-    }
-}
-
-window.duplicarObra = function(id) {
-    const obra = window.obrasData.find(o => o.id === id);
-    if (!obra) return;
-
-    // 1. Limpiar el formulario primero (para resetear estados)
-    window.resetFormulario();
-
-    // 2. Rellenar los campos con los datos de la obra original
-    document.getElementById('dash-titulo').value = obra.titulo || '';
-    document.getElementById('dash-artista').value = obra.artista || '';
-    document.getElementById('dash-ano').value = obra.ano || '';
-    document.getElementById('dash-tec-desc').value = obra.descripcion_tecnica || '';
-    document.getElementById('dash-art-desc').value = obra.descripcion_artistica || '';
-    document.getElementById('dash-status').value = obra.status || '';
-    document.getElementById('dash-estado-obra').value = obra.estado_obra || '';
-    document.getElementById('dash-ancho').value = obra.ancho || '';
-    document.getElementById('dash-alto').value = obra.alto || '';
-    document.getElementById('dash-peso').value = obra.peso || '';
-    document.getElementById('dash-marcos').value = obra.marcos || '';
-    document.getElementById('dash-precio').value = obra.precio || '';
-    document.getElementById('dash-certificado').value = obra.certificado || '';
-    // Dejamos el ID vacío para que la base de datos genere uno nuevo
-    document.getElementById('dash-id').value = '';
-    document.getElementById('dash-procedencia').value = obra.procedencia || '';
-    document.getElementById('dash-firma').value = obra.firma || '';
-    document.getElementById('dash-soporte').value = obra.soporte || '';
-    document.getElementById('dash-conservacion').value = obra.conservacion || '';
-    document.getElementById('dash-etiquetas').value = obra.etiquetas || '';
-    document.getElementById('dash-localizacion').value = obra.localizacion || '';
-
-    // 3. Cambiar el estado de los botones a "Guardar"
-    const btnSave = document.getElementById('btn-save');
-    const btnUpdate = document.getElementById('btn-update');
-    if (btnSave && btnUpdate) {
-        btnSave.style.display = 'block';
-        btnSave.classList.remove('hidden');
-        btnUpdate.style.display = 'none';
-        btnUpdate.classList.add('hidden');
-    }
-
-    // 4. Limpiar las imágenes precargadas (para que el usuario suba las suyas)
-    for (let i = 0; i < 5; i++) {
-        const slot = document.getElementById(`slot-${i}`);
-        const input = document.getElementById(`dash-imagen-${i}`);
-        if (input) input.value = "";
-        if (slot) {
-            slot.classList.remove('has-image');
-            const img = slot.querySelector('.preview-img');
-            if (img) {
-                img.src = "";
-                img.classList.add('hidden');
-            }
-        }
-    }
-
-    // 5. Scroll hacia arriba para ver el formulario
-    const dash = document.getElementById('admin-dashboard');
-    if (dash) dash.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// Función para mostrar la vista previa en el slot correspondiente
-function previewImage(event, index) {
-    const reader = new FileReader();
-    const file = event.target.files[0];
-    const slot = document.getElementById(`slot-${index}`);
-    const imgPreview = slot.querySelector('.preview-img');
-
-    reader.onload = function() {
-        imgPreview.src = reader.result;
-        imgPreview.classList.remove('hidden');
-        slot.classList.add('has-image'); // Oculta el icono de "+"
-    }
-
-    if (file) {
-        reader.readAsDataURL(file);
-    }
-}
-
-window.resetFormulario = function() {
-    console.log("Iniciando limpieza del formulario...");
-    
-    // 1. Limpiar campos de texto y selección
-    const form = document.getElementById('artwork-form');
-    if(form) form.reset();
-    
-    // 2. Resetear el ID de edición
-    window.editingId = null; 
-
-    // 3. Limpiar todos los inputs de archivo y slots
-    for (let i = 0; i < 5; i++) {
-        const input = document.getElementById(`dash-imagen-${i}`);
-        if (input) input.value = "";
-        
-        const slot = document.getElementById(`slot-${i}`);
-        if (slot) {
-            slot.classList.remove('has-image');
-            const img = slot.querySelector('.preview-img');
-            if (img) {
-                img.src = "";
-                img.classList.add('hidden');
-            }
-        }
-    }
-
-    // 4. Limpiar el texto de feedback de archivo
-    const nameDisplay = document.getElementById('file-names-display');
-    if(nameDisplay) nameDisplay.textContent = "";
-
-    // 5. 🔥 RESTAURACIÓN COMPLETA DEL BOTÓN
-    if (window.btnSave) {
-        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
-        window.btnSave.disabled = false;
-        window.btnSave.style.display = 'block'; 
-        window.btnSave.classList.remove('hidden');
-    }
-    if (window.btnUpdate) {
-        window.btnUpdate.style.display = 'none';
-        window.btnUpdate.classList.add('hidden');
-    }
-
-    // 6. Quitar bordes rojos de validación
-    if(form) {
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(i => i.style.border = "none");
-    }
-
-    console.log("Limpieza completada con éxito.");
-};
-
-// Función para activar el input file correspondiente
-function activarInput(slotIndex) {
-    document.getElementById(`dash-imagen-${slotIndex}`).click();
-}
-
-// Función para mostrar vista previa en el slot correspondiente
-function previewImage(event, slotIndex) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    const slot = document.getElementById(`slot-${slotIndex}`);
-    const imgPreview = slot.querySelector('.preview-img');
-    
-    reader.onload = function(e) {
-        imgPreview.src = e.target.result;
-        imgPreview.classList.remove('hidden');
-        slot.classList.add('has-image');
-        
-        // Mostrar nombres de archivos seleccionados
-        actualizarNombresArchivos();
-    };
-    
-    reader.readAsDataURL(file);
-}
-
-// Función para actualizar la lista de nombres de archivos
-function actualizarNombresArchivos() {
-    const display = document.getElementById('file-names-display');
-    let archivos = [];
-    
-    for (let i = 0; i < 5; i++) {
-        const input = document.getElementById(`dash-imagen-${i}`);
-        if (input.files[0]) {
-            archivos.push(input.files[0].name);
-        }
-    }
-    
-    if (archivos.length > 0) {
-        display.textContent = `Archivos (${archivos.length}/5): ${archivos.join(', ')}`;
-        display.style.color = "#2ecc71";
-    } else {
-        display.textContent = '';
-    }
-}
-
-window.resetFormulario = function() {
-    console.log("Iniciando limpieza del formulario...");
-    
-    // 1. Limpiar campos de texto y selección
-    const form = document.getElementById('artwork-form');
-    if(form) form.reset();
-    
-    // 2. Resetear el ID de edición
-    window.editingId = null; 
-
-    // 3. Limpiar todos los inputs de archivo y slots
-    for (let i = 0; i < 5; i++) {
-        const input = document.getElementById(`dash-imagen-${i}`);
-        if (input) input.value = "";
-        
-        const slot = document.getElementById(`slot-${i}`);
-        if (slot) {
-            slot.classList.remove('has-image');
-            const img = slot.querySelector('.preview-img');
-            if (img) {
-                img.src = "";
-                img.classList.add('hidden');
-            }
-        }
-    }
-
-    // 4. Limpiar el texto de feedback de archivo
-    const nameDisplay = document.getElementById('file-names-display');
-    if(nameDisplay) nameDisplay.textContent = "";
-
-    // 5. RESTAURAR BOTONES A SU ESTADO NORMAL
-    if (window.btnSave) {
-        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
-        window.btnSave.disabled = false;
-        window.btnSave.style.display = 'block'; 
-        window.btnSave.classList.remove('hidden');
-    }
-    if (window.btnUpdate) {
-        window.btnUpdate.style.display = 'none';
-        window.btnUpdate.classList.add('hidden');
-    }
-
-    // 6. Quitar bordes rojos de validación
-    if(form) {
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(i => i.style.border = "none");
-    }
-
-    console.log("Limpieza completada con éxito.");
-};
+// ... (aquí van tus funciones de cargarGaleria, mostrarGaleria, verDetalleObra, etc.) ...
 
 // --- GALERÍA DE OBRAS ---
 
