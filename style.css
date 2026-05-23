@@ -709,7 +709,7 @@ body {
     overflow: hidden;
     position: relative;
     margin-bottom: 15px;
-    border-radius: 8px;
+    border-radius: 0 !important;
     cursor: pointer;
 }
 .obra-imagen img {
