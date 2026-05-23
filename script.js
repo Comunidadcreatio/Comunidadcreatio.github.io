@@ -1635,3 +1635,20 @@ function actualizarInterfazArtista() {
         perfilIcon.parentElement.title = "Iniciar sesión como Artista";
     }
 }
+
+async function cargarMisObras() {
+    const token = localStorage.getItem('artistaToken');
+    if (!token) return;
+
+    try {
+        const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/mis-obras', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const obras = await response.json();
+        renderizarTabla(obras); // Usa tu función existente para renderizar la tabla
+    } catch (error) {
+        console.error("Error cargando mis obras:", error);
+    }
+}
