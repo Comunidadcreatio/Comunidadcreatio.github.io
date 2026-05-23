@@ -453,6 +453,57 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para registro de artista -->
+<div id="registro-artista-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Registro de Artista</h2>
+        <form id="registro-artista-form">
+            <div class="input-group-dash">
+                <label>Nombre Artístico</label>
+                <input type="text" id="reg-nombre-artista" required>
+            </div>
+            <div class="input-group-dash">
+                <label>Nombre Real (Opcional)</label>
+                <input type="text" id="reg-nombre-real">
+            </div>
+            <div class="input-group-dash">
+                <label>Email</label>
+                <input type="email" id="reg-email" required>
+            </div>
+            <div class="input-group-dash">
+                <label>Contraseña</label>
+                <input type="password" id="reg-password" required>
+            </div>
+            <button type="submit" class="btn-save-artwork">Registrarse</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para login de artista -->
+<div id="login-artista-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Iniciar Sesión como Artista</h2>
+        <form id="login-artista-form">
+            <div class="input-group-dash">
+                <label>Email</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="input-group-dash">
+                <label>Contraseña</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit" class="btn-save-artwork">Iniciar Sesión</button>
+        </form>
+        <p style="margin-top: 15px; text-align: center;">
+            ¿No tienes cuenta? <a href="#" id="ir-a-registro">Regístrate aquí</a>
+        </p>
+    </div>
+</div>
+
+
 <script src="script.js"></script>
 </body>
 </html>
