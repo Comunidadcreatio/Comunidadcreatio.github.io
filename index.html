@@ -455,58 +455,55 @@
 </div>
 
 <div id="registro-artista-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-content" style="max-width: 550px;">
         <span class="close-modal">&times;</span>
-        <h2 style="color: var(--accent-gold);">Registro de Artista</h2>
+        <h2 style="color: var(--accent-gold); font-family: var(--font-titulo); margin-bottom: 20px;">Registro de Artista</h2>
         <form id="registro-artista-form">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <!-- Fila 1 -->
                 <div class="input-group-dash">
                     <label>Nombre Artístico *</label>
-                    <input type="text" id="reg-nombre-artista" required>
+                    <input type="text" id="reg-nombre-artista" required placeholder="ej. EdgarFernandez">
                 </div>
                 <div class="input-group-dash">
                     <label>Nombre Real</label>
-                    <input type="text" id="reg-nombre-real">
+                    <input type="text" id="reg-nombre-real" placeholder="Edgar Fernández">
                 </div>
+                
+                <!-- Fila 2 -->
                 <div class="input-group-dash">
                     <label>Email *</label>
-                    <input type="email" id="reg-email" required>
+                    <input type="email" id="reg-email" required placeholder="artista@email.com">
                 </div>
                 <div class="input-group-dash">
                     <label>Contraseña *</label>
-                    <input type="password" id="reg-password" required>
+                    <input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres">
                 </div>
+                
+                <!-- Fila 3 -->
                 <div class="input-group-dash">
                     <label>Teléfono</label>
-                    <input type="text" id="reg-telefono">
+                    <input type="text" id="reg-telefono" placeholder="+58 412 1234567">
                 </div>
                 <div class="input-group-dash">
                     <label>Fecha de Nacimiento</label>
                     <input type="date" id="reg-fecha-nacimiento">
                 </div>
+                
+                <!-- Fila 4 -->
                 <div class="input-group-dash">
                     <label>País</label>
-                    <input type="text" id="reg-pais">
+                    <input type="text" id="reg-pais" placeholder="Venezuela">
                 </div>
                 <div class="input-group-dash">
                     <label>Ciudad</label>
-                    <input type="text" id="reg-ciudad">
+                    <input type="text" id="reg-ciudad" placeholder="Caracas">
                 </div>
+                
+                <!-- Fila 5 -->
                 <div class="input-group-dash">
                     <label>Instagram (sin @)</label>
-                    <input type="text" id="reg-instagram">
-                </div>
-                <div class="input-group-dash">
-                    <label>Tipo de Artista</label>
-                    <select id="reg-tipo-artista">
-                        <option value="">Selecciona</option>
-                        <option value="Pintor/a">Pintor/a</option>
-                        <option value="Escultor/a">Escultor/a</option>
-                        <option value="Fotógrafo/a">Fotógrafo/a</option>
-                        <option value="Ilustrador/a">Ilustrador/a</option>
-                        <option value="Ceramista">Ceramista</option>
-                        <option value="Artesano/a">Artesano/a</option>
-                    </select>
+                    <input type="text" id="reg-instagram" placeholder="edgar.fernandez">
                 </div>
                 <div class="input-group-dash">
                     <label>Género</label>
@@ -517,20 +514,9 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-                <div class="input-group-dash">
-                    <label>Preferencia de Contacto</label>
-                    <select id="reg-pref-contacto">
-                        <option value="Email">Email</option>
-                        <option value="Teléfono">Teléfono</option>
-                        <option value="Ambos">Ambos</option>
-                    </select>
-                </div>
             </div>
-            <div class="input-group-dash" style="grid-column: 1/-1;">
-                <label>Biografía</label>
-                <textarea id="reg-biografia" rows="3" placeholder="Cuéntanos sobre tu arte..."></textarea>
-            </div>
-            <button type="submit" class="btn-save-artwork">Registrarse</button>
+            
+            <button type="submit" class="btn-save-artwork" style="margin-top: 20px;">Registrarse</button>
         </form>
     </div>
 </div>
