@@ -585,6 +585,66 @@ async function eliminarObra(id) {
     }
 }
 
+window.duplicarObra = function(id) {
+    const obra = window.obrasData.find(o => o.id === id);
+    if (!obra) return;
+
+    // 1. Limpiar el formulario primero (para resetear estados)
+    window.resetFormulario();
+
+    // 2. Rellenar los campos con los datos de la obra original
+    document.getElementById('dash-titulo').value = obra.titulo || '';
+    document.getElementById('dash-artista').value = obra.artista || '';
+    document.getElementById('dash-ano').value = obra.ano || '';
+    document.getElementById('dash-tec-desc').value = obra.descripcion_tecnica || '';
+    document.getElementById('dash-art-desc').value = obra.descripcion_artistica || '';
+    document.getElementById('dash-status').value = obra.status || '';
+    document.getElementById('dash-estado-obra').value = obra.estado_obra || '';
+    document.getElementById('dash-ancho').value = obra.ancho || '';
+    document.getElementById('dash-alto').value = obra.alto || '';
+    document.getElementById('dash-peso').value = obra.peso || '';
+    document.getElementById('dash-marcos').value = obra.marcos || '';
+    document.getElementById('dash-precio').value = obra.precio || '';
+    document.getElementById('dash-certificado').value = obra.certificado || '';
+    // Dejamos el ID vacío para que la base de datos genere uno nuevo
+    document.getElementById('dash-id').value = '';
+    document.getElementById('dash-procedencia').value = obra.procedencia || '';
+    document.getElementById('dash-firma').value = obra.firma || '';
+    document.getElementById('dash-soporte').value = obra.soporte || '';
+    document.getElementById('dash-conservacion').value = obra.conservacion || '';
+    document.getElementById('dash-etiquetas').value = obra.etiquetas || '';
+    document.getElementById('dash-localizacion').value = obra.localizacion || '';
+
+    // 3. Cambiar el estado de los botones a "Guardar"
+    const btnSave = document.getElementById('btn-save');
+    const btnUpdate = document.getElementById('btn-update');
+    if (btnSave && btnUpdate) {
+        btnSave.style.display = 'block';
+        btnSave.classList.remove('hidden');
+        btnUpdate.style.display = 'none';
+        btnUpdate.classList.add('hidden');
+    }
+
+    // 4. Limpiar las imágenes precargadas (para que el usuario suba las suyas)
+    for (let i = 0; i < 5; i++) {
+        const slot = document.getElementById(`slot-${i}`);
+        const input = document.getElementById(`dash-imagen-${i}`);
+        if (input) input.value = "";
+        if (slot) {
+            slot.classList.remove('has-image');
+            const img = slot.querySelector('.preview-img');
+            if (img) {
+                img.src = "";
+                img.classList.add('hidden');
+            }
+        }
+    }
+
+    // 5. Scroll hacia arriba para ver el formulario
+    const dash = document.getElementById('admin-dashboard');
+    if (dash) dash.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // Función para mostrar la vista previa en el slot correspondiente
 function previewImage(event, index) {
     const reader = new FileReader();

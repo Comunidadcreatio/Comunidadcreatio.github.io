@@ -1490,3 +1490,23 @@ body {
     .galeria-col { flex: 1 1 100%; /* 1 columna en móviles */ }
 }
 
+/* --- ESTILO PARA EL BOTÓN DUPLICAR --- */
+.btn-icon-duplicate {
+    background: #e3f2fd; /* Azul muy claro */
+    color: #0d47a1;      /* Azul oscuro para el icono */
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-icon-duplicate:hover {
+    background: #bbdefb;
+    transform: scale(1.1);
+}
+
