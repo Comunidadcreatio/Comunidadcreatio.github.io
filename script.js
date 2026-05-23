@@ -411,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("¡Obra guardada exitosamente!");
                     resetFormularioArtista();
                     cargarMisObras();
+                    cargarGaleria(); // Refrescar la galería pública
                 } else {
                     alert("Error: " + (result.error || "No se pudo guardar"));
                 }
@@ -481,6 +482,55 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("Error al cargar obra para editar:", err));
     };
+
+    window.duplicarObra = function(id) {
+    if (!artistaToken) return;
+    fetch(`https://backend-fundacion-atpe.onrender.com/obras/${id}`, {
+        headers: { 'Authorization': `Bearer ${artistaToken}` }
+    })
+    .then(res => res.json())
+    .then(obra => {
+        if (!obra) return;
+        // 1. Resetear el formulario
+        resetFormularioArtista();
+        // 2. Llenar el formulario con los datos de la obra, excepto el ID
+        document.getElementById('artista-titulo').value = obra.titulo || '';
+        document.getElementById('artista-artista').value = obra.artista || '';
+        document.getElementById('artista-ano').value = obra.ano || '';
+        document.getElementById('artista-tec-desc').value = obra.descripcion_tecnica || '';
+        document.getElementById('artista-art-desc').value = obra.descripcion_artistica || '';
+        document.getElementById('artista-status').value = obra.status || '';
+        document.getElementById('artista-estado-obra').value = obra.estado_obra || '';
+        document.getElementById('artista-ancho').value = obra.ancho || '';
+        document.getElementById('artista-alto').value = obra.alto || '';
+        document.getElementById('artista-peso').value = obra.peso || '';
+        document.getElementById('artista-marcos').value = obra.marcos || '';
+        document.getElementById('artista-precio').value = obra.precio || '';
+        document.getElementById('artista-certificado').value = obra.certificado || '';
+        document.getElementById('artista-id').value = ''; // Dejar vacío para que se genere uno nuevo
+        document.getElementById('artista-procedencia').value = obra.procedencia || '';
+        document.getElementById('artista-firma').value = obra.firma || '';
+        document.getElementById('artista-soporte').value = obra.soporte || '';
+        document.getElementById('artista-conservacion').value = obra.conservacion || '';
+        document.getElementById('artista-etiquetas').value = obra.etiquetas || '';
+        document.getElementById('artista-localizacion').value = obra.localizacion || '';
+        // 3. Limpiar imágenes
+        for (let i = 0; i < 5; i++) {
+            const slot = document.getElementById(`artista-slot-${i}`);
+            const img = slot.querySelector('.preview-img');
+            if (img) {
+                img.src = '';
+                img.classList.add('hidden');
+            }
+            slot.classList.remove('has-image');
+        }
+        // 4. Mostrar botón guardar, ocultar actualizar
+        document.getElementById('btn-artista-save').style.display = 'block';
+        document.getElementById('btn-artista-update').style.display = 'none';
+        document.getElementById('artist-dashboard').scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(err => console.error("Error al duplicar obra:", err));
+};
 
     // 7. Actualizar Obra (Artista)
     if (btnArtistaUpdate) {
