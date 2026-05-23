@@ -1413,7 +1413,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* --- EFECTO REVEAL FINAL (Versión transform) --- */
+/* --- EFECTO REVEAL FINAL (Empuje por columna) --- */
 
 /* 1. Contenedor principal de la tarjeta */
 .obra-card {
@@ -1422,10 +1422,10 @@ body {
     flex-direction: column;
     border-radius: 12px;
     background: transparent;
+    transition: all 0.4s ease;
     cursor: pointer;
     overflow: visible;
-    margin-bottom: 20px; /* Espacio base entre tarjetas */
-    transition: transform 0.3s ease;
+    margin-bottom: 0; /* Sin margen, el spacer maneja el espacio */
 }
 
 /* 2. La imagen de la obra (siempre visible) */
@@ -1436,6 +1436,7 @@ body {
     position: relative;
     z-index: 1;
     overflow: hidden;
+    transition: all 0.4s ease;
 }
 
 /* 3. La información (oculta inicialmente) */
@@ -1445,29 +1446,101 @@ body {
     background: #ffffff;
     border-radius: 0 0 12px 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    position: absolute;
-    top: 100%; /* Se coloca justo debajo de la imagen */
-    left: 0;
-    z-index: 2;
     
-    /* Oculto inicialmente */
+    /* Altura inicial 0 (oculta) */
+    max-height: 0;
+    padding: 0 20px;
+    overflow: hidden;
     opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px); /* Desplazado hacia arriba */
-    transition: all 0.3s ease;
+    
+    transition: all 0.4s ease;
 }
 
-/* 4. Al pasar el mouse */
-.obra-card:hover {
-    margin-bottom: 220px; /* Aumenta el espacio inferior empujando SOLO la columna afectada */
+/* 4. El spacer (espacio vacío que se expande) */
+.obra-spacer {
+    width: 100%;
+    height: 0;
+    transition: height 0.4s ease;
 }
 
+/* 5. Al pasar el mouse */
 .obra-card:hover .obra-imagen {
     border-radius: 12px 12px 0 0;
 }
 
 .obra-card:hover .obra-info {
+    max-height: 300px;
+    padding: 20px;
     opacity: 1;
-    visibility: visible;
-    transform: translateY(0); /* Se desliza hacia abajo a su posición natural */
+}
+
+.obra-card:hover .obra-spacer {
+    height: 40px; /* Altura del espacio extra que empujará a la tarjeta de abajo */
+}
+
+/* --- Ajustes internos de la información --- */
+.obra-titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 2px;
+}
+
+.obra-artista {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.obra-artista::before {
+    content: '✔';
+    color: #2ecc71;
+    font-size: 0.9rem;
+}
+
+.obra-detalles {
+    display: flex;
+    gap: 8px;
+    color: #666;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.obra-precio {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.precio-monto {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #000;
+}
+
+.precio-etiqueta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.btn-ver-detalle {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 25px;
+    background: var(--accent-gold);
+    color: var(--bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-ver-detalle:hover {
+    background: #e5cf7d;
 }
