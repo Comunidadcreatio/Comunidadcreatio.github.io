@@ -670,7 +670,7 @@ body {
 .galeria-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 16px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
@@ -680,7 +680,7 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1 1 25%; /* Las columnas ocupan el 25% del ancho total */
-    gap: 15px; /* Espacio entre obras en la misma columna */
+    gap: 16px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
