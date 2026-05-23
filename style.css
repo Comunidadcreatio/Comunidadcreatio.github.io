@@ -680,7 +680,7 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1 1 calc(25% - 30px); /* 4 columnas iguales */
-    gap: 20px; /* Espacio entre obras en la misma columna */
+    gap: 15px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
