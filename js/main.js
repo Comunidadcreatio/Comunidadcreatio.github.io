@@ -112,6 +112,27 @@ function setupEvents() {
             alert("Error: " + result.error);
         }
     });
+
+    // --- NAVEGACIÓN ENTRE MODALES (Login ↔ Registro) ---
+    // Ir de Login a Registro
+    document.getElementById('btn-ir-registro').addEventListener('click', () => {
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('hidden');
+    });
+
+    // Ir de Registro a Login
+    document.getElementById('btn-ir-login').addEventListener('click', () => {
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.cerrar-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+        });
+    });
+
+
 }
 
 // ============================================
