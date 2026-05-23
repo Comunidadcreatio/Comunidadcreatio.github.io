@@ -205,20 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 8. GUARDAR NUEVA OBRA (POST) ---
     if (artworkForm) {
-        artworkForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // 1. Validar vacíos
-            if (!validarFormulario()) return;
+    artworkForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // 1. Validar vacíos
+        if (!validarFormulario()) return;
 
-            // 2. Preparar UI
-            const originalText = btnSave.innerHTML;
-            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
-            btnSave.disabled = true;
+        // 2. Preparar UI (Guardando...)
+        const originalText = window.btnSave.innerHTML;
+        window.btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+        window.btnSave.disabled = true;
 
-            // 3. Recopilar datos
-            const formData = new FormData();
-            // Agregar múltiples imágenes (hasta 5)
+        // 3. Recopilar datos
+        const formData = new FormData();
         for (let i = 0; i < 5; i++) {
             const inputArchivo = document.getElementById(`dash-imagen-${i}`);
             if (inputArchivo && inputArchivo.files[0]) {
@@ -226,50 +225,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Agregar el resto de campos
-        formData.append('titulo', document.getElementById('dash-titulo').value);
-        formData.append('artista', document.getElementById('dash-artista').value);
-        formData.append('ano', document.getElementById('dash-ano').value);
-        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
-        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
-        formData.append('status', document.getElementById('dash-status').value);
-        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
-        formData.append('ancho', document.getElementById('dash-ancho').value);
-        formData.append('alto', document.getElementById('dash-alto').value);
-        formData.append('peso', document.getElementById('dash-peso').value);
-        formData.append('marcos', document.getElementById('dash-marcos').value);
-        formData.append('precio', document.getElementById('dash-precio').value);
-        formData.append('certificado', document.getElementById('dash-certificado').value);
-        formData.append('id_obra', document.getElementById('dash-id').value);
-        formData.append('procedencia', document.getElementById('dash-procedencia').value);
-        formData.append('firma', document.getElementById('dash-firma').value);
-        formData.append('soporte', document.getElementById('dash-soporte').value);
-        formData.append('conservacion', document.getElementById('dash-conservacion').value);
-        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
-        formData.append('localizacion', document.getElementById('dash-localizacion').value);
+        const campos = [
+            'titulo', 'artista', 'ano', 'descripcion_tecnica', 'descripcion_artistica',
+            'status', 'estado_obra', 'ancho', 'alto', 'peso', 'marcos', 'precio',
+            'certificado', 'id_obra', 'procedencia', 'firma', 'soporte', 'conservacion',
+            'etiquetas', 'localizacion'
+        ];
+        campos.forEach(campo => {
+            const el = document.getElementById(`dash-${campo}`);
+            if (el) formData.append(campo, el.value);
+        });
 
         try {
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
                 method: 'POST',
-                body: formData 
+                body: formData
             });
             const result = await response.json();
 
             if (response.ok && result.success) {
                 alert("¡Obra registrada con éxito!");
-                window.resetFormulario();
+                // Recargar la tabla (pero sin limpiar el formulario aquí, lo hará el finally)
                 cargarTablaObras(); 
             } else {
                 alert("Error: " + (result.error || "No se pudo guardar"));
             }
         } catch (error) {
             console.error("Error al guardar obra:", error);
-            // Si el backend devuelve un JSON con error, lo mostramos
-            if (error.response && error.response.data) {
-                alert("Error del servidor: " + error.response.data.error);
-            } else {
-                alert("Error de conexión. Verifica que tu imagen no sea demasiado grande.");
-            }
+            alert("Error de conexión. Verifica que tu imagen no sea demasiado grande.");
+        } finally {
+            // 🔥 ESTO SIEMPRE SE EJECUTA, TANTO SI TODO SALE BIEN COMO SI HAY ERROR
+            window.resetFormulario(); 
         }
     });
 }
@@ -693,8 +679,10 @@ window.resetFormulario = function() {
     const nameDisplay = document.getElementById('file-names-display');
     if(nameDisplay) nameDisplay.textContent = "";
 
-    // 5. 🔥 RESTAURAR LOS BOTONES A SU ESTADO NORMAL (SOLO VISIBILIDAD, NO CONTENIDO)
+    // 5. 🔥 RESTAURACIÓN COMPLETA DEL BOTÓN
     if (window.btnSave) {
+        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+        window.btnSave.disabled = false;
         window.btnSave.style.display = 'block'; 
         window.btnSave.classList.remove('hidden');
     }
