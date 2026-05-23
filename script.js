@@ -693,10 +693,8 @@ window.resetFormulario = function() {
     const nameDisplay = document.getElementById('file-names-display');
     if(nameDisplay) nameDisplay.textContent = "";
 
-    // 5. 🔥 RESTAURAR LOS BOTONES A SU ESTADO NORMAL
+    // 5. 🔥 RESTAURAR LOS BOTONES A SU ESTADO NORMAL (SOLO VISIBILIDAD, NO CONTENIDO)
     if (window.btnSave) {
-        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
-        window.btnSave.disabled = false;
         window.btnSave.style.display = 'block'; 
         window.btnSave.classList.remove('hidden');
     }
