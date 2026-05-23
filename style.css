@@ -670,7 +670,7 @@ body {
 .galeria-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 15px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
@@ -679,8 +679,8 @@ body {
 .galeria-col {
     display: flex;
     flex-direction: column;
-    flex: 1 1 calc(25% - 30px); /* 4 columnas iguales */
-    gap: 20px; /* Espacio entre obras en la misma columna */
+    flex: 1 1 25%; /* Las columnas ocupan el 25% del ancho total */
+    gap: 15px; /* Espacio entre obras en la misma columna */
 }
 
 .galeria-section {
@@ -692,7 +692,7 @@ body {
 
 .obra-card {
     background: transparent;
-    border-radius: 0;
+    border-radius: 0 !important;
     overflow: visible;
     box-shadow: none;
     transition: transform 0.3s ease;
