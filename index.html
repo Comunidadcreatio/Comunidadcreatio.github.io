@@ -44,7 +44,6 @@
                         </tr>
                     </thead>
                     <tbody id="tabla-obras-body">
-                        <!-- Filas de obras -->
                     </tbody>
                 </table>
             </div>
@@ -52,59 +51,28 @@
             <div id="formulario-obra">
                 <h3>Agregar / Editar Obra</h3>
                 <form id="artista-artwork-form" class="artwork-form-grid">
-
-                    <input type="hidden" id="input-id-edicion">
+                    
                     <!-- Campos Básicos -->
                     <div class="input-group-dash">
                         <label>Título de la Obra</label>
-                        <input type="text" id="artista-titulo" placeholder="Ej: La última cena">
+                        <input type="text" id="artista-titulo" placeholder="Título">
                     </div>
                     <div class="input-group-dash">
                         <label>Nombre del Artista</label>
-                        <input type="text" id="artista-artista" placeholder="Ej: Leonardo Da Vinci">
+                        <input type="text" id="artista-artista" placeholder="Artista">
                     </div>
-
                     <div class="input-group-dash">
                         <label>Año de Creación</label>
-                        <input type="number" id="artista-ano" class="dash-input" placeholder="Ej: 2024">
+                        <input type="number" id="artista-ano" placeholder="2024">
                     </div>
                     <div class="input-group-dash">
                         <label>Técnica</label>
-                        <div class="select-wrapper">
-                            <select id="artista-tec-desc" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Óleo">Óleo sobre lienzo</option>
-                                <option value="Acrílico">Acrílico sobre lienzo</option>
-                                <option value="Acuarela">Acuarela</option>
-                                <option value="Técnica mixta sobre lienzo">Técnica mixta sobre lienzo</option>
-                                <option value="Pintura al pastel">Pintura al pastel</option>
-                                <option value="Gouache">Gouache</option>
-                                <option value="Bronce">Bronce fundido</option>
-                                <option value="Madera">Madera tallada</option>
-                                <option value="Cerámica/terracota">Cerámica/terracota</option>
-                                <option value="Resina">Resina moldeada</option>
-                                <option value="Escultura en metal">Escultura en metal (ensamblaje/soldadura)</option>
-                                <option value="Mármol/piedra tallada">Mármol/piedra tallada</option>
-                                <option value="Dibujo a lápiz">Dibujo a lápiz/grafito</option>
-                                <option value="Dibujo a tinta">Dibujo a tinta</option>
-                                <option value="Carboncillo">Carboncillo</option>
-                                <option value="Lápices de colores">Lápices de colores</option>
-                                <option value="Collage en papel">Collage en papel</option>
-                                <option value="Serigrafía/grabado">Serigrafía/grabado</option>
-                                <option value="Fotografía digital">Fotografía digital</option>
-                                <option value="Fotografía analógica">Fotografía analógica (B/N o color)</option>
-                                <option value="Videoarte">Videoarte</option>
-                                <option value="Arte digital">Arte digital/ilustración digital</option>
-                                <option value="Impresión giclée">Impresión giclée</option>
-                                <option value="NFT">NFT (arte digital tokenizado)</option>
-                                <option value="Instalación">Instalación (site-specific)</option>
-                                <option value="Arte textil">Arte textil (tapiz, bordado)</option>
-                                <option value="Performance documentada">Performance documentada</option>
-                                <option value="Arte objeto">Arte objeto/ready-made</option>
-                                <option value="Técnica mixta (multidisciplinar)">Técnica mixta (multidisciplinar)</option>
-                            </select>   
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-tec-desc">
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="Óleo">Óleo sobre lienzo</option>
+                            <option value="Acrílico">Acrílico sobre lienzo</option>
+                            <option value="Acuarela">Acuarela</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash full-width">
@@ -114,84 +82,56 @@
 
                     <div class="input-group-dash">
                         <label>Status</label>
-                        <div class="select-wrapper">
-                            <select id="artista-status" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Activo">Activo (Visible en Galería)</option>
-                                <option value="Inactivo">Inactivo (Oculto)</option>
-                            </select>   
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-status">
+                            <option value="Activo">Activo (Visible en Galería)</option>
+                            <option value="Inactivo">Inactivo (Oculto)</option>
+                        </select>
                     </div>
                     <div class="input-group-dash">
                         <label>Estado</label>
-                        <div class="select-wrapper">
-                            <select id="artista-estado-obra" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Disponible">Disponible (en venta)</option>
-                                <option value="Reservado">Reservado</option>
-                                <option value="Vendido">Vendido</option>
-                                <option value="No disponible">No disponible temporalmente</option>
-                                <option value="En préstamo">En préstamo (fuera de galería)</option>
-                                <option value="Solo exhibición">Solo para exhibición (no venta)</option>
-                                <option value="Retirado">Retirado del inventario</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-estado-obra">
+                            <option value="Disponible">Disponible (en venta)</option>
+                            <option value="Reservado">Reservado</option>
+                            <option value="Vendido">Vendido</option>
+                        </select>
                     </div>
                     
+                    <!-- Dimensiones -->
                     <div class="input-group-dash triple-row-container full-width">
                         <div class="triple-field-grid">
                             <div class="field-item">
-                                <label for="artista-ancho">Ancho</label>
-                                <input type="number" id="artista-ancho" name="ancho" min="0" max="400" step="1" placeholder="0" class="dash-input">
-                                <span class="unit-suffix">cm</span>
+                                <label for="artista-ancho">Ancho (cm)</label>
+                                <input type="number" id="artista-ancho" placeholder="0">
                             </div>
                             <div class="field-item">
-                                <label for="artista-alto">Alto</label>
-                                <input type="number" id="artista-alto" name="alto" min="0" max="400" step="1" placeholder="0" class="dash-input">
-                                <span class="unit-suffix">cm</span>
+                                <label for="artista-alto">Alto (cm)</label>
+                                <input type="number" id="artista-alto" placeholder="0">
                             </div>  
                             <div class="field-item">
-                                <label for="artista-peso">Peso</label>
-                                <input type="number" id="artista-peso" name="peso" min="0" max="400" step="1" placeholder="0" class="dash-input">
-                                <span class="unit-suffix">kg</span>            
+                                <label for="artista-peso">Peso (kg)</label>
+                                <input type="number" id="artista-peso" placeholder="0">
                             </div>
                         </div>
                     </div>  
 
                     <div class="input-group-dash">
                         <label>Enmarcado</label>
-                        <div class="select-wrapper">
-                            <select id="artista-marcos" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Ya enmarcada">Ya enmarcada (listo para colgar)</option>
-                                <option value="Sin enmarcar">Sin enmarcar (solo lienzo/bastidor)</option>
-                                <option value="Enmarcado opcional">Enmarcado opcional (el cliente elige después)</option>
-                                <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
-                                <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-marcos">
+                            <option value="Sin enmarcar">Sin enmarcar</option>
+                            <option value="Ya enmarcada">Ya enmarcada</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash">
                         <label>Precio</label>
-                        <input type="number" id="artista-precio" class="dash-input" placeholder="Precio Total">
+                        <input type="number" id="artista-precio" placeholder="Precio Total">
                     </div>
                     <div class="input-group-dash">
                         <label>Certificado</label>
-                        <div class="select-wrapper">
-                            <select id="artista-certificado" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Si">Sí (autenticado)</option>
-                                <option value="No">No</option>
-                                <option value="En trámite">En trámite</option>
-                                <option value="Certificado digital disponible">Certificado digital disponible</option>
-                                <option value="Certificado físico disponible">Certificado físico disponible</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>   
+                        <select id="artista-certificado">
+                            <option value="Si">Sí (autenticado)</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash">
@@ -200,140 +140,97 @@
                     </div>
                     <div class="input-group-dash">
                         <label>Procedencia</label>
-                        <div class="select-wrapper">
-                            <select id="artista-procedencia" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Colección privada">Colección privada</option>
-                                <option value="Taller del artista">Taller del artista</option>
-                                <option value="Herencia familiar">Herencia familiar</option>
-                                <option value="Compra directa al artista">Compra directa al artista</option>
-                                <option value="Adquisición en subasta">Adquisición en subasta</option>
-                                <option value="Donación">Donación</option>
-                                <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
-                                <option value="Desconocida">Desconocida</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-procedencia">
+                            <option value="Taller del artista">Taller del artista</option>
+                            <option value="Colección privada">Colección privada</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash">
                         <label>Firma</label>
-                        <div class="select-wrapper">
-                            <select id="artista-firma" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
-                                <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
-                                <option value="Firmada en el bastidor">Firmada en el bastidor</option>
-                                <option value="Iniciales solamente">Iniciales solamente</option>
-                                <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
-                                <option value="No firmada">No firmada</option>
-                                <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
-                                <option value="Firma ilegible">Firma ilegible</option>
-                                <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
-                                <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-firma">
+                            <option value="Firmada al frente">Firmada al frente</option>
+                            <option value="No firmada">No firmada</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash">
                         <label>Soporte</label>
-                        <div class="select-wrapper">
-                            <select id="artista-soporte" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
-                                <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
-                                <option value="Papel (acuarela, dibujo, grabado)">Papel (acuarela, dibujo, grabado)</option>
-                                <option value="Cartón (cartulina, cartón pluma)">Cartón (cartulina, cartón pluma)</option>
-                                <option value="Madera (tabla, panel, contrachapado)">Madera (tabla, panel, contrachapado)</option>
-                                <option value="Metal (lámina de aluminio, cobre)">Metal (lámina de aluminio, cobre)</option>
-                                <option value="Vidrio (pintura sobre vidrio)">Vidrio (pintura sobre vidrio)</option>
-                                <option value="Cerámica (azulejo, loza)">Cerámica (azulejo, loza)</option>
-                                <option value="Tela (seda, algodón, yute)">Tela (seda, algodón, yute)</option>
-                                <option value="Piel/cuero">Piel/cuero</option>
-                                <option value="Muro (fresco, mural - no transportable)">Muro (fresco, mural - no transportable)</option>
-                                <option value="Digital (archivo, sin soporte físico)">Digital (archivo, sin soporte físico)</option>
-                                <option value="Mixto (varios materiales)">Mixto (varios materiales)</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-soporte">
+                            <option value="Lienzo">Lienzo</option>
+                            <option value="Papel">Papel</option>
+                        </select>
                     </div>
 
                      <div class="input-group-dash">
                         <label>Estado de Conservación</label>
-                        <div class="select-wrapper">
-                            <select id="artista-conservacion" class="dash-input-select">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
-                                <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
-                                <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
-                                <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
-                                <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
-                                <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
+                        <select id="artista-conservacion">
+                            <option value="Excelente">Excelente (como nuevo)</option>
+                            <option value="Bueno">Bueno (ligeros signos de edad)</option>
+                        </select>
                     </div>
 
                     <div class="input-group-dash">
                         <label>Etiquetas</label>
-                        <input type="text" id="artista-etiquetas" placeholder="Ej: Azul, realista, figurativo, renacimiento...">
+                        <input type="text" id="artista-etiquetas" placeholder="Etiquetas separadas por comas">
                     </div>
 
                     <div class="input-group-dash">
-                        <label for="artista-localizacion">Localización de la Obra</label>
-                        <div class="select-wrapper">
-                            <select id="artista-localizacion" class="dash-input-select">
-                                <option value="" disabled selected>Selecciona un País</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        <label>Localización de la Obra</label>
+                        <select id="artista-localizacion">
+                            <option value="" disabled selected>Selecciona un País</option>
+                        </select>
+                    </div>
+
+                    <!-- 🌟 CAMPO OCULTO PARA EL ID DE EDICIÓN -->
+                    <input type="hidden" id="input-id-edicion">
+
+                    <!-- 🌟 BOTONES DE ACCIÓN (Los que faltaban) -->
+                    <div class="form-actions-group">
+                        <button type="submit" id="btn-artista-save" class="btn-save-artwork">
+                            💾 Guardar Obra
+                        </button>
+                        <button type="button" id="btn-artista-update" class="btn-update-artwork hidden">
+                            🔄 Refrescar Obra
+                        </button>
+                        <button type="button" id="btn-artista-clear" class="btn-clear-form">
+                            🧹 Limpiar Campos
+                        </button>
+                    </div>
+
+                    <!-- 🌟 SECCIÓN DE SUBIR IMÁGENES (Los 5 cuadros) -->
+                    <div class="image-upload-section">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imágenes de la Obra (Máx. 5)</label>
+                        <div class="image-upload-container">
+                            <div class="image-slot" id="artista-slot-0" onclick="activarInput(0)">
+                                <img src="" class="preview-img hidden" alt="Vista previa">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div class="image-slot" id="artista-slot-1" onclick="activarInput(1)">
+                                <img src="" class="preview-img hidden" alt="Vista previa">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div class="image-slot" id="artista-slot-2" onclick="activarInput(2)">
+                                <img src="" class="preview-img hidden" alt="Vista previa">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div class="image-slot" id="artista-slot-3" onclick="activarInput(3)">
+                                <img src="" class="preview-img hidden" alt="Vista previa">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div class="image-slot" id="artista-slot-4" onclick="activarInput(4)">
+                                <img src="" class="preview-img hidden" alt="Vista previa">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
                         </div>
+                        <input type="file" id="artista-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
+                        <input type="file" id="artista-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
+                        <input type="file" id="artista-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
+                        <input type="file" id="artista-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
+                        <input type="file" id="artista-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
+                        <small id="artista-file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
                     </div>
                 </form>
-
-                <div class="form-actions-group">
-                    <button type="submit" form="artista-artwork-form" id="btn-artista-save" class="btn-save-artwork">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Obra
-                    </button>
-                    <button type="button" id="btn-artista-update" class="btn-update-artwork hidden">
-                        <i class="fa-solid fa-rotate"></i> Refrescar Obra
-                    </button>
-                    <button type="button" id="btn-artista-clear" class="btn-clear-form">
-                        <i class="fa-solid fa-eraser"></i> Limpiar Campos
-                    </button>
-                </div>
-
-                <div class="image-upload-section">
-                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imágenes de la Obra (Máx. 5)</label>
-                    <div class="image-upload-container">
-                        <div class="image-slot" id="artista-slot-0" onclick="activarInput(0)">
-                            <img src="" class="preview-img hidden" alt="Vista previa">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                        <div class="image-slot" id="artista-slot-1" onclick="activarInput(1)">
-                            <img src="" class="preview-img hidden" alt="Vista previa">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                        <div class="image-slot" id="artista-slot-2" onclick="activarInput(2)">
-                            <img src="" class="preview-img hidden" alt="Vista previa">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                        <div class="image-slot" id="artista-slot-3" onclick="activarInput(3)">
-                            <img src="" class="preview-img hidden" alt="Vista previa">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                        <div class="image-slot" id="artista-slot-4" onclick="activarInput(4)">
-                            <img src="" class="preview-img hidden" alt="Vista previa">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                    </div>
-                    <input type="file" id="artista-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
-                    <input type="file" id="artista-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
-                    <input type="file" id="artista-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
-                    <input type="file" id="artista-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
-                    <input type="file" id="artista-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
-                    <small id="artista-file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
-                </div>
             </div>
         </section>
     </main>
