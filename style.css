@@ -1510,25 +1510,3 @@ body {
     transform: scale(1.1);
 }
 
-/* --- MODALES DE ARTISTAS --- */
-#registro-artista-modal.modal,
-#login-artista-modal.modal {
-    z-index: 3500; /* Por encima del panel de admin */
-}
-
-#registro-artista-modal .modal-content,
-#login-artista-modal .modal-content {
-    background: rgba(15, 23, 36, 0.95);
-    color: white;
-    max-width: 500px;
-    padding: 30px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-#registro-artista-modal h2,
-#login-artista-modal h2 {
-    color: var(--accent-gold);
-    margin-bottom: 20px;
-}
-

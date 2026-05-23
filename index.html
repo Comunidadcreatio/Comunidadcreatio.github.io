@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundación Extramuros</title>
+    <title>Hagamos Arte Táchira</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
     <div class="container">
         <div class="logo-container">
             <a href="index.html" class="logo-link">
-                <img src="Logo.svg" alt="Logo Fundación Extramuros" class="main-logo-img">
-                <h1 class="brand-name">HATáchira</h1>
+                <!-- <img src="" alt="Logo HATáchira" class="main-logo-img"> -->
+                <h1 class="brand-name">HA<span>Táchira</span></h1>
             </a>
         </div>
 
@@ -39,7 +39,8 @@
                 </a>
             </div>
             
-            <a href="#" title="Perfil" id="perfil-btn"><i class="fa-solid fa-user"></i></a>
+            <a href="#" title="Admin" id="admin-btn"><i class="fa-solid fa-user-shield"></i></a>
+            <a href="#" title="Perfil"><i class="fa-solid fa-user"></i></a>
         </div>
 
         <div class="mobile-menu-btn">
@@ -49,7 +50,7 @@
 </header>
 
 <main class="main-content">
-    <h2>Bienvenido a Fundación Extramuros</h2>
+    <h2>Hagamos Arte Táchira</h2>
 </main>
 
 <!-- Sección Galería -->
@@ -74,10 +75,39 @@
     </div>
 </div>
 
+<!-- Login -->
+<div id="login-panel" class="login-overlay hidden">
+    <div class="login-card">
+        <div class="login-header">
+            <i class="fa-solid fa-user-shield main-icon"></i>
+            <h2>Panel de Administración</h2>
+            <p>Ingresa tus credenciales para gestionar los productos</p>
+        </div>
+        <form class="login-form">
+            <div class="input-group">
+                <label><i class="fa-solid fa-user"></i> Usuario</label>
+                <input type="text" placeholder="Ingresa tu Usuario">
+            </div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                <input type="password" placeholder="Ingresa tu contraseña">
+            </div>
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox"> Recordar sesión
+                </label>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- ========================================== -->
-<!-- PANEL DE ARTISTA (NUEVO)                     -->
+<!-- NUEVO PANEL DE ADMINISTRACIÓN REESTRUCTURADO -->
 <!-- ========================================== -->
-<div id="artist-dashboard" class="login-overlay hidden">
+<div id="admin-dashboard" class="login-overlay hidden">
     <div class="login-card dashboard-wide">
         
         <!-- 1. HEADER SUPERIOR -->
@@ -85,21 +115,21 @@
             <div class="dash-welcome">
                 <i class="fa-solid fa-palette main-icon-dash"></i>
                 <div>
-                    <h2>Panel de Artista</h2>
-                    <p>Bienvenido, <span id="artist-username">(Nombre de Artista)</span></p>
+                    <h2>Panel de Administración</h2>
+                    <p>Bienvenido, <span id="admin-username">(Nombre de Usuario)</span></p>
                 </div>
             </div>
-            <button id="btn-artist-logout" class="btn-logout-dash">
+            <button id="btn-logout" class="btn-logout-dash">
                 <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
             </button>
         </div>
 
-        <!-- 2. TABLA DE GESTIÓN -->
+        <!-- 2. TABLA DE GESTIÓN (Nuevo contenedor independiente) -->
         <div class="dash-table-wrapper">
             <div class="table-header-container">
-                <h3>Mis Obras</h3>
+                <h3>Gestión de Productos</h3>
                 <div class="search-box">
-                    <input type="text" id="artista-buscador-obras" placeholder="Buscar por título, autor o ID...">
+                    <input type="text" id="buscador-obras" placeholder="Buscar por título, autor o ID...">
                 </div>
             </div>
             
@@ -117,7 +147,7 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="artista-tabla-obras-body">
+                    <tbody id="tabla-obras-body">
                         <!-- Contenido dinámico -->
                     </tbody>
                 </table>
@@ -126,26 +156,28 @@
 
         <!-- 3. FORMULARIO Y SUBIDA DE IMÁGENES -->
         <div class="dashboard-layout">
+            
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
             <div class="dash-column-left">
                 <h3>Agregar Nueva Obra</h3>
-                <form id="artista-artwork-form" class="artwork-form-grid">
+                <form id="artwork-form" class="artwork-form-grid">
                     <div class="input-group-dash">
                         <label>Título de la Obra</label>
-                        <input type="text" id="artista-titulo" placeholder="Ej: La última cena">
+                        <input type="text" id="dash-titulo" placeholder="Ej: La última cena">
                     </div>
                     <div class="input-group-dash">
                         <label>Nombre del Artista</label>
-                        <input type="text" id="artista-artista" placeholder="Ej: Leonardo Da Vinci">
+                        <input type="text" id="dash-artista" placeholder="Ej: Leonardo Da Vinci">
                     </div>
 
                     <div class="input-group-dash">
                         <label>Año de Creación</label>
-                        <input type="number" id="artista-ano" class="dash-input" placeholder="Ej: 2024">
+                        <input type="number" id="dash-ano" class="dash-input" placeholder="Ej: 2024">
                     </div>
                     <div class="input-group-dash">
                         <label>Técnica</label>
                         <div class="select-wrapper">
-                            <select id="artista-tec-desc" class="dash-input-select">
+                            <select id="dash-tec-desc" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Óleo">Óleo sobre lienzo</option>
                                 <option value="Acrílico">Acrílico sobre lienzo</option>
@@ -183,13 +215,13 @@
 
                     <div class="input-group-dash full-width">
                         <label>Acerca de la Obra</label>
-                        <textarea id="artista-art-desc" rows="3" placeholder="Comparte la historia detrás de esta obra..."></textarea>
+                        <textarea id="dash-art-desc" rows="3" placeholder="Comparte la historia detrás de esta obra..."></textarea>
                     </div>
 
                     <div class="input-group-dash">
                         <label>Status</label>
                         <div class="select-wrapper">
-                            <select id="artista-status" class="dash-input-select">
+                            <select id="dash-status" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Activo">Activo (Visible en Galería)</option>
                                 <option value="Inactivo">Inactivo (Oculto)</option>
@@ -200,7 +232,7 @@
                     <div class="input-group-dash">
                         <label>Estado</label>
                         <div class="select-wrapper">
-                            <select id="artista-estado-obra" class="dash-input-select">
+                            <select id="dash-estado-obra" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Disponible">Disponible (en venta)</option>
                                 <option value="Reservado">Reservado</option>
@@ -218,18 +250,18 @@
                     <div class="input-group-dash triple-row-container full-width">
                         <div class="triple-field-grid">
                             <div class="field-item">
-                                <label for="artista-ancho">Ancho</label>
-                                <input type="number" id="artista-ancho" name="ancho" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <label for="dash-ancho">Ancho</label>
+                                <input type="number" id="dash-ancho" name="ancho" min="0" max="400" step="1" placeholder="0" class="dash-input">
                                 <span class="unit-suffix">cm</span>
                             </div>
                             <div class="field-item">
-                                <label for="artista-alto">Alto</label>
-                                <input type="number" id="artista-alto" name="alto" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <label for="dash-alto">Alto</label>
+                                <input type="number" id="dash-alto" name="alto" min="0" max="400" step="1" placeholder="0" class="dash-input">
                                 <span class="unit-suffix">cm</span>
                             </div>  
                             <div class="field-item">
-                                <label for="artista-peso">Peso</label>
-                                <input type="number" id="artista-peso" name="peso" min="0" max="400" step="1" placeholder="0" class="dash-input">
+                                <label for="dash-peso">Peso</label>
+                                <input type="number" id="dash-peso" name="peso" min="0" max="400" step="1" placeholder="0" class="dash-input">
                                 <span class="unit-suffix">kg</span>            
                             </div>
                         </div>
@@ -238,7 +270,7 @@
                     <div class="input-group-dash">
                         <label>Enmarcado</label>
                         <div class="select-wrapper">
-                            <select id="artista-marcos" class="dash-input-select">
+                            <select id="dash-marcos" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Ya enmarcada">Ya enmarcada (listo para colgar)</option>
                                 <option value="Sin enmarcar">Sin enmarcar (solo lienzo/bastidor)</option>
@@ -252,12 +284,12 @@
 
                     <div class="input-group-dash">
                         <label>Precio</label>
-                        <input type="number" id="artista-precio" class="dash-input" placeholder="Precio Total">
+                        <input type="number" id="dash-precio" class="dash-input" placeholder="Precio Total">
                     </div>
                     <div class="input-group-dash">
                         <label>Certificado</label>
                         <div class="select-wrapper">
-                            <select id="artista-certificado" class="dash-input-select">
+                            <select id="dash-certificado" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Si">Sí (autenticado)</option>
                                 <option value="No">No</option>
@@ -271,12 +303,12 @@
 
                     <div class="input-group-dash">
                         <label>ID</label>
-                        <input type="text" id="artista-id" placeholder="Código interno de la Obra">
+                        <input type="text" id="dash-id" placeholder="Código interno de la Obra">
                     </div>
                     <div class="input-group-dash">
                         <label>Procedencia</label>
                         <div class="select-wrapper">
-                            <select id="artista-procedencia" class="dash-input-select">
+                            <select id="dash-procedencia" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Colección privada">Colección privada</option>
                                 <option value="Taller del artista">Taller del artista</option>
@@ -294,7 +326,7 @@
                     <div class="input-group-dash">
                         <label>Firma</label>
                         <div class="select-wrapper">
-                            <select id="artista-firma" class="dash-input-select">
+                            <select id="dash-firma" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
                                 <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
@@ -314,7 +346,7 @@
                     <div class="input-group-dash">
                         <label>Soporte</label>
                         <div class="select-wrapper">
-                            <select id="artista-soporte" class="dash-input-select">
+                            <select id="dash-soporte" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
                                 <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
@@ -337,7 +369,7 @@
                      <div class="input-group-dash">
                         <label>Estado de Conservación</label>
                         <div class="select-wrapper">
-                            <select id="artista-conservacion" class="dash-input-select">
+                            <select id="dash-conservacion" class="dash-input-select">
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
                                 <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
@@ -352,13 +384,13 @@
 
                     <div class="input-group-dash">
                         <label>Etiquetas</label>
-                        <input type="text" id="artista-etiquetas" placeholder="Ej: Azul, realista, figurativo, renacimiento...">
+                        <input type="text" id="dash-etiquetas" placeholder="Ej: Azul, realista, figurativo, renacimiento...">
                     </div>
 
                     <div class="input-group-dash">
-                        <label for="artista-localizacion">Localización de la Obra</label>
+                        <label for="dash-localizacion">Localización de la Obra</label>
                         <div class="select-wrapper">
-                            <select id="artista-localizacion" class="dash-input-select">
+                            <select id="dash-localizacion" class="dash-input-select">
                                 <option value="" disabled selected>Selecciona un País</option>
                             </select>
                             <i class="fa-solid fa-chevron-down select-arrow"></i>
@@ -367,135 +399,60 @@
                 </form>
 
                 <div class="form-actions-group">
-                    <button type="submit" form="artista-artwork-form" id="btn-artista-save" class="btn-save-artwork">
+                    <button type="submit" form="artwork-form" id="btn-save" class="btn-save-artwork">
                         <i class="fa-solid fa-floppy-disk"></i> Guardar Obra
                     </button>
-                    <button type="button" id="btn-artista-update" class="btn-update-artwork hidden">
+
+                    <button type="button" id="btn-update" class="btn-update-artwork hidden">
                         <i class="fa-solid fa-rotate"></i> Refrescar Obra
                     </button>
-                    <button type="button" id="btn-artista-clear" class="btn-clear-form">
+    
+                    <button type="button" id="btn-clear" class="btn-clear-form">
                         <i class="fa-solid fa-eraser"></i> Limpiar Campos
                     </button>
                 </div>
 
                 <div class="image-upload-section">
                     <label style="display: block; margin-bottom: 10px; font-weight: 600;">Subir Imágenes de la Obra (Máx. 5)</label>
+                        
                     <div class="image-upload-container">
-                        <div class="image-slot" id="artista-slot-0" onclick="activarInput(0)">
+                        <div class="image-slot" id="slot-0" onclick="activarInput(0)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
                             <i class="fa-solid fa-plus"></i>
                         </div>
-                        <div class="image-slot" id="artista-slot-1" onclick="activarInput(1)">
+                        <div class="image-slot" id="slot-1" onclick="activarInput(1)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
                             <i class="fa-solid fa-plus"></i>
                         </div>
-                        <div class="image-slot" id="artista-slot-2" onclick="activarInput(2)">
+                        <div class="image-slot" id="slot-2" onclick="activarInput(2)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
                             <i class="fa-solid fa-plus"></i>
                         </div>
-                        <div class="image-slot" id="artista-slot-3" onclick="activarInput(3)">
+                        <div class="image-slot" id="slot-3" onclick="activarInput(3)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
                             <i class="fa-solid fa-plus"></i>
                         </div>
-                        <div class="image-slot" id="artista-slot-4" onclick="activarInput(4)">
+                        <div class="image-slot" id="slot-4" onclick="activarInput(4)">
                             <img src="" class="preview-img hidden" alt="Vista previa">
                             <i class="fa-solid fa-plus"></i>
                         </div>
                     </div>
 
-                    <input type="file" id="artista-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
-                    <input type="file" id="artista-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
-                    <input type="file" id="artista-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
-                    <input type="file" id="artista-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
-                    <input type="file" id="artista-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
-                    
-                    <small id="artista-file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
+                    <input type="file" id="dash-imagen-0" name="imagen_0" accept="image/*" style="display: none;" onchange="previewImage(event, 0)">
+                    <input type="file" id="dash-imagen-1" name="imagen_1" accept="image/*" style="display: none;" onchange="previewImage(event, 1)">
+                    <input type="file" id="dash-imagen-2" name="imagen_2" accept="image/*" style="display: none;" onchange="previewImage(event, 2)">
+                    <input type="file" id="dash-imagen-3" name="imagen_3" accept="image/*" style="display: none;" onchange="previewImage(event, 3)">
+                    <input type="file" id="dash-imagen-4" name="imagen_4" accept="image/*" style="display: none;" onchange="previewImage(event, 4)">
+                        
+                    <small id="file-names-display" style="color: #2ecc71; display: block; margin-top: 5px;"></small>
                 </div>
 
+
             </div>
+
         </div>
     </div>
 </div>
-
-<!-- MODAL DE LOGIN Y REGISTRO -->
-<div id="login-artista-modal" class="modal hidden">
-    <div class="modal-content" style="background: rgba(15, 23, 36, 0.95); color: white; max-width: 450px; padding: 30px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
-        <span class="close-modal">&times;</span>
-        <h2 style="color: var(--accent-gold);">Iniciar Sesión como Artista</h2>
-        <form id="login-artista-form">
-            <div class="input-group-dash">
-                <label>Email</label>
-                <input type="email" id="login-email" required>
-            </div>
-            <div class="input-group-dash">
-                <label>Contraseña</label>
-                <input type="password" id="login-password" required>
-            </div>
-            <button type="submit" class="btn-save-artwork">Iniciar Sesión</button>
-        </form>
-        <p style="margin-top: 15px; text-align: center; color: #aaa;">
-            ¿No tienes cuenta? <a href="#" id="ir-a-registro" style="color: var(--accent-gold);">Regístrate aquí</a>
-        </p>
-    </div>
-</div>
-
-<div id="registro-artista-modal" class="modal hidden">
-    <div class="modal-content" style="background: rgba(15, 23, 36, 0.95); color: white; max-width: 600px; padding: 30px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
-        <span class="close-modal">&times;</span>
-        <h2 style="color: var(--accent-gold);">Registro de Artista</h2>
-        <form id="registro-artista-form">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="input-group-dash">
-                    <label>Nombre Artístico *</label>
-                    <input type="text" id="reg-nombre-artista" required>
-                </div>
-                <div class="input-group-dash">
-                    <label>Nombre Real</label>
-                    <input type="text" id="reg-nombre-real">
-                </div>
-                <div class="input-group-dash">
-                    <label>Email *</label>
-                    <input type="email" id="reg-email" required>
-                </div>
-                <div class="input-group-dash">
-                    <label>Contraseña *</label>
-                    <input type="password" id="reg-password" required>
-                </div>
-                <div class="input-group-dash">
-                    <label>Teléfono</label>
-                    <input type="text" id="reg-telefono">
-                </div>
-                <div class="input-group-dash">
-                    <label>Fecha de Nacimiento</label>
-                    <input type="date" id="reg-fecha-nacimiento">
-                </div>
-                <div class="input-group-dash">
-                    <label>País</label>
-                    <input type="text" id="reg-pais">
-                </div>
-                <div class="input-group-dash">
-                    <label>Ciudad</label>
-                    <input type="text" id="reg-ciudad">
-                </div>
-                <div class="input-group-dash">
-                    <label>Instagram (sin @)</label>
-                    <input type="text" id="reg-instagram">
-                </div>
-                <div class="input-group-dash">
-                    <label>Género</label>
-                    <select id="reg-genero">
-                        <option value="">Prefiero no decir</option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
-            </div>
-            <button type="submit" class="btn-save-artwork">Registrarse</button>
-        </form>
-    </div>
-</div>
-
 <script src="script.js"></script>
 </body>
 </html>
