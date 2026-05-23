@@ -1518,7 +1518,6 @@ document.getElementById('ir-a-registro')?.addEventListener('click', (e) => {
     registroArtistaModal.classList.remove('hidden');
 });
 
-// --- REGISTRO DE ARTISTA ---
 if (registroArtistaForm) {
     registroArtistaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1527,16 +1526,40 @@ if (registroArtistaForm) {
         btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
         btnSubmit.disabled = true;
 
+        // Capturar todos los campos del formulario
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
         const nombre_real = document.getElementById('reg-nombre-real').value;
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
+        const telefono = document.getElementById('reg-telefono')?.value || '';
+        const pais = document.getElementById('reg-pais')?.value || '';
+        const ciudad = document.getElementById('reg-ciudad')?.value || '';
+        const biografia = document.getElementById('reg-biografia')?.value || '';
+        const instagram = document.getElementById('reg-instagram')?.value || '';
+        const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento')?.value || '';
+        const tipo_artista = document.getElementById('reg-tipo-artista')?.value || '';
+        const genero = document.getElementById('reg-genero')?.value || '';
+        const pref_contacto = document.getElementById('reg-pref-contacto')?.value || 'Email';
 
         try {
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/api/artistas/registro', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre_artista, nombre_real, email, password })
+                body: JSON.stringify({ 
+                    nombre_artista, 
+                    nombre_real, 
+                    email, 
+                    password,
+                    telefono,
+                    pais,
+                    ciudad,
+                    biografia,
+                    instagram,
+                    fecha_nacimiento,
+                    tipo_artista,
+                    genero,
+                    pref_contacto
+                })
             });
             const result = await response.json();
             if (result.success) {

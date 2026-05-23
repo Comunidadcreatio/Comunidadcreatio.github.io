@@ -454,27 +454,81 @@
     </div>
 </div>
 
-<!-- Modal para registro de artista -->
 <div id="registro-artista-modal" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 600px;">
         <span class="close-modal">&times;</span>
-        <h2>Registro de Artista</h2>
+        <h2 style="color: var(--accent-gold);">Registro de Artista</h2>
         <form id="registro-artista-form">
-            <div class="input-group-dash">
-                <label>Nombre Artístico</label>
-                <input type="text" id="reg-nombre-artista" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="input-group-dash">
+                    <label>Nombre Artístico *</label>
+                    <input type="text" id="reg-nombre-artista" required>
+                </div>
+                <div class="input-group-dash">
+                    <label>Nombre Real</label>
+                    <input type="text" id="reg-nombre-real">
+                </div>
+                <div class="input-group-dash">
+                    <label>Email *</label>
+                    <input type="email" id="reg-email" required>
+                </div>
+                <div class="input-group-dash">
+                    <label>Contraseña *</label>
+                    <input type="password" id="reg-password" required>
+                </div>
+                <div class="input-group-dash">
+                    <label>Teléfono</label>
+                    <input type="text" id="reg-telefono">
+                </div>
+                <div class="input-group-dash">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" id="reg-fecha-nacimiento">
+                </div>
+                <div class="input-group-dash">
+                    <label>País</label>
+                    <input type="text" id="reg-pais">
+                </div>
+                <div class="input-group-dash">
+                    <label>Ciudad</label>
+                    <input type="text" id="reg-ciudad">
+                </div>
+                <div class="input-group-dash">
+                    <label>Instagram (sin @)</label>
+                    <input type="text" id="reg-instagram">
+                </div>
+                <div class="input-group-dash">
+                    <label>Tipo de Artista</label>
+                    <select id="reg-tipo-artista">
+                        <option value="">Selecciona</option>
+                        <option value="Pintor/a">Pintor/a</option>
+                        <option value="Escultor/a">Escultor/a</option>
+                        <option value="Fotógrafo/a">Fotógrafo/a</option>
+                        <option value="Ilustrador/a">Ilustrador/a</option>
+                        <option value="Ceramista">Ceramista</option>
+                        <option value="Artesano/a">Artesano/a</option>
+                    </select>
+                </div>
+                <div class="input-group-dash">
+                    <label>Género</label>
+                    <select id="reg-genero">
+                        <option value="">Prefiero no decir</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="input-group-dash">
+                    <label>Preferencia de Contacto</label>
+                    <select id="reg-pref-contacto">
+                        <option value="Email">Email</option>
+                        <option value="Teléfono">Teléfono</option>
+                        <option value="Ambos">Ambos</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group-dash">
-                <label>Nombre Real (Opcional)</label>
-                <input type="text" id="reg-nombre-real">
-            </div>
-            <div class="input-group-dash">
-                <label>Email</label>
-                <input type="email" id="reg-email" required>
-            </div>
-            <div class="input-group-dash">
-                <label>Contraseña</label>
-                <input type="password" id="reg-password" required>
+            <div class="input-group-dash" style="grid-column: 1/-1;">
+                <label>Biografía</label>
+                <textarea id="reg-biografia" rows="3" placeholder="Cuéntanos sobre tu arte..."></textarea>
             </div>
             <button type="submit" class="btn-save-artwork">Registrarse</button>
         </form>
