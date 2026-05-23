@@ -1459,9 +1459,7 @@ body {
 
 /* 4. Al pasar el mouse, la tarjeta se expande y la info aparece */
 .obra-card:hover {
-    height: auto; /* La tarjeta se expande para abarcar la info */
-    margin-bottom: 20px; /* Empuja solo a la tarjeta de abajo en la misma columna */
-    transform: translateY(0); /* Sin elevación */
+    margin-bottom: 40px; /* Empuja a las otras tarjetas hacia abajo */
 }
 
 /* 4. Al pasar el mouse, la información se despliega */
