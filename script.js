@@ -212,12 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validarFormulario()) return;
 
         // 2. Preparar UI (Guardando...)
-        const originalText = window.btnSave.innerHTML;
-        window.btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
-        window.btnSave.disabled = true;
+        const originalText = btnSave.innerHTML;
+        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+        btnSave.disabled = true;
 
         // 3. Recopilar datos
         const formData = new FormData();
+        // Agregar múltiples imágenes (hasta 5)
         for (let i = 0; i < 5; i++) {
             const inputArchivo = document.getElementById(`dash-imagen-${i}`);
             if (inputArchivo && inputArchivo.files[0]) {
@@ -225,16 +226,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const campos = [
-            'titulo', 'artista', 'ano', 'descripcion_tecnica', 'descripcion_artistica',
-            'status', 'estado_obra', 'ancho', 'alto', 'peso', 'marcos', 'precio',
-            'certificado', 'id_obra', 'procedencia', 'firma', 'soporte', 'conservacion',
-            'etiquetas', 'localizacion'
-        ];
-        campos.forEach(campo => {
-            const el = document.getElementById(`dash-${campo}`);
-            if (el) formData.append(campo, el.value);
-        });
+        // 🔥 RECOPILACIÓN ORIGINAL CAMPO POR CAMPO (Sin cambios en tu lógica)
+        formData.append('titulo', document.getElementById('dash-titulo').value);
+        formData.append('artista', document.getElementById('dash-artista').value);
+        formData.append('ano', document.getElementById('dash-ano').value);
+        formData.append('descripcion_tecnica', document.getElementById('dash-tec-desc').value);
+        formData.append('descripcion_artistica', document.getElementById('dash-art-desc').value);
+        formData.append('status', document.getElementById('dash-status').value);
+        formData.append('estado_obra', document.getElementById('dash-estado-obra').value);
+        formData.append('ancho', document.getElementById('dash-ancho').value);
+        formData.append('alto', document.getElementById('dash-alto').value);
+        formData.append('peso', document.getElementById('dash-peso').value);
+        formData.append('marcos', document.getElementById('dash-marcos').value);
+        formData.append('precio', document.getElementById('dash-precio').value);
+        formData.append('certificado', document.getElementById('dash-certificado').value);
+        formData.append('id_obra', document.getElementById('dash-id').value);
+        formData.append('procedencia', document.getElementById('dash-procedencia').value);
+        formData.append('firma', document.getElementById('dash-firma').value);
+        formData.append('soporte', document.getElementById('dash-soporte').value);
+        formData.append('conservacion', document.getElementById('dash-conservacion').value);
+        formData.append('etiquetas', document.getElementById('dash-etiquetas').value);
+        formData.append('localizacion', document.getElementById('dash-localizacion').value);
 
         try {
             const response = await fetch('https://backend-fundacion-atpe.onrender.com/obras', {
@@ -245,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok && result.success) {
                 alert("¡Obra registrada con éxito!");
-                // Recargar la tabla (pero sin limpiar el formulario aquí, lo hará el finally)
+                window.resetFormulario();
                 cargarTablaObras(); 
             } else {
                 alert("Error: " + (result.error || "No se pudo guardar"));
@@ -254,8 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error al guardar obra:", error);
             alert("Error de conexión. Verifica que tu imagen no sea demasiado grande.");
         } finally {
-            // 🔥 ESTO SIEMPRE SE EJECUTA, TANTO SI TODO SALE BIEN COMO SI HAY ERROR
-            window.resetFormulario(); 
+            // 🔥 ESTO SIEMPRE SE EJECUTA: Restaura el botón a su estado original
+            btnSave.innerHTML = originalText;
+            btnSave.disabled = false;
         }
     });
 }
