@@ -663,7 +663,6 @@ function previewImage(event, index) {
     }
 }
 
-// Modifica tu función resetFormulario para limpiar también las imágenes
 window.resetFormulario = function() {
     console.log("Iniciando limpieza del formulario...");
     
@@ -672,49 +671,45 @@ window.resetFormulario = function() {
     if(form) form.reset();
     
     // 2. Resetear el ID de edición
-    editingId = null; 
+    window.editingId = null; 
 
-    const fileInputReal = document.getElementById('dash-imagen');
-    if(fileInputReal) fileInputReal.value = "";
-    // 3. LIMPIEZA DE IMAGEN (Forzada)
-    const slots = document.querySelectorAll('.image-slot');
-    slots.forEach(slot => {
-        // Quitamos la clase que oculta el icono "+"
-        slot.classList.remove('has-image');
+    // 3. Limpiar todos los inputs de archivo y slots
+    for (let i = 0; i < 5; i++) {
+        const input = document.getElementById(`dash-imagen-${i}`);
+        if (input) input.value = "";
         
-        // Buscamos la imagen y forzamos su ocultación y vaciado
-        const img = slot.querySelector('img.preview-img');
-        if(img) {
-            img.src = ""; 
-            img.classList.add('hidden'); // Oculta la imagen
+        const slot = document.getElementById(`slot-${i}`);
+        if (slot) {
+            slot.classList.remove('has-image');
+            const img = slot.querySelector('.preview-img');
+            if (img) {
+                img.src = "";
+                img.classList.add('hidden');
+            }
         }
-
-        // Aseguramos que el icono "+" vuelva a ser visible
-        const icon = slot.querySelector('i');
-        if(icon) icon.style.display = 'block';
-        
-    });
+    }
 
     // 4. Limpiar el texto de feedback de archivo
-    const nameDisplay = document.getElementById('file-name-display');
+    const nameDisplay = document.getElementById('file-names-display');
     if(nameDisplay) nameDisplay.textContent = "";
 
-    // 5. Volver botones a la normalidad (Estado "Guardar")
-    const btnSave = document.getElementById('btn-save');
-    const btnUpdate = document.getElementById('btn-update');
-    
-    if(btnSave) {
-        btnSave.style.display = 'block'; 
-        btnSave.classList.remove('hidden');
+    // 5. 🔥 RESTAURAR LOS BOTONES A SU ESTADO NORMAL
+    if (window.btnSave) {
+        window.btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Obra';
+        window.btnSave.disabled = false;
+        window.btnSave.style.display = 'block'; 
+        window.btnSave.classList.remove('hidden');
     }
-    if(btnUpdate) {
-        btnUpdate.style.display = 'none';
-        btnUpdate.classList.add('hidden');
+    if (window.btnUpdate) {
+        window.btnUpdate.style.display = 'none';
+        window.btnUpdate.classList.add('hidden');
     }
 
-    // 6. Quitar bordes rojos de validación si existen
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(i => i.style.border = "none");
+    // 6. Quitar bordes rojos de validación
+    if(form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => i.style.border = "none");
+    }
 
     console.log("Limpieza completada con éxito.");
 };
