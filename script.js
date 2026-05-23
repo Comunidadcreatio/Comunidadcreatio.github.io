@@ -888,6 +888,8 @@ function mostrarGaleria(obras) {
                         <span><i class="fa-solid fa-eye"></i> Ver detalles</span>
                     </button>
                 </div>
+
+                <div class="obra-spacer"></div>
             </div>
         `;
     }).join('');
