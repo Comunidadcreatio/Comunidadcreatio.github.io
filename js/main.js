@@ -7,7 +7,6 @@ import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './pa
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
 // ============================================
-const mainContent = document.querySelector('main');
 const galeriaContainer = document.getElementById('galeria-container');
 const panelArtista = document.getElementById('panel-artista');
 const tablaBody = document.getElementById('tabla-obras-body');
@@ -18,29 +17,24 @@ const btnPerfil = document.getElementById('btn-perfil');
 // ============================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
-
-// Esta función se ejecutará al cargar la página
 async function init() {
-    // 1. Verificar sesión inicial
     if (token && artistaActual) {
         await mostrarPanelArtista();
     } else {
-        // 2. Cargar galería pública
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
-            // Función para mostrar detalles (debes implementarla)
             console.log("Ver detalles de obra con ID:", id);
-            // Llamar a una función para abrir el modal de detalles...
+            // Aquí puedes llamar a tu modal de detalles
         });
     }
-
-    // 3. Configurar eventos globales de UI (Login, Logout, etc.)
     setupEvents();
 }
 
-// 4. Eventos (Login, Logout, Cambio de secciones)
+// ============================================
+// CONFIGURACIÓN DE EVENTOS
+// ============================================
 function setupEvents() {
-    // Click en Perfil
+    // Perfil
     btnPerfil.addEventListener('click', () => {
         if (token) {
             mostrarPanelArtista();
@@ -53,10 +47,10 @@ function setupEvents() {
     btnLogout.addEventListener('click', () => {
         logout();
         ocultarPanelArtista();
-        location.reload(); // Recargar para volver al estado inicial limpio
+        location.reload();
     });
 
-    // Formularios de Login/Registro (usando los módulos)
+    // Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -70,6 +64,7 @@ function setupEvents() {
         }
     });
 
+    // Registro
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
@@ -85,21 +80,21 @@ function setupEvents() {
         }
     });
 
-    // Formulario de Obra (Guardar/Actualizar)
+    // Guardar/Editar Obra (AQUÍ SE AGREGA EL ID PERSONALIZADO)
     obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
         const idEdicion = document.getElementById('input-id-edicion').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value; // <--- Agregar esto
+        const idPersonalizado = document.getElementById('input-id-personalizado').value; // <--- NUEVO
         const imagenInput = document.getElementById('input-imagen');
 
         const formData = new FormData();
         formData.append('titulo', titulo);
         formData.append('artista', artista);
         formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado); // <--- Agregar esto (el backend espera 'id_obra')
+        formData.append('id_obra', idPersonalizado); // <--- ENVIAMOS EL ID PERSONALIZADO
         if (imagenInput.files[0]) {
             formData.append('imagen_0', imagenInput.files[0]);
         }
@@ -109,40 +104,36 @@ function setupEvents() {
             alert("Obra guardada correctamente.");
             obraForm.reset();
             document.getElementById('input-id-edicion').value = '';
+            document.getElementById('btn-cancelar').classList.add('hidden'); // Ocultar botón cancelar
             await refrescarTabla();
         } else {
             alert("Error: " + result.error);
         }
     });
 
-    // --- NAVEGACIÓN ENTRE MODALES (Login ↔ Registro) ---
-    // Ir de Login a Registro
+    // Botón Cancelar Edición (opcional)
+    document.getElementById('btn-cancelar').addEventListener('click', () => {
+        obraForm.reset();
+        document.getElementById('input-id-edicion').value = '';
+        document.getElementById('btn-cancelar').classList.add('hidden');
+    });
+
+    // Navegación entre modales
     document.getElementById('btn-ir-registro').addEventListener('click', () => {
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('hidden');
     });
 
-    // Ir de Registro a Login
     document.getElementById('btn-ir-login').addEventListener('click', () => {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('hidden');
     });
-
-    document.querySelectorAll('.cerrar-modal').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-        });
-    });
-
-
 }
 
 // ============================================
 // FUNCIONES DE NAVEGACIÓN Y RENDERIZADO
 // ============================================
-
 async function mostrarPanelArtista() {
-    // Ocultar la galería y mostrar el panel
     document.getElementById('galeria-publica').classList.add('hidden');
     panelArtista.classList.remove('hidden');
     btnLogout.classList.remove('hidden');
@@ -159,32 +150,27 @@ function ocultarPanelArtista() {
 
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
-    renderizarTabla(obras, tablaBody, (id) => {
-        // --- Lógica para editar (Ahora con fetch real) ---
+    renderizarTabla(obras, tablaBody, async (id) => {
+        // Lógica completa para editar una obra (carga datos al formulario)
         try {
             const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const obra = await res.json();
             
-            // Llenar el formulario con los datos de la obra
             document.getElementById('input-id-edicion').value = obra.id;
             document.getElementById('input-titulo').value = obra.titulo;
             document.getElementById('input-artista').value = obra.artista;
             document.getElementById('input-precio').value = obra.precio;
-            document.getElementById('input-id-personalizado').value = obra.id_personalizado; // <--- Cargar el ID personalizado
+            document.getElementById('input-id-personalizado').value = obra.id_personalizado; // <--- CARGAMOS EL ID
             
-            // El botón cancelar (opcional) se puede mostrar/ocultar aquí
             document.getElementById('btn-cancelar').classList.remove('hidden');
-            
-            // Hacer scroll al formulario
             document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
         } catch (error) {
             console.error("Error al cargar datos de la obra:", error);
             alert("Error al cargar la obra para editar");
         }
     }, async (id) => {
-        // (Lógica de eliminar, ya la tienes)
         const exito = await eliminarObra(token, id);
         if (exito) {
             await refrescarTabla();
