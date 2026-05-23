@@ -1425,8 +1425,7 @@ body {
     transition: all 0.4s ease;
     cursor: pointer;
     overflow: visible;
-    height: 400px; /* Altura fija para la imagen */
-    margin-bottom: 0; /* Sin margen inferior */
+    margin-bottom: 20px; /* Espacio base entre tarjetas */
 }
 
 /* 2. La imagen de la obra (siempre visible) */
