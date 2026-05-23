@@ -692,7 +692,7 @@ body {
 
 .obra-card {
     background: transparent;
-    border-radius: 0;
+    border-radius: 0 !important;
     overflow: visible;
     box-shadow: none;
     transition: transform 0.3s ease;
