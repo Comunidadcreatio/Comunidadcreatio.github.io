@@ -95,9 +95,8 @@ function setupEvents() {
     );
 
     if (result.success) {
-        alert("Registro exitoso. Inicia sesión.");
+        alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
         document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('hidden');
     } else {
         alert("Error: " + result.error);
     }
