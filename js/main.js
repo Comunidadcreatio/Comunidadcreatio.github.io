@@ -149,6 +149,11 @@ async function mostrarPanelArtista() {
     panelArtista.classList.remove('hidden');
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
+    // 🟢 ESTA ES LA NUEVA LÍNEA: Asigna el nombre del artista automáticamente
+    if (artistaActual) {
+        document.getElementById('input-artista').value = artistaActual.nombre_artista;
+    }
+    
     await refrescarTabla();
 }
 
@@ -174,7 +179,7 @@ async function refrescarTabla() {
                 
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = obra.artista;
+                document.getElementById('input-artista').value = artistaActual.nombre_artista;
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = obra.id_personalizado;
                 
@@ -204,7 +209,7 @@ async function refrescarTabla() {
                 
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = obra.artista;
+                document.getElementById('input-artista').value = artistaActual.nombre_artista;
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = '';
                 document.getElementById('input-imagen').value = '';
