@@ -66,18 +66,39 @@ function setupEvents() {
 
     // Registro
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nombre_artista = document.getElementById('reg-nombre-artista').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-pass').value;
-        const result = await register(nombre_artista, email, password);
-        if (result.success) {
-            alert("Registro exitoso. Inicia sesión.");
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-login').classList.remove('hidden');
-        } else {
-            alert("Error: " + result.error);
-        }
+    e.preventDefault();
+    const nombre_artista = document.getElementById('reg-nombre-artista').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-pass').value;
+
+    // 🆕 CAPTURAR NUEVOS CAMPOS
+    const telefono = document.getElementById('reg-telefono').value;
+    const pais = document.getElementById('reg-pais').value;
+    const ciudad = document.getElementById('reg-ciudad').value;
+    const instagram = document.getElementById('reg-instagram').value;
+    const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
+    const genero = document.getElementById('reg-genero').value;
+
+    // 🆕 PASARLOS A LA FUNCIÓN REGISTER
+    const result = await register(
+        nombre_artista, 
+        email, 
+        password, 
+        telefono, 
+        pais, 
+        ciudad, 
+        instagram, 
+        fecha_nacimiento, 
+        genero
+    );
+
+    if (result.success) {
+        alert("Registro exitoso. Inicia sesión.");
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('hidden');
+    } else {
+        alert("Error: " + result.error);
+    }
     });
 
     // Guardar/Editar Obra (AQUÍ SE AGREGA EL ID PERSONALIZADO)

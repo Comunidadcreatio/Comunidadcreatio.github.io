@@ -27,12 +27,22 @@ export async function login(email, password) {
     }
 }
 
-export async function register(nombre_artista, email, password) {
+export async function register(nombre_artista, email, password, telefono, pais, ciudad, instagram, fecha_nacimiento, genero) {
     try {
         const res = await fetch(`${API_BASE_URL}/api/artistas/registro`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre_artista, email, password })
+            body: JSON.stringify({ 
+                nombre_artista, 
+                email, 
+                password,
+                telefono,
+                pais,
+                ciudad,
+                instagram,
+                fecha_nacimiento,
+                genero
+            })
         });
         return await res.json();
     } catch (error) {
