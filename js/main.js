@@ -1,9 +1,12 @@
+// js/main.js
 import { API_BASE_URL } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 
-// ELEMENTOS DOM
+// ============================================
+// ELEMENTOS DEL DOM (GLOBALES)
+// ============================================
 const galeriaContainer = document.getElementById('galeria-container');
 const panelArtista = document.getElementById('panel-artista');
 const tablaBody = document.getElementById('tabla-obras-body');
@@ -11,19 +14,27 @@ const obraForm = document.getElementById('obra-form');
 const btnLogout = document.getElementById('btn-logout');
 const btnPerfil = document.getElementById('btn-perfil');
 
+// ============================================
+// INICIALIZACIÓN DE LA APLICACIÓN
+// ============================================
 async function init() {
     if (token && artistaActual) {
         await mostrarPanelArtista();
     } else {
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Detalles de obra:", id);
+            console.log("Ver detalles de obra con ID:", id);
+            // Aquí puedes llamar a tu modal de detalles
         });
     }
     setupEvents();
 }
 
+// ============================================
+// CONFIGURACIÓN DE EVENTOS
+// ============================================
 function setupEvents() {
+    // Perfil
     btnPerfil.addEventListener('click', () => {
         if (token) {
             mostrarPanelArtista();
@@ -32,12 +43,14 @@ function setupEvents() {
         }
     });
 
+    // Logout
     btnLogout.addEventListener('click', () => {
         logout();
         ocultarPanelArtista();
         location.reload();
     });
 
+    // Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -51,6 +64,7 @@ function setupEvents() {
         }
     });
 
+    // Registro
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
@@ -66,20 +80,21 @@ function setupEvents() {
         }
     });
 
+    // Guardar/Editar Obra (AQUÍ SE AGREGA EL ID PERSONALIZADO)
     obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
         const idEdicion = document.getElementById('input-id-edicion').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
+        const idPersonalizado = document.getElementById('input-id-personalizado').value; // <--- NUEVO
         const imagenInput = document.getElementById('input-imagen');
 
         const formData = new FormData();
         formData.append('titulo', titulo);
         formData.append('artista', artista);
         formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado);
+        formData.append('id_obra', idPersonalizado); // <--- ENVIAMOS EL ID PERSONALIZADO
         if (imagenInput.files[0]) {
             formData.append('imagen_0', imagenInput.files[0]);
         }
@@ -89,19 +104,21 @@ function setupEvents() {
             alert("Obra guardada correctamente.");
             obraForm.reset();
             document.getElementById('input-id-edicion').value = '';
-            document.getElementById('btn-cancelar').classList.add('hidden');
+            document.getElementById('btn-cancelar').classList.add('hidden'); // Ocultar botón cancelar
             await refrescarTabla();
         } else {
             alert("Error: " + result.error);
         }
     });
 
+    // Botón Cancelar Edición (opcional)
     document.getElementById('btn-cancelar').addEventListener('click', () => {
         obraForm.reset();
         document.getElementById('input-id-edicion').value = '';
         document.getElementById('btn-cancelar').classList.add('hidden');
     });
 
+    // Navegación entre modales
     document.getElementById('btn-ir-registro').addEventListener('click', () => {
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('hidden');
@@ -111,8 +128,22 @@ function setupEvents() {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('hidden');
     });
+
+    // Botones de cerrar modal (la X)
+        document.querySelectorAll('.cerrar-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Buscar el modal padre más cercano y ocultarlo
+                const modal = this.closest('.modal');
+                if (modal) {
+            modal.classList.add('hidden');
+                }
+            });
+        });
 }
 
+// ============================================
+// FUNCIONES DE NAVEGACIÓN Y RENDERIZADO
+// ============================================
 async function mostrarPanelArtista() {
     document.getElementById('galeria-publica').classList.add('hidden');
     panelArtista.classList.remove('hidden');
@@ -131,7 +162,7 @@ function ocultarPanelArtista() {
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
     
-    // ⚠️ AQUÍ SE PASAN LOS 4 ARGUMENTOS
+    // ⚠️ IMPORTANTE: AQUÍ SE PASAN LOS 4 ARGUMENTOS
     renderizarTabla(obras, tablaBody, 
         async (id) => { 
             // EDITAR
@@ -191,4 +222,7 @@ async function refrescarTabla() {
     );
 }
 
+// ============================================
+// INICIALIZACIÓN
+// ============================================
 init();
