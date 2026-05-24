@@ -55,6 +55,7 @@ function setupEvents() {
     // Logout
     btnLogout.addEventListener('click', () => {
         logout();
+        document.getElementById('btn-volver-galeria').classList.add('hidden'); // 🆕 Ocultar botón
         ocultarPanelArtista();
         location.reload();
     });
@@ -202,6 +203,9 @@ function ocultarPanelArtista() {
     panelArtista.classList.add('hidden');
     btnLogout.classList.add('hidden');
     btnPerfil.textContent = '👤';
+
+    // 🆕 Ocultar el botón "Volver a la Galería"
+    document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
 async function refrescarTabla() {
