@@ -19,12 +19,19 @@ const btnPerfil = document.getElementById('btn-perfil');
 // ============================================
 async function init() {
     if (token && artistaActual) {
-        await mostrarPanelArtista();
-    } else {
+        // El usuario está logueado, mostramos la galería pública por defecto
+        btnLogout.classList.remove('hidden');
+        btnPerfil.textContent = '👤 Artista';
+        
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
-            // Aquí puedes llamar a tu modal de detalles
+        });
+    } else {
+        // ... lógica para usuario no logueado
+        const obras = await cargarGaleria(galeriaContainer);
+        mostrarGaleria(obras, galeriaContainer, (id) => {
+            console.log("Ver detalles de obra con ID:", id);
         });
     }
     setupEvents();
@@ -40,6 +47,8 @@ function setupEvents() {
             mostrarPanelArtista();
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
+            document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
+
         }
     });
 
@@ -179,6 +188,7 @@ async function mostrarPanelArtista() {
     panelArtista.classList.remove('hidden');
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
+    document.getElementById('btn-volver-galeria').classList.remove('hidden');
     // 🟢 ESTA ES LA NUEVA LÍNEA: Asigna el nombre del artista automáticamente
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
@@ -255,6 +265,22 @@ async function refrescarTabla() {
             }
         }
     );
+}
+
+function mostrarGaleriaPublica() {
+    // Ocultar el panel del artista
+    document.getElementById('panel-artista').classList.add('hidden');
+    // Mostrar la galería pública
+    document.getElementById('galeria-publica').classList.remove('hidden');
+    // Ocultar el botón de "Volver a la Galería"
+    document.getElementById('btn-volver-galeria').classList.add('hidden');
+    
+    // Recargar la galería para mostrar las obras actualizadas
+    cargarGaleria(galeriaContainer).then(obras => {
+        mostrarGaleria(obras, galeriaContainer, (id) => {
+            console.log("Ver detalles de obra con ID:", id);
+        });
+    });
 }
 
 // ============================================
