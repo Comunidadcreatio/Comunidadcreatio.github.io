@@ -51,11 +51,52 @@
             <div id="formulario-obra">
                 <h3>Agregar / Editar Obra</h3>
                 <form id="obra-form">
-                    <input type="text" id="input-titulo" placeholder="Título">
+                    <!-- Datos básicos -->
+                    <input type="text" id="input-titulo" placeholder="Título" required>
                     <input type="text" id="input-artista" placeholder="Artista" readonly>
-                    <input type="number" id="input-precio" placeholder="Precio">
-                    <input type="text" id="input-id-personalizado" placeholder="(ej: 1440001)">
-                    <input type="file" id="input-imagen" accept="image/*">
+                    <input type="number" id="input-precio" placeholder="Precio" required>
+                    <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)">
+
+                    <!-- Detalles -->
+                    <input type="number" id="input-ano" placeholder="Año">
+                    <textarea id="input-descripcion-tecnica" placeholder="Descripción Técnica"></textarea>
+                    <textarea id="input-descripcion-artistica" placeholder="Descripción Artística"></textarea>
+
+                    <!-- Estado y Otros -->
+                    <select id="input-estado-obra">
+                        <option value="">Estado de la Obra</option>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Vendida">Vendida</option>
+                        <option value="Reservada">Reservada</option>
+                        <option value="No disponible">No disponible</option>
+                    </select>
+                    <input type="text" id="input-procedencia" placeholder="Procedencia">
+                    <input type="text" id="input-marcos" placeholder="Marcos">
+                    <input type="text" id="input-certificado" placeholder="Certificado">
+                    <input type="text" id="input-status" placeholder="Status">
+        
+                    <!-- Dimensiones y Especificaciones -->
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="input-ancho" placeholder="Ancho (cm)" style="flex: 1;">
+                        <input type="number" id="input-alto" placeholder="Alto (cm)" style="flex: 1;">
+                    </div>
+                    <input type="text" id="input-firma" placeholder="Firma">
+                    <input type="text" id="input-conservacion" placeholder="Conservación">
+                    <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)">
+                    <input type="text" id="input-localizacion" placeholder="Localización">
+
+                    <!-- Múltiples Imágenes (Tu backend ya soporta 5 imágenes) -->
+                    <label>Imagen Principal:</label>
+                    <input type="file" id="input-imagen-0" accept="image/*">
+                    <label>Imagen 2 (opcional):</label>
+                    <input type="file" id="input-imagen-1" accept="image/*">
+                    <label>Imagen 3 (opcional):</label>
+                    <input type="file" id="input-imagen-2" accept="image/*">
+                    <label>Imagen 4 (opcional):</label>
+                    <input type="file" id="input-imagen-3" accept="image/*">
+                    <label>Imagen 5 (opcional):</label>
+                    <input type="file" id="input-imagen-4" accept="image/*">
+
                     <input type="hidden" id="input-id-edicion">
                     <button type="submit" id="btn-guardar">Guardar Obra</button>
                     <button type="button" id="btn-cancelar" class="hidden">Cancelar Edición</button>
