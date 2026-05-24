@@ -105,17 +105,25 @@ function setupEvents() {
             obraForm.reset();
             document.getElementById('input-id-edicion').value = '';
             document.getElementById('btn-cancelar').classList.add('hidden'); // Ocultar botón cancelar
+        if (artistaActual) {
+            document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        }
             await refrescarTabla();
         } else {
             alert("Error: " + result.error);
         }
     });
 
-    // Botón Cancelar Edición (opcional)
+    // Botón Cancelar Edición (corregido)
     document.getElementById('btn-cancelar').addEventListener('click', () => {
         obraForm.reset();
         document.getElementById('input-id-edicion').value = '';
         document.getElementById('btn-cancelar').classList.add('hidden');
+    
+        // ✅ RESTAURAR EL VALOR POR DEFECTO DEL ARTISTA
+        if (artistaActual) {
+            document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        }
     });
 
     // Navegación entre modales
