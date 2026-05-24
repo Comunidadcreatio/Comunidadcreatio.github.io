@@ -13,7 +13,7 @@ export async function cargarMisObras(token) {
     }
 }
 
-export function renderizarTabla(obras, container, onEditar, onEliminar) {
+export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplicar) { // <--- Agregar onDuplicar aquí
     container.innerHTML = '';
     obras.forEach(obra => {
         const tr = document.createElement('tr');
