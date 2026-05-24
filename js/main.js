@@ -68,6 +68,7 @@ function setupEvents() {
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const nombre_artista = document.getElementById('reg-nombre-artista').value;
+    const nombre_real = document.getElementById('reg-nombre-real').value; // 🆕 CAPTURAR
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-pass').value;
 
@@ -82,6 +83,7 @@ function setupEvents() {
     // 🆕 PASARLOS A LA FUNCIÓN REGISTER
     const result = await register(
         nombre_artista, 
+        nombre_real,
         email, 
         password, 
         telefono, 
