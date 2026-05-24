@@ -162,7 +162,7 @@ function ocultarPanelArtista() {
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
     
-    // ⚠️ IMPORTANTE: 4 argumentos
+    // ⚠️ IMPORTANTE: AQUÍ SE PASAN LOS 4 ARGUMENTOS
     renderizarTabla(obras, tablaBody, 
         async (id) => { 
             // EDITAR
