@@ -126,6 +126,7 @@ function setupEvents() {
         // Nuevos campos
         const ano = document.getElementById('input-ano').value;
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+        const soporte = document.getElementById('input-soporte').value;
         const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
         const estado_obra = document.getElementById('input-estado-obra').value;
         const procedencia = document.getElementById('input-procedencia').value;
@@ -149,6 +150,7 @@ function setupEvents() {
         // Agregar nuevos campos
         formData.append('ano', ano);
         formData.append('descripcion_tecnica', descripcion_tecnica);
+        formData.append('soporte', soporte);
         formData.append('descripcion_artistica', descripcion_artistica);
         formData.append('estado_obra', estado_obra);
         formData.append('procedencia', procedencia);
@@ -281,6 +283,7 @@ async function refrescarTabla() {
                 // Nuevos campos
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
+                document.getElementById('input-soporte').value = obra.soporte || '';
                 document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
                 document.getElementById('input-estado-obra').value = obra.estado_obra || '';
                 document.getElementById('input-procedencia').value = obra.procedencia || '';
@@ -332,6 +335,7 @@ async function refrescarTabla() {
                 // Nuevos campos (copiar todos)
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
+                document.getElementById('input-soporte').value = obra.soporte || '';
                 document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
                 document.getElementById('input-estado-obra').value = obra.estado_obra || '';
                 document.getElementById('input-procedencia').value = obra.procedencia || '';
