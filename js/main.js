@@ -124,111 +124,130 @@ function setupEvents() {
     });
 
     // Guardar Obra
-    obraForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-    
-        // 1. Recoger datos de los inputs
-        const titulo = document.getElementById('input-titulo').value;
-        const artista = document.getElementById('input-artista').value;
-        const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
-        const idEdicion = document.getElementById('input-id-edicion').value;
+    // En js/main.js - Reemplazar el evento submit del obraForm
+obraForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const ano = document.getElementById('input-ano').value; 
-        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-        const soporte = document.getElementById('input-soporte').value;
-        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-        const estado_obra = document.getElementById('input-estado-obra').value;
-        const procedencia = document.getElementById('input-procedencia').value;
-        const marcos = document.getElementById('input-marcos').value;
-        const certificado = document.getElementById('input-certificado').value;
-        const status = document.getElementById('input-status').value;
-        const ancho = document.getElementById('input-ancho').value;
-        const alto = document.getElementById('input-alto').value;
-        const firma = document.getElementById('input-firma').value;
-        const conservacion = document.getElementById('input-conservacion').value;
-        const etiquetas = document.getElementById('input-etiquetas').value;
-        const localizacion = document.getElementById('input-localizacion').value;
+    // 1. Recoger datos de los inputs
+    const titulo = document.getElementById('input-titulo').value;
+    const artista = document.getElementById('input-artista').value;
+    const precio = document.getElementById('input-precio').value;
+    const idPersonalizado = document.getElementById('input-id-personalizado').value;
+    const idEdicion = document.getElementById('input-id-edicion').value;
 
-        // 2. Construir FormData
-        const formData = new FormData();
-        formData.append('titulo', titulo);
-        formData.append('artista', artista);
-        formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado);
-    
-        formData.append('ano', ano);
-        formData.append('descripcion_tecnica', descripcion_tecnica);
-        formData.append('soporte', soporte);
-        formData.append('descripcion_artistica', descripcion_artistica);
-        formData.append('estado_obra', estado_obra);
-        formData.append('procedencia', procedencia);
-        formData.append('marcos', marcos);
-        formData.append('certificado', certificado);
-        formData.append('status', status);
-        formData.append('ancho', ancho);
-        formData.append('alto', alto);
-        formData.append('firma', firma);
-        formData.append('conservacion', conservacion);
-        formData.append('etiquetas', etiquetas);
-        formData.append('localizacion', localizacion);
+    const ano = document.getElementById('input-ano').value; 
+    const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+    const soporte = document.getElementById('input-soporte').value;
+    const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+    const estado_obra = document.getElementById('input-estado-obra').value;
+    const procedencia = document.getElementById('input-procedencia').value;
+    const marcos = document.getElementById('input-marcos').value;
+    const certificado = document.getElementById('input-certificado').value;
+    const status = document.getElementById('input-status').value;
+    const ancho = document.getElementById('input-ancho').value;
+    const alto = document.getElementById('input-alto').value;
+    const firma = document.getElementById('input-firma').value;
+    const conservacion = document.getElementById('input-conservacion').value;
+    const etiquetas = document.getElementById('input-etiquetas').value;
+    const localizacion = document.getElementById('input-localizacion').value;
 
-        // 3. Agregar imágenes al FormData
-        const archivos = [
-            document.getElementById('input-imagen-0'),
-            document.getElementById('input-imagen-1'),
-            document.getElementById('input-imagen-2'),
-            document.getElementById('input-imagen-3'),
-            document.getElementById('input-imagen-4')
-        ];
-    
-        archivos.forEach((input, index) => {
-            if (input && input.files && input.files.length > 0) {
-                formData.append(`imagen_${index}`, input.files[0]);
-            }
-        });
+    // 2. Construir FormData
+    const formData = new FormData();
+    formData.append('titulo', titulo);
+    formData.append('artista', artista);
+    formData.append('precio', precio);
+    formData.append('id_obra', idPersonalizado);
 
-        // 4. Enviar al backend
-        const result = await guardarObra(token, formData, idEdicion || null);
-        if (result.success) {
-            alert("Obra guardada correctamente.");
-            // Limpiar formulario completamente después de guardar
-            limpiarFormularioCompleto(true);
-            await refrescarTabla();
-        } else {
-            alert("Error: " + result.error);
+    // Agregar nuevos campos
+    formData.append('ano', ano);
+    formData.append('descripcion_tecnica', descripcion_tecnica);
+    formData.append('soporte', soporte);
+    formData.append('descripcion_artistica', descripcion_artistica);
+    formData.append('estado_obra', estado_obra);
+    formData.append('procedencia', procedencia);
+    formData.append('marcos', marcos);
+    formData.append('certificado', certificado);
+    formData.append('status', status);
+    formData.append('ancho', ancho);
+    formData.append('alto', alto);
+    formData.append('firma', firma);
+    formData.append('conservacion', conservacion);
+    formData.append('etiquetas', etiquetas);
+    formData.append('localizacion', localizacion);
+
+    // 3. Agregar imágenes al FormData
+    const archivos = [
+        document.getElementById('input-imagen-0'),
+        document.getElementById('input-imagen-1'),
+        document.getElementById('input-imagen-2'),
+        document.getElementById('input-imagen-3'),
+        document.getElementById('input-imagen-4')
+    ];
+
+    // 🟢 Validar que al menos una imagen esté seleccionada para obras nuevas
+    if (!idEdicion) {
+        const imagenSeleccionada = archivos.some(input => input.files.length > 0);
+        if (!imagenSeleccionada) {
+            alert("Para una obra nueva, debes seleccionar al menos una imagen.");
+            return;
+        }
+    }
+
+    archivos.forEach((input, index) => {
+        if (input && input.files && input.files.length > 0) {
+            formData.append(`imagen_${index}`, input.files[0]);
         }
     });
 
+    // 4. Enviar al backend
+    const result = await guardarObra(token, formData, idEdicion || null);
+    if (result.success) {
+        alert("Obra guardada correctamente.");
+        // Restaurar el texto del botón después de guardar
+        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+        limpiarFormularioCompleto(true);
+        await refrescarTabla();
+    } else {
+        alert("Error: " + result.error);
+    }
+});
+
     // 🟢 NUEVO: Función para limpiar el formulario completamente
     function limpiarFormularioCompleto(restaurarArtista = true) {
-        obraForm.reset();
-        document.getElementById('input-id-edicion').value = '';
-        document.getElementById('btn-cancelar').classList.add('hidden');
-        document.getElementById('btn-limpiar-campos').classList.add('hidden');
-
-        // Limpiar recuadros de imágenes
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            const placeholder = document.getElementById(`placeholder-${i}`);
-            const inputFile = document.getElementById(`input-imagen-${i}`);
-
-            if (preview) {
-                preview.src = '';
-                preview.style.display = 'none';
-            }
-            if (placeholder) {
-                placeholder.style.display = 'block';
-            }
-            if (inputFile) {
-                inputFile.value = '';
-            }
+    // Limpiar todos los campos de texto, selects y textareas
+    obraForm.reset();
+    
+    // Limpiar el ID de edición
+    document.getElementById('input-id-edicion').value = '';
+    
+    // Ocultar los botones de acción
+    document.getElementById('btn-cancelar').classList.add('hidden');
+    document.getElementById('btn-limpiar-campos').classList.add('hidden');
+    
+    // 🟢 RESTAURAR EL TEXTO DEL BOTÓN
+    document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+    
+    // Limpiar recuadros de imágenes
+    for (let i = 0; i < 5; i++) {
+        const preview = document.getElementById(`preview-${i}`);
+        const placeholder = document.getElementById(`placeholder-${i}`);
+        const inputFile = document.getElementById(`input-imagen-${i}`);
+        
+        if (preview && placeholder) {
+            preview.src = '';
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
         }
-
-        if (restaurarArtista && artistaActual) {
-            document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        if (inputFile) {
+            inputFile.value = '';
         }
     }
+    
+    // Restaurar el nombre del artista si se solicita
+    if (restaurarArtista && artistaActual) {
+        document.getElementById('input-artista').value = artistaActual.nombre_artista;
+    }
+}
 
     // 🟢 Botón Cancelar Edición (actualizado)
     document.getElementById('btn-cancelar').addEventListener('click', () => {
@@ -325,7 +344,10 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // 🟢 Cargar miniaturas de imágenes existentes
+                // 🟢 CAMBIAR EL TEXTO DEL BOTÓN
+                document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
+                
+                // Cargar miniaturas de imágenes existentes
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -346,10 +368,8 @@ async function refrescarTabla() {
                     }
                 });
                 
-                // 🟢 Mostrar botones de acción
                 document.getElementById('btn-cancelar').classList.remove('hidden');
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
-                
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 console.error("Error al cargar datos de la obra:", error);
@@ -395,6 +415,9 @@ async function refrescarTabla() {
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
+                
+                // 🟢 RESTAURAR EL TEXTO DEL BOTÓN PARA OBRA NUEVA
+                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
                 
                 // Limpiar imágenes en la duplicación
                 for (let i = 0; i < 5; i++) {
