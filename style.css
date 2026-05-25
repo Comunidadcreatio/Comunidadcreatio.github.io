@@ -149,7 +149,7 @@
 .modal-content input[type="email"],
 .modal-content input[type="password"],
 .modal-content input[type="date"],
-.modal-content input[name="genero"],
+.modal-content select[name="genero"],
 .modal-content button {
     margin-bottom: 10px;
     padding: 8px;
