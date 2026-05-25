@@ -251,3 +251,9 @@
 #btn-limpiar-campos:hover {
     background-color: #c82333;
 }
+
+#tabla-obras-container table th, 
+#tabla-obras-container table td {
+    vertical-align: middle;
+    text-align: center;
+}

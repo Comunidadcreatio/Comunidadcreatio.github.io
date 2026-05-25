@@ -17,11 +17,31 @@ export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplic
     container.innerHTML = '';
     obras.forEach(obra => {
         const tr = document.createElement('tr');
+
+        // Determinar estilo y texto para el status
+        const statusText = obra.status || 'Desconocido';
+        // Simplificamos el texto para mostrar solo "Activo" o "Inactivo" si es muy largo
+        let statusDisplay = statusText;
+        let statusColor = '#6c757d'; // Gris por defecto
+
+        if (statusText.includes('Activo')) {
+            statusColor = '#28a745'; // Verde
+            statusDisplay = '✅ Activo';
+        } else if (statusText.includes('Inactivo')) {
+            statusColor = '#dc3545'; // Rojo
+            statusDisplay = '❌ Inactivo';
+        }
+
         tr.innerHTML = `
             <td>${obra.id_personalizado || obra.id}</td>
             <td>${obra.titulo}</td>
             <td>${obra.precio}</td>
             <td><img src="${obra.imagen_url}" width="50"></td>
+            <td>
+                <span style="color: ${statusColor}; font-weight: bold; padding: 4px 8px; border-radius: 4px; border: 1px solid ${statusColor};">
+                    ${statusDisplay}
+                </span>
+            </td>
             <td>
                 <button class="btn-editar" data-id="${obra.id}">Editar</button>
                 <button class="btn-eliminar" data-id="${obra.id}">Eliminar</button>
