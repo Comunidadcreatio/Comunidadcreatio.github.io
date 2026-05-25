@@ -433,7 +433,6 @@ async function refrescarTabla() {
                 
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
-                alert("Datos copiados. Escribe un nuevo ID personalizado y selecciona al menos una imagen.");
             } catch (error) {
                 console.error("Error al duplicar:", error);
                 alert("Error al duplicar.");
