@@ -86,6 +86,20 @@ function setupEvents() {
     const ciudad = document.getElementById('reg-ciudad').value;
     const instagram = document.getElementById('reg-instagram').value;
     const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
+            // Validar mayoría de edad (18 años)
+        if (fecha_nacimiento) {
+            const fechaNac = new Date(fecha_nacimiento);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNac.getFullYear();
+            const mes = hoy.getMonth() - fechaNac.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+            if (edad < 18) {
+                alert("Debes tener al menos 18 años para registrarte.");
+                return;
+            }
+        }
     const genero = document.getElementById('reg-genero').value;
 
     // 🆕 PASARLOS A LA FUNCIÓN REGISTER
