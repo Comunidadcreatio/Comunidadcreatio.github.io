@@ -80,6 +80,12 @@ function setupEvents() {
         const instagram = document.getElementById('reg-instagram').value;
         const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
 
+            // 🛑 1. VALIDACIÓN EXPLÍCITA: ¿La fecha está vacía?
+        if (!fecha_nacimiento) {
+            alert("❌ La fecha de nacimiento es obligatoria.");
+            return;
+        }
+
         if (fecha_nacimiento) {
             const fechaNac = new Date(fecha_nacimiento);
             const hoy = new Date();
