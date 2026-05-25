@@ -220,8 +220,6 @@ obraForm.addEventListener('submit', async (e) => {
     // Limpiar el ID de edición
     document.getElementById('input-id-edicion').value = '';
     
-    // Ocultar los botones de acción
-    document.getElementById('btn-cancelar').classList.add('hidden');
     document.getElementById('btn-limpiar-campos').classList.add('hidden');
     
     // 🟢 RESTAURAR EL TEXTO DEL BOTÓN
@@ -249,10 +247,6 @@ obraForm.addEventListener('submit', async (e) => {
     }
 }
 
-    // 🟢 Botón Cancelar Edición (actualizado)
-    document.getElementById('btn-cancelar').addEventListener('click', () => {
-        limpiarFormularioCompleto(true);
-    });
 
     // 🟢 Botón Limpiar Campos (nuevo)
     document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
@@ -368,7 +362,7 @@ async function refrescarTabla() {
                     }
                 });
                 
-                document.getElementById('btn-cancelar').classList.remove('hidden');
+                
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
@@ -431,7 +425,7 @@ async function refrescarTabla() {
                     document.getElementById(`input-imagen-${i}`).value = '';
                 }
                 
-                document.getElementById('btn-cancelar').classList.add('hidden');
+            
                 document.getElementById('btn-limpiar-campos').classList.add('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
