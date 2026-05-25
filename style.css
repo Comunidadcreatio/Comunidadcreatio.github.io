@@ -257,3 +257,11 @@
     vertical-align: middle;
     text-align: center;
 }
+
+#registro-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+}
