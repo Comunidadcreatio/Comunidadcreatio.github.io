@@ -324,28 +324,13 @@ async function refrescarTabla() {
                 
                 imagenes.forEach((url, index) => {
                     if (url) {
-                        const imgContainer = document.createElement('div');
-                        imgContainer.style.position = 'relative';
-                        imgContainer.style.display = 'inline-block';
-                        imgContainer.style.margin = '5px';
-                        
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.style.width = '80px';
-                        img.style.height = '80px';
-                        img.style.objectFit = 'cover';
-                        img.style.borderRadius = '4px';
-                        
-                        // Opcional: Etiqueta para indicar el número de imagen
-                        const label = document.createElement('span');
-                        label.textContent = `Imagen ${index + 1}`;
-                        label.style.display = 'block';
-                        label.style.fontSize = '10px';
-                        label.style.textAlign = 'center';
-                        
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(label);
-                        contenedorImagenes.appendChild(imgContainer);
+                        const preview = document.getElementById(`preview-${index}`);
+                        const placeholder = document.getElementById(`placeholder-${index}`);
+                        if (preview && placeholder) {
+                            preview.src = url;
+                            preview.style.display = 'block';
+                            placeholder.style.display = 'none';
+                        }
                     }
                 });
                 
@@ -405,6 +390,13 @@ async function refrescarTabla() {
                 
                 // Limpiar inputs de archivo (obligatorio subir nuevas imágenes)
                 for (let i = 0; i < 5; i++) {
+                    const preview = document.getElementById(`preview-${i}`);
+                    const placeholder = document.getElementById(`placeholder-${i}`);
+                    if (preview && placeholder) {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                        placeholder.style.display = 'block';
+                    }
                     document.getElementById(`input-imagen-${i}`).value = '';
                 }
                 
