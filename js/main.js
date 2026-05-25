@@ -310,7 +310,44 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // (Los inputs de imagen se dejan vacíos al editar para subir nuevas si se desea)
+                // 🆕 CARGAR MINIATURAS DE IMÁGENES EXISTENTES
+                const contenedorImagenes = document.getElementById('vista-previa-imagenes');
+                contenedorImagenes.innerHTML = ''; // Limpiar previas
+                
+                const imagenes = [
+                    obra.imagen_url,
+                    obra.imagen_url_1,
+                    obra.imagen_url_2,
+                    obra.imagen_url_3,
+                    obra.imagen_url_4
+                ];
+                
+                imagenes.forEach((url, index) => {
+                    if (url) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.style.position = 'relative';
+                        imgContainer.style.display = 'inline-block';
+                        imgContainer.style.margin = '5px';
+                        
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.width = '80px';
+                        img.style.height = '80px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '4px';
+                        
+                        // Opcional: Etiqueta para indicar el número de imagen
+                        const label = document.createElement('span');
+                        label.textContent = `Imagen ${index + 1}`;
+                        label.style.display = 'block';
+                        label.style.fontSize = '10px';
+                        label.style.textAlign = 'center';
+                        
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(label);
+                        contenedorImagenes.appendChild(imgContainer);
+                    }
+                });
                 
                 document.getElementById('btn-cancelar').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
@@ -362,7 +399,11 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // Limpiar imágenes (es obligatorio subir nuevas)
+                // 🆕 LIMPIAR MINIATURAS DE IMÁGENES (la obra duplicada no hereda imágenes)
+                const contenedorImagenes = document.getElementById('vista-previa-imagenes');
+                contenedorImagenes.innerHTML = '';
+                
+                // Limpiar inputs de archivo (obligatorio subir nuevas imágenes)
                 for (let i = 0; i < 5; i++) {
                     document.getElementById(`input-imagen-${i}`).value = '';
                 }
