@@ -47,7 +47,7 @@ function setupEvents() {
             mostrarPanelArtista();
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
-            document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
+            document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica)
 
         }
     });
@@ -124,7 +124,7 @@ function setupEvents() {
         const idEdicion = document.getElementById('input-id-edicion').value;
 
         // Nuevos campos
-        const ano = document.getElementById('input-ano').value;
+        const ano = document.getElementById('input-ano').value; 
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
         const soporte = document.getElementById('input-soporte').value;
         const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
