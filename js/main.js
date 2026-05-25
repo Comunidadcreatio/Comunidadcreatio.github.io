@@ -47,8 +47,6 @@ function setupEvents() {
             mostrarPanelArtista();
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
-            document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
-
         }
     });
 
@@ -229,6 +227,7 @@ function setupEvents() {
                 }
             });
         });
+    document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
 }
 
 // ============================================
