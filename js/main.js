@@ -387,13 +387,16 @@ async function refrescarTabla() {
                 });
                 const obra = await res.json();
                 
+                // ID de edición vacío (es una nueva obra)
                 document.getElementById('input-id-edicion').value = '';
                 
+                // Campos básicos (copiar)
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = '';
                 
+                // Nuevos campos (copiar todos)
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
                 document.getElementById('input-soporte').value = obra.soporte || '';
@@ -410,9 +413,6 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // 🟢 RESTAURAR EL TEXTO DEL BOTÓN PARA OBRA NUEVA
-                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-                
                 // Limpiar imágenes en la duplicación
                 for (let i = 0; i < 5; i++) {
                     const preview = document.getElementById(`preview-${i}`);
@@ -425,8 +425,12 @@ async function refrescarTabla() {
                     document.getElementById(`input-imagen-${i}`).value = '';
                 }
                 
-            
-                document.getElementById('btn-limpiar-campos').classList.add('hidden');
+                // 🟢 RESTAURAR EL TEXTO DEL BOTÓN
+                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+                
+                // 🟢 MOSTRAR EL BOTÓN "LIMPIAR CAMPOS"
+                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
+                
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
                 alert("Datos copiados. Escribe un nuevo ID personalizado y selecciona al menos una imagen.");
