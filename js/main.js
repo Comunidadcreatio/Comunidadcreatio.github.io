@@ -35,6 +35,7 @@ async function init() {
         });
     }
     setupEvents();
+    setupImagePreviews(); // 🟢 Inicializar vista previa de imágenes
 }
 
 // ============================================
@@ -53,7 +54,7 @@ function setupEvents() {
     // Logout
     btnLogout.addEventListener('click', () => {
         logout();
-        document.getElementById('btn-volver-galeria').classList.add('hidden'); // 🆕 Ocultar botón
+        document.getElementById('btn-volver-galeria').classList.add('hidden');
         ocultarPanelArtista();
         location.reload();
     });
@@ -74,19 +75,18 @@ function setupEvents() {
 
     // Registro
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre_artista = document.getElementById('reg-nombre-artista').value;
-    const nombre_real = document.getElementById('reg-nombre-real').value; // 🆕 CAPTURAR
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-pass').value;
+        e.preventDefault();
+        const nombre_artista = document.getElementById('reg-nombre-artista').value;
+        const nombre_real = document.getElementById('reg-nombre-real').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-pass').value;
+        const telefono = document.getElementById('reg-telefono').value;
+        const pais = document.getElementById('reg-pais').value;
+        const ciudad = document.getElementById('reg-ciudad').value;
+        const instagram = document.getElementById('reg-instagram').value;
+        const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
 
-    // 🆕 CAPTURAR NUEVOS CAMPOS
-    const telefono = document.getElementById('reg-telefono').value;
-    const pais = document.getElementById('reg-pais').value;
-    const ciudad = document.getElementById('reg-ciudad').value;
-    const instagram = document.getElementById('reg-instagram').value;
-    const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
-            // Validar mayoría de edad (18 años)
+        // Validar mayoría de edad (18 años)
         if (fecha_nacimiento) {
             const fechaNac = new Date(fecha_nacimiento);
             const hoy = new Date();
@@ -100,31 +100,30 @@ function setupEvents() {
                 return;
             }
         }
-    const genero = document.getElementById('reg-genero').value;
+        const genero = document.getElementById('reg-genero').value;
 
-    // 🆕 PASARLOS A LA FUNCIÓN REGISTER
-    const result = await register(
-        nombre_artista, 
-        nombre_real,
-        email, 
-        password, 
-        telefono, 
-        pais, 
-        ciudad, 
-        instagram, 
-        fecha_nacimiento, 
-        genero
-    );
+        const result = await register(
+            nombre_artista, 
+            nombre_real,
+            email, 
+            password, 
+            telefono, 
+            pais, 
+            ciudad, 
+            instagram, 
+            fecha_nacimiento, 
+            genero
+        );
 
-    if (result.success) {
-        alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-        document.getElementById('modal-registro').classList.add('hidden');
-    } else {
-        alert("Error: " + result.error);
-    }
+        if (result.success) {
+            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+            document.getElementById('modal-registro').classList.add('hidden');
+        } else {
+            alert("Error: " + result.error);
+        }
     });
 
-    // En js/main.js - Reemplazar el evento submit del obraForm
+    // Guardar Obra
     obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
     
@@ -135,7 +134,6 @@ function setupEvents() {
         const idPersonalizado = document.getElementById('input-id-personalizado').value;
         const idEdicion = document.getElementById('input-id-edicion').value;
 
-        // Nuevos campos
         const ano = document.getElementById('input-ano').value; 
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
         const soporte = document.getElementById('input-soporte').value;
@@ -159,7 +157,6 @@ function setupEvents() {
         formData.append('precio', precio);
         formData.append('id_obra', idPersonalizado);
     
-        // Agregar nuevos campos
         formData.append('ano', ano);
         formData.append('descripcion_tecnica', descripcion_tecnica);
         formData.append('soporte', soporte);
@@ -176,7 +173,7 @@ function setupEvents() {
         formData.append('etiquetas', etiquetas);
         formData.append('localizacion', localizacion);
 
-        // 3. Agregar imágenes al FormData (soporte para 5)
+        // 3. Agregar imágenes al FormData
         const archivos = [
             document.getElementById('input-imagen-0'),
             document.getElementById('input-imagen-1'),
@@ -186,7 +183,7 @@ function setupEvents() {
         ];
     
         archivos.forEach((input, index) => {
-            if (input.files.length > 0) {
+            if (input && input.files && input.files.length > 0) {
                 formData.append(`imagen_${index}`, input.files[0]);
             }
         });
@@ -195,29 +192,52 @@ function setupEvents() {
         const result = await guardarObra(token, formData, idEdicion || null);
         if (result.success) {
             alert("Obra guardada correctamente.");
-            obraForm.reset();
-            document.getElementById('input-id-edicion').value = '';
-            document.getElementById('btn-cancelar').classList.add('hidden');
-            // Restaurar el nombre del artista en el formulario
-            if (artistaActual) {
-                document.getElementById('input-artista').value = artistaActual.nombre_artista;
-            }
+            // Limpiar formulario completamente después de guardar
+            limpiarFormularioCompleto(true);
             await refrescarTabla();
         } else {
             alert("Error: " + result.error);
         }
     });
 
-    // Botón Cancelar Edición (corregido)
-    document.getElementById('btn-cancelar').addEventListener('click', () => {
+    // 🟢 NUEVO: Función para limpiar el formulario completamente
+    function limpiarFormularioCompleto(restaurarArtista = true) {
         obraForm.reset();
         document.getElementById('input-id-edicion').value = '';
         document.getElementById('btn-cancelar').classList.add('hidden');
-    
-        // ✅ RESTAURAR EL VALOR POR DEFECTO DEL ARTISTA
-        if (artistaActual) {
+        document.getElementById('btn-limpiar-campos').classList.add('hidden');
+
+        // Limpiar recuadros de imágenes
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            const placeholder = document.getElementById(`placeholder-${i}`);
+            const inputFile = document.getElementById(`input-imagen-${i}`);
+
+            if (preview) {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+            if (placeholder) {
+                placeholder.style.display = 'block';
+            }
+            if (inputFile) {
+                inputFile.value = '';
+            }
+        }
+
+        if (restaurarArtista && artistaActual) {
             document.getElementById('input-artista').value = artistaActual.nombre_artista;
         }
+    }
+
+    // 🟢 Botón Cancelar Edición (actualizado)
+    document.getElementById('btn-cancelar').addEventListener('click', () => {
+        limpiarFormularioCompleto(true);
+    });
+
+    // 🟢 Botón Limpiar Campos (nuevo)
+    document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
+        limpiarFormularioCompleto(true);
     });
 
     // Navegación entre modales
@@ -232,15 +252,16 @@ function setupEvents() {
     });
 
     // Botones de cerrar modal (la X)
-        document.querySelectorAll('.cerrar-modal').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Buscar el modal padre más cercano y ocultarlo
-                const modal = this.closest('.modal');
-                if (modal) {
-            modal.classList.add('hidden');
-                }
-            });
+    document.querySelectorAll('.cerrar-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         });
+    });
+
+    // Volver a la Galería
     document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
 }
 
@@ -253,7 +274,7 @@ async function mostrarPanelArtista() {
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
     document.getElementById('btn-volver-galeria').classList.remove('hidden');
-    // 🟢 ESTA ES LA NUEVA LÍNEA: Asigna el nombre del artista automáticamente
+
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
@@ -266,12 +287,9 @@ function ocultarPanelArtista() {
     panelArtista.classList.add('hidden');
     btnLogout.classList.add('hidden');
     btnPerfil.textContent = '👤';
-
-    // 🆕 Ocultar el botón "Volver a la Galería"
     document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
-// En js/main.js - Dentro de refrescarTabla
 async function refrescarTabla() {
     const obras = await cargarMisObras(token);
     
@@ -284,16 +302,13 @@ async function refrescarTabla() {
                 });
                 const obra = await res.json();
                 
-                // ID de edición
                 document.getElementById('input-id-edicion').value = obra.id;
                 
-                // Campos básicos
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = obra.id_personalizado;
                 
-                // Nuevos campos
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
                 document.getElementById('input-soporte').value = obra.soporte || '';
@@ -310,10 +325,7 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // 🆕 CARGAR MINIATURAS DE IMÁGENES EXISTENTES
-                const contenedorImagenes = document.getElementById('vista-previa-imagenes');
-                contenedorImagenes.innerHTML = ''; // Limpiar previas
-                
+                // 🟢 Cargar miniaturas de imágenes existentes
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -334,14 +346,17 @@ async function refrescarTabla() {
                     }
                 });
                 
+                // 🟢 Mostrar botones de acción
                 document.getElementById('btn-cancelar').classList.remove('hidden');
+                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
+                
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 console.error("Error al cargar datos de la obra:", error);
                 alert("Error al cargar la obra para editar");
             }
         },
-        // ELIMINAR (sin cambios)
+        // ELIMINAR
         async (id) => {
             const exito = await eliminarObra(token, id);
             if (exito) {
@@ -350,7 +365,7 @@ async function refrescarTabla() {
                 alert("Error al eliminar la obra.");
             }
         },
-        // DUPLICAR (Copiar datos excepto ID personalizado e imágenes)
+        // DUPLICAR
         async (id) => {
             try {
                 const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
@@ -358,16 +373,13 @@ async function refrescarTabla() {
                 });
                 const obra = await res.json();
                 
-                // ID de edición vacío (es una nueva obra)
                 document.getElementById('input-id-edicion').value = '';
                 
-                // Campos básicos (copiar)
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
                 document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = ''; // Vacío para nuevo ID
+                document.getElementById('input-id-personalizado').value = '';
                 
-                // Nuevos campos (copiar todos)
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
                 document.getElementById('input-soporte').value = obra.soporte || '';
@@ -384,11 +396,7 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
-                // 🆕 LIMPIAR MINIATURAS DE IMÁGENES (la obra duplicada no hereda imágenes)
-                const contenedorImagenes = document.getElementById('vista-previa-imagenes');
-                contenedorImagenes.innerHTML = '';
-                
-                // Limpiar inputs de archivo (obligatorio subir nuevas imágenes)
+                // Limpiar imágenes en la duplicación
                 for (let i = 0; i < 5; i++) {
                     const preview = document.getElementById(`preview-${i}`);
                     const placeholder = document.getElementById(`placeholder-${i}`);
@@ -401,6 +409,7 @@ async function refrescarTabla() {
                 }
                 
                 document.getElementById('btn-cancelar').classList.add('hidden');
+                document.getElementById('btn-limpiar-campos').classList.add('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
                 alert("Datos copiados. Escribe un nuevo ID personalizado y selecciona al menos una imagen.");
@@ -413,14 +422,10 @@ async function refrescarTabla() {
 }
 
 function mostrarGaleriaPublica() {
-    // Ocultar el panel del artista
     document.getElementById('panel-artista').classList.add('hidden');
-    // Mostrar la galería pública
     document.getElementById('galeria-publica').classList.remove('hidden');
-    // Ocultar el botón de "Volver a la Galería"
     document.getElementById('btn-volver-galeria').classList.add('hidden');
     
-    // Recargar la galería para mostrar las obras actualizadas
     cargarGaleria(galeriaContainer).then(obras => {
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
@@ -428,7 +433,6 @@ function mostrarGaleriaPublica() {
     });
 }
 
-// Función para manejar la vista previa de imágenes en los recuadros
 function setupImagePreviews() {
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
@@ -441,24 +445,24 @@ function setupImagePreviews() {
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
+                        if (preview) {
+                            preview.src = e.target.result;
+                            preview.style.display = 'block';
+                        }
                         if (placeholder) placeholder.style.display = 'none';
                     }
                     reader.readAsDataURL(file);
                 } else {
-                    // Si se cancela la selección, vuelve al estado inicial
-                    preview.src = '';
-                    preview.style.display = 'none';
+                    if (preview) {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                    }
                     if (placeholder) placeholder.style.display = 'block';
                 }
             });
         }
     }
 }
-
-// Llama a esta función al final de init():
-setupImagePreviews();
 
 // ============================================
 // INICIALIZACIÓN
