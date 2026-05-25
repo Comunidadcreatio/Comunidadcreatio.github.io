@@ -436,6 +436,38 @@ function mostrarGaleriaPublica() {
     });
 }
 
+// Función para manejar la vista previa de imágenes en los recuadros
+function setupImagePreviews() {
+    for (let i = 0; i < 5; i++) {
+        const input = document.getElementById(`input-imagen-${i}`);
+        const preview = document.getElementById(`preview-${i}`);
+        const placeholder = document.getElementById(`placeholder-${i}`);
+        
+        if (input) {
+            input.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    // Si se cancela la selección, vuelve al estado inicial
+                    preview.src = '';
+                    preview.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'block';
+                }
+            });
+        }
+    }
+}
+
+// Llama a esta función al final de init():
+setupImagePreviews();
+
 // ============================================
 // INICIALIZACIÓN
 // ============================================
