@@ -339,40 +339,48 @@ async function refrescarTabla() {
                             preview.src = url;
                             preview.style.display = 'block';
                             placeholder.style.display = 'none';
-                            
-                            // 🆕 Crear y agregar botón de eliminar
+
+                            // 🆕 OBTENER EL RECUADRO PADRE
                             const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
                             if (recuadro) {
+                                // ✅ ELIMINAR BOTÓN "X" PREVIO (SI EXISTE) PARA EVITAR DUPLICADOS
+                                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
+                                if (btnExistente) {
+                                    btnExistente.remove();
+                                }
+
+                                // 🆕 CREAR BOTÓN "X" PARA ESTA IMAGEN
                                 const btnEliminar = document.createElement('button');
                                 btnEliminar.type = 'button';
                                 btnEliminar.className = 'btn-eliminar-imagen';
                                 btnEliminar.dataset.index = index;
                                 btnEliminar.textContent = '✕';
                                 btnEliminar.style.cssText = `
-                                    position: absolute; top: 0; right: 0; 
-                                    background: #dc3545; color: white; 
-                                    border: none; border-radius: 50%; 
-                                    width: 24px; height: 24px; 
-                                    cursor: pointer; font-size: 14px; 
+                                    position: absolute; top: 0; right: 0;
+                                    background: #dc3545; color: white;
+                                    border: none; border-radius: 50%;
+                                    width: 24px; height: 24px;
+                                    cursor: pointer; font-size: 14px;
                                     display: block; z-index: 10;
                                     line-height: 24px; text-align: center;
                                 `;
                                 recuadro.style.position = 'relative';
                                 recuadro.appendChild(btnEliminar);
-                                
+
+                                // ✅ LISTENER PARA ELIMINAR LA IMAGEN
                                 btnEliminar.addEventListener('click', function() {
                                     const idx = parseInt(this.dataset.index);
                                     const previewImg = document.getElementById(`preview-${idx}`);
                                     const placeholderSpan = document.getElementById(`placeholder-${idx}`);
                                     const inputFile = document.getElementById(`input-imagen-${idx}`);
-                                    
+
                                     if (previewImg.src && previewImg.src !== '') {
                                         imagenesAEliminar.add(idx);
                                         previewImg.src = '';
                                         previewImg.style.display = 'none';
                                         placeholderSpan.style.display = 'block';
                                         inputFile.value = '';
-                                        this.style.display = 'none';
+                                        this.style.display = 'none'; // Ocultar botón
                                         console.log(`Imagen ${idx} marcada para eliminar.`);
                                     }
                                 });
