@@ -81,9 +81,9 @@ function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
     if (!ciudadSelect) return;
 
-    ciudadSelect.innerHTML = ''; // Limpiar opciones previas
-
-    // Agregar la opción por defecto
+    ciudadSelect.innerHTML = '';
+    
+    // Opción por defecto
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Selecciona tu ciudad';
@@ -91,12 +91,20 @@ function poblarCiudades(paisSeleccionado) {
     defaultOption.selected = true;
     ciudadSelect.appendChild(defaultOption);
 
-    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
-        ciudadesPorPais[paisSeleccionado].forEach(ciudad => {
-            const option = document.createElement('option');
-            option.value = ciudad;
-            option.textContent = ciudad;
-            ciudadSelect.appendChild(option);
+    // Si hay país seleccionado y tenemos datos
+    if (paisSeleccionado && window.ciudadesCompletas && window.ciudadesCompletas[paisSeleccionado]) {
+        // Primero, mostrar departamentos/estados como grupos de optgroup
+        const data = window.ciudadesCompletas[paisSeleccionado];
+        Object.keys(data).forEach(departamento => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = departamento;
+            data[departamento].forEach(ciudad => {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                optgroup.appendChild(option);
+            });
+            ciudadSelect.appendChild(optgroup);
         });
     }
 }
