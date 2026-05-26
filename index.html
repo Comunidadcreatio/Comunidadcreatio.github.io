@@ -340,13 +340,17 @@
                 <input type="email" id="reg-email" placeholder="Correo Electronico" required>
                 <input type="password" id="reg-pass" placeholder="Contraseña" required>
                 <input type="text" id="reg-telefono" placeholder="Número de celular" required>
+
                 <label for="reg-pais" style="display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold;">País de Residencia</label>
+                <select id="reg-pais" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="" disabled selected>Selecciona tu país</option>
+                    <option value="Venezuela">Venezuela</option>
+                    <option value="Colombia">Colombia</option>
+                </select>
                 <label for="reg-ciudad" style="display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold;">Ciudad</label>
                 <select id="reg-ciudad" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
                     <option value="" disabled selected>Primero selecciona un país</option>
                 </select>
-                <input type="text" id="reg-ciudad" placeholder="Ciudad" required>
-                <!-- En index.html, dentro del formulario de registro -->
                 <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Fecha de Nacimiento</label>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <select name="dia" id="reg-dia" required>
