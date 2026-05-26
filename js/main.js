@@ -15,6 +15,39 @@ const btnLogout = document.getElementById('btn-logout');
 const btnPerfil = document.getElementById('btn-perfil');
 const imagenesAEliminar = new Set(); // Almacena índices de imágenes a eliminar (0, 1, 2, etc.)
 
+const ciudadesPorPais = {
+        'Venezuela': [
+            'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay', 'Barcelona', 'Cumaná', 'Ciudad Bolívar', 'Maturín', 'Puerto Ordaz', 'San Cristóbal', 'Mérida', 'Los Teques', 'Coro', 'Porlamar'
+        ],
+        'Colombia': [
+            'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Cúcuta', 'Pereira', 'Santa Marta', 'Manizales', 'Villavicencio', 'Pasto', 'Neiva', 'Armenia', 'Popayán'
+        ]
+    };
+
+function poblarCiudades(paisSeleccionado) {
+    const ciudadSelect = document.getElementById('reg-ciudad');
+    if (!ciudadSelect) return;
+
+    ciudadSelect.innerHTML = ''; // Limpiar opciones previas
+
+    // Agregar la opción por defecto
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Selecciona tu ciudad';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    ciudadSelect.appendChild(defaultOption);
+
+    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
+        ciudadesPorPais[paisSeleccionado].forEach(ciudad => {
+            const option = document.createElement('option');
+            option.value = ciudad;
+            option.textContent = ciudad;
+            ciudadSelect.appendChild(option);
+        });
+    }
+}
+
 // ============================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
@@ -43,15 +76,6 @@ async function init() {
 // ============================================
     function setupEvents() {
 
-            const ciudadesPorPais = {
-        'Venezuela': [
-            'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay', 'Barcelona', 'Cumaná', 'Ciudad Bolívar', 'Maturín', 'Puerto Ordaz', 'San Cristóbal', 'Mérida', 'Los Teques', 'Coro', 'Porlamar'
-        ],
-        'Colombia': [
-            'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Cúcuta', 'Pereira', 'Santa Marta', 'Manizales', 'Villavicencio', 'Pasto', 'Neiva', 'Armenia', 'Popayán'
-        ]
-    };
-
         document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
         currentSearch = document.getElementById('search-input').value;
         currentSortBy = document.getElementById('sort-select').value;
@@ -60,28 +84,6 @@ async function init() {
         currentPage = 1; // Reiniciar a página 1 al aplicar filtros
         refrescarTabla();
     });
-
-    function poblarCiudades(paisSeleccionado) {
-        const ciudadSelect = document.getElementById('reg-ciudad');
-        ciudadSelect.innerHTML = ''; // Limpiar opciones previas
-
-        // Agregar la opción por defecto
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Selecciona tu ciudad';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        ciudadSelect.appendChild(defaultOption);
-
-        if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
-            ciudadesPorPais[paisSeleccionado].forEach(ciudad => {
-                const option = document.createElement('option');
-                option.value = ciudad;
-                option.textContent = ciudad;
-                ciudadSelect.appendChild(option);
-            });
-        }
-    }
 
     document.getElementById('reg-pais').addEventListener('change', function() {
         const paisSeleccionado = this.value;
