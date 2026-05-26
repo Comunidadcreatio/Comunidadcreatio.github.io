@@ -40,13 +40,42 @@ async function init() {
 // ============================================
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
-function setupEvents() {
+    function setupEvents() {
+
+        document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
+        currentSearch = document.getElementById('search-input').value;
+        currentSortBy = document.getElementById('sort-select').value;
+        currentOrder = document.getElementById('order-select').value;
+        currentLimit = parseInt(document.getElementById('limit-select').value);
+        currentPage = 1; // Reiniciar a página 1 al aplicar filtros
+        refrescarTabla();
+    });
+
+    // Paginación
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            refrescarTabla();
+        }
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+        const totalPages = Math.ceil(totalObras / currentLimit);
+        if (currentPage < totalPages) {
+            currentPage++;
+            refrescarTabla();
+        }
+    });
+        
+
     btnPerfil.addEventListener('click', () => {
         if (token) {
             mostrarPanelArtista();
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
         }
+        
+
     });
 
     btnLogout.addEventListener('click', () => {
@@ -323,8 +352,32 @@ function ocultarPanelArtista() {
     document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
+let currentPage = 1;
+let currentLimit = 10;
+let currentSearch = '';
+let currentSortBy = 'id';
+let currentOrder = 'DESC';
+let totalObras = 0;
+
 async function refrescarTabla() {
-    const obras = await cargarMisObras(token);
+    const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
+    
+    if (!result.success) {
+        console.error("Error al cargar obras:", result.error);
+        return;
+    }
+
+    const obras = result.obras;
+    totalObras = result.total;
+    const totalPages = Math.ceil(totalObras / currentLimit);
+
+    // Actualizar información de paginación
+    document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
+    document.getElementById('btn-prev').disabled = currentPage <= 1;
+    document.getElementById('btn-next').disabled = currentPage >= totalPages;
+
+    
+
     
     renderizarTabla(obras, tablaBody, 
         // EDITAR

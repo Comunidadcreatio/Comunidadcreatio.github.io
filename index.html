@@ -30,6 +30,44 @@
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
         <section id="panel-artista" class="hidden">
             <h2>Mi Panel</h2>
+
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
+        <!-- Búsqueda -->
+        <input type="text" id="search-input" placeholder="Buscar por título, artista o ID..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        
+        <!-- Ordenamiento -->
+        <select id="sort-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="id">Ordenar por ID</option>
+            <option value="titulo">Ordenar por Título</option>
+            <option value="precio">Ordenar por Precio</option>
+            <option value="ano">Ordenar por Año</option>
+            <option value="status">Ordenar por Status</option>
+        </select>
+        
+        <select id="order-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+        </select>
+        
+        <!-- Tamaño de página -->
+        <select id="limit-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="5">5 por página</option>
+            <option value="10" selected>10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="50">50 por página</option>
+        </select>
+        
+        <button id="btn-aplicar-filtros" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Aplicar</button>
+    </div>
+
+    <!-- Controles de paginación -->
+    <div id="pagination-controls" style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
+        <button id="btn-prev" class="pagination-btn" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer;">« Anterior</button>
+        <span id="page-info" style="padding: 6px 12px;">Página 1</span>
+        <button id="btn-next" class="pagination-btn" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer;">Siguiente »</button>
+    </div>
+
             <!-- Tabla de obras -->
             <div id="tabla-obras-container">
                 <table>
