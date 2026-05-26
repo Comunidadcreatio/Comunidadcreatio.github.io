@@ -159,7 +159,7 @@ function setupEvents() {
     const localizacion = document.getElementById('input-localizacion').value;
 
     // Obtener los inputs de archivo y los elementos de vista previa
-    const archivosInputs = [
+    const archivos = [
         document.getElementById('input-imagen-0'),
         document.getElementById('input-imagen-1'),
         document.getElementById('input-imagen-2'),
