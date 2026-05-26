@@ -332,7 +332,10 @@
             <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
             <h2>Registro de Artista</h2>
             <form id="registro-form">
-                <input type="text" id="reg-nombre-real" placeholder="Nombre Completo" required>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="reg-nombres" placeholder="Nombres" required style="flex: 1;">
+                    <input type="text" id="reg-apellidos" placeholder="Apellidos" required style="flex: 1;">
+                </div>
                 <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required>
                 <input type="email" id="reg-email" placeholder="Correo Electronico" required>
                 <input type="password" id="reg-pass" placeholder="Contraseña" required>

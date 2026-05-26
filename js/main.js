@@ -101,7 +101,9 @@ async function init() {
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
-        const nombre_real = document.getElementById('reg-nombre-real').value;
+        const nombres = document.getElementById('reg-nombres').value;
+        const apellidos = document.getElementById('reg-apellidos').value;
+        const nombre_real = `${nombres} ${apellidos}`.trim();
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-pass').value;
         const telefono = document.getElementById('reg-telefono').value;
