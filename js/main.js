@@ -79,7 +79,6 @@ function setupEvents() {
         const pais = document.getElementById('reg-pais').value;
         const ciudad = document.getElementById('reg-ciudad').value;
         const instagram = document.getElementById('reg-instagram').value;
-        const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
         const genero = document.getElementById('reg-genero').value;
         const dia = document.getElementById('reg-dia').value;
         const mes = document.getElementById('reg-mes').value;
