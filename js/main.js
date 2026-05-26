@@ -484,7 +484,7 @@ function mostrarGaleriaPublica() {
 }
 
 function setupImagePreviews() {
-    const idEdicion = document.getElementById('input-id-edicion').value; // Obtener el ID de edición actual
+    const idEdicion = document.getElementById('input-id-edicion').value; // Detectar modo edición
 
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
@@ -497,6 +497,12 @@ function setupImagePreviews() {
                 const recuadro = this.closest('.recuadro-imagen');
                 if (!recuadro) return;
 
+                // 🛑 ELIMINAR BOTÓN "X" PREVIO (si existe)
+                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
+                if (btnExistente) {
+                    btnExistente.remove();
+                }
+
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -506,66 +512,61 @@ function setupImagePreviews() {
                         }
                         if (placeholder) placeholder.style.display = 'none';
 
-                        // 🟢 CREAR O MOSTRAR EL BOTÓN "X"
-                        let btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
-                        if (!btnEliminar) {
-                            btnEliminar = document.createElement('button');
-                            btnEliminar.type = 'button';
-                            btnEliminar.className = 'btn-eliminar-imagen';
-                            btnEliminar.dataset.index = i;
-                            btnEliminar.textContent = '✕';
-                            btnEliminar.style.cssText = `
-                                position: absolute; top: 0; right: 0;
-                                background: #dc3545; color: white;
-                                border: none; border-radius: 50%;
-                                width: 24px; height: 24px;
-                                cursor: pointer; font-size: 14px;
-                                display: block; z-index: 10;
-                                line-height: 24px; text-align: center;
-                            `;
-                            recuadro.style.position = 'relative';
-                            recuadro.appendChild(btnEliminar);
+                        // 🆕 CREAR UN NUEVO BOTÓN "X" SIEMPRE
+                        const btnEliminar = document.createElement('button');
+                        btnEliminar.type = 'button';
+                        btnEliminar.className = 'btn-eliminar-imagen';
+                        btnEliminar.dataset.index = i;
+                        btnEliminar.textContent = '✕';
+                        btnEliminar.style.cssText = `
+                            position: absolute; top: 0; right: 0;
+                            background: #dc3545; color: white;
+                            border: none; border-radius: 50%;
+                            width: 24px; height: 24px;
+                            cursor: pointer; font-size: 14px;
+                            display: block; z-index: 10;
+                            line-height: 24px; text-align: center;
+                        `;
+                        recuadro.style.position = 'relative';
+                        recuadro.appendChild(btnEliminar);
 
-                            // 🛑 LISTENER CORREGIDO PARA LA "X"
-                            btnEliminar.addEventListener('click', function() {
-                                const idx = parseInt(this.dataset.index);
-                                const previewImg = document.getElementById(`preview-${idx}`);
-                                const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-                                const inputFile = document.getElementById(`input-imagen-${idx}`);
+                        // 🔥 LISTENER DEL BOTÓN "X" (SIEMPRE NUEVO Y FUNCIONAL)
+                        btnEliminar.addEventListener('click', function() {
+                            const idx = parseInt(this.dataset.index);
+                            const previewImg = document.getElementById(`preview-${idx}`);
+                            const placeholderSpan = document.getElementById(`placeholder-${idx}`);
+                            const inputFile = document.getElementById(`input-imagen-${idx}`);
 
-                                // 🔴 PASO 1: Limpiar visualmente y el input de archivo
-                                if (previewImg.src && previewImg.src !== '') {
-                                    previewImg.src = '';
-                                    previewImg.style.display = 'none';
-                                    placeholderSpan.style.display = 'block';
-                                    inputFile.value = '';
-                                    this.style.display = 'none';
-                                }
+                            // 🔴 PASO 1: Limpiar visualmente y el input de archivo
+                            if (previewImg.src && previewImg.src !== '') {
+                                previewImg.src = '';
+                                previewImg.style.display = 'none';
+                                placeholderSpan.style.display = 'block';
+                                inputFile.value = '';
+                                this.remove(); // 🛑 Eliminar el botón "X" también
+                            }
 
-                                // 🔴 PASO 2: Si es una EDICIÓN, marcar para eliminar en el backend
-                                if (idEdicion) {
-                                    imagenesAEliminar.add(idx);
-                                    console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
-                                } else {
-                                    // Si es una NUEVA obra, solo limpiamos la selección, no marcamos nada.
-                                    console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
-                                }
-                            });
-                        } else {
-                            // Si el botón ya existe, asegurarse de que esté visible
-                            btnEliminar.style.display = 'block';
-                        }
+                            // 🔴 PASO 2: Si es una EDICIÓN, marcar para eliminar en el backend
+                            if (idEdicion) {
+                                imagenesAEliminar.add(idx);
+                                console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
+                            } else {
+                                console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
+                            }
+                        });
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    // Si se cancela la selección, volver al estado inicial
+                    // Si se cancela la selección, volver al estado inicial y eliminar la "X"
                     if (preview) {
                         preview.src = '';
                         preview.style.display = 'none';
                     }
                     if (placeholder) placeholder.style.display = 'block';
                     const btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
-                    if (btnEliminar) btnEliminar.style.display = 'none';
+                    if (btnEliminar) {
+                        btnEliminar.remove(); // Eliminar el botón "X"
+                    }
                 }
             });
         }
