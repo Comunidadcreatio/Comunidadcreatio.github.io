@@ -36,7 +36,7 @@ const ciudadesPorPais = {
         'Nueva Esparta': ['La Asunción', 'Porlamar', 'Juan Griego', 'Pampatar', 'Punta de Piedras'],
         'Portuguesa': ['Guanare', 'Acarigua', 'Araure', 'Villa Bruzual', 'El Baúl', 'Biscucuy'],
         'Sucre': ['Cumaná', 'Carúpano', 'Cumanacoa', 'Güiria', 'Araya', 'Yaguaraparo'],
-        'Táchira': ['San Cristóbal', 'Táriba', 'La Grita', 'Rubio', 'San Antonio del Táchira', 'Capacho Viejo', 'Queniquea', 'San José de Bolivar', 'Seboruco', 'La Fria', 'Colon', 'Coloncito', 'Pregonero'],
+        'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero'],
         'Trujillo': ['Trujillo', 'Valera', 'Boconó', 'Betijoque', 'Escuque', 'El Dividive'],
         'Yaracuy': ['San Felipe', 'Yaritagua', 'Chivacoa', 'Nirgua', 'Urachiche', 'La Sabana'],
         'Zulia': ['Maracaibo', 'Cabimas', 'Ciudad Ojeda', 'Machiques', 'Santa Bárbara', 'San Rafael del Moján']
@@ -63,7 +63,7 @@ const ciudadesPorPais = {
         'Magdalena': ['Santa Marta', 'Ciénaga', 'Aracataca', 'Fundación', 'El Banco', 'Pivijay'],
         'Meta': ['Villavicencio', 'Acacias', 'Puerto López', 'Granada', 'Lejanías', 'San Martín'],
         'Nariño': ['Pasto', 'Tumaco', 'Ipiales', 'Túquerres', 'Barbacoas', 'Sandoná'],
-        'Norte de Santander': ['Cúcuta', 'Villa del Rosario', 'Ocaña', 'Pamplona', 'Los Patios', 'El Zulia'],
+        'Norte de Santander': ['Cúcuta', 'Villa del Rosario', 'Ocaña', 'Pamplona', 'Los Patios', 'El Zulia', 'San Cayetano', 'Puerto Santander', 'Tibú', 'Sardinata', 'El Tarra', 'Bucarasica', 'Arboledas', 'Cucutilla', 'Gramalote', 'Lourdes', 'Salazar de las Palmas', 'Santiago', 'Villa Caro', 'Ábrego', 'Cáchira', 'Convención', 'El Carmen', 'Hacarí', 'La Esperanza', 'La Playa de Belén', 'San Calixto', 'Teorama', 'Cácota', 'Chitagá', 'Mutiscua', 'Pamplonita', 'Santo Domingo de Silos', 'Bochalema', 'Chinácota', 'Durania', 'Herrán', 'Labateca', 'Ragonvalia', 'Toledo'],
         'Putumayo': ['Mocoa', 'Puerto Asís', 'Orito', 'Villa Garzón', 'Valle del Guamuez'],
         'Quindío': ['Armenia', 'Calarcá', 'Circasia', 'Montenegro', 'Salento', 'Quimbaya'],
         'Risaralda': ['Pereira', 'Dosquebradas', 'Santa Rosa de Cabal', 'La Virginia', 'Marsella'],
