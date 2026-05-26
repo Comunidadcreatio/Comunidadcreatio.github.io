@@ -1,15 +1,16 @@
 // js/panel.js
 import { API_BASE_URL } from './config.js';
 
-export async function cargarMisObras(token) {
+export async function cargarMisObras(token, page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/mis-obras`, {
+        const params = new URLSearchParams({ page, limit, search, sortBy, order });
+        const res = await fetch(`${API_BASE_URL}/api/artistas/mis-obras?${params}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         return await res.json();
     } catch (error) {
         console.error("Error al cargar mis obras:", error);
-        return [];
+        return { success: false, obras: [], total: 0 };
     }
 }
 
