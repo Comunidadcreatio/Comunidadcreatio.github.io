@@ -27,7 +27,7 @@ export async function login(email, password) {
     }
 }
 
-export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, instagram, fecha_nacimiento, genero) {
+export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero) {
     try {
         const res = await fetch(`${API_BASE_URL}/api/artistas/registro`, {
             method: 'POST',
@@ -40,7 +40,6 @@ export async function register(nombre_artista, nombre_real, email, password, tel
                 telefono,
                 pais,
                 ciudad,
-                instagram,
                 fecha_nacimiento,
                 genero
             })

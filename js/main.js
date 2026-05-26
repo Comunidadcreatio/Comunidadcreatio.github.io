@@ -35,12 +35,22 @@ async function init() {
     setupEvents();
     setupImagePreviews();
     cargarSelectoresFecha();
+    poblarCiudades('');
 }
 
 // ============================================
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
     function setupEvents() {
+
+            const ciudadesPorPais = {
+        'Venezuela': [
+            'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay', 'Barcelona', 'Cumaná', 'Ciudad Bolívar', 'Maturín', 'Puerto Ordaz', 'San Cristóbal', 'Mérida', 'Los Teques', 'Coro', 'Porlamar'
+        ],
+        'Colombia': [
+            'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Cúcuta', 'Pereira', 'Santa Marta', 'Manizales', 'Villavicencio', 'Pasto', 'Neiva', 'Armenia', 'Popayán'
+        ]
+    };
 
         document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
         currentSearch = document.getElementById('search-input').value;
@@ -49,6 +59,33 @@ async function init() {
         currentLimit = parseInt(document.getElementById('limit-select').value);
         currentPage = 1; // Reiniciar a página 1 al aplicar filtros
         refrescarTabla();
+    });
+
+    function poblarCiudades(paisSeleccionado) {
+        const ciudadSelect = document.getElementById('reg-ciudad');
+        ciudadSelect.innerHTML = ''; // Limpiar opciones previas
+
+        // Agregar la opción por defecto
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecciona tu ciudad';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        ciudadSelect.appendChild(defaultOption);
+
+        if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
+            ciudadesPorPais[paisSeleccionado].forEach(ciudad => {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                ciudadSelect.appendChild(option);
+            });
+        }
+    }
+
+    document.getElementById('reg-pais').addEventListener('change', function() {
+        const paisSeleccionado = this.value;
+        poblarCiudades(paisSeleccionado);
     });
 
     // Paginación
@@ -109,7 +146,6 @@ async function init() {
         const telefono = document.getElementById('reg-telefono').value;
         const pais = document.getElementById('reg-pais').value;
         const ciudad = document.getElementById('reg-ciudad').value;
-        const instagram = document.getElementById('reg-instagram').value;
         const genero = document.getElementById('reg-genero').value;
         const dia = document.getElementById('reg-dia').value;
         const mes = document.getElementById('reg-mes').value;
@@ -148,8 +184,7 @@ async function init() {
             password, 
             telefono, 
             pais, 
-            ciudad, 
-            instagram, 
+            ciudad,  
             fecha_nacimiento, 
             genero
         );
