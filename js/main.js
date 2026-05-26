@@ -34,6 +34,7 @@ async function init() {
     }
     setupEvents();
     setupImagePreviews();
+    cargarSelectoresFecha();
 }
 
 // ============================================
@@ -79,27 +80,39 @@ function setupEvents() {
         const ciudad = document.getElementById('reg-ciudad').value;
         const instagram = document.getElementById('reg-instagram').value;
         const fecha_nacimiento = document.getElementById('reg-fecha-nacimiento').value;
+        const genero = document.getElementById('reg-genero').value;
+        const dia = document.getElementById('reg-dia').value;
+        const mes = document.getElementById('reg-mes').value;
+        const ano = document.getElementById('reg-ano').value;
 
-            // 🛑 1. VALIDACIÓN EXPLÍCITA: ¿La fecha está vacía?
-        if (!fecha_nacimiento) {
-            alert("❌ La fecha de nacimiento es obligatoria.");
+        // 🛑 1. VALIDACIÓN EXPLÍCITA: ¿Todos los campos están seleccionados?
+        if (!dia || !mes || !ano) {
+            alert("❌ Todos los campos de fecha son obligatorios.");
             return;
         }
 
-        if (fecha_nacimiento) {
-            const fechaNac = new Date(fecha_nacimiento);
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - fechaNac.getFullYear();
-            const mes = hoy.getMonth() - fechaNac.getMonth();
-            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-                edad--;
-            }
-            if (edad < 18) {
-                alert("Debes tener al menos 18 años para registrarte.");
-                return;
-            }
+        // 🛑 2. VALIDACIÓN DE FECHA REAL (ej: 31 de febrero no es válido)
+        const fechaNac = new Date(ano, mes - 1, dia);
+        if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
+            alert("❌ La fecha seleccionada no es válida.");
+            return;
         }
-        const genero = document.getElementById('reg-genero').value;
+
+        // 🛑 3. VALIDACIÓN DE EDAD: ¿Tiene al menos 18 años?
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mesDiff = hoy.getMonth() - fechaNac.getMonth();
+        if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+        }
+        if (edad < 18) {
+            alert("⚠️ Debes tener al menos 18 años para registrarte.");
+            return;
+        }
+
+        // 🛑 4. Construir la fecha en formato YYYY-MM-DD para enviar al backend
+        const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        
 
         const result = await register(
             nombre_artista, 
@@ -549,6 +562,43 @@ function setupImagePreviews() {
                     if (btnEliminar) btnEliminar.style.display = 'none';
                 }
             });
+        }
+    }
+}
+
+function cargarSelectoresFecha() {
+    // Llenar selector de días (1 al 31)
+    const diaSelect = document.getElementById('reg-dia');
+    if (diaSelect) {
+        for (let i = 1; i <= 31; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            diaSelect.appendChild(option);
+        }
+    }
+
+    // Llenar selector de meses (Enero a Diciembre)
+    const mesSelect = document.getElementById('reg-mes');
+    if (mesSelect) {
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        meses.forEach((nombre, i) => {
+            const option = document.createElement('option');
+            option.value = i + 1; // 1-12
+            option.textContent = nombre;
+            mesSelect.appendChild(option);
+        });
+    }
+
+    // Llenar selector de años (desde 1900 hasta el año actual menos 18)
+    const anoSelect = document.getElementById('reg-ano');
+    if (anoSelect) {
+        const maxYear = new Date().getFullYear() - 18;
+        for (let i = maxYear; i >= 1900; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            anoSelect.appendChild(option);
         }
     }
 }
