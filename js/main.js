@@ -16,13 +16,66 @@ const btnPerfil = document.getElementById('btn-perfil');
 const imagenesAEliminar = new Set(); // Almacena índices de imágenes a eliminar (0, 1, 2, etc.)
 
 const ciudadesPorPais = {
-        'Venezuela': [
-            'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay', 'Barcelona', 'Cumaná', 'Ciudad Bolívar', 'Maturín', 'Puerto Ordaz', 'San Cristóbal', 'Mérida', 'Los Teques', 'Coro', 'Porlamar'
-        ],
-        'Colombia': [
-            'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Cúcuta', 'Pereira', 'Santa Marta', 'Manizales', 'Villavicencio', 'Pasto', 'Neiva', 'Armenia', 'Popayán'
-        ]
-    };
+    'Venezuela': {
+        'Distrito Capital': ['Caracas'],
+        'Amazonas': ['Puerto Ayacucho', 'San Fernando de Atabapo', 'La Esmeralda', 'Maroa'],
+        'Anzoátegui': ['Barcelona', 'Puerto La Cruz', 'Lechería', 'Anaco', 'El Tigre', 'Cantaura', 'Pariaguán'],
+        'Apure': ['San Fernando de Apure', 'Guasdualito', 'Achaguas', 'Bruzual', 'El Amparo'],
+        'Aragua': ['Maracay', 'La Victoria', 'Cagua', 'Turmero', 'Palo Negro', 'Villa de Cura'],
+        'Barinas': ['Barinas', 'Alto Barinas', 'Barinitas', 'Santa Rosa', 'Sabaneta', 'Ciudad Bolivia'],
+        'Bolívar': ['Ciudad Bolívar', 'Ciudad Guayana', 'Upata', 'Tumeremo', 'El Callao', 'Santa Elena de Uairén'],
+        'Carabobo': ['Valencia', 'Puerto Cabello', 'Naguanagua', 'Guacara', 'Tocuyito', 'San Joaquín'],
+        'Cojedes': ['San Carlos', 'Tinaquillo', 'Las Vegas', 'La Loma', 'El Pao', 'Macapo'],
+        'Delta Amacuro': ['Tucupita', 'Pedernales', 'Curiapo', 'Amatuka', 'El Triunfo'],
+        'Falcón': ['Coro', 'Punto Fijo', 'La Vela de Coro', 'Chichiriviche', 'Tucacas', 'Puerto Cumarebo'],
+        'Guárico': ['San Juan de los Morros', 'Calabozo', 'Valle de la Pascua', 'Zaraza', 'Altagracia de Orituco', 'El Sombrero'],
+        'Lara': ['Barquisimeto', 'Cabudare', 'Carora', 'El Tocuyo', 'Quíbor', 'Sanare'],
+        'Mérida': ['Mérida', 'El Vigía', 'Tovar', 'Mucuchíes', 'Timotes', 'Santo Domingo'],
+        'Miranda': ['Los Teques', 'Guarenas', 'Guatire', 'Ocumare del Tuy', 'Santa Teresa del Tuy', 'Cúa', 'San Antonio de los Altos'],
+        'Monagas': ['Maturín', 'Caripito', 'Quiriquire', 'Punta de Mata', 'Santa Bárbara', 'San José de Barlovento'],
+        'Nueva Esparta': ['La Asunción', 'Porlamar', 'Juan Griego', 'Pampatar', 'Punta de Piedras'],
+        'Portuguesa': ['Guanare', 'Acarigua', 'Araure', 'Villa Bruzual', 'El Baúl', 'Biscucuy'],
+        'Sucre': ['Cumaná', 'Carúpano', 'Cumanacoa', 'Güiria', 'Araya', 'Yaguaraparo'],
+        'Táchira': ['San Cristóbal', 'Táriba', 'La Grita', 'Rubio', 'San Antonio del Táchira', 'Capacho Viejo'],
+        'Trujillo': ['Trujillo', 'Valera', 'Boconó', 'Betijoque', 'Escuque', 'El Dividive'],
+        'Yaracuy': ['San Felipe', 'Yaritagua', 'Chivacoa', 'Nirgua', 'Urachiche', 'La Sabana'],
+        'Zulia': ['Maracaibo', 'Cabimas', 'Ciudad Ojeda', 'Machiques', 'Santa Bárbara', 'San Rafael del Moján']
+    },
+    'Colombia': {
+        'Amazonas': ['Leticia'],
+        'Antioquia': ['Medellín', 'Bello', 'Itagüí', 'Envigado', 'Rionegro', 'La Ceja', 'Jardín', 'Sonsón', 'San Jerónimo', 'Yarumal'],
+        'Arauca': ['Arauca', 'Tame', 'Saravena'],
+        'Atlántico': ['Barranquilla', 'Soledad', 'Malambo', 'Sabanalarga', 'Puerto Colombia'],
+        'Bolívar': ['Cartagena', 'Turbaco', 'Turbana', 'Clemencia', 'Magangué', 'Achí'],
+        'Boyacá': ['Tunja', 'Duitama', 'Sogamoso', 'Paipa', 'Villa de Leyva', 'Monguí'],
+        'Caldas': ['Manizales', 'La Dorada', 'Neira', 'Salamina', 'Villamaría'],
+        'Caquetá': ['Florencia', 'La Montañita', 'Morelia', 'Belén de los Andaquíes'],
+        'Casanare': ['Yopal', 'Villanueva', 'Tauramena', 'Trinidad', 'Maní', 'Paz de Ariporo'],
+        'Cauca': ['Popayán', 'Villa Rica', 'Cajibío', 'El Tambo', 'Puerto Tejada', 'Guachené'],
+        'Cesar': ['Valledupar', 'La Paz', 'Aguachica', 'San Alberto', 'Bosconia', 'Codazzi'],
+        'Chocó': ['Quibdó', 'Istmina', 'Sipí', 'Nuquí', 'Bahía Solano'],
+        'Córdoba': ['Montería', 'Sincelejo', 'Lorica', 'Ciénaga de Oro', 'San Antero', 'Cereté'],
+        'Cundinamarca': ['Bogotá', 'Soacha', 'Zipaquirá', 'Facatativá', 'Chía', 'Cota', 'Funza', 'Mosquera'],
+        'Guainía': ['Puerto Inírida', 'San Felipe', 'Cacahual'],
+        'Guaviare': ['San José del Guaviare', 'El Retorno', 'Calamar'],
+        'Huila': ['Neiva', 'Garzón', 'Pitalito', 'La Plata', 'Timaná', 'San Agustín'],
+        'La Guajira': ['Riohacha', 'Maicao', 'Uribia', 'Villanueva', 'San Juan del Cesar'],
+        'Magdalena': ['Santa Marta', 'Ciénaga', 'Aracataca', 'Fundación', 'El Banco', 'Pivijay'],
+        'Meta': ['Villavicencio', 'Acacias', 'Puerto López', 'Granada', 'Lejanías', 'San Martín'],
+        'Nariño': ['Pasto', 'Tumaco', 'Ipiales', 'Túquerres', 'Barbacoas', 'Sandoná'],
+        'Norte de Santander': ['Cúcuta', 'Villa del Rosario', 'Ocaña', 'Pamplona', 'Los Patios', 'El Zulia'],
+        'Putumayo': ['Mocoa', 'Puerto Asís', 'Orito', 'Villa Garzón', 'Valle del Guamuez'],
+        'Quindío': ['Armenia', 'Calarcá', 'Circasia', 'Montenegro', 'Salento', 'Quimbaya'],
+        'Risaralda': ['Pereira', 'Dosquebradas', 'Santa Rosa de Cabal', 'La Virginia', 'Marsella'],
+        'Santander': ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta', 'Barrancabermeja', 'San Gil', 'Socorro'],
+        'San Andrés y Providencia': ['San Andrés', 'Providencia'],
+        'Sucre': ['Sincelejo', 'San Onofre', 'Corozal', 'San Benito Abad'],
+        'Tolima': ['Ibagué', 'Espinal', 'Líbano', 'Honda', 'Lérida', 'Chaparral'],
+        'Valle del Cauca': ['Cali', 'Buga', 'Tuluá', 'Palmira', 'Yumbo', 'Jamundí', 'Cartago', 'Zarzal', 'Sevilla'],
+        'Vaupés': ['Mitú', 'Taraira', 'Carurú'],
+        'Vichada': ['Puerto Carreño', 'Santa Rita', 'La Primavera']
+    }
+};
 
 function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
