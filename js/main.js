@@ -109,7 +109,7 @@ function setupEvents() {
             return;
         }
         // 🛑 4. Construir la fecha en formato YYYY-MM-DD para enviar al backend
-        const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;sad
+        const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
         const result = await register(
             nombre_artista, 
             nombre_real,
