@@ -133,119 +133,105 @@ function setupEvents() {
 
     // Guardar Obra
     obraForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const titulo = document.getElementById('input-titulo').value;
-        const artista = document.getElementById('input-artista').value;
-        const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
-        const idEdicion = document.getElementById('input-id-edicion').value;
+    // 1. Recoger datos de los inputs
+    const titulo = document.getElementById('input-titulo').value;
+    const artista = document.getElementById('input-artista').value;
+    const precio = document.getElementById('input-precio').value;
+    const idPersonalizado = document.getElementById('input-id-personalizado').value;
+    const idEdicion = document.getElementById('input-id-edicion').value;
 
-        const ano = document.getElementById('input-ano').value; 
-        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-        const soporte = document.getElementById('input-soporte').value;
-        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-        const estado_obra = document.getElementById('input-estado-obra').value;
-        const procedencia = document.getElementById('input-procedencia').value;
-        const marcos = document.getElementById('input-marcos').value;
-        const certificado = document.getElementById('input-certificado').value;
-        const status = document.getElementById('input-status').value;
-        const ancho = document.getElementById('input-ancho').value;
-        const alto = document.getElementById('input-alto').value;
-        const firma = document.getElementById('input-firma').value;
-        const conservacion = document.getElementById('input-conservacion').value;
-        const etiquetas = document.getElementById('input-etiquetas').value;
-        const localizacion = document.getElementById('input-localizacion').value;
+    const ano = document.getElementById('input-ano').value; 
+    const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+    const soporte = document.getElementById('input-soporte').value;
+    const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+    const estado_obra = document.getElementById('input-estado-obra').value;
+    const procedencia = document.getElementById('input-procedencia').value;
+    const marcos = document.getElementById('input-marcos').value;
+    const certificado = document.getElementById('input-certificado').value;
+    const status = document.getElementById('input-status').value;
+    const ancho = document.getElementById('input-ancho').value;
+    const alto = document.getElementById('input-alto').value;
+    const firma = document.getElementById('input-firma').value;
+    const conservacion = document.getElementById('input-conservacion').value;
+    const etiquetas = document.getElementById('input-etiquetas').value;
+    const localizacion = document.getElementById('input-localizacion').value;
 
-        const formData = new FormData();
-        formData.append('titulo', titulo);
-        formData.append('artista', artista);
-        formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado);
-        formData.append('ano', ano);
-        formData.append('descripcion_tecnica', descripcion_tecnica);
-        formData.append('soporte', soporte);
-        formData.append('descripcion_artistica', descripcion_artistica);
-        formData.append('estado_obra', estado_obra);
-        formData.append('procedencia', procedencia);
-        formData.append('marcos', marcos);
-        formData.append('certificado', certificado);
-        formData.append('status', status);
-        formData.append('ancho', ancho);
-        formData.append('alto', alto);
-        formData.append('firma', firma);
-        formData.append('conservacion', conservacion);
-        formData.append('etiquetas', etiquetas);
-        formData.append('localizacion', localizacion);
+    // 2. Validación de imágenes (Robusta y unificada)
+    const archivos = [
+        document.getElementById('input-imagen-0'),
+        document.getElementById('input-imagen-1'),
+        document.getElementById('input-imagen-2'),
+        document.getElementById('input-imagen-3'),
+        document.getElementById('input-imagen-4')
+    ];
 
-        // 🆕 Agregar imágenes a eliminar al FormData
-        if (imagenesAEliminar.size > 0) {
-            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+    // Verificar si el usuario subió un archivo nuevo
+    const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
+
+    // Verificar si hay imágenes existentes que NO estén marcadas para eliminar
+    let imagenesConservadas = false;
+    for (let i = 0; i < 5; i++) {
+        const preview = document.getElementById(`preview-${i}`);
+        if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
+            imagenesConservadas = true;
+            break;
         }
+    }
 
-        const archivos = [
-            document.getElementById('input-imagen-0'),
-            document.getElementById('input-imagen-1'),
-            document.getElementById('input-imagen-2'),
-            document.getElementById('input-imagen-3'),
-            document.getElementById('input-imagen-4')
-        ];
+    // 🚨 Decisión final: Si no hay imágenes seleccionadas ni conservadas, bloquear
+    if (!imagenSeleccionada && !imagenesConservadas) {
+        alert("❌ La obra debe tener al menos una imagen. No puedes eliminar la única imagen.");
+        return;
+    }
 
-        const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
+    // 3. Construir FormData
+    const formData = new FormData();
+    formData.append('titulo', titulo);
+    formData.append('artista', artista);
+    formData.append('precio', precio);
+    formData.append('id_obra', idPersonalizado);
+    formData.append('ano', ano);
+    formData.append('descripcion_tecnica', descripcion_tecnica);
+    formData.append('soporte', soporte);
+    formData.append('descripcion_artistica', descripcion_artistica);
+    formData.append('estado_obra', estado_obra);
+    formData.append('procedencia', procedencia);
+    formData.append('marcos', marcos);
+    formData.append('certificado', certificado);
+    formData.append('status', status);
+    formData.append('ancho', ancho);
+    formData.append('alto', alto);
+    formData.append('firma', firma);
+    formData.append('conservacion', conservacion);
+    formData.append('etiquetas', etiquetas);
+    formData.append('localizacion', localizacion);
 
-            // ❌ También verificar si hay imágenes existentes (en modo edición) que no se hayan eliminado
-        const hayImagenesExistentes = Array.from({ length: 5 }, (_, i) => {
-            const preview = document.getElementById(`preview-${i}`);
-            return preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i);
-        }).some(val => val === true);
+    // 4. Agregar imágenes a eliminar al FormData (solo si hay)
+    if (imagenesAEliminar.size > 0) {
+        formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+    }
 
-            let imagenesConservadas = false;
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
-                imagenesConservadas = true;
-                break;
-            }
-        }
-
-        // 🚨 Decisión final: Si no hay imágenes seleccionadas ni imágenes conservadas, bloquear
-        if (!imagenSeleccionada && !imagenesConservadas) {
-            alert("❌ La obra debe tener al menos una imagen. No puedes eliminar la única imagen.");
-            return;
-        }
-
-        // 🚨 Si no hay imágenes seleccionadas ni imágenes existentes, bloquear el envío
-        if (!imagenSeleccionada && !hayImagenesExistentes) {
-            alert("❌ Debes seleccionar al menos una imagen para la obra.");
-            return;
-        }
-
-        if (!idEdicion) {
-            const imagenSeleccionada = archivos.some(input => input.files.length > 0);
-            if (!imagenSeleccionada) {
-                alert("Para una obra nueva, debes seleccionar al menos una imagen.");
-                return;
-            }
-        }
-
-
-        archivos.forEach((input, index) => {
-            if (input && input.files && input.files.length > 0) {
-                formData.append(`imagen_${index}`, input.files[0]);
-            }
-        });
-
-        const result = await guardarObra(token, formData, idEdicion || null);
-        if (result.success) {
-            alert("Obra guardada correctamente.");
-            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-            imagenesAEliminar.clear(); // 🆕 Limpiar el Set
-            limpiarFormularioCompleto(true);
-            await refrescarTabla();
-        } else {
-            alert("Error: " + result.error);
+    // 5. Agregar nuevas imágenes al FormData
+    archivos.forEach((input, index) => {
+        if (input && input.files && input.files.length > 0) {
+            formData.append(`imagen_${index}`, input.files[0]);
         }
     });
+
+    // 6. Enviar al backend
+    const result = await guardarObra(token, formData, idEdicion || null);
+    if (result.success) {
+        alert("Obra guardada correctamente.");
+        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+        imagenesAEliminar.clear(); // Limpiar el Set
+        limpiarFormularioCompleto(true);
+        await refrescarTabla();
+    } else {
+        alert("Error: " + result.error);
+    }
+});
 
     // Función para limpiar el formulario completamente
     function limpiarFormularioCompleto(restaurarArtista = true) {
