@@ -158,7 +158,9 @@ function setupEvents() {
     const etiquetas = document.getElementById('input-etiquetas').value;
     const localizacion = document.getElementById('input-localizacion').value;
 
-    // 🛑 DEFINIR LA VARIABLE 'archivos' AQUÍ
+    // ====================================================
+    // 1. Obtener los inputs de archivo
+    // ====================================================
     const archivos = [
         document.getElementById('input-imagen-0'),
         document.getElementById('input-imagen-1'),
@@ -167,22 +169,26 @@ function setupEvents() {
         document.getElementById('input-imagen-4')
     ];
 
-    // 2. Validación de imágenes
-    // Verificar si el usuario subió un archivo nuevo
-    const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
+    // ====================================================
+    // 2. Validación visual directa (La más confiable)
+    // ====================================================
+    let imagenFinalVisible = false;
 
-    // Verificar si hay imágenes existentes que NO estén marcadas para eliminar
-    let imagenesConservadas = false;
+    // A. Verificar si el usuario subió un archivo nuevo
+    const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
+
+    // B. Verificar si hay imágenes visibles en los recuadros que NO estén marcadas para eliminar
     for (let i = 0; i < 5; i++) {
         const preview = document.getElementById(`preview-${i}`);
-        if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
-            imagenesConservadas = true;
+        // Condición clave: ¿El preview está visible y no está marcado para eliminación?
+        if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
+            imagenFinalVisible = true;
             break;
         }
     }
 
-    // 🚨 Si no hay imágenes seleccionadas ni conservadas, bloquear
-    if (!imagenSeleccionada && !imagenesConservadas) {
+    // 🚨 Decisión final: Si no hay archivos nuevos ni imágenes visibles, bloquear
+    if (!hayArchivosNuevos && !imagenFinalVisible) {
         alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
         return;
     }
@@ -547,7 +553,6 @@ function setupImagePreviews() {
                         recuadro.style.position = 'relative';
                         recuadro.appendChild(btnEliminar);
 
-                        // 🔥 LISTENER DEL BOTÓN "X" (SIEMPRE NUEVO Y FUNCIONAL)
                         btnEliminar.addEventListener('click', function() {
                             const idx = parseInt(this.dataset.index);
                             const previewImg = document.getElementById(`preview-${idx}`);
@@ -555,20 +560,22 @@ function setupImagePreviews() {
                             const inputFile = document.getElementById(`input-imagen-${idx}`);
 
                             if (previewImg.src && previewImg.src !== '') {
-                                // ✅ PASO 1: Limpiar la fuente de la imagen (evita el error 404)
+                                // 1. Limpiar la fuente (para evitar el error 404)
                                 previewImg.src = '';
+                                
+                                // 2. Ocultar la imagen (CRUCIAL para la validación)
                                 previewImg.style.display = 'none';
                                 
-                                // ✅ PASO 2: Mostrar el placeholder
+                                // 3. Mostrar el placeholder
                                 placeholderSpan.style.display = 'block';
                                 
-                                // ✅ PASO 3: Limpiar el input de archivo
+                                // 4. Limpiar el input de archivo
                                 inputFile.value = '';
                                 
-                                // ✅ PASO 4: Eliminar el botón "X"
+                                // 5. Eliminar el botón "X"
                                 this.remove();
 
-                                // ✅ PASO 5: Si es una edición, marcar para eliminar en el backend
+                                // 6. Marcar para eliminar en el backend (solo si es edición)
                                 const idEdicion = document.getElementById('input-id-edicion').value;
                                 if (idEdicion) {
                                     imagenesAEliminar.add(idx);
