@@ -199,6 +199,21 @@ function setupEvents() {
             return preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i);
         }).some(val => val === true);
 
+            let imagenesConservadas = false;
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
+                imagenesConservadas = true;
+                break;
+            }
+        }
+
+        // 🚨 Decisión final: Si no hay imágenes seleccionadas ni imágenes conservadas, bloquear
+        if (!imagenSeleccionada && !imagenesConservadas) {
+            alert("❌ La obra debe tener al menos una imagen. No puedes eliminar la única imagen.");
+            return;
+        }
+
         // 🚨 Si no hay imágenes seleccionadas ni imágenes existentes, bloquear el envío
         if (!imagenSeleccionada && !hayImagenesExistentes) {
             alert("❌ Debes seleccionar al menos una imagen para la obra.");
