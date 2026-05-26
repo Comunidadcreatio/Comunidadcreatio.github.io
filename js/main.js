@@ -484,6 +484,8 @@ function mostrarGaleriaPublica() {
 }
 
 function setupImagePreviews() {
+    const idEdicion = document.getElementById('input-id-edicion').value; // Obtener el ID de edición actual
+
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
         const preview = document.getElementById(`preview-${i}`);
@@ -524,21 +526,29 @@ function setupImagePreviews() {
                             recuadro.style.position = 'relative';
                             recuadro.appendChild(btnEliminar);
 
-                            // Listener para eliminar esta imagen (nueva o existente)
+                            // 🛑 LISTENER CORREGIDO PARA LA "X"
                             btnEliminar.addEventListener('click', function() {
                                 const idx = parseInt(this.dataset.index);
                                 const previewImg = document.getElementById(`preview-${idx}`);
                                 const placeholderSpan = document.getElementById(`placeholder-${idx}`);
                                 const inputFile = document.getElementById(`input-imagen-${idx}`);
 
+                                // 🔴 PASO 1: Limpiar visualmente y el input de archivo
                                 if (previewImg.src && previewImg.src !== '') {
-                                    imagenesAEliminar.add(idx);
                                     previewImg.src = '';
                                     previewImg.style.display = 'none';
                                     placeholderSpan.style.display = 'block';
                                     inputFile.value = '';
                                     this.style.display = 'none';
-                                    console.log(`Imagen ${idx} marcada para eliminar.`);
+                                }
+
+                                // 🔴 PASO 2: Si es una EDICIÓN, marcar para eliminar en el backend
+                                if (idEdicion) {
+                                    imagenesAEliminar.add(idx);
+                                    console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
+                                } else {
+                                    // Si es una NUEVA obra, solo limpiamos la selección, no marcamos nada.
+                                    console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
                                 }
                             });
                         } else {
