@@ -158,7 +158,7 @@ function setupEvents() {
     const etiquetas = document.getElementById('input-etiquetas').value;
     const localizacion = document.getElementById('input-localizacion').value;
 
-    // Obtener los inputs de archivo y los elementos de vista previa
+    // 🛑 DEFINIR LA VARIABLE 'archivos' AQUÍ
     const archivos = [
         document.getElementById('input-imagen-0'),
         document.getElementById('input-imagen-1'),
@@ -167,22 +167,22 @@ function setupEvents() {
         document.getElementById('input-imagen-4')
     ];
 
-    // Verificar si el usuario seleccionó un archivo nuevo
-    const hayArchivosNuevos = archivosInputs.some(input => input && input.files && input.files.length > 0);
+    // 2. Validación de imágenes
+    // Verificar si el usuario subió un archivo nuevo
+    const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
 
-    // Verificar si hay imágenes visibles en los recuadros que NO estén marcadas para eliminar
-    let hayImagenesVisibles = false;
+    // Verificar si hay imágenes existentes que NO estén marcadas para eliminar
+    let imagenesConservadas = false;
     for (let i = 0; i < 5; i++) {
         const preview = document.getElementById(`preview-${i}`);
-        // Verificar que la imagen tenga una fuente válida (no vacía y no nula)
         if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
-            hayImagenesVisibles = true;
+            imagenesConservadas = true;
             break;
         }
     }
 
-    // 🚨 Decisión final: Si no hay archivos nuevos ni imágenes visibles, bloquear
-    if (!hayArchivosNuevos && !hayImagenesVisibles) {
+    // 🚨 Si no hay imágenes seleccionadas ni conservadas, bloquear
+    if (!imagenSeleccionada && !imagenesConservadas) {
         alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
         return;
     }
@@ -209,12 +209,12 @@ function setupEvents() {
     formData.append('etiquetas', etiquetas);
     formData.append('localizacion', localizacion);
 
-    // 4. Agregar imágenes a eliminar al FormData (solo si hay)
+    // 4. Agregar imágenes a eliminar al FormData
     if (imagenesAEliminar.size > 0) {
         formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
     }
 
-    // 5. Agregar nuevas imágenes al FormData
+    // 5. Agregar nuevas imágenes al FormData (AHORA 'archivos' ESTÁ DEFINIDO)
     archivos.forEach((input, index) => {
         if (input && input.files && input.files.length > 0) {
             formData.append(`imagen_${index}`, input.files[0]);
@@ -226,7 +226,7 @@ function setupEvents() {
     if (result.success) {
         alert("Obra guardada correctamente.");
         document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-        imagenesAEliminar.clear(); // Limpiar el Set
+        imagenesAEliminar.clear();
         limpiarFormularioCompleto(true);
         await refrescarTabla();
     } else {
