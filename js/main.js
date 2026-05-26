@@ -91,10 +91,9 @@ function poblarCiudades(paisSeleccionado) {
     defaultOption.selected = true;
     ciudadSelect.appendChild(defaultOption);
 
-    // Si hay país seleccionado y tenemos datos
-    if (paisSeleccionado && window.ciudadesCompletas && window.ciudadesCompletas[paisSeleccionado]) {
-        // Primero, mostrar departamentos/estados como grupos de optgroup
-        const data = window.ciudadesCompletas[paisSeleccionado];
+    // 🚨 CORRECCIÓN: Usar 'ciudadesPorPais' directamente
+    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
+        const data = ciudadesPorPais[paisSeleccionado];
         Object.keys(data).forEach(departamento => {
             const optgroup = document.createElement('optgroup');
             optgroup.label = departamento;
