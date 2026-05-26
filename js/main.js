@@ -158,8 +158,8 @@ function setupEvents() {
     const etiquetas = document.getElementById('input-etiquetas').value;
     const localizacion = document.getElementById('input-localizacion').value;
 
-    // 2. Validación de imágenes (Robusta y unificada)
-    const archivos = [
+    // Obtener los inputs de archivo y los elementos de vista previa
+    const archivosInputs = [
         document.getElementById('input-imagen-0'),
         document.getElementById('input-imagen-1'),
         document.getElementById('input-imagen-2'),
@@ -167,22 +167,23 @@ function setupEvents() {
         document.getElementById('input-imagen-4')
     ];
 
-    // Verificar si el usuario subió un archivo nuevo
-    const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
+    // Verificar si el usuario seleccionó un archivo nuevo
+    const hayArchivosNuevos = archivosInputs.some(input => input && input.files && input.files.length > 0);
 
-    // Verificar si hay imágenes existentes que NO estén marcadas para eliminar
-    let imagenesConservadas = false;
+    // Verificar si hay imágenes visibles en los recuadros que NO estén marcadas para eliminar
+    let hayImagenesVisibles = false;
     for (let i = 0; i < 5; i++) {
         const preview = document.getElementById(`preview-${i}`);
+        // Verificar que la imagen tenga una fuente válida (no vacía y no nula)
         if (preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i)) {
-            imagenesConservadas = true;
+            hayImagenesVisibles = true;
             break;
         }
     }
 
-    // 🚨 Decisión final: Si no hay imágenes seleccionadas ni conservadas, bloquear
-    if (!imagenSeleccionada && !imagenesConservadas) {
-        alert("❌ La obra debe tener al menos una imagen. No puedes eliminar la única imagen.");
+    // 🚨 Decisión final: Si no hay archivos nuevos ni imágenes visibles, bloquear
+    if (!hayArchivosNuevos && !hayImagenesVisibles) {
+        alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
         return;
     }
 
@@ -553,21 +554,28 @@ function setupImagePreviews() {
                             const placeholderSpan = document.getElementById(`placeholder-${idx}`);
                             const inputFile = document.getElementById(`input-imagen-${idx}`);
 
-                            // 🔴 PASO 1: Limpiar visualmente y el input de archivo
                             if (previewImg.src && previewImg.src !== '') {
+                                // ✅ PASO 1: Limpiar la fuente de la imagen (evita el error 404)
                                 previewImg.src = '';
                                 previewImg.style.display = 'none';
+                                
+                                // ✅ PASO 2: Mostrar el placeholder
                                 placeholderSpan.style.display = 'block';
+                                
+                                // ✅ PASO 3: Limpiar el input de archivo
                                 inputFile.value = '';
-                                this.remove(); // 🛑 Eliminar el botón "X" también
-                            }
+                                
+                                // ✅ PASO 4: Eliminar el botón "X"
+                                this.remove();
 
-                            // 🔴 PASO 2: Si es una EDICIÓN, marcar para eliminar en el backend
-                            if (idEdicion) {
-                                imagenesAEliminar.add(idx);
-                                console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
-                            } else {
-                                console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
+                                // ✅ PASO 5: Si es una edición, marcar para eliminar en el backend
+                                const idEdicion = document.getElementById('input-id-edicion').value;
+                                if (idEdicion) {
+                                    imagenesAEliminar.add(idx);
+                                    console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
+                                } else {
+                                    console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
+                                }
                             }
                         });
                     };
