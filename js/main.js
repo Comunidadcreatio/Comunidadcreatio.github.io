@@ -191,6 +191,20 @@ function setupEvents() {
             document.getElementById('input-imagen-4')
         ];
 
+        const imagenSeleccionada = archivos.some(input => input && input.files && input.files.length > 0);
+
+            // ❌ También verificar si hay imágenes existentes (en modo edición) que no se hayan eliminado
+        const hayImagenesExistentes = Array.from({ length: 5 }, (_, i) => {
+            const preview = document.getElementById(`preview-${i}`);
+            return preview && preview.src && preview.src !== '' && !imagenesAEliminar.has(i);
+        }).some(val => val === true);
+
+        // 🚨 Si no hay imágenes seleccionadas ni imágenes existentes, bloquear el envío
+        if (!imagenSeleccionada && !hayImagenesExistentes) {
+            alert("❌ Debes seleccionar al menos una imagen para la obra.");
+            return;
+        }
+
         if (!idEdicion) {
             const imagenSeleccionada = archivos.some(input => input.files.length > 0);
             if (!imagenSeleccionada) {
@@ -198,6 +212,7 @@ function setupEvents() {
                 return;
             }
         }
+
 
         archivos.forEach((input, index) => {
             if (input && input.files && input.files.length > 0) {
