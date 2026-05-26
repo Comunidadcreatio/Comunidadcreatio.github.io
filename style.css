@@ -150,6 +150,9 @@
 .modal-content input[type="password"],
 .modal-content input[type="date"],
 .modal-content select[name="genero"],
+.modal-content select[name="dia"],
+.modal-content select[name="mes"],
+.modal-content select[name="ano"],
 .modal-content button {
     margin-bottom: 10px;
     padding: 8px;
