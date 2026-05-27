@@ -51,6 +51,31 @@ export async function register(nombre_artista, nombre_real, email, password, tel
     }
 }
 
+export async function registerWithPhoneVerification(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero, firebaseIdToken) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/artistas/registro-verificado`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre_artista,
+                nombre_real,
+                email,
+                password,
+                telefono,
+                pais,
+                ciudad,
+                fecha_nacimiento,
+                genero,
+                firebaseIdToken
+            })
+        });
+        return await res.json();
+    } catch (error) {
+        console.error("Error en registro verificado:", error);
+        return { success: false, error: "Error de conexión" };
+    }
+}
+
 export function logout() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ARTISTA_KEY);
