@@ -159,7 +159,7 @@ async function init() {
 
         // 🛑 Validación de teléfono venezolano
         // Formato aceptado: 04121234567 o +584121234567
-        const regexVzla = /^(\+58|0)4\d{7}$/;
+        const regexVzla = /^(\+58|0)(\d{2})\d{7}$/;
 
         if (!regexVzla.test(telefono)) {
             alert("❌ El número de teléfono venezolano debe comenzar con 04 o +58 y tener 11 dígitos (ej: 04121234567 o +584121234567).");
