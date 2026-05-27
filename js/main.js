@@ -18,9 +18,6 @@ const imagenesAEliminar = new Set(); // Almacena índices de imágenes a elimina
 const ciudadesPorPais = {
     'Venezuela': {
         'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
-    },
-    'Colombia': {
-        'Norte de Santander': ['Cúcuta', 'Villa del Rosario', 'Ocaña', 'Pamplona', 'Los Patios', 'El Zulia', 'San Cayetano', 'Puerto Santander', 'Tibú', 'Sardinata', 'El Tarra', 'Bucarasica', 'Arboledas', 'Cucutilla', 'Gramalote', 'Lourdes', 'Salazar de las Palmas', 'Santiago', 'Villa Caro', 'Ábrego', 'Cáchira', 'Convención', 'El Carmen', 'Hacarí', 'La Esperanza', 'La Playa de Belén', 'San Calixto', 'Teorama', 'Cácota', 'Chitagá', 'Mutiscua', 'Pamplonita', 'Santo Domingo de Silos', 'Bochalema', 'Chinácota', 'Durania', 'Herrán', 'Labateca', 'Ragonvalia', 'Toledo']
     }
 };
 
