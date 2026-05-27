@@ -1,8 +1,10 @@
 // js/main.js
 import { API_BASE_URL } from './config.js';
-import { token, artistaActual, login, register, logout } from './auth.js';
+import { token, artistaActual, login, register, logout, registerWithPhoneVerification } from './auth.js'; // 🔥 Importamos la nueva función
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
+// 🔥 Importamos Firebase
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from './firebase.js';
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
@@ -35,7 +37,6 @@ function poblarCiudades(paisSeleccionado) {
     defaultOption.selected = true;
     ciudadSelect.appendChild(defaultOption);
 
-    // 🚨 CORRECCIÓN: Usar 'ciudadesPorPais' directamente
     if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
         const data = ciudadesPorPais[paisSeleccionado];
         Object.keys(data).forEach(departamento => {
@@ -78,14 +79,13 @@ async function init() {
 // ============================================
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
-    function setupEvents() {
-
-        document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
+function setupEvents() {
+    document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
         currentSearch = document.getElementById('search-input').value;
         currentSortBy = document.getElementById('sort-select').value;
         currentOrder = document.getElementById('order-select').value;
         currentLimit = parseInt(document.getElementById('limit-select').value);
-        currentPage = 1; // Reiniciar a página 1 al aplicar filtros
+        currentPage = 1;
         refrescarTabla();
     });
 
@@ -94,7 +94,6 @@ async function init() {
         poblarCiudades(paisSeleccionado);
     });
 
-    // Paginación
     document.getElementById('btn-prev').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
@@ -109,7 +108,6 @@ async function init() {
             refrescarTabla();
         }
     });
-        
 
     btnPerfil.addEventListener('click', () => {
         if (token) {
@@ -117,8 +115,6 @@ async function init() {
         } else {
             document.getElementById('modal-login').classList.remove('hidden');
         }
-        
-
     });
 
     btnLogout.addEventListener('click', () => {
@@ -141,8 +137,13 @@ async function init() {
         }
     });
 
+    // ==========================================================
+    // 🔥 REGISTRO CON VERIFICACIÓN DE TELÉFONO (FIREBASE)
+    // ==========================================================
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // 1. Recoger datos
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
         const nombres = document.getElementById('reg-nombres').value;
         const apellidos = document.getElementById('reg-apellidos').value;
@@ -157,15 +158,7 @@ async function init() {
         const mes = document.getElementById('reg-mes').value;
         const ano = document.getElementById('reg-ano').value;
 
-        // 🛑 Validación de teléfono venezolano
-        // Formato aceptado: 04121234567 o +584121234567
-        const regexVzla = /^(\+58|0)(\d{3})\d{7}$/;
-
-        if (!regexVzla.test(telefono)) {
-            alert("❌ El número de teléfono venezolano debe comenzar con 04 o +58 y tener 11 dígitos (ej: 04121234567 o +584121234567).");
-            return;
-        }
-
+        // 2. Validar fecha (tu código de validación existente aquí)
         // 🛑 1. VALIDACIÓN EXPLÍCITA: ¿Todos los campos están seleccionados?
         if (!dia || !mes || !ano) {
             alert("❌ Todos los campos de fecha son obligatorios.");
@@ -190,134 +183,175 @@ async function init() {
             alert("⚠️ Debes tener al menos 18 años para registrarte.");
             return;
         }
-        // 🛑 4. Construir la fecha en formato YYYY-MM-DD para enviar al backend
         const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-        const result = await register(
-            nombre_artista, 
-            nombre_real,
-            email, 
-            password, 
-            telefono, 
-            pais, 
-            ciudad,  
-            fecha_nacimiento, 
-            genero
-        );
 
+        // 3. Validar teléfono venezolano
+        const regexVzla = /^(\+58|0)(\d{3})\d{7}$/;
+        if (!regexVzla.test(telefono)) {
+            alert("❌ El número de teléfono venezolano debe tener 11 dígitos y comenzar con 04 o +58.");
+            return;
+        }
+
+        // 4. Formatear número para Firebase (+584161317560)
+        let telefonoFirebase = telefono;
+        if (telefono.startsWith('0')) {
+            telefonoFirebase = '+58' + telefono.slice(1);
+        }
+
+        // 5. Configurar reCAPTCHA (solo la primera vez)
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'invisible',
+                'callback': (response) => {}
+            });
+        }
+
+        // 6. Mostrar mensaje de carga
+        const loadingDiv = document.createElement('div');
+        loadingDiv.textContent = '⏳ Enviando código de verificación a tu teléfono...';
+        loadingDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; display: flex; justify-content: center; align-items: center; font-size: 20px; z-index: 9999;';
+        document.body.appendChild(loadingDiv);
+
+        try {
+            // 7. Enviar el código OTP
+            const confirmation = await signInWithPhoneNumber(auth, telefonoFirebase, window.recaptchaVerifier);
+            window.confirmationResult = confirmation;
+            loadingDiv.remove();
+
+            // 8. Pedir al usuario el código OTP
+            const otpCode = prompt("📱 Se ha enviado un código de 6 dígitos a tu teléfono. Por favor, ingresa ese código aquí:");
+            if (!otpCode) {
+                alert("⚠️ Registro cancelado.");
+                return;
+            }
+
+            // 9. Verificar el código OTP con Firebase
+            const result = await confirmation.confirm(otpCode);
+            const idToken = await result.user.getIdToken(); // Token de verificación de Firebase
+
+            // 10. Enviar todos los datos + token al backend
+            const registerResult = await registerWithPhoneVerification(
+                nombre_artista,
+                nombre_real,
+                email,
+                password,
+                telefono,
+                pais,
+                ciudad,
+                fecha_nacimiento,
+                genero,
+                idToken
+            );
+
+            if (registerResult.success) {
+                alert("🎉 ¡Registro exitoso! Revisa tu correo para confirmar tu cuenta.");
+                document.getElementById('modal-registro').classList.add('hidden');
+            } else {
+                alert("❌ Error en el registro: " + registerResult.error);
+            }
+
+        } catch (error) {
+            loadingDiv.remove();
+            console.error("Error en verificación de teléfono:", error);
+            if (error.code === 'auth/too-many-requests') {
+                alert("⚠️ Demasiados intentos. Espera un minuto y vuelve a intentarlo.");
+            } else if (error.code === 'auth/invalid-verification-code') {
+                alert("❌ El código de verificación es incorrecto. Inténtalo de nuevo.");
+            } else {
+                alert("❌ Error al verificar el teléfono: " + error.message);
+            }
+        }
+    });
+    // ==========================================================
+
+    // Guardar Obra
+    obraForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const titulo = document.getElementById('input-titulo').value;
+        const artista = document.getElementById('input-artista').value;
+        const precio = document.getElementById('input-precio').value;
+        const idPersonalizado = document.getElementById('input-id-personalizado').value;
+        const idEdicion = document.getElementById('input-id-edicion').value;
+
+        const ano = document.getElementById('input-ano').value; 
+        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+        const soporte = document.getElementById('input-soporte').value;
+        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+        const estado_obra = document.getElementById('input-estado-obra').value;
+        const procedencia = document.getElementById('input-procedencia').value;
+        const marcos = document.getElementById('input-marcos').value;
+        const certificado = document.getElementById('input-certificado').value;
+        const status = document.getElementById('input-status').value;
+        const ancho = document.getElementById('input-ancho').value;
+        const alto = document.getElementById('input-alto').value;
+        const firma = document.getElementById('input-firma').value;
+        const conservacion = document.getElementById('input-conservacion').value;
+        const etiquetas = document.getElementById('input-etiquetas').value;
+
+        const archivos = [
+            document.getElementById('input-imagen-0'),
+            document.getElementById('input-imagen-1'),
+            document.getElementById('input-imagen-2'),
+            document.getElementById('input-imagen-3'),
+            document.getElementById('input-imagen-4')
+        ];
+
+        let imagenFinalVisible = false;
+        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
+                imagenFinalVisible = true;
+                break;
+            }
+        }
+        if (!hayArchivosNuevos && !imagenFinalVisible) {
+            alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('titulo', titulo);
+        formData.append('artista', artista);
+        formData.append('precio', precio);
+        formData.append('id_obra', idPersonalizado);
+        formData.append('ano', ano);
+        formData.append('descripcion_tecnica', descripcion_tecnica);
+        formData.append('soporte', soporte);
+        formData.append('descripcion_artistica', descripcion_artistica);
+        formData.append('estado_obra', estado_obra);
+        formData.append('procedencia', procedencia);
+        formData.append('marcos', marcos);
+        formData.append('certificado', certificado);
+        formData.append('status', status);
+        formData.append('ancho', ancho);
+        formData.append('alto', alto);
+        formData.append('firma', firma);
+        formData.append('conservacion', conservacion);
+        formData.append('etiquetas', etiquetas);
+
+        if (imagenesAEliminar.size > 0) {
+            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+        }
+
+        archivos.forEach((input, index) => {
+            if (input && input.files && input.files.length > 0) {
+                formData.append(`imagen_${index}`, input.files[0]);
+            }
+        });
+
+        const result = await guardarObra(token, formData, idEdicion || null);
         if (result.success) {
-            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-            document.getElementById('modal-registro').classList.add('hidden');
+            alert("Obra guardada correctamente.");
+            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+            imagenesAEliminar.clear();
+            limpiarFormularioCompleto(true);
+            await refrescarTabla();
         } else {
             alert("Error: " + result.error);
         }
     });
-
-    // Guardar Obra
-    obraForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // 1. Recoger datos de los inputs
-    const titulo = document.getElementById('input-titulo').value;
-    const artista = document.getElementById('input-artista').value;
-    const precio = document.getElementById('input-precio').value;
-    const idPersonalizado = document.getElementById('input-id-personalizado').value;
-    const idEdicion = document.getElementById('input-id-edicion').value;
-
-    const ano = document.getElementById('input-ano').value; 
-    const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-    const soporte = document.getElementById('input-soporte').value;
-    const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-    const estado_obra = document.getElementById('input-estado-obra').value;
-    const procedencia = document.getElementById('input-procedencia').value;
-    const marcos = document.getElementById('input-marcos').value;
-    const certificado = document.getElementById('input-certificado').value;
-    const status = document.getElementById('input-status').value;
-    const ancho = document.getElementById('input-ancho').value;
-    const alto = document.getElementById('input-alto').value;
-    const firma = document.getElementById('input-firma').value;
-    const conservacion = document.getElementById('input-conservacion').value;
-    const etiquetas = document.getElementById('input-etiquetas').value;
-
-    // ====================================================
-    // 1. Obtener los inputs de archivo
-    // ====================================================
-    const archivos = [
-        document.getElementById('input-imagen-0'),
-        document.getElementById('input-imagen-1'),
-        document.getElementById('input-imagen-2'),
-        document.getElementById('input-imagen-3'),
-        document.getElementById('input-imagen-4')
-    ];
-
-    // ====================================================
-    // 2. Validación visual directa (La más confiable)
-    // ====================================================
-    let imagenFinalVisible = false;
-
-    // A. Verificar si el usuario subió un archivo nuevo
-    const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
-
-    // B. Verificar si hay imágenes visibles en los recuadros que NO estén marcadas para eliminar
-    for (let i = 0; i < 5; i++) {
-        const preview = document.getElementById(`preview-${i}`);
-        // Condición clave: ¿El preview está visible y no está marcado para eliminación?
-        if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
-            imagenFinalVisible = true;
-            break;
-        }
-    }
-
-    // 🚨 Decisión final: Si no hay archivos nuevos ni imágenes visibles, bloquear
-    if (!hayArchivosNuevos && !imagenFinalVisible) {
-        alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
-        return;
-    }
-
-    // 3. Construir FormData
-    const formData = new FormData();
-    formData.append('titulo', titulo);
-    formData.append('artista', artista);
-    formData.append('precio', precio);
-    formData.append('id_obra', idPersonalizado);
-    formData.append('ano', ano);
-    formData.append('descripcion_tecnica', descripcion_tecnica);
-    formData.append('soporte', soporte);
-    formData.append('descripcion_artistica', descripcion_artistica);
-    formData.append('estado_obra', estado_obra);
-    formData.append('procedencia', procedencia);
-    formData.append('marcos', marcos);
-    formData.append('certificado', certificado);
-    formData.append('status', status);
-    formData.append('ancho', ancho);
-    formData.append('alto', alto);
-    formData.append('firma', firma);
-    formData.append('conservacion', conservacion);
-    formData.append('etiquetas', etiquetas);
-
-    // 4. Agregar imágenes a eliminar al FormData
-    if (imagenesAEliminar.size > 0) {
-        formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
-    }
-
-    // 5. Agregar nuevas imágenes al FormData (AHORA 'archivos' ESTÁ DEFINIDO)
-    archivos.forEach((input, index) => {
-        if (input && input.files && input.files.length > 0) {
-            formData.append(`imagen_${index}`, input.files[0]);
-        }
-    });
-
-    // 6. Enviar al backend
-    const result = await guardarObra(token, formData, idEdicion || null);
-    if (result.success) {
-        alert("Obra guardada correctamente.");
-        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-        imagenesAEliminar.clear();
-        limpiarFormularioCompleto(true);
-        await refrescarTabla();
-    } else {
-        alert("Error: " + result.error);
-    }
-});
 
     // Función para limpiar el formulario completamente
     function limpiarFormularioCompleto(restaurarArtista = true) {
@@ -325,7 +359,7 @@ async function init() {
         document.getElementById('input-id-edicion').value = '';
         document.getElementById('btn-limpiar-campos').classList.add('hidden');
         document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-        imagenesAEliminar.clear(); // 🆕 Limpiar el Set
+        imagenesAEliminar.clear();
 
         for (let i = 0; i < 5; i++) {
             const preview = document.getElementById(`preview-${i}`);
@@ -339,7 +373,6 @@ async function init() {
             if (inputFile) {
                 inputFile.value = '';
             }
-            // 🆕 Ocultar botones de eliminar al limpiar
             const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
             if (btnEliminar) {
                 btnEliminar.style.display = 'none';
@@ -421,14 +454,10 @@ async function refrescarTabla() {
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
 
-    // Actualizar información de paginación
     document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
     document.getElementById('btn-prev').disabled = currentPage <= 1;
     document.getElementById('btn-next').disabled = currentPage >= totalPages;
 
-    
-
-    
     renderizarTabla(obras, tablaBody, 
         // EDITAR
         async (id) => {
@@ -468,7 +497,6 @@ async function refrescarTabla() {
                     obra.imagen_url_4
                 ];
                 
-                // 🆕 Limpiar botones de eliminar previos
                 document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
                 
                 imagenes.forEach((url, index) => {
@@ -480,16 +508,13 @@ async function refrescarTabla() {
                             preview.style.display = 'block';
                             placeholder.style.display = 'none';
 
-                            // 🆕 OBTENER EL RECUADRO PADRE
                             const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
                             if (recuadro) {
-                                // ✅ ELIMINAR BOTÓN "X" PREVIO (SI EXISTE) PARA EVITAR DUPLICADOS
                                 const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
                                 if (btnExistente) {
                                     btnExistente.remove();
                                 }
 
-                                // 🆕 CREAR BOTÓN "X" PARA ESTA IMAGEN
                                 const btnEliminar = document.createElement('button');
                                 btnEliminar.type = 'button';
                                 btnEliminar.className = 'btn-eliminar-imagen';
@@ -507,7 +532,6 @@ async function refrescarTabla() {
                                 recuadro.style.position = 'relative';
                                 recuadro.appendChild(btnEliminar);
 
-                                // ✅ LISTENER PARA ELIMINAR LA IMAGEN
                                 btnEliminar.addEventListener('click', function() {
                                     const idx = parseInt(this.dataset.index);
                                     const previewImg = document.getElementById(`preview-${idx}`);
@@ -520,7 +544,7 @@ async function refrescarTabla() {
                                         previewImg.style.display = 'none';
                                         placeholderSpan.style.display = 'block';
                                         inputFile.value = '';
-                                        this.style.display = 'none'; // Ocultar botón
+                                        this.style.display = 'none';
                                         console.log(`Imagen ${idx} marcada para eliminar.`);
                                     }
                                 });
@@ -608,7 +632,7 @@ function mostrarGaleriaPublica() {
 }
 
 function setupImagePreviews() {
-    const idEdicion = document.getElementById('input-id-edicion').value; // Detectar modo edición
+    const idEdicion = document.getElementById('input-id-edicion').value;
 
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
@@ -621,7 +645,6 @@ function setupImagePreviews() {
                 const recuadro = this.closest('.recuadro-imagen');
                 if (!recuadro) return;
 
-                // 🛑 ELIMINAR BOTÓN "X" PREVIO (si existe)
                 const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
                 if (btnExistente) {
                     btnExistente.remove();
@@ -636,7 +659,6 @@ function setupImagePreviews() {
                         }
                         if (placeholder) placeholder.style.display = 'none';
 
-                        // 🆕 CREAR UN NUEVO BOTÓN "X" SIEMPRE
                         const btnEliminar = document.createElement('button');
                         btnEliminar.type = 'button';
                         btnEliminar.className = 'btn-eliminar-imagen';
@@ -661,22 +683,12 @@ function setupImagePreviews() {
                             const inputFile = document.getElementById(`input-imagen-${idx}`);
 
                             if (previewImg.src && previewImg.src !== '') {
-                                // 1. Limpiar la fuente (para evitar el error 404)
                                 previewImg.src = '';
-                                
-                                // 2. Ocultar la imagen (CRUCIAL para la validación)
                                 previewImg.style.display = 'none';
-                                
-                                // 3. Mostrar el placeholder
                                 placeholderSpan.style.display = 'block';
-                                
-                                // 4. Limpiar el input de archivo
                                 inputFile.value = '';
-                                
-                                // 5. Eliminar el botón "X"
                                 this.remove();
 
-                                // 6. Marcar para eliminar en el backend (solo si es edición)
                                 const idEdicion = document.getElementById('input-id-edicion').value;
                                 if (idEdicion) {
                                     imagenesAEliminar.add(idx);
@@ -689,7 +701,6 @@ function setupImagePreviews() {
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    // Si se cancela la selección, volver al estado inicial y eliminar la "X"
                     if (preview) {
                         preview.src = '';
                         preview.style.display = 'none';
@@ -697,7 +708,7 @@ function setupImagePreviews() {
                     if (placeholder) placeholder.style.display = 'block';
                     const btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
                     if (btnEliminar) {
-                        btnEliminar.remove(); // Eliminar el botón "X"
+                        btnEliminar.remove();
                     }
                 }
             });
@@ -706,7 +717,6 @@ function setupImagePreviews() {
 }
 
 function cargarSelectoresFecha() {
-    // Llenar selector de días (1 al 31)
     const diaSelect = document.getElementById('reg-dia');
     if (diaSelect) {
         for (let i = 1; i <= 31; i++) {
@@ -717,19 +727,17 @@ function cargarSelectoresFecha() {
         }
     }
 
-    // Llenar selector de meses (Enero a Diciembre)
     const mesSelect = document.getElementById('reg-mes');
     if (mesSelect) {
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         meses.forEach((nombre, i) => {
             const option = document.createElement('option');
-            option.value = i + 1; // 1-12
+            option.value = i + 1;
             option.textContent = nombre;
             mesSelect.appendChild(option);
         });
     }
 
-    // Llenar selector de años (desde 1900 hasta el año actual menos 18)
     const anoSelect = document.getElementById('reg-ano');
     if (anoSelect) {
         const maxYear = new Date().getFullYear() - 18;
