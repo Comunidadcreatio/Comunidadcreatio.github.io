@@ -3,8 +3,7 @@ import { API_BASE_URL } from './config.js';
 import { token, artistaActual, login, register, logout, registerWithPhoneVerification } from './auth.js'; // 🔥 Importamos la nueva función
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
-// 🔥 Importamos Firebase
-import { auth, RecaptchaVerifier, signInWithPhoneNumber } from './firebase.js';
+
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
