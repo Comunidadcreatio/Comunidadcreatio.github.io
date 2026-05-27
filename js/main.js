@@ -143,7 +143,6 @@ function setupEvents() {
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // 1. Recoger datos
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
         const nombres = document.getElementById('reg-nombres').value;
         const apellidos = document.getElementById('reg-apellidos').value;
@@ -158,21 +157,16 @@ function setupEvents() {
         const mes = document.getElementById('reg-mes').value;
         const ano = document.getElementById('reg-ano').value;
 
-        // 2. Validar fecha (tu código de validación existente aquí)
-        // 🛑 1. VALIDACIÓN EXPLÍCITA: ¿Todos los campos están seleccionados?
+        // 1. Validación de fecha y edad (la que ya tenías)
         if (!dia || !mes || !ano) {
             alert("❌ Todos los campos de fecha son obligatorios.");
             return;
         }
-
-        // 🛑 2. VALIDACIÓN DE FECHA REAL (ej: 31 de febrero no es válido)
         const fechaNac = new Date(ano, mes - 1, dia);
         if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
             alert("❌ La fecha seleccionada no es válida.");
             return;
         }
-
-        // 🛑 3. VALIDACIÓN DE EDAD: ¿Tiene al menos 18 años?
         const hoy = new Date();
         let edad = hoy.getFullYear() - fechaNac.getFullYear();
         const mesDiff = hoy.getMonth() - fechaNac.getMonth();
@@ -185,81 +179,31 @@ function setupEvents() {
         }
         const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-        // 3. Validar teléfono venezolano
+        // 2. Validación de teléfono (formato, opcional si quieres mantenerla)
         const regexVzla = /^(\+58|0)(\d{3})\d{7}$/;
         if (!regexVzla.test(telefono)) {
-            alert("❌ El número de teléfono venezolano debe tener 11 dígitos y comenzar con 04 o +58.");
+            alert("❌ El número de teléfono debe tener 11 dígitos y comenzar con 04 o +58.");
             return;
         }
 
-        // 4. Formatear número para Firebase (+584161317560)
-        let telefonoFirebase = telefono;
-        if (telefono.startsWith('0')) {
-            telefonoFirebase = '+58' + telefono.slice(1);
-        }
+        // 3. Llamar a la función de registro normal (sin Firebase)
+        const result = await register(
+            nombre_artista,
+            nombre_real,
+            email,
+            password,
+            telefono,
+            pais,
+            ciudad,
+            fecha_nacimiento,
+            genero
+        );
 
-        // 5. Configurar reCAPTCHA (solo la primera vez)
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                'size': 'invisible',
-                'callback': (response) => {}
-            });
-        }
-
-        // 6. Mostrar mensaje de carga
-        const loadingDiv = document.createElement('div');
-        loadingDiv.textContent = '⏳ Enviando código de verificación a tu teléfono...';
-        loadingDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; display: flex; justify-content: center; align-items: center; font-size: 20px; z-index: 9999;';
-        document.body.appendChild(loadingDiv);
-
-        try {
-            // 7. Enviar el código OTP
-            const confirmation = await signInWithPhoneNumber(auth, telefonoFirebase, window.recaptchaVerifier);
-            window.confirmationResult = confirmation;
-            loadingDiv.remove();
-
-            // 8. Pedir al usuario el código OTP
-            const otpCode = prompt("📱 Se ha enviado un código de 6 dígitos a tu teléfono. Por favor, ingresa ese código aquí:");
-            if (!otpCode) {
-                alert("⚠️ Registro cancelado.");
-                return;
-            }
-
-            // 9. Verificar el código OTP con Firebase
-            const result = await confirmation.confirm(otpCode);
-            const idToken = await result.user.getIdToken(); // Token de verificación de Firebase
-
-            // 10. Enviar todos los datos + token al backend
-            const registerResult = await registerWithPhoneVerification(
-                nombre_artista,
-                nombre_real,
-                email,
-                password,
-                telefono,
-                pais,
-                ciudad,
-                fecha_nacimiento,
-                genero,
-                idToken
-            );
-
-            if (registerResult.success) {
-                alert("🎉 ¡Registro exitoso! Revisa tu correo para confirmar tu cuenta.");
-                document.getElementById('modal-registro').classList.add('hidden');
-            } else {
-                alert("❌ Error en el registro: " + registerResult.error);
-            }
-
-        } catch (error) {
-            loadingDiv.remove();
-            console.error("Error en verificación de teléfono:", error);
-            if (error.code === 'auth/too-many-requests') {
-                alert("⚠️ Demasiados intentos. Espera un minuto y vuelve a intentarlo.");
-            } else if (error.code === 'auth/invalid-verification-code') {
-                alert("❌ El código de verificación es incorrecto. Inténtalo de nuevo.");
-            } else {
-                alert("❌ Error al verificar el teléfono: " + error.message);
-            }
+        if (result.success) {
+            alert("✅ ¡Registro exitoso! Revisa tu correo para confirmar tu cuenta.");
+            document.getElementById('modal-registro').classList.add('hidden');
+        } else {
+            alert("❌ Error: " + result.error);
         }
     });
     // ==========================================================
