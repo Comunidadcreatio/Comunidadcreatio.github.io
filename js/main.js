@@ -237,7 +237,6 @@ async function init() {
     const firma = document.getElementById('input-firma').value;
     const conservacion = document.getElementById('input-conservacion').value;
     const etiquetas = document.getElementById('input-etiquetas').value;
-    const localizacion = document.getElementById('input-localizacion').value;
 
     // ====================================================
     // 1. Obtener los inputs de archivo
@@ -294,7 +293,6 @@ async function init() {
     formData.append('firma', firma);
     formData.append('conservacion', conservacion);
     formData.append('etiquetas', etiquetas);
-    formData.append('localizacion', localizacion);
 
     // 4. Agregar imágenes a eliminar al FormData
     if (imagenesAEliminar.size > 0) {
@@ -459,7 +457,6 @@ async function refrescarTabla() {
                 document.getElementById('input-firma').value = obra.firma || '';
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
-                document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
                 
@@ -575,7 +572,6 @@ async function refrescarTabla() {
                 document.getElementById('input-firma').value = obra.firma || '';
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
-                document.getElementById('input-localizacion').value = obra.localizacion || '';
                 
                 for (let i = 0; i < 5; i++) {
                     const preview = document.getElementById(`preview-${i}`);
