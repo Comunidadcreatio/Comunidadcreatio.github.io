@@ -136,6 +136,33 @@ function setupEvents() {
         }
     });
 
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', async () => {
+        if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible y eliminará todas tus obras.")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                // Cerrar sesión y redirigir a la página principal
+                logout();
+                location.reload();
+            } else {
+                alert("❌ Error al eliminar la cuenta: " + data.error);
+            }
+        } catch (error) {
+            console.error("Error al eliminar la cuenta:", error);
+            alert("❌ Error al eliminar la cuenta. Intenta más tarde.");
+        }
+    });
+
     // ==========================================================
     // 🔥 REGISTRO CON VERIFICACIÓN DE TELÉFONO (FIREBASE)
     // ==========================================================
