@@ -156,7 +156,6 @@ async function init() {
         const dia = document.getElementById('reg-dia').value;
         const mes = document.getElementById('reg-mes').value;
         const ano = document.getElementById('reg-ano').value;
-        const telefono = document.getElementById('reg-telefono').value;
 
         // 🛑 Validación de teléfono venezolano
         // Formato aceptado: 04121234567 o +584121234567
