@@ -136,79 +136,46 @@ function setupEvents() {
         }
     });
 
-    // Botón "Eliminar mi cuenta"
-    document.getElementById('btn-eliminar-cuenta').addEventListener('click', async () => {
-    // 1. Confirmación inicial
-    if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y borrará todas tus obras.")) {
-        return;
-    }
-
-    // 2. Solicitar la contraseña para verificar la identidad
-    const password = prompt("🔑 Por favor, ingresa tu contraseña para confirmar la eliminación:");
-    if (!password) return;
-
-    // 3. Enviar la solicitud al backend
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ password })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            alert("✅ Tu cuenta ha sido eliminada correctamente.");
-            // Cerrar sesión y recargar la página
-            logout();
-            location.reload();
-        } else {
-            alert("❌ Error: " + data.error);
-        }
-    } catch (error) {
-        console.error("Error al eliminar cuenta:", error);
-        alert("❌ Error al eliminar la cuenta. Intenta más tarde.");
-    }
-});
-
-// Abrir modal de confirmación
-document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
     document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-});
+    });
 
-// Enviar confirmación
-document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const password = document.getElementById('confirmar-password').value;
-    const mensajeError = document.getElementById('mensaje-error');
-    mensajeError.style.display = 'none';
+    // Abrir modal de confirmación
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+    });
 
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ password })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            alert("✅ Tu cuenta ha sido eliminada correctamente.");
-            logout();
-            location.reload();
-        } else {
-            mensajeError.textContent = '❌ ' + data.error;
+    // Enviar confirmación
+    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('confirmar-password').value;
+        const mensajeError = document.getElementById('mensaje-error');
+        mensajeError.style.display = 'none';
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ password })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                logout();
+                location.reload();
+            } else {
+                mensajeError.textContent = '❌ ' + data.error;
+                mensajeError.style.display = 'block';
+            }
+        } catch (error) {
+            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
             mensajeError.style.display = 'block';
         }
-    } catch (error) {
-        mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-        mensajeError.style.display = 'block';
-    }
-});
+    });
 
 // Cerrar modal con la X
 document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventListener('click', () => {
