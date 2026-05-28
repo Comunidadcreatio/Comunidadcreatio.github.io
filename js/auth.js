@@ -6,11 +6,11 @@ export let artistaActual = JSON.parse(localStorage.getItem(ARTISTA_KEY));
 
 export async function login(email, password) {
     try {
-        const res = await apiRequest('/api/artistas/login', {
+        const res = await fetch(`${API_BASE_URL}/api/artistas/login`, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        if (!res) return { success: false, error: "Sesión cerrada remotamente" };
         const data = await res.json();
         if (data.success) {
             token = data.token;
