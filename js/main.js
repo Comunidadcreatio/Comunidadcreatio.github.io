@@ -51,16 +51,7 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    // Verifica si la sesión es válida
-    const sesionValida = await verificarSesionBackend();
-
-    if (sesionValida) {
-        // Sesión válida: muestra el panel
-        btnLogout.classList.remove('hidden');
-        btnPerfil.textContent = '👤 Artista';
-        // Muestra el panel (oculta la galería)
-        mostrarPanelArtista();  // 👈 Agrega esta línea
-    } else {
+    // Verifica si la sesión es válid
         // Sesión inválida: muestra la galería pública
         // Fuerza la ocultación del panel al inicio
         document.getElementById('panel-artista').classList.add('hidden');
@@ -72,7 +63,7 @@ async function init() {
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
         });
-    }
+    
     setupEvents();
     setupImagePreviews();
     cargarSelectoresFecha();
