@@ -93,8 +93,8 @@
     }
 
     .modal-content {
-        width: 70%;               /* 🔹 Ancho con aire a los lados */
-        max-width: 70%;
+        width: 40%;               /* 🔹 Ancho con aire a los lados */
+        max-width: 40%;
         }
 
     #modal-registro .cerrar-modal {
