@@ -61,20 +61,12 @@
 @media (max-width: 480px) {
     .modal-content {
         padding: 1.5rem;
-        max-height: 85vh;
     }
 
     .name-group,
     .date-group {
-        display: flex;
-        gap: 5px;
-    }
-
-    .date-group select {
-        flex: 1;
-        min-width: 0;
-        font-size: 12px;
-        padding: 6px;
+        flex-direction: column;
+        gap: 0;
     }
 
     #galeria-container {
@@ -87,14 +79,31 @@
         gap: 0.5rem;
         text-align: center;
     }
+}
 
-    /* Mantener nombres y apellidos en una sola fila */
-    .form-row {
-        display: flex;
-        gap: 5px;
+/* ==============================================
+   MEDIA QUERY PARA MODAL DE REGISTRO EN PANTALLA COMPLETA
+   ============================================== */
+@media (max-width: 600px) {
+    #modal-registro .modal-content {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border: none;
+        border-radius: 0;
+        padding: 2rem;
+        overflow-y: auto;
+        background: white;
+        position: relative;
     }
-    
-    .form-row .form-group {
-        flex: 1;
+
+    #modal-registro .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+        color: #333;
+        cursor: pointer;
     }
 }
