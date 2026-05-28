@@ -51,13 +51,14 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
+    document.getElementById('panel-artista').classList.add('hidden');
+    ocument.getElementById('galeria-publica').classList.remove('hidden');
+
     // FORZAR EL CIERRE DE SESIÓN LOCAL AL INICIAR
     localStorage.removeItem('artistaToken');
     localStorage.removeItem('artistaData');
     // (Opcional) También puedes forzar el token a null
-    token = null;
-    artistaActual = null;
-
+    
     // Mostrar solo la galería pública
     const obras = await cargarGaleria(galeriaContainer);
     mostrarGaleria(obras, galeriaContainer, (id) => {
