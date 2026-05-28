@@ -79,7 +79,7 @@
    MEDIA QUERY PARA MODAL DE REGISTRO EN PANTALLA COMPLETA
    ============================================== */
 @media (max-width: 600px) {
-    #modal-registro {
+    #modal-registro .modal-content {
         width: 95%;               /* 🔹 Ancho con aire a los lados */
         max-width: 95%;           /* 🔹 Aire a los lados */
         height: 100vh;
