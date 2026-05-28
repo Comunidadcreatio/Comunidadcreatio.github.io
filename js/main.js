@@ -83,6 +83,12 @@ async function init() {
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
 function setupEvents() {
+    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-restablecimiento').classList.remove('hidden');
+    });
+
     document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
         currentSearch = document.getElementById('search-input').value;
         currentSortBy = document.getElementById('sort-select').value;
