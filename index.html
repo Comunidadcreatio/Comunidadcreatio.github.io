@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,47 +24,42 @@
                 <!-- Las tarjetas de obras se cargarán aquí -->
                 <p>Cargando galería...</p>
             </div>
+            <!-- 🆕 NUEVO BOTÓN PARA VOLVER A LA GALERÍA -->
+            <button id="btn-volver-galeria" class="btn-volver hidden">← Volver a la Galería</button>
         </section>
-        <!-- 🆕 NUEVO BOTÓN PARA VOLVER A LA GALERÍA -->
-        <button id="btn-volver-galeria" class="btn-volver hidden">← Volver a la Galería</button>
+
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
         <section id="panel-artista" class="hidden">
             <h2>Mi Panel</h2>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
-        <!-- Búsqueda -->
-        <input type="text" id="search-input" placeholder="Buscar por título, artista o ID..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-        
-        <!-- Ordenamiento -->
-        <select id="sort-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="id">Ordenar por ID</option>
-            <option value="titulo">Ordenar por Título</option>
-            <option value="precio">Ordenar por Precio</option>
-            <option value="status">Ordenar por Status</option>
-        </select>
-        
-        <select id="order-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="DESC">Descendente</option>
-            <option value="ASC">Ascendente</option>
-        </select>
-        
-        <!-- Tamaño de página -->
-        <select id="limit-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="5">5 por página</option>
-            <option value="10" selected>10 por página</option>
-            <option value="20">20 por página</option>
-            <option value="50">50 por página</option>
-        </select>
-        
-        <button id="btn-aplicar-filtros" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Aplicar</button>
-    </div>
+            <!-- Controles de búsqueda y filtros -->
+            <div class="filter-controls">
+                <input type="text" id="search-input" placeholder="Buscar por título, artista o ID...">
+                <select id="sort-select">
+                    <option value="id">Ordenar por ID</option>
+                    <option value="titulo">Ordenar por Título</option>
+                    <option value="precio">Ordenar por Precio</option>
+                    <option value="status">Ordenar por Status</option>
+                </select>
+                <select id="order-select">
+                    <option value="DESC">Descendente</option>
+                    <option value="ASC">Ascendente</option>
+                </select>
+                <select id="limit-select">
+                    <option value="5">5 por página</option>
+                    <option value="10" selected>10 por página</option>
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                </select>
+                <button id="btn-aplicar-filtros">Aplicar</button>
+            </div>
 
-    <!-- Controles de paginación -->
-    <div id="pagination-controls" style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
-        <button id="btn-prev" class="pagination-btn" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer;">« Anterior</button>
-        <span id="page-info" style="padding: 6px 12px;">Página 1</span>
-        <button id="btn-next" class="pagination-btn" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer;">Siguiente »</button>
-    </div>
+            <!-- Controles de paginación -->
+            <div class="pagination-controls">
+                <button id="btn-prev" class="pagination-btn">« Anterior</button>
+                <span id="page-info">Página 1</span>
+                <button id="btn-next" class="pagination-btn">Siguiente »</button>
+            </div>
 
             <!-- Tabla de obras -->
             <div id="tabla-obras-container">
@@ -85,288 +79,204 @@
                     </tbody>
                 </table>
             </div>
+
             <!-- Formulario para agregar/editar obra -->
             <div id="formulario-obra">
-    <h3>Agregar / Editar Obra</h3>
-    <form id="obra-form">
-    <!-- Datos básicos -->
-    <input type="text" id="input-titulo" placeholder="Título" required>
-    <input type="text" id="input-artista" placeholder="Artista" readonly>
-    <input type="number" id="input-precio" placeholder="Precio" required>
-    <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required>
+                <h3>Agregar / Editar Obra</h3>
+                <form id="obra-form">
+                    <!-- Datos básicos -->
+                    <input type="text" id="input-titulo" placeholder="Título" required>
+                    <input type="text" id="input-artista" placeholder="Artista" readonly>
+                    <input type="number" id="input-precio" placeholder="Precio" required>
+                    <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required>
 
-    <!-- Técnica -->
-    <select id="input-descripcion-tecnica" required>
-        <option value="" disabled selected>Selecciona Técnica</option>
-        <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
-        <option value="Acrílico sobre lienzo">Acrílico sobre lienzo</option>
-        <option value="Acuarela">Acuarela</option>
-        <option value="Técnica mixta sobre lienzo">Técnica mixta sobre lienzo</option>
-        <option value="Pintura al pastel">Pintura al pastel</option>
-        <option value="Gouache">Gouache</option>
-        <option value="Bronce fundido">Bronce fundido</option>
-        <option value="Madera tallada">Madera tallada</option>
-        <option value="Cerámica/terracota">Cerámica/terracota</option>
-        <option value="Resina moldeada">Resina moldeada</option>
-        <option value="Escultura en metal (ensamblaje/soldadura)">Escultura en metal (ensamblaje/soldadura)</option>
-        <option value="Mármol/piedra tallada">Mármol/piedra tallada</option>
-        <option value="Dibujo a lápiz/grafito">Dibujo a lápiz/grafito</option>
-        <option value="Dibujo a tinta">Dibujo a tinta</option>
-        <option value="Carboncillo">Carboncillo</option>
-        <option value="Lápices de colores">Lápices de colores</option>
-        <option value="Collage en papel">Collage en papel</option>
-        <option value="Serigrafía/grabado">Serigrafía/grabado</option>
-        <option value="Fotografía digital">Fotografía digital</option>
-        <option value="Fotografía analógica (B/N o color)">Fotografía analógica (B/N o color)</option>
-        <option value="Videoarte">Videoarte</option>
-        <option value="Arte digital/ilustración digital">Arte digital/ilustración digital</option>
-        <option value="Impresión giclée">Impresión giclée</option>
-        <option value="NFT (arte digital tokenizado)">NFT (arte digital tokenizado)</option>
-        <option value="Instalación (site-specific)">Instalación (site-specific)</option>
-        <option value="Arte textil (tapiz, bordado)">Arte textil (tapiz, bordado)</option>
-        <option value="Performance documentada">Performance documentada</option>
-        <option value="Arte objeto/ready-made">Arte objeto/ready-made</option>
-        <option value="Técnica mixta (multidisciplinar)">Técnica mixta (multidisciplinar)</option>
-    </select>
+                    <!-- Técnica -->
+                    <select id="input-descripcion-tecnica" required>
+                        <option value="" disabled selected>Selecciona Técnica</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <select id="input-soporte" required>
-    <option value="" disabled selected>Selecciona Soporte</option>
-    <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
-    <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
-    <option value="Papel (acuarela, dibujo, grabado)">Papel (acuarela, dibujo, grabado)</option>
-    <option value="Cartón (cartulina, cartón pluma)">Cartón (cartulina, cartón pluma)</option>
-    <option value="Madera (tabla, panel, contrachapado)">Madera (tabla, panel, contrachapado)</option>
-    <option value="Metal (lámina de aluminio, cobre)">Metal (lámina de aluminio, cobre)</option>
-    <option value="Vidrio (pintura sobre vidrio)">Vidrio (pintura sobre vidrio)</option>
-    <option value="Cerámica (azulejo, loza)">Cerámica (azulejo, loza)</option>
-    <option value="Tela (seda, algodón, yute)">Tela (seda, algodón, yute)</option>
-    <option value="Piel/cuero">Piel/cuero</option>
-    <option value="Muro (fresco, mural - no transportable)">Muro (fresco, mural - no transportable)</option>
-    <option value="Digital (archivo, sin soporte físico)">Digital (archivo, sin soporte físico)</option>
-    <option value="Mixto (varios materiales)">Mixto (varios materiales)</option>
-    </select>
+                    <!-- Soporte -->
+                    <select id="input-soporte" required>
+                        <option value="" disabled selected>Selecciona Soporte</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Año -->
-    <input type="number" id="input-ano" placeholder="Año" required>
+                    <!-- Año -->
+                    <input type="number" id="input-ano" placeholder="Año" required>
 
-    <!-- Descripción Artística -->
-    <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required></textarea>
+                    <!-- Descripción Artística -->
+                    <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required></textarea>
 
-    <!-- Estado de la Obra -->
-    <select id="input-estado-obra" required>
-        <option value="" disabled selected>Selecciona Estado</option>
-        <option value="Disponible (en venta)">Disponible (en venta)</option>
-        <option value="Reservado">Reservado</option>
-        <option value="Vendido">Vendido</option>
-        <option value="No disponible temporalmente">No disponible temporalmente</option>
-        <option value="En préstamo (fuera de galería)">En préstamo (fuera de galería)</option>
-        <option value="Solo para exhibición (no venta)">Solo para exhibición (no venta)</option>
-        <option value="Retirado del inventario">Retirado del inventario</option>
-    </select>
+                    <!-- Estado de la Obra -->
+                    <select id="input-estado-obra" required>
+                        <option value="" disabled selected>Selecciona Estado</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Procedencia -->
-    <select id="input-procedencia" required>
-        <option value="" disabled selected>Selecciona Procedencia</option>
-        <option value="Colección privada">Colección privada</option>
-        <option value="Taller del artista">Taller del artista</option>
-        <option value="Herencia familiar">Herencia familiar</option>
-        <option value="Compra directa al artista">Compra directa al artista</option>
-        <option value="Adquisición en subasta">Adquisición en subasta</option>
-        <option value="Donación">Donación</option>
-        <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
-        <option value="Desconocida">Desconocida</option>
-    </select>
+                    <!-- Procedencia -->
+                    <select id="input-procedencia" required>
+                        <option value="" disabled selected>Selecciona Procedencia</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Marcos -->
-    <select id="input-marcos" required>
-        <option value="" disabled selected>Selecciona Marcos</option>
-        <option value="Ya enmarcada (listo para colgar)">Ya enmarcada (listo para colgar)</option>
-        <option value="Sin enmarcar (solo lienzo/bastidor)">Sin enmarcar (solo lienzo/bastidor)</option>
-        <option value="Enmarcado opcional (el cliente elige después)">Enmarcado opcional (el cliente elige después)</option>
-        <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
-        <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
-    </select>
+                    <!-- Marcos -->
+                    <select id="input-marcos" required>
+                        <option value="" disabled selected>Selecciona Marcos</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Certificado -->
-    <select id="input-certificado" required>
-        <option value="" disabled selected>Selecciona Certificado</option>
-        <option value="Sí (autenticado)">Sí (autenticado)</option>
-        <option value="No">No</option>
-        <option value="En trámite">En trámite</option>
-        <option value="Certificado digital disponible">Certificado digital disponible</option>
-        <option value="Certificado físico disponible">Certificado físico disponible</option>
-    </select>
+                    <!-- Certificado -->
+                    <select id="input-certificado" required>
+                        <option value="" disabled selected>Selecciona Certificado</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Status -->
-    <select id="input-status" required>
-        <option value="" disabled selected>Selecciona Status</option>
-        <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
-        <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
-    </select>
+                    <!-- Status -->
+                    <select id="input-status" required>
+                        <option value="" disabled selected>Selecciona Status</option>
+                        <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
+                        <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
+                    </select>
 
-    <!-- Dimensiones -->
-    <div style="display: flex; gap: 10px;">
-        <input type="number" id="input-ancho" placeholder="Ancho (cm)" required style="flex: 1;">
-        <input type="number" id="input-alto" placeholder="Alto (cm)" required style="flex: 1;">
-    </div>
+                    <!-- Dimensiones -->
+                    <div class="dimensiones-group">
+                        <input type="number" id="input-ancho" placeholder="Ancho (cm)" required>
+                        <input type="number" id="input-alto" placeholder="Alto (cm)" required>
+                    </div>
 
-    <!-- Firma -->
-    <select id="input-firma" required>
-        <option value="" disabled selected>Selecciona Firma</option>
-        <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
-        <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
-        <option value="Firmada en el bastidor">Firmada en el bastidor</option>
-        <option value="Iniciales solamente">Iniciales solamente</option>
-        <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
-        <option value="No firmada">No firmada</option>
-        <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
-        <option value="Firma ilegible">Firma ilegible</option>
-        <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
-        <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
-    </select>
+                    <!-- Firma -->
+                    <select id="input-firma" required>
+                        <option value="" disabled selected>Selecciona Firma</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Conservación -->
-    <select id="input-conservacion" required>
-        <option value="" disabled selected>Selecciona Conservación</option>
-        <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
-        <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
-        <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
-        <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
-        <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
-        <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
-    </select>
+                    <!-- Conservación -->
+                    <select id="input-conservacion" required>
+                        <option value="" disabled selected>Selecciona Conservación</option>
+                        <!-- opciones... -->
+                    </select>
 
-    <!-- Etiquetas -->
-    <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
+                    <!-- Etiquetas -->
+                    <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
 
-    <!-- Contenedor para los 5 recuadros de imágenes -->
-<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-    
-    <!-- Recuadro 1 (Imagen Principal - Obligatoria) -->
-    <div class="recuadro-imagen" style="width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;">
-        <label for="input-imagen-0" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <span id="placeholder-0" style="font-size: 12px; color: #888; text-align: center;">+<br>Principal</span>
-            <img id="preview-0" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            <input type="file" id="input-imagen-0" accept="image/*" style="display: none;">
-            <button type="button" class="btn-eliminar-imagen" data-index="0" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: none;">✕</button>
-        </label>
-    </div>
+                    <!-- Contenedor para los 5 recuadros de imágenes -->
+                    <div class="imagenes-contenedor">
+                        <!-- Recuadro 1 (Imagen Principal - Obligatoria) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-0">
+                                <span id="placeholder-0" class="placeholder-text">+<br>Principal</span>
+                                <img id="preview-0" src="" class="preview-img">
+                                <input type="file" id="input-imagen-0" accept="image/*">
+                                <button type="button" class="btn-eliminar-imagen" data-index="0">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 2 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-1">
+                                <span id="placeholder-1" class="placeholder-text">+<br>Imagen 2</span>
+                                <img id="preview-1" src="" class="preview-img">
+                                <input type="file" id="input-imagen-1" accept="image/*">
+                                <button type="button" class="btn-eliminar-imagen" data-index="1">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 3 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-2">
+                                <span id="placeholder-2" class="placeholder-text">+<br>Imagen 3</span>
+                                <img id="preview-2" src="" class="preview-img">
+                                <input type="file" id="input-imagen-2" accept="image/*">
+                                <button type="button" class="btn-eliminar-imagen" data-index="2">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 4 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-3">
+                                <span id="placeholder-3" class="placeholder-text">+<br>Imagen 4</span>
+                                <img id="preview-3" src="" class="preview-img">
+                                <input type="file" id="input-imagen-3" accept="image/*">
+                                <button type="button" class="btn-eliminar-imagen" data-index="3">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 5 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-4">
+                                <span id="placeholder-4" class="placeholder-text">+<br>Imagen 5</span>
+                                <img id="preview-4" src="" class="preview-img">
+                                <input type="file" id="input-imagen-4" accept="image/*">
+                                <button type="button" class="btn-eliminar-imagen" data-index="4">✕</button>
+                            </label>
+                        </div>
+                    </div>
 
-    <!-- Recuadro 2 (Opcional) -->
-    <div class="recuadro-imagen" style="width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;">
-        <label for="input-imagen-1" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <span id="placeholder-1" style="font-size: 12px; color: #888; text-align: center;">+<br>Imagen 2</span>
-            <img id="preview-1" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            <input type="file" id="input-imagen-1" accept="image/*" style="display: none;">
-            <button type="button" class="btn-eliminar-imagen" data-index="1" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: none;">✕</button>
-        </label>
-    </div>
+                    <div id="vista-previa-imagenes" class="vista-previa"></div>
 
-    <!-- Recuadro 3 (Opcional) -->
-    <div class="recuadro-imagen" style="width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;">
-        <label for="input-imagen-2" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <span id="placeholder-2" style="font-size: 12px; color: #888; text-align: center;">+<br>Imagen 3</span>
-            <img id="preview-2" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            <input type="file" id="input-imagen-2" accept="image/*" style="display: none;">
-            <button type="button" class="btn-eliminar-imagen" data-index="2" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: none;">✕</button>
-        </label>
-    </div>
+                    <input type="hidden" id="input-id-edicion">
+                    <div class="form-actions">
+                        <button type="submit" id="btn-guardar">Guardar Obra</button>
+                        <button type="button" id="btn-limpiar-campos" class="hidden">🗑️ Limpiar Campos</button>
+                    </div>
 
-    <!-- Recuadro 4 (Opcional) -->
-    <div class="recuadro-imagen" style="width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;">
-        <label for="input-imagen-3" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <span id="placeholder-3" style="font-size: 12px; color: #888; text-align: center;">+<br>Imagen 4</span>
-            <img id="preview-3" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            <input type="file" id="input-imagen-3" accept="image/*" style="display: none;">
-            <button type="button" class="btn-eliminar-imagen" data-index="3" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: none;">✕</button>
-        </label>
-    </div>
+                    <!-- Sección de peligro al final del panel -->
+                    <div class="danger-zone">
+                        <h3>⚠️ Zona de Peligro</h3>
+                        <p>Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
+                        <button id="btn-eliminar-cuenta">🗑️ Eliminar mi cuenta</button>
+                    </div>
 
-    <!-- Recuadro 5 (Opcional) -->
-    <div class="recuadro-imagen" style="width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;">
-        <label for="input-imagen-4" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <span id="placeholder-4" style="font-size: 12px; color: #888; text-align: center;">+<br>Imagen 5</span>
-            <img id="preview-4" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            <input type="file" id="input-imagen-4" accept="image/*" style="display: none;">
-            <button type="button" class="btn-eliminar-imagen" data-index="4" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: none;">✕</button>
-        </label>
-    </div>
+                </form>
 
-</div>
-
-    <input type="hidden" id="input-id-edicion">
-    <button type="submit" id="btn-guardar">Guardar Obra</button>
-    <button type="button" id="btn-limpiar-campos" class="hidden">🗑️ Limpiar Campos</button>
-
-    <div id="vista-previa-imagenes" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;"></div>
-
-    <!-- Sección de peligro al final del panel -->
-<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #dc3545;">
-    <h3 style="color: #dc3545; margin-bottom: 10px;">⚠️ Zona de Peligro</h3>
-    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
-    <button id="btn-eliminar-cuenta" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Eliminar mi cuenta</button>
-</div>
-
-
-
-</form>
-
-<div style="margin-top: 20px; text-align: center;">
-    <button id="btn-cerrar-todas-sesiones" type="button" style="padding: 10px 20px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer;">
-        🔐 Cerrar todas las sesiones
-    </button>
-</div>
-
-</div>
+                <div class="session-actions">
+                    <button id="btn-cerrar-todas-sesiones" type="button">🔐 Cerrar todas las sesiones</button>
+                </div>
+            </div>
         </section>
     </main>
 
     <!-- MODALES -->
     <div id="modal-login" class="modal hidden">
-        
         <div class="modal-content">
-            <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+            <span class="cerrar-modal">&times;</span>
             <h2>Iniciar Sesión</h2>
             <form id="login-form">
-                
                 <input type="email" id="login-email" placeholder="Email" required>
                 <input type="password" id="login-pass" placeholder="Contraseña" required>
-                <!-- 🆕 Enlace para restablecer contraseña -->
-                <p style="text-align: right; margin-bottom: 10px;">
-                    <a href="#" id="btn-olvide-contrasena" style="color: #007bff; font-size: 14px; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                <p class="forgot-password">
+                    <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
                 </p>
-
                 <button type="submit">Entrar</button>
             </form>
-            <button id="btn-ir-registro">Registrarse</button>
+            <button id="btn-ir-registro" class="secondary-btn">Registrarse</button>
         </div>
     </div>
 
     <div id="modal-registro" class="modal hidden">
         <div class="modal-content">
-            <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+            <span class="cerrar-modal">&times;</span>
             <h2>Registro de Artista</h2>
             <form id="registro-form">
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="reg-nombres" placeholder="Nombres" required style="flex: 1;">
-                    <input type="text" id="reg-apellidos" placeholder="Apellidos" required style="flex: 1;">
+                <div class="name-group">
+                    <input type="text" id="reg-nombres" placeholder="Nombres" required>
+                    <input type="text" id="reg-apellidos" placeholder="Apellidos" required>
                 </div>
                 <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required>
                 <input type="email" id="reg-email" placeholder="Correo Electronico" required>
                 <input type="password" id="reg-pass" placeholder="Contraseña" required>
                 <input type="text" id="reg-telefono" placeholder="Número de celular" required>
 
-                <label for="reg-pais" style="display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold;">País de Residencia</label>
-                <select id="reg-pais" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
+                <label for="reg-pais">País de Residencia</label>
+                <select id="reg-pais" required>
                     <option value="" disabled selected>Selecciona tu país</option>
                     <option value="Venezuela">Venezuela</option>
                 </select>
-                <label for="reg-ciudad" style="display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold;">Ciudad</label>
-                <select id="reg-ciudad" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
+
+                <label for="reg-ciudad">Ciudad</label>
+                <select id="reg-ciudad" required>
                     <option value="" disabled selected>Primero selecciona un país</option>
                 </select>
-                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Fecha de Nacimiento</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+
+                <label>Fecha de Nacimiento</label>
+                <div class="date-group">
                     <select name="dia" id="reg-dia" required>
                         <option value="" disabled selected>Día</option>
                     </select>
@@ -377,44 +287,45 @@
                         <option value="" disabled selected>Año</option>
                     </select>
                 </div>
-    
+
                 <select name="genero" id="reg-genero" required>
                     <option value="" disabled selected>Selecciona Género</option>
                     <option value="masculino">Masculino</option>
                     <option value="femenino">Femenino</option>
                     <option value="otro">Otro</option>
                 </select>
+
                 <button type="submit">Registrarse</button>
             </form>
-            <button id="btn-ir-login">Volver al Login</button>
+            <button id="btn-ir-login" class="secondary-btn">Volver al Login</button>
         </div>
     </div>
 
-        <!-- Modal para solicitar restablecimiento de contraseña -->
+    <!-- Modal para solicitar restablecimiento de contraseña -->
     <div id="modal-restablecimiento" class="modal hidden">
         <div class="modal-content">
-            <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+            <span class="cerrar-modal">&times;</span>
             <h2>Restablecer Contraseña</h2>
             <form id="solicitar-restablecimiento-form">
-                <label for="reset-email" style="display: block; margin-bottom: 5px; font-size: 14px;">Ingresa tu correo electrónico:</label>
-                <input type="email" id="reset-email" placeholder="Correo Electrónico" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Enviar enlace</button>
+                <label for="reset-email">Ingresa tu correo electrónico:</label>
+                <input type="email" id="reset-email" placeholder="Correo Electrónico" required>
+                <button type="submit">Enviar enlace</button>
             </form>
-            <p id="reset-message" style="text-align: center; margin-top: 10px; font-size: 14px; display: none;"></p>
+            <p id="reset-message" class="form-message"></p>
         </div>
     </div>
 
     <!-- Modal para confirmar eliminación de cuenta -->
     <div id="modal-confirmar-eliminacion" class="modal hidden">
         <div class="modal-content">
-            <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
-            <h2 style="color: #dc3545;">🗑️ Eliminar Cuenta</h2>
-            <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Para eliminar tu cuenta, por favor ingresa tu contraseña actual.</p>
+            <span class="cerrar-modal">&times;</span>
+            <h2>🗑️ Eliminar Cuenta</h2>
+            <p>Para eliminar tu cuenta, por favor ingresa tu contraseña actual.</p>
             <form id="confirmar-eliminacion-form">
-                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Eliminar mi cuenta</button>
+                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required>
+                <button type="submit">Eliminar mi cuenta</button>
             </form>
-            <p id="mensaje-error" style="color: #dc3545; text-align: center; margin-top: 10px; display: none;"></p>
+            <p id="mensaje-error" class="error-message"></p>
         </div>
     </div>
 
