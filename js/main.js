@@ -50,7 +50,7 @@ function poblarCiudades(paisSeleccionado) {
 // ============================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
-async function init() {
+async function init() {ss
 
     console.log("🚨 INICIO DE INIT");
     console.log("Token:", token);
