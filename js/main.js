@@ -177,30 +177,27 @@ function setupEvents() {
         }
     });
 
-        document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-        if (!confirm("¿Estás seguro de que quieres cerrar todas las sesiones? Esto cerrará tu sesión en todos los dispositivos.")) {
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/artistas/cerrar-todas-sesiones`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+            // Cerrar todas las sesiones
+    document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
+        if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/artistas/cerrar-todas-sesiones`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
+                    // 🛑 Cerrar sesión local y recargar la página
+                    logout(); // Esto limpia localStorage y dispara el evento 'userLogout'
+                    location.reload(); // Recarga la página para mostrar la galería pública
+                } else {
+                    alert("❌ Error: " + data.error);
                 }
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert("✅ Todas las sesiones han sido cerradas. Deberás iniciar sesión nuevamente.");
-                logout();
-                location.reload();
-            } else {
-                alert("❌ Error: " + data.error);
+            } catch (error) {
+                console.error("Error al cerrar todas las sesiones:", error);
+                alert("❌ Error de conexión. Intenta más tarde.");
             }
-        } catch (error) {
-            alert("❌ Error de conexión: " + error.message);
         }
     });
 
