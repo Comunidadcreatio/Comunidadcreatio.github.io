@@ -59,9 +59,6 @@ async function init() {
     // FORZAR LIMPIEZA DE LOCALSTORAGE AL INICIAR
     localStorage.removeItem('artistaToken');
     localStorage.removeItem('artistaData');
-    token = null;
-    artistaActual = null;
-    // 🛑 FIN DE LA DEPURACIÓN
 
     console.log("🔍 Iniciando aplicación...");
     console.log("Token:", token);
