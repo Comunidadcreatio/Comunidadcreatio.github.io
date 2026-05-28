@@ -454,7 +454,7 @@ body {
 .danger-zone {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 2px solid #dc3545; /* Borde rojo */
+    border-top: 2px solid #dc3545;
 }
 
 .danger-zone h3 {
@@ -468,17 +468,58 @@ body {
     color: #666;
 }
 
-#btn-eliminar-cuenta {
+.danger-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Estilo unificado para ambos botones (rojo y amarillo) */
+#btn-eliminar-cuenta,
+#btn-cerrar-todas-sesiones {
     padding: 10px 20px;
-    background: #dc3545; /* Rojo */
-    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1; /* Ambos botones ocupan el mismo ancho */
+    min-width: 150px;
+    max-width: 250px;
+    transition: opacity 0.2s;
+}
+
+/* Colores específicos */
+#btn-eliminar-cuenta {
+    background: #dc3545;
+    color: white;
 }
 
 #btn-eliminar-cuenta:hover {
-    background: #c82333;
+    opacity: 0.9;
+}
+
+#btn-cerrar-todas-sesiones {
+    background: #ffc107;
+    color: #333;
+}
+
+#btn-cerrar-todas-sesiones:hover {
+    opacity: 0.9;
+}
+
+/* En móviles, los botones se apilan uno encima del otro */
+@media (max-width: 480px) {
+    .danger-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    #btn-eliminar-cuenta,
+    #btn-cerrar-todas-sesiones {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 
 /* --- Cerrar todas las sesiones --- */
@@ -633,4 +674,45 @@ body {
     color: #dc3545;
     text-align: center;
     margin-top: 10px;
+}
+
+/* --- MEDIA QUERIES PARA MÓVILES --- */
+@media (max-width: 768px) {
+    /* Controles de filtro se apilan uno encima del otro */
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .filter-controls input[type="text"],
+    .filter-controls select,
+    .filter-controls button {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Paginación se apila */
+    .pagination-controls {
+        flex-wrap: wrap;
+    }
+
+    /* Contenedor de la tabla con scroll horizontal */
+    #tabla-obras-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tabla: Opcional: Ocultar columnas menos importantes para ahorrar espacio */
+    #tabla-obras-container th:nth-child(1), /* ID */
+    #tabla-obras-container td:nth-child(1) {
+        display: none;
+    }
+    #tabla-obras-container th:nth-child(3), /* Precio */
+    #tabla-obras-container td:nth-child(3) {
+        display: none;
+    }
+    #tabla-obras-container th:nth-child(5), /* Status */
+    #tabla-obras-container td:nth-child(5) {
+        display: none;
+    }
 }
