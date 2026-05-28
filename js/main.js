@@ -51,6 +51,18 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
+
+    console.log("🚨 INICIO DE INIT");
+    console.log("Token:", token);
+    console.log("Artista:", artistaActual);
+
+    // FORZAR LIMPIEZA DE LOCALSTORAGE AL INICIAR
+    localStorage.removeItem('artistaToken');
+    localStorage.removeItem('artistaData');
+    token = null;
+    artistaActual = null;
+    // 🛑 FIN DE LA DEPURACIÓN
+
     console.log("🔍 Iniciando aplicación...");
     console.log("Token:", token);
     console.log("Artista actual:", artistaActual);
@@ -681,5 +693,6 @@ async function verificarSesionBackend() {
         return false;
     }
 }
+
 
 init();
