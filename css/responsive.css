@@ -63,12 +63,6 @@
         padding: 1.5rem;
     }
 
-    .name-group,
-    .date-group {
-        flex-direction: column;
-        gap: 0;
-    }
-
     #galeria-container {
         grid-template-columns: 1fr;
         padding: 1rem;
