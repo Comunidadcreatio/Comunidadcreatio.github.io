@@ -15,9 +15,15 @@ export async function apiRequest(endpoint, options = {}) {
         }
     });
 
-    // Si el backend devuelve 401 y NO es la ruta de eliminar cuenta, cerramos sesión
-    if (res.status === 401 && !endpoint.includes('/api/artistas/eliminar-cuenta')) {
-        // ... resto de la lógica para manejar el 401 en otras rutas ...
+    // Si el backend devuelve 401 (Sesión expirada/cerrada), cerramos sesión local
+    // 🛑 EXCEPCIÓN: SI ES EL ENDPOINT DE ELIMINAR CUENTA, NO REDIRIGIMOS
+    if (res.status === 401 && !endpoint.includes('/eliminar-cuenta')) {
+        console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
+        alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(ARTISTA_KEY);
+        location.reload();
+        return null;
     }
 
     return res;
