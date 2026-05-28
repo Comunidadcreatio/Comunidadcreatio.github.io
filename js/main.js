@@ -391,6 +391,35 @@ document.getElementById('solicitar-restablecimiento-form').addEventListener('sub
     }
 });
 
+
+// --- CONFIRMAR ELIMINACIÓN DE CUENTA ---
+document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('confirmar-password').value;
+    const mensajeError = document.getElementById('mensaje-error');
+    mensajeError.style.display = 'none';
+
+    try {
+        const res = await apiRequest('/api/artistas/eliminar-cuenta', {
+            method: 'POST',
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert("✅ Tu cuenta ha sido eliminada correctamente.");
+            logout();
+            location.reload();
+        } else {
+            mensajeError.textContent = '❌ ' + data.error;
+            mensajeError.style.display = 'block';
+        }
+    } catch (error) {
+        mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+        mensajeError.style.display = 'block';
+    }
+});
+
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
