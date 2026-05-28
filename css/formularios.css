@@ -44,7 +44,8 @@
 .dimensiones-group input,
 .name-group input,
 .date-group select {
-    flex: 1;
+    flex: 1; /* Cada selector ocupa el mismo ancho */
+    min-width: 0; /* Permite que se encojan si es necesario */
 }
 
 /* --- Contenedor de imágenes --- */
