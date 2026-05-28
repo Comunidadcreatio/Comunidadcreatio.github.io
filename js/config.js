@@ -16,10 +16,14 @@ export async function apiRequest(endpoint, options = {}) {
         }
     });
 
-    // Si el backend devuelve 401 (Sesión expirada/cerrada), cerramos sesión local
     if (res.status === 401) {
         console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
-        alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
+        
+        // 🛑 NO MOSTRAR LA ALERTA SI ES LA RUTA DE CONFIRMAR RESTABLECIMIENTO
+        if (!endpoint.includes('/confirmar-restablecimiento')) {
+            alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
+        }
+        
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(ARTISTA_KEY);
         location.reload();
