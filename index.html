@@ -394,6 +394,20 @@
         </div>
     </div>
 
+    <!-- Modal para confirmar eliminación de cuenta -->
+    <div id="modal-confirmar-eliminacion" class="modal hidden">
+        <div class="modal-content">
+            <span class="cerrar-modal" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+            <h2 style="color: #dc3545;">🗑️ Eliminar Cuenta</h2>
+            <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Para eliminar tu cuenta, por favor ingresa tu contraseña actual.</p>
+            <form id="confirmar-eliminacion-form">
+                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                <button type="submit" style="width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Eliminar mi cuenta</button>
+            </form>
+            <p id="mensaje-error" style="color: #dc3545; text-align: center; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
     <div id="modal-detalles" class="modal hidden">
         <div class="modal-content">
             <h2 id="detalle-titulo"></h2>
