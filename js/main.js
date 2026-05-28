@@ -51,16 +51,31 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    // Ignorar la sesión por completo
-    const obras = await cargarGaleria(galeriaContainer);
-    mostrarGaleria(obras, galeriaContainer, (id) => {
-        console.log("Ver detalles de obra con ID:", id);
-    });
-    // Asegurar que el panel esté oculto
-    panelArtista.classList.add('hidden');
-    btnLogout.classList.add('hidden');
-    // Opcional: ocultar el botón de volver a la galería (ya que ya estamos en la galería)
-    document.getElementById('btn-volver-galeria').classList.add('hidden');
+    // Verifica si la sesión es válid
+
+    if (sesionValida) {
+        // Sesión válida: muestra el panel
+        btnLogout.classList.remove('hidden');
+        btnPerfil.textContent = '👤 Artista';
+        // Muestra el panel (oculta la galería)
+        mostrarPanelArtista();  // 👈 Agrega esta línea
+    } else {
+        // Sesión inválida: muestra la galería pública
+        // Fuerza la ocultación del panel al inicio
+        document.getElementById('panel-artista').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.remove('hidden');
+        btnLogout.classList.add('hidden');
+        btnPerfil.textContent = '👤';
+
+        const obras = await cargarGaleria(galeriaContainer);
+        mostrarGaleria(obras, galeriaContainer, (id) => {
+            console.log("Ver detalles de obra con ID:", id);
+        });
+    }
+    setupEvents();
+    setupImagePreviews();
+    cargarSelectoresFecha();
+    poblarCiudades('');
 }
 
 // ============================================
