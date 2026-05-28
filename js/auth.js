@@ -10,7 +10,7 @@ export async function login(email, password) {
             method: 'POST',
             body: JSON.stringify({ email, password })
         });
-        if (!res) return { success: false, error: "Sesión cerrada remotamente" }; // Seguridad extra
+        if (!res) return { success: false, error: "Sesión cerrada remotamente" };
         const data = await res.json();
         if (data.success) {
             token = data.token;
