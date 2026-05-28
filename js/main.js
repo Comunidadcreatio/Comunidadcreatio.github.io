@@ -51,18 +51,24 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
+    console.log("🔍 Iniciando aplicación...");
+    console.log("Token:", token);
+    console.log("Artista actual:", artistaActual);
+
     // Primero, verifica si la sesión es válida en el backend
+    console.log("🔍 Verificando sesión con el backend...");
     const sesionValida = await verificarSesionBackend();
+    console.log("🔍 Resultado de verificación:", sesionValida);
 
     if (sesionValida) {
-        // Sesión válida: muestra el panel
+        console.log("✅ Sesión válida. Mostrando panel.");
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
         // Opcional: cargar la galería o el panel según lo que necesites
         // const obras = await cargarGaleria(galeriaContainer);
         // mostrarGaleria(obras, galeriaContainer, (id) => { ... });
     } else {
-        // Sesión inválida: muestra la galería pública
+        console.log("❌ Sesión inválida. Mostrando galería pública.");
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
