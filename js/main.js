@@ -363,6 +363,30 @@ function setupEvents() {
         document.getElementById('modal-login').classList.remove('hidden');
     });
 
+    // 🔹 Enviar solicitud de restablecimiento
+document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // ✅ Evita la recarga de la página
+    const email = document.getElementById('reset-email').value;
+    const messageEl = document.getElementById('reset-message');
+    messageEl.style.display = 'block';
+    messageEl.textContent = '⏳ Enviando solicitud...';
+    messageEl.style.color = '#555';
+
+    try {
+        const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        messageEl.textContent = data.success ? '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.' : '❌ Error: ' + data.error;
+        messageEl.style.color = data.success ? '#28a745' : '#dc3545';
+    } catch (error) {
+        console.error('Error al solicitar restablecimiento:', error);
+        messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+        messageEl.style.color = '#dc3545';
+    }
+});
+
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
