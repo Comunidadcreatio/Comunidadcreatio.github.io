@@ -4,7 +4,6 @@ export const JWT_SECRET = 'your_super_secret_key';
 export const ARTISTA_KEY = 'artistaData';
 export const TOKEN_KEY = 'artistaToken';
 
-// Interceptor global para manejar sesiones expiradas (401)
 export async function apiRequest(endpoint, options = {}) {
     const token = localStorage.getItem(TOKEN_KEY);
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -16,18 +15,9 @@ export async function apiRequest(endpoint, options = {}) {
         }
     });
 
-    if (res.status === 401) {
-        console.warn("🚨 Sesión expirada o cerrada remotamente.");
-        // 🔹 No mostrar alerta si es la ruta de eliminar cuenta
-        if (!endpoint.includes('/eliminar-cuenta')) {
-            alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
-            localStorage.removeItem(TOKEN_KEY);
-            localStorage.removeItem(ARTISTA_KEY);
-            location.reload();
-            return null;
-        }
-        // 🔹 Si es eliminar cuenta, solo devolvemos la respuesta sin redirigir
-        return res;
+    // Si el backend devuelve 401 y NO es la ruta de eliminar cuenta, cerramos sesión
+    if (res.status === 401 && !endpoint.includes('/api/artistas/eliminar-cuenta')) {
+        // ... resto de la lógica para manejar el 401 en otras rutas ...
     }
 
     return res;
