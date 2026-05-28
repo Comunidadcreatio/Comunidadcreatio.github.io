@@ -1,52 +1,99 @@
-/* --- ESTILOS BÁSICOS PARA LA GALERÍA --- */
+/* --- Estilos Generales --- */
+* {
+    box-sizing: border-box;
+}
 
-/* 1. Contenedor principal de la galería */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Header --- */
+#main-header {
+    background-color: #343a40;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#brand-name {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+#user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+#btn-perfil,
+#btn-logout {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#btn-perfil:hover,
+#btn-logout:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* --- Galería Pública --- */
 #galeria-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Cuadrícula responsiva */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
-    padding: 20px;
+    padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* 2. Tarjeta de la obra */
 .obra-card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: white;
     border-radius: 8px;
     overflow: hidden;
-    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
 }
 
 .obra-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
-/* 3. La imagen dentro de la tarjeta (¡Aquí se evita el desborde!) */
 .obra-card img {
     width: 100%;
-    height: 200px; /* Altura fija para que todas las tarjetas sean iguales */
-    object-fit: cover; /* Recorta la imagen para llenar el espacio sin deformarla */
-    display: block;
+    height: 200px;
+    object-fit: cover;
 }
 
-/* 4. Información dentro de la tarjeta (título, artista, precio, botón) */
 .obra-card h3 {
     font-size: 1.1rem;
     margin: 10px 15px 5px;
-    font-family: sans-serif;
-    color: #333;
+    color: #222;
 }
 
 .obra-card p {
-    font-size: 0.9rem;
     margin: 0 15px 5px;
+    font-size: 0.9rem;
     color: #666;
-    font-family: sans-serif;
 }
 
 .obra-card button {
@@ -58,68 +105,370 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
 }
 
 .obra-card button:hover {
     background-color: #0056b3;
 }
 
-/* --- ESTILOS PARA EL PANEL DEL ARTISTA (Básico) --- */
-#panel-artista {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
+/* --- Botón Volver a Galería --- */
+.btn-volver {
+    display: block;
+    margin: 1rem auto 2rem;
+    padding: 8px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
+.btn-volver:hover {
+    background: #5a6268;
+}
+
+/* --- Panel del Artista --- */
+#panel-artista {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+#panel-artista h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* --- Controles de Filtros --- */
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-controls input[type="text"],
+.filter-controls select,
+.filter-controls button {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.filter-controls input[type="text"] {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-controls button:hover {
+    background-color: #0056b3;
+}
+
+/* --- Paginación --- */
+.pagination-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 1rem 0 2rem;
+}
+
+.pagination-btn {
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f1f1f1;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#page-info {
+    padding: 6px 12px;
+    align-self: center;
+}
+
+/* --- Tabla --- */
 #tabla-obras-container table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-#tabla-obras-container th, #tabla-obras-container td {
-    border: 1px solid #ddd;
-    padding: 8px;
+#tabla-obras-container th,
+#tabla-obras-container td {
+    padding: 12px;
     text-align: left;
+    border-bottom: 1px solid #eee;
 }
 
 #tabla-obras-container th {
-    background-color: #f2f2f2;
+    background-color: #f8f9fa;
+    font-weight: 600;
 }
 
+#tabla-obras-container td img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+#tabla-obras-container tr:last-child td {
+    border-bottom: none;
+}
+
+#tabla-obras-container td button {
+    margin-right: 4px;
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+#tabla-obras-container td button:hover {
+    background: #f1f1f1;
+}
+
+.btn-editar { color: #007bff; border-color: #007bff; }
+.btn-eliminar { color: #dc3545; border-color: #dc3545; }
+.btn-duplicar { color: #28a745; border-color: #28a745; }
+
+/* --- Formulario de Obra --- */
 #formulario-obra {
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
+    background: white;
+    padding: 2rem;
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 2rem;
 }
 
-#formulario-obra input[type="text"],
-#formulario-obra input[type="number"],
-#formulario-obra input[type="file"],
-#formulario-obra button {
-    margin-bottom: 10px;
-    padding: 8px;
+#obra-form input[type="text"],
+#obra-form input[type="number"],
+#obra-form select,
+#obra-form textarea {
     width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
     box-sizing: border-box;
 }
 
-#formulario-obra button {
+#obra-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+#obra-form input:read-only {
+    background-color: #f1f1f1;
+}
+
+/* Grupos de inputs */
+.dimensiones-group {
+    display: flex;
+    gap: 10px;
+}
+
+.dimensiones-group input {
+    flex: 1;
+}
+
+/* Imágenes */
+.imagenes-contenedor {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.recuadro-imagen {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.recuadro-imagen:hover {
+    border-color: #007bff;
+}
+
+.recuadro-imagen label {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.placeholder-text {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    pointer-events: none;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.recuadro-imagen input[type="file"] {
+    display: none;
+}
+
+.btn-eliminar-imagen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    display: none;
+    z-index: 10;
+    line-height: 24px;
+    text-align: center;
+}
+
+.vista-previa {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* Botones del formulario */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#btn-guardar {
+    width: 100%;
+    padding: 12px;
     background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#btn-guardar:hover {
+    background-color: #218838;
+}
+
+#btn-limpiar-campos {
+    width: 100%;
+    padding: 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#btn-limpiar-campos:hover {
+    background-color: #c82333;
+}
+
+/* --- Zona de Peligro --- */
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #dc3545;
+}
+
+.danger-zone h3 {
+    color: #dc3545;
+    margin-bottom: 10px;
+}
+
+.danger-zone p {
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+#btn-eliminar-cuenta {
+    padding: 10px 20px;
+    background: #dc3545;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-#formulario-obra button:hover {
-    background-color: #218838;
+#btn-eliminar-cuenta:hover {
+    background: #c82333;
 }
 
-/* --- ESTILOS PARA MODALES (Login, Registro, Detalles) --- */
+/* --- Cerrar todas las sesiones --- */
+.session-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#btn-cerrar-todas-sesiones {
+    padding: 10px 20px;
+    background: #ffc107;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#btn-cerrar-todas-sesiones:hover {
+    background: #e0a800;
+}
+
+/* --- Modales --- */
 .modal {
     position: fixed;
     top: 0;
@@ -139,132 +488,111 @@
 
 .modal-content {
     background: white;
-    padding: 30px;
+    padding: 2rem;
     border-radius: 8px;
-    max-width: 400px;
+    max-width: 450px;
     width: 90%;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+}
+
+.cerrar-modal:hover {
+    color: #333;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #333;
 }
 
 .modal-content input[type="text"],
 .modal-content input[type="email"],
 .modal-content input[type="password"],
-.modal-content input[type="date"],
-.modal-content select[name="genero"],
-.modal-content select[name="dia"],
-.modal-content select[name="mes"],
-.modal-content select[name="ano"],
+.modal-content select,
 .modal-content button {
-    margin-bottom: 10px;
-    padding: 8px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.modal-content button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.modal-content button:hover {
-    background-color: #0056b3;
-}
-
-/* Ocultar elementos visualmente */
-.hidden {
-    display: none !important;
-}
-
-.btn-volver {
-    background-color: #6c757d;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    font-size: 14px;
-}
-.btn-volver:hover {
-    background-color: #5a6268;
-}
-
-/* Estilo unificado para todos los inputs, selects y textareas */
-#obra-form input[type="text"],
-#obra-form input[type="number"],
-#obra-form select,
-#obra-form textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #ced4da;
     border-radius: 4px;
+    box-sizing: border-box;
     font-size: 14px;
-    box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
-    background-color: white;
-    display: block; /* Asegura que cada elemento ocupe su propia línea */
 }
 
-/* Estilo específico para los textarea (altura) */
-#obra-form textarea {
-    min-height: 60px;
-    resize: vertical;
-}
-
-/* Estilo para el botón de guardar */
-#obra-form button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    background-color: #28a745;
+.modal-content button {
+    background: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
-#obra-form button[type="submit"]:hover {
-    background-color: #218838;
+.modal-content button:hover {
+    background: #0056b3;
 }
 
-/* Contenedor flex para Ancho y Alto (si están en la misma línea) */
-.flex-row {
+.modal-content .secondary-btn {
+    background: #6c757d;
+}
+
+.modal-content .secondary-btn:hover {
+    background: #5a6268;
+}
+
+/* Formulario de registro - grupos */
+.name-group {
     display: flex;
-    gap: 15px;
+    gap: 10px;
 }
 
-.flex-row input {
+.name-group input {
     flex: 1;
 }
 
-#btn-limpiar-campos {
-    background-color: #dc3545;
-    color: white;
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
+.date-group {
+    display: flex;
+    gap: 10px;
 }
 
-#btn-limpiar-campos:hover {
-    background-color: #c82333;
+.date-group select {
+    flex: 1;
 }
 
-#tabla-obras-container table th, 
-#tabla-obras-container table td {
-    vertical-align: middle;
-    text-align: center;
+.forgot-password {
+    text-align: right;
+    margin-bottom: 10px;
 }
 
-#registro-form label {
-    display: block;
-    margin-bottom: 5px;
+.forgot-password a {
+    color: #007bff;
     font-size: 14px;
-    color: #444;
-    font-weight: 500;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.form-message {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    margin-top: 10px;
 }
