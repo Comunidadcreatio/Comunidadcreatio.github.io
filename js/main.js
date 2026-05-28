@@ -375,6 +375,43 @@ function setupEvents() {
         document.getElementById('modal-registro').classList.remove('hidden');
     });
 
+        // 🔹 Mostrar modal de restablecimiento
+    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-restablecimiento').classList.remove('hidden');
+    });
+
+    // 🔹 Enviar solicitud de restablecimiento
+    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value;
+        const messageEl = document.getElementById('reset-message');
+        messageEl.style.display = 'block';
+        messageEl.textContent = '⏳ Enviando solicitud...';
+        messageEl.style.color = '#555';
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/artistas/solicitar-restablecimiento`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            messageEl.textContent = data.success ? '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.' : '❌ Error: ' + data.error;
+            messageEl.style.color = data.success ? '#28a745' : '#dc3545';
+        } catch (error) {
+            console.error('Error al solicitar restablecimiento:', error);
+            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+            messageEl.style.color = '#dc3545';
+        }
+    });
+
+    // 🔹 Cerrar el modal de restablecimiento con la X
+    document.querySelector('#modal-restablecimiento .cerrar-modal').addEventListener('click', () => {
+        document.getElementById('modal-restablecimiento').classList.add('hidden');
+    });
+
     document.getElementById('btn-ir-login').addEventListener('click', () => {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('hidden');
