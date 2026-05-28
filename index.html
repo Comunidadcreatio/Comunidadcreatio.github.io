@@ -32,12 +32,6 @@
         <section id="panel-artista" class="hidden">
             <h2>Mi Panel</h2>
 
-        <div id="eliminar-cuenta-container" style="margin-top: 20px; text-align: center;">
-            <button id="btn-eliminar-cuenta" style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-                🗑️ Eliminar mi cuenta
-            </button>
-        </div>
-
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
         <!-- Búsqueda -->
         <input type="text" id="search-input" placeholder="Buscar por título, artista o ID..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
@@ -305,6 +299,13 @@
     <button type="button" id="btn-limpiar-campos" class="hidden">🗑️ Limpiar Campos</button>
 
     <div id="vista-previa-imagenes" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;"></div>
+
+    <!-- Sección de peligro al final del panel -->
+<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #dc3545;">
+    <h3 style="color: #dc3545; margin-bottom: 10px;">⚠️ Zona de Peligro</h3>
+    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
+    <button id="btn-eliminar-cuenta" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Eliminar mi cuenta</button>
+</div>
 </form>
 </div>
         </section>
