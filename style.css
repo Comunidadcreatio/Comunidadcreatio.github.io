@@ -5,8 +5,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: #ffffff; /* Fondo blanco */
+    color: #000;
     margin: 0;
     padding: 0;
 }
@@ -17,12 +17,13 @@ body {
 
 /* --- Header --- */
 #main-header {
-    background-color: #343a40;
-    color: white;
+    background-color: #ffffff; /* Fondo blanco */
+    color: #000;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 2px solid #000; /* Borde negro inferior */
 }
 
 #brand-name {
@@ -39,18 +40,19 @@ body {
 #btn-perfil,
 #btn-logout {
     background: none;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
+    border: 1px solid #000;
+    color: #000;
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 #btn-perfil:hover,
 #btn-logout:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: #000;
+    color: #fff;
 }
 
 /* --- Galería Pública --- */
@@ -67,7 +69,7 @@ body {
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #000; /* Borde negro */
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
@@ -87,29 +89,30 @@ body {
 .obra-card h3 {
     font-size: 1.1rem;
     margin: 10px 15px 5px;
-    color: #222;
+    color: #000;
 }
 
 .obra-card p {
     margin: 0 15px 5px;
     font-size: 0.9rem;
-    color: #666;
+    color: #333;
 }
 
 .obra-card button {
     margin: 10px 15px 15px;
     padding: 8px 12px;
-    border: none;
-    background-color: #007bff;
-    color: white;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .obra-card button:hover {
-    background-color: #0056b3;
+    background-color: #000;
+    color: #fff;
 }
 
 /* --- Botón Volver a Galería --- */
@@ -117,16 +120,17 @@ body {
     display: block;
     margin: 1rem auto 2rem;
     padding: 8px 20px;
-    background: #6c757d;
-    color: white;
-    border: none;
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
 }
 
 .btn-volver:hover {
-    background: #5a6268;
+    background: #000;
+    color: #fff;
 }
 
 /* --- Panel del Artista --- */
@@ -149,13 +153,16 @@ body {
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
     align-items: center;
+    padding: 10px;
+    border: 1px solid #000; /* Borde negro */
+    border-radius: 4px;
 }
 
 .filter-controls input[type="text"],
 .filter-controls select,
 .filter-controls button {
     padding: 8px 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid #000;
     border-radius: 4px;
     font-size: 14px;
     background: white;
@@ -167,7 +174,7 @@ body {
 }
 
 .filter-controls button {
-    background-color: #007bff;
+    background-color: #007bff; /* Azul */
     color: white;
     border: none;
     cursor: pointer;
@@ -188,7 +195,7 @@ body {
 
 .pagination-btn {
     padding: 6px 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid #000;
     border-radius: 4px;
     background: white;
     cursor: pointer;
@@ -209,20 +216,24 @@ body {
 }
 
 /* --- Tabla --- */
+#tabla-obras-container {
+    border: 1px solid #000; /* Borde negro */
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
 #tabla-obras-container table {
     width: 100%;
     border-collapse: collapse;
     background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 #tabla-obras-container th,
 #tabla-obras-container td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #000;
 }
 
 #tabla-obras-container th {
@@ -235,6 +246,7 @@ body {
     height: 50px;
     object-fit: cover;
     border-radius: 4px;
+    border: 1px solid #000;
 }
 
 #tabla-obras-container tr:last-child td {
@@ -244,28 +256,46 @@ body {
 #tabla-obras-container td button {
     margin-right: 4px;
     padding: 4px 8px;
-    border: 1px solid #ced4da;
     border-radius: 4px;
-    background: white;
     cursor: pointer;
     font-size: 12px;
     transition: all 0.2s;
+    background: white;
 }
 
-#tabla-obras-container td button:hover {
-    background: #f1f1f1;
+.btn-editar {
+    color: #007bff;
+    border: 1px solid #007bff;
+}
+.btn-editar:hover {
+    background: #007bff;
+    color: white;
 }
 
-.btn-editar { color: #007bff; border-color: #007bff; }
-.btn-eliminar { color: #dc3545; border-color: #dc3545; }
-.btn-duplicar { color: #28a745; border-color: #28a745; }
+.btn-eliminar {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.btn-eliminar:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-duplicar {
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+.btn-duplicar:hover {
+    background: #28a745;
+    color: white;
+}
 
 /* --- Formulario de Obra --- */
 #formulario-obra {
     background: white;
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #000; /* Borde negro */
+    border-radius: 4px;
     margin-top: 2rem;
 }
 
@@ -276,10 +306,12 @@ body {
     width: 100%;
     padding: 10px;
     margin-bottom: 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid #000;
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
+    background: white;
+    color: #000;
 }
 
 #obra-form textarea {
@@ -312,7 +344,7 @@ body {
 .recuadro-imagen {
     width: 100px;
     height: 100px;
-    border: 2px dashed #ced4da;
+    border: 2px dashed #000; /* Borde negro */
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -389,7 +421,7 @@ body {
 #btn-guardar {
     width: 100%;
     padding: 12px;
-    background-color: #28a745;
+    background-color: #28a745; /* Verde */
     color: white;
     border: none;
     border-radius: 4px;
@@ -405,7 +437,7 @@ body {
 #btn-limpiar-campos {
     width: 100%;
     padding: 12px;
-    background-color: #dc3545;
+    background-color: #dc3545; /* Rojo */
     color: white;
     border: none;
     border-radius: 4px;
@@ -422,7 +454,7 @@ body {
 .danger-zone {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 2px solid #dc3545;
+    border-top: 2px solid #dc3545; /* Borde rojo */
 }
 
 .danger-zone h3 {
@@ -438,7 +470,7 @@ body {
 
 #btn-eliminar-cuenta {
     padding: 10px 20px;
-    background: #dc3545;
+    background: #dc3545; /* Rojo */
     color: white;
     border: none;
     border-radius: 4px;
@@ -457,7 +489,7 @@ body {
 
 #btn-cerrar-todas-sesiones {
     padding: 10px 20px;
-    background: #ffc107;
+    background: #ffc107; /* Amarillo */
     color: #333;
     border: none;
     border-radius: 4px;
@@ -493,7 +525,8 @@ body {
     max-width: 450px;
     width: 90%;
     position: relative;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    border: 1px solid #000; /* Borde negro */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .cerrar-modal {
@@ -525,14 +558,16 @@ body {
     width: 100%;
     padding: 10px;
     margin-bottom: 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid #000;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
+    background: white;
+    color: #000;
 }
 
 .modal-content button {
-    background: #007bff;
+    background: #007bff; /* Azul */
     color: white;
     border: none;
     cursor: pointer;
@@ -544,11 +579,14 @@ body {
 }
 
 .modal-content .secondary-btn {
-    background: #6c757d;
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
 }
 
 .modal-content .secondary-btn:hover {
-    background: #5a6268;
+    background: #000;
+    color: #fff;
 }
 
 /* Formulario de registro - grupos */
