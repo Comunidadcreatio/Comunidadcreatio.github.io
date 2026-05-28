@@ -29,10 +29,17 @@
     padding: 2rem;
     overflow-y: auto;
     background: white;
-    position: fixed;
-    top: 0;
-    left: 0;
     z-index: 1001;
+    position: relative;
+}
+
+#modal-registro .cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
 }
 
 /* Resto de los modales mantienen su diseño original */
