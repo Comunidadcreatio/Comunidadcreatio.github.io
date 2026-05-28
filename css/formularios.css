@@ -41,6 +41,25 @@
     gap: 10px;
 }
 
+/* Contenedor para poner dos campos en la misma fila */
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row .form-group {
+    flex: 1; /* Cada grupo ocupa el mismo ancho */
+    min-width: 0; /* Permite que se encojan si es necesario */
+}
+
+/* Ajuste para que los labels no tengan margen extra */
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 .dimensiones-group input,
 .name-group input,
 .date-group select {
