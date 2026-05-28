@@ -55,15 +55,14 @@ async function init() {
     const sesionValida = await verificarSesionBackend();
 
     if (sesionValida) {
-        // Si el backend confirma que la sesión es válida, mostramos el panel
+        // Sesión válida: muestra el panel
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
-        const obras = await cargarGaleria(galeriaContainer);
-        mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Ver detalles de obra con ID:", id);
-        });
+        // Opcional: cargar la galería o el panel según lo que necesites
+        // const obras = await cargarGaleria(galeriaContainer);
+        // mostrarGaleria(obras, galeriaContainer, (id) => { ... });
     } else {
-        // Si no es válida, mostramos la galería pública
+        // Sesión inválida: muestra la galería pública
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
@@ -669,7 +668,8 @@ async function verificarSesionBackend() {
     if (!token) return false; // Si no hay token, no hay sesión
     try {
         const res = await apiRequest('/api/artistas/mis-obras?page=1&limit=1');
-        // Si apiRequest devuelve null (401), ya cerró la sesión. Si devuelve Response, el token es válido.
+        // Si apiRequest devuelve null (401), ya cerró la sesión.
+        // Si devuelve un objeto Response, el token es válido.
         return res !== null;
     } catch (error) {
         return false;
