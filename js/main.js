@@ -400,7 +400,7 @@ document.getElementById('confirmar-eliminacion-form').addEventListener('submit',
     mensajeError.style.display = 'none';
 
     try {
-        const res = fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
+        const res = await apiRequest('/api/artistas/eliminar-cuenta', {
             method: 'POST',
             body: JSON.stringify({ password })
         });
@@ -419,7 +419,6 @@ document.getElementById('confirmar-eliminacion-form').addEventListener('submit',
         mensajeError.style.display = 'block';
     }
 });
-
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
