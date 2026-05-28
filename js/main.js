@@ -177,6 +177,33 @@ function setupEvents() {
         }
     });
 
+        document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
+        if (!confirm("¿Estás seguro de que quieres cerrar todas las sesiones? Esto cerrará tu sesión en todos los dispositivos.")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/artistas/cerrar-todas-sesiones`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                alert("✅ Todas las sesiones han sido cerradas. Deberás iniciar sesión nuevamente.");
+                logout();
+                location.reload();
+            } else {
+                alert("❌ Error: " + data.error);
+            }
+        } catch (error) {
+            alert("❌ Error de conexión: " + error.message);
+        }
+    });
+
 // Cerrar modal con la X
 document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventListener('click', () => {
     document.getElementById('modal-confirmar-eliminacion').classList.add('hidden');
