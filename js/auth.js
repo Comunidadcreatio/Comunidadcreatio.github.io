@@ -1,16 +1,16 @@
 // js/auth.js
-import { API_BASE_URL, TOKEN_KEY, ARTISTA_KEY } from './config.js';
+import { API_BASE_URL, TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
 
 export let token = localStorage.getItem(TOKEN_KEY);
 export let artistaActual = JSON.parse(localStorage.getItem(ARTISTA_KEY));
 
 export async function login(email, password) {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/login`, {
+        const res = await apiRequest('/api/artistas/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
+        if (!res) return { success: false, error: "Sesión cerrada remotamente" }; // Seguridad extra
         const data = await res.json();
         if (data.success) {
             token = data.token;
@@ -29,49 +29,14 @@ export async function login(email, password) {
 
 export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero) {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/registro`, {
+        const res = await apiRequest('/api/artistas/registro', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                nombre_artista,
-                nombre_real, 
-                email, 
-                password,
-                telefono,
-                pais,
-                ciudad,
-                fecha_nacimiento,
-                genero
-            })
+            body: JSON.stringify({ nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero })
         });
+        if (!res) return { success: false, error: "Sesión cerrada remotamente" };
         return await res.json();
     } catch (error) {
         console.error("Error en registro:", error);
-        return { success: false, error: "Error de conexión" };
-    }
-}
-
-export async function registerWithPhoneVerification(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero, firebaseIdToken) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/artistas/registro-verificado`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nombre_artista,
-                nombre_real,
-                email,
-                password,
-                telefono,
-                pais,
-                ciudad,
-                fecha_nacimiento,
-                genero,
-                firebaseIdToken
-            })
-        });
-        return await res.json();
-    } catch (error) {
-        console.error("Error en registro verificado:", error);
         return { success: false, error: "Error de conexión" };
     }
 }
@@ -81,6 +46,5 @@ export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
     token = null;
     artistaActual = null;
-    // Disparar un evento personalizado para que el main.js se entere
     document.dispatchEvent(new Event('userLogout'));
 }
