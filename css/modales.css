@@ -30,17 +30,20 @@
 }
 
 .cerrar-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    line-height: 1;
+    position: absolute !important;
+    top: 10px !important;
+    right: 15px !important;
+    font-size: 30px !important;
+    font-weight: bold;
+    color: #666 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    z-index: 1001 !important;  /* 🔥 Asegura que esté por encima de todo */
+    display: block !important;  /* 🔥 Fuerza su visualización */
 }
 
 .cerrar-modal:hover {
-    color: #333;
+    color: #333 !important;
 }
 
 .modal-content h2 {
