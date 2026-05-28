@@ -38,3 +38,13 @@
     background-color: #000;
     color: #fff;
 }
+
+/* 🔥 CORRECCIÓN PARA EL HEADER */
+#btn-logout.hidden {
+    display: none !important;
+}
+
+/* Opcional: también asegurar que el botón de perfil tenga el estado correcto */
+#btn-perfil.hidden {
+    display: none !important;
+}
