@@ -18,32 +18,8 @@
     display: none;
 }
 
-/* --- Contenido del modal --- */
-#modal-registro .modal-content {
-    width: 100%;
-    max-width: 100%;
-    height: 100vh;
-    max-height: 100vh;
-    border: none;
-    border-radius: 0;
-    padding: 2rem;
-    overflow-y: auto;
-    background: white;
-    z-index: 1001;
-    position: relative;
-}
-
-#modal-registro .cerrar-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 30px;
-    color: #333;
-    cursor: pointer;
-}
-
-/* Resto de los modales mantienen su diseño original */
-.modal:not(#modal-registro) .modal-content {
+/* --- Contenido del modal (estándar para todos) --- */
+.modal-content {
     max-width: 450px;
     width: 90%;
     height: auto;
@@ -51,6 +27,8 @@
     border: 1px solid #000;
     border-radius: 8px;
     padding: 2rem;
+    background: white;
+    overflow-y: auto;
 }
 
 .cerrar-modal {
@@ -143,4 +121,32 @@
     color: #dc3545;
     text-align: center;
     margin-top: 10px;
+}
+
+/* ==============================================
+   MEDIA QUERY PARA MÓVILES (PANTALLA COMPLETA)
+   ============================================== */
+@media (max-width: 600px) {
+    #modal-registro .modal-content {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border: none;
+        border-radius: 0;
+        padding: 2rem;
+        overflow-y: auto;
+        background: white;
+        /* position: relative; para el botón de cerrar */
+        position: relative;
+    }
+
+    #modal-registro .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+        color: #333;
+        cursor: pointer;
+    }
 }
