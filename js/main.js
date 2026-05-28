@@ -116,11 +116,24 @@ function setupEvents() {
         }
     });
 
-    btnLogout.addEventListener('click', () => {
-        logout();
-        document.getElementById('btn-volver-galeria').classList.add('hidden');
-        ocultarPanelArtista();
-        location.reload();
+    btnLogout.addEventListener('click', async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/artistas/logout`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (!data.success) {
+                console.warn("El backend no pudo cerrar la sesión:", data.error);
+            }
+        } catch (error) {
+            console.error("Error al cerrar sesión en el backend:", error);
+        } finally {
+            logout();
+            document.getElementById('btn-volver-galeria').classList.add('hidden');
+            ocultarPanelArtista();
+            location.reload();
+        }
     });
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
