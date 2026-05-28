@@ -51,7 +51,8 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    // Verifica si la sesión es válid
+    // 1. Verificar si la sesión es válida en el backend
+    const sesionValida = await verificarSesionBackend();
 
     if (sesionValida) {
         // Sesión válida: muestra el panel
