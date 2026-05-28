@@ -19,10 +19,9 @@ export async function apiRequest(endpoint, options = {}) {
     // Si el backend devuelve 401 (Sesión expirada/cerrada), cerramos sesión local
     if (res.status === 401) {
         console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
-        // 🔹 Eliminamos el token manualmente sin usar logout()
+        alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(ARTISTA_KEY);
-        // 🔹 Recargamos la página para volver al inicio
         location.reload();
         return null;
     }
