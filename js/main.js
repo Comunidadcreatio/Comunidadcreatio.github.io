@@ -138,40 +138,40 @@ function setupEvents() {
 
     // Botón "Eliminar mi cuenta"
     document.getElementById('btn-eliminar-cuenta').addEventListener('click', async () => {
-        // 1. Confirmación
-        if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y borrará todas tus obras.")) {
-            return;
-        }
+    // 1. Confirmación inicial
+    if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y borrará todas tus obras.")) {
+        return;
+    }
 
-        // 2. Solicitar la contraseña para verificar la identidad
-        const password = prompt("🔑 Por favor, ingresa tu contraseña para confirmar la eliminación:");
-        if (!password) return;
+    // 2. Solicitar la contraseña para verificar la identidad
+    const password = prompt("🔑 Por favor, ingresa tu contraseña para confirmar la eliminación:");
+    if (!password) return;
 
-        try {
-            // 3. Enviar la solicitud al backend (usando POST)
-            const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
-                method: 'POST', // Cambiado a POST para enviar datos en el cuerpo
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ password })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert("✅ Tu cuenta ha sido eliminada correctamente.");
-                // Cerrar sesión y recargar la página
-                logout();
-                location.reload();
-            } else {
-                alert("❌ Error: " + data.error);
-            }
-        } catch (error) {
-            console.error("Error al eliminar cuenta:", error);
-            alert("❌ Error al eliminar la cuenta. Intenta más tarde.");
+    // 3. Enviar la solicitud al backend
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert("✅ Tu cuenta ha sido eliminada correctamente.");
+            // Cerrar sesión y recargar la página
+            logout();
+            location.reload();
+        } else {
+            alert("❌ Error: " + data.error);
         }
-    });
+    } catch (error) {
+        console.error("Error al eliminar cuenta:", error);
+        alert("❌ Error al eliminar la cuenta. Intenta más tarde.");
+    }
+});
 
 
 
