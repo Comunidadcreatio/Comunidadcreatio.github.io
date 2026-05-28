@@ -17,17 +17,17 @@ export async function apiRequest(endpoint, options = {}) {
     });
 
     if (res.status === 401) {
-        console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
-        
-        // 🛑 NO MOSTRAR LA ALERTA SI ES LA RUTA DE CONFIRMAR RESTABLECIMIENTO
-        if (!endpoint.includes('/confirmar-restablecimiento')) {
+        console.warn("🚨 Sesión expirada o cerrada remotamente.");
+        // 🔹 No mostrar alerta si es la ruta de eliminar cuenta
+        if (!endpoint.includes('/eliminar-cuenta')) {
             alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(ARTISTA_KEY);
+            location.reload();
+            return null;
         }
-        
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(ARTISTA_KEY);
-        location.reload();
-        return null;
+        // 🔹 Si es eliminar cuenta, solo devolvemos la respuesta sin redirigir
+        return res;
     }
 
     return res;
