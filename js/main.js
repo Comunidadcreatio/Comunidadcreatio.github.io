@@ -173,6 +173,48 @@ function setupEvents() {
     }
 });
 
+// Abrir modal de confirmación
+document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+    document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+});
+
+// Enviar confirmación
+document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('confirmar-password').value;
+    const mensajeError = document.getElementById('mensaje-error');
+    mensajeError.style.display = 'none';
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert("✅ Tu cuenta ha sido eliminada correctamente.");
+            logout();
+            location.reload();
+        } else {
+            mensajeError.textContent = '❌ ' + data.error;
+            mensajeError.style.display = 'block';
+        }
+    } catch (error) {
+        mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+        mensajeError.style.display = 'block';
+    }
+});
+
+// Cerrar modal con la X
+document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventListener('click', () => {
+    document.getElementById('modal-confirmar-eliminacion').classList.add('hidden');
+});
+
 
 
     // ==========================================================
