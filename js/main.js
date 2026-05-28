@@ -400,7 +400,7 @@ document.getElementById('confirmar-eliminacion-form').addEventListener('submit',
     mensajeError.style.display = 'none';
 
     try {
-        const res = await apiRequest('/api/artistas/eliminar-cuenta', {
+        const res = fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
             method: 'POST',
             body: JSON.stringify({ password })
         });
