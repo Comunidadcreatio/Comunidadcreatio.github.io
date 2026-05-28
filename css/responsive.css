@@ -80,8 +80,8 @@
    ============================================== */
 @media (max-width: 600px) {
     #modal-registro .modal-content {
-        width: 95%;               /* 🔹 Ancho con aire a los lados */
-        max-width: 95%;           /* 🔹 Aire a los lados */
+        width: 45%;               /* 🔹 Ancho con aire a los lados */
+        max-width: 45%;           /* 🔹 Aire a los lados */
         height: 100vh;
         max-height: 100vh;
         border: none;

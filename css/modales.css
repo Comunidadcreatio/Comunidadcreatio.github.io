@@ -115,39 +115,3 @@
     text-align: center;
     margin-top: 10px;
 }
-
-/* 🔥 CORRECCIÓN DEFINITIVA PARA EL MODAL DE REGISTRO */
-#modal-registro .modal-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 20px 15px 40px !important;
-    background: white !important;
-    position: relative !important;
-    
-    /* 🚀 HABILITAR SCROLL */
-    overflow-y: auto !important;
-    
-    /* 🚀 PERMITIR QUE EL TÍTULO SEA VISIBLE */
-    display: block !important;
-}
-
-#modal-registro .modal-content h2 {
-    margin-top: 10px !important;
-    margin-bottom: 20px !important;
-    font-size: 1.8rem !important;
-    color: #000 !important;
-    display: block !important;
-}
-
-#modal-registro .modal-content .cerrar-modal {
-    position: absolute !important;
-    top: 10px !important;
-    right: 15px !important;
-    font-size: 30px !important;
-    cursor: pointer !important;
-    z-index: 10 !important;
-}
