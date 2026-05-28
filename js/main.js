@@ -51,13 +51,7 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    // Verifica si la sesión es válid
-        // Sesión inválida: muestra la galería pública
-        // Fuerza la ocultación del panel al inicio
-        document.getElementById('panel-artista').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.remove('hidden');
-        btnLogout.classList.add('hidden');
-        btnPerfil.textContent = '👤';
+    
 
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
