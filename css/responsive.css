@@ -1,0 +1,82 @@
+/* css/responsive.css - Ajustes para dispositivos móviles */
+
+/* --- Ajustes para tablets y móviles (pantallas menores a 768px) --- */
+@media (max-width: 768px) {
+    /* Controles de filtro se apilan uno encima del otro */
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .filter-controls input[type="text"],
+    .filter-controls select,
+    .filter-controls button {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Paginación se apila */
+    .pagination-controls {
+        flex-wrap: wrap;
+    }
+
+    /* Contenedor de la tabla con scroll horizontal */
+    #tabla-obras-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Opcional: Ocultar columnas menos importantes para ahorrar espacio */
+    #tabla-obras-container th:nth-child(1), /* ID */
+    #tabla-obras-container td:nth-child(1) {
+        display: none;
+    }
+    #tabla-obras-container th:nth-child(3), /* Precio */
+    #tabla-obras-container td:nth-child(3) {
+        display: none;
+    }
+    #tabla-obras-container th:nth-child(5), /* Status */
+    #tabla-obras-container td:nth-child(5) {
+        display: none;
+    }
+
+    /* Contenedor de imágenes se ajusta */
+    .imagenes-contenedor {
+        justify-content: center;
+    }
+
+    /* Botones de peligro se apilan */
+    .danger-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    #btn-eliminar-cuenta,
+    #btn-cerrar-todas-sesiones {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* --- Ajustes adicionales para móviles pequeños (pantallas menores a 480px) --- */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .name-group,
+    .date-group {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    #galeria-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    #main-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}

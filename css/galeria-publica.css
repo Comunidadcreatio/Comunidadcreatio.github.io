@@ -1,0 +1,77 @@
+/* css/galeria-publica.css - Estilos de la galería pública */
+
+#galeria-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.obra-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #000;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.obra-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.obra-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.obra-card h3 {
+    font-size: 1.1rem;
+    margin: 10px 15px 5px;
+    color: #000;
+}
+
+.obra-card p {
+    margin: 0 15px 5px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.obra-card button {
+    margin: 10px 15px 15px;
+    padding: 8px 12px;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.obra-card button:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+#btn-volver-galeria {
+    display: block;
+    margin: 1rem auto 2rem;
+    padding: 8px 20px;
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#btn-volver-galeria:hover {
+    background: #000;
+    color: #fff;
+}

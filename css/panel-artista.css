@@ -1,0 +1,215 @@
+/* css/panel-artista.css - Estilos del panel del artista */
+
+/* Contenedor principal del panel */
+#panel-artista {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+#panel-artista h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* --- Controles de búsqueda y filtros --- */
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.filter-controls input[type="text"],
+.filter-controls select,
+.filter-controls button {
+    padding: 8px 12px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.filter-controls input[type="text"] {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-controls button:hover {
+    background-color: #0056b3;
+}
+
+/* --- Paginación --- */
+.pagination-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 1rem 0 2rem;
+}
+
+.pagination-btn {
+    padding: 6px 12px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f1f1f1;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#page-info {
+    padding: 6px 12px;
+    align-self: center;
+}
+
+/* --- Tabla de obras --- */
+#tabla-obras-container {
+    border: 1px solid #000;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+#tabla-obras-container table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+#tabla-obras-container th,
+#tabla-obras-container td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #000;
+}
+
+#tabla-obras-container th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+#tabla-obras-container td img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #000;
+}
+
+#tabla-obras-container tr:last-child td {
+    border-bottom: none;
+}
+
+#tabla-obras-container td button {
+    margin-right: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    background: white;
+}
+
+.btn-editar {
+    color: #007bff;
+    border: 1px solid #007bff;
+}
+.btn-editar:hover {
+    background: #007bff;
+    color: white;
+}
+
+.btn-eliminar {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.btn-eliminar:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-duplicar {
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+.btn-duplicar:hover {
+    background: #28a745;
+    color: white;
+}
+
+/* --- Zona de Peligro y Acciones --- */
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #dc3545;
+}
+
+.danger-zone h3 {
+    color: #dc3545;
+    margin-bottom: 10px;
+}
+
+.danger-zone p {
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.danger-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#btn-eliminar-cuenta,
+#btn-cerrar-todas-sesiones {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1;
+    min-width: 150px;
+    max-width: 250px;
+    transition: opacity 0.2s;
+}
+
+#btn-eliminar-cuenta {
+    background: #dc3545;
+    color: white;
+}
+
+#btn-eliminar-cuenta:hover {
+    opacity: 0.9;
+}
+
+#btn-cerrar-todas-sesiones {
+    background: #ffc107;
+    color: #333;
+}
+
+#btn-cerrar-todas-sesiones:hover {
+    opacity: 0.9;
+}

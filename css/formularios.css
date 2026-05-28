@@ -1,0 +1,184 @@
+/* css/formularios.css - Estilos de todos los formularios */
+
+/* --- Estilos generales para inputs, selects y textareas --- */
+#obra-form input[type="text"],
+#obra-form input[type="number"],
+#obra-form select,
+#obra-form textarea,
+#registro-form input[type="text"],
+#registro-form input[type="email"],
+#registro-form input[type="password"],
+#registro-form select,
+#login-form input[type="email"],
+#login-form input[type="password"],
+#solicitar-restablecimiento-form input[type="email"],
+#confirmar-eliminacion-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: white;
+    color: #000;
+}
+
+#obra-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+#obra-form input:read-only {
+    background-color: #f1f1f1;
+}
+
+/* --- Grupos de inputs --- */
+.dimensiones-group,
+.name-group,
+.date-group {
+    display: flex;
+    gap: 10px;
+}
+
+.dimensiones-group input,
+.name-group input,
+.date-group select {
+    flex: 1;
+}
+
+/* --- Contenedor de imágenes --- */
+.imagenes-contenedor {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.recuadro-imagen {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #000;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.recuadro-imagen:hover {
+    border-color: #007bff;
+}
+
+.recuadro-imagen label {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.placeholder-text {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    pointer-events: none;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.recuadro-imagen input[type="file"] {
+    display: none;
+}
+
+.btn-eliminar-imagen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    display: none;
+    z-index: 10;
+    line-height: 24px;
+    text-align: center;
+}
+
+.vista-previa {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* --- Botones de acción del formulario --- */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#btn-guardar {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#btn-guardar:hover {
+    background-color: #218838;
+}
+
+#btn-limpiar-campos {
+    width: 100%;
+    padding: 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#btn-limpiar-campos:hover {
+    background-color: #c82333;
+}
+
+/* --- Botones de formularios en modales --- */
+#login-form button[type="submit"],
+#registro-form button[type="submit"],
+#solicitar-restablecimiento-form button[type="submit"],
+#confirmar-eliminacion-form button[type="submit"] {
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#login-form button[type="submit"]:hover,
+#registro-form button[type="submit"]:hover,
+#solicitar-restablecimiento-form button[type="submit"]:hover,
+#confirmar-eliminacion-form button[type="submit"]:hover {
+    background: #0056b3;
+}

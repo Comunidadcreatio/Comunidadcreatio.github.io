@@ -1,0 +1,19 @@
+/* css/style.css - Archivo principal */
+
+/* 1. Estilos globales, reset y tipografía */
+@import url('header.css');
+
+/* 2. Galería pública (tarjetas de obras) */
+@import url('galeria-publica.css');
+
+/* 3. Panel del artista (filtros, tabla, peligro, acciones) */
+@import url('panel-artista.css');
+
+/* 4. Formularios (registro y obra) */
+@import url('formularios.css');
+
+/* 5. Modales (login, registro, restablecimiento, etc.) */
+@import url('modales.css');
+
+/* 6. Media Queries y ajustes para móviles */
+@import url('responsive.css');
