@@ -51,25 +51,16 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    document.getElementById('panel-artista').classList.add('hidden');
-    ocument.getElementById('galeria-publica').classList.remove('hidden');
-
-    // FORZAR EL CIERRE DE SESIÓN LOCAL AL INICIAR
-    localStorage.removeItem('artistaToken');
-    localStorage.removeItem('artistaData');
-    // (Opcional) También puedes forzar el token a null
-    
-    // Mostrar solo la galería pública
+    // Ignorar la sesión por completo
     const obras = await cargarGaleria(galeriaContainer);
     mostrarGaleria(obras, galeriaContainer, (id) => {
         console.log("Ver detalles de obra con ID:", id);
     });
-
-    // Configurar los eventos (pero no el panel)
-    setupEvents();
-    setupImagePreviews();
-    cargarSelectoresFecha();
-    poblarCiudades('');
+    // Asegurar que el panel esté oculto
+    panelArtista.classList.add('hidden');
+    btnLogout.classList.add('hidden');
+    // Opcional: ocultar el botón de volver a la galería (ya que ya estamos en la galería)
+    document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
 // ============================================
