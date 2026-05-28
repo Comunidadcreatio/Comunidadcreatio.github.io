@@ -51,33 +51,23 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-
-    console.log("🚨 INICIO DE INIT");
-    console.log("Token:", token);
-    console.log("Artista:", artistaActual);
-
-    // FORZAR LIMPIEZA DE LOCALSTORAGE AL INICIAR
-    localStorage.removeItem('artistaToken');
-    localStorage.removeItem('artistaData');
-
-    console.log("🔍 Iniciando aplicación...");
-    console.log("Token:", token);
-    console.log("Artista actual:", artistaActual);
-
-    // Primero, verifica si la sesión es válida en el backend
-    console.log("🔍 Verificando sesión con el backend...");
+    // Verifica si la sesión es válida
     const sesionValida = await verificarSesionBackend();
-    console.log("🔍 Resultado de verificación:", sesionValida);
 
     if (sesionValida) {
-        console.log("✅ Sesión válida. Mostrando panel.");
+        // Sesión válida: muestra el panel
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
-        // Opcional: cargar la galería o el panel según lo que necesites
-        // const obras = await cargarGaleria(galeriaContainer);
-        // mostrarGaleria(obras, galeriaContainer, (id) => { ... });
+        // Muestra el panel (oculta la galería)
+        mostrarPanelArtista();  // 👈 Agrega esta línea
     } else {
-        console.log("❌ Sesión inválida. Mostrando galería pública.");
+        // Sesión inválida: muestra la galería pública
+        // Fuerza la ocultación del panel al inicio
+        document.getElementById('panel-artista').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.remove('hidden');
+        btnLogout.classList.add('hidden');
+        btnPerfil.textContent = '👤';
+
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
