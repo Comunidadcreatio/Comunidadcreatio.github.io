@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <script>
+    // FORZAR EL CIERRE DE SESIÓN AL CARGAR LA PÁGINA (PRUEBA)
+    localStorage.removeItem('artistaToken');
+    localStorage.removeItem('artistaData');
+    location.reload();
+    </script>
     <!-- HEADER -->
     <header id="main-header">
         <h1 id="brand-name">Galería de Arte</h1>
