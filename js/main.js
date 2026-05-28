@@ -1,9 +1,8 @@
 // js/main.js
-import { API_BASE_URL } from './config.js';
-import { token, artistaActual, login, register, logout, registerWithPhoneVerification } from './auth.js'; // 🔥 Importamos la nueva función
+import { API_BASE_URL, apiRequest } from './config.js';
+import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
-
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
@@ -14,7 +13,7 @@ const tablaBody = document.getElementById('tabla-obras-body');
 const obraForm = document.getElementById('obra-form');
 const btnLogout = document.getElementById('btn-logout');
 const btnPerfil = document.getElementById('btn-perfil');
-const imagenesAEliminar = new Set(); // Almacena índices de imágenes a eliminar (0, 1, 2, etc.)
+const imagenesAEliminar = new Set();
 
 const ciudadesPorPais = {
     'Venezuela': {
@@ -25,17 +24,13 @@ const ciudadesPorPais = {
 function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
     if (!ciudadSelect) return;
-
     ciudadSelect.innerHTML = '';
-    
-    // Opción por defecto
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Selecciona tu ciudad';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     ciudadSelect.appendChild(defaultOption);
-
     if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
         const data = ciudadesPorPais[paisSeleccionado];
         Object.keys(data).forEach(departamento => {
@@ -118,13 +113,9 @@ function setupEvents() {
 
     btnLogout.addEventListener('click', async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/artistas/logout`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (!data.success) {
-                console.warn("El backend no pudo cerrar la sesión:", data.error);
+            const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
+            if (res && !res.success) {
+                console.warn("El backend no pudo cerrar la sesión:", res.error);
             }
         } catch (error) {
             console.error("Error al cerrar sesión en el backend:", error);
@@ -149,84 +140,8 @@ function setupEvents() {
         }
     });
 
-    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
-    document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-    });
-
-    // Abrir modal de confirmación
-    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
-        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-    });
-
-    // Enviar confirmación
-    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const password = document.getElementById('confirmar-password').value;
-        const mensajeError = document.getElementById('mensaje-error');
-        mensajeError.style.display = 'none';
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/artistas/eliminar-cuenta`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ password })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert("✅ Tu cuenta ha sido eliminada correctamente.");
-                logout();
-                location.reload();
-            } else {
-                mensajeError.textContent = '❌ ' + data.error;
-                mensajeError.style.display = 'block';
-            }
-        } catch (error) {
-            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-            mensajeError.style.display = 'block';
-        }
-    });
-
-            // Cerrar todas las sesiones
-    document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-        if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/artistas/cerrar-todas-sesiones`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
-                    // 🛑 Cerrar sesión local y recargar la página
-                    logout(); // Esto limpia localStorage y dispara el evento 'userLogout'
-                    location.reload(); // Recarga la página para mostrar la galería pública
-                } else {
-                    alert("❌ Error: " + data.error);
-                }
-            } catch (error) {
-                console.error("Error al cerrar todas las sesiones:", error);
-                alert("❌ Error de conexión. Intenta más tarde.");
-            }
-        }
-    });
-
-// Cerrar modal con la X
-document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventListener('click', () => {
-    document.getElementById('modal-confirmar-eliminacion').classList.add('hidden');
-});
-
-
-
-    // ==========================================================
-    // 🔥 REGISTRO CON VERIFICACIÓN DE TELÉFONO (FIREBASE)
-    // ==========================================================
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
         const nombres = document.getElementById('reg-nombres').value;
         const apellidos = document.getElementById('reg-apellidos').value;
@@ -241,7 +156,6 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
         const mes = document.getElementById('reg-mes').value;
         const ano = document.getElementById('reg-ano').value;
 
-        // 1. Validación de fecha y edad (la que ya tenías)
         if (!dia || !mes || !ano) {
             alert("❌ Todos los campos de fecha son obligatorios.");
             return;
@@ -262,15 +176,6 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
             return;
         }
         const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-
-        // 2. Validación de teléfono (formato, opcional si quieres mantenerla)
-        const regexVzla = /^(\+58|0)(\d{3})\d{7}$/;
-        if (!regexVzla.test(telefono)) {
-            alert("❌ El número de teléfono debe tener 11 dígitos y comenzar con 04 o +58.");
-            return;
-        }
-
-        // 3. Llamar a la función de registro normal (sin Firebase)
         const result = await register(
             nombre_artista,
             nombre_real,
@@ -282,27 +187,23 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
             fecha_nacimiento,
             genero
         );
-
         if (result.success) {
-            alert("✅ ¡Registro exitoso! Revisa tu correo para confirmar tu cuenta.");
+            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
             document.getElementById('modal-registro').classList.add('hidden');
         } else {
-            alert("❌ Error: " + result.error);
+            alert("Error: " + result.error);
         }
     });
-    // ==========================================================
 
     // Guardar Obra
     obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
         const idPersonalizado = document.getElementById('input-id-personalizado').value;
         const idEdicion = document.getElementById('input-id-edicion').value;
-
-        const ano = document.getElementById('input-ano').value; 
+        const ano = document.getElementById('input-ano').value;
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
         const soporte = document.getElementById('input-soporte').value;
         const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
@@ -381,14 +282,12 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
         }
     });
 
-    // Función para limpiar el formulario completamente
     function limpiarFormularioCompleto(restaurarArtista = true) {
         obraForm.reset();
         document.getElementById('input-id-edicion').value = '';
         document.getElementById('btn-limpiar-campos').classList.add('hidden');
         document.getElementById('btn-guardar').textContent = 'Guardar Obra';
         imagenesAEliminar.clear();
-
         for (let i = 0; i < 5; i++) {
             const preview = document.getElementById(`preview-${i}`);
             const placeholder = document.getElementById(`placeholder-${i}`);
@@ -406,7 +305,6 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
                 btnEliminar.style.display = 'none';
             }
         }
-
         if (restaurarArtista && artistaActual) {
             document.getElementById('input-artista').value = artistaActual.nombre_artista;
         }
@@ -419,43 +317,6 @@ document.querySelector('#modal-confirmar-eliminacion .cerrar-modal').addEventLis
     document.getElementById('btn-ir-registro').addEventListener('click', () => {
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('hidden');
-    });
-
-        // 🔹 Mostrar modal de restablecimiento
-    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-restablecimiento').classList.remove('hidden');
-    });
-
-    // 🔹 Enviar solicitud de restablecimiento
-    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('reset-email').value;
-        const messageEl = document.getElementById('reset-message');
-        messageEl.style.display = 'block';
-        messageEl.textContent = '⏳ Enviando solicitud...';
-        messageEl.style.color = '#555';
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/artistas/solicitar-restablecimiento`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-            const data = await res.json();
-            messageEl.textContent = data.success ? '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.' : '❌ Error: ' + data.error;
-            messageEl.style.color = data.success ? '#28a745' : '#dc3545';
-        } catch (error) {
-            console.error('Error al solicitar restablecimiento:', error);
-            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-            messageEl.style.color = '#dc3545';
-        }
-    });
-
-    // 🔹 Cerrar el modal de restablecimiento con la X
-    document.querySelector('#modal-restablecimiento .cerrar-modal').addEventListener('click', () => {
-        document.getElementById('modal-restablecimiento').classList.add('hidden');
     });
 
     document.getElementById('btn-ir-login').addEventListener('click', () => {
@@ -484,11 +345,9 @@ async function mostrarPanelArtista() {
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
     document.getElementById('btn-volver-galeria').classList.remove('hidden');
-
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
-    
     await refrescarTabla();
 }
 
@@ -509,29 +368,23 @@ let totalObras = 0;
 
 async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
-    
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
         return;
     }
-
     const obras = result.obras;
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
-
     document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
     document.getElementById('btn-prev').disabled = currentPage <= 1;
     document.getElementById('btn-next').disabled = currentPage >= totalPages;
 
-    renderizarTabla(obras, tablaBody, 
-        // EDITAR
+    renderizarTabla(obras, tablaBody,
         async (id) => {
             try {
-                const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await apiRequest(`/obras/${id}`);
+                if (!res) return;
                 const obra = await res.json();
-                
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -551,9 +404,7 @@ async function refrescarTabla() {
                 document.getElementById('input-firma').value = obra.firma || '';
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
-                
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
-                
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -561,9 +412,7 @@ async function refrescarTabla() {
                     obra.imagen_url_3,
                     obra.imagen_url_4
                 ];
-                
                 document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
-                
                 imagenes.forEach((url, index) => {
                     if (url) {
                         const preview = document.getElementById(`preview-${index}`);
@@ -572,14 +421,10 @@ async function refrescarTabla() {
                             preview.src = url;
                             preview.style.display = 'block';
                             placeholder.style.display = 'none';
-
                             const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
                             if (recuadro) {
                                 const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                                if (btnExistente) {
-                                    btnExistente.remove();
-                                }
-
+                                if (btnExistente) btnExistente.remove();
                                 const btnEliminar = document.createElement('button');
                                 btnEliminar.type = 'button';
                                 btnEliminar.className = 'btn-eliminar-imagen';
@@ -596,13 +441,11 @@ async function refrescarTabla() {
                                 `;
                                 recuadro.style.position = 'relative';
                                 recuadro.appendChild(btnEliminar);
-
                                 btnEliminar.addEventListener('click', function() {
                                     const idx = parseInt(this.dataset.index);
                                     const previewImg = document.getElementById(`preview-${idx}`);
                                     const placeholderSpan = document.getElementById(`placeholder-${idx}`);
                                     const inputFile = document.getElementById(`input-imagen-${idx}`);
-
                                     if (previewImg.src && previewImg.src !== '') {
                                         imagenesAEliminar.add(idx);
                                         previewImg.src = '';
@@ -617,7 +460,6 @@ async function refrescarTabla() {
                         }
                     }
                 });
-                
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
@@ -625,7 +467,6 @@ async function refrescarTabla() {
                 alert("Error al cargar la obra para editar");
             }
         },
-        // ELIMINAR
         async (id) => {
             const exito = await eliminarObra(token, id);
             if (exito) {
@@ -634,14 +475,11 @@ async function refrescarTabla() {
                 alert("Error al eliminar la obra.");
             }
         },
-        // DUPLICAR
         async (id) => {
             try {
-                const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await apiRequest(`/obras/${id}`);
+                if (!res) return;
                 const obra = await res.json();
-                
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -661,7 +499,6 @@ async function refrescarTabla() {
                 document.getElementById('input-firma').value = obra.firma || '';
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
-                
                 for (let i = 0; i < 5; i++) {
                     const preview = document.getElementById(`preview-${i}`);
                     const placeholder = document.getElementById(`placeholder-${i}`);
@@ -672,7 +509,6 @@ async function refrescarTabla() {
                     }
                     document.getElementById(`input-imagen-${i}`).value = '';
                 }
-                
                 document.getElementById('btn-guardar').textContent = 'Guardar Obra';
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
@@ -698,23 +534,17 @@ function mostrarGaleriaPublica() {
 
 function setupImagePreviews() {
     const idEdicion = document.getElementById('input-id-edicion').value;
-
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
         const preview = document.getElementById(`preview-${i}`);
         const placeholder = document.getElementById(`placeholder-${i}`);
-
         if (input) {
             input.addEventListener('change', function(e) {
                 const file = this.files[0];
                 const recuadro = this.closest('.recuadro-imagen');
                 if (!recuadro) return;
-
                 const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                if (btnExistente) {
-                    btnExistente.remove();
-                }
-
+                if (btnExistente) btnExistente.remove();
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -723,7 +553,6 @@ function setupImagePreviews() {
                             preview.style.display = 'block';
                         }
                         if (placeholder) placeholder.style.display = 'none';
-
                         const btnEliminar = document.createElement('button');
                         btnEliminar.type = 'button';
                         btnEliminar.className = 'btn-eliminar-imagen';
@@ -740,21 +569,17 @@ function setupImagePreviews() {
                         `;
                         recuadro.style.position = 'relative';
                         recuadro.appendChild(btnEliminar);
-
                         btnEliminar.addEventListener('click', function() {
                             const idx = parseInt(this.dataset.index);
                             const previewImg = document.getElementById(`preview-${idx}`);
                             const placeholderSpan = document.getElementById(`placeholder-${idx}`);
                             const inputFile = document.getElementById(`input-imagen-${idx}`);
-
                             if (previewImg.src && previewImg.src !== '') {
                                 previewImg.src = '';
                                 previewImg.style.display = 'none';
                                 placeholderSpan.style.display = 'block';
                                 inputFile.value = '';
                                 this.remove();
-
-                                const idEdicion = document.getElementById('input-id-edicion').value;
                                 if (idEdicion) {
                                     imagenesAEliminar.add(idx);
                                     console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
@@ -772,9 +597,7 @@ function setupImagePreviews() {
                     }
                     if (placeholder) placeholder.style.display = 'block';
                     const btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
-                    if (btnEliminar) {
-                        btnEliminar.remove();
-                    }
+                    if (btnEliminar) btnEliminar.remove();
                 }
             });
         }
@@ -791,7 +614,6 @@ function cargarSelectoresFecha() {
             diaSelect.appendChild(option);
         }
     }
-
     const mesSelect = document.getElementById('reg-mes');
     if (mesSelect) {
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -802,7 +624,6 @@ function cargarSelectoresFecha() {
             mesSelect.appendChild(option);
         });
     }
-
     const anoSelect = document.getElementById('reg-ano');
     if (anoSelect) {
         const maxYear = new Date().getFullYear() - 18;
