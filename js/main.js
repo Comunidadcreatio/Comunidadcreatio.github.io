@@ -363,6 +363,10 @@ function setupEvents() {
         document.getElementById('modal-login').classList.remove('hidden');
     });
 
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+    document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+    });
+
     // 🔹 Enviar solicitud de restablecimiento
 document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
     e.preventDefault(); // ✅ Evita la recarga de la página
