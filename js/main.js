@@ -51,7 +51,11 @@ function poblarCiudades(paisSeleccionado) {
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    if (token && artistaActual) {
+    // Primero, verifica si la sesión es válida en el backend
+    const sesionValida = await verificarSesionBackend();
+
+    if (sesionValida) {
+        // Si el backend confirma que la sesión es válida, mostramos el panel
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
         const obras = await cargarGaleria(galeriaContainer);
@@ -59,6 +63,7 @@ async function init() {
             console.log("Ver detalles de obra con ID:", id);
         });
     } else {
+        // Si no es válida, mostramos la galería pública
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
@@ -657,6 +662,17 @@ function cargarSelectoresFecha() {
             option.textContent = i;
             anoSelect.appendChild(option);
         }
+    }
+}
+
+async function verificarSesionBackend() {
+    if (!token) return false; // Si no hay token, no hay sesión
+    try {
+        const res = await apiRequest('/api/artistas/mis-obras?page=1&limit=1');
+        // Si apiRequest devuelve null (401), ya cerró la sesión. Si devuelve Response, el token es válido.
+        return res !== null;
+    } catch (error) {
+        return false;
     }
 }
 
