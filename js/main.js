@@ -310,6 +310,30 @@ function setupEvents() {
         }
     }
 
+    // En setupEvents(), al final
+        document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
+            if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+                try {
+                    const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
+                        method: 'POST'
+                    });
+                    // ⚠️ apiRequest ya maneja el 401 y redirige automáticamente
+                    const data = await res.json();
+                    if (data.success) {
+                        alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
+                        // Dado que apiRequest redirige en caso de 401, pero si no hay token, aún cerramos la sesión local.
+                        logout();
+                        location.reload();
+                    } else {
+                        alert("❌ Error: " + data.error);
+                    }
+                } catch (error) {
+                    console.error("Error al cerrar todas las sesiones:", error);
+                    alert("❌ Error de conexión. Intenta más tarde.");
+                }
+            }
+        });
+
     document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
         limpiarFormularioCompleto(true);
     });
