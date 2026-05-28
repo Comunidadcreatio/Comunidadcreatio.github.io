@@ -17,3 +17,7 @@
 
 /* 6. Media Queries y ajustes para móviles */
 @import url('responsive.css');
+
+.hidden {
+    display: none !important;
+}
