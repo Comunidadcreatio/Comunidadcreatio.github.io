@@ -21,23 +21,6 @@ const ciudadesPorPais = {
     }
 };
 
-// ============================================
-// FUNCIÓN AUXILIAR PARA MOSTRAR ERRORES DEL BACKEND
-// ============================================
-function mostrarErrores(result) {
-    if (Array.isArray(result.errors) && result.errors.length > 0) {
-        // Formato con múltiples errores (express-validator)
-        const mensaje = result.errors.join('\n• ');
-        alert('❌ Se encontraron los siguientes errores:\n\n• ' + mensaje);
-    } else if (result.error) {
-        // Formato con un solo error (respuesta antigua o error general)
-        alert('❌ Error: ' + result.error);
-    } else {
-        // Si no hay mensaje de error, mostrar algo genérico
-        alert('❌ Ocurrió un error inesperado. Inténtalo de nuevo.');
-    }
-}
-
 function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
     if (!ciudadSelect) return;
@@ -65,20 +48,30 @@ function poblarCiudades(paisSeleccionado) {
 }
 
 // ============================================
+// FUNCIÓN AUXILIAR PARA MOSTRAR ERRORES DEL BACKEND
+// ============================================
+function mostrarErrores(result) {
+    if (Array.isArray(result.errors) && result.errors.length > 0) {
+        const mensaje = result.errors.join('\n• ');
+        alert('❌ Se encontraron los siguientes errores:\n\n• ' + mensaje);
+    } else if (result.error) {
+        alert('❌ Error: ' + result.error);
+    } else {
+        alert('❌ Ocurrió un error inesperado. Inténtalo de nuevo.');
+    }
+}
+
+// ============================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
 async function init() {
-    // 1. Verificar si la sesión es válida en el backend
     const sesionValida = await verificarSesionBackend();
 
     if (sesionValida) {
-        // Sesión válida: muestra el panel
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
-        // Muestra el panel (oculta la galería)
         mostrarPanelArtista();
     } else {
-        // Sesión inválida: muestra la galería pública
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
         btnLogout.classList.add('hidden');
@@ -341,7 +334,6 @@ function setupEvents() {
         }
     }
 
-    // Botón cerrar todas las sesiones
     document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
         if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
             try {
@@ -382,7 +374,6 @@ function setupEvents() {
         document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
     });
 
-    // Solicitar restablecimiento de contraseña
     document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('reset-email').value;
@@ -413,7 +404,6 @@ function setupEvents() {
         }
     });
 
-    // Confirmar eliminación de cuenta
     document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const password = document.getElementById('confirmar-password').value;
@@ -494,7 +484,6 @@ async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
-        // Mostrar error al usuario
         mostrarErrores(result);
         return;
     }
@@ -508,9 +497,17 @@ async function refrescarTabla() {
     renderizarTabla(obras, tablaBody,
         async (id) => {
             try {
-                const res = await apiRequest(`/obras/${id}`);
-                if (!res) return;
-                const obra = data;
+                // ✅ CORRECCIÓN AQUÍ: NO LLAMAR A .json()
+                const data = await apiRequest(`/obras/${id}`);
+                if (!data) return;
+                // Si hay un error (success: false), mostrarlo
+                if (data.success === false) {
+                    console.error('Error al obtener obra:', data.error);
+                    alert('Error al cargar la obra: ' + data.error);
+                    return;
+                }
+                const obra = data;  // ✅ Ya son los datos parseados
+
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -531,6 +528,8 @@ async function refrescarTabla() {
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
+
+                // Cargar imágenes
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -605,7 +604,7 @@ async function refrescarTabla() {
             try {
                 const res = await apiRequest(`/obras/${id}`);
                 if (!res) return;
-                const obra = data;
+                const obra = res;
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -766,7 +765,6 @@ async function verificarSesionBackend() {
     if (!token) return false;
     try {
         const res = await apiRequest('/api/artistas/mis-obras?page=1&limit=1');
-        // Si apiRequest devuelve null (401), la sesión no es válida
         return res !== null && res.success !== false;
     } catch (error) {
         return false;
