@@ -510,7 +510,7 @@ async function refrescarTabla() {
             try {
                 const res = await apiRequest(`/obras/${id}`);
                 if (!res) return;
-                const obra = await res.json();
+                const obra = data;
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -605,7 +605,7 @@ async function refrescarTabla() {
             try {
                 const res = await apiRequest(`/obras/${id}`);
                 if (!res) return;
-                const obra = await res.json();
+                const obra = data;
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
