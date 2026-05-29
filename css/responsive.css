@@ -22,23 +22,18 @@
 
     /* Contenedor de la tabla con scroll horizontal */
     #tabla-obras-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    overflow-x: auto;      /* Habilita el desplazamiento horizontal */
+    -webkit-overflow-scrolling: touch; /* Mejora el scroll en iOS */
     }
 
-    /* Opcional: Ocultar columnas menos importantes para ahorrar espacio */
-    #tabla-obras-container th:nth-child(1), /* ID */
-    #tabla-obras-container td:nth-child(1) {
-        display: none;
-    }
-    #tabla-obras-container th:nth-child(3), /* Precio */
-    #tabla-obras-container td:nth-child(3) {
-        display: none;
-    }
-    #tabla-obras-container th:nth-child(5), /* Status */
-    #tabla-obras-container td:nth-child(5) {
-        display: none;
-    }
+    /* Opcional: Agrega un estilo para que el scroll se vea mejor */
+#tabla-obras-container::-webkit-scrollbar {
+    height: 6px;
+}
+#tabla-obras-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
 
     /* Contenedor de imágenes se ajusta */
     .imagenes-contenedor {
