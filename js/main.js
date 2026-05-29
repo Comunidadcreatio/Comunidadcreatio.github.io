@@ -1,8 +1,10 @@
 // js/main.js
+import { TOKEN_KEY, ARTISTA_KEY } from './config.js';
 import { API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
+
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
