@@ -337,21 +337,33 @@ function setupEvents() {
     document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
         if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
             try {
+                // 🔥 Llamamos al endpoint
                 const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
                     method: 'POST'
                 });
+
+                // 🔥 Mostramos el mensaje correspondiente
                 if (res && res.success) {
-                    alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
-                    logout();
-                    location.reload();
+                    alert("✅ Todas las sesiones han sido cerradas correctamente.");
                 } else if (res && res.error) {
-                    mostrarErrores(res);
+                    // Si hay error, lo mostramos (puede ser "Sesión expirada" o cualquier otro)
+                    alert("❌ " + res.error);
                 } else {
                     alert("❌ Error inesperado al cerrar las sesiones.");
                 }
+
             } catch (error) {
                 console.error("Error al cerrar todas las sesiones:", error);
-                alert("❌ Error de conexión. Intenta más tarde.");
+                alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
+            } finally {
+                // 🔥 ESTE BLOQUE SIEMPRE SE EJECUTA. Cerramos sesión local y redireccionamos.
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(ARTISTA_KEY);
+                
+                // 🔥 Esperamos 2 segundos para que el usuario vea el mensaje y luego redireccionamos.
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
             }
         }
     });
