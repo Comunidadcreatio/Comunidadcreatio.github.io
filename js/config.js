@@ -6,25 +6,28 @@ export const TOKEN_KEY = 'artistaToken';
 
 export async function apiRequest(endpoint, options = {}) {
     const token = localStorage.getItem(TOKEN_KEY);
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-            ...options.headers
+    try {
+        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : '',
+                ...options.headers
+            }
+        });
+
+        if (res.status === 401 && !endpoint.includes('/eliminar-cuenta')) {
+            console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(ARTISTA_KEY);
+            // No redirigir automáticamente, devolver objeto de error
+            return { success: false, error: "Sesión expirada. Por favor inicia sesión nuevamente." };
         }
-    });
 
-    // Si el backend devuelve 401 (Sesión expirada/cerrada), cerramos sesión local
-    // 🛑 EXCEPCIÓN: SI ES EL ENDPOINT DE ELIMINAR CUENTA, NO REDIRIGIMOS
-    if (res.status === 401 && !endpoint.includes('/eliminar-cuenta')) {
-        console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
-        alert("Tu sesión ha sido cerrada remotamente. Serás redirigido a la galería.");
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(ARTISTA_KEY);
-        location.reload();
-        return null;
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error en apiRequest:", error);
+        return { success: false, error: "Error de conexión. Intenta más tarde." };
     }
-
-    return res;
 }
