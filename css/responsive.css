@@ -98,17 +98,34 @@
     }
 }
 
-/* Ajuste para los controles de filtro en móviles */
 @media (max-width: 600px) {
     .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
+        /* Forzar dirección vertical */
+        flex-direction: column !important;
+        /* Asegurar que ocupe todo el ancho disponible */
+        width: 100% !important;
+        /* Eliminar márgenes y padding que puedan desbordar */
+        box-sizing: border-box !important;
+        padding: 10px !important;
+        gap: 10px !important;
+        /* Eliminar flex-wrap forzado */
+        flex-wrap: nowrap !important;
     }
-    .filter-controls input[type="text"],
+
+    /* 🔥 IMPORTANTE: ANULAR las reglas de escritorio para el input de búsqueda */
+    .filter-controls input[type="text"] {
+        flex: none !important;      /* Anula el flex: 1 */
+        min-width: unset !important; /* Anula el min-width: 150px */
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Ajustar selects y botón para que también ocupen el 100% */
     .filter-controls select,
     .filter-controls button {
-        width: 100%;
-        min-width: unset;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        flex: none !important;
+        margin: 0 !important;
     }
 }
