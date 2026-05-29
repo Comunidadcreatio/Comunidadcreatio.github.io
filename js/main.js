@@ -337,32 +337,28 @@ function setupEvents() {
     }
 
     document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-        if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
             try {
-                // 🔥 Llamamos al endpoint
                 const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
                     method: 'POST'
                 });
 
-                // 🔥 Mostramos el mensaje correspondiente
                 if (res && res.success) {
                     alert("✅ Todas las sesiones han sido cerradas correctamente.");
                 } else if (res && res.error) {
-                    // Si hay error, lo mostramos (puede ser "Sesión expirada" o cualquier otro)
                     alert("❌ " + res.error);
                 } else {
                     alert("❌ Error inesperado al cerrar las sesiones.");
                 }
-
             } catch (error) {
                 console.error("Error al cerrar todas las sesiones:", error);
                 alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
             } finally {
-                // 🔥 ESTE BLOQUE SIEMPRE SE EJECUTA. Cerramos sesión local y redireccionamos.
+                // 🔥 ESTE BLOQUE SIEMPRE SE EJECUTA. Limpia la sesión y redirige.
                 localStorage.removeItem(TOKEN_KEY);
                 localStorage.removeItem(ARTISTA_KEY);
                 
-                // 🔥 Esperamos 2 segundos para que el usuario vea el mensaje y luego redireccionamos.
+                // 🔥 Redirige a la página principal después de 2 segundos.
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 2000);
@@ -496,11 +492,27 @@ let totalObras = 0;
 
 async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
+    
+    // 🚨 DETECTAR ERROR DE SESIÓN EXPIRADA Y REDIRIGIR
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
+        
+        // Si el error indica que la sesión expiró, redirigimos a la página principal
+        if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
+            alert("🔐 Tu sesión ha expirado. Serás redirigido a la página principal.");
+            // Limpiamos la sesión local
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(ARTISTA_KEY);
+            // Redirigimos a la raíz
+            window.location.href = '/';
+            return;
+        }
+        
+        // Para otros errores, solo mostramos el mensaje
         mostrarErrores(result);
         return;
     }
+
     const obras = result.obras;
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
