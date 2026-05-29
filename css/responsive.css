@@ -4,9 +4,15 @@
 @media (max-width: 768px) {
     /* Controles de filtro se apilan uno encima del otro */
     .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
+        flex-direction: column !important;
+        /* Asegurar que ocupe todo el ancho disponible */
+        width: 100% !important;
+        /* Eliminar márgenes y padding que puedan desbordar */
+        box-sizing: border-box !important;
+        padding: 10px !important;
+        gap: 10px !important;
+        /* Eliminar flex-wrap forzado */
+        flex-wrap: nowrap !important;
     }
     .filter-controls input[type="text"],
     .filter-controls select,
