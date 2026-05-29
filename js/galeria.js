@@ -25,8 +25,10 @@ export function mostrarGaleria(obras, container, onDetalle) {
     obras.forEach(obra => {
         const card = document.createElement('div');
         card.className = 'obra-card';
+        // ✅ Usar la miniatura predefinida (imagen_thumbnail_url) si existe
+        const imgSrc = obra.imagen_thumbnail_url || obra.imagen_url || '';
         card.innerHTML = `
-            <img src="${obra.imagen_url}" alt="${obra.titulo}">
+            <img src="${imgSrc}" alt="${obra.titulo}">
             <h3>${obra.titulo}</h3>
             <p>${obra.artista}</p>
             <p>Precio: $${obra.precio || 'N/A'}</p>
@@ -38,4 +40,14 @@ export function mostrarGaleria(obras, container, onDetalle) {
         });
         container.appendChild(card);
     });
+}
+
+// Función auxiliar para construir URL optimizada
+function cloudinaryUrl(originalUrl, width, height) {
+    if (!originalUrl) return '';
+    // Ejemplo: https://res.cloudinary.com/.../image/upload/v123/obra.jpg
+    // Cambiar a: https://res.cloudinary.com/.../image/upload/w_300,h_300,c_limit,q_auto:good/v123/obra.jpg
+    const parts = originalUrl.split('/upload/');
+    if (parts.length !== 2) return originalUrl;
+    return `${parts[0]}/upload/w_${width},h_${height},c_limit,q_auto:good/${parts[1]}`;
 }

@@ -5,13 +5,13 @@ export async function cargarMisObras(token, page = 1, limit = 10, search = '', s
     try {
         const params = new URLSearchParams({ page, limit, search, sortBy, order });
         const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
-        // apiRequest ya devuelve los datos parseados
         return data;
     } catch (error) {
         console.error("Error al cargar mis obras:", error);
         return { success: false, obras: [], total: 0 };
     }
 }
+
 
 export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplicar) {
     container.innerHTML = '';
@@ -27,11 +27,13 @@ export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplic
             statusColor = '#dc3545';
             statusDisplay = '❌ Inactivo';
         }
+        // ✅ Usar miniatura para la tabla
+        const imgSrc = obra.imagen_thumbnail_url || obra.imagen_url || '';
         tr.innerHTML = `
             <td>${obra.id_personalizado || obra.id}</td>
             <td>${obra.titulo}</td>
             <td>${obra.precio}</td>
-            <td><img src="${obra.imagen_url}" width="50"></td>
+            <td><img src="${imgSrc}" width="50"></td>
             <td><span style="color: ${statusColor}; font-weight: bold; padding: 4px 8px; border-radius: 4px; border: 1px solid ${statusColor};">${statusDisplay}</span></td>
             <td>
                 <button class="btn-editar" data-id="${obra.id}">Editar</button>
@@ -39,23 +41,12 @@ export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplic
                 <button class="btn-duplicar" data-id="${obra.id}">Duplicar</button>
             </td>
         `;
-        tr.querySelector('.btn-editar').addEventListener('click', (e) => {
-            const id = e.target.dataset.id;
-            onEditar(id);
-        });
+        tr.querySelector('.btn-editar').addEventListener('click', (e) => onEditar(e.target.dataset.id));
         tr.querySelector('.btn-eliminar').addEventListener('click', (e) => {
-            const id = e.target.dataset.id;
-            if (confirm('¿Estás seguro de eliminar esta obra?')) {
-                onEliminar(id);
-            }
+            if (confirm('¿Estás seguro de eliminar esta obra?')) onEliminar(e.target.dataset.id);
         });
         tr.querySelector('.btn-duplicar').addEventListener('click', (e) => {
-            const id = e.target.dataset.id;
-            if (typeof onDuplicar === 'function') {
-                onDuplicar(id);
-            } else {
-                console.warn('El botón duplicar no está configurado. Revisa tu main.js');
-            }
+            if (typeof onDuplicar === 'function') onDuplicar(e.target.dataset.id);
         });
         container.appendChild(tr);
     });
@@ -70,8 +61,7 @@ export async function guardarObra(token, formData, idEdicion = null) {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
-        const data = await res.json();
-        return data;
+        return await res.json();
     } catch (error) {
         console.error("Error al guardar obra:", error);
         return { success: false, error: "Error de conexión" };
