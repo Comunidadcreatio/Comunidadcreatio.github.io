@@ -29,12 +29,22 @@ export async function login(email, password) {
 
 export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero) {
     try {
-        const res = await apiRequest('/api/artistas/registro', {
+        const data = await apiRequest('/api/artistas/registro', {
             method: 'POST',
-            body: JSON.stringify({ nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero })
+            body: JSON.stringify({
+                nombre_artista,
+                nombre_real,
+                email,
+                password,
+                telefono,
+                pais,
+                ciudad,
+                fecha_nacimiento,
+                genero
+            })
         });
-        if (!res) return { success: false, error: "Sesión cerrada remotamente" };
-        return await res.json();
+        // apiRequest ya devuelve los datos parseados (data)
+        return data;
     } catch (error) {
         console.error("Error en registro:", error);
         return { success: false, error: "Error de conexión" };

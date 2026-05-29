@@ -4,9 +4,9 @@ import { API_BASE_URL, apiRequest } from './config.js';
 export async function cargarMisObras(token, page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     try {
         const params = new URLSearchParams({ page, limit, search, sortBy, order });
-        const res = await apiRequest(`/api/artistas/mis-obras?${params}`);
-        if (!res) return { success: false, obras: [], total: 0 };
-        return await res.json();
+        const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
+        // apiRequest ya devuelve los datos parseados
+        return data;
     } catch (error) {
         console.error("Error al cargar mis obras:", error);
         return { success: false, obras: [], total: 0 };
@@ -70,7 +70,8 @@ export async function guardarObra(token, formData, idEdicion = null) {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
-        return await res.json();
+        const data = await res.json();
+        return data;
     } catch (error) {
         console.error("Error al guardar obra:", error);
         return { success: false, error: "Error de conexión" };

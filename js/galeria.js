@@ -4,9 +4,15 @@ import { API_BASE_URL, apiRequest } from './config.js';
 export async function cargarGaleria(container) {
     container.innerHTML = '<p>Cargando obras...</p>';
     try {
-        const res = await apiRequest('/obras');
-        if (!res) return [];
-        return await res.json();
+        const data = await apiRequest('/obras');
+        // Si apiRequest devolvió un error (success: false)
+        if (data && data.success === false) {
+            console.error('Error al cargar galería:', data.error);
+            container.innerHTML = '<p>Error al cargar las obras.</p>';
+            return [];
+        }
+        // Si es un array de obras, devolverlo
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         console.error("Error al cargar la galería:", error);
         container.innerHTML = '<p>Error al cargar las obras.</p>';
