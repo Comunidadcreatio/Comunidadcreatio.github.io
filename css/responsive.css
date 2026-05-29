@@ -101,4 +101,18 @@
         cursor: pointer;
         z-index: 10;
     }
+
+
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .filter-controls input[type="text"],
+    .filter-controls select,
+    .filter-controls button {
+        width: 100%;
+        min-width: unset;
+    }
+
 }
