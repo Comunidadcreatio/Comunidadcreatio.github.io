@@ -21,28 +21,30 @@
     gap: 10px;
 }
 
-/* En css/header.css, reemplaza los estilos de #btn-perfil */
-#btn-perfil {
-    background: #007bff;      /* Azul */
-    color: white;
-    border: none;
-    padding: 6px 16px;
+#btn-perfil,
+#btn-logout {
+    background: none;
+    border: 1px solid #000;
+    color: #000;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
-#btn-perfil:hover {
-    background: #0056b3;
+#btn-perfil:hover,
+#btn-logout:hover {
+    background-color: #000;
+    color: #fff;
 }
 
-/* Cuando el usuario está logueado (contenido dinámico desde main.js) */
-#btn-perfil.logged-in {
-    background: #28a745;      /* Verde */
+/* 🔥 CORRECCIÓN PARA EL HEADER */
+#btn-logout.hidden {
+    display: none !important;
 }
 
-#btn-perfil.logged-in:hover {
-    background: #218838;
+/* Opcional: también asegurar que el botón de perfil tenga el estado correcto */
+#btn-perfil.hidden {
+    display: none !important;
 }

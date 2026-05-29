@@ -439,7 +439,7 @@ async function mostrarPanelArtista() {
     panelArtista.classList.remove('hidden');
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
-    btnPerfil.classList.add('logged-in');
+    document.getElementById('btn-volver-galeria').classList.remove('hidden');
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
@@ -450,8 +450,8 @@ function ocultarPanelArtista() {
     document.getElementById('galeria-publica').classList.remove('hidden');
     panelArtista.classList.add('hidden');
     btnLogout.classList.add('hidden');
-    btnPerfil.textContent = 'Iniciar Sesión'; // Restaura el texto
-    btnPerfil.classList.remove('logged-in');
+    btnPerfil.textContent = '👤';
+    document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
 let currentPage = 1;
