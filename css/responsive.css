@@ -14,11 +14,21 @@
         /* Eliminar flex-wrap forzado */
         flex-wrap: nowrap !important;
     }
-    .filter-controls input[type="text"],
+    /* 🔥 IMPORTANTE: ANULAR las reglas de escritorio para el input de búsqueda */
+    .filter-controls input[type="text"] {
+        flex: none !important;      /* Anula el flex: 1 */
+        min-width: unset !important; /* Anula el min-width: 150px */
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Ajustar selects y botón para que también ocupen el 100% */
     .filter-controls select,
     .filter-controls button {
-        width: 100%;
-        min-width: unset;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        flex: none !important;
+        margin: 0 !important;
     }
 
     /* Paginación se apila */
