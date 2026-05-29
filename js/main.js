@@ -450,7 +450,7 @@ function ocultarPanelArtista() {
     document.getElementById('galeria-publica').classList.remove('hidden');
     panelArtista.classList.add('hidden');
     btnLogout.classList.add('hidden');
-    btnPerfil.textContent = '👤';
+    btnPerfil.textContent = 'Iniciar Sesión'; // Restaura el texto
     document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
