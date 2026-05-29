@@ -21,6 +21,23 @@ const ciudadesPorPais = {
     }
 };
 
+// ============================================
+// FUNCIÓN AUXILIAR PARA MOSTRAR ERRORES DEL BACKEND
+// ============================================
+function mostrarErrores(result) {
+    if (Array.isArray(result.errors) && result.errors.length > 0) {
+        // Formato con múltiples errores (express-validator)
+        const mensaje = result.errors.join('\n• ');
+        alert('❌ Se encontraron los siguientes errores:\n\n• ' + mensaje);
+    } else if (result.error) {
+        // Formato con un solo error (respuesta antigua o error general)
+        alert('❌ Error: ' + result.error);
+    } else {
+        // Si no hay mensaje de error, mostrar algo genérico
+        alert('❌ Ocurrió un error inesperado. Inténtalo de nuevo.');
+    }
+}
+
 function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
     if (!ciudadSelect) return;
@@ -59,10 +76,9 @@ async function init() {
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
         // Muestra el panel (oculta la galería)
-        mostrarPanelArtista();  // 👈 Agrega esta línea
+        mostrarPanelArtista();
     } else {
         // Sesión inválida: muestra la galería pública
-        // Fuerza la ocultación del panel al inicio
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
         btnLogout.classList.add('hidden');
@@ -151,7 +167,7 @@ function setupEvents() {
             document.getElementById('modal-login').classList.add('hidden');
             await mostrarPanelArtista();
         } else {
-            alert("Error: " + result.error);
+            mostrarErrores(result);
         }
     });
 
@@ -206,7 +222,7 @@ function setupEvents() {
             alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
             document.getElementById('modal-registro').classList.add('hidden');
         } else {
-            alert("Error: " + result.error);
+            mostrarErrores(result);
         }
     });
 
@@ -293,7 +309,7 @@ function setupEvents() {
             limpiarFormularioCompleto(true);
             await refrescarTabla();
         } else {
-            alert("Error: " + result.error);
+            mostrarErrores(result);
         }
     });
 
@@ -325,29 +341,28 @@ function setupEvents() {
         }
     }
 
-    // En setupEvents(), al final
-        document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-            if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
-                try {
-                    const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
-                        method: 'POST'
-                    });
-                    // ⚠️ apiRequest ya maneja el 401 y redirige automáticamente
-                    const data = await res.json();
-                    if (data.success) {
-                        alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
-                        // Dado que apiRequest redirige en caso de 401, pero si no hay token, aún cerramos la sesión local.
-                        logout();
-                        location.reload();
-                    } else {
-                        alert("❌ Error: " + data.error);
-                    }
-                } catch (error) {
-                    console.error("Error al cerrar todas las sesiones:", error);
-                    alert("❌ Error de conexión. Intenta más tarde.");
+    // Botón cerrar todas las sesiones
+    document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
+        if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+            try {
+                const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
+                    method: 'POST'
+                });
+                if (res && res.success) {
+                    alert("✅ Todas las sesiones han sido cerradas. Cerrando tu sesión actual...");
+                    logout();
+                    location.reload();
+                } else if (res && res.error) {
+                    mostrarErrores(res);
+                } else {
+                    alert("❌ Error inesperado al cerrar las sesiones.");
                 }
+            } catch (error) {
+                console.error("Error al cerrar todas las sesiones:", error);
+                alert("❌ Error de conexión. Intenta más tarde.");
             }
-        });
+        }
+    });
 
     document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
         limpiarFormularioCompleto(true);
@@ -364,61 +379,75 @@ function setupEvents() {
     });
 
     document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
-    document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
     });
 
-    // 🔹 Enviar solicitud de restablecimiento
-document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
-    e.preventDefault(); // ✅ Evita la recarga de la página
-    const email = document.getElementById('reset-email').value;
-    const messageEl = document.getElementById('reset-message');
-    messageEl.style.display = 'block';
-    messageEl.textContent = '⏳ Enviando solicitud...';
-    messageEl.style.color = '#555';
+    // Solicitar restablecimiento de contraseña
+    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value;
+        const messageEl = document.getElementById('reset-message');
+        messageEl.style.display = 'block';
+        messageEl.textContent = '⏳ Enviando solicitud...';
+        messageEl.style.color = '#555';
 
-    try {
-        const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
-            method: 'POST',
-            body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        messageEl.textContent = data.success ? '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.' : '❌ Error: ' + data.error;
-        messageEl.style.color = data.success ? '#28a745' : '#dc3545';
-    } catch (error) {
-        console.error('Error al solicitar restablecimiento:', error);
-        messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-        messageEl.style.color = '#dc3545';
-    }
-});
+        try {
+            const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (res && res.success) {
+                messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
+                messageEl.style.color = '#28a745';
+            } else if (res && res.error) {
+                messageEl.textContent = '❌ Error: ' + res.error;
+                messageEl.style.color = '#dc3545';
+            } else {
+                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+                messageEl.style.color = '#dc3545';
+            }
+        } catch (error) {
+            console.error('Error al solicitar restablecimiento:', error);
+            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+            messageEl.style.color = '#dc3545';
+        }
+    });
 
+    // Confirmar eliminación de cuenta
+    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('confirmar-password').value;
+        const mensajeError = document.getElementById('mensaje-error');
+        mensajeError.style.display = 'none';
 
-// --- CONFIRMAR ELIMINACIÓN DE CUENTA ---
-document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const password = document.getElementById('confirmar-password').value;
-    const mensajeError = document.getElementById('mensaje-error');
-    mensajeError.style.display = 'none';
-
-    try {
-        const res = await apiRequest('/api/artistas/eliminar-cuenta', {
-            method: 'POST',
-            body: JSON.stringify({ password })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            alert("✅ Tu cuenta ha sido eliminada correctamente.");
-            logout();
-            location.reload();
-        } else {
-            mensajeError.textContent = '❌ ' + data.error;
+        try {
+            const res = await apiRequest('/api/artistas/eliminar-cuenta', {
+                method: 'POST',
+                body: JSON.stringify({ password })
+            });
+            if (res && res.success) {
+                alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                logout();
+                location.reload();
+            } else if (res && (res.errors || res.error)) {
+                if (Array.isArray(res.errors) && res.errors.length > 0) {
+                    mensajeError.textContent = '❌ ' + res.errors.join('\n');
+                } else if (res.error) {
+                    mensajeError.textContent = '❌ ' + res.error;
+                } else {
+                    mensajeError.textContent = '❌ Error desconocido.';
+                }
+                mensajeError.style.display = 'block';
+            } else {
+                mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+                mensajeError.style.display = 'block';
+            }
+        } catch (error) {
+            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
             mensajeError.style.display = 'block';
         }
-    } catch (error) {
-        mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-        mensajeError.style.display = 'block';
-    }
-});
+    });
+
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -465,6 +494,8 @@ async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
+        // Mostrar error al usuario
+        mostrarErrores(result);
         return;
     }
     const obras = result.obras;
@@ -567,7 +598,7 @@ async function refrescarTabla() {
             if (exito) {
                 await refrescarTabla();
             } else {
-                alert("Error al eliminar la obra.");
+                alert("❌ Error al eliminar la obra.");
             }
         },
         async (id) => {
@@ -732,16 +763,17 @@ function cargarSelectoresFecha() {
 }
 
 async function verificarSesionBackend() {
-    if (!token) return false; // Si no hay token, no hay sesión
+    if (!token) return false;
     try {
         const res = await apiRequest('/api/artistas/mis-obras?page=1&limit=1');
-        // Si apiRequest devuelve null (401), ya cerró la sesión.
-        // Si devuelve un objeto Response, el token es válido.
-        return res !== null;
+        // Si apiRequest devuelve null (401), la sesión no es válida
+        return res !== null && res.success !== false;
     } catch (error) {
         return false;
     }
 }
 
-
+// ============================================
+// INICIALIZAR LA APLICACIÓN
+// ============================================
 init();
