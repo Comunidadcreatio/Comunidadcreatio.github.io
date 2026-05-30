@@ -164,7 +164,7 @@ function setupEvents() {
         const result = await login(email, password);
         if (result.success) {
             document.getElementById('modal-login').classList.add('hidden');
-            document.getElementById('toggle-panel').classList.add('hidden');
+            document.getElementById('toggle-panel').classList.remove('hidden');
             await mostrarPanelArtista();
         } else {
             mostrarErrores(result);
