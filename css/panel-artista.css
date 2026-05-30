@@ -282,3 +282,14 @@
         display: none !important;
     }
 }
+
+#sidebar-desktop .sidebar-icon {
+    width: 32px;   /* Ajusta según el tamaño de tu icono */
+    height: 32px;
+    object-fit: contain;
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+#sidebar-desktop:hover .sidebar-icon {
+    /* Opcional: efecto al hover si quieres */
+}
