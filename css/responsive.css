@@ -156,6 +156,49 @@
     #toggle-panel:hover #btn-logout-sidebar .toggle-label {
         opacity: 1;
     }
+
+    /* ==============================================
+   NUEVO BOTÓN DE GALERÍA EN LA BARRA LATERAL
+   ============================================== */
+    #btn-galeria {
+        pointer-events: auto;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 8px 10px;
+        cursor: pointer;
+        margin-bottom: 5px; /* Separación entre botones */
+    }
+
+    #btn-galeria .toggle-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    #btn-galeria .toggle-label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-left: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #toggle-panel:hover #btn-galeria .toggle-label {
+        opacity: 1;
+    }
+
+    #btn-galeria:hover {
+        background-color: rgba(0,0,0,0.05);
+        border-radius: 4px;
+    }
+
+
 }
 
 
