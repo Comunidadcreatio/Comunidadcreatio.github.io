@@ -1,12 +1,15 @@
 /* css/modales.css - Estilos base de los modales */
 
+/* ==============================================
+   CONTENEDOR DEL MODAL (Fondo oscuro)
+   ============================================== */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,8 +20,12 @@
     display: none;
 }
 
+
+/* ==============================================
+   CONTENIDO DEL MODAL
+   ============================================== */
 .modal-content {
-    position: relative; /* 🔥 ESTA ES LA CLAVE PARA QUE LA X SE POSICIONE CORRECTAMENTE */
+    position: relative;
     max-width: 450px;
     width: 90%;
     height: auto;
@@ -30,23 +37,6 @@
     overflow-y: auto;
 }
 
-.cerrar-modal {
-    position: absolute !important;
-    top: 10px !important;
-    right: 15px !important;
-    font-size: 30px !important;
-    font-weight: bold;
-    color: #666 !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    z-index: 1001 !important;  /* 🔥 Asegura que esté por encima de todo */
-    display: block !important;  /* 🔥 Fuerza su visualización */
-}
-
-.cerrar-modal:hover {
-    color: #333 !important;
-}
-
 .modal-content h2 {
     margin-top: 0;
     margin-bottom: 1.5rem;
@@ -54,6 +44,31 @@
     color: #333;
 }
 
+
+/* ==============================================
+   BOTÓN DE CERRAR (X)
+   ============================================== */
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #666;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    display: block;
+}
+
+.cerrar-modal:hover {
+    color: #333;
+}
+
+
+/* ==============================================
+   FORMULARIOS DENTRO DE MODALES
+   ============================================== */
 .modal-content input[type="text"],
 .modal-content input[type="email"],
 .modal-content input[type="password"],
@@ -93,6 +108,10 @@
     color: #fff;
 }
 
+
+/* ==============================================
+   ENLACES Y MENSAJES
+   ============================================== */
 .forgot-password {
     text-align: right;
     margin-bottom: 10px;
@@ -120,28 +139,29 @@
     margin-top: 10px;
 }
 
+
 /* ==============================================
-   MODAL DE LOGIN A PANTALLA COMPLETA
+   MODAL A PANTALLA COMPLETA (Login y Registro)
    ============================================== */
 .modal-fullscreen {
-    background-color: #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-fullscreen .modal-content {
-    border: none !important;
-    border-radius: 0 !important;
-    max-width: 500px !important;
-    width: 90% !important;
-    box-shadow: none !important;
-    padding: 2rem !important;
+    border: none;
+    border-radius: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: none;
+    padding: 2rem;
 }
 
-/* Ocultar la 'X' de cerrar en ambos modales */
+/* Ocultar la 'X' de cerrar en modo pantalla completa */
 .modal-fullscreen .cerrar-modal {
-    display: none !important;
+    display: none;
 }
 
 .modal-fullscreen h2 {
