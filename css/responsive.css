@@ -1,16 +1,10 @@
 /* css/responsive.css - Ajustes para dispositivos móviles */
 
 /* ==============================================
-   BARRA UNIFICADA (toggle-panel)
+   BARRA UNIFICADA (toggle-panel) - Estilos base
    ============================================== */
 
-
-/* El botón debe capturar clics */
-#btn-panel-toggle {
-    pointer-events: auto;
-}
-
-/* Contenedor principal */
+/* El contenedor principal no captura clics */
 #toggle-panel {
     pointer-events: none;
     position: fixed;
@@ -24,151 +18,8 @@
     transition: all 0.3s ease;
 }
 
-/* Estilos comunes del botón */
-#btn-panel-toggle {
-    pointer-events: auto;   /* ✅ El botón SÍ captura clics */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;           /* ✅ El botón solo ocupa lo que necesita (el icono) */
-    min-width: 44px;       /* ✅ Tamaño mínimo para facilidad de toque */
-    height: 44px;          /* ✅ Altura suficiente para el icono */
-    padding: 0;            /* ✅ Sin padding extra que amplíe el área */
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-/* Estilos comunes del icono */
-.toggle-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    flex-shrink: 0; /* Evita que el icono se encoja */
-}
-
-/* Estilos comunes del texto */
-.toggle-label {
-    font-size: 16px;
-    font-weight: 500;
-    margin-left: 12px;
-    white-space: nowrap;
-    color: #000000;
-    font-family: sans-serif;
-}
-
-
-/* ==============================================
-   VERSIÓN ESCRITORIO (Barra lateral completa)
-   ============================================== */
-@media (min-width: 769px) {
-/* ==============================================
-   LAYOUT: TODO EL CONTENIDO SE DESPLAZA (CORREGIDO)
-   ============================================== */
-
-/* Contenedor principal */
-.app-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    transition: margin-left 0.3s ease;
-    width: auto;
-}
-
-/* Header */
-#main-header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #000;
-    padding: 1rem 2rem;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-/* Main */
-main {
-    flex: 1;
-    padding: 20px;
-}
-
-/* ==============================================
-   BARRA LATERAL (CORREGIDA)
-   ============================================== */
-#toggle-panel {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 56px;
-    height: 100vh;
-    background-color: #ffffff;
-    border: none;           /* 🔥 Elimina todos los bordes */
-    border-right: 2px solid #000000; /* 🔥 Solo borde a la derecha */
-    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 0;
-    transition: width 0.3s ease;
-    z-index: 1000;
-    pointer-events: none;
-}
-
-#toggle-panel:hover {
-    width: 200px;
-}
-
-#btn-panel-toggle {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 8px 10px;
-    cursor: pointer;
-}
-
-.toggle-icon {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-.toggle-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-#toggle-panel:hover .toggle-label {
-    opacity: 1;
-}
-
-/* ==============================================
-   DESPLAZAMIENTO DEL CONTENIDO (NUEVO Y CORRECTO)
-   ============================================== */
-
-/* 1. Cuando la barra está visible (colapsada) */
-#toggle-panel:not(.hidden) ~ .app-container {
-    margin-left: 56px;
-}
-
-/* 2. Cuando la barra se expande (hover) */
-#toggle-panel:hover ~ .app-container {
-    margin-left: 200px;
-}
-
-/* ==============================================
-   NUEVO BOTÓN DE CERRAR SESIÓN EN LA BARRA LATERAL
-   ============================================== */
+/* Todos los botones dentro de la barra sí capturan clics */
+#btn-panel-toggle,
 #btn-logout-sidebar {
     pointer-events: auto;
     background: none;
@@ -179,40 +30,134 @@ main {
     width: 100%;
     padding: 8px 10px;
     cursor: pointer;
-    margin-top: 15px; /* Separación del botón del panel */
-    transition: background-color 0.2s ease;
 }
 
-#btn-logout-sidebar .toggle-icon {
+#btn-logout-sidebar {
+    margin-top: 10px;
+}
+
+#btn-panel-toggle:hover,
+#btn-logout-sidebar:hover {
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+/* Iconos y textos comunes */
+.toggle-icon {
     width: 32px;
     height: 32px;
     object-fit: contain;
     flex-shrink: 0;
 }
 
-#btn-logout-sidebar .toggle-label {
+.toggle-label {
     font-size: 14px;
     font-weight: 500;
     margin-left: 12px;
     white-space: nowrap;
+    color: #000000;
+    font-family: sans-serif;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-#toggle-panel:hover #btn-logout-sidebar .toggle-label {
-    opacity: 1;
+
+/* ==============================================
+   VERSIÓN ESCRITORIO (Barra lateral completa)
+   ============================================== */
+@media (min-width: 769px) {
+    /* Layout: desplazamiento del contenido */
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+        width: auto;
+    }
+
+    #main-header {
+        background-color: #ffffff;
+        border-bottom: 2px solid #000;
+        padding: 1rem 2rem;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    main {
+        flex: 1;
+        padding: 20px;
+    }
+
+    /* Barra lateral fija a la izquierda */
+    #toggle-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 56px;
+        height: 100vh;
+        background-color: #ffffff;
+        border: none;
+        border-right: 2px solid #000000;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 0;
+        transition: width 0.3s ease;
+        z-index: 1000;
+    }
+
+    #toggle-panel:hover {
+        width: 200px;
+    }
+
+    /* Mostrar textos al expandir */
+    #toggle-panel:hover .toggle-label {
+        opacity: 1;
+    }
+
+    /* Ajustes específicos de iconos en escritorio */
+    .toggle-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Desplazamiento del contenido */
+    #toggle-panel:not(.hidden) ~ .app-container {
+        margin-left: 56px;
+    }
+
+    #toggle-panel:hover ~ .app-container {
+        margin-left: 200px;
+    }
+
+    /* Botones dentro de la barra */
+    #btn-panel-toggle {
+        width: 100%;
+        padding: 8px 15px;
+        justify-content: flex-start;
+    }
+
+    #btn-logout-sidebar {
+        width: 100%;
+        padding: 8px 15px;
+        justify-content: flex-start;
+        margin-top: 15px;
+    }
+
+    #btn-logout-sidebar .toggle-label {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #toggle-panel:hover #btn-logout-sidebar .toggle-label {
+        opacity: 1;
+    }
 }
 
-/* Efecto hover opcional para el botón de logout */
-#btn-logout-sidebar:hover {
-    background-color: rgba(0,0,0,0.05);
-    border-radius: 4px;
-}
-
-
-
-
-}
 
 /* ==============================================
    VERSIÓN MÓVIL (Barra inferior)
@@ -225,59 +170,66 @@ main {
         height: 50px;
         border-bottom: none;
         border-radius: 8px 8px 0 0;
-        padding: 0 15px;
-        justify-content: flex-end; /* Icono alineado a la derecha */
+        padding: 0 20px;
+        justify-content: flex-end;
         box-sizing: border-box;
-        padding-right: 20px;       /* Separación del borde */
         background-color: #ffffff;
+        border: 2px solid #000000;
+        border-bottom: none;
     }
 
-    /* Ocultar el texto en móviles */
-    #toggle-panel .toggle-label {
-        display: none;
+    /* Ocultar textos en móviles */
+    .toggle-label {
+        display: none !important;
     }
 
-    /* Ajuste adicional para el botón y el icono */
-    #btn-panel-toggle {
-        margin-right: 0; /* Elimina cualquier margen extra */
-        width: auto;      /* El botón solo ocupa lo que necesita */
-        height: auto;
-    }
-
-    /* El icono un poco más pequeño en móviles para que se vea elegante */
+    /* Ajuste de iconos en móviles */
     .toggle-icon {
         width: 24px;
         height: 24px;
     }
 
-    /* Ajuste para que el contenido de la página no quede oculto detrás de la barra */
+    /* Alinear botones a la derecha */
+    #btn-panel-toggle,
+    #btn-logout-sidebar {
+        width: auto;
+        padding: 0 5px;
+        justify-content: center;
+        margin-top: 0;
+    }
+
+    #btn-logout-sidebar {
+        margin-left: 10px;
+    }
+
+    /* Ajuste del body */
     body {
         padding-bottom: 60px;
     }
 }
 
-/* --- Ajustes para tablets y móviles (pantallas menores a 768px) --- */
-    /* Controles de filtro se apilan uno encima del otro */
+
+/* ==============================================
+   AJUSTES GENERALES PARA TABLETS Y MÓVILES
+   ============================================== */
+@media (max-width: 768px) {
+    /* Controles de filtro se apilan */
     .filter-controls {
         flex-direction: column !important;
-        /* Asegurar que ocupe todo el ancho disponible */
         width: 100% !important;
-        /* Eliminar márgenes y padding que puedan desbordar */
         box-sizing: border-box !important;
         padding: 10px !important;
         gap: 10px !important;
-        /* Eliminar flex-wrap forzado */
         flex-wrap: nowrap !important;
     }
-    /* 🔥 IMPORTANTE: ANULAR las reglas de escritorio para el input de búsqueda */
+
     .filter-controls input[type="text"] {
-        flex: none !important;      /* Anula el flex: 1 */
-        min-width: unset !important; /* Anula el min-width: 150px */
+        flex: none !important;
+        min-width: unset !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* Ajustar selects y botón para que también ocupen el 100% */
     .filter-controls select,
     .filter-controls button {
         width: 100% !important;
@@ -286,47 +238,43 @@ main {
         margin: 0 !important;
     }
 
-    /* Paginación se apila */
     .pagination-controls {
         flex-wrap: wrap;
     }
 
-    /* Contenedor de la tabla con scroll horizontal */
     #tabla-obras-container {
-    overflow-x: auto;      /* Habilita el desplazamiento horizontal */
-    -webkit-overflow-scrolling: touch; /* Mejora el scroll en iOS */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* Opcional: Agrega un estilo para que el scroll se vea mejor */
-#tabla-obras-container::-webkit-scrollbar {
-    height: 6px;
-}
-#tabla-obras-container::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 4px;
-}
+    #tabla-obras-container::-webkit-scrollbar {
+        height: 6px;
+    }
+    #tabla-obras-container::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
 
-    /* Contenedor de imágenes se ajusta */
     .imagenes-contenedor {
         justify-content: center;
     }
 
-    /* Botones de peligro se apilan */
     .danger-actions {
         flex-direction: column;
         align-items: center;
     }
+
     #btn-eliminar-cuenta,
     #btn-cerrar-todas-sesiones {
         width: 100%;
         max-width: 100%;
     }
-    
-#btn-logout-sidebar .toggle-label {
-        display: none; /* Ocultar texto en móviles */
-    }
+}
 
-/* --- Ajustes adicionales para móviles pequeños (pantallas menores a 480px) --- */
+
+/* ==============================================
+   AJUSTES ADICIONALES PARA MÓVILES PEQUEÑOS
+   ============================================== */
 @media (max-width: 480px) {
     .modal-content {
         padding: 1.5rem;
@@ -344,19 +292,20 @@ main {
     }
 }
 
+
 /* ==============================================
-   MEDIA QUERY PARA MODAL DE REGISTRO EN PANTALLA COMPLETA
+   MODALES A PANTALLA COMPLETA EN MÓVILES
    ============================================== */
 @media (max-width: 600px) {
     #modal-registro .modal-content {
-        width: 95%;               /* 🔹 Ancho con aire a los lados */
-        max-width: 95%;           /* 🔹 Aire a los lados */
+        width: 95%;
+        max-width: 95%;
         height: 100vh;
         max-height: 100vh;
         border: none;
         border-radius: 0;
-        padding: 2rem 1.5rem 4rem; /* 🔹 Padding inferior extra para el botón */
-        overflow-y: auto;          /* 🔹 Permite el scroll vertical */
+        padding: 2rem 1.5rem 4rem;
+        overflow-y: auto;
         background: white;
         position: relative;
     }
@@ -371,36 +320,3 @@ main {
         z-index: 10;
     }
 }
-
-@media (max-width: 600px) {
-    .filter-controls {
-        /* Forzar dirección vertical */
-        flex-direction: column !important;
-        /* Asegurar que ocupe todo el ancho disponible */
-        width: 100% !important;
-        /* Eliminar márgenes y padding que puedan desbordar */
-        box-sizing: border-box !important;
-        padding: 10px !important;
-        gap: 10px !important;
-        /* Eliminar flex-wrap forzado */
-        flex-wrap: nowrap !important;
-    }
-
-    /* 🔥 IMPORTANTE: ANULAR las reglas de escritorio para el input de búsqueda */
-    .filter-controls input[type="text"] {
-        flex: none !important;      /* Anula el flex: 1 */
-        min-width: unset !important; /* Anula el min-width: 150px */
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Ajustar selects y botón para que también ocupen el 100% */
-    .filter-controls select,
-    .filter-controls button {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        flex: none !important;
-        margin: 0 !important;
-    }
-}
-
