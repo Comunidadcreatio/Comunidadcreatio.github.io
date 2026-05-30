@@ -80,7 +80,6 @@ async function init() {
         document.getElementById('galeria-publica').classList.remove('hidden');
         document.getElementById('pagina-blanca').classList.add('hidden');
         document.getElementById('toggle-panel').classList.add('hidden');
-        btnLogout.classList.add('hidden');
         btnPerfil.classList.remove('hidden');
         btnPerfil.textContent = '👤';
 
