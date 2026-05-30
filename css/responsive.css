@@ -103,7 +103,8 @@
         border-radius: 8px 8px 0 0;
         padding: 0 15px;
         justify-content: flex-end; /* Icono alineado a la derecha */
-        padding-right: 15px;       /* Separación del borde */
+        box-sizing: border-box;
+        padding-right: 20px;       /* Separación del borde */
         background-color: #ffffff;
     }
 
@@ -112,10 +113,17 @@
         display: none;
     }
 
+    /* Ajuste adicional para el botón y el icono */
+    #btn-panel-toggle {
+        margin-right: 0; /* Elimina cualquier margen extra */
+        width: auto;      /* El botón solo ocupa lo que necesita */
+        height: auto;
+    }
+
     /* El icono un poco más pequeño en móviles para que se vea elegante */
     .toggle-icon {
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
     }
 
     /* Ajuste para que el contenido de la página no quede oculto detrás de la barra */
