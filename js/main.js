@@ -71,28 +71,36 @@ async function init() {
 
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
-        btnPerfil.classList.add('hidden'); // ✅ Ocultamos el icono de login
+        btnPerfil.classList.add('hidden');
         document.getElementById('toggle-panel').classList.remove('hidden');
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('modal-fullscreen');
         mostrarPanelArtista();
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
     } else {
+         // Usuario NO logueado: pantalla completa de login
         document.getElementById('panel-artista').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.remove('hidden');
+        document.getElementById('galeria-publica').classList.add('hidden');
         document.getElementById('toggle-panel').classList.add('hidden');
         btnLogout.classList.add('hidden');
-        btnPerfil.classList.remove('hidden'); // ✅ Mostramos el icono de login
-        btnPerfil.textContent = '👤';
+        btnPerfil.classList.add('hidden');
 
         document.getElementById('modal-login').classList.remove('hidden');
 
-        const obras = await cargarGaleria(galeriaContainer);
-        mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Ver detalles de obra con ID:", id);
-        });
+        // 🔥 Configurar modal como pantalla completa
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
+        
+        // Establecer eventos después de que el DOM esté listo
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
     }
-    setupEvents();
-    setupImagePreviews();
-    cargarSelectoresFecha();
-    poblarCiudades('');
 }
 
 // ============================================
@@ -188,7 +196,12 @@ function setupEvents() {
         const password = document.getElementById('login-pass').value;
         const result = await login(email, password);
         if (result.success) {
-            document.getElementById('modal-login').classList.add('hidden');
+                // 🔥 Quitar el modo pantalla completa
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.add('hidden');
+            modalLogin.classList.remove('modal-fullscreen');
+            
+            // Mostrar la interfaz normal
             document.getElementById('toggle-panel').classList.remove('hidden');
             await mostrarPanelArtista();
         } else {
@@ -244,7 +257,11 @@ function setupEvents() {
             genero
         );
         if (result.success) {
-            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+                const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.add('hidden');
+            modalLogin.classList.remove('modal-fullscreen');
+            
+            alert("¡Registro exitoso! Revisa tu correo para confirmar.");
             document.getElementById('modal-registro').classList.add('hidden');
         } else {
             mostrarErrores(result);
