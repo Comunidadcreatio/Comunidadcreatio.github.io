@@ -1,5 +1,71 @@
 /* css/responsive.css - Ajustes para dispositivos móviles */
 
+
+/* Barra inferior móvil */
+#footer-movil {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    border-top: 2px solid #000000;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Sombra sutil hacia arriba para que destaque */
+    box-shadow: 0 -4px 8px rgba(0,0,0,0.1);
+}
+
+#footer-movil .footer-content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinea el icono a la derecha */
+}
+
+#footer-movil .footer-spacer {
+    flex: 1; /* Ocupa el espacio restante a la izquierda del icono */
+}
+
+/* El botón dentro de la barra */
+#btn-panel-toggle {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#btn-panel-toggle:hover {
+    transform: scale(1.1);
+}
+
+#btn-panel-toggle img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* Ajustar el padding del body para que el contenido no quede oculto detrás de la barra */
+body {
+    padding-bottom: 70px; /* Altura de la barra + espacio extra */
+}
+
+/* Ocultar en escritorio */
+@media (min-width: 769px) {
+    #footer-movil {
+        display: none !important;
+    }
+}
+
 /* --- Ajustes para tablets y móviles (pantallas menores a 768px) --- */
 @media (max-width: 768px) {
     /* Controles de filtro se apilan uno encima del otro */
