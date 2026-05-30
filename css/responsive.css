@@ -62,25 +62,27 @@
    VERSIÓN ESCRITORIO (Barra lateral completa)
    ============================================== */
 @media (min-width: 769px) {
-    /* ==============================================
-   LAYOUT FLEXBOX (para que la barra lateral no tape el header)
+/* ==============================================
+   LAYOUT: TODO EL CONTENIDO SE DESPLAZA
    ============================================== */
+
+/* Contenedor principal (header + main) */
 .app-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    margin-left: 56px; /* Espacio para la barra colapsada */
+    margin-left: 56px; /* Desplaza todo el contenido hacia la derecha */
     transition: margin-left 0.3s ease;
 }
 
-/* Cuando la barra se expande, el contenido se desplaza */
+/* Cuando la barra se expande, todo el contenido se desplaza más */
 #toggle-panel:hover ~ .app-container {
     margin-left: 200px;
 }
 
-/* Ajustar el header */
+/* Header fijo dentro del contenedor */
 #main-header {
-    position: sticky; /* En lugar de fixed, para que fluya con el flexbox */
+    position: sticky;
     top: 0;
     width: 100%;
     z-index: 999;
@@ -94,7 +96,7 @@
     justify-content: space-between;
 }
 
-/* Ajustar el main */
+/* Main ocupa el resto del espacio */
 main {
     flex: 1;
     padding: 20px;
@@ -102,7 +104,7 @@ main {
 }
 
 /* ==============================================
-   BARRA LATERAL (posicionada a la izquierda)
+   BARRA LATERAL (fija a la izquierda)
    ============================================== */
 #toggle-panel {
     position: fixed;
