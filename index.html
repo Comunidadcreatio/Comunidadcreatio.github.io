@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="app-container">
     <!-- HEADER -->
     <header id="main-header">
         <h1 id="brand-name">Galería de Arte</h1>
@@ -307,8 +306,6 @@
             </div>
         </section>
     </main>
-</div>
-    
 
     <!-- MODALES -->
     <div id="modal-login" class="modal hidden">
@@ -447,7 +444,12 @@
         </div>
     </div>
 
-    
+    <div id="toggle-panel" class="hidden">
+        <button id="btn-panel-toggle">
+            <img src="iconos/Panel.svg" alt="Panel" class="toggle-icon">
+            <span class="toggle-label">Registro de obra</span>
+        </button>
+    </div>
 
     <!-- JS PRINCIPAL (type="module") -->
     <script src="js/main.js" type="module"></script>
