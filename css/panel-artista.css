@@ -1,6 +1,8 @@
 /* css/panel-artista.css - Estilos del panel del artista */
 
-/* Contenedor principal del panel */
+/* ==============================================
+   CONTENEDOR PRINCIPAL DEL PANEL
+   ============================================== */
 #panel-artista {
     max-width: 1000px;
     margin: 2rem auto;
@@ -17,7 +19,10 @@
     display: none !important;
 }
 
-/* --- Controles de búsqueda y filtros --- */
+
+/* ==============================================
+   CONTROLES DE BÚSQUEDA Y FILTROS
+   ============================================== */
 .filter-controls {
     display: flex;
     gap: 10px;
@@ -56,7 +61,10 @@
     background-color: #0056b3;
 }
 
-/* --- Paginación --- */
+
+/* ==============================================
+   CONTROLES DE PAGINACIÓN
+   ============================================== */
 .pagination-controls {
     display: flex;
     gap: 10px;
@@ -86,7 +94,10 @@
     align-self: center;
 }
 
-/* --- Tabla de obras --- */
+
+/* ==============================================
+   TABLA DE OBRAS
+   ============================================== */
 #tabla-obras-container {
     border: 1px solid #000;
     border-radius: 4px;
@@ -134,10 +145,12 @@
     background: white;
 }
 
+/* Botones de acción de la tabla */
 .btn-editar {
     color: #007bff;
     border: 1px solid #007bff;
 }
+
 .btn-editar:hover {
     background: #007bff;
     color: white;
@@ -147,6 +160,7 @@
     color: #dc3545;
     border: 1px solid #dc3545;
 }
+
 .btn-eliminar:hover {
     background: #dc3545;
     color: white;
@@ -156,12 +170,16 @@
     color: #28a745;
     border: 1px solid #28a745;
 }
+
 .btn-duplicar:hover {
     background: #28a745;
     color: white;
 }
 
-/* --- Zona de Peligro y Acciones --- */
+
+/* ==============================================
+   ZONA DE PELIGRO (Acciones críticas)
+   ============================================== */
 .danger-zone {
     margin-top: 40px;
     padding-top: 20px;
