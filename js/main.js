@@ -71,7 +71,6 @@ async function init() {
 
     if (sesionValida) {
         // Usuario logueado: mostrar todo normalmente
-        btnLogout.classList.remove('hidden');
         btnPerfil.classList.add('hidden');
         document.getElementById('toggle-panel').classList.remove('hidden');
         
@@ -545,7 +544,6 @@ function setupEvents() {
 async function mostrarPanelArtista() {
     document.getElementById('galeria-publica').classList.add('hidden');
     panelArtista.classList.remove('hidden');
-    btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
