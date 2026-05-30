@@ -251,6 +251,30 @@
     }
 }
 
+#btn-galeria {
+    pointer-events: auto !important; /* Asegura que capte clics */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    padding: 0 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px; /* Separación del botón de panel */
+}
+
+#btn-galeria .toggle-icon {
+    width: 24px; /* Ajusta según el tamaño de tu icono */
+    height: 24px;
+    object-fit: contain;
+}
+
+#btn-galeria .toggle-label {
+    display: none; /* Ocultar texto en móviles */
+}
+
 
 /* ==============================================
    AJUSTES GENERALES PARA TABLETS Y MÓVILES
