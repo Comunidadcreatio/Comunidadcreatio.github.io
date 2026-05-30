@@ -71,15 +71,15 @@ async function init() {
 
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
-        btnPerfil.textContent = '👤 Artista';
+        btnPerfil.classList.add('hidden'); // ✅ Ocultamos el icono de login
         document.getElementById('footer-movil').classList.remove('hidden'); // ✅ Mostrar la barra
         document.getElementById('sidebar-desktop').classList.remove('hidden'); // ✅ Mostrar barra escritorio
         mostrarPanelArtista();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
-        document.getElementById('footer-movil').classList.add('hidden'); // ✅ Ocultar la barra
-        document.getElementById('sidebar-desktop').classList.add('hidden'); // ✅ Ocultar barra escritorio
+        btnLogout.classList.add('hidden');
+        btnPerfil.classList.remove('hidden'); // ✅ Mostramos el icono de login
         btnLogout.classList.add('hidden');
         btnPerfil.textContent = '👤';
 
@@ -151,7 +151,6 @@ function setupEvents() {
             console.error("Error al cerrar sesión en el backend:", error);
         } finally {
             logout();
-            document.getElementById('btn-volver-galeria').classList.add('hidden');
             document.getElementById('sidebar-desktop').classList.add('hidden');
             document.getElementById('footer-movil').classList.add('hidden');
             ocultarPanelArtista();
@@ -487,7 +486,6 @@ function setupEvents() {
         });
     });
 
-    document.getElementById('btn-volver-galeria').addEventListener('click', mostrarGaleriaPublica);
 }
 
 // ============================================
@@ -498,7 +496,6 @@ async function mostrarPanelArtista() {
     panelArtista.classList.remove('hidden');
     btnLogout.classList.remove('hidden');
     btnPerfil.textContent = '👤 Artista';
-    document.getElementById('btn-volver-galeria').classList.remove('hidden');
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
@@ -510,7 +507,6 @@ function ocultarPanelArtista() {
     panelArtista.classList.add('hidden');
     btnLogout.classList.add('hidden');
     btnPerfil.textContent = '👤';
-    document.getElementById('btn-volver-galeria').classList.add('hidden');
 }
 
 let currentPage = 1;
@@ -705,7 +701,6 @@ async function refrescarTabla() {
 function mostrarGaleriaPublica() {
     document.getElementById('panel-artista').classList.add('hidden');
     document.getElementById('galeria-publica').classList.remove('hidden');
-    document.getElementById('btn-volver-galeria').classList.add('hidden');
     cargarGaleria(galeriaContainer).then(obras => {
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);

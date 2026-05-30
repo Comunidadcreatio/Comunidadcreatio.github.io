@@ -59,19 +59,3 @@
     color: #fff;
 }
 
-#btn-volver-galeria {
-    display: block;
-    margin: 1rem auto 2rem;
-    padding: 8px 20px;
-    background: #fff;
-    color: #000;
-    border: 1px solid #000;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#btn-volver-galeria:hover {
-    background: #000;
-    color: #fff;
-}
