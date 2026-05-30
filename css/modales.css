@@ -119,3 +119,32 @@
     text-align: center;
     margin-top: 10px;
 }
+
+/* ==============================================
+   MODAL DE LOGIN A PANTALLA COMPLETA
+   ============================================== */
+#modal-login.modal-fullscreen {
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-login.modal-fullscreen .modal-content {
+    border: none;
+    border-radius: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: none;
+    padding: 2rem;
+}
+
+#modal-login.modal-fullscreen .cerrar-modal {
+    display: none; /* Ocultar la X cuando es pantalla completa */
+}
+
+#modal-login.modal-fullscreen h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
