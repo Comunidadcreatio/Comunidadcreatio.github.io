@@ -131,39 +131,10 @@
     }
 
     /* Desplazar el contenido principal cuando la barra lateral está visible */
-#toggle-panel ~ * {
-    margin-left: 56px; /* Mismo ancho que la barra colapsada */
-    transition: margin-left 0.3s ease;
-}
-
-#toggle-panel:hover ~ * {
-    margin-left: 200px; /* Mismo ancho que la barra expandida */
-}
-
-/* Ajustar el header específicamente */
-#main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-    background-color: #ffffff;
-    border-bottom: 2px solid #000;
-    padding-left: 70px; /* 56px + 14px de padding */
-    box-sizing: border-box;
-    transition: padding-left 0.3s ease;
-}
-
-#toggle-panel:hover ~ #main-header {
-    padding-left: 214px; /* 200px + 14px de padding */
-}
-
-/* Ajustar el resto del contenido */
-main {
-    margin-top: 70px; /* Altura aproximada del header */
-    padding-left: 20px;
-    padding-right: 20px;
-}
+    #toggle-panel ~ * {
+        margin-left: 56px; /* Mismo ancho que la barra colapsada */
+        transition: margin-left 0.3s ease;
+    }
 
 }
 
