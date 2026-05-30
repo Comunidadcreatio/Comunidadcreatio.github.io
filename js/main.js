@@ -236,6 +236,10 @@ function setupEvents() {
         }
     });
 
+    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
+    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
+
+
     document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
     try {
         const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
@@ -247,6 +251,10 @@ function setupEvents() {
     } finally {
         // 🔥 Limpiar la sesión local
         logout();
+
+        document.getElementById('toggle-panel').classList.add('hidden');
+        document.getElementById('pagina-blanca').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.remove('hidden');
         
         // 🔥 Ocultar la barra lateral y el panel
         document.getElementById('toggle-panel').classList.add('hidden');
@@ -282,7 +290,7 @@ function setupEvents() {
             
             // Mostrar la interfaz normal
             document.getElementById('toggle-panel').classList.remove('hidden');
-            await mostrarPanelArtista();
+            mostrarPaginaBlanca(); // ✅ Al iniciar sesión, se muestra la página en blanco
         } else {
             mostrarErrores(result);
         }
