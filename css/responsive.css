@@ -166,6 +166,50 @@ main {
     margin-left: 200px;
 }
 
+/* ==============================================
+   NUEVO BOTÓN DE CERRAR SESIÓN EN LA BARRA LATERAL
+   ============================================== */
+#btn-logout-sidebar {
+    pointer-events: auto;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 8px 10px;
+    cursor: pointer;
+    margin-top: 15px; /* Separación del botón del panel */
+}
+
+#btn-logout-sidebar .toggle-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+    font-size: 24px;
+    text-align: center;
+}
+
+#btn-logout-sidebar .toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#toggle-panel:hover #btn-logout-sidebar .toggle-label {
+    opacity: 1;
+}
+
+/* Efecto hover opcional para el botón de logout */
+#btn-logout-sidebar:hover {
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
 
 }
 
