@@ -59,57 +59,70 @@
 
 
 /* ==============================================
-   VERSIÓN ESCRITORIO (Barra lateral)
+   VERSIÓN ESCRITORIO (Barra lateral completa)
    ============================================== */
 @media (min-width: 769px) {
     #toggle-panel {
+        position: fixed;
         left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        border-left: none;
-        border-radius: 0 8px 8px 0;
-        width: 56px;
-        height: auto;
+        top: 0;                /* 🔥 Desde el borde superior */
+        bottom: 0;             /* 🔥 Hasta el borde inferior */
+        width: 56px;           /* Ancho inicial: solo el icono */
+        height: 100vh;         /* 🔥 Altura completa de la ventana */
         background-color: #ffffff;
-        padding: 8px;          /* 🔥 Menos padding para dar espacio al icono */
-        box-sizing: border-box;
+        border-right: 2px solid #000000; /* Borde a la derecha */
+        border-top: none;
+        border-bottom: none;
+        border-left: none;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1); /* Sombra sutil a la derecha */
         display: flex;
-        align-items: center;
-        justify-content: flex-start; /* 🔥 El contenido se alinea a la izquierda */
+        flex-direction: column;  /* 🔥 Los elementos se apilan verticalmente */
+        align-items: center;     /* Centrar horizontalmente */
+        padding: 15px 0;         /* Espaciado vertical */
+        transition: width 0.3s ease;
+        overflow: hidden;        /* Para ocultar el texto cuando está colapsado */
+        pointer-events: none;    /* El contenedor no captura clics */
     }
 
+    /* El botón principal */
     #btn-panel-toggle {
+        pointer-events: auto;    /* El botón sí captura clics */
         background: none;
         border: none;
         display: flex;
+        flex-direction: row;     /* Icono y texto en horizontal */
         align-items: center;
         justify-content: flex-start;
         width: 100%;
-        height: 100%;
+        padding: 8px 10px;
         cursor: pointer;
-        padding: 0;           /* 🔥 Eliminamos el padding interno del botón */
+        flex-shrink: 0;
     }
 
+    /* Estilo del icono */
     .toggle-icon {
-        width: 26px;          /* 🔥 Aumentamos un poco el tamaño */
+        width: 26px;
         height: 26px;
         object-fit: contain;
-        flex-shrink: 0;        /* 🔥 Evita que el icono se encoja */
+        flex-shrink: 0;
     }
 
+    /* Estilo del texto */
     .toggle-label {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 500;
         margin-left: 12px;
         white-space: nowrap;
         color: #000000;
-        font-family: sans-serif;
         opacity: 0;
         transition: opacity 0.3s ease;
+        font-family: sans-serif;
+        pointer-events: none;    /* El texto no captura clics */
     }
 
+    /* Efecto hover: expandir la barra */
     #toggle-panel:hover {
-        width: 220px;         /* 🔥 Ancho suficiente para mostrar el texto sin recortar */
+        width: 200px;           /* Ancho suficiente para mostrar el texto */
         background-color: #f8f9fa;
     }
 
@@ -117,7 +130,6 @@
         opacity: 1;
     }
 }
-
 
 /* ==============================================
    VERSIÓN MÓVIL (Barra inferior)
