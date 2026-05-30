@@ -68,20 +68,49 @@
         transform: translateY(-50%);
         border-left: none;
         border-radius: 0 8px 8px 0;
-        width: 56px; /* Ancho inicial: solo el icono */
+        width: 56px;
         height: auto;
-        background-color: #ffffff; /* Fondo blanco puro */
+        background-color: #ffffff;
+        padding: 8px;          /* 🔥 Menos padding para dar espacio al icono */
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* 🔥 El contenido se alinea a la izquierda */
     }
 
-    #toggle-panel .toggle-label {
+    #btn-panel-toggle {
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        padding: 0;           /* 🔥 Eliminamos el padding interno del botón */
+    }
+
+    .toggle-icon {
+        width: 36px;          /* 🔥 Aumentamos un poco el tamaño */
+        height: 36px;
+        object-fit: contain;
+        flex-shrink: 0;        /* 🔥 Evita que el icono se encoja */
+    }
+
+    .toggle-label {
+        font-size: 16px;
+        font-weight: 500;
+        margin-left: 12px;
+        white-space: nowrap;
+        color: #000000;
+        font-family: sans-serif;
         opacity: 0;
         transition: opacity 0.3s ease;
     }
 
-    /* Efecto hover: expandir la barra y mostrar el texto */
     #toggle-panel:hover {
-        width: 200px;
-        background-color: #f8f9fa; /* Un fondo muy suave al expandir */
+        width: 220px;         /* 🔥 Ancho suficiente para mostrar el texto sin recortar */
+        background-color: #f8f9fa;
     }
 
     #toggle-panel:hover .toggle-label {
