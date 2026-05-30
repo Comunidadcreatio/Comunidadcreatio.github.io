@@ -169,3 +169,19 @@
     font-size: 2rem;
     margin-bottom: 2rem;
 }
+
+/* ==============================================
+   ESTILO DEL LOGO EN EL LOGIN
+   ============================================== */
+.login-logo {
+    display: block;
+    margin: 0 auto 20px auto; /* Centrado y con margen inferior */
+    max-width: 250px;         /* Tamaño máximo en escritorio */
+    width: 100%;
+    height: auto;
+}
+
+/* Ajuste para que el modal no quede muy alto con el logo */
+.modal-content {
+    padding-top: 30px; /* Espacio extra para el logo */
+}
