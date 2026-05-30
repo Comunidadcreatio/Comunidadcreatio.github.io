@@ -7,7 +7,8 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 45px;
+    min-height: 45px;
     background-color: #ffffff;
     border-top: 2px solid #000000;
     z-index: 999;
@@ -35,9 +36,9 @@
 #btn-panel-toggle {
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: 18px;
     cursor: pointer;
-    padding: 5px;
+    padding: 0 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,14 +50,14 @@
 }
 
 #btn-panel-toggle img {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
 /* Ajustar el padding del body para que el contenido no quede oculto detrás de la barra */
 body {
-    padding-bottom: 70px; /* Altura de la barra + espacio extra */
+    padding-bottom: 60px; /* Altura de la barra + espacio extra */
 }
 
 /* Ocultar en escritorio */
