@@ -180,6 +180,7 @@ main {
     padding: 8px 10px;
     cursor: pointer;
     margin-top: 15px; /* Separación del botón del panel */
+    transition: background-color 0.2s ease;
 }
 
 #btn-logout-sidebar .toggle-icon {
@@ -187,8 +188,6 @@ main {
     height: 32px;
     object-fit: contain;
     flex-shrink: 0;
-    font-size: 24px;
-    text-align: center;
 }
 
 #btn-logout-sidebar .toggle-label {
@@ -209,6 +208,8 @@ main {
     background-color: rgba(0,0,0,0.05);
     border-radius: 4px;
 }
+
+
 
 
 }
@@ -256,7 +257,6 @@ main {
 }
 
 /* --- Ajustes para tablets y móviles (pantallas menores a 768px) --- */
-@media (max-width: 768px) {
     /* Controles de filtro se apilan uno encima del otro */
     .filter-controls {
         flex-direction: column !important;
@@ -321,7 +321,10 @@ main {
         width: 100%;
         max-width: 100%;
     }
-}
+    
+#btn-logout-sidebar .toggle-label {
+        display: none; /* Ocultar texto en móviles */
+    }
 
 /* --- Ajustes adicionales para móviles pequeños (pantallas menores a 480px) --- */
 @media (max-width: 480px) {
