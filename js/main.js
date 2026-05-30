@@ -70,35 +70,43 @@ async function init() {
     const sesionValida = await verificarSesionBackend();
 
     if (sesionValida) {
-        // Usuario logueado: mostrar página en blanco por defecto
-        if (btnPerfil) btnPerfil.classList.add('hidden');
-        const togglePanel = document.getElementById('toggle-panel');
-        if (togglePanel) togglePanel.classList.remove('hidden');
-        mostrarPaginaBlanca(); // Asegúrate de que esta función también verifique la existencia
-    } else {
-        // Usuario no logueado: mostrar galería pública
-        const panelArtista = document.getElementById('panel-artista');
-        if (panelArtista) panelArtista.classList.add('hidden');
-        const galeriaPublica = document.getElementById('galeria-publica');
-        if (galeriaPublica) galeriaPublica.classList.remove('hidden');
-        const paginaBlanca = document.getElementById('pagina-blanca');
-        if (paginaBlanca) paginaBlanca.classList.add('hidden');
-        const togglePanel = document.getElementById('toggle-panel');
-        if (togglePanel) togglePanel.classList.add('hidden');
-        if (btnPerfil) {
-            btnPerfil.classList.remove('hidden');
-            btnPerfil.textContent = '👤';
-        }
+        // Usuario logueado: mostrar todo normalmente
+        btnPerfil.classList.add('hidden');
+        document.getElementById('toggle-panel').classList.remove('hidden');
+        mostrarPaginaBlanca(); // ✅ Cambio clave: arranca en blanco
+        
+        // Asegurar que los modales estén ocultos y sin modo fullscreen
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('modal-fullscreen');
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
 
-        const obras = await cargarGaleria(galeriaContainer);
-        mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Ver detalles de obra con ID:", id);
-        });
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
+    } else {
+        // Usuario NO logueado: mostrar login a pantalla completa
+        document.getElementById('panel-artista').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.add('hidden');
+        document.getElementById('toggle-panel').classList.add('hidden');
+        btnPerfil.classList.add('hidden');
+        
+        // Configurar login como pantalla completa
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
+        
+        // Asegurar que registro esté oculto
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
     }
-    setupEvents();
-    setupImagePreviews();
-    cargarSelectoresFecha();
-    poblarCiudades('');
 }
 
 
@@ -107,9 +115,13 @@ async function init() {
 // ============================================
 
 function mostrarPaginaBlanca() {
-    document.getElementById('galeria-publica').classList.add('hidden');
-    document.getElementById('panel-artista').classList.add('hidden');
-    document.getElementById('pagina-blanca').classList.remove('hidden');
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+    const paginaBlanca = document.getElementById('pagina-blanca');
+
+    if (galeria) galeria.classList.add('hidden');
+    if (panel) panel.classList.add('hidden');
+    if (paginaBlanca) paginaBlanca.classList.remove('hidden');
 }
 
 function toggleGaleria() {
@@ -183,7 +195,6 @@ function setupEvents() {
             refrescarTabla();
         }
     });
-    
 
     document.getElementById('btn-next').addEventListener('click', () => {
         const totalPages = Math.ceil(totalObras / currentLimit);
@@ -225,9 +236,6 @@ function setupEvents() {
         }
     });
 
-    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
-    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
-
     document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
     try {
         const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
@@ -239,10 +247,6 @@ function setupEvents() {
     } finally {
         // 🔥 Limpiar la sesión local
         logout();
-
-        document.getElementById('toggle-panel').classList.add('hidden');
-        document.getElementById('pagina-blanca').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.remove('hidden');
         
         // 🔥 Ocultar la barra lateral y el panel
         document.getElementById('toggle-panel').classList.add('hidden');
@@ -267,10 +271,18 @@ function setupEvents() {
         const password = document.getElementById('login-pass').value;
         const result = await login(email, password);
         if (result.success) {
-            document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('modal-fullscreen');
-        document.getElementById('toggle-panel').classList.remove('hidden');
-        mostrarPaginaBlanca(); // ✅ Al iniciar sesión, se muestra la página en blanco
+            // Quitar el modo pantalla completa del login
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.add('hidden');
+            modalLogin.classList.remove('modal-fullscreen');
+            
+            // Asegurar que registro también esté oculto
+            document.getElementById('modal-registro').classList.add('hidden');
+            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+            
+            // Mostrar la interfaz normal
+            document.getElementById('toggle-panel').classList.remove('hidden');
+            await mostrarPanelArtista();
         } else {
             mostrarErrores(result);
         }
