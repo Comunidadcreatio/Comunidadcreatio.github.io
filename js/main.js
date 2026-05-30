@@ -72,10 +72,12 @@ async function init() {
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
         btnPerfil.classList.add('hidden'); // ✅ Ocultamos el icono de login
+        document.getElementById('toggle-panel').classList.remove('hidden');
         mostrarPanelArtista();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
+        document.getElementById('toggle-panel').classList.add('hidden');
         btnLogout.classList.add('hidden');
         btnPerfil.classList.remove('hidden'); // ✅ Mostramos el icono de login
         btnLogout.classList.add('hidden');
@@ -149,8 +151,7 @@ function setupEvents() {
             console.error("Error al cerrar sesión en el backend:", error);
         } finally {
             logout();
-            document.getElementById('sidebar-desktop').classList.add('hidden');
-            document.getElementById('footer-movil').classList.add('hidden');
+            document.getElementById('toggle-panel').classList.add('hidden');
             ocultarPanelArtista();
             location.reload();
         }
@@ -163,8 +164,7 @@ function setupEvents() {
         const result = await login(email, password);
         if (result.success) {
             document.getElementById('modal-login').classList.add('hidden');
-            document.getElementById('sidebar-desktop').classList.remove('hidden'); // ✅ Mostrar barra escritorio
-            document.getElementById('footer-movil').classList.remove('hidden'); // ✅ Mostrar barra al loguearse
+            document.getElementById('toggle-panel').classList.add('hidden');
             await mostrarPanelArtista();
         } else {
             mostrarErrores(result);
