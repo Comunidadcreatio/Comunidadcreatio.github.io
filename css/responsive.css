@@ -136,6 +136,11 @@
         transition: margin-left 0.3s ease;
     }
 
+    #toggle-panel:hover ~ * {
+    margin-left: 200px; /* Mismo ancho que la barra expandida */
+}
+
+
 }
 
 /* ==============================================
