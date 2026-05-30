@@ -4,6 +4,16 @@
    BARRA UNIFICADA (toggle-panel)
    ============================================== */
 
+/* El contenedor no debe capturar clics */
+#toggle-panel {
+    pointer-events: none;
+}
+
+/* El botón debe capturar clics */
+#btn-panel-toggle {
+    pointer-events: auto;
+}
+
 /* Contenedor principal */
 #toggle-panel {
     position: fixed;
@@ -15,8 +25,6 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: all 0.3s ease;
-    pointer-events: none;
-
 }
 
 /* Estilos comunes del botón */
@@ -29,7 +37,6 @@
     height: 100%;
     cursor: pointer;
     padding: 10px 15px;
-    pointer-events: auto;
 }
 
 /* Estilos comunes del icono */
@@ -64,7 +71,6 @@
         width: 56px; /* Ancho inicial: solo el icono */
         height: auto;
         background-color: #ffffff; /* Fondo blanco puro */
-        pointer-events: none;
     }
 
     #toggle-panel .toggle-label {
@@ -98,7 +104,6 @@
         padding: 0 15px;
         justify-content: flex-end; /* Icono alineado a la derecha */
         background-color: #ffffff;
-        pointer-events: none;
     }
 
     /* Ocultar el texto en móviles */
