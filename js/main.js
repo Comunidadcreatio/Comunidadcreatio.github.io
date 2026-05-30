@@ -181,7 +181,7 @@ function setupEvents() {
         }
     });
 
-    btnLogout.addEventListener('click', async () => {
+    document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
         try {
             const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
             if (res && !res.success) {
