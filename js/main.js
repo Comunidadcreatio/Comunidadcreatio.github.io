@@ -181,20 +181,33 @@ function setupEvents() {
     });
 
     document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
-        try {
-            const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
-            if (res && !res.success) {
-                console.warn("El backend no pudo cerrar la sesión:", res.error);
-            }
-        } catch (error) {
-            console.error("Error al cerrar sesión en el backend:", error);
-        } finally {
-            logout();
-            document.getElementById('toggle-panel').classList.add('hidden');
-            ocultarPanelArtista();
-            location.reload();
+    try {
+        const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
+        if (res && !res.success) {
+            console.warn("El backend no pudo cerrar la sesión:", res.error);
         }
-    });
+    } catch (error) {
+        console.error("Error al cerrar sesión en el backend:", error);
+    } finally {
+        // 🔥 Limpiar la sesión local
+        logout();
+        
+        // 🔥 Ocultar la barra lateral y el panel
+        document.getElementById('toggle-panel').classList.add('hidden');
+        document.getElementById('panel-artista').classList.add('hidden');
+        
+        // 🔥 Mostrar la galería pública (opcional, pero la ocultaremos para mostrar login)
+        document.getElementById('galeria-publica').classList.add('hidden');
+        
+        // 🔥 Mostrar el modal de login a pantalla completa
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
+        
+        // 🔥 Mostrar el botón de perfil para futuros logins
+        document.getElementById('btn-perfil').classList.remove('hidden');
+    }
+});
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
