@@ -72,12 +72,12 @@ async function init() {
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
         btnPerfil.classList.add('hidden'); // ✅ Ocultamos el icono de login
-        document.getElementById('btn-panel-toggle').classList.remove('hidden');
+        document.getElementById('toggle-panel').classList.remove('hidden');
         mostrarPanelArtista();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
-        document.getElementById('btn-panel-toggle').classList.add('hidden');
+        document.getElementById('toggle-panel').classList.add('hidden');
         btnLogout.classList.add('hidden');
         btnPerfil.classList.remove('hidden'); // ✅ Mostramos el icono de login
         btnLogout.classList.add('hidden');
