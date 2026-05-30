@@ -213,9 +213,3 @@ body {
     }
 }
 
-/* Ocultar botones en móviles */
-@media (max-width: 768px) {
-    #user-actions #btn-perfil {
-        display: none !important;
-    }
-}
