@@ -72,10 +72,12 @@ async function init() {
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
         btnPerfil.textContent = '👤 Artista';
+        document.getElementById('footer-movil').classList.remove('hidden'); // ✅ Mostrar la barra
         mostrarPanelArtista();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.remove('hidden');
+        document.getElementById('footer-movil').classList.add('hidden'); // ✅ Ocultar la barra
         btnLogout.classList.add('hidden');
         btnPerfil.textContent = '👤';
 
@@ -148,6 +150,7 @@ function setupEvents() {
         } finally {
             logout();
             document.getElementById('btn-volver-galeria').classList.add('hidden');
+            document.getElementById('footer-movil').classList.add('hidden');
             ocultarPanelArtista();
             location.reload();
         }
@@ -160,6 +163,7 @@ function setupEvents() {
         const result = await login(email, password);
         if (result.success) {
             document.getElementById('modal-login').classList.add('hidden');
+            document.getElementById('footer-movil').classList.remove('hidden'); // ✅ Mostrar barra al loguearse
             await mostrarPanelArtista();
         } else {
             mostrarErrores(result);
@@ -796,6 +800,23 @@ async function verificarSesionBackend() {
         return false;
     }
 }
+
+// Botón de la barra inferior para alternar el panel
+document.getElementById('btn-panel-toggle').addEventListener('click', () => {
+    const galeriaPublica = document.getElementById('galeria-publica');
+    const panelArtista = document.getElementById('panel-artista');
+    const footerMovil = document.getElementById('footer-movil');
+
+    if (panelArtista.classList.contains('hidden')) {
+        // Mostrar panel, ocultar galería
+        galeriaPublica.classList.add('hidden');
+        panelArtista.classList.remove('hidden');
+    } else {
+        // Ocultar panel, mostrar galería
+        panelArtista.classList.add('hidden');
+        galeriaPublica.classList.remove('hidden');
+    }
+});
 
 // ============================================
 // INICIALIZAR LA APLICACIÓN
