@@ -80,8 +80,9 @@ async function init() {
         document.getElementById('toggle-panel').classList.add('hidden');
         btnLogout.classList.add('hidden');
         btnPerfil.classList.remove('hidden'); // ✅ Mostramos el icono de login
-        btnLogout.classList.add('hidden');
         btnPerfil.textContent = '👤';
+
+        document.getElementById('modal-login').classList.remove('hidden');
 
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
