@@ -201,8 +201,8 @@ main {
 
     /* El icono un poco más pequeño en móviles para que se vea elegante */
     .toggle-icon {
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
     }
 
     /* Ajuste para que el contenido de la página no quede oculto detrás de la barra */
