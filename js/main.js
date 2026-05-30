@@ -169,6 +169,10 @@ function togglePanel() {
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
 function setupEvents() {
+
+    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
+    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
+    
     document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('modal-login').classList.add('hidden');
@@ -236,8 +240,7 @@ function setupEvents() {
         }
     });
 
-    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
-    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
+    
 
 
     document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
