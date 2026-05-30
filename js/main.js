@@ -72,8 +72,6 @@ async function init() {
     if (sesionValida) {
         btnLogout.classList.remove('hidden');
         btnPerfil.classList.add('hidden'); // ✅ Ocultamos el icono de login
-        document.getElementById('footer-movil').classList.remove('hidden'); // ✅ Mostrar la barra
-        document.getElementById('sidebar-desktop').classList.remove('hidden'); // ✅ Mostrar barra escritorio
         mostrarPanelArtista();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
@@ -826,16 +824,18 @@ document.getElementById('btn-panel-toggle').addEventListener('click', () => {
     const galeriaPublica = document.getElementById('galeria-publica');
     const panelArtista = document.getElementById('panel-artista');
 
+    if (!token) {
+        document.getElementById('modal-login').classList.remove('hidden');
+        return;
+    }
+
     if (panelArtista.classList.contains('hidden')) {
-        // Muestra el panel
         galeriaPublica.classList.add('hidden');
         panelArtista.classList.remove('hidden');
-        refrescarTabla(); // Opcional, para cargar la tabla del panel
+        refrescarTabla();
     } else {
-        // Oculta el panel y carga la galería pública
         panelArtista.classList.add('hidden');
         galeriaPublica.classList.remove('hidden');
-        // 🔥 IMPORTANTE: Cargar las obras al mostrar la galería
         cargarGaleria(galeriaContainer).then(obras => {
             mostrarGaleria(obras, galeriaContainer, (id) => {
                 console.log("Ver detalles de obra con ID:", id);
