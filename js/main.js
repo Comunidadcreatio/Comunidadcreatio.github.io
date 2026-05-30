@@ -141,6 +141,30 @@ function setupEvents() {
         }
     });
 
+    document.getElementById('btn-panel-toggle').addEventListener('click', () => {
+        const galeriaPublica = document.getElementById('galeria-publica');
+        const panelArtista = document.getElementById('panel-artista');
+
+        if (!token) {
+            document.getElementById('modal-login').classList.remove('hidden');
+            return;
+        }
+
+        if (panelArtista.classList.contains('hidden')) {
+            galeriaPublica.classList.add('hidden');
+            panelArtista.classList.remove('hidden');
+            refrescarTabla();
+        } else {
+            panelArtista.classList.add('hidden');
+            galeriaPublica.classList.remove('hidden');
+            cargarGaleria(galeriaContainer).then(obras => {
+                mostrarGaleria(obras, galeriaContainer, (id) => {
+                    console.log("Ver detalles de obra con ID:", id);
+                });
+            });
+        }
+    });
+
     btnLogout.addEventListener('click', async () => {
         try {
             const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
@@ -151,7 +175,7 @@ function setupEvents() {
             console.error("Error al cerrar sesión en el backend:", error);
         } finally {
             logout();
-            document.getElementById('btn-panel-toggle').classList.add('hidden');
+            document.getElementById('toggle-panel').classList.add('hidden');
             ocultarPanelArtista();
             location.reload();
         }
@@ -164,7 +188,7 @@ function setupEvents() {
         const result = await login(email, password);
         if (result.success) {
             document.getElementById('modal-login').classList.add('hidden');
-            document.getElementById('btn-panel-toggle').classList.remove('hidden');
+            document.getElementById('toggle-panel').classList.remove('hidden');
             await mostrarPanelArtista();
         } else {
             mostrarErrores(result);
@@ -797,30 +821,6 @@ async function verificarSesionBackend() {
         return false;
     }
 }
-
-document.getElementById('btn-panel-toggle').addEventListener('click', () => {
-    const galeriaPublica = document.getElementById('galeria-publica');
-    const panelArtista = document.getElementById('panel-artista');
-
-    if (!token) {
-        document.getElementById('modal-login').classList.remove('hidden');
-        return;
-    }
-
-    if (panelArtista.classList.contains('hidden')) {
-        galeriaPublica.classList.add('hidden');
-        panelArtista.classList.remove('hidden');
-        refrescarTabla();
-    } else {
-        panelArtista.classList.add('hidden');
-        galeriaPublica.classList.remove('hidden');
-        cargarGaleria(galeriaContainer).then(obras => {
-            mostrarGaleria(obras, galeriaContainer, (id) => {
-                console.log("Ver detalles de obra con ID:", id);
-            });
-        });
-    }
-});
 
 // ============================================
 // INICIALIZAR LA APLICACIÓN
