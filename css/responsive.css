@@ -4,10 +4,6 @@
    BARRA UNIFICADA (toggle-panel)
    ============================================== */
 
-/* El contenedor no debe capturar clics */
-#toggle-panel {
-    pointer-events: none;
-}
 
 /* El botón debe capturar clics */
 #btn-panel-toggle {
@@ -16,6 +12,7 @@
 
 /* Contenedor principal */
 #toggle-panel {
+    pointer-events: none;
     position: fixed;
     z-index: 998;
     display: flex;
@@ -29,14 +26,17 @@
 
 /* Estilos comunes del botón */
 #btn-panel-toggle {
-    background: none;
-    border: none;
+    pointer-events: auto;   /* ✅ El botón SÍ captura clics */
     display: flex;
     align-items: center;
-    width: 100%;
-    height: 100%;
+    justify-content: center;
+    width: auto;           /* ✅ El botón solo ocupa lo que necesita (el icono) */
+    min-width: 44px;       /* ✅ Tamaño mínimo para facilidad de toque */
+    height: 44px;          /* ✅ Altura suficiente para el icono */
+    padding: 0;            /* ✅ Sin padding extra que amplíe el área */
+    background: transparent;
+    border: none;
     cursor: pointer;
-    padding: 10px 15px;
 }
 
 /* Estilos comunes del icono */
@@ -103,6 +103,7 @@
         border-radius: 8px 8px 0 0;
         padding: 0 15px;
         justify-content: flex-end; /* Icono alineado a la derecha */
+        padding-right: 15px;       /* Separación del borde */
         background-color: #ffffff;
     }
 
