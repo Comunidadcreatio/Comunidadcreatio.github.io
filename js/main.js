@@ -71,17 +71,24 @@ async function init() {
 
     if (sesionValida) {
         // Usuario logueado: mostrar página en blanco por defecto
-        btnPerfil.classList.add('hidden');
-        document.getElementById('toggle-panel').classList.remove('hidden');
-        mostrarPaginaBlanca(); // ✅ Cambio clave: arranca en blanco
+        if (btnPerfil) btnPerfil.classList.add('hidden');
+        const togglePanel = document.getElementById('toggle-panel');
+        if (togglePanel) togglePanel.classList.remove('hidden');
+        mostrarPaginaBlanca(); // Asegúrate de que esta función también verifique la existencia
     } else {
         // Usuario no logueado: mostrar galería pública
-        document.getElementById('panel-artista').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.remove('hidden');
-        document.getElementById('pagina-blanca').classList.add('hidden');
-        document.getElementById('toggle-panel').classList.add('hidden');
-        btnPerfil.classList.remove('hidden');
-        btnPerfil.textContent = '👤';
+        const panelArtista = document.getElementById('panel-artista');
+        if (panelArtista) panelArtista.classList.add('hidden');
+        const galeriaPublica = document.getElementById('galeria-publica');
+        if (galeriaPublica) galeriaPublica.classList.remove('hidden');
+        const paginaBlanca = document.getElementById('pagina-blanca');
+        if (paginaBlanca) paginaBlanca.classList.add('hidden');
+        const togglePanel = document.getElementById('toggle-panel');
+        if (togglePanel) togglePanel.classList.add('hidden');
+        if (btnPerfil) {
+            btnPerfil.classList.remove('hidden');
+            btnPerfil.textContent = '👤';
+        }
 
         const obras = await cargarGaleria(galeriaContainer);
         mostrarGaleria(obras, galeriaContainer, (id) => {
