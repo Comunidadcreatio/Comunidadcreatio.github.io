@@ -90,7 +90,6 @@ async function init() {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.add('hidden');
         document.getElementById('toggle-panel').classList.add('hidden');
-        btnLogout.classList.add('hidden');
         btnPerfil.classList.add('hidden');
         
         // Configurar login como pantalla completa
@@ -567,7 +566,6 @@ async function mostrarPanelArtista() {
 function ocultarPanelArtista() {
     document.getElementById('galeria-publica').classList.remove('hidden');
     panelArtista.classList.add('hidden');
-    btnLogout.classList.add('hidden');
     btnPerfil.textContent = '👤';
 }
 
