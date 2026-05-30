@@ -70,32 +70,39 @@ async function init() {
     const sesionValida = await verificarSesionBackend();
 
     if (sesionValida) {
+        // Usuario logueado: mostrar todo normalmente
         btnLogout.classList.remove('hidden');
         btnPerfil.classList.add('hidden');
         document.getElementById('toggle-panel').classList.remove('hidden');
+        
+        // Asegurar que los modales estén ocultos y sin modo fullscreen
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('modal-fullscreen');
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
         mostrarPanelArtista();
         setupEvents();
         setupImagePreviews();
         cargarSelectoresFecha();
         poblarCiudades('');
     } else {
-         // Usuario NO logueado: pantalla completa de login
+        // Usuario NO logueado: mostrar login a pantalla completa
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.add('hidden');
         document.getElementById('toggle-panel').classList.add('hidden');
         btnLogout.classList.add('hidden');
         btnPerfil.classList.add('hidden');
-
-        document.getElementById('modal-login').classList.remove('hidden');
-
-        // 🔥 Configurar modal como pantalla completa
+        
+        // Configurar login como pantalla completa
         const modalLogin = document.getElementById('modal-login');
         modalLogin.classList.remove('hidden');
         modalLogin.classList.add('modal-fullscreen');
         
-        // Establecer eventos después de que el DOM esté listo
+        // Asegurar que registro esté oculto
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
         setupEvents();
         setupImagePreviews();
         cargarSelectoresFecha();
@@ -196,10 +203,14 @@ function setupEvents() {
         const password = document.getElementById('login-pass').value;
         const result = await login(email, password);
         if (result.success) {
-                // 🔥 Quitar el modo pantalla completa
+            // Quitar el modo pantalla completa del login
             const modalLogin = document.getElementById('modal-login');
             modalLogin.classList.add('hidden');
             modalLogin.classList.remove('modal-fullscreen');
+            
+            // Asegurar que registro también esté oculto
+            document.getElementById('modal-registro').classList.add('hidden');
+            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
             
             // Mostrar la interfaz normal
             document.getElementById('toggle-panel').classList.remove('hidden');
@@ -257,12 +268,20 @@ function setupEvents() {
             genero
         );
         if (result.success) {
-                const modalLogin = document.getElementById('modal-login');
-            modalLogin.classList.add('hidden');
-            modalLogin.classList.remove('modal-fullscreen');
+            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
             
-            alert("¡Registro exitoso! Revisa tu correo para confirmar.");
-            document.getElementById('modal-registro').classList.add('hidden');
+            // Cerrar registro y volver al login (pantalla completa)
+            const modalRegistro = document.getElementById('modal-registro');
+            modalRegistro.classList.add('hidden');
+            modalRegistro.classList.remove('modal-fullscreen');
+            
+            // Mostrar login nuevamente
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.remove('hidden');
+            modalLogin.classList.add('modal-fullscreen');
+            
+            // Opcional: limpiar campos del formulario de registro
+            document.getElementById('registro-form').reset();
         } else {
             mostrarErrores(result);
         }
@@ -418,13 +437,27 @@ function setupEvents() {
     });
 
     document.getElementById('btn-ir-registro').addEventListener('click', () => {
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('hidden');
+        // Ocultar login
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.add('hidden');
+        modalLogin.classList.remove('modal-fullscreen');
+        
+        // Mostrar registro a pantalla completa
+        const modalRegistro = document.getElementById('modal-registro');
+        modalRegistro.classList.remove('hidden');
+        modalRegistro.classList.add('modal-fullscreen');
     });
 
     document.getElementById('btn-ir-login').addEventListener('click', () => {
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('hidden');
+        // Ocultar registro
+        const modalRegistro = document.getElementById('modal-registro');
+        modalRegistro.classList.add('hidden');
+        modalRegistro.classList.remove('modal-fullscreen');
+        
+        // Mostrar login a pantalla completa
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
     });
 
     document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
