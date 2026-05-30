@@ -171,28 +171,6 @@ function setupEvents() {
         }
     });
 
-        // Botón de la barra lateral de escritorio
-    document.getElementById('btn-panel-desktop').addEventListener('click', () => {
-        const galeriaPublica = document.getElementById('galeria-publica');
-        const panelArtista = document.getElementById('panel-artista');
-
-        if (panelArtista.classList.contains('hidden')) {
-            // Muestra el panel
-            galeriaPublica.classList.add('hidden');
-            panelArtista.classList.remove('hidden');
-            refrescarTabla();
-        } else {
-            // Oculta el panel y muestra la galería
-            panelArtista.classList.add('hidden');
-            galeriaPublica.classList.remove('hidden');
-            cargarGaleria(galeriaContainer).then(obras => {
-                mostrarGaleria(obras, galeriaContainer, (id) => {
-                    console.log("Ver detalles de obra con ID:", id);
-                });
-            });
-        }
-    });
-
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
