@@ -275,6 +275,13 @@
     display: none; /* Ocultar texto en móviles */
 }
 
+@media (max-width: 768px) {
+    .login-logo {
+        max-width: 150px; /* Logo un poco más pequeño en móvil */
+        margin-bottom: 15px;
+    }
+}
+
 
 /* ==============================================
    AJUSTES GENERALES PARA TABLETS Y MÓVILES
