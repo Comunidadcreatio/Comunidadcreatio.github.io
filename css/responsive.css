@@ -366,9 +366,12 @@
     background: #1a1a1a;
 }
 .mobile-logout-panel .logout-option {
+    font-size: 16px;
+    padding: 12px 20px;
     color: #ffffff !important; /* Fuerza blanco */
     background: transparent;
 }
+
 .mobile-logout-panel .logout-option:hover {
     background: #1a1a1a;
 }
