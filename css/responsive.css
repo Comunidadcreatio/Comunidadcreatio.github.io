@@ -357,34 +357,21 @@
 }
 
 /* ---------- Móvil (Menú principal) ---------- */
-/* El menú principal se posicionará dinámicamente con JS */
-.mobile-main-menu {
-    position: fixed;
-    z-index: 2000;
-    background: transparent;
-    pointer-events: none;
-    display: none;
-}
-.mobile-main-menu:not(.hidden) {
-    display: block;
-    pointer-events: auto;
-}
-.mobile-main-menu .mobile-logout-panel.speech-bubble {
-    margin: 0; /* Sin márgenes fijos, JS lo posiciona */
-    width: 200px;
-    position: absolute; /* Para que JS pueda moverlo con top/left */
+/* Ajustamos el ancho del bocadillo del menú principal */
+#mobile-main-menu .mobile-logout-panel.speech-bubble {
+    width: 240px;
 }
 
-/* Asegurar que los textos de ambos paneles móviles sean blancos */
-.mobile-logout-panel .logout-option,
-.mobile-main-menu .logout-option {
-    color: #ffffff !important;
-    font-weight: 500;
-    background: transparent;
+/* Movemos la cola (el triangulito) hacia la izquierda para que apunte al ícono de "Menú" */
+#mobile-main-menu .mobile-logout-panel.speech-bubble::after {
+    right: 68px; /* El ícono de logout usa 20px, este lo empujamos más a la izquierda */
 }
-.mobile-logout-panel .logout-option:hover,
-.mobile-main-menu .logout-option:hover {
-    background: #1a1a1a;
+
+/* Ajuste fino para la cola en pantallas de teléfonos muy pequeños */
+@media (max-width: 480px) {
+    #mobile-main-menu .mobile-logout-panel.speech-bubble::after {
+        right: 60px;
+    }
 }
 
 /* ---------- Estilos comunes de opciones ---------- */
@@ -410,7 +397,7 @@
     background: #1a1a1a;
 }
 .mobile-logout-panel .logout-option,
-.mobile-main-menu .logout-option {
+.logout-option {
     font-size: 16px;
     padding: 12px 20px;
 }
@@ -458,11 +445,11 @@
         border-top: 10px solid #000000;
     }
     .mobile-logout-panel .logout-option,
-    .mobile-main-menu .logout-option {
+     .logout-option {
         padding: 10px 16px;
         font-size: 15px;
     }
-    .mobile-main-menu .mobile-logout-panel.speech-bubble {
+    .mobile-logout-panel.speech-bubble {
         margin: 0 !important;
         width: 200px;
     }
