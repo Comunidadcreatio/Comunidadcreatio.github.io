@@ -96,6 +96,7 @@ function updateCerrarTodasSesionesButtonState() {
     const desktopBtn = document.getElementById('btn-cerrar-todas-sesiones-sidebar');
     const mobileAllBtn = document.getElementById('mobile-logout-all');
     const isEnabled = activeSessionsCount >= 2;
+    
     if (desktopBtn) {
         if (isEnabled) {
             desktopBtn.classList.remove('disabled');
@@ -103,11 +104,16 @@ function updateCerrarTodasSesionesButtonState() {
             desktopBtn.classList.add('disabled');
         }
     }
+    
     if (mobileAllBtn) {
         if (isEnabled) {
             mobileAllBtn.classList.remove('disabled');
+            mobileAllBtn.classList.add('enabled');
+            mobileAllBtn.style.color = '#ffffff';
         } else {
             mobileAllBtn.classList.add('disabled');
+            mobileAllBtn.classList.remove('enabled');
+            mobileAllBtn.style.color = '#a0a0a0';
         }
     }
 }
