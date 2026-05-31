@@ -21,33 +21,56 @@
 }
 
 /* Estilos del botón "Cerrar todas las sesiones" (Escritorio) */
-#logout-all-container {
+/* ==============================================
+   CONTENEDOR DE LOGOUT (Escritorio)
+   ============================================== */
+#logout-container {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
     margin-top: 5px;
-    padding-left: 10px;
 }
 
-#btn-logout-all {
-    font-size: 12px;
-    padding: 4px 8px;
-    display: block;
-    width: 100%;
-    text-align: left;
-    pointer-events: none;
-    color: #888;
-    transition: color 0.2s, background-color 0.2s;
-    cursor: default;
-}
-
-#btn-logout-all.active {
-    color: #000;
+.sidebar-btn {
     pointer-events: auto;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 6px 10px;
     cursor: pointer;
 }
 
-#btn-logout-all.active:hover {
+.sidebar-btn:hover {
     background-color: rgba(0,0,0,0.05);
     border-radius: 4px;
+}
+
+.sub-btn {
+    padding-left: 20px; /* Sangría para indicar sub-opción */
+}
+
+/* Estilos para el texto de la sub-opción */
+#btn-logout-all .toggle-label {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 13px; /* Un poco más pequeño que la opción principal */
+    color: #888; /* Gris por defecto */
+    pointer-events: none; /* Deshabilitado por defecto */
+}
+
+#btn-logout-all.active .toggle-label {
+    color: #000; /* Negro cuando está habilitado */
+    pointer-events: auto;
+}
+
+/* Al expandir la barra, ambas opciones deben ser visibles */
+#toggle-panel:hover #btn-logout-sidebar .toggle-label,
+#toggle-panel:hover #btn-logout-all .toggle-label {
+    opacity: 1;
 }
 
 /* Estilos del globo de texto (Móvil) */
