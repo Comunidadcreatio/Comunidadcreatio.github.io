@@ -235,6 +235,16 @@
         }
     }
 
+    /* Asegurar que el menú móvil no herede posicionamiento de logout */
+#mobile-main-menu {
+    position: fixed;
+    z-index: 2000;
+}
+#mobile-main-menu .mobile-logout-panel.speech-bubble {
+    margin: 0; /* reset */
+    width: 200px; /* tamaño adecuado */
+}
+
     /* Modales a pantalla completa en móviles */
     @media (max-width: 600px) {
         #modal-registro .modal-content {
@@ -259,6 +269,8 @@
             z-index: 10;
         }
     }
+
+    
 }
 
 /* ==============================================
@@ -272,6 +284,27 @@
 #mobile-main-menu .logout-option:hover {
     background: #1a1a1a;
 }
+
+/* ==============================================
+   PANEL MÓVIL PARA MENÚ PRINCIPAL
+   ============================================== */
+#mobile-main-menu {
+    position: fixed;
+    bottom: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: 2000;
+    pointer-events: none;
+    display: none; /* lo maneja JS */
+}
+#mobile-main-menu:not(.hidden) {
+    display: flex;
+    pointer-events: auto;
+}
+
+/* Posicionamiento dinámico se hará con JS (similar a escritorio) */
+/* Pero para que no se superponga al logout, podemos posicionarlo manualmente con JS */
 
 
 /* ==============================================
