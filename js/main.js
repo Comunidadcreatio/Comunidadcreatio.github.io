@@ -23,6 +23,9 @@ let currentSearch = '';
 let currentSortBy = 'id';
 let currentOrder = 'DESC';
 let totalObras = 0;
+let desktopLogoutModal = null;
+let desktopLogoutAllBtn = null;
+let desktopLogoutSingleBtn = null;
 
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
@@ -92,8 +95,20 @@ async function fetchActiveSessionsCount() {
     }
 }
 
+function updateDesktopButtonsState() {
+    const isEnabled = activeSessionsCount >= 2;
+    if (desktopLogoutAllBtn) {
+        if (isEnabled) {
+            desktopLogoutAllBtn.classList.remove('disabled');
+            desktopLogoutAllBtn.classList.add('enabled');
+        } else {
+            desktopLogoutAllBtn.classList.add('disabled');
+            desktopLogoutAllBtn.classList.remove('enabled');
+        }
+    }
+}
+
 function updateCerrarTodasSesionesButtonState() {
-    const desktopBtn = document.getElementById('btn-cerrar-todas-sesiones-sidebar');
     const mobileAllBtn = document.getElementById('mobile-logout-all');
     const isEnabled = activeSessionsCount >= 2;
     
@@ -116,6 +131,58 @@ function updateCerrarTodasSesionesButtonState() {
             mobileAllBtn.style.color = '#a0a0a0';
         }
     }
+
+    if (desktopLogoutAllBtn) {
+    if (isEnabled) {
+        desktopLogoutAllBtn.classList.remove('disabled');
+        desktopLogoutAllBtn.classList.add('enabled');
+    } else {
+        desktopLogoutAllBtn.classList.add('disabled');
+        desktopLogoutAllBtn.classList.remove('enabled');
+    }
+}
+
+}
+
+if (desktopLogoutAllBtn) {
+    desktopLogoutAllBtn.addEventListener('click', () => {
+        closeAllSessions();  // función ya existente
+        desktopLogoutModal.classList.add('hidden');
+    });
+}
+if (desktopLogoutSingleBtn) {
+    desktopLogoutSingleBtn.addEventListener('click', async () => {
+        desktopLogoutModal.classList.add('hidden');
+        await ejecutarLogout();
+    });
+}
+
+if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
+    desktopLogoutModal.classList.add('hidden');
+    return;
+}
+
+function positionDesktopPanel(triggerElement, panelElement) {
+    const rect = triggerElement.getBoundingClientRect();
+    const panelRect = panelElement.querySelector('.desktop-logout-panel').getBoundingClientRect();
+    let top = rect.bottom + 8;
+    let left = rect.left;
+    let placement = 'right';
+    
+    // Si no cabe hacia abajo, poner arriba
+    if (top + panelRect.height > window.innerHeight) {
+        top = rect.top - panelRect.height - 8;
+    }
+    // Si se sale por la derecha, alinear a la izquierda del icono
+    if (left + panelRect.width > window.innerWidth) {
+        left = rect.right - panelRect.width;
+        placement = 'left';
+    } else {
+        placement = 'right';
+    }
+    panelElement.style.top = `${top}px`;
+    panelElement.style.left = `${left}px`;
+    panelElement.querySelector('.desktop-logout-panel').setAttribute('data-placement', placement);
 }
 
 async function closeAllSessions() {
@@ -233,23 +300,38 @@ function setupEvents() {
     const logoutIcon = document.getElementById('btn-logout-sidebar');
     if (logoutIcon) {
         logoutIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
             const isMobile = window.innerWidth <= 768;
             if (isMobile) {
-                // Mostrar panel negro móvil
+                // Mostrar panel móvil (ya existente)
                 const mobileModal = document.getElementById('mobile-logout-options');
                 if (mobileModal) mobileModal.classList.remove('hidden');
             } else {
-                // En escritorio ejecutar logout directo
-                ejecutarLogout();
+                // Mostrar panel de escritorio
+                if (!desktopLogoutModal) {
+                    desktopLogoutModal = document.getElementById('desktop-logout-options');
+                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
+                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+                }
+                // Actualizar estado de los botones según sesiones activas
+                updateDesktopButtonsState();
+                // Posicionar y mostrar
+                positionDesktopPanel(logoutIcon, desktopLogoutModal);
+                desktopLogoutModal.classList.remove('hidden');
+                // Cerrar al hacer clic fuera
+                setTimeout(() => {
+                    document.addEventListener('click', function onClickOutside(event) {
+                        if (!desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+                            desktopLogoutModal.classList.add('hidden');
+                            document.removeEventListener('click', onClickOutside);
+                        }
+                    });
+                }, 0);
             }
         });
     }
 
-    // Botón "Cerrar todas las sesiones" en escritorio (barra lateral)
-    const desktopCloseAll = document.getElementById('btn-cerrar-todas-sesiones-sidebar');
-    if (desktopCloseAll) {
-        desktopCloseAll.addEventListener('click', closeAllSessions);
-    }
+    
 
     // Botones del panel móvil
     const mobileSingle = document.getElementById('mobile-logout-single');
