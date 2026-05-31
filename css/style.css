@@ -67,10 +67,7 @@
 /* ==============================================
    TIPOGRAFÍA GLOBAL
    ============================================== */
-* {
-    font-family: 'MADE Tommy Soft', sans-serif;
-    font-weight: 400; /* Peso normal por defecto */
-}
+
 
 /* Ajuste para títulos */
 h1, h2, h3, h4, h5, h6, .brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
