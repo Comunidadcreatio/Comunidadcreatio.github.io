@@ -314,55 +314,122 @@
     }
 
 
-/* Panel negro emergente (móvil) */
+/* ==============================================
+   PANEL MÓVIL CON FORMA DE BOCADILLO (COLA)
+   ============================================== */
 .mobile-logout-modal {
     position: fixed;
     bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    right: 0;
+    left: auto;
+    width: auto;
+    background: transparent;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: flex-end;
     z-index: 2000;
-    transition: all 0.3s ease;
+    pointer-events: none; /* El fondo no captura clics */
 }
 .mobile-logout-modal.hidden {
     display: none;
 }
-.mobile-logout-panel {
-    background: #1a1a1a;  /* Negro más profundo */
-    width: 90%;
-    max-width: 360px;
-    margin: 0 auto 20px auto;
-    border-radius: 32px;
-    padding: 16px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+.mobile-logout-modal:not(.hidden) {
+    pointer-events: auto;
 }
-.mobile-logout-panel button {
+
+/* Bocadillo con cola en la esquina inferior derecha */
+.mobile-logout-panel.speech-bubble {
+    position: relative;
+    background: #000000; /* Negro sólido */
+    width: 260px;
+    max-width: 85vw;
+    margin: 0 16px 70px 0; /* Separación desde borde derecho y desde abajo */
+    border-radius: 20px;
+    padding: 12px 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    z-index: 2001;
+}
+
+/* La cola (triángulo) apuntando hacia abajo-derecha */
+.mobile-logout-panel.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #000000;
+    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+}
+
+/* Estilo base de las opciones */
+.logout-option {
     display: block;
     width: 100%;
-    padding: 16px 12px;
-    margin: 12px 0;
-    background: #2a2a2a;
-    color: #ffffff;
+    padding: 12px 20px;
+    background: transparent;
     border: none;
-    border-radius: 50px;  /* Muy redondeado como en la imagen */
-    font-size: 17px;
-    font-weight: 600;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
     cursor: pointer;
     transition: background 0.2s ease;
-    text-align: center;
-    letter-spacing: 0.5px;
 }
-.mobile-logout-panel button:active {
-    background: #3a3a3a;
+
+/* Opción superior: gris tenue (inhabilitada visualmente) */
+#mobile-logout-all.logout-option {
+    color: #a0a0a0;
 }
-.mobile-logout-panel button.disabled {
-    opacity: 0.5;
-    background: #2a2a2a;
+#mobile-logout-all.logout-option.disabled {
+    opacity: 0.6;
     pointer-events: none;
+}
+/* Cuando está habilitada (múltiples sesiones) se pone blanco */
+#mobile-logout-all.logout-option.enabled {
+    color: #ffffff;
+    pointer-events: auto;
+}
+#mobile-logout-all.logout-option.enabled:hover,
+#mobile-logout-single.logout-option:hover {
+    background: #1a1a1a;
+}
+
+/* Opción inferior: blanco brillante */
+#mobile-logout-single.logout-option {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Línea divisoria */
+.divider {
+    height: 1px;
+    background-color: #333333;
+    margin: 4px 16px;
+}
+
+/* Ajuste para móviles muy pequeños */
+@media (max-width: 480px) {
+    .mobile-logout-panel.speech-bubble {
+        width: 240px;
+        margin-right: 12px;
+        margin-bottom: 65px;
+        border-radius: 18px;
+    }
+    .mobile-logout-panel.speech-bubble::after {
+        right: 16px;
+        bottom: -10px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #000000;
+    }
+    .logout-option {
+        padding: 10px 16px;
+        font-size: 15px;
+    }
 }
     
 }
