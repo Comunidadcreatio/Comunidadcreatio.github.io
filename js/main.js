@@ -178,6 +178,10 @@ function cerrarMobileLogoutModal() {
 
 function cerrarDesktopLogoutModal() {
     if (desktopLogoutModal) desktopLogoutModal.classList.add('hidden');
+    if (clickOutsideHandler) {
+        document.removeEventListener('click', clickOutsideHandler);
+        clickOutsideHandler = null;
+    }
 }
 
 function positionDesktopPanel(triggerElement, panelElement) {
@@ -572,53 +576,76 @@ function setupEvents() {
     document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
     document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
 
-    // Botón de cerrar sesión (icono de la barra)
-    const logoutIcon = document.getElementById('btn-logout-sidebar');
-    if (logoutIcon) {
-        logoutIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                // Versión móvil: mostrar panel negro inferior
-                const mobileModal = document.getElementById('mobile-logout-options');
-                if (mobileModal) mobileModal.classList.remove('hidden');
-            } else {
-                // Versión escritorio: mostrar panel flotante
-                if (!desktopLogoutModal) {
-                    desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
-                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
-                    // Asignar eventos de los botones del panel de escritorio (una sola vez)
-                    if (desktopLogoutAllBtn) {
-                        desktopLogoutAllBtn.addEventListener('click', () => {
-                            closeAllSessions();
-                            cerrarDesktopLogoutModal();
-                        });
-                    }
-                    if (desktopLogoutSingleBtn) {
-                        desktopLogoutSingleBtn.addEventListener('click', async () => {
-                            cerrarDesktopLogoutModal();
-                            await ejecutarLogout();
-                        });
-                    }
+    // Dentro de setupEvents, reemplazar el bloque del logoutIcon por:
+
+const logoutIcon = document.getElementById('btn-logout-sidebar');
+if (logoutIcon) {
+    let clickOutsideHandler = null; // para poder remover el listener
+
+    logoutIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            // Móvil: ya tiene su propia lógica, pero también podríamos hacer toggle
+            const mobileModal = document.getElementById('mobile-logout-options');
+            if (mobileModal) {
+                if (mobileModal.classList.contains('hidden')) {
+                    mobileModal.classList.remove('hidden');
+                } else {
+                    mobileModal.classList.add('hidden');
                 }
-                // Actualizar estado visual (habilitado/deshabilitado)
+            }
+        } else {
+            // Escritorio: toggle del panel flotante
+            if (!desktopLogoutModal) {
+                desktopLogoutModal = document.getElementById('desktop-logout-options');
+                desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
+                desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+                if (desktopLogoutAllBtn) {
+                    desktopLogoutAllBtn.addEventListener('click', () => {
+                        closeAllSessions();
+                        cerrarDesktopLogoutModal();
+                    });
+                }
+                if (desktopLogoutSingleBtn) {
+                    desktopLogoutSingleBtn.addEventListener('click', async () => {
+                        cerrarDesktopLogoutModal();
+                        await ejecutarLogout();
+                    });
+                }
+            }
+
+            // Si el panel está oculto, lo mostramos; si está visible, lo ocultamos
+            if (desktopLogoutModal.classList.contains('hidden')) {
+                // Mostrar panel
                 updateCerrarTodasSesionesButtonState();
-                // Posicionar y mostrar
                 positionDesktopPanel(logoutIcon, desktopLogoutModal);
                 desktopLogoutModal.classList.remove('hidden');
-                // Cerrar al hacer clic fuera
+                // Agregar listener para cerrar al hacer clic fuera (solo una vez)
+                if (clickOutsideHandler) {
+                    document.removeEventListener('click', clickOutsideHandler);
+                }
+                clickOutsideHandler = function(event) {
+                    if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+                        cerrarDesktopLogoutModal();
+                        document.removeEventListener('click', clickOutsideHandler);
+                        clickOutsideHandler = null;
+                    }
+                };
                 setTimeout(() => {
-                    document.addEventListener('click', function onClickOutside(event) {
-                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
-                            cerrarDesktopLogoutModal();
-                            document.removeEventListener('click', onClickOutside);
-                        }
-                    });
+                    document.addEventListener('click', clickOutsideHandler);
                 }, 0);
+            } else {
+                // Ocultar panel
+                cerrarDesktopLogoutModal();
+                if (clickOutsideHandler) {
+                    document.removeEventListener('click', clickOutsideHandler);
+                    clickOutsideHandler = null;
+                }
             }
-        });
-    }
+        }
+    });
+}
 
     // Botones del panel móvil
     const mobileSingle = document.getElementById('mobile-logout-single');
