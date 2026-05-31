@@ -40,6 +40,25 @@
     font-display: swap;
 }
 
+/* ==============================================
+   TIPOGRAFÍA GLOBAL
+   ============================================== */
+* {
+    font-family: 'MADE Tommy Soft', sans-serif;
+    font-weight: 400; /* Peso normal por defecto */
+}
+
+/* Ajuste para títulos */
+h1, h2, h3, h4, h5, h6, .brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
+    font-weight: 700; /* Negrita para títulos */
+}
+
+/* Ajuste para botones y elementos interactivos */
+button, input, select, textarea, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
+    font-family: 'MADE Tommy Soft', sans-serif;
+    font-weight: 500; /* Peso medio para botones */
+}
+
 /* 1. Estilos globales, reset y tipografía */
 @import url('header.css');
 
