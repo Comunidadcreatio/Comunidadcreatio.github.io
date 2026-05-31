@@ -186,19 +186,24 @@ function positionDesktopPanel(triggerElement, panelElement) {
     const panelDiv = panelElement.querySelector('.desktop-logout-panel');
     if (!panelDiv) return;
     const panelRect = panelDiv.getBoundingClientRect();
-    let top = rect.bottom + 8;
-    let left = rect.left;
+    
+    // Intentar colocar a la derecha primero
+    let left = rect.right + 8;      // a la derecha del icono
+    let top = rect.top;              // alineado arriba
     let placement = 'right';
-
-    if (top + panelRect.height > window.innerHeight) {
-        top = rect.top - panelRect.height - 8;
-    }
+    
+    // Si no cabe a la derecha (se sale de la pantalla), colocamos a la izquierda
     if (left + panelRect.width > window.innerWidth) {
-        left = rect.right - panelRect.width;
+        left = rect.left - panelRect.width - 8;
         placement = 'left';
-    } else {
-        placement = 'right';
     }
+    
+    // Ajustar verticalmente para que no se salga arriba/abajo
+    if (top + panelRect.height > window.innerHeight) {
+        top = window.innerHeight - panelRect.height - 10;
+    }
+    if (top < 10) top = 10;
+    
     panelElement.style.top = `${top}px`;
     panelElement.style.left = `${left}px`;
     panelDiv.setAttribute('data-placement', placement);
