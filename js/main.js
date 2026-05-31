@@ -605,10 +605,6 @@ async function verificarSesionBackend() {
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
 function setupEvents() {
-    // Botones de la barra lateral
-    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
-    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
-
     // Dentro de setupEvents, reemplazar el bloque del logoutIcon por:
 
 const logoutIcon = document.getElementById('btn-logout-sidebar');
