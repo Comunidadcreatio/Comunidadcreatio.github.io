@@ -1,6 +1,6 @@
 // js/main.js
-import { TOKEN_KEY, ARTISTA_KEY } from './config.js';
-import { API_BASE_URL, apiRequest } from './config.js';
+import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL } from './config.js';
+import { apiRequest } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
@@ -13,10 +13,21 @@ const galeriaContainer = document.getElementById('galeria-container');
 const panelArtista = document.getElementById('panel-artista');
 const tablaBody = document.getElementById('tabla-obras-body');
 const obraForm = document.getElementById('obra-form');
-const btnLogout = document.getElementById('btn-logout');
 const btnPerfil = document.getElementById('btn-perfil');
 const imagenesAEliminar = new Set();
 
+// Variables para paginación y filtros
+let currentPage = 1;
+let currentLimit = 10;
+let currentSearch = '';
+let currentSortBy = 'id';
+let currentOrder = 'DESC';
+let totalObras = 0;
+
+// Conteo de sesiones activas
+let activeSessionsCount = 0;
+
+// Ciudades para el registro
 const ciudadesPorPais = {
     'Venezuela': {
         'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
@@ -64,56 +75,100 @@ function mostrarErrores(result) {
 }
 
 // ============================================
-// INICIALIZACIÓN DE LA APLICACIÓN
+// FUNCIONES PARA EL MANEJO DE SESIONES (CERRAR TODAS)
 // ============================================
-async function init() {
-    const sesionValida = await verificarSesionBackend();
-
-    if (sesionValida) {
-        // Usuario logueado: mostrar todo normalmente
-        btnPerfil.classList.add('hidden');
-        document.getElementById('toggle-panel').classList.remove('hidden');
-        mostrarPaginaBlanca(); // ✅ Cambio clave: arranca en blanco
-        
-        // Asegurar que los modales estén ocultos y sin modo fullscreen
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('modal-fullscreen');
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        
-
-        setupEvents();
-        setupImagePreviews();
-        cargarSelectoresFecha();
-        poblarCiudades('');
-    } else {
-        // Usuario NO logueado: mostrar login a pantalla completa
-        document.getElementById('panel-artista').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.add('hidden');
-        document.getElementById('toggle-panel').classList.add('hidden');
-        btnPerfil.classList.add('hidden');
-        
-        // Configurar login como pantalla completa
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.remove('hidden');
-        modalLogin.classList.add('modal-fullscreen');
-        
-        // Asegurar que registro esté oculto
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        
-        setupEvents();
-        setupImagePreviews();
-        cargarSelectoresFecha();
-        poblarCiudades('');
+async function fetchActiveSessionsCount() {
+    if (!token) return;
+    try {
+        const res = await apiRequest('/api/artistas/sesiones-activas');
+        if (res && res.success) {
+            activeSessionsCount = res.count;
+            updateCerrarTodasSesionesButtonState();
+        } else if (res && res.error) {
+            console.warn("No se pudo obtener conteo de sesiones:", res.error);
+        }
+    } catch (error) {
+        console.error("Error al obtener número de sesiones:", error);
     }
 }
 
+function updateCerrarTodasSesionesButtonState() {
+    const desktopBtn = document.getElementById('btn-cerrar-todas-sesiones-sidebar');
+    const mobileAllBtn = document.getElementById('mobile-logout-all');
+    const isEnabled = activeSessionsCount >= 2;
+    if (desktopBtn) {
+        if (isEnabled) {
+            desktopBtn.classList.remove('disabled');
+        } else {
+            desktopBtn.classList.add('disabled');
+        }
+    }
+    if (mobileAllBtn) {
+        if (isEnabled) {
+            mobileAllBtn.classList.remove('disabled');
+        } else {
+            mobileAllBtn.classList.add('disabled');
+        }
+    }
+}
+
+async function closeAllSessions() {
+    if (activeSessionsCount < 2) {
+        alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+        return;
+    }
+    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+        try {
+            const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
+            if (res && res.success) {
+                alert("✅ Todas las sesiones han sido cerradas correctamente.");
+            } else {
+                alert("❌ " + (res.error || "Error inesperado."));
+            }
+        } catch (error) {
+            console.error("Error al cerrar todas las sesiones:", error);
+            alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
+        } finally {
+            // Limpiar sesión local y redirigir
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(ARTISTA_KEY);
+            window.location.href = '/';
+        }
+    }
+}
+
+// ============================================
+// FUNCIONES DE LOGOUT Y MODAL MÓVIL
+// ============================================
+async function ejecutarLogout() {
+    try {
+        const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
+        if (res && !res.success) console.warn(res.error);
+    } catch (error) {
+        console.error("Error en logout backend:", error);
+    } finally {
+        logout(); // función de auth.js
+        // Ocultar elementos de usuario logueado
+        document.getElementById('toggle-panel').classList.add('hidden');
+        document.getElementById('pagina-blanca').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.add('hidden');
+        document.getElementById('panel-artista').classList.add('hidden');
+        // Mostrar login en pantalla completa
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
+        document.getElementById('btn-perfil').classList.remove('hidden');
+    }
+}
+
+function cerrarMobileLogoutModal() {
+    const modal = document.getElementById('mobile-logout-options');
+    if (modal) modal.classList.add('hidden');
+}
 
 // ============================================
 // FUNCIONES DE MANEJO DE VISTAS
 // ============================================
-
 function mostrarPaginaBlanca() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
@@ -130,18 +185,15 @@ function toggleGaleria() {
     const paginaBlanca = document.getElementById('pagina-blanca');
 
     if (galeria.classList.contains('hidden')) {
-        // Mostrar galería
         galeria.classList.remove('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
-        // Recargar la galería si es necesario
         cargarGaleria(galeriaContainer).then(obras => {
             mostrarGaleria(obras, galeriaContainer, (id) => {
                 console.log("Ver detalles de obra con ID:", id);
             });
         });
     } else {
-        // Ocultar galería y mostrar página en blanco
         galeria.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
     }
@@ -153,13 +205,11 @@ function togglePanel() {
     const paginaBlanca = document.getElementById('pagina-blanca');
 
     if (panel.classList.contains('hidden')) {
-        // Mostrar panel
         panel.classList.remove('hidden');
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
-        refrescarTabla(); // Cargar datos del panel
+        refrescarTabla();
     } else {
-        // Ocultar panel y mostrar página en blanco
         panel.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
     }
@@ -169,10 +219,62 @@ function togglePanel() {
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
 function setupEvents() {
-
+    // Botones de la barra lateral
     document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
     document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
+    
+    // Botón de cerrar sesión (icono de la barra)
+    const logoutIcon = document.getElementById('btn-logout-sidebar');
+    if (logoutIcon) {
+        logoutIcon.addEventListener('click', (e) => {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                // Mostrar panel negro móvil
+                const mobileModal = document.getElementById('mobile-logout-options');
+                if (mobileModal) mobileModal.classList.remove('hidden');
+            } else {
+                // En escritorio ejecutar logout directo
+                ejecutarLogout();
+            }
+        });
+    }
 
+    // Botón "Cerrar todas las sesiones" en escritorio (barra lateral)
+    const desktopCloseAll = document.getElementById('btn-cerrar-todas-sesiones-sidebar');
+    if (desktopCloseAll) {
+        desktopCloseAll.addEventListener('click', closeAllSessions);
+    }
+
+    // Botones del panel móvil
+    const mobileSingle = document.getElementById('mobile-logout-single');
+    if (mobileSingle) {
+        mobileSingle.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            await ejecutarLogout();
+        });
+    }
+    const mobileAll = document.getElementById('mobile-logout-all');
+    if (mobileAll) {
+        mobileAll.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            if (activeSessionsCount >= 2) {
+                await closeAllSessions();
+            } else {
+                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+            }
+        });
+    }
+    // Cerrar modal móvil si se hace clic fuera del panel
+    const mobileModal = document.getElementById('mobile-logout-options');
+    if (mobileModal) {
+        mobileModal.addEventListener('click', (e) => {
+            if (e.target === mobileModal) {
+                cerrarMobileLogoutModal();
+            }
+        });
+    }
+
+    // Resto de eventos (filtros, paginación, etc.)
     document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('modal-login').classList.add('hidden');
@@ -189,8 +291,7 @@ function setupEvents() {
     });
 
     document.getElementById('reg-pais').addEventListener('change', function() {
-        const paisSeleccionado = this.value;
-        poblarCiudades(paisSeleccionado);
+        poblarCiudades(this.value);
     });
 
     document.getElementById('btn-prev').addEventListener('click', () => {
@@ -216,67 +317,29 @@ function setupEvents() {
         }
     });
 
-
-
-    
-
-
-    document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
-    try {
-        const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
-        if (res && !res.success) {
-            console.warn("El backend no pudo cerrar la sesión:", res.error);
-        }
-    } catch (error) {
-        console.error("Error al cerrar sesión en el backend:", error);
-    } finally {
-        // 🔥 Limpiar la sesión local
-        logout();
-
-        document.getElementById('toggle-panel').classList.add('hidden');
-        document.getElementById('pagina-blanca').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.remove('hidden');
-        
-        // 🔥 Ocultar la barra lateral y el panel
-        document.getElementById('toggle-panel').classList.add('hidden');
-        document.getElementById('panel-artista').classList.add('hidden');
-        
-        // 🔥 Mostrar la galería pública (opcional, pero la ocultaremos para mostrar login)
-        document.getElementById('galeria-publica').classList.add('hidden');
-        
-        // 🔥 Mostrar el modal de login a pantalla completa
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.remove('hidden');
-        modalLogin.classList.add('modal-fullscreen');
-        
-        // 🔥 Mostrar el botón de perfil para futuros logins
-        document.getElementById('btn-perfil').classList.remove('hidden');
-    }
-});
-
+    // Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-pass').value;
         const result = await login(email, password);
         if (result.success) {
-            // Quitar el modo pantalla completa del login
+            // Quitar modo pantalla completa del login
             const modalLogin = document.getElementById('modal-login');
             modalLogin.classList.add('hidden');
             modalLogin.classList.remove('modal-fullscreen');
-            
-            // Asegurar que registro también esté oculto
             document.getElementById('modal-registro').classList.add('hidden');
             document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-            
-            // Mostrar la interfaz normal
             document.getElementById('toggle-panel').classList.remove('hidden');
-            mostrarPaginaBlanca(); // ✅ Al iniciar sesión, se muestra la página en blanco
+            mostrarPaginaBlanca();
+            // Obtener conteo de sesiones activas
+            await fetchActiveSessionsCount();
         } else {
             mostrarErrores(result);
         }
     });
 
+    // Registro
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre_artista = document.getElementById('reg-nombre-artista').value;
@@ -326,18 +389,12 @@ function setupEvents() {
         );
         if (result.success) {
             alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-            
-            // Cerrar registro y volver al login (pantalla completa)
             const modalRegistro = document.getElementById('modal-registro');
             modalRegistro.classList.add('hidden');
             modalRegistro.classList.remove('modal-fullscreen');
-            
-            // Mostrar login nuevamente
             const modalLogin = document.getElementById('modal-login');
             modalLogin.classList.remove('hidden');
             modalLogin.classList.add('modal-fullscreen');
-            
-            // Opcional: limpiar campos del formulario de registro
             document.getElementById('registro-form').reset();
         } else {
             mostrarErrores(result);
@@ -459,59 +516,23 @@ function setupEvents() {
         }
     }
 
-    document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
-            try {
-                const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
-                    method: 'POST'
-                });
-
-                if (res && res.success) {
-                    alert("✅ Todas las sesiones han sido cerradas correctamente.");
-                } else if (res && res.error) {
-                    alert("❌ " + res.error);
-                } else {
-                    alert("❌ Error inesperado al cerrar las sesiones.");
-                }
-            } catch (error) {
-                console.error("Error al cerrar todas las sesiones:", error);
-                alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
-            } finally {
-                // 🔥 ESTE BLOQUE SIEMPRE SE EJECUTA. Limpia la sesión y redirige.
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(ARTISTA_KEY);
-                
-                // 🔥 Redirige a la página principal después de 2 segundos.
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
-            }
-        }
-    });
-
     document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
         limpiarFormularioCompleto(true);
     });
 
     document.getElementById('btn-ir-registro').addEventListener('click', () => {
-        // Ocultar login
         const modalLogin = document.getElementById('modal-login');
         modalLogin.classList.add('hidden');
         modalLogin.classList.remove('modal-fullscreen');
-        
-        // Mostrar registro a pantalla completa
         const modalRegistro = document.getElementById('modal-registro');
         modalRegistro.classList.remove('hidden');
         modalRegistro.classList.add('modal-fullscreen');
     });
 
     document.getElementById('btn-ir-login').addEventListener('click', () => {
-        // Ocultar registro
         const modalRegistro = document.getElementById('modal-registro');
         modalRegistro.classList.add('hidden');
         modalRegistro.classList.remove('modal-fullscreen');
-        
-        // Mostrar login a pantalla completa
         const modalLogin = document.getElementById('modal-login');
         modalLogin.classList.remove('hidden');
         modalLogin.classList.add('modal-fullscreen');
@@ -528,7 +549,6 @@ function setupEvents() {
         messageEl.style.display = 'block';
         messageEl.textContent = '⏳ Enviando solicitud...';
         messageEl.style.color = '#555';
-
         try {
             const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
                 method: 'POST',
@@ -556,7 +576,6 @@ function setupEvents() {
         const password = document.getElementById('confirmar-password').value;
         const mensajeError = document.getElementById('mensaje-error');
         mensajeError.style.display = 'none';
-
         try {
             const res = await apiRequest('/api/artistas/eliminar-cuenta', {
                 method: 'POST',
@@ -593,7 +612,6 @@ function setupEvents() {
             }
         });
     });
-
 }
 
 // ============================================
@@ -615,32 +633,18 @@ function ocultarPanelArtista() {
     btnPerfil.textContent = '👤';
 }
 
-let currentPage = 1;
-let currentLimit = 10;
-let currentSearch = '';
-let currentSortBy = 'id';
-let currentOrder = 'DESC';
-let totalObras = 0;
-
 async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     
-    // 🚨 DETECTAR ERROR DE SESIÓN EXPIRADA Y REDIRIGIR
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
-        
-        // Si el error indica que la sesión expiró, redirigimos a la página principal
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
             alert("🔐 Tu sesión ha expirado. Serás redirigido a la página principal.");
-            // Limpiamos la sesión local
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
-            // Redirigimos a la raíz
             window.location.href = '/';
             return;
         }
-        
-        // Para otros errores, solo mostramos el mensaje
         mostrarErrores(result);
         return;
     }
@@ -655,17 +659,14 @@ async function refrescarTabla() {
     renderizarTabla(obras, tablaBody,
         async (id) => {
             try {
-                // ✅ CORRECCIÓN AQUÍ: NO LLAMAR A .json()
                 const data = await apiRequest(`/obras/${id}`);
                 if (!data) return;
-                // Si hay un error (success: false), mostrarlo
                 if (data.success === false) {
                     console.error('Error al obtener obra:', data.error);
                     alert('Error al cargar la obra: ' + data.error);
                     return;
                 }
-                const obra = data;  // ✅ Ya son los datos parseados
-
+                const obra = data;
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -687,7 +688,6 @@ async function refrescarTabla() {
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
 
-                // Cargar imágenes
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -736,7 +736,6 @@ async function refrescarTabla() {
                                         placeholderSpan.style.display = 'block';
                                         inputFile.value = '';
                                         this.style.display = 'none';
-                                        console.log(`Imagen ${idx} marcada para eliminar.`);
                                     }
                                 });
                             }
@@ -864,9 +863,6 @@ function setupImagePreviews() {
                                 this.remove();
                                 if (idEdicion) {
                                     imagenesAEliminar.add(idx);
-                                    console.log(`📌 [Edición] Imagen ${idx} marcada para eliminar.`);
-                                } else {
-                                    console.log(`🆕 [Nueva obra] Imagen ${idx} eliminada visualmente.`);
                                 }
                             }
                         });
@@ -929,6 +925,45 @@ async function verificarSesionBackend() {
 }
 
 // ============================================
-// INICIALIZAR LA APLICACIÓN
+// INICIALIZACIÓN DE LA APLICACIÓN
 // ============================================
+async function init() {
+    const sesionValida = await verificarSesionBackend();
+
+    if (sesionValida) {
+        btnPerfil.classList.add('hidden');
+        document.getElementById('toggle-panel').classList.remove('hidden');
+        mostrarPaginaBlanca();
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('modal-fullscreen');
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
+        
+        // Obtener el conteo de sesiones activas
+        await fetchActiveSessionsCount();
+    } else {
+        document.getElementById('panel-artista').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.add('hidden');
+        document.getElementById('toggle-panel').classList.add('hidden');
+        btnPerfil.classList.add('hidden');
+        
+        const modalLogin = document.getElementById('modal-login');
+        modalLogin.classList.remove('hidden');
+        modalLogin.classList.add('modal-fullscreen');
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        
+        setupEvents();
+        setupImagePreviews();
+        cargarSelectoresFecha();
+        poblarCiudades('');
+    }
+}
+
+// Iniciar
 init();
