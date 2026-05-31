@@ -766,6 +766,24 @@ if (menuBtn) {
     });
 }
 
+// Ejemplo de cómo debería verse en tu main.js
+const btnGaleriaMovil = document.getElementById('tu-id-del-boton-galeria-movil');
+const btnPanelMovil = document.getElementById('tu-id-del-boton-panel-movil');
+
+if (btnGaleriaMovil) {
+    btnGaleriaMovil.addEventListener('click', () => {
+        // Aquí llamas a la función que muestra la galería
+        mobileMainMenu.classList.add('hidden'); // Para cerrar el menú luego de hacer clic
+    });
+}
+
+if (btnPanelMovil) {
+    btnPanelMovil.addEventListener('click', () => {
+        // Aquí llamas a la función que muestra el panel
+        mobileMainMenu.classList.add('hidden'); 
+    });
+}
+
     // ----- Botones del menú móvil (alternativa, por si no se asignaron arriba) -----
     const mobileGaleriaAlt = document.getElementById('mobile-menu-galeria');
     const mobilePanelAlt = document.getElementById('mobile-menu-panel');
