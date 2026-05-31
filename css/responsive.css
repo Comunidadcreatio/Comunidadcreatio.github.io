@@ -463,6 +463,7 @@
         font-size: 15px;
     }
     .mobile-main-menu .mobile-logout-panel.speech-bubble {
+        margin: 0 !important;
         width: 200px;
     }
 }
