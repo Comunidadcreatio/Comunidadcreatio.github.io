@@ -669,25 +669,6 @@ function setupEvents() {
         });
     }
 
-const mobileGaleriaAlt = document.getElementById('mobile-menu-galeria');
-    const mobilePanelAlt = document.getElementById('mobile-menu-panel');
-    if (mobileGaleriaAlt && !mobileGaleriaAlt.hasAttribute('data-listener')) {
-        mobileGaleriaAlt.addEventListener('click', () => {
-            const menu = document.getElementById('mobile-main-menu');
-            if (menu) menu.classList.add('hidden');
-            toggleGaleria();
-        });
-        mobileGaleriaAlt.setAttribute('data-listener', 'true');
-    }
-    if (mobilePanelAlt && !mobilePanelAlt.hasAttribute('data-listener')) {
-        mobilePanelAlt.addEventListener('click', () => {
-            const menu = document.getElementById('mobile-main-menu');
-            if (menu) menu.classList.add('hidden');
-            togglePanel();
-        });
-        mobilePanelAlt.setAttribute('data-listener', 'true');
-    }
-
     // ----- Menú principal unificado (Galería + Panel) -----
     const menuBtn = document.getElementById('btn-menu-principal');
 if (menuBtn) {
@@ -784,7 +765,6 @@ if (menuBtn) {
         }
     });
 }
-
 
     // ----- Botones del menú móvil (alternativa, por si no se asignaron arriba) -----
     const mobileGaleriaAlt = document.getElementById('mobile-menu-galeria');
