@@ -31,6 +31,30 @@
     font-display: swap;
 }
 
+
+
+/* 1. Estilos globales, reset y tipografía */
+@import url('header.css');
+
+/* 2. Galería pública (tarjetas de obras) */
+@import url('galeria-publica.css');
+
+/* 3. Panel del artista (filtros, tabla, peligro, acciones) */
+@import url('panel-artista.css');
+
+/* 4. Formularios (registro y obra) */
+@import url('formularios.css');
+
+/* 5. Modales (login, registro, restablecimiento, etc.) */
+@import url('modales.css');
+
+/* 6. Media Queries y ajustes para móviles */
+@import url('responsive.css');
+
+.hidden {
+    display: none !important;
+}
+
 /* Light (Peso 300, opcional) */
 @font-face {
     font-family: 'MADE Tommy Soft';
@@ -57,26 +81,4 @@ h1, h2, h3, h4, h5, h6, .brand-name, .modal-content h2, #panel-artista h2, .obra
 button, input, select, textarea, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
     font-family: 'MADE Tommy Soft', sans-serif;
     font-weight: 500; /* Peso medio para botones */
-}
-
-/* 1. Estilos globales, reset y tipografía */
-@import url('header.css');
-
-/* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css');
-
-/* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css');
-
-/* 4. Formularios (registro y obra) */
-@import url('formularios.css');
-
-/* 5. Modales (login, registro, restablecimiento, etc.) */
-@import url('modales.css');
-
-/* 6. Media Queries y ajustes para móviles */
-@import url('responsive.css');
-
-.hidden {
-    display: none !important;
 }
