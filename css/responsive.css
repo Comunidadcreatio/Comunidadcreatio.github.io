@@ -249,9 +249,8 @@
     body {
         padding-bottom: 60px;
     }
-}
 
-#btn-galeria {
+    #btn-galeria {
     pointer-events: auto !important; /* Asegura que capte clics */
     display: flex;
     align-items: center;
@@ -274,6 +273,10 @@
 #btn-galeria .toggle-label {
     display: none; /* Ocultar texto en móviles */
 }
+    
+}
+
+
 
 @media (max-width: 768px) {
     .login-logo {
