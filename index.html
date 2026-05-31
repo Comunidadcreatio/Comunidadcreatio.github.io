@@ -23,13 +23,18 @@
             <img src="iconos/Cerrar sesion.svg" alt="Cerrar Sesión" class="toggle-icon">
             <span class="toggle-label">Cerrar Sesión</span>
         </button>
-        <button id="btn-cerrar-todas-sesiones-sidebar">
-        <img src="iconos/Cerrar sesion.svg" alt="Cerrar todas las sesiones" class="toggle-icon">
-        <span class="toggle-label">Cerrar todas las sesiones</span>
-    </button>
     </div>
 
      <div class="app-container">
+
+        <!-- Panel flotante para escritorio (bocadillo) -->
+    <div id="desktop-logout-options" class="desktop-logout-modal hidden">
+        <div class="desktop-logout-panel speech-bubble">
+            <button id="desktop-logout-all" class="logout-option disabled">Cerrar todas las sesiones.</button>
+            <div class="divider"></div>
+            <button id="desktop-logout-single" class="logout-option">Cerrar Sesión.</button>
+        </div>
+    </div>
 
     <div id="mobile-logout-options" class="mobile-logout-modal hidden">
         <div class="mobile-logout-panel speech-bubble">
@@ -38,6 +43,8 @@
             <button id="mobile-logout-single" class="logout-option">Cerrar Sesión.</button>
         </div>
     </div>
+
+
     <!-- HEADER -->
     <header id="main-header">
         <img src="iconos/Logo-temporal.svg" alt="Hagamos Arte Táchira" class="login-logo">
