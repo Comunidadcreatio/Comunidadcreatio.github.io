@@ -374,6 +374,32 @@
     }
 }
 
+/* 1. Asegurar que el contenedor principal reciba clics y esté al frente */
+#mobile-main-menu {
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+}
+
+/* 2. Dar color blanco al texto y asegurar que los botones sean clickeables */
+#mobile-main-menu button,
+#mobile-main-menu .logout-option {
+    color: #ffffff !important;        /* Forzamos el texto a blanco */
+    pointer-events: auto !important;  /* Reactivamos los clics */
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 3. Un pequeño efecto visual al tocar las opciones */
+#mobile-main-menu button:active,
+#mobile-main-menu .logout-option:active {
+    background-color: #333333;
+}
+
 /* ---------- Estilos comunes de opciones ---------- */
 .logout-option {
     display: block;
