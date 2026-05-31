@@ -126,16 +126,16 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 50px;
+        height: 55px; /* Un poco más alto para mejor toque */
         border-bottom: none;
-        border-radius: 8px 8px 0 0;
-        padding: 0 12px; /* Reducido para mejor espacio */
+        border-radius: 12px 12px 0 0;
+        padding: 0 16px; /* Espacio lateral para evitar desborde */
         justify-content: flex-end;
         background-color: #ffffff;
         border: 2px solid #000000;
         border-bottom: none;
-        gap: 8px; /* Espaciado entre botones */
-        overflow-x: auto; /* Permite scroll horizontal si hay muchos botones */
+        box-sizing: border-box;
+        gap: 10px; /* Separación entre botones */
     }
 
     /* Ocultar textos en móviles */
@@ -143,29 +143,37 @@
         display: none !important;
     }
 
+    /* Iconos */
     .toggle-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
     }
 
-    /* Botones alineados horizontalmente */
+    /* Botones: todos con el mismo tamaño y sin desbordar */
     #btn-menu-principal,
     #btn-logout-sidebar {
         width: auto;
-        padding: 0;
+        min-width: 44px; /* Área táctil mínima */
+        padding: 8px;
         justify-content: center;
         margin: 0;
-        flex-shrink: 0; /* Evita que se encojan */
+        background: none;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
     }
 
     #btn-logout-sidebar {
-        margin-left: 10px;
+        margin-left: 0;
     }
 
+    /* Ajuste del body para no tapar contenido */
     body {
-        padding-bottom: 60px;
+        padding-bottom: 65px;
     }
 
+    /* Logo más pequeño */
     .login-logo {
         max-width: 150px;
         margin-bottom: 15px;
@@ -203,7 +211,7 @@
         justify-content: center;
     }
 
-    /* Ajustes adicionales para móviles pequeños */
+    /* Ajustes para móviles pequeños */
     @media (max-width: 480px) {
         .modal-content {
             padding: 1.5rem;
@@ -216,6 +224,14 @@
             flex-direction: column;
             gap: 0.5rem;
             text-align: center;
+        }
+        #toggle-panel {
+            padding: 0 12px;
+            gap: 8px;
+        }
+        .toggle-icon {
+            width: 24px;
+            height: 24px;
         }
     }
 
@@ -244,6 +260,19 @@
         }
     }
 }
+
+/* ==============================================
+   PANEL MÓVIL PARA MENÚ PRINCIPAL (texto visible)
+   ============================================== */
+/* Aseguramos que los botones del menú móvil tengan texto blanco */
+#mobile-main-menu .logout-option {
+    color: #ffffff !important;
+    font-weight: 500;
+}
+#mobile-main-menu .logout-option:hover {
+    background: #1a1a1a;
+}
+
 
 /* ==============================================
    PANELES FLOTANTES (Comunes escritorio + móvil)
