@@ -226,9 +226,10 @@ function positionMobilePanel(triggerElement, panelElement) {
     
     panelDiv.style.margin = '0';
     
-    // 🔧 Quitar las restricciones de bottom/right heredadas del CSS
+    // 🔧 Forzar posición libre eliminando los anclajes del CSS
     panelElement.style.bottom = 'auto';
     panelElement.style.right = 'auto';
+    panelElement.style.display = 'block';   // necesario si oculta con display:none y usamos flex
     
     const panelRect = panelDiv.getBoundingClientRect();
     // Intentar colocar arriba del botón
@@ -238,7 +239,7 @@ function positionMobilePanel(triggerElement, panelElement) {
     if (top < 10) {
         top = rect.bottom + 8;
     }
-    // Ajuste horizontal
+    // Ajuste horizontal para que no se salga de pantalla
     if (left + panelRect.width > window.innerWidth) {
         left = window.innerWidth - panelRect.width - 10;
     }
@@ -607,6 +608,7 @@ async function verificarSesionBackend() {
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
 function setupEvents() {
+    let mobileMenuClickListener = null;
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
     if (logoutIcon) {
