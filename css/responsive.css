@@ -233,13 +233,11 @@
     color: #aaa !important;
 }
 
-/* ==============================================
-   PANEL DE ESCRITORIO (BOCADILLO)
-   ============================================== */
+/* Panel flotante para escritorio - a la derecha/izquierda del icono */
 .desktop-logout-modal {
     position: fixed;
     z-index: 2000;
-    display: none; /* Se mostrará con JS */
+    display: none;
 }
 .desktop-logout-modal:not(.hidden) {
     display: block;
@@ -255,27 +253,28 @@
     text-align: left;
 }
 
-/* Cola del bocadillo (apunta hacia el icono) */
-.desktop-logout-panel.speech-bubble::before {
+/* Cola por defecto (panel a la derecha del icono): apunta hacia la izquierda */
+.desktop-logout-panel.speech-bubble[data-placement="right"]::before {
     content: '';
     position: absolute;
+    top: 12px;           /* distancia desde el borde superior */
+    left: -10px;         /* pegado al borde izquierdo, hacia fuera */
     width: 0;
     height: 0;
     border-style: solid;
-}
-
-/* Por defecto, la cola apuntará hacia la izquierda (si el panel está a la derecha del icono) */
-.desktop-logout-panel.speech-bubble[data-placement="right"]::before {
-    top: 12px;
-    left: -10px;
     border-width: 8px 10px 8px 0;
     border-color: transparent #000000 transparent transparent;
 }
 
-/* Si el panel se coloca a la izquierda, la cola apunta a la derecha */
+/* Si el panel se coloca a la izquierda del icono: la cola apunta a la derecha */
 .desktop-logout-panel.speech-bubble[data-placement="left"]::before {
+    content: '';
+    position: absolute;
     top: 12px;
     right: -10px;
+    width: 0;
+    height: 0;
+    border-style: solid;
     border-width: 8px 0 8px 10px;
     border-color: transparent transparent transparent #000000;
 }
