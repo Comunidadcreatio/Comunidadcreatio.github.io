@@ -1,5 +1,45 @@
 /* css/style.css - Archivo principal */
 
+/* ==============================================
+   IMPORTACIÓN DE MADE TOMMY SOFT (.otf)
+   ============================================== */
+
+/* Regular (Peso 400) */
+@font-face {
+    font-family: 'MADE Tommy Soft';
+    src: url('../fonts/MADE Tommy Soft Regular PERSONAL USE.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Bold (Peso 700) */
+@font-face {
+    font-family: 'MADE Tommy Soft';
+    src: url('../fonts/MADE Tommy Soft Bold PERSONAL USE.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ExtraBold (Peso 800, opcional) */
+@font-face {
+    font-family: 'MADE Tommy Soft';
+    src: url('../fonts/MADE Tommy Soft ExtraBold PERSONAL USE.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Light (Peso 300, opcional) */
+@font-face {
+    font-family: 'MADE Tommy Soft';
+    src: url('../fonts/MADE Tommy Soft Light PERSONAL USE.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* 1. Estilos globales, reset y tipografía */
 @import url('header.css');
 
