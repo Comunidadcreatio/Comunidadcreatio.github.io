@@ -669,6 +669,78 @@ function setupEvents() {
         });
     }
 
+    // ----- Menú principal unificado (Abre el bocadillo de Galería/Panel) -----
+    const menuBtn = document.getElementById('btn-menu-principal');
+    const mobileMainMenu = document.getElementById('mobile-main-menu');
+    const desktopMainMenu = document.getElementById('desktop-main-menu');
+
+    if (menuBtn) {
+        let mobileClickListener = null;
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                if (mobileMainMenu) {
+                    if (mobileMainMenu.classList.contains('hidden')) {
+                        mobileMainMenu.classList.remove('hidden');
+                        
+                        // Cierra el menú al tocar fuera de él
+                        if (mobileClickListener) document.removeEventListener('click', mobileClickListener);
+                        mobileClickListener = (event) => {
+                            if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
+                                mobileMainMenu.classList.add('hidden');
+                                document.removeEventListener('click', mobileClickListener);
+                                mobileClickListener = null;
+                            }
+                        };
+                        setTimeout(() => { document.addEventListener('click', mobileClickListener); }, 0);
+                    } else {
+                        mobileMainMenu.classList.add('hidden');
+                    }
+                }
+            } else {
+                // Lógica de escritorio (PC)
+                if (desktopMainMenu) {
+                    if (desktopMainMenu.classList.contains('hidden')) {
+                        positionDesktopPanel(menuBtn, desktopMainMenu, true);
+                        desktopMainMenu.classList.remove('hidden');
+                        
+                        if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
+                        clickOutsideHandlerMainMenu = (event) => {
+                            if (!desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
+                                cerrarDesktopMainMenu();
+                            }
+                        };
+                        setTimeout(() => { document.addEventListener('click', clickOutsideHandlerMainMenu); }, 0);
+                    } else {
+                        cerrarDesktopMainMenu();
+                    }
+                }
+            }
+        });
+    }
+
+    // ----- Botones de Acción dentro del menú Móvil -----
+    const btnGaleriaMovil = document.getElementById('mobile-menu-galeria');
+    const btnPanelMovil = document.getElementById('mobile-menu-panel');
+
+    if (btnGaleriaMovil) {
+        btnGaleriaMovil.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (mobileMainMenu) mobileMainMenu.classList.add('hidden'); // Cierra el bocadillo
+            toggleGaleria(); // Muestra la galería
+        });
+    }
+
+    if (btnPanelMovil) {
+        btnPanelMovil.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (mobileMainMenu) mobileMainMenu.classList.add('hidden'); // Cierra el bocadillo
+            togglePanel(); // Muestra el panel de registro
+        });
+    }
+
     // ----- Menú principal unificado (Galería + Panel) -----
     const menuBtn = document.getElementById('btn-menu-principal');
 if (menuBtn) {
@@ -766,23 +838,6 @@ if (menuBtn) {
     });
 }
 
-// Ejemplo de cómo debería verse en tu main.js
-const btnGaleriaMovil = document.getElementById('tu-id-del-boton-galeria-movil');
-const btnPanelMovil = document.getElementById('tu-id-del-boton-panel-movil');
-
-if (btnGaleriaMovil) {
-    btnGaleriaMovil.addEventListener('click', () => {
-        // Aquí llamas a la función que muestra la galería
-        mobileMainMenu.classList.add('hidden'); // Para cerrar el menú luego de hacer clic
-    });
-}
-
-if (btnPanelMovil) {
-    btnPanelMovil.addEventListener('click', () => {
-        // Aquí llamas a la función que muestra el panel
-        mobileMainMenu.classList.add('hidden'); 
-    });
-}
 
     // ----- Botones del menú móvil (alternativa, por si no se asignaron arriba) -----
     const mobileGaleriaAlt = document.getElementById('mobile-menu-galeria');
