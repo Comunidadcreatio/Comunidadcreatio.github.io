@@ -5,7 +5,6 @@ import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 
-
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
 // ============================================
@@ -23,6 +22,8 @@ let currentSearch = '';
 let currentSortBy = 'id';
 let currentOrder = 'DESC';
 let totalObras = 0;
+
+// Variables para el panel de escritorio
 let desktopLogoutModal = null;
 let desktopLogoutAllBtn = null;
 let desktopLogoutSingleBtn = null;
@@ -37,6 +38,9 @@ const ciudadesPorPais = {
     }
 };
 
+// ============================================
+// FUNCIONES AUXILIARES
+// ============================================
 function poblarCiudades(paisSeleccionado) {
     const ciudadSelect = document.getElementById('reg-ciudad');
     if (!ciudadSelect) return;
@@ -63,9 +67,6 @@ function poblarCiudades(paisSeleccionado) {
     }
 }
 
-// ============================================
-// FUNCIÓN AUXILIAR PARA MOSTRAR ERRORES DEL BACKEND
-// ============================================
 function mostrarErrores(result) {
     if (Array.isArray(result.errors) && result.errors.length > 0) {
         const mensaje = result.errors.join('\n• ');
@@ -78,7 +79,7 @@ function mostrarErrores(result) {
 }
 
 // ============================================
-// FUNCIONES PARA EL MANEJO DE SESIONES (CERRAR TODAS)
+// MANEJO DE SESIONES (CERRAR TODAS)
 // ============================================
 async function fetchActiveSessionsCount() {
     if (!token) return;
@@ -95,31 +96,11 @@ async function fetchActiveSessionsCount() {
     }
 }
 
-function updateDesktopButtonsState() {
-    const isEnabled = activeSessionsCount >= 2;
-    if (desktopLogoutAllBtn) {
-        if (isEnabled) {
-            desktopLogoutAllBtn.classList.remove('disabled');
-            desktopLogoutAllBtn.classList.add('enabled');
-        } else {
-            desktopLogoutAllBtn.classList.add('disabled');
-            desktopLogoutAllBtn.classList.remove('enabled');
-        }
-    }
-}
-
 function updateCerrarTodasSesionesButtonState() {
     const mobileAllBtn = document.getElementById('mobile-logout-all');
     const isEnabled = activeSessionsCount >= 2;
-    
-    if (desktopBtn) {
-        if (isEnabled) {
-            desktopBtn.classList.remove('disabled');
-        } else {
-            desktopBtn.classList.add('disabled');
-        }
-    }
-    
+
+    // Actualizar botón móvil
     if (mobileAllBtn) {
         if (isEnabled) {
             mobileAllBtn.classList.remove('disabled');
@@ -132,57 +113,16 @@ function updateCerrarTodasSesionesButtonState() {
         }
     }
 
+    // Actualizar botón de escritorio (si existe)
     if (desktopLogoutAllBtn) {
-    if (isEnabled) {
-        desktopLogoutAllBtn.classList.remove('disabled');
-        desktopLogoutAllBtn.classList.add('enabled');
-    } else {
-        desktopLogoutAllBtn.classList.add('disabled');
-        desktopLogoutAllBtn.classList.remove('enabled');
+        if (isEnabled) {
+            desktopLogoutAllBtn.classList.remove('disabled');
+            desktopLogoutAllBtn.classList.add('enabled');
+        } else {
+            desktopLogoutAllBtn.classList.add('disabled');
+            desktopLogoutAllBtn.classList.remove('enabled');
+        }
     }
-}
-
-}
-
-if (desktopLogoutAllBtn) {
-    desktopLogoutAllBtn.addEventListener('click', () => {
-        closeAllSessions();  // función ya existente
-        desktopLogoutModal.classList.add('hidden');
-    });
-}
-if (desktopLogoutSingleBtn) {
-    desktopLogoutSingleBtn.addEventListener('click', async () => {
-        desktopLogoutModal.classList.add('hidden');
-        await ejecutarLogout();
-    });
-}
-
-if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
-    desktopLogoutModal.classList.add('hidden');
-    return;
-}
-
-function positionDesktopPanel(triggerElement, panelElement) {
-    const rect = triggerElement.getBoundingClientRect();
-    const panelRect = panelElement.querySelector('.desktop-logout-panel').getBoundingClientRect();
-    let top = rect.bottom + 8;
-    let left = rect.left;
-    let placement = 'right';
-    
-    // Si no cabe hacia abajo, poner arriba
-    if (top + panelRect.height > window.innerHeight) {
-        top = rect.top - panelRect.height - 8;
-    }
-    // Si se sale por la derecha, alinear a la izquierda del icono
-    if (left + panelRect.width > window.innerWidth) {
-        left = rect.right - panelRect.width;
-        placement = 'left';
-    } else {
-        placement = 'right';
-    }
-    panelElement.style.top = `${top}px`;
-    panelElement.style.left = `${left}px`;
-    panelElement.querySelector('.desktop-logout-panel').setAttribute('data-placement', placement);
 }
 
 async function closeAllSessions() {
@@ -202,7 +142,6 @@ async function closeAllSessions() {
             console.error("Error al cerrar todas las sesiones:", error);
             alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
         } finally {
-            // Limpiar sesión local y redirigir
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
             window.location.href = '/';
@@ -211,7 +150,7 @@ async function closeAllSessions() {
 }
 
 // ============================================
-// FUNCIONES DE LOGOUT Y MODAL MÓVIL
+// LOGOUT Y MODALES MÓVIL/ESCRITORIO
 // ============================================
 async function ejecutarLogout() {
     try {
@@ -220,13 +159,11 @@ async function ejecutarLogout() {
     } catch (error) {
         console.error("Error en logout backend:", error);
     } finally {
-        logout(); // función de auth.js
-        // Ocultar elementos de usuario logueado
+        logout();
         document.getElementById('toggle-panel').classList.add('hidden');
         document.getElementById('pagina-blanca').classList.add('hidden');
         document.getElementById('galeria-publica').classList.add('hidden');
         document.getElementById('panel-artista').classList.add('hidden');
-        // Mostrar login en pantalla completa
         const modalLogin = document.getElementById('modal-login');
         modalLogin.classList.remove('hidden');
         modalLogin.classList.add('modal-fullscreen');
@@ -239,14 +176,41 @@ function cerrarMobileLogoutModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+function cerrarDesktopLogoutModal() {
+    if (desktopLogoutModal) desktopLogoutModal.classList.add('hidden');
+}
+
+function positionDesktopPanel(triggerElement, panelElement) {
+    if (!panelElement) return;
+    const rect = triggerElement.getBoundingClientRect();
+    const panelDiv = panelElement.querySelector('.desktop-logout-panel');
+    if (!panelDiv) return;
+    const panelRect = panelDiv.getBoundingClientRect();
+    let top = rect.bottom + 8;
+    let left = rect.left;
+    let placement = 'right';
+
+    if (top + panelRect.height > window.innerHeight) {
+        top = rect.top - panelRect.height - 8;
+    }
+    if (left + panelRect.width > window.innerWidth) {
+        left = rect.right - panelRect.width;
+        placement = 'left';
+    } else {
+        placement = 'right';
+    }
+    panelElement.style.top = `${top}px`;
+    panelElement.style.left = `${left}px`;
+    panelDiv.setAttribute('data-placement', placement);
+}
+
 // ============================================
-// FUNCIONES DE MANEJO DE VISTAS
+// MANEJO DE VISTAS (Galería, Panel, Página Blanca)
 // ============================================
 function mostrarPaginaBlanca() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
-
     if (galeria) galeria.classList.add('hidden');
     if (panel) panel.classList.add('hidden');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
@@ -256,7 +220,6 @@ function toggleGaleria() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
-
     if (galeria.classList.contains('hidden')) {
         galeria.classList.remove('hidden');
         panel.classList.add('hidden');
@@ -276,7 +239,6 @@ function togglePanel() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
-
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         galeria.classList.add('hidden');
@@ -289,441 +251,10 @@ function togglePanel() {
 }
 
 // ============================================
-// CONFIGURACIÓN DE EVENTOS
+// RENDERIZADO DE TABLA (Panel del Artista)
 // ============================================
-function setupEvents() {
-    // Botones de la barra lateral
-    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
-    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
-    
-    // Botón de cerrar sesión (icono de la barra)
-    const logoutIcon = document.getElementById('btn-logout-sidebar');
-    if (logoutIcon) {
-        logoutIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                // Mostrar panel móvil (ya existente)
-                const mobileModal = document.getElementById('mobile-logout-options');
-                if (mobileModal) mobileModal.classList.remove('hidden');
-            } else {
-                // Mostrar panel de escritorio
-                if (!desktopLogoutModal) {
-                    desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
-                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
-                }
-                // Actualizar estado de los botones según sesiones activas
-                updateDesktopButtonsState();
-                // Posicionar y mostrar
-                positionDesktopPanel(logoutIcon, desktopLogoutModal);
-                desktopLogoutModal.classList.remove('hidden');
-                // Cerrar al hacer clic fuera
-                setTimeout(() => {
-                    document.addEventListener('click', function onClickOutside(event) {
-                        if (!desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
-                            desktopLogoutModal.classList.add('hidden');
-                            document.removeEventListener('click', onClickOutside);
-                        }
-                    });
-                }, 0);
-            }
-        });
-    }
-
-    
-
-    // Botones del panel móvil
-    const mobileSingle = document.getElementById('mobile-logout-single');
-    if (mobileSingle) {
-        mobileSingle.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            await ejecutarLogout();
-        });
-    }
-    const mobileAll = document.getElementById('mobile-logout-all');
-    if (mobileAll) {
-        mobileAll.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            if (activeSessionsCount >= 2) {
-                await closeAllSessions();
-            } else {
-                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
-            }
-        });
-    }
-    // Cerrar modal móvil si se hace clic fuera del panel
-    const mobileModal = document.getElementById('mobile-logout-options');
-    if (mobileModal) {
-        mobileModal.addEventListener('click', (e) => {
-            if (e.target === mobileModal) {
-                cerrarMobileLogoutModal();
-            }
-        });
-    }
-
-    // Resto de eventos (filtros, paginación, etc.)
-    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-restablecimiento').classList.remove('hidden');
-    });
-
-    document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
-        currentSearch = document.getElementById('search-input').value;
-        currentSortBy = document.getElementById('sort-select').value;
-        currentOrder = document.getElementById('order-select').value;
-        currentLimit = parseInt(document.getElementById('limit-select').value);
-        currentPage = 1;
-        refrescarTabla();
-    });
-
-    document.getElementById('reg-pais').addEventListener('change', function() {
-        poblarCiudades(this.value);
-    });
-
-    document.getElementById('btn-prev').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            refrescarTabla();
-        }
-    });
-
-    document.getElementById('btn-next').addEventListener('click', () => {
-        const totalPages = Math.ceil(totalObras / currentLimit);
-        if (currentPage < totalPages) {
-            currentPage++;
-            refrescarTabla();
-        }
-    });
-
-    btnPerfil.addEventListener('click', () => {
-        if (token) {
-            mostrarPanelArtista();
-        } else {
-            document.getElementById('modal-login').classList.remove('hidden');
-        }
-    });
-
-    // Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-pass').value;
-        const result = await login(email, password);
-        if (result.success) {
-            // Quitar modo pantalla completa del login
-            const modalLogin = document.getElementById('modal-login');
-            modalLogin.classList.add('hidden');
-            modalLogin.classList.remove('modal-fullscreen');
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-            document.getElementById('toggle-panel').classList.remove('hidden');
-            mostrarPaginaBlanca();
-            // Obtener conteo de sesiones activas
-            await fetchActiveSessionsCount();
-        } else {
-            mostrarErrores(result);
-        }
-    });
-
-    // Registro
-    document.getElementById('registro-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nombre_artista = document.getElementById('reg-nombre-artista').value;
-        const nombres = document.getElementById('reg-nombres').value;
-        const apellidos = document.getElementById('reg-apellidos').value;
-        const nombre_real = `${nombres} ${apellidos}`.trim();
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-pass').value;
-        const telefono = document.getElementById('reg-telefono').value;
-        const pais = document.getElementById('reg-pais').value;
-        const ciudad = document.getElementById('reg-ciudad').value;
-        const genero = document.getElementById('reg-genero').value;
-        const dia = document.getElementById('reg-dia').value;
-        const mes = document.getElementById('reg-mes').value;
-        const ano = document.getElementById('reg-ano').value;
-
-        if (!dia || !mes || !ano) {
-            alert("❌ Todos los campos de fecha son obligatorios.");
-            return;
-        }
-        const fechaNac = new Date(ano, mes - 1, dia);
-        if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
-            alert("❌ La fecha seleccionada no es válida.");
-            return;
-        }
-        const hoy = new Date();
-        let edad = hoy.getFullYear() - fechaNac.getFullYear();
-        const mesDiff = hoy.getMonth() - fechaNac.getMonth();
-        if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) {
-            edad--;
-        }
-        if (edad < 18) {
-            alert("⚠️ Debes tener al menos 18 años para registrarte.");
-            return;
-        }
-        const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-        const result = await register(
-            nombre_artista,
-            nombre_real,
-            email,
-            password,
-            telefono,
-            pais,
-            ciudad,
-            fecha_nacimiento,
-            genero
-        );
-        if (result.success) {
-            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-            const modalRegistro = document.getElementById('modal-registro');
-            modalRegistro.classList.add('hidden');
-            modalRegistro.classList.remove('modal-fullscreen');
-            const modalLogin = document.getElementById('modal-login');
-            modalLogin.classList.remove('hidden');
-            modalLogin.classList.add('modal-fullscreen');
-            document.getElementById('registro-form').reset();
-        } else {
-            mostrarErrores(result);
-        }
-    });
-
-    // Guardar Obra
-    obraForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('input-titulo').value;
-        const artista = document.getElementById('input-artista').value;
-        const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
-        const idEdicion = document.getElementById('input-id-edicion').value;
-        const ano = document.getElementById('input-ano').value;
-        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-        const soporte = document.getElementById('input-soporte').value;
-        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-        const estado_obra = document.getElementById('input-estado-obra').value;
-        const procedencia = document.getElementById('input-procedencia').value;
-        const marcos = document.getElementById('input-marcos').value;
-        const certificado = document.getElementById('input-certificado').value;
-        const status = document.getElementById('input-status').value;
-        const ancho = document.getElementById('input-ancho').value;
-        const alto = document.getElementById('input-alto').value;
-        const firma = document.getElementById('input-firma').value;
-        const conservacion = document.getElementById('input-conservacion').value;
-        const etiquetas = document.getElementById('input-etiquetas').value;
-
-        const archivos = [
-            document.getElementById('input-imagen-0'),
-            document.getElementById('input-imagen-1'),
-            document.getElementById('input-imagen-2'),
-            document.getElementById('input-imagen-3'),
-            document.getElementById('input-imagen-4')
-        ];
-
-        let imagenFinalVisible = false;
-        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
-                imagenFinalVisible = true;
-                break;
-            }
-        }
-        if (!hayArchivosNuevos && !imagenFinalVisible) {
-            alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('titulo', titulo);
-        formData.append('artista', artista);
-        formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado);
-        formData.append('ano', ano);
-        formData.append('descripcion_tecnica', descripcion_tecnica);
-        formData.append('soporte', soporte);
-        formData.append('descripcion_artistica', descripcion_artistica);
-        formData.append('estado_obra', estado_obra);
-        formData.append('procedencia', procedencia);
-        formData.append('marcos', marcos);
-        formData.append('certificado', certificado);
-        formData.append('status', status);
-        formData.append('ancho', ancho);
-        formData.append('alto', alto);
-        formData.append('firma', firma);
-        formData.append('conservacion', conservacion);
-        formData.append('etiquetas', etiquetas);
-
-        if (imagenesAEliminar.size > 0) {
-            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
-        }
-
-        archivos.forEach((input, index) => {
-            if (input && input.files && input.files.length > 0) {
-                formData.append(`imagen_${index}`, input.files[0]);
-            }
-        });
-
-        const result = await guardarObra(token, formData, idEdicion || null);
-        if (result.success) {
-            alert("Obra guardada correctamente.");
-            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-            imagenesAEliminar.clear();
-            limpiarFormularioCompleto(true);
-            await refrescarTabla();
-        } else {
-            mostrarErrores(result);
-        }
-    });
-
-    function limpiarFormularioCompleto(restaurarArtista = true) {
-        obraForm.reset();
-        document.getElementById('input-id-edicion').value = '';
-        document.getElementById('btn-limpiar-campos').classList.add('hidden');
-        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-        imagenesAEliminar.clear();
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            const placeholder = document.getElementById(`placeholder-${i}`);
-            const inputFile = document.getElementById(`input-imagen-${i}`);
-            if (preview && placeholder) {
-                preview.src = '';
-                preview.style.display = 'none';
-                placeholder.style.display = 'block';
-            }
-            if (inputFile) {
-                inputFile.value = '';
-            }
-            const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
-            if (btnEliminar) {
-                btnEliminar.style.display = 'none';
-            }
-        }
-        if (restaurarArtista && artistaActual) {
-            document.getElementById('input-artista').value = artistaActual.nombre_artista;
-        }
-    }
-
-    document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
-        limpiarFormularioCompleto(true);
-    });
-
-    document.getElementById('btn-ir-registro').addEventListener('click', () => {
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.add('hidden');
-        modalLogin.classList.remove('modal-fullscreen');
-        const modalRegistro = document.getElementById('modal-registro');
-        modalRegistro.classList.remove('hidden');
-        modalRegistro.classList.add('modal-fullscreen');
-    });
-
-    document.getElementById('btn-ir-login').addEventListener('click', () => {
-        const modalRegistro = document.getElementById('modal-registro');
-        modalRegistro.classList.add('hidden');
-        modalRegistro.classList.remove('modal-fullscreen');
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.remove('hidden');
-        modalLogin.classList.add('modal-fullscreen');
-    });
-
-    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
-        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-    });
-
-    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('reset-email').value;
-        const messageEl = document.getElementById('reset-message');
-        messageEl.style.display = 'block';
-        messageEl.textContent = '⏳ Enviando solicitud...';
-        messageEl.style.color = '#555';
-        try {
-            const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
-                method: 'POST',
-                body: JSON.stringify({ email })
-            });
-            if (res && res.success) {
-                messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
-                messageEl.style.color = '#28a745';
-            } else if (res && res.error) {
-                messageEl.textContent = '❌ Error: ' + res.error;
-                messageEl.style.color = '#dc3545';
-            } else {
-                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-                messageEl.style.color = '#dc3545';
-            }
-        } catch (error) {
-            console.error('Error al solicitar restablecimiento:', error);
-            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-            messageEl.style.color = '#dc3545';
-        }
-    });
-
-    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const password = document.getElementById('confirmar-password').value;
-        const mensajeError = document.getElementById('mensaje-error');
-        mensajeError.style.display = 'none';
-        try {
-            const res = await apiRequest('/api/artistas/eliminar-cuenta', {
-                method: 'POST',
-                body: JSON.stringify({ password })
-            });
-            if (res && res.success) {
-                alert("✅ Tu cuenta ha sido eliminada correctamente.");
-                logout();
-                location.reload();
-            } else if (res && (res.errors || res.error)) {
-                if (Array.isArray(res.errors) && res.errors.length > 0) {
-                    mensajeError.textContent = '❌ ' + res.errors.join('\n');
-                } else if (res.error) {
-                    mensajeError.textContent = '❌ ' + res.error;
-                } else {
-                    mensajeError.textContent = '❌ Error desconocido.';
-                }
-                mensajeError.style.display = 'block';
-            } else {
-                mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-                mensajeError.style.display = 'block';
-            }
-        } catch (error) {
-            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-            mensajeError.style.display = 'block';
-        }
-    });
-
-    document.querySelectorAll('.cerrar-modal').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const modal = this.closest('.modal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        });
-    });
-}
-
-// ============================================
-// FUNCIONES DE NAVEGACIÓN Y RENDERIZADO
-// ============================================
-async function mostrarPanelArtista() {
-    document.getElementById('galeria-publica').classList.add('hidden');
-    panelArtista.classList.remove('hidden');
-    btnPerfil.textContent = '👤 Artista';
-    if (artistaActual) {
-        document.getElementById('input-artista').value = artistaActual.nombre_artista;
-    }
-    await refrescarTabla();
-}
-
-function ocultarPanelArtista() {
-    document.getElementById('galeria-publica').classList.remove('hidden');
-    panelArtista.classList.add('hidden');
-    btnPerfil.textContent = '👤';
-}
-
 async function refrescarTabla() {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
-    
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
@@ -736,14 +267,12 @@ async function refrescarTabla() {
         mostrarErrores(result);
         return;
     }
-
     const obras = result.obras;
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
     document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
     document.getElementById('btn-prev').disabled = currentPage <= 1;
     document.getElementById('btn-next').disabled = currentPage >= totalPages;
-
     renderizarTabla(obras, tablaBody,
         async (id) => {
             try {
@@ -775,7 +304,6 @@ async function refrescarTabla() {
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
-
                 const imagenes = [
                     obra.imagen_url,
                     obra.imagen_url_1,
@@ -891,6 +419,16 @@ async function refrescarTabla() {
     );
 }
 
+async function mostrarPanelArtista() {
+    document.getElementById('galeria-publica').classList.add('hidden');
+    panelArtista.classList.remove('hidden');
+    btnPerfil.textContent = '👤 Artista';
+    if (artistaActual) {
+        document.getElementById('input-artista').value = artistaActual.nombre_artista;
+    }
+    await refrescarTabla();
+}
+
 function mostrarGaleriaPublica() {
     document.getElementById('panel-artista').classList.add('hidden');
     document.getElementById('galeria-publica').classList.remove('hidden');
@@ -901,6 +439,9 @@ function mostrarGaleriaPublica() {
     });
 }
 
+// ============================================
+// PREVISUALIZACIÓN DE IMÁGENES
+// ============================================
 function setupImagePreviews() {
     const idEdicion = document.getElementById('input-id-edicion').value;
     for (let i = 0; i < 5; i++) {
@@ -970,6 +511,9 @@ function setupImagePreviews() {
     }
 }
 
+// ============================================
+// SELECTORES DE FECHA PARA REGISTRO
+// ============================================
 function cargarSelectoresFecha() {
     const diaSelect = document.getElementById('reg-dia');
     if (diaSelect) {
@@ -1002,6 +546,9 @@ function cargarSelectoresFecha() {
     }
 }
 
+// ============================================
+// VERIFICAR SESIÓN EN BACKEND
+// ============================================
 async function verificarSesionBackend() {
     if (!token) return false;
     try {
@@ -1013,11 +560,387 @@ async function verificarSesionBackend() {
 }
 
 // ============================================
-// INICIALIZACIÓN DE LA APLICACIÓN
+// CONFIGURACIÓN DE EVENTOS (setupEvents)
+// ============================================
+function setupEvents() {
+    // Botones de la barra lateral
+    document.getElementById('btn-galeria').addEventListener('click', toggleGaleria);
+    document.getElementById('btn-panel-toggle').addEventListener('click', togglePanel);
+
+    // Botón de cerrar sesión (icono de la barra)
+    const logoutIcon = document.getElementById('btn-logout-sidebar');
+    if (logoutIcon) {
+        logoutIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                // Versión móvil: mostrar panel negro inferior
+                const mobileModal = document.getElementById('mobile-logout-options');
+                if (mobileModal) mobileModal.classList.remove('hidden');
+            } else {
+                // Versión escritorio: mostrar panel flotante
+                if (!desktopLogoutModal) {
+                    desktopLogoutModal = document.getElementById('desktop-logout-options');
+                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
+                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+                    // Asignar eventos de los botones del panel de escritorio (una sola vez)
+                    if (desktopLogoutAllBtn) {
+                        desktopLogoutAllBtn.addEventListener('click', () => {
+                            closeAllSessions();
+                            cerrarDesktopLogoutModal();
+                        });
+                    }
+                    if (desktopLogoutSingleBtn) {
+                        desktopLogoutSingleBtn.addEventListener('click', async () => {
+                            cerrarDesktopLogoutModal();
+                            await ejecutarLogout();
+                        });
+                    }
+                }
+                // Actualizar estado visual (habilitado/deshabilitado)
+                updateCerrarTodasSesionesButtonState();
+                // Posicionar y mostrar
+                positionDesktopPanel(logoutIcon, desktopLogoutModal);
+                desktopLogoutModal.classList.remove('hidden');
+                // Cerrar al hacer clic fuera
+                setTimeout(() => {
+                    document.addEventListener('click', function onClickOutside(event) {
+                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+                            cerrarDesktopLogoutModal();
+                            document.removeEventListener('click', onClickOutside);
+                        }
+                    });
+                }, 0);
+            }
+        });
+    }
+
+    // Botones del panel móvil
+    const mobileSingle = document.getElementById('mobile-logout-single');
+    if (mobileSingle) {
+        mobileSingle.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            await ejecutarLogout();
+        });
+    }
+    const mobileAll = document.getElementById('mobile-logout-all');
+    if (mobileAll) {
+        mobileAll.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            if (activeSessionsCount >= 2) {
+                await closeAllSessions();
+            } else {
+                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+            }
+        });
+    }
+    const mobileModal = document.getElementById('mobile-logout-options');
+    if (mobileModal) {
+        mobileModal.addEventListener('click', (e) => {
+            if (e.target === mobileModal) cerrarMobileLogoutModal();
+        });
+    }
+
+    // Resto de eventos (filtros, paginación, etc.)
+    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-restablecimiento').classList.remove('hidden');
+    });
+    document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
+        currentSearch = document.getElementById('search-input').value;
+        currentSortBy = document.getElementById('sort-select').value;
+        currentOrder = document.getElementById('order-select').value;
+        currentLimit = parseInt(document.getElementById('limit-select').value);
+        currentPage = 1;
+        refrescarTabla();
+    });
+    document.getElementById('reg-pais').addEventListener('change', function() {
+        poblarCiudades(this.value);
+    });
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            refrescarTabla();
+        }
+    });
+    document.getElementById('btn-next').addEventListener('click', () => {
+        const totalPages = Math.ceil(totalObras / currentLimit);
+        if (currentPage < totalPages) {
+            currentPage++;
+            refrescarTabla();
+        }
+    });
+    btnPerfil.addEventListener('click', () => {
+        if (token) mostrarPanelArtista();
+        else document.getElementById('modal-login').classList.remove('hidden');
+    });
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-pass').value;
+        const result = await login(email, password);
+        if (result.success) {
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.add('hidden');
+            modalLogin.classList.remove('modal-fullscreen');
+            document.getElementById('modal-registro').classList.add('hidden');
+            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+            document.getElementById('toggle-panel').classList.remove('hidden');
+            mostrarPaginaBlanca();
+            await fetchActiveSessionsCount();
+        } else {
+            mostrarErrores(result);
+        }
+    });
+
+    // Registro
+    document.getElementById('registro-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre_artista = document.getElementById('reg-nombre-artista').value;
+        const nombres = document.getElementById('reg-nombres').value;
+        const apellidos = document.getElementById('reg-apellidos').value;
+        const nombre_real = `${nombres} ${apellidos}`.trim();
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-pass').value;
+        const telefono = document.getElementById('reg-telefono').value;
+        const pais = document.getElementById('reg-pais').value;
+        const ciudad = document.getElementById('reg-ciudad').value;
+        const genero = document.getElementById('reg-genero').value;
+        const dia = document.getElementById('reg-dia').value;
+        const mes = document.getElementById('reg-mes').value;
+        const ano = document.getElementById('reg-ano').value;
+        if (!dia || !mes || !ano) {
+            alert("❌ Todos los campos de fecha son obligatorios.");
+            return;
+        }
+        const fechaNac = new Date(ano, mes - 1, dia);
+        if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
+            alert("❌ La fecha seleccionada no es válida.");
+            return;
+        }
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mesDiff = hoy.getMonth() - fechaNac.getMonth();
+        if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
+        if (edad < 18) {
+            alert("⚠️ Debes tener al menos 18 años para registrarte.");
+            return;
+        }
+        const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        const result = await register(
+            nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
+        );
+        if (result.success) {
+            alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+            const modalRegistro = document.getElementById('modal-registro');
+            modalRegistro.classList.add('hidden');
+            modalRegistro.classList.remove('modal-fullscreen');
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.remove('hidden');
+            modalLogin.classList.add('modal-fullscreen');
+            document.getElementById('registro-form').reset();
+        } else {
+            mostrarErrores(result);
+        }
+    });
+
+    // Guardar obra
+    obraForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titulo = document.getElementById('input-titulo').value;
+        const artista = document.getElementById('input-artista').value;
+        const precio = document.getElementById('input-precio').value;
+        const idPersonalizado = document.getElementById('input-id-personalizado').value;
+        const idEdicion = document.getElementById('input-id-edicion').value;
+        const ano = document.getElementById('input-ano').value;
+        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+        const soporte = document.getElementById('input-soporte').value;
+        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+        const estado_obra = document.getElementById('input-estado-obra').value;
+        const procedencia = document.getElementById('input-procedencia').value;
+        const marcos = document.getElementById('input-marcos').value;
+        const certificado = document.getElementById('input-certificado').value;
+        const status = document.getElementById('input-status').value;
+        const ancho = document.getElementById('input-ancho').value;
+        const alto = document.getElementById('input-alto').value;
+        const firma = document.getElementById('input-firma').value;
+        const conservacion = document.getElementById('input-conservacion').value;
+        const etiquetas = document.getElementById('input-etiquetas').value;
+        const archivos = [
+            document.getElementById('input-imagen-0'),
+            document.getElementById('input-imagen-1'),
+            document.getElementById('input-imagen-2'),
+            document.getElementById('input-imagen-3'),
+            document.getElementById('input-imagen-4')
+        ];
+        let imagenFinalVisible = false;
+        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
+                imagenFinalVisible = true;
+                break;
+            }
+        }
+        if (!hayArchivosNuevos && !imagenFinalVisible) {
+            alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append('titulo', titulo);
+        formData.append('artista', artista);
+        formData.append('precio', precio);
+        formData.append('id_obra', idPersonalizado);
+        formData.append('ano', ano);
+        formData.append('descripcion_tecnica', descripcion_tecnica);
+        formData.append('soporte', soporte);
+        formData.append('descripcion_artistica', descripcion_artistica);
+        formData.append('estado_obra', estado_obra);
+        formData.append('procedencia', procedencia);
+        formData.append('marcos', marcos);
+        formData.append('certificado', certificado);
+        formData.append('status', status);
+        formData.append('ancho', ancho);
+        formData.append('alto', alto);
+        formData.append('firma', firma);
+        formData.append('conservacion', conservacion);
+        formData.append('etiquetas', etiquetas);
+        if (imagenesAEliminar.size > 0) {
+            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+        }
+        archivos.forEach((input, index) => {
+            if (input && input.files && input.files.length > 0) {
+                formData.append(`imagen_${index}`, input.files[0]);
+            }
+        });
+        const result = await guardarObra(token, formData, idEdicion || null);
+        if (result.success) {
+            alert("Obra guardada correctamente.");
+            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+            imagenesAEliminar.clear();
+            limpiarFormularioCompleto(true);
+            await refrescarTabla();
+        } else {
+            mostrarErrores(result);
+        }
+    });
+
+    function limpiarFormularioCompleto(restaurarArtista = true) {
+        obraForm.reset();
+        document.getElementById('input-id-edicion').value = '';
+        document.getElementById('btn-limpiar-campos').classList.add('hidden');
+        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+        imagenesAEliminar.clear();
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            const placeholder = document.getElementById(`placeholder-${i}`);
+            const inputFile = document.getElementById(`input-imagen-${i}`);
+            if (preview && placeholder) {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+            if (inputFile) inputFile.value = '';
+            const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
+            if (btnEliminar) btnEliminar.style.display = 'none';
+        }
+        if (restaurarArtista && artistaActual) {
+            document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        }
+    }
+
+    document.getElementById('btn-limpiar-campos').addEventListener('click', () => limpiarFormularioCompleto(true));
+    document.getElementById('btn-ir-registro').addEventListener('click', () => {
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-login').classList.remove('modal-fullscreen');
+        document.getElementById('modal-registro').classList.remove('hidden');
+        document.getElementById('modal-registro').classList.add('modal-fullscreen');
+    });
+    document.getElementById('btn-ir-login').addEventListener('click', () => {
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        document.getElementById('modal-login').classList.remove('hidden');
+        document.getElementById('modal-login').classList.add('modal-fullscreen');
+    });
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+    });
+    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value;
+        const messageEl = document.getElementById('reset-message');
+        messageEl.style.display = 'block';
+        messageEl.textContent = '⏳ Enviando solicitud...';
+        messageEl.style.color = '#555';
+        try {
+            const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (res && res.success) {
+                messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
+                messageEl.style.color = '#28a745';
+            } else if (res && res.error) {
+                messageEl.textContent = '❌ Error: ' + res.error;
+                messageEl.style.color = '#dc3545';
+            } else {
+                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+                messageEl.style.color = '#dc3545';
+            }
+        } catch (error) {
+            console.error('Error al solicitar restablecimiento:', error);
+            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+            messageEl.style.color = '#dc3545';
+        }
+    });
+    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('confirmar-password').value;
+        const mensajeError = document.getElementById('mensaje-error');
+        mensajeError.style.display = 'none';
+        try {
+            const res = await apiRequest('/api/artistas/eliminar-cuenta', {
+                method: 'POST',
+                body: JSON.stringify({ password })
+            });
+            if (res && res.success) {
+                alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                logout();
+                location.reload();
+            } else if (res && (res.errors || res.error)) {
+                if (Array.isArray(res.errors) && res.errors.length > 0) {
+                    mensajeError.textContent = '❌ ' + res.errors.join('\n');
+                } else if (res.error) {
+                    mensajeError.textContent = '❌ ' + res.error;
+                } else {
+                    mensajeError.textContent = '❌ Error desconocido.';
+                }
+                mensajeError.style.display = 'block';
+            } else {
+                mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+                mensajeError.style.display = 'block';
+            }
+        } catch (error) {
+            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+            mensajeError.style.display = 'block';
+        }
+    });
+    document.querySelectorAll('.cerrar-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) modal.classList.add('hidden');
+        });
+    });
+}
+
+// ============================================
+// INICIALIZACIÓN
 // ============================================
 async function init() {
     const sesionValida = await verificarSesionBackend();
-
     if (sesionValida) {
         btnPerfil.classList.add('hidden');
         document.getElementById('toggle-panel').classList.remove('hidden');
@@ -1026,26 +949,21 @@ async function init() {
         document.getElementById('modal-login').classList.remove('modal-fullscreen');
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        
         setupEvents();
         setupImagePreviews();
         cargarSelectoresFecha();
         poblarCiudades('');
-        
-        // Obtener el conteo de sesiones activas
         await fetchActiveSessionsCount();
     } else {
         document.getElementById('panel-artista').classList.add('hidden');
         document.getElementById('galeria-publica').classList.add('hidden');
         document.getElementById('toggle-panel').classList.add('hidden');
         btnPerfil.classList.add('hidden');
-        
         const modalLogin = document.getElementById('modal-login');
         modalLogin.classList.remove('hidden');
         modalLogin.classList.add('modal-fullscreen');
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        
         setupEvents();
         setupImagePreviews();
         cargarSelectoresFecha();
@@ -1053,5 +971,4 @@ async function init() {
     }
 }
 
-// Iniciar
 init();
