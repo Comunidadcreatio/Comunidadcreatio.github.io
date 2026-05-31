@@ -21,91 +21,33 @@
 }
 
 /* Estilos del botón "Cerrar todas las sesiones" (Escritorio) */
-/* ==============================================
-   CONTENEDOR DE LOGOUT (Escritorio)
-   ============================================== */
-
-.sidebar-btn {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+#logout-all-container {
     width: 100%;
-    padding: 6px 10px;
-    cursor: pointer;
+    margin-top: 5px;
+    padding-left: 10px;
 }
 
-#logout-container {
+#btn-logout-all {
+    font-size: 12px;
+    padding: 4px 8px;
+    display: block;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    margin-top: 0;
-}
-
-.sub-btn {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 4px 10px 4px 20px; /* Sangría a la izquierda */
-    cursor: pointer;
-}
-
-.sub-btn:hover {
-    background-color: rgba(0,0,0,0.05);
-    border-radius: 4px;
-}
-
-.sub-btn .toggle-label {
-    font-size: 13px;
-    color: #888;
+    text-align: left;
     pointer-events: none;
-    transition: color 0.2s, opacity 0.3s ease;
-    opacity: 0;
+    color: #888;
+    transition: color 0.2s, background-color 0.2s;
+    cursor: default;
 }
 
-#toggle-panel:hover .sub-btn .toggle-label {
-    opacity: 1;
-}
-
-.sub-btn.active .toggle-label {
+#btn-logout-all.active {
     color: #000;
     pointer-events: auto;
+    cursor: pointer;
 }
 
-.sidebar-btn:hover {
+#btn-logout-all.active:hover {
     background-color: rgba(0,0,0,0.05);
     border-radius: 4px;
-}
-
-.sub-btn {
-    padding-left: 20px; /* Sangría para indicar sub-opción */
-}
-
-/* Estilos para el texto de la sub-opción */
-#btn-logout-all .toggle-label {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    font-size: 13px; /* Un poco más pequeño que la opción principal */
-    color: #888; /* Gris por defecto */
-    pointer-events: none; /* Deshabilitado por defecto */
-}
-
-#btn-logout-all.active .toggle-label {
-    color: #000; /* Negro cuando está habilitado */
-    pointer-events: auto;
-}
-
-/* Al expandir la barra, ambas opciones deben ser visibles */
-#toggle-panel:hover #btn-logout-sidebar .toggle-label,
-#toggle-panel:hover #btn-logout-all .toggle-label {
-    opacity: 1;
 }
 
 /* Estilos del globo de texto (Móvil) */
