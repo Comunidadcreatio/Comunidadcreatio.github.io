@@ -27,6 +27,9 @@ let totalObras = 0;
 let desktopLogoutModal = null;
 let desktopLogoutAllBtn = null;
 let desktopLogoutSingleBtn = null;
+let desktopMainMenu = null;
+let mobileMainMenu = null;
+let desktopClickOutsideHandlerMenu = null;
 
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
@@ -168,6 +171,36 @@ async function ejecutarLogout() {
         modalLogin.classList.remove('hidden');
         modalLogin.classList.add('modal-fullscreen');
         document.getElementById('btn-perfil').classList.remove('hidden');
+    }
+}
+
+function positionDesktopMenu(triggerElement, panelElement) {
+    if (!panelElement) return;
+    const rect = triggerElement.getBoundingClientRect();
+    const panelDiv = panelElement.querySelector('.desktop-logout-panel');
+    if (!panelDiv) return;
+    const panelRect = panelDiv.getBoundingClientRect();
+    let left = rect.right + 8;
+    let top = rect.top;
+    let placement = 'right';
+    if (left + panelRect.width > window.innerWidth) {
+        left = rect.left - panelRect.width - 8;
+        placement = 'left';
+    }
+    if (top + panelRect.height > window.innerHeight) {
+        top = window.innerHeight - panelRect.height - 10;
+    }
+    if (top < 10) top = 10;
+    panelElement.style.top = `${top}px`;
+    panelElement.style.left = `${left}px`;
+    panelDiv.setAttribute('data-placement', placement);
+}
+
+function cerrarDesktopMainMenu() {
+    if (desktopMainMenu) desktopMainMenu.classList.add('hidden');
+    if (desktopClickOutsideHandlerMenu) {
+        document.removeEventListener('click', desktopClickOutsideHandlerMenu);
+        desktopClickOutsideHandlerMenu = null;
     }
 }
 
@@ -644,6 +677,83 @@ if (logoutIcon) {
                 }
             }
         }
+    });
+}
+
+// Botón principal (menú unificado)
+const menuBtn = document.getElementById('btn-menu-principal');
+if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            // Móvil
+            if (!mobileMainMenu) mobileMainMenu = document.getElementById('mobile-main-menu');
+            if (mobileMainMenu.classList.contains('hidden')) {
+                mobileMainMenu.classList.remove('hidden');
+                // Cerrar al tocar fuera
+                setTimeout(() => {
+                    document.addEventListener('click', function onClickOutsideMenu(e) {
+                        if (!mobileMainMenu.contains(e.target) && e.target !== menuBtn) {
+                            mobileMainMenu.classList.add('hidden');
+                            document.removeEventListener('click', onClickOutsideMenu);
+                        }
+                    });
+                }, 0);
+            } else {
+                mobileMainMenu.classList.add('hidden');
+            }
+        } else {
+            // Escritorio
+            if (!desktopMainMenu) {
+                desktopMainMenu = document.getElementById('desktop-main-menu');
+                // Asignar eventos a los botones del menú
+                const galeriaBtn = document.getElementById('menu-galeria');
+                const panelBtn = document.getElementById('menu-panel');
+                if (galeriaBtn) galeriaBtn.addEventListener('click', () => {
+                    cerrarDesktopMainMenu();
+                    toggleGaleria();
+                });
+                if (panelBtn) panelBtn.addEventListener('click', () => {
+                    cerrarDesktopMainMenu();
+                    togglePanel();
+                });
+            }
+            if (desktopMainMenu.classList.contains('hidden')) {
+                positionDesktopMenu(menuBtn, desktopMainMenu);
+                desktopMainMenu.classList.remove('hidden');
+                // Cerrar al hacer clic fuera
+                if (desktopClickOutsideHandlerMenu) {
+                    document.removeEventListener('click', desktopClickOutsideHandlerMenu);
+                }
+                desktopClickOutsideHandlerMenu = function(event) {
+                    if (desktopMainMenu && !desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
+                        cerrarDesktopMainMenu();
+                    }
+                };
+                setTimeout(() => {
+                    document.addEventListener('click', desktopClickOutsideHandlerMenu);
+                }, 0);
+            } else {
+                cerrarDesktopMainMenu();
+            }
+        }
+    });
+}
+
+// También debes manejar los botones del menú móvil
+const mobileGaleria = document.getElementById('mobile-menu-galeria');
+const mobilePanel = document.getElementById('mobile-menu-panel');
+if (mobileGaleria) {
+    mobileGaleria.addEventListener('click', () => {
+        document.getElementById('mobile-main-menu').classList.add('hidden');
+        toggleGaleria();
+    });
+}
+if (mobilePanel) {
+    mobilePanel.addEventListener('click', () => {
+        document.getElementById('mobile-main-menu').classList.add('hidden');
+        togglePanel();
     });
 }
 
