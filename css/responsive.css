@@ -1,20 +1,8 @@
 /* css/responsive.css - Ajustes para dispositivos móviles */
-
 /* ==============================================
    BARRA UNIFICADA (toggle-panel) - Estilos base
    ============================================== */
 
-
-#desktop-main-menu {
-    position: fixed;
-    top: 100px;
-    left: 100px;
-    background: red;
-    display: block;
-    z-index: 9999;
-}
-
-/* El contenedor principal no captura clics */
 #toggle-panel {
     pointer-events: none;
     position: fixed;
@@ -28,28 +16,15 @@
     transition: all 0.3s ease;
 }
 
-/* Todos los botones dentro de la barra sí capturan clics */
-#btn-panel-toggle,
+/* Botones dentro de la barra (todos capturan clics) */
+#btn-menu-principal,
 #btn-logout-sidebar {
     pointer-events: auto;
     background: none;
     border: none;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 8px 10px;
     cursor: pointer;
-}
-
-#btn-logout-sidebar {
-    margin-top: 10px;
-}
-
-#btn-panel-toggle:hover,
-#btn-logout-sidebar:hover {
-    background-color: rgba(0,0,0,0.05);
-    border-radius: 4px;
 }
 
 /* Iconos y textos comunes */
@@ -71,17 +46,14 @@
     transition: opacity 0.3s ease;
 }
 
-
 /* ==============================================
-   VERSIÓN ESCRITORIO (Barra lateral completa)
+   VERSIÓN ESCRITORIO (Barra lateral izquierda)
    ============================================== */
 @media (min-width: 769px) {
-    /* Layout: desplazamiento del contenido */
     .app-container {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        transition: margin-left 0.3s ease;
         width: auto;
     }
 
@@ -103,7 +75,6 @@
 
     /* Barra lateral fija a la izquierda */
     #toggle-panel {
-        position: fixed;
         left: 0;
         top: 0;
         bottom: 0;
@@ -116,116 +87,166 @@
         flex-direction: column;
         align-items: center;
         padding: 15px 0;
-        transition: width 0.3s ease;
         z-index: 1000;
     }
 
-    /* Ajustes específicos de iconos en escritorio */
+    /* Ajuste de iconos en escritorio */
     .toggle-icon {
         width: 28px;
         height: 28px;
     }
 
-    /* Botones dentro de la barra */
-    #btn-panel-toggle {
-        width: 100%;
-        padding: 8px 15px;
-        justify-content: flex-start;
-    }
-
+    /* Botones dentro de la barra lateral */
+    #btn-menu-principal,
     #btn-logout-sidebar {
         width: 100%;
         padding: 8px 15px;
         justify-content: flex-start;
+        margin-top: 5px;
+    }
+
+    #btn-logout-sidebar {
         margin-top: 15px;
     }
 
-    #btn-logout-sidebar .toggle-label {
+    .toggle-label {
         opacity: 0;
-        transition: opacity 0.3s ease;
     }
 
-    #toggle-panel:hover #btn-logout-sidebar .toggle-label {
+    #toggle-panel:hover .toggle-label {
         opacity: 1;
     }
+}
 
-    /* ==============================================
-   NUEVO BOTÓN DE GALERÍA EN LA BARRA LATERAL
+/* ==============================================
+   VERSIÓN MÓVIL (Barra inferior)
    ============================================== */
-    #btn-galeria {
-        pointer-events: auto;
-        background: none;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+@media (max-width: 768px) {
+    #toggle-panel {
+        bottom: 0;
+        left: 0;
         width: 100%;
-        padding: 8px 10px;
-        cursor: pointer;
-        margin-bottom: 5px; /* Separación entre botones */
+        height: 50px;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        padding: 0 20px;
+        justify-content: flex-end;
+        background-color: #ffffff;
+        border: 2px solid #000000;
+        border-bottom: none;
     }
 
-    #btn-galeria .toggle-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-        flex-shrink: 0;
+    /* Ocultar textos en móviles */
+    .toggle-label {
+        display: none !important;
     }
 
-    #btn-galeria .toggle-label {
-        font-size: 14px;
-        font-weight: 500;
-        margin-left: 12px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+    .toggle-icon {
+        width: 24px;
+        height: 24px;
     }
 
-    #toggle-panel:hover #btn-galeria .toggle-label {
-        opacity: 1;
+    /* Botones alineados horizontalmente */
+    #btn-menu-principal,
+    #btn-logout-sidebar {
+        width: auto;
+        padding: 0 5px;
+        justify-content: center;
+        margin-top: 0;
     }
 
-    #btn-galeria:hover {
-        background-color: rgba(0,0,0,0.05);
+    #btn-logout-sidebar {
+        margin-left: 10px;
+    }
+
+    body {
+        padding-bottom: 60px;
+    }
+
+    .login-logo {
+        max-width: 150px;
+        margin-bottom: 15px;
+    }
+
+    /* Controles de filtro apilados */
+    .filter-controls {
+        flex-direction: column !important;
+        width: 100% !important;
+        padding: 10px !important;
+        gap: 10px !important;
+    }
+    .filter-controls input[type="text"],
+    .filter-controls select,
+    .filter-controls button {
+        width: 100% !important;
+    }
+
+    .pagination-controls {
+        flex-wrap: wrap;
+    }
+
+    #tabla-obras-container {
+        overflow-x: auto;
+    }
+    #tabla-obras-container::-webkit-scrollbar {
+        height: 6px;
+    }
+    #tabla-obras-container::-webkit-scrollbar-thumb {
+        background-color: #ccc;
         border-radius: 4px;
     }
 
-    #btn-cerrar-todas-sesiones-sidebar {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 8px 10px;
-    cursor: pointer;
-    margin-top: 10px;
+    .imagenes-contenedor {
+        justify-content: center;
+    }
+
+    /* Ajustes adicionales para móviles pequeños */
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 1.5rem;
+        }
+        #galeria-container {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+        #main-header {
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+        }
+    }
+
+    /* Modales a pantalla completa en móviles */
+    @media (max-width: 600px) {
+        #modal-registro .modal-content {
+            width: 95%;
+            max-width: 95%;
+            height: 100vh;
+            max-height: 100vh;
+            border: none;
+            border-radius: 0;
+            padding: 2rem 1.5rem 4rem;
+            overflow-y: auto;
+            background: white;
+            position: relative;
+        }
+        #modal-registro .cerrar-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            color: #333;
+            cursor: pointer;
+            z-index: 10;
+        }
+    }
 }
 
-#btn-cerrar-todas-sesiones-sidebar .toggle-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
+/* ==============================================
+   PANELES FLOTANTES (Comunes escritorio + móvil)
+   ============================================== */
 
-#toggle-panel:hover #btn-cerrar-todas-sesiones-sidebar .toggle-label {
-    opacity: 1;
-}
-
-/* Estado deshabilitado */
-#btn-cerrar-todas-sesiones-sidebar.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-#btn-cerrar-todas-sesiones-sidebar.disabled .toggle-label {
-    color: #aaa !important;
-}
-
-/* Panel flotante para escritorio - a la derecha/izquierda del icono */
+/* Panel para escritorio */
 .desktop-logout-modal {
     position: fixed;
     z-index: 2000;
@@ -245,12 +266,12 @@
     text-align: left;
 }
 
-/* Cola por defecto (panel a la derecha del icono): apunta hacia la izquierda */
+/* Cola a la izquierda (panel a la derecha del icono) */
 .desktop-logout-panel.speech-bubble[data-placement="right"]::before {
     content: '';
     position: absolute;
-    top: 12px;           /* distancia desde el borde superior */
-    left: -10px;         /* pegado al borde izquierdo, hacia fuera */
+    top: 12px;
+    left: -10px;
     width: 0;
     height: 0;
     border-style: solid;
@@ -258,7 +279,7 @@
     border-color: transparent #000000 transparent transparent;
 }
 
-/* Si el panel se coloca a la izquierda del icono: la cola apunta a la derecha */
+/* Cola a la derecha (panel a la izquierda del icono) */
 .desktop-logout-panel.speech-bubble[data-placement="left"]::before {
     content: '';
     position: absolute;
@@ -271,138 +292,7 @@
     border-color: transparent transparent transparent #000000;
 }
 
-/* Opciones dentro del panel */
-.desktop-logout-panel .logout-option {
-    display: block;
-    width: 100%;
-    padding: 10px 16px;
-    background: transparent;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    cursor: pointer;
-    color: #ffffff;
-}
-.desktop-logout-panel .logout-option:hover {
-    background: #1a1a1a;
-}
-#desktop-logout-all.logout-option.disabled {
-    color: #a0a0a0;
-    pointer-events: none;
-}
-#desktop-logout-all.logout-option.enabled {
-    color: #ffffff;
-}
-.desktop-logout-panel .divider {
-    height: 1px;
-    background-color: #333;
-    margin: 4px 12px;
-}
-
-#btn-menu-principal {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 8px 10px;
-    cursor: pointer;
-    margin-bottom: 5px;
-}
-#btn-menu-principal .toggle-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-}
-
-
-}
-
-
-/* ==============================================
-   VERSIÓN MÓVIL (Barra inferior)
-   ============================================== */
-@media (max-width: 768px) {
-    #toggle-panel {
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 50px;
-        border-bottom: none;
-        border-radius: 8px 8px 0 0;
-        padding: 0 20px;
-        justify-content: flex-end;
-        box-sizing: border-box;
-        background-color: #ffffff;
-        border: 2px solid #000000;
-        border-bottom: none;
-    }
-
-    /* Ocultar textos en móviles */
-    .toggle-label {
-        display: none !important;
-    }
-
-    /* Ajuste de iconos en móviles */
-    .toggle-icon {
-        width: 24px;
-        height: 24px;
-    }
-
-    /* Alinear botones a la derecha */
-    #btn-panel-toggle,
-    #btn-logout-sidebar {
-        width: auto;
-        padding: 0 5px;
-        justify-content: center;
-        margin-top: 0;
-    }
-
-    #btn-logout-sidebar {
-        margin-left: 10px;
-    }
-
-    /* Ajuste del body */
-    body {
-        padding-bottom: 60px;
-    }
-
-    #btn-galeria {
-    pointer-events: auto !important; /* Asegura que capte clics */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    padding: 0 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 10px; /* Separación del botón de panel */
-}
-
-#btn-galeria .toggle-icon {
-    width: 24px; /* Ajusta según el tamaño de tu icono */
-    height: 24px;
-    object-fit: contain;
-}
-
-#btn-galeria .toggle-label {
-    display: none; /* Ocultar texto en móviles */
-}
-
-#btn-cerrar-todas-sesiones-sidebar {
-        display: none !important;
-    }
-
-
-/* ==============================================
-   PANEL MÓVIL CON FORMA DE BOCADILLO (COLA)
-   ============================================== */
+/* Panel para móvil (bocadillo inferior derecho) */
 .mobile-logout-modal {
     position: fixed;
     bottom: 0;
@@ -414,7 +304,7 @@
     justify-content: flex-end;
     align-items: flex-end;
     z-index: 2000;
-    pointer-events: none; /* El fondo no captura clics */
+    pointer-events: none;
 }
 .mobile-logout-modal.hidden {
     display: none;
@@ -423,13 +313,12 @@
     pointer-events: auto;
 }
 
-/* Bocadillo con cola en la esquina inferior derecha */
 .mobile-logout-panel.speech-bubble {
     position: relative;
-    background: #000000; /* Negro sólido */
+    background: #000000;
     width: 260px;
     max-width: 85vw;
-    margin: 0 16px 70px 0; /* Separación desde borde derecho y desde abajo */
+    margin: 0 16px 70px 0;
     border-radius: 20px;
     padding: 12px 0;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
@@ -437,7 +326,7 @@
     z-index: 2001;
 }
 
-/* La cola (triángulo) apuntando hacia abajo-derecha */
+/* Cola apuntando hacia abajo a la derecha */
 .mobile-logout-panel.speech-bubble::after {
     content: '';
     position: absolute;
@@ -451,7 +340,7 @@
     filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
 }
 
-/* Estilo base de las opciones */
+/* Estilos comunes de opciones (ambos paneles) */
 .logout-option {
     display: block;
     width: 100%;
@@ -459,32 +348,40 @@
     background: transparent;
     border: none;
     font-family: 'Nunito', sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     text-align: left;
     cursor: pointer;
     transition: background 0.2s ease;
 }
+.desktop-logout-panel .logout-option {
+    font-size: 14px;
+    padding: 10px 16px;
+    color: #ffffff;
+}
+.desktop-logout-panel .logout-option:hover {
+    background: #1a1a1a;
+}
+.mobile-logout-panel .logout-option {
+    font-size: 16px;
+    padding: 12px 20px;
+}
 
-/* Opción superior: gris tenue (inhabilitada visualmente) */
-#mobile-logout-all.logout-option {
-    color: #a0a0a0;
-}
+/* Estado deshabilitado para "Cerrar todas las sesiones" */
+#desktop-logout-all.logout-option.disabled,
 #mobile-logout-all.logout-option.disabled {
-    opacity: 0.6;
+    color: #a0a0a0;
     pointer-events: none;
+    opacity: 0.6;
 }
-/* Cuando está habilitada (múltiples sesiones) se pone blanco */
+#desktop-logout-all.logout-option.enabled,
 #mobile-logout-all.logout-option.enabled {
     color: #ffffff;
     pointer-events: auto;
 }
-#mobile-logout-all.logout-option.enabled:hover,
-#mobile-logout-single.logout-option:hover {
-    background: #1a1a1a;
-}
 
-/* Opción inferior: blanco brillante */
+/* Opción de cerrar sesión siempre blanca */
+#desktop-logout-single.logout-option,
 #mobile-logout-single.logout-option {
     color: #ffffff;
     font-weight: 600;
@@ -512,162 +409,23 @@
         border-right: 10px solid transparent;
         border-top: 10px solid #000000;
     }
-    .logout-option {
+    .mobile-logout-panel .logout-option {
         padding: 10px 16px;
         font-size: 15px;
     }
 }
 
-#btn-menu-principal {
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    padding: 0 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 10px;
-}
-#btn-menu-principal .toggle-icon {
-    width: 24px;
-    height: 24px;
-}
-    
-}
-
-
-
-@media (max-width: 768px) {
-    .login-logo {
-        max-width: 150px; /* Logo un poco más pequeño en móvil */
-        margin-bottom: 15px;
-    }
-}
-
-
 /* ==============================================
-   AJUSTES GENERALES PARA TABLETS Y MÓVILES
+   PÁGINA EN BLANCO
    ============================================== */
-@media (max-width: 768px) {
-    /* Controles de filtro se apilan */
-    .filter-controls {
-        flex-direction: column !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 10px !important;
-        gap: 10px !important;
-        flex-wrap: nowrap !important;
-    }
-
-    .filter-controls input[type="text"] {
-        flex: none !important;
-        min-width: unset !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .filter-controls select,
-    .filter-controls button {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        flex: none !important;
-        margin: 0 !important;
-    }
-
-    .pagination-controls {
-        flex-wrap: wrap;
-    }
-
-    #tabla-obras-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    #tabla-obras-container::-webkit-scrollbar {
-        height: 6px;
-    }
-    #tabla-obras-container::-webkit-scrollbar-thumb {
-        background-color: #ccc;
-        border-radius: 4px;
-    }
-
-    .imagenes-contenedor {
-        justify-content: center;
-    }
-
-    .danger-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    #btn-eliminar-cuenta,
-    #btn-cerrar-todas-sesiones {
-        width: 100%;
-        max-width: 100%;
-    }
-}
-
-
-/* ==============================================
-   AJUSTES ADICIONALES PARA MÓVILES PEQUEÑOS
-   ============================================== */
-@media (max-width: 480px) {
-    .modal-content {
-        padding: 1.5rem;
-    }
-
-    #galeria-container {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-    }
-
-    #main-header {
-        flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
-    }
-}
-
-
-/* ==============================================
-   MODALES A PANTALLA COMPLETA EN MÓVILES
-   ============================================== */
-@media (max-width: 600px) {
-    #modal-registro .modal-content {
-        width: 95%;
-        max-width: 95%;
-        height: 100vh;
-        max-height: 100vh;
-        border: none;
-        border-radius: 0;
-        padding: 2rem 1.5rem 4rem;
-        overflow-y: auto;
-        background: white;
-        position: relative;
-    }
-
-    #modal-registro .cerrar-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 30px;
-        color: #333;
-        cursor: pointer;
-        z-index: 10;
-    }
-}
-
 #pagina-blanca {
     flex: 1;
     background-color: #ffffff;
-    min-height: calc(100vh - 70px); /* Resta la altura del header */
+    min-height: calc(100vh - 70px);
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 #pagina-blanca.hidden {
     display: none !important;
 }
