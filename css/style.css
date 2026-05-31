@@ -21,3 +21,25 @@
 .hidden {
     display: none !important;
 }
+
+/* ==============================================
+   TIPOGRAFÍA GLOBAL (Nunito)
+   ============================================== */
+body, input, button, select, textarea, .filter-controls input, .filter-controls select, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
+    font-family: 'Nunito', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, #brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700; /* Negrita para títulos */
+}
+
+/* Opcional: darle un peso un poco más ligero al contenido normal para mejorar la lectura */
+p, span, label {
+    font-weight: 400;
+}
+
+/* Opcional: ajuste fino para inputs */
+input, select, textarea {
+    font-weight: 500;
+}
