@@ -129,11 +129,13 @@
         height: 50px;
         border-bottom: none;
         border-radius: 8px 8px 0 0;
-        padding: 0 20px;
+        padding: 0 12px; /* Reducido para mejor espacio */
         justify-content: flex-end;
         background-color: #ffffff;
         border: 2px solid #000000;
         border-bottom: none;
+        gap: 8px; /* Espaciado entre botones */
+        overflow-x: auto; /* Permite scroll horizontal si hay muchos botones */
     }
 
     /* Ocultar textos en móviles */
@@ -150,9 +152,10 @@
     #btn-menu-principal,
     #btn-logout-sidebar {
         width: auto;
-        padding: 0 5px;
+        padding: 0;
         justify-content: center;
-        margin-top: 0;
+        margin: 0;
+        flex-shrink: 0; /* Evita que se encojan */
     }
 
     #btn-logout-sidebar {
@@ -363,8 +366,11 @@
     background: #1a1a1a;
 }
 .mobile-logout-panel .logout-option {
-    font-size: 16px;
-    padding: 12px 20px;
+    color: #ffffff !important; /* Fuerza blanco */
+    background: transparent;
+}
+.mobile-logout-panel .logout-option:hover {
+    background: #1a1a1a;
 }
 
 /* Estado deshabilitado para "Cerrar todas las sesiones" */
