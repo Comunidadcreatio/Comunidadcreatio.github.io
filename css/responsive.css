@@ -126,35 +126,32 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 55px; /* Un poco más alto para mejor toque */
+        height: 55px;
         border-bottom: none;
         border-radius: 12px 12px 0 0;
-        padding: 0 16px; /* Espacio lateral para evitar desborde */
+        padding: 0 16px;
         justify-content: flex-end;
         background-color: #ffffff;
         border: 2px solid #000000;
         border-bottom: none;
         box-sizing: border-box;
-        gap: 10px; /* Separación entre botones */
+        gap: 10px;
     }
 
-    /* Ocultar textos en móviles */
     .toggle-label {
         display: none !important;
     }
 
-    /* Iconos */
     .toggle-icon {
         width: 28px;
         height: 28px;
         object-fit: contain;
     }
 
-    /* Botones: todos con el mismo tamaño y sin desbordar */
     #btn-menu-principal,
     #btn-logout-sidebar {
         width: auto;
-        min-width: 44px; /* Área táctil mínima */
+        min-width: 44px;
         padding: 8px;
         justify-content: center;
         margin: 0;
@@ -168,12 +165,10 @@
         margin-left: 0;
     }
 
-    /* Ajuste del body para no tapar contenido */
     body {
         padding-bottom: 65px;
     }
 
-    /* Logo más pequeño */
     .login-logo {
         max-width: 150px;
         margin-bottom: 15px;
@@ -235,16 +230,6 @@
         }
     }
 
-    /* Asegurar que el menú móvil no herede posicionamiento de logout */
-#mobile-main-menu {
-    position: fixed;
-    z-index: 2000;
-}
-#mobile-main-menu .mobile-logout-panel.speech-bubble {
-    margin: 0; /* reset */
-    width: 200px; /* tamaño adecuado */
-}
-
     /* Modales a pantalla completa en móviles */
     @media (max-width: 600px) {
         #modal-registro .modal-content {
@@ -269,55 +254,21 @@
             z-index: 10;
         }
     }
-
-    
 }
 
 /* ==============================================
-   PANEL MÓVIL PARA MENÚ PRINCIPAL (texto visible)
-   ============================================== */
-/* Aseguramos que los botones del menú móvil tengan texto blanco */
-#mobile-main-menu .logout-option {
-    color: #ffffff !important;
-    font-weight: 500;
-}
-#mobile-main-menu .logout-option:hover {
-    background: #1a1a1a;
-}
-
-/* ==============================================
-   PANEL MÓVIL PARA MENÚ PRINCIPAL
-   ============================================== */
-#mobile-main-menu {
-    position: fixed;
-    bottom: auto;
-    top: auto;
-    left: auto;
-    right: auto;
-    z-index: 2000;
-    pointer-events: none;
-    display: none; /* lo maneja JS */
-}
-#mobile-main-menu:not(.hidden) {
-    display: flex;
-    pointer-events: auto;
-}
-
-/* Posicionamiento dinámico se hará con JS (similar a escritorio) */
-/* Pero para que no se superponga al logout, podemos posicionarlo manualmente con JS */
-
-
-/* ==============================================
-   PANELES FLOTANTES (Comunes escritorio + móvil)
+   PANELES FLOTANTES (Escritorio y Móvil)
    ============================================== */
 
-/* Panel para escritorio */
-.desktop-logout-modal {
+/* ---------- Escritorio ---------- */
+.desktop-logout-modal,
+.desktop-main-menu {
     position: fixed;
     z-index: 2000;
     display: none;
 }
-.desktop-logout-modal:not(.hidden) {
+.desktop-logout-modal:not(.hidden),
+.desktop-main-menu:not(.hidden) {
     display: block;
 }
 
@@ -357,7 +308,7 @@
     border-color: transparent transparent transparent #000000;
 }
 
-/* Panel para móvil (bocadillo inferior derecho) */
+/* ---------- Móvil (Logout) ---------- */
 .mobile-logout-modal {
     position: fixed;
     bottom: 0;
@@ -405,7 +356,38 @@
     filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
 }
 
-/* Estilos comunes de opciones (ambos paneles) */
+/* ---------- Móvil (Menú principal) ---------- */
+/* El menú principal se posicionará dinámicamente con JS */
+.mobile-main-menu {
+    position: fixed;
+    z-index: 2000;
+    background: transparent;
+    pointer-events: none;
+    display: none;
+}
+.mobile-main-menu:not(.hidden) {
+    display: block;
+    pointer-events: auto;
+}
+.mobile-main-menu .mobile-logout-panel.speech-bubble {
+    margin: 0; /* Sin márgenes fijos, JS lo posiciona */
+    width: 200px;
+    position: absolute; /* Para que JS pueda moverlo con top/left */
+}
+
+/* Asegurar que los textos de ambos paneles móviles sean blancos */
+.mobile-logout-panel .logout-option,
+.mobile-main-menu .logout-option {
+    color: #ffffff !important;
+    font-weight: 500;
+    background: transparent;
+}
+.mobile-logout-panel .logout-option:hover,
+.mobile-main-menu .logout-option:hover {
+    background: #1a1a1a;
+}
+
+/* ---------- Estilos comunes de opciones ---------- */
 .logout-option {
     display: block;
     width: 100%;
@@ -427,15 +409,10 @@
 .desktop-logout-panel .logout-option:hover {
     background: #1a1a1a;
 }
-.mobile-logout-panel .logout-option {
+.mobile-logout-panel .logout-option,
+.mobile-main-menu .logout-option {
     font-size: 16px;
     padding: 12px 20px;
-    color: #ffffff !important; /* Fuerza blanco */
-    background: transparent;
-}
-
-.mobile-logout-panel .logout-option:hover {
-    background: #1a1a1a;
 }
 
 /* Estado deshabilitado para "Cerrar todas las sesiones" */
@@ -480,9 +457,13 @@
         border-right: 10px solid transparent;
         border-top: 10px solid #000000;
     }
-    .mobile-logout-panel .logout-option {
+    .mobile-logout-panel .logout-option,
+    .mobile-main-menu .logout-option {
         padding: 10px 16px;
         font-size: 15px;
+    }
+    .mobile-main-menu .mobile-logout-panel.speech-bubble {
+        width: 200px;
     }
 }
 
