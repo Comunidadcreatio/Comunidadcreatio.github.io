@@ -233,6 +233,83 @@
     color: #aaa !important;
 }
 
+/* ==============================================
+   PANEL DE ESCRITORIO (BOCADILLO)
+   ============================================== */
+.desktop-logout-modal {
+    position: fixed;
+    z-index: 2000;
+    display: none; /* Se mostrará con JS */
+}
+.desktop-logout-modal:not(.hidden) {
+    display: block;
+}
+
+.desktop-logout-panel.speech-bubble {
+    position: absolute;
+    background: #000000;
+    width: 240px;
+    border-radius: 16px;
+    padding: 8px 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    text-align: left;
+}
+
+/* Cola del bocadillo (apunta hacia el icono) */
+.desktop-logout-panel.speech-bubble::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* Por defecto, la cola apuntará hacia la izquierda (si el panel está a la derecha del icono) */
+.desktop-logout-panel.speech-bubble[data-placement="right"]::before {
+    top: 12px;
+    left: -10px;
+    border-width: 8px 10px 8px 0;
+    border-color: transparent #000000 transparent transparent;
+}
+
+/* Si el panel se coloca a la izquierda, la cola apunta a la derecha */
+.desktop-logout-panel.speech-bubble[data-placement="left"]::before {
+    top: 12px;
+    right: -10px;
+    border-width: 8px 0 8px 10px;
+    border-color: transparent transparent transparent #000000;
+}
+
+/* Opciones dentro del panel */
+.desktop-logout-panel .logout-option {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    color: #ffffff;
+}
+.desktop-logout-panel .logout-option:hover {
+    background: #1a1a1a;
+}
+#desktop-logout-all.logout-option.disabled {
+    color: #a0a0a0;
+    pointer-events: none;
+}
+#desktop-logout-all.logout-option.enabled {
+    color: #ffffff;
+}
+.desktop-logout-panel .divider {
+    height: 1px;
+    background-color: #333;
+    margin: 4px 12px;
+}
+
 
 }
 
