@@ -81,7 +81,7 @@ async function init() {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         
-
+        actualizarEstadoCerrarTodasSesiones();
         setupEvents();
         setupImagePreviews();
         cargarSelectoresFecha();
@@ -166,6 +166,29 @@ function togglePanel() {
 }
 
 // ============================================
+// LÓGICA DE LOGOUT (Común para ambos botones)
+// ============================================
+async function performLogout() {
+    try {
+        const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
+        if (res && !res.success) {
+            console.warn("El backend no pudo cerrar la sesión:", res.error);
+        }
+    } catch (error) {
+        console.error("Error al cerrar sesión en el backend:", error);
+    } finally {
+        logout(); // Limpia token y artista del localStorage
+        document.getElementById('toggle-panel').classList.add('hidden');
+        document.getElementById('panel-artista').classList.add('hidden');
+        document.getElementById('pagina-blanca').classList.add('hidden');
+        document.getElementById('galeria-publica').classList.remove('hidden');
+        document.getElementById('btn-perfil').classList.remove('hidden');
+        // Redirigir al login (opcional, dependiendo de tu lógica)
+        location.reload(); // O simplemente recargar para mostrar el login
+    }
+}
+
+// ============================================
 // CONFIGURACIÓN DE EVENTOS
 // ============================================
 function setupEvents() {
@@ -216,10 +239,72 @@ function setupEvents() {
         }
     });
 
+    // Cerrar todas las sesiones (Escritorio)
+document.getElementById('btn-logout-all').addEventListener('click', async () => {
+    if (!document.getElementById('btn-logout-all').classList.contains('active')) return; // No hacer nada si está deshabilitado
 
+    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos?")) {
+        try {
+            const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
+            if (res && res.success) {
+                alert("✅ Todas las sesiones han sido cerradas.");
+            } else if (res && res.error) {
+                alert("❌ " + res.error);
+            }
+        } catch (error) {
+            console.error("Error al cerrar todas las sesiones:", error);
+        } finally {
+            // Cerrar sesión local y redirigir al login
+            logout();
+            location.reload();
+        }
+    }
+});
 
+// Opción del globo: "Cerrar todas las sesiones" (Móvil)
+document.getElementById('tooltip-item-all').addEventListener('click', async () => {
+    // 1. Cerrar el globo
+    const tooltip = document.getElementById('logout-tooltip');
+    if (tooltip) tooltip.classList.add('hidden');
+
+    // 2. Verificar si está habilitado
+    const item = document.getElementById('tooltip-item-all');
+    if (item && item.classList.contains('disabled')) {
+        return; // Si está deshabilitado, no hacer nada
+    }
+
+    // 3. Ejecutar la lógica de "Cerrar todas las sesiones"
+    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos?")) {
+        try {
+            const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
+            if (res && res.success) {
+                alert("✅ Todas las sesiones han sido cerradas.");
+            } else if (res && res.error) {
+                alert("❌ " + res.error);
+            }
+        } catch (error) {
+            console.error("Error al cerrar todas las sesiones:", error);
+            alert("❌ Error de conexión.");
+        } finally {
+            logout();
+            location.reload();
+        }
+    }
+});
+
+    // Opción del globo: "Cerrar Sesión" (Móvil)
+    document.getElementById('tooltip-item-logout').addEventListener('click', async () => {
+        // 1. Cerrar el globo
+        const tooltip = document.getElementById('logout-tooltip');
+        if (tooltip) tooltip.classList.add('hidden');
+
+        // 2. Ejecutar la lógica de logout
+        await performLogout();
+    });
     
 
+    
+    document.getElementById('logout-tooltip').classList.add('hidden');
 
     document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
     try {
@@ -251,6 +336,7 @@ function setupEvents() {
         
         // 🔥 Mostrar el botón de perfil para futuros logins
         document.getElementById('btn-perfil').classList.remove('hidden');
+        location.reload(); // O implementar la lógica de redirección sin recarga
     }
 });
 
@@ -459,34 +545,29 @@ function setupEvents() {
         }
     }
 
-    document.getElementById('btn-cerrar-todas-sesiones').addEventListener('click', async () => {
-    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
-            try {
-                const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', {
-                    method: 'POST'
-                });
-
-                if (res && res.success) {
-                    alert("✅ Todas las sesiones han sido cerradas correctamente.");
-                } else if (res && res.error) {
-                    alert("❌ " + res.error);
-                } else {
-                    alert("❌ Error inesperado al cerrar las sesiones.");
-                }
-            } catch (error) {
-                console.error("Error al cerrar todas las sesiones:", error);
-                alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
-            } finally {
-                // 🔥 ESTE BLOQUE SIEMPRE SE EJECUTA. Limpia la sesión y redirige.
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(ARTISTA_KEY);
-                
-                // 🔥 Redirige a la página principal después de 2 segundos.
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+    // Evento para el botón de cerrar sesión (globo en móvil)
+    document.getElementById('btn-logout-sidebar').addEventListener('click', (e) => {
+        // Si es móvil, alternar el globo
+        if (window.innerWidth <= 768) {
+            const tooltip = document.getElementById('logout-tooltip');
+            if (tooltip) {
+                tooltip.classList.toggle('hidden');
+                e.stopPropagation(); // Evitar que el clic cierre el menú inmediatamente
             }
+        } else {
+        // Escritorio: cerrar sesión directamente
+        performLogout();
         }
+    });
+
+    // Cerrar el globo al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        const tooltip = document.getElementById('logout-tooltip');
+        const sidebar = document.getElementById('toggle-panel');
+        if (tooltip && !tooltip.classList.contains('hidden') && !sidebar.contains(e.target)) {
+            tooltip.classList.add('hidden');
+        }
+        
     });
 
     document.getElementById('btn-limpiar-campos').addEventListener('click', () => {
@@ -594,6 +675,52 @@ function setupEvents() {
         });
     });
 
+}
+
+// ============================================
+// FUNCIONES PARA GESTIONAR SESIONES ACTIVAS
+// ============================================
+
+async function obtenerSesionesActivas() {
+    try {
+        const data = await apiRequest('/api/artistas/sesiones-activas');
+        return data.success ? data.count : 0;
+    } catch (error) {
+        console.error("Error al obtener sesiones activas:", error);
+        return 0;
+    }
+}
+
+async function actualizarEstadoCerrarTodasSesiones() {
+    const count = await obtenerSesionesActivas();
+    const btnLogoutAll = document.getElementById('btn-logout-all');
+    const tooltipItemAll = document.getElementById('tooltip-item-all');
+
+    if (count > 1) {
+        // Habilitar
+        if (btnLogoutAll) {
+            btnLogoutAll.classList.add('active');
+            btnLogoutAll.style.color = '#000';
+            btnLogoutAll.style.pointerEvents = 'auto';
+        }
+        if (tooltipItemAll) {
+            tooltipItemAll.classList.remove('disabled');
+            tooltipItemAll.style.color = 'white';
+            tooltipItemAll.style.pointerEvents = 'auto';
+        }
+    } else {
+        // Deshabilitar
+        if (btnLogoutAll) {
+            btnLogoutAll.classList.remove('active');
+            btnLogoutAll.style.color = '#888';
+            btnLogoutAll.style.pointerEvents = 'none';
+        }
+        if (tooltipItemAll) {
+            tooltipItemAll.classList.add('disabled');
+            tooltipItemAll.style.color = '#666';
+            tooltipItemAll.style.pointerEvents = 'none';
+        }
+    }
 }
 
 // ============================================
