@@ -110,15 +110,6 @@
         z-index: 1000;
     }
 
-    #toggle-panel:hover {
-        width: 200px;
-    }
-
-    /* Mostrar textos al expandir */
-    #toggle-panel:hover .toggle-label {
-        opacity: 1;
-    }
-
     /* Ajustes específicos de iconos en escritorio */
     .toggle-icon {
         width: 28px;
