@@ -157,6 +157,8 @@
         opacity: 1;
     }
 
+    
+
     /* ==============================================
    NUEVO BOTÓN DE GALERÍA EN LA BARRA LATERAL
    ============================================== */
@@ -409,4 +411,90 @@
 
 #pagina-blanca.hidden {
     display: none !important;
+}
+
+/* ==============================================
+   ESTILO PARA "CERRAR TODAS LAS SESIONES" (ESCRITORIO)
+   ============================================== */
+#logout-all-container {
+    width: 100%;
+    margin-top: 5px;
+    padding-left: 10px;
+}
+
+#btn-logout-all {
+    font-size: 12px;
+    padding: 4px 8px;
+    display: block;
+    width: 100%;
+    text-align: left;
+    pointer-events: none; /* Deshabilitado por defecto */
+    color: #888; /* Gris claro por defecto */
+    transition: color 0.2s, background-color 0.2s;
+    cursor: default;
+}
+
+#btn-logout-all.active {
+    color: #000; /* Negro cuando está habilitado */
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+#btn-logout-all.active:hover {
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+/* ==============================================
+   ESTILO PARA EL GLOBO DE TEXTO (MÓVIL)
+   ============================================== */
+#logout-tooltip {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    width: 180px;
+    background: #1a1a1a;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+    z-index: 1001;
+}
+
+#logout-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 15px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #1a1a1a;
+}
+
+.tooltip-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    color: white;
+}
+
+.tooltip-item:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.tooltip-item.disabled {
+    color: #666; /* Gris claro cuando está deshabilitado */
+    pointer-events: none;
+}
+
+.tooltip-divider {
+    border-top: 1px solid #444;
+    margin: 4px 16px;
+}
+
+/* Ajuste para que el botón de cerrar sesión en móvil no abra el globo por defecto */
+@media (min-width: 769px) {
+    #logout-tooltip {
+        display: none !important;
+    }
 }
