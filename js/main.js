@@ -702,6 +702,7 @@ if (menuBtn) {
             // Si el menú está oculto, lo mostramos; si no, lo ocultamos (toggle)
             if (mobileMainMenu.classList.contains('hidden')) {
                 // Posicionar el panel cerca del botón
+                positionMobilePanel(menuBtn, mobileMainMenu);
                 mobileMainMenu.classList.remove('hidden');
                 // Cerrar al hacer clic fuera
                 if (mobileClickListener) {
