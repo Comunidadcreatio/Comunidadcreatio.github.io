@@ -116,15 +116,6 @@
         height: 28px;
     }
 
-    /* Desplazamiento del contenido */
-    #toggle-panel:not(.hidden) ~ .app-container {
-        margin-left: 56px;
-    }
-
-    #toggle-panel:hover ~ .app-container {
-        margin-left: 200px;
-    }
-
     /* Botones dentro de la barra */
     #btn-panel-toggle {
         width: 100%;
