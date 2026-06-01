@@ -33,7 +33,6 @@ let clickOutsideHandlerLogout = null;
 let clickOutsideHandlerMainMenu = null;
 
 // Control de estado del menú móvil (NUEVO)
-let menuVisible = false;
 let mobileOutsideClickListener = null;
 
 // Conteo de sesiones activas
