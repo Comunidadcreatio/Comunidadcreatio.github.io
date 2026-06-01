@@ -677,27 +677,29 @@ function setupEvents() {
             const isMobile = window.innerWidth <= 768;
 
             if (isMobile) {
-    if (!mobileMainMenu) {
-        mobileMainMenu = document.getElementById('mobile-main-menu');
-        if (!mobileMainMenu) return;
+                if (!mobileMainMenu) {
+                    mobileMainMenu = document.getElementById('mobile-main-menu');
+                    if (!mobileMainMenu) return;
 
-        document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-            mobileMainMenu.classList.add('hidden');
-            toggleGaleria();
-        });
-        document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-            mobileMainMenu.classList.add('hidden');
-            togglePanel();
-        });
-    }
+                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+                        mobileMainMenu.classList.add('hidden');
+                        toggleGaleria();
+                    });
+                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+                        mobileMainMenu.classList.add('hidden');
+                        togglePanel();
+                    });
+                }
 
-    // Toggle directo con classList
-    if (mobileMainMenu.classList.contains('hidden')) {
-        mobileMainMenu.classList.remove('hidden');
-    } else {
-        mobileMainMenu.classList.add('hidden');
-    }
+                // Posiciona el panel cerca del botón para que no lo tape
+                positionMobilePanel(menuBtn, mobileMainMenu);
 
+                // Toggle directo
+                if (mobileMainMenu.classList.contains('hidden')) {
+                    mobileMainMenu.classList.remove('hidden');
+                } else {
+                    mobileMainMenu.classList.add('hidden');
+                }
 
                 if (!menuVisible) {
                     // Mostrar
