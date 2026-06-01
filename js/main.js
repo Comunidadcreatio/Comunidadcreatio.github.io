@@ -669,6 +669,7 @@ function setupEvents() {
     }
 
     // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
+    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
     const menuBtn = document.getElementById('btn-menu-principal');
     if (menuBtn) {
         menuBtn.addEventListener('click', (e) => {
@@ -681,7 +682,7 @@ function setupEvents() {
                     mobileMainMenu = document.getElementById('mobile-main-menu');
                     if (!mobileMainMenu) return;
 
-                    // Asignar eventos a las opciones (solo una vez)
+                    // Asignar eventos a las opciones
                     document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
                         cerrarMenuMovil();
                         toggleGaleria();
@@ -690,28 +691,31 @@ function setupEvents() {
                         cerrarMenuMovil();
                         togglePanel();
                     });
+
+                    // ¡LA PIEZA CLAVE QUE FALTABA!
+                    // Cierra el menú si se toca el fondo transparente que cubre el botón
+                    mobileMainMenu.addEventListener('click', (evento) => {
+                        if (evento.target === mobileMainMenu) cerrarMenuMovil();
+                    });
                 }
 
-                // Usamos el DOM como fuente de la verdad (igual que en Cerrar Sesión)
                 if (mobileMainMenu.classList.contains('hidden')) {
                     // Mostrar menú
                     mobileMainMenu.classList.remove('hidden');
                     
-                    // Limpiar listener anterior por seguridad
                     if (mobileOutsideClickListener) {
                         document.removeEventListener('click', mobileOutsideClickListener);
                     }
                     
-                    // Listener para cerrar al hacer clic fuera
+                    // Listener para cerrar al hacer clic fuera del menú
                     mobileOutsideClickListener = (event) => {
-                        // CRÍTICO: Usar menuBtn.contains asegura que hacer clic en el ícono no rompa la lógica
                         if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
                             cerrarMenuMovil();
                         }
                     };
                     setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
                 } else {
-                    // Ocultar menú si ya está visible
+                    // Ocultar menú
                     cerrarMenuMovil();
                 }
 
