@@ -32,6 +32,10 @@ let mobileMainMenu = null;
 let clickOutsideHandlerLogout = null;
 let clickOutsideHandlerMainMenu = null;
 
+// Control de estado del menú móvil (NUEVO)
+let menuVisible = false;
+let mobileOutsideClickListener = null;
+
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
 
@@ -216,7 +220,6 @@ function positionDesktopPanel(triggerElement, panelElement) {
 }
 
 // Posiciona el panel móvil cerca del botón que lo activa
-// js/main.js – dentro de positionMobilePanel
 function positionMobilePanel(triggerElement, panelElement) {
     if (!panelElement) return;
     const rect = triggerElement.getBoundingClientRect();
@@ -225,19 +228,16 @@ function positionMobilePanel(triggerElement, panelElement) {
     
     panelDiv.style.margin = '0';
     
-    // 🔧 Quitar las restricciones de bottom/right heredadas del CSS
+    // Quitar las restricciones de bottom/right heredadas del CSS
     panelElement.style.bottom = 'auto';
     panelElement.style.right = 'auto';
     
     const panelRect = panelDiv.getBoundingClientRect();
-    // Intentar colocar arriba del botón
     let top = rect.top - panelRect.height - 8;
     let left = rect.left;
-    // Si no cabe arriba, colocar debajo
     if (top < 10) {
         top = rect.bottom + 8;
     }
-    // Ajuste horizontal
     if (left + panelRect.width > window.innerWidth) {
         left = window.innerWidth - panelRect.width - 10;
     }
@@ -669,76 +669,89 @@ function setupEvents() {
         });
     }
 
-    // ----- Menú principal unificado (Galería + Panel) -----
-const menuBtn = document.getElementById('btn-menu-principal');
-if (menuBtn) {
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isMobile = window.innerWidth <= 768;
+    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
+    const menuBtn = document.getElementById('btn-menu-principal');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isMobile = window.innerWidth <= 768;
 
-        if (isMobile) {
-            // ---------- MÓVIL ----------
-            if (!mobileMainMenu) {
-                mobileMainMenu = document.getElementById('mobile-main-menu');
-                if (!mobileMainMenu) return;
+            if (isMobile) {
+                // ---------- MÓVIL (con estado controlado) ----------
+                if (!mobileMainMenu) {
+                    mobileMainMenu = document.getElementById('mobile-main-menu');
+                    if (!mobileMainMenu) return;
 
-                // Asignar eventos a las opciones (solo una vez)
-                document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                    mobileMainMenu.classList.add('hidden');
-                    toggleGaleria();
-                });
-                document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                    mobileMainMenu.classList.add('hidden');
-                    togglePanel();
-                });
-            }
+                    // Asignar eventos a las opciones (solo una vez)
+                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+                        cerrarMenuMovil();
+                        toggleGaleria();
+                    });
+                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+                        cerrarMenuMovil();
+                        togglePanel();
+                    });
+                }
 
-            // TOGGLE: si está oculto lo muestra, si está visible lo oculta
-            if (mobileMainMenu.classList.contains('hidden')) {
-                mobileMainMenu.classList.remove('hidden');
-                // Agregar listener para cerrar al hacer clic fuera
-                const cerrarFuera = (event) => {
-                    if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
-                        mobileMainMenu.classList.add('hidden');
-                        document.removeEventListener('click', cerrarFuera);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', cerrarFuera), 10);
+                if (!menuVisible) {
+                    // Mostrar
+                    mobileMainMenu.classList.remove('hidden');
+                    menuVisible = true;
+                    // Listener para cerrar al hacer clic fuera
+                    mobileOutsideClickListener = (event) => {
+                        if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
+                            cerrarMenuMovil();
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
+                } else {
+                    // Ocultar
+                    cerrarMenuMovil();
+                }
+
             } else {
-                mobileMainMenu.classList.add('hidden');
-            }
-
-        } else {
-            // ---------- ESCRITORIO (código original que ya funcionaba) ----------
-            if (!desktopMainMenu) {
-                desktopMainMenu = document.getElementById('desktop-main-menu');
-                if (!desktopMainMenu) return;
-                document.getElementById('menu-galeria')?.addEventListener('click', () => {
-                    cerrarDesktopMainMenu();
-                    toggleGaleria();
-                });
-                document.getElementById('menu-panel')?.addEventListener('click', () => {
-                    cerrarDesktopMainMenu();
-                    togglePanel();
-                });
-            }
-
-            if (desktopMainMenu.classList.contains('hidden')) {
-                positionDesktopPanel(menuBtn, desktopMainMenu, true);
-                desktopMainMenu.classList.remove('hidden');
-                if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
-                clickOutsideHandlerMainMenu = (event) => {
-                    if (desktopMainMenu && !desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
+                // ---------- ESCRITORIO (sin cambios) ----------
+                if (!desktopMainMenu) {
+                    desktopMainMenu = document.getElementById('desktop-main-menu');
+                    if (!desktopMainMenu) return;
+                    document.getElementById('menu-galeria')?.addEventListener('click', () => {
                         cerrarDesktopMainMenu();
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
-            } else {
-                cerrarDesktopMainMenu();
+                        toggleGaleria();
+                    });
+                    document.getElementById('menu-panel')?.addEventListener('click', () => {
+                        cerrarDesktopMainMenu();
+                        togglePanel();
+                    });
+                }
+
+                if (desktopMainMenu.classList.contains('hidden')) {
+                    positionDesktopPanel(menuBtn, desktopMainMenu, true);
+                    desktopMainMenu.classList.remove('hidden');
+                    if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
+                    clickOutsideHandlerMainMenu = (event) => {
+                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
+                            cerrarDesktopMainMenu();
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
+                } else {
+                    cerrarDesktopMainMenu();
+                }
             }
+        });
+    }
+
+    // Función auxiliar para cerrar menú móvil limpiamente
+    function cerrarMenuMovil() {
+        if (mobileMainMenu) {
+            mobileMainMenu.classList.add('hidden');
         }
-    });
-}
+        menuVisible = false;
+        if (mobileOutsideClickListener) {
+            document.removeEventListener('click', mobileOutsideClickListener);
+            mobileOutsideClickListener = null;
+        }
+    }
 
     // ----- Botones del panel móvil de logout -----
     const mobileSingle = document.getElementById('mobile-logout-single');
