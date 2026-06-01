@@ -491,7 +491,7 @@
     /* Menú principal móvil */
     #mobile-main-menu {
         pointer-events: auto !important;
-        z-index: 1000 !important;
+        
     }
     #mobile-main-menu .mobile-logout-panel.speech-bubble {
         width: 240px;
