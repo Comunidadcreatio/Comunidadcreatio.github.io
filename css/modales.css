@@ -185,3 +185,37 @@
 .modal-content {
     padding-top: 30px; /* Espacio extra para el logo */
 }
+
+/* ==============================================
+   DISEÑO RESPONSIVO - MODALES
+   ============================================== */
+@media (max-width: 768px) {
+    /* Modales a pantalla completa */
+    #modal-registro .modal-content {
+        width: 95%;
+        max-width: 95%;
+        height: 100vh;
+        max-height: 100vh;
+        border: none;
+        border-radius: 0;
+        padding: 2rem 1.5rem 4rem;
+        overflow-y: auto;
+        background: white;
+        position: relative;
+    }
+    #modal-registro .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+        color: #333;
+        cursor: pointer;
+        z-index: 10;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+}
