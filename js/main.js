@@ -676,54 +676,37 @@ if (menuBtn) {
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-            if (!mobileMainMenu) {
-                mobileMainMenu = document.getElementById('mobile-main-menu');
+            if (isMobile) {
+                // Asegurar que el elemento se obtiene una sola vez
                 if (!mobileMainMenu) {
-                    console.error("No se encontró #mobile-main-menu");
-                    return;
-                }
-                // Asignar eventos a los botones internos (solo una vez)
-                const mobileGaleria = document.getElementById('mobile-menu-galeria');
-                const mobilePanel = document.getElementById('mobile-menu-panel');
-                if (mobileGaleria) {
-                    mobileGaleria.addEventListener('click', () => {
+                    mobileMainMenu = document.getElementById('mobile-main-menu');
+                    if (!mobileMainMenu) return;
+                    // Asignar eventos a los botones internos (solo una vez)
+                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
                         mobileMainMenu.classList.add('hidden');
-                        toggleGaleria(); // Cambiar vista a galería
+                        toggleGaleria();
+                    });
+                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+                        mobileMainMenu.classList.add('hidden');
+                        togglePanel();
                     });
                 }
-                if (mobilePanel) {
-                    mobilePanel.addEventListener('click', () => {
-                        mobileMainMenu.classList.add('hidden');
-                        togglePanel(); // Cambiar vista a panel del artista
-                    });
-                }
-            }
-            // Si el menú está oculto, lo mostramos; si no, lo ocultamos (toggle)
-            if (mobileMainMenu.classList.contains('hidden')) {
-                // Posicionar el panel cerca del botón
-                mobileMainMenu.classList.remove('hidden');
-                // Cerrar al hacer clic fuera
-                if (mobileClickListener) {
-                    document.removeEventListener('click', mobileClickListener);
-                }
-                mobileClickListener = (event) => {
-                    if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
-                        mobileMainMenu.classList.add('hidden');
-                        document.removeEventListener('click', mobileClickListener);
-                        mobileClickListener = null;
-                    }
-                };
-                setTimeout(() => {
-                    document.addEventListener('click', mobileClickListener);
-                }, 0);
-            } else {
+
+                // Toggle: si está oculto lo muestra, si está visible lo oculta
+                if (mobileMainMenu.classList.contains('hidden')) {
+                    mobileMainMenu.classList.remove('hidden');
+                    // Cerrar al hacer clic fuera
+                    const closeOnOutside = (event) => {
+                        if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
+                            mobileMainMenu.classList.add('hidden');
+                            document.removeEventListener('click', closeOnOutside);
+                        }
+                    };
+                    // Retraso mínimo para no interferir con el mismo clic
+                    setTimeout(() => document.addEventListener('click', closeOnOutside), 10);
+                } else {
                 // Ocultar si ya está visible
                 mobileMainMenu.classList.add('hidden');
-                if (mobileClickListener) {
-                    document.removeEventListener('click', mobileClickListener);
-                    mobileClickListener = null;
-                }
             }
         } else {
             // Escritorio (código existente, lo dejo igual)
@@ -765,26 +748,6 @@ if (menuBtn) {
         }
     });
 }
-
-    // ----- Botones del menú móvil (alternativa, por si no se asignaron arriba) -----
-    const mobileGaleriaAlt = document.getElementById('mobile-menu-galeria');
-    const mobilePanelAlt = document.getElementById('mobile-menu-panel');
-    if (mobileGaleriaAlt && !mobileGaleriaAlt.hasAttribute('data-listener')) {
-        mobileGaleriaAlt.addEventListener('click', () => {
-            const menu = document.getElementById('mobile-main-menu');
-            if (menu) menu.classList.add('hidden');
-            toggleGaleria();
-        });
-        mobileGaleriaAlt.setAttribute('data-listener', 'true');
-    }
-    if (mobilePanelAlt && !mobilePanelAlt.hasAttribute('data-listener')) {
-        mobilePanelAlt.addEventListener('click', () => {
-            const menu = document.getElementById('mobile-main-menu');
-            if (menu) menu.classList.add('hidden');
-            togglePanel();
-        });
-        mobilePanelAlt.setAttribute('data-listener', 'true');
-    }
 
     // ----- Botones del panel móvil de logout -----
     const mobileSingle = document.getElementById('mobile-logout-single');
