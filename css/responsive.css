@@ -461,12 +461,7 @@
     }
 
     #mobile-main-menu .mobile-logout-panel.speech-bubble::after {
-        right: 60px;
-    }
-
-        /* Ajustamos el ancho del bocadillo del menú principal */
-    #mobile-main-menu .mobile-logout-panel.speech-bubble {
-        width: 240px;
+        right: 68px;
     }
 
     .mobile-logout-panel .logout-option,
