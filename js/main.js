@@ -671,32 +671,33 @@ function setupEvents() {
 
     // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
     const menuBtn = document.getElementById('btn-menu-principal');
-        menuBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const isMobile = window.innerWidth <= 768;
-        console.log('Click en Menú. Móvil:', isMobile, 'menuVisible actual:', menuVisible);
-    });
     if (menuBtn) {
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isMobile = window.innerWidth <= 768;
 
             if (isMobile) {
-                // ---------- MÓVIL (con estado controlado) ----------
-                if (!mobileMainMenu) {
-                    mobileMainMenu = document.getElementById('mobile-main-menu');
-                    if (!mobileMainMenu) return;
+    if (!mobileMainMenu) {
+        mobileMainMenu = document.getElementById('mobile-main-menu');
+        if (!mobileMainMenu) return;
 
-                    // Asignar eventos a las opciones (solo una vez)
-                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        toggleGaleria();
-                    });
-                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        togglePanel();
-                    });
-                }
+        document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+            mobileMainMenu.classList.add('hidden');
+            toggleGaleria();
+        });
+        document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+            mobileMainMenu.classList.add('hidden');
+            togglePanel();
+        });
+    }
+
+    // Toggle directo con classList
+    if (mobileMainMenu.classList.contains('hidden')) {
+        mobileMainMenu.classList.remove('hidden');
+    } else {
+        mobileMainMenu.classList.add('hidden');
+    }
+
 
                 if (!menuVisible) {
                     // Mostrar
