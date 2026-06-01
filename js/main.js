@@ -670,78 +670,69 @@ function setupEvents() {
     }
 
     // ----- Menú principal unificado (Galería + Panel) -----
-    const menuBtn = document.getElementById('btn-menu-principal');
+const menuBtn = document.getElementById('btn-menu-principal');
 if (menuBtn) {
-    let mobileClickListener = null;
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                // Asegurar que el elemento se obtiene una sola vez
-                if (!mobileMainMenu) {
-                    mobileMainMenu = document.getElementById('mobile-main-menu');
-                    if (!mobileMainMenu) return;
-                    // Asignar eventos a los botones internos (solo una vez)
-                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                        mobileMainMenu.classList.add('hidden');
-                        toggleGaleria();
-                    });
-                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                        mobileMainMenu.classList.add('hidden');
-                        togglePanel();
-                    });
-                }
 
-                // Toggle: si está oculto lo muestra, si está visible lo oculta
-                if (mobileMainMenu.classList.contains('hidden')) {
-                    mobileMainMenu.classList.remove('hidden');
-                    // Cerrar al hacer clic fuera
-                    const closeOnOutside = (event) => {
-                        if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
-                            mobileMainMenu.classList.add('hidden');
-                            document.removeEventListener('click', closeOnOutside);
-                        }
-                    };
-                    // Retraso mínimo para no interferir con el mismo clic
-                    setTimeout(() => document.addEventListener('click', closeOnOutside), 10);
-                } else {
-                // Ocultar si ya está visible
+        if (isMobile) {
+            // ---------- MÓVIL ----------
+            if (!mobileMainMenu) {
+                mobileMainMenu = document.getElementById('mobile-main-menu');
+                if (!mobileMainMenu) return;
+
+                // Asignar eventos a las opciones (solo una vez)
+                document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+                    mobileMainMenu.classList.add('hidden');
+                    toggleGaleria();
+                });
+                document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+                    mobileMainMenu.classList.add('hidden');
+                    togglePanel();
+                });
+            }
+
+            // TOGGLE: si está oculto lo muestra, si está visible lo oculta
+            if (mobileMainMenu.classList.contains('hidden')) {
+                mobileMainMenu.classList.remove('hidden');
+                // Agregar listener para cerrar al hacer clic fuera
+                const cerrarFuera = (event) => {
+                    if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
+                        mobileMainMenu.classList.add('hidden');
+                        document.removeEventListener('click', cerrarFuera);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', cerrarFuera), 10);
+            } else {
                 mobileMainMenu.classList.add('hidden');
             }
+
         } else {
-            // Escritorio (código existente, lo dejo igual)
+            // ---------- ESCRITORIO (código original que ya funcionaba) ----------
             if (!desktopMainMenu) {
                 desktopMainMenu = document.getElementById('desktop-main-menu');
                 if (!desktopMainMenu) return;
-                const galeriaBtn = document.getElementById('menu-galeria');
-                const panelBtn = document.getElementById('menu-panel');
-                if (galeriaBtn) {
-                    galeriaBtn.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        toggleGaleria();
-                    });
-                }
-                if (panelBtn) {
-                    panelBtn.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        togglePanel();
-                    });
-                }
+                document.getElementById('menu-galeria')?.addEventListener('click', () => {
+                    cerrarDesktopMainMenu();
+                    toggleGaleria();
+                });
+                document.getElementById('menu-panel')?.addEventListener('click', () => {
+                    cerrarDesktopMainMenu();
+                    togglePanel();
+                });
             }
+
             if (desktopMainMenu.classList.contains('hidden')) {
                 positionDesktopPanel(menuBtn, desktopMainMenu, true);
                 desktopMainMenu.classList.remove('hidden');
-                if (clickOutsideHandlerMainMenu) {
-                    document.removeEventListener('click', clickOutsideHandlerMainMenu);
-                }
+                if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
                 clickOutsideHandlerMainMenu = (event) => {
                     if (desktopMainMenu && !desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
                         cerrarDesktopMainMenu();
                     }
                 };
-                setTimeout(() => {
-                    document.addEventListener('click', clickOutsideHandlerMainMenu);
-                }, 0);
+                setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
             } else {
                 cerrarDesktopMainMenu();
             }
