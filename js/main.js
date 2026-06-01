@@ -676,7 +676,7 @@ function setupEvents() {
             const isMobile = window.innerWidth <= 768;
 
             if (isMobile) {
-                // ---------- MÓVIL (con estado controlado) ----------
+                // ---------- MÓVIL ----------
                 if (!mobileMainMenu) {
                     mobileMainMenu = document.getElementById('mobile-main-menu');
                     if (!mobileMainMenu) return;
@@ -692,19 +692,26 @@ function setupEvents() {
                     });
                 }
 
-                if (!menuVisible) {
-                    // Mostrar
+                // Usamos el DOM como fuente de la verdad (igual que en Cerrar Sesión)
+                if (mobileMainMenu.classList.contains('hidden')) {
+                    // Mostrar menú
                     mobileMainMenu.classList.remove('hidden');
-                    menuVisible = true;
+                    
+                    // Limpiar listener anterior por seguridad
+                    if (mobileOutsideClickListener) {
+                        document.removeEventListener('click', mobileOutsideClickListener);
+                    }
+                    
                     // Listener para cerrar al hacer clic fuera
                     mobileOutsideClickListener = (event) => {
-                        if (!mobileMainMenu.contains(event.target) && event.target !== menuBtn) {
+                        // CRÍTICO: Usar menuBtn.contains asegura que hacer clic en el ícono no rompa la lógica
+                        if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
                             cerrarMenuMovil();
                         }
                     };
                     setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
                 } else {
-                    // Ocultar
+                    // Ocultar menú si ya está visible
                     cerrarMenuMovil();
                 }
 
@@ -728,7 +735,7 @@ function setupEvents() {
                     desktopMainMenu.classList.remove('hidden');
                     if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
                     clickOutsideHandlerMainMenu = (event) => {
-                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && event.target !== menuBtn) {
+                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
                             cerrarDesktopMainMenu();
                         }
                     };
@@ -745,7 +752,6 @@ function setupEvents() {
         if (mobileMainMenu) {
             mobileMainMenu.classList.add('hidden');
         }
-        menuVisible = false;
         if (mobileOutsideClickListener) {
             document.removeEventListener('click', mobileOutsideClickListener);
             mobileOutsideClickListener = null;
