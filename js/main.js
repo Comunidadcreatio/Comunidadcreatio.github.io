@@ -671,6 +671,11 @@ function setupEvents() {
 
     // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
     const menuBtn = document.getElementById('btn-menu-principal');
+        menuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isMobile = window.innerWidth <= 768;
+        console.log('Click en Menú. Móvil:', isMobile, 'menuVisible actual:', menuVisible);
+    });
     if (menuBtn) {
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
