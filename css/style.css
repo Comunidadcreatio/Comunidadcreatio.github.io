@@ -15,9 +15,6 @@
 /* 5. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css');
 
-/* 6. Media Queries y ajustes para móviles */
-@import url('responsive.css');
-
 .hidden {
     display: none !important;
 }
