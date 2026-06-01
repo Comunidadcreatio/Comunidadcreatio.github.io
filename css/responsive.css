@@ -370,7 +370,56 @@
 /* Ajuste fino para la cola en pantallas de teléfonos muy pequeños */
 @media (max-width: 480px) {
 
-    #mobile-main-menu .mobile-logout-panel.speech-bubble {
+.mobile-logout-modal {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: auto;
+    background: transparent;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    z-index: 2000;
+    pointer-events: none;
+}
+.mobile-logout-modal.hidden {
+    display: none;
+}
+.mobile-logout-modal:not(.hidden) {
+    pointer-events: auto;
+}
+
+.mobile-logout-panel.speech-bubble {
+    position: relative;
+    background: #000000;
+    width: 260px;
+    max-width: 85vw;
+    margin: 0 16px 70px 0;
+    border-radius: 20px;
+    padding: 12px 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    z-index: 2001;
+}
+
+/* Cola apuntando hacia abajo a la derecha */
+.mobile-logout-panel.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #000000;
+    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+}
+
+/* ---------- Móvil (Menú principal) ---------- */
+/* Ajustamos el ancho del bocadillo del menú principal */
+#mobile-main-menu .mobile-logout-panel.speech-bubble {
     width: 240px;
 }
 
