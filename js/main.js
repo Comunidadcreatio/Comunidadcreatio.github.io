@@ -677,28 +677,20 @@ function setupEvents() {
             const isMobile = window.innerWidth <= 768;
 
             if (isMobile) {
+                // ---------- MÓVIL (con estado controlado) ----------
                 if (!mobileMainMenu) {
                     mobileMainMenu = document.getElementById('mobile-main-menu');
                     if (!mobileMainMenu) return;
 
+                    // Asignar eventos a las opciones (solo una vez)
                     document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                        mobileMainMenu.classList.add('hidden');
+                        cerrarMenuMovil();
                         toggleGaleria();
                     });
                     document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                        mobileMainMenu.classList.add('hidden');
+                        cerrarMenuMovil();
                         togglePanel();
                     });
-                }
-
-                // Posiciona el panel cerca del botón para que no lo tape
-                positionMobilePanel(menuBtn, mobileMainMenu);
-
-                // Toggle directo
-                if (mobileMainMenu.classList.contains('hidden')) {
-                    mobileMainMenu.classList.remove('hidden');
-                } else {
-                    mobileMainMenu.classList.add('hidden');
                 }
 
                 if (!menuVisible) {
