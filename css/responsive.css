@@ -37,6 +37,7 @@
 }
 
 .toggle-label {
+    color: #ffffff !important;
     font-size: 14px;
     font-weight: 500;
     margin-left: 12px;
