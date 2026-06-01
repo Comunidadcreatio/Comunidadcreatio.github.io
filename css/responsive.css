@@ -369,9 +369,16 @@
 
 /* Ajuste fino para la cola en pantallas de teléfonos muy pequeños */
 @media (max-width: 480px) {
-    #mobile-main-menu .mobile-logout-panel.speech-bubble::after {
-        right: 60px;
-    }
+
+    #mobile-main-menu .mobile-logout-panel.speech-bubble {
+    width: 240px;
+}
+
+/* Movemos la cola (el triangulito) hacia la izquierda para que apunte al ícono de "Menú" */
+#mobile-main-menu .mobile-logout-panel.speech-bubble::after {
+    right: 68px; /* El ícono de logout usa 20px, este lo empujamos más a la izquierda */
+}
+
 }
 
 /* 1. Asegurar que el contenedor principal reciba clics y esté al frente */
