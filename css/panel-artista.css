@@ -235,3 +235,40 @@
 #btn-cerrar-todas-sesiones:hover {
     opacity: 0.9;
 }
+
+/* ==============================================
+   DISEÑO RESPONSIVO - PANEL DE ARTISTA
+   ============================================== */
+@media (max-width: 768px) {
+    /* Controles de filtro apilados */
+    .filter-controls {
+        flex-direction: column;
+        width: 100%;
+        padding: 10px;
+        gap: 10px;
+    }
+    .filter-controls input[type="text"],
+    .filter-controls select,
+    .filter-controls button {
+        width: 100%;
+    }
+    .pagination-controls {
+        flex-wrap: wrap;
+    }
+    
+    /* Scroll horizontal en la tabla de obras */
+    #tabla-obras-container {
+        overflow-x: auto;
+    }
+    #tabla-obras-container::-webkit-scrollbar {
+        height: 6px;
+    }
+    #tabla-obras-container::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+    
+    .imagenes-contenedor {
+        justify-content: center;
+    }
+}
