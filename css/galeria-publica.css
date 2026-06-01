@@ -59,3 +59,13 @@
     color: #fff;
 }
 
+/* ==============================================
+   DISEÑO RESPONSIVO - GALERIA PUBLICA
+   ============================================== */
+@media (max-width: 480px) {
+    #galeria-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+}
+
