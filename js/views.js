@@ -1,75 +1,75 @@
 // js/views.js
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
-import { galeriaContainer, panelArtista, btnPerfil, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras, tablaBody, imagenesAEliminar } from './dom-globals.js';
+import { galeriaContainer, panelArtista, btnPerfil, imagenesAEliminar, state } from './dom-globals.js';
 import { token, artistaActual } from './auth.js';
-import { cargarMisObras, renderizarTabla, eliminarObra, guardarObra } from './panel.js';
+import { cargarMisObras, renderizarTabla, eliminarObra } from './panel.js';
 import { apiRequest } from './config.js';
 import { mostrarErrores } from './utils.js';
 
 export function mostrarPaginaBlanca() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (galeria) galeria.classList.add('hidden');
-    if (panel) panel.classList.add('hidden');
-    if (paginaBlanca) paginaBlanca.classList.remove('hidden');
+  const galeria = document.getElementById('galeria-publica');
+  const panel = document.getElementById('panel-artista');
+  const paginaBlanca = document.getElementById('pagina-blanca');
+  if (galeria) galeria.classList.add('hidden');
+  if (panel) panel.classList.add('hidden');
+  if (paginaBlanca) paginaBlanca.classList.remove('hidden');
 }
 
 export function toggleGaleria() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (galeria.classList.contains('hidden')) {
-        galeria.classList.remove('hidden');
-        panel.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        cargarGaleria(galeriaContainer).then(obras => {
-            mostrarGaleria(obras, galeriaContainer, (id) => {
-                console.log("Ver detalles de obra con ID:", id);
-            });
-        });
-    } else {
-        galeria.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
-    }
+  const galeria = document.getElementById('galeria-publica');
+  const panel = document.getElementById('panel-artista');
+  const paginaBlanca = document.getElementById('pagina-blanca');
+  if (galeria.classList.contains('hidden')) {
+    galeria.classList.remove('hidden');
+    panel.classList.add('hidden');
+    paginaBlanca.classList.add('hidden');
+    cargarGaleria(galeriaContainer).then(obras => {
+      mostrarGaleria(obras, galeriaContainer, (id) => {
+        console.log("Ver detalles de obra con ID:", id);
+      });
+    });
+  } else {
+    galeria.classList.add('hidden');
+    paginaBlanca.classList.remove('hidden');
+  }
 }
 
 export function togglePanel() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (panel.classList.contains('hidden')) {
-        panel.classList.remove('hidden');
-        galeria.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        refrescarTabla();
-    } else {
-        panel.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
-    }
+  const galeria = document.getElementById('galeria-publica');
+  const panel = document.getElementById('panel-artista');
+  const paginaBlanca = document.getElementById('pagina-blanca');
+  if (panel.classList.contains('hidden')) {
+    panel.classList.remove('hidden');
+    galeria.classList.add('hidden');
+    paginaBlanca.classList.add('hidden');
+    refrescarTabla();
+  } else {
+    panel.classList.add('hidden');
+    paginaBlanca.classList.remove('hidden');
+  }
 }
 
 export async function refrescarTabla() {
-    const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
-    if (!result.success) {
-        console.error("Error al cargar obras:", result.error);
-        if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
-            alert("🔐 Tu sesión ha expirado. Serás redirigido a la página principal.");
-            localStorage.removeItem('token');
-            localStorage.removeItem('artista');
-            window.location.href = '/';
-            return;
-        }
-        mostrarErrores(result);
-        return;
+  const result = await cargarMisObras(token, state.currentPage, state.currentLimit, state.currentSearch, state.currentSortBy, state.currentOrder);
+  if (!result.success) {
+    console.error("Error al cargar obras:", result.error);
+    if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
+      alert("🔐 Tu sesión ha expirado. Serás redirigido a la página principal.");
+      localStorage.removeItem('token');
+      localStorage.removeItem('artista');
+      window.location.href = '/';
+      return;
     }
-    const obras = result.obras;
-    totalObras = result.total; // reasigna variable exportada (mutable)
-    const totalPages = Math.ceil(totalObras / currentLimit);
-    document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-    document.getElementById('btn-prev').disabled = currentPage <= 1;
-    document.getElementById('btn-next').disabled = currentPage >= totalPages;
-    renderizarTabla(obras, tablaBody,
+    mostrarErrores(result);
+    return;
+  }
+  const obras = result.obras;
+  state.totalObras = result.total;
+  const totalPages = Math.ceil(state.totalObras / state.currentLimit);
+  document.getElementById('page-info').textContent = `Página ${state.currentPage} de ${totalPages || 1}`;
+  document.getElementById('btn-prev').disabled = state.currentPage <= 1;
+  document.getElementById('btn-next').disabled = state.currentPage >= totalPages;
+  renderizarTabla(obras, tablaBody,
         async (id) => {
             try {
                 const data = await apiRequest(`/obras/${id}`);
@@ -216,21 +216,21 @@ export async function refrescarTabla() {
 }
 
 export async function mostrarPanelArtista() {
-    document.getElementById('galeria-publica').classList.add('hidden');
-    panelArtista.classList.remove('hidden');
-    btnPerfil.textContent = '👤 Artista';
-    if (artistaActual) {
-        document.getElementById('input-artista').value = artistaActual.nombre_artista;
-    }
-    await refrescarTabla();
+  document.getElementById('galeria-publica').classList.add('hidden');
+  panelArtista.classList.remove('hidden');
+  btnPerfil.textContent = '👤 Artista';
+  if (artistaActual) {
+    document.getElementById('input-artista').value = artistaActual.nombre_artista;
+  }
+  await refrescarTabla();
 }
 
 export function mostrarGaleriaPublica() {
-    document.getElementById('panel-artista').classList.add('hidden');
-    document.getElementById('galeria-publica').classList.remove('hidden');
-    cargarGaleria(galeriaContainer).then(obras => {
-        mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Ver detalles de obra con ID:", id);
-        });
+  document.getElementById('panel-artista').classList.add('hidden');
+  document.getElementById('galeria-publica').classList.remove('hidden');
+  cargarGaleria(galeriaContainer).then(obras => {
+    mostrarGaleria(obras, galeriaContainer, (id) => {
+      console.log("Ver detalles de obra con ID:", id);
     });
+  });
 }
