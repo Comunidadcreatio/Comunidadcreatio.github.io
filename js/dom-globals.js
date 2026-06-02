@@ -6,30 +6,30 @@ export const obraForm = document.getElementById('obra-form');
 export const btnPerfil = document.getElementById('btn-perfil');
 export const imagenesAEliminar = new Set();
 
-// Paginación y filtros
-export let currentPage = 1;
-export let currentLimit = 10;
-export let currentSearch = '';
-export let currentSortBy = 'id';
-export let currentOrder = 'DESC';
-export let totalObras = 0;
+// Estado global mutable (paginación, paneles, sesiones...)
+export const state = {
+  currentPage: 1,
+  currentLimit: 10,
+  currentSearch: '',
+  currentSortBy: 'id',
+  currentOrder: 'DESC',
+  totalObras: 0,
 
-// Paneles flotantes
-export let desktopLogoutModal = null;
-export let desktopLogoutAllBtn = null;
-export let desktopLogoutSingleBtn = null;
-export let desktopMainMenu = null;
-export let mobileMainMenu = null;
-export let clickOutsideHandlerLogout = null;
-export let clickOutsideHandlerMainMenu = null;
-export let mobileOutsideClickListener = null;
+  desktopLogoutModal: null,
+  desktopLogoutAllBtn: null,
+  desktopLogoutSingleBtn: null,
+  desktopMainMenu: null,
+  mobileMainMenu: null,
+  clickOutsideHandlerLogout: null,
+  clickOutsideHandlerMainMenu: null,
+  mobileOutsideClickListener: null,
 
-// Sesiones activas
-export let activeSessionsCount = 0;
+  activeSessionsCount: 0
+};
 
-// Ciudades
+// Datos fijos
 export const ciudadesPorPais = {
-    'Venezuela': {
-        'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
-    }
+  'Venezuela': {
+    'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
+  }
 };
