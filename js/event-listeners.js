@@ -1,14 +1,7 @@
 // js/event-listeners.js
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
-import { 
-    btnPerfil, obraForm, imagenesAEliminar, 
-    currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
-    desktopLogoutModal, desktopLogoutAllBtn, desktopLogoutSingleBtn, 
-    desktopMainMenu, mobileMainMenu,
-    clickOutsideHandlerLogout, clickOutsideHandlerMainMenu, mobileOutsideClickListener,
-    activeSessionsCount
-} from './dom-globals.js';
+import { btnPerfil, obraForm, imagenesAEliminar, state } from './dom-globals.js';
 import { mostrarErrores, limpiarFormularioCompleto, poblarCiudades } from './utils.js';
 import { fetchActiveSessionsCount, updateCerrarTodasSesionesButtonState, closeAllSessions } from './session-manager.js';
 import { ejecutarLogout, cerrarMobileLogoutModal, cerrarDesktopLogoutModal, cerrarDesktopMainMenu, cerrarMenuMovil, positionDesktopPanel } from './logout-panels.js';
@@ -16,135 +9,135 @@ import { mostrarPaginaBlanca, toggleGaleria, togglePanel, refrescarTabla, mostra
 import { guardarObra } from './panel.js';
 
 export function setupEvents() {
-    // Panel de logout (escritorio y móvil)
-    const logoutIcon = document.getElementById('btn-logout-sidebar');
-    if (logoutIcon) {
-        logoutIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                const mobileModal = document.getElementById('mobile-logout-options');
-                if (mobileModal) {
-                    if (mobileModal.classList.contains('hidden')) {
-                        mobileModal.classList.remove('hidden');
-                        setTimeout(() => {
-                            document.addEventListener('click', function onClickOutsideMobile(e) {
-                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
-                                    mobileModal.classList.add('hidden');
-                                    document.removeEventListener('click', onClickOutsideMobile);
-                                }
-                            });
-                        }, 0);
-                    } else {
-                        mobileModal.classList.add('hidden');
-                    }
+  // Panel de logout
+  const logoutIcon = document.getElementById('btn-logout-sidebar');
+  if (logoutIcon) {
+    logoutIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        const mobileModal = document.getElementById('mobile-logout-options');
+        if (mobileModal) {
+          if (mobileModal.classList.contains('hidden')) {
+            mobileModal.classList.remove('hidden');
+            setTimeout(() => {
+              document.addEventListener('click', function onClickOutsideMobile(e) {
+                if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
+                  mobileModal.classList.add('hidden');
+                  document.removeEventListener('click', onClickOutsideMobile);
                 }
-            } else {
-                if (!desktopLogoutModal) {
-                    desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
-                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
-                    if (desktopLogoutAllBtn) {
-                        desktopLogoutAllBtn.addEventListener('click', () => {
-                            closeAllSessions();
-                            cerrarDesktopLogoutModal();
-                        });
-                    }
-                    if (desktopLogoutSingleBtn) {
-                        desktopLogoutSingleBtn.addEventListener('click', async () => {
-                            cerrarDesktopLogoutModal();
-                            await ejecutarLogout();
-                        });
-                    }
-                }
-                if (desktopLogoutModal.classList.contains('hidden')) {
-                    updateCerrarTodasSesionesButtonState();
-                    positionDesktopPanel(logoutIcon, desktopLogoutModal);
-                    desktopLogoutModal.classList.remove('hidden');
-                    if (clickOutsideHandlerLogout) {
-                        document.removeEventListener('click', clickOutsideHandlerLogout);
-                    }
-                    clickOutsideHandlerLogout = function(event) {
-                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
-                            cerrarDesktopLogoutModal();
-                        }
-                    };
-                    setTimeout(() => {
-                        document.addEventListener('click', clickOutsideHandlerLogout);
-                    }, 0);
-                } else {
-                    cerrarDesktopLogoutModal();
-                }
+              });
+            }, 0);
+          } else {
+            mobileModal.classList.add('hidden');
+          }
+        }
+      } else {
+        if (!state.desktopLogoutModal) {
+          state.desktopLogoutModal = document.getElementById('desktop-logout-options');
+          state.desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
+          state.desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+          if (state.desktopLogoutAllBtn) {
+            state.desktopLogoutAllBtn.addEventListener('click', () => {
+              closeAllSessions();
+              cerrarDesktopLogoutModal();
+            });
+          }
+          if (state.desktopLogoutSingleBtn) {
+            state.desktopLogoutSingleBtn.addEventListener('click', async () => {
+              cerrarDesktopLogoutModal();
+              await ejecutarLogout();
+            });
+          }
+        }
+        if (state.desktopLogoutModal.classList.contains('hidden')) {
+          updateCerrarTodasSesionesButtonState();
+          positionDesktopPanel(logoutIcon, state.desktopLogoutModal);
+          state.desktopLogoutModal.classList.remove('hidden');
+          if (state.clickOutsideHandlerLogout) {
+            document.removeEventListener('click', state.clickOutsideHandlerLogout);
+          }
+          state.clickOutsideHandlerLogout = function(event) {
+            if (state.desktopLogoutModal && !state.desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+              cerrarDesktopLogoutModal();
             }
-        });
-    }
+          };
+          setTimeout(() => {
+            document.addEventListener('click', state.clickOutsideHandlerLogout);
+          }, 0);
+        } else {
+          cerrarDesktopLogoutModal();
+        }
+      }
+    });
+  }
 
-    // Menú principal unificado (Galería + Panel)
-    const menuBtn = document.getElementById('btn-menu-principal');
-    if (menuBtn) {
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
+  // Menú principal unificado
+  const menuBtn = document.getElementById('btn-menu-principal');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isMobile = window.innerWidth <= 768;
 
-            if (isMobile) {
-                if (!mobileMainMenu) {
-                    mobileMainMenu = document.getElementById('mobile-main-menu');
-                    if (!mobileMainMenu) return;
-                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        toggleGaleria();
-                    });
-                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        togglePanel();
-                    });
-                    mobileMainMenu.addEventListener('click', (evento) => {
-                        if (evento.target === mobileMainMenu) cerrarMenuMovil();
-                    });
-                }
-                if (mobileMainMenu.classList.contains('hidden')) {
-                    mobileMainMenu.classList.remove('hidden');
-                    if (mobileOutsideClickListener) {
-                        document.removeEventListener('click', mobileOutsideClickListener);
-                    }
-                    mobileOutsideClickListener = (event) => {
-                        if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
-                            cerrarMenuMovil();
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
-                } else {
-                    cerrarMenuMovil();
-                }
-            } else {
-                if (!desktopMainMenu) {
-                    desktopMainMenu = document.getElementById('desktop-main-menu');
-                    if (!desktopMainMenu) return;
-                    document.getElementById('menu-galeria')?.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        toggleGaleria();
-                    });
-                    document.getElementById('menu-panel')?.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        togglePanel();
-                    });
-                }
-                if (desktopMainMenu.classList.contains('hidden')) {
-                    positionDesktopPanel(menuBtn, desktopMainMenu);
-                    desktopMainMenu.classList.remove('hidden');
-                    if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
-                    clickOutsideHandlerMainMenu = (event) => {
-                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
-                            cerrarDesktopMainMenu();
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
-                } else {
-                    cerrarDesktopMainMenu();
-                }
+      if (isMobile) {
+        if (!state.mobileMainMenu) {
+          state.mobileMainMenu = document.getElementById('mobile-main-menu');
+          if (!state.mobileMainMenu) return;
+          document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+            cerrarMenuMovil();
+            toggleGaleria();
+          });
+          document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+            cerrarMenuMovil();
+            togglePanel();
+          });
+          state.mobileMainMenu.addEventListener('click', (evento) => {
+            if (evento.target === state.mobileMainMenu) cerrarMenuMovil();
+          });
+        }
+        if (state.mobileMainMenu.classList.contains('hidden')) {
+          state.mobileMainMenu.classList.remove('hidden');
+          if (state.mobileOutsideClickListener) {
+            document.removeEventListener('click', state.mobileOutsideClickListener);
+          }
+          state.mobileOutsideClickListener = (event) => {
+            if (!state.mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+              cerrarMenuMovil();
             }
-        });
-    }
+          };
+          setTimeout(() => document.addEventListener('click', state.mobileOutsideClickListener), 10);
+        } else {
+          cerrarMenuMovil();
+        }
+      } else {
+        if (!state.desktopMainMenu) {
+          state.desktopMainMenu = document.getElementById('desktop-main-menu');
+          if (!state.desktopMainMenu) return;
+          document.getElementById('menu-galeria')?.addEventListener('click', () => {
+            cerrarDesktopMainMenu();
+            toggleGaleria();
+          });
+          document.getElementById('menu-panel')?.addEventListener('click', () => {
+            cerrarDesktopMainMenu();
+            togglePanel();
+          });
+        }
+        if (state.desktopMainMenu.classList.contains('hidden')) {
+          positionDesktopPanel(menuBtn, state.desktopMainMenu);
+          state.desktopMainMenu.classList.remove('hidden');
+          if (state.clickOutsideHandlerMainMenu) document.removeEventListener('click', state.clickOutsideHandlerMainMenu);
+          state.clickOutsideHandlerMainMenu = (event) => {
+            if (state.desktopMainMenu && !state.desktopMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+              cerrarDesktopMainMenu();
+            }
+          };
+          setTimeout(() => document.addEventListener('click', state.clickOutsideHandlerMainMenu), 10);
+        } else {
+          cerrarDesktopMainMenu();
+        }
+      }
+    });
+  }
 
     // Botones del panel móvil de logout
     const mobileSingle = document.getElementById('mobile-logout-single');
