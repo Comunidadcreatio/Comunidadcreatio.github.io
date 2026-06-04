@@ -32,7 +32,7 @@ let mobileMainMenu = null;
 let clickOutsideHandlerLogout = null;
 let clickOutsideHandlerMainMenu = null;
 
-// Control de estado del menú móvil (NUEVO)
+// Control de estado del menú móvil
 let mobileOutsideClickListener = null;
 
 // Conteo de sesiones activas
@@ -218,7 +218,6 @@ function positionDesktopPanel(triggerElement, panelElement) {
     panelDiv.setAttribute('data-placement', placement);
 }
 
-// Posiciona el panel móvil cerca del botón que lo activa
 function positionMobilePanel(triggerElement, panelElement) {
     if (!panelElement) return;
     const rect = triggerElement.getBoundingClientRect();
@@ -226,8 +225,6 @@ function positionMobilePanel(triggerElement, panelElement) {
     if (!panelDiv) return;
     
     panelDiv.style.margin = '0';
-    
-    // Quitar las restricciones de bottom/right heredadas del CSS
     panelElement.style.bottom = 'auto';
     panelElement.style.right = 'auto';
     
@@ -559,6 +556,7 @@ function setupImagePreviews() {
 function cargarSelectoresFecha() {
     const diaSelect = document.getElementById('reg-dia');
     if (diaSelect) {
+        diaSelect.innerHTML = '<option value="" disabled selected>Día</option>';
         for (let i = 1; i <= 31; i++) {
             const option = document.createElement('option');
             option.value = i;
@@ -568,6 +566,7 @@ function cargarSelectoresFecha() {
     }
     const mesSelect = document.getElementById('reg-mes');
     if (mesSelect) {
+        mesSelect.innerHTML = '<option value="" disabled selected>Mes</option>';
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         meses.forEach((nombre, i) => {
             const option = document.createElement('option');
@@ -578,6 +577,7 @@ function cargarSelectoresFecha() {
     }
     const anoSelect = document.getElementById('reg-ano');
     if (anoSelect) {
+        anoSelect.innerHTML = '<option value="" disabled selected>Año</option>';
         const maxYear = new Date().getFullYear() - 18;
         for (let i = maxYear; i >= 1900; i--) {
             const option = document.createElement('option');
@@ -601,9 +601,8 @@ async function verificarSesionBackend() {
     }
 }
 
-
 // ============================================
-// FORMULARIO DE REGISTRO PASO A PASO (WIZARD)
+// FORMULARIO DE REGISTRO PASO A PASO (WIZARD) - UNA SOLA VEZ
 // ============================================
 
 // Variables para el wizard
@@ -741,7 +740,6 @@ document.getElementById('registro-form').addEventListener('submit', async functi
 // Inicializar mostrando el paso 1
 showStep(1);
 
-
 // ============================================
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
@@ -809,8 +807,7 @@ function setupEvents() {
         });
     }
 
-    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
-    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
+    // ----- Menú principal unificado (Galería + Panel) -----
     const menuBtn = document.getElementById('btn-menu-principal');
     if (menuBtn) {
         menuBtn.addEventListener('click', (e) => {
@@ -818,12 +815,10 @@ function setupEvents() {
             const isMobile = window.innerWidth <= 768;
 
             if (isMobile) {
-                // ---------- MÓVIL ----------
                 if (!mobileMainMenu) {
                     mobileMainMenu = document.getElementById('mobile-main-menu');
                     if (!mobileMainMenu) return;
 
-                    // Asignar eventos a las opciones
                     document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
                         cerrarMenuMovil();
                         toggleGaleria();
@@ -833,22 +828,16 @@ function setupEvents() {
                         togglePanel();
                     });
 
-                    // ¡LA PIEZA CLAVE QUE FALTABA!
-                    // Cierra el menú si se toca el fondo transparente que cubre el botón
                     mobileMainMenu.addEventListener('click', (evento) => {
                         if (evento.target === mobileMainMenu) cerrarMenuMovil();
                     });
                 }
 
                 if (mobileMainMenu.classList.contains('hidden')) {
-                    // Mostrar menú
                     mobileMainMenu.classList.remove('hidden');
-                    
                     if (mobileOutsideClickListener) {
                         document.removeEventListener('click', mobileOutsideClickListener);
                     }
-                    
-                    // Listener para cerrar al hacer clic fuera del menú
                     mobileOutsideClickListener = (event) => {
                         if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
                             cerrarMenuMovil();
@@ -856,12 +845,9 @@ function setupEvents() {
                     };
                     setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
                 } else {
-                    // Ocultar menú
                     cerrarMenuMovil();
                 }
-
             } else {
-                // ---------- ESCRITORIO (sin cambios) ----------
                 if (!desktopMainMenu) {
                     desktopMainMenu = document.getElementById('desktop-main-menu');
                     if (!desktopMainMenu) return;
@@ -892,7 +878,6 @@ function setupEvents() {
         });
     }
 
-    // Función auxiliar para cerrar menú móvil limpiamente
     function cerrarMenuMovil() {
         if (mobileMainMenu) {
             mobileMainMenu.classList.add('hidden');
@@ -929,13 +914,7 @@ function setupEvents() {
         });
     }
 
-    // ========== RESTO DE EVENTOS (filtros, login, registro, etc.) ==========
-    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-restablecimiento').classList.remove('hidden');
-    });
-
+    // ========== RESTO DE EVENTOS (filtros, login, etc.) ==========
     document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
         currentSearch = document.getElementById('search-input').value;
         currentSortBy = document.getElementById('sort-select').value;
@@ -988,12 +967,6 @@ function setupEvents() {
             mostrarErrores(result);
         }
     });
-
-    // ============================================
-// FORMULARIO DE REGISTRO PASO A PASO (WIZARD)
-// ============================================
-
-
 
     // Guardar obra
     obraForm.addEventListener('submit', async (e) => {
@@ -1116,34 +1089,6 @@ function setupEvents() {
     document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
         document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
     });
-    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('reset-email').value;
-        const messageEl = document.getElementById('reset-message');
-        messageEl.style.display = 'block';
-        messageEl.textContent = '⏳ Enviando solicitud...';
-        messageEl.style.color = '#555';
-        try {
-            const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
-                method: 'POST',
-                body: JSON.stringify({ email })
-            });
-            if (res && res.success) {
-                messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
-                messageEl.style.color = '#28a745';
-            } else if (res && res.error) {
-                messageEl.textContent = '❌ Error: ' + res.error;
-                messageEl.style.color = '#dc3545';
-            } else {
-                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-                messageEl.style.color = '#dc3545';
-            }
-        } catch (error) {
-            console.error('Error al solicitar restablecimiento:', error);
-            messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-            messageEl.style.color = '#dc3545';
-        }
-    });
     document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const password = document.getElementById('confirmar-password').value;
@@ -1176,6 +1121,51 @@ function setupEvents() {
             mensajeError.style.display = 'block';
         }
     });
+
+    // ✅ Listener de "Olvidé mi contraseña" (ahora seguro, solo si el elemento existe)
+    const olvideContrasena = document.getElementById('btn-olvide-contrasena');
+    if (olvideContrasena) {
+        olvideContrasena.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('modal-login').classList.add('hidden');
+            document.getElementById('modal-restablecimiento').classList.remove('hidden');
+        });
+    }
+
+    // ✅ Listener de solicitar restablecimiento (seguro)
+    const solicitarForm = document.getElementById('solicitar-restablecimiento-form');
+    if (solicitarForm) {
+        solicitarForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            const messageEl = document.getElementById('reset-message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = '⏳ Enviando solicitud...';
+            messageEl.style.color = '#555';
+            try {
+                const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
+                    method: 'POST',
+                    body: JSON.stringify({ email })
+                });
+                if (res && res.success) {
+                    messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
+                    messageEl.style.color = '#28a745';
+                } else if (res && res.error) {
+                    messageEl.textContent = '❌ Error: ' + res.error;
+                    messageEl.style.color = '#dc3545';
+                } else {
+                    messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+                    messageEl.style.color = '#dc3545';
+                }
+            } catch (error) {
+                console.error('Error al solicitar restablecimiento:', error);
+                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
+                messageEl.style.color = '#dc3545';
+            }
+        });
+    }
+
+    // Cerrar modales al hacer clic en la X
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -1199,7 +1189,7 @@ async function init() {
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         setupEvents();
         setupImagePreviews();
-        cargarSelectoresFecha();
+        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
         poblarCiudades('');
         await fetchActiveSessionsCount();
     } else {
@@ -1214,7 +1204,7 @@ async function init() {
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         setupEvents();
         setupImagePreviews();
-        cargarSelectoresFecha();
+        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
         poblarCiudades('');
     }
 }
