@@ -32,7 +32,7 @@ let mobileMainMenu = null;
 let clickOutsideHandlerLogout = null;
 let clickOutsideHandlerMainMenu = null;
 
-// Control de estado del menú móvil
+// Control de estado del menú móvil (NUEVO)
 let mobileOutsideClickListener = null;
 
 // Conteo de sesiones activas
@@ -218,6 +218,7 @@ function positionDesktopPanel(triggerElement, panelElement) {
     panelDiv.setAttribute('data-placement', placement);
 }
 
+// Posiciona el panel móvil cerca del botón que lo activa
 function positionMobilePanel(triggerElement, panelElement) {
     if (!panelElement) return;
     const rect = triggerElement.getBoundingClientRect();
@@ -225,6 +226,8 @@ function positionMobilePanel(triggerElement, panelElement) {
     if (!panelDiv) return;
     
     panelDiv.style.margin = '0';
+    
+    // Quitar las restricciones de bottom/right heredadas del CSS
     panelElement.style.bottom = 'auto';
     panelElement.style.right = 'auto';
     
@@ -556,7 +559,6 @@ function setupImagePreviews() {
 function cargarSelectoresFecha() {
     const diaSelect = document.getElementById('reg-dia');
     if (diaSelect) {
-        diaSelect.innerHTML = '<option value="" disabled selected>Día</option>';
         for (let i = 1; i <= 31; i++) {
             const option = document.createElement('option');
             option.value = i;
@@ -566,7 +568,6 @@ function cargarSelectoresFecha() {
     }
     const mesSelect = document.getElementById('reg-mes');
     if (mesSelect) {
-        mesSelect.innerHTML = '<option value="" disabled selected>Mes</option>';
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         meses.forEach((nombre, i) => {
             const option = document.createElement('option');
@@ -577,7 +578,6 @@ function cargarSelectoresFecha() {
     }
     const anoSelect = document.getElementById('reg-ano');
     if (anoSelect) {
-        anoSelect.innerHTML = '<option value="" disabled selected>Año</option>';
         const maxYear = new Date().getFullYear() - 18;
         for (let i = maxYear; i >= 1900; i--) {
             const option = document.createElement('option');
@@ -602,6 +602,253 @@ async function verificarSesionBackend() {
 }
 
 // ============================================
+// CONFIGURACIÓN DE EVENTOS (setupEvents)
+// ============================================
+function setupEvents() {
+    // ----- Panel de logout (escritorio y móvil) -----
+    const logoutIcon = document.getElementById('btn-logout-sidebar');
+    if (logoutIcon) {
+        logoutIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                const mobileModal = document.getElementById('mobile-logout-options');
+                if (mobileModal) {
+                    if (mobileModal.classList.contains('hidden')) {
+                        mobileModal.classList.remove('hidden');
+                        setTimeout(() => {
+                            document.addEventListener('click', function onClickOutsideMobile(e) {
+                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
+                                    mobileModal.classList.add('hidden');
+                                    document.removeEventListener('click', onClickOutsideMobile);
+                                }
+                            });
+                        }, 0);
+                    } else {
+                        mobileModal.classList.add('hidden');
+                    }
+                }
+            } else {
+                if (!desktopLogoutModal) {
+                    desktopLogoutModal = document.getElementById('desktop-logout-options');
+                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
+                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+                    if (desktopLogoutAllBtn) {
+                        desktopLogoutAllBtn.addEventListener('click', () => {
+                            closeAllSessions();
+                            cerrarDesktopLogoutModal();
+                        });
+                    }
+                    if (desktopLogoutSingleBtn) {
+                        desktopLogoutSingleBtn.addEventListener('click', async () => {
+                            cerrarDesktopLogoutModal();
+                            await ejecutarLogout();
+                        });
+                    }
+                }
+                if (desktopLogoutModal.classList.contains('hidden')) {
+                    updateCerrarTodasSesionesButtonState();
+                    positionDesktopPanel(logoutIcon, desktopLogoutModal);
+                    desktopLogoutModal.classList.remove('hidden');
+                    if (clickOutsideHandlerLogout) {
+                        document.removeEventListener('click', clickOutsideHandlerLogout);
+                    }
+                    clickOutsideHandlerLogout = function(event) {
+                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+                            cerrarDesktopLogoutModal();
+                        }
+                    };
+                    setTimeout(() => {
+                        document.addEventListener('click', clickOutsideHandlerLogout);
+                    }, 0);
+                } else {
+                    cerrarDesktopLogoutModal();
+                }
+            }
+        });
+    }
+
+    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
+    // ----- Menú principal unificado (Galería + Panel) CORREGIDO -----
+    const menuBtn = document.getElementById('btn-menu-principal');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                // ---------- MÓVIL ----------
+                if (!mobileMainMenu) {
+                    mobileMainMenu = document.getElementById('mobile-main-menu');
+                    if (!mobileMainMenu) return;
+
+                    // Asignar eventos a las opciones
+                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
+                        cerrarMenuMovil();
+                        toggleGaleria();
+                    });
+                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
+                        cerrarMenuMovil();
+                        togglePanel();
+                    });
+
+                    // ¡LA PIEZA CLAVE QUE FALTABA!
+                    // Cierra el menú si se toca el fondo transparente que cubre el botón
+                    mobileMainMenu.addEventListener('click', (evento) => {
+                        if (evento.target === mobileMainMenu) cerrarMenuMovil();
+                    });
+                }
+
+                if (mobileMainMenu.classList.contains('hidden')) {
+                    // Mostrar menú
+                    mobileMainMenu.classList.remove('hidden');
+                    
+                    if (mobileOutsideClickListener) {
+                        document.removeEventListener('click', mobileOutsideClickListener);
+                    }
+                    
+                    // Listener para cerrar al hacer clic fuera del menú
+                    mobileOutsideClickListener = (event) => {
+                        if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+                            cerrarMenuMovil();
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
+                } else {
+                    // Ocultar menú
+                    cerrarMenuMovil();
+                }
+
+            } else {
+                // ---------- ESCRITORIO (sin cambios) ----------
+                if (!desktopMainMenu) {
+                    desktopMainMenu = document.getElementById('desktop-main-menu');
+                    if (!desktopMainMenu) return;
+                    document.getElementById('menu-galeria')?.addEventListener('click', () => {
+                        cerrarDesktopMainMenu();
+                        toggleGaleria();
+                    });
+                    document.getElementById('menu-panel')?.addEventListener('click', () => {
+                        cerrarDesktopMainMenu();
+                        togglePanel();
+                    });
+                }
+
+                if (desktopMainMenu.classList.contains('hidden')) {
+                    positionDesktopPanel(menuBtn, desktopMainMenu, true);
+                    desktopMainMenu.classList.remove('hidden');
+                    if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
+                    clickOutsideHandlerMainMenu = (event) => {
+                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+                            cerrarDesktopMainMenu();
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
+                } else {
+                    cerrarDesktopMainMenu();
+                }
+            }
+        });
+    }
+
+    // Función auxiliar para cerrar menú móvil limpiamente
+    function cerrarMenuMovil() {
+        if (mobileMainMenu) {
+            mobileMainMenu.classList.add('hidden');
+        }
+        if (mobileOutsideClickListener) {
+            document.removeEventListener('click', mobileOutsideClickListener);
+            mobileOutsideClickListener = null;
+        }
+    }
+
+    // ----- Botones del panel móvil de logout -----
+    const mobileSingle = document.getElementById('mobile-logout-single');
+    if (mobileSingle) {
+        mobileSingle.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            await ejecutarLogout();
+        });
+    }
+    const mobileAll = document.getElementById('mobile-logout-all');
+    if (mobileAll) {
+        mobileAll.addEventListener('click', async () => {
+            cerrarMobileLogoutModal();
+            if (activeSessionsCount >= 2) {
+                await closeAllSessions();
+            } else {
+                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+            }
+        });
+    }
+    const mobileModalLogout = document.getElementById('mobile-logout-options');
+    if (mobileModalLogout) {
+        mobileModalLogout.addEventListener('click', (e) => {
+            if (e.target === mobileModalLogout) cerrarMobileLogoutModal();
+        });
+    }
+
+    // ========== RESTO DE EVENTOS (filtros, login, registro, etc.) ==========
+    document.getElementById('btn-olvide-contrasena').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('modal-login').classList.add('hidden');
+        document.getElementById('modal-restablecimiento').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
+        currentSearch = document.getElementById('search-input').value;
+        currentSortBy = document.getElementById('sort-select').value;
+        currentOrder = document.getElementById('order-select').value;
+        currentLimit = parseInt(document.getElementById('limit-select').value);
+        currentPage = 1;
+        refrescarTabla();
+    });
+
+    document.getElementById('reg-pais').addEventListener('change', function() {
+        poblarCiudades(this.value);
+    });
+
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            refrescarTabla();
+        }
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+        const totalPages = Math.ceil(totalObras / currentLimit);
+        if (currentPage < totalPages) {
+            currentPage++;
+            refrescarTabla();
+        }
+    });
+
+    btnPerfil.addEventListener('click', () => {
+        if (token) mostrarPanelArtista();
+        else document.getElementById('modal-login').classList.remove('hidden');
+    });
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-pass').value;
+        const result = await login(email, password);
+        if (result.success) {
+            const modalLogin = document.getElementById('modal-login');
+            modalLogin.classList.add('hidden');
+            modalLogin.classList.remove('modal-fullscreen');
+            document.getElementById('modal-registro').classList.add('hidden');
+            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+            document.getElementById('toggle-panel').classList.remove('hidden');
+            mostrarPaginaBlanca();
+            await fetchActiveSessionsCount();
+        } else {
+            mostrarErrores(result);
+        }
+    });
+
+    // ============================================
 // FORMULARIO DE REGISTRO PASO A PASO (WIZARD)
 // ============================================
 
@@ -615,19 +862,6 @@ function showStep(step) {
     const target = document.querySelector(`.step[data-step="${step}"]`);
     if (target) target.style.display = 'block';
     currentStep = step;
-
-    // Cargar selectores de fecha al llegar al paso 2
-    if (step === 2) {
-        cargarSelectoresFecha();
-    }
-
-    // Poblar ciudades al llegar al paso 3
-    if (step === 3) {
-        const paisSelect = document.getElementById('reg-pais');
-        if (paisSelect && paisSelect.value) {
-            poblarCiudades(paisSelect.value);
-        }
-    }
 }
 
 // Validación de campos del paso actual antes de avanzar
@@ -740,253 +974,128 @@ document.getElementById('registro-form').addEventListener('submit', async functi
 // Inicializar mostrando el paso 1
 showStep(1);
 
-// ============================================
-// CONFIGURACIÓN DE EVENTOS (setupEvents FINAL)
-// ============================================
-function setupEvents() {
-    // ----- Panel de logout (escritorio y móvil) -----
-    const logoutIcon = document.getElementById('btn-logout-sidebar');
-    if (logoutIcon) {
-        logoutIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                const mobileModal = document.getElementById('mobile-logout-options');
-                if (mobileModal) {
-                    if (mobileModal.classList.contains('hidden')) {
-                        mobileModal.classList.remove('hidden');
-                        setTimeout(() => {
-                            document.addEventListener('click', function onClickOutsideMobile(e) {
-                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
-                                    mobileModal.classList.add('hidden');
-                                    document.removeEventListener('click', onClickOutsideMobile);
-                                }
-                            });
-                        }, 0);
-                    } else {
-                        mobileModal.classList.add('hidden');
-                    }
-                }
-            } else {
-                if (!desktopLogoutModal) {
-                    desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
-                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
-                    if (desktopLogoutAllBtn) {
-                        desktopLogoutAllBtn.addEventListener('click', () => {
-                            closeAllSessions();
-                            cerrarDesktopLogoutModal();
-                        });
-                    }
-                    if (desktopLogoutSingleBtn) {
-                        desktopLogoutSingleBtn.addEventListener('click', async () => {
-                            cerrarDesktopLogoutModal();
-                            await ejecutarLogout();
-                        });
-                    }
-                }
-                if (desktopLogoutModal.classList.contains('hidden')) {
-                    updateCerrarTodasSesionesButtonState();
-                    positionDesktopPanel(logoutIcon, desktopLogoutModal);
-                    desktopLogoutModal.classList.remove('hidden');
-                    if (clickOutsideHandlerLogout) {
-                        document.removeEventListener('click', clickOutsideHandlerLogout);
-                    }
-                    clickOutsideHandlerLogout = function(event) {
-                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
-                            cerrarDesktopLogoutModal();
-                        }
-                    };
-                    setTimeout(() => {
-                        document.addEventListener('click', clickOutsideHandlerLogout);
-                    }, 0);
-                } else {
-                    cerrarDesktopLogoutModal();
-                }
-            }
-        });
-    }
-
-    // ----- Menú principal unificado (Galería + Panel) -----
-    const menuBtn = document.getElementById('btn-menu-principal');
-    if (menuBtn) {
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-
-            if (isMobile) {
-                if (!mobileMainMenu) {
-                    mobileMainMenu = document.getElementById('mobile-main-menu');
-                    if (!mobileMainMenu) return;
-
-                    document.getElementById('mobile-menu-galeria')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        toggleGaleria();
-                    });
-                    document.getElementById('mobile-menu-panel')?.addEventListener('click', () => {
-                        cerrarMenuMovil();
-                        togglePanel();
-                    });
-
-                    mobileMainMenu.addEventListener('click', (evento) => {
-                        if (evento.target === mobileMainMenu) cerrarMenuMovil();
-                    });
-                }
-
-                if (mobileMainMenu.classList.contains('hidden')) {
-                    mobileMainMenu.classList.remove('hidden');
-                    if (mobileOutsideClickListener) {
-                        document.removeEventListener('click', mobileOutsideClickListener);
-                    }
-                    mobileOutsideClickListener = (event) => {
-                        if (!mobileMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
-                            cerrarMenuMovil();
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', mobileOutsideClickListener), 10);
-                } else {
-                    cerrarMenuMovil();
-                }
-            } else {
-                if (!desktopMainMenu) {
-                    desktopMainMenu = document.getElementById('desktop-main-menu');
-                    if (!desktopMainMenu) return;
-                    document.getElementById('menu-galeria')?.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        toggleGaleria();
-                    });
-                    document.getElementById('menu-panel')?.addEventListener('click', () => {
-                        cerrarDesktopMainMenu();
-                        togglePanel();
-                    });
-                }
-
-                if (desktopMainMenu.classList.contains('hidden')) {
-                    positionDesktopPanel(menuBtn, desktopMainMenu, true);
-                    desktopMainMenu.classList.remove('hidden');
-                    if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
-                    clickOutsideHandlerMainMenu = (event) => {
-                        if (desktopMainMenu && !desktopMainMenu.contains(event.target) && !menuBtn.contains(event.target)) {
-                            cerrarDesktopMainMenu();
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerMainMenu), 10);
-                } else {
-                    cerrarDesktopMainMenu();
-                }
-            }
-        });
-    }
-
-    // ----- Botones del panel móvil de logout -----
-    const mobileSingle = document.getElementById('mobile-logout-single');
-    if (mobileSingle) {
-        mobileSingle.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            await ejecutarLogout();
-        });
-    }
-    const mobileAll = document.getElementById('mobile-logout-all');
-    if (mobileAll) {
-        mobileAll.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            if (activeSessionsCount >= 2) {
-                await closeAllSessions();
-            } else {
-                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
-            }
-        });
-    }
-    const mobileModalLogout = document.getElementById('mobile-logout-options');
-    if (mobileModalLogout) {
-        mobileModalLogout.addEventListener('click', (e) => {
-            if (e.target === mobileModalLogout) cerrarMobileLogoutModal();
-        });
-    }
-
-    // ========== LISTENERS RESTANTES (Filtros, Login, etc.) ==========
-    
-    // LISTENER PARA EL SELECTOR DE PAÍS (paso 3)
-    const regPais = document.getElementById('reg-pais');
-    if (regPais) {
-        regPais.addEventListener('change', function() {
-            poblarCiudades(this.value);
-        });
-    }
-
-    // Filtros
-    document.getElementById('btn-aplicar-filtros')?.addEventListener('click', () => {
-        currentSearch = document.getElementById('search-input').value;
-        currentSortBy = document.getElementById('sort-select').value;
-        currentOrder = document.getElementById('order-select').value;
-        currentLimit = parseInt(document.getElementById('limit-select').value);
-        currentPage = 1;
-        refrescarTabla();
-    });
-
-    // Paginación
-    document.getElementById('btn-prev')?.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            refrescarTabla();
-        }
-    });
-
-    document.getElementById('btn-next')?.addEventListener('click', () => {
-        const totalPages = Math.ceil(totalObras / currentLimit);
-        if (currentPage < totalPages) {
-            currentPage++;
-            refrescarTabla();
-        }
-    });
-
-    // Perfil
-    btnPerfil.addEventListener('click', () => {
-        if (token) mostrarPanelArtista();
-        else document.getElementById('modal-login').classList.remove('hidden');
-    });
-
-    // Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    // Guardar obra
+    obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-pass').value;
-        const result = await login(email, password);
+        const titulo = document.getElementById('input-titulo').value;
+        const artista = document.getElementById('input-artista').value;
+        const precio = document.getElementById('input-precio').value;
+        const idPersonalizado = document.getElementById('input-id-personalizado').value;
+        const idEdicion = document.getElementById('input-id-edicion').value;
+        const ano = document.getElementById('input-ano').value;
+        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+        const soporte = document.getElementById('input-soporte').value;
+        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+        const estado_obra = document.getElementById('input-estado-obra').value;
+        const procedencia = document.getElementById('input-procedencia').value;
+        const marcos = document.getElementById('input-marcos').value;
+        const certificado = document.getElementById('input-certificado').value;
+        const status = document.getElementById('input-status').value;
+        const ancho = document.getElementById('input-ancho').value;
+        const alto = document.getElementById('input-alto').value;
+        const firma = document.getElementById('input-firma').value;
+        const conservacion = document.getElementById('input-conservacion').value;
+        const etiquetas = document.getElementById('input-etiquetas').value;
+        const archivos = [
+            document.getElementById('input-imagen-0'),
+            document.getElementById('input-imagen-1'),
+            document.getElementById('input-imagen-2'),
+            document.getElementById('input-imagen-3'),
+            document.getElementById('input-imagen-4')
+        ];
+        let imagenFinalVisible = false;
+        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
+                imagenFinalVisible = true;
+                break;
+            }
+        }
+        if (!hayArchivosNuevos && !imagenFinalVisible) {
+            alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append('titulo', titulo);
+        formData.append('artista', artista);
+        formData.append('precio', precio);
+        formData.append('id_obra', idPersonalizado);
+        formData.append('ano', ano);
+        formData.append('descripcion_tecnica', descripcion_tecnica);
+        formData.append('soporte', soporte);
+        formData.append('descripcion_artistica', descripcion_artistica);
+        formData.append('estado_obra', estado_obra);
+        formData.append('procedencia', procedencia);
+        formData.append('marcos', marcos);
+        formData.append('certificado', certificado);
+        formData.append('status', status);
+        formData.append('ancho', ancho);
+        formData.append('alto', alto);
+        formData.append('firma', firma);
+        formData.append('conservacion', conservacion);
+        formData.append('etiquetas', etiquetas);
+        if (imagenesAEliminar.size > 0) {
+            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+        }
+        archivos.forEach((input, index) => {
+            if (input && input.files && input.files.length > 0) {
+                formData.append(`imagen_${index}`, input.files[0]);
+            }
+        });
+        const result = await guardarObra(token, formData, idEdicion || null);
         if (result.success) {
-            const modalLogin = document.getElementById('modal-login');
-            modalLogin.classList.add('hidden');
-            modalLogin.classList.remove('modal-fullscreen');
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-            document.getElementById('toggle-panel').classList.remove('hidden');
-            mostrarPaginaBlanca();
-            await fetchActiveSessionsCount();
+            alert("Obra guardada correctamente.");
+            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+            imagenesAEliminar.clear();
+            limpiarFormularioCompleto(true);
+            await refrescarTabla();
         } else {
             mostrarErrores(result);
         }
     });
 
-    // Navegación entre modales (Login <-> Registro)
-    document.getElementById('btn-ir-registro')?.addEventListener('click', () => {
+    function limpiarFormularioCompleto(restaurarArtista = true) {
+        obraForm.reset();
+        document.getElementById('input-id-edicion').value = '';
+        document.getElementById('btn-limpiar-campos').classList.add('hidden');
+        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+        imagenesAEliminar.clear();
+        for (let i = 0; i < 5; i++) {
+            const preview = document.getElementById(`preview-${i}`);
+            const placeholder = document.getElementById(`placeholder-${i}`);
+            const inputFile = document.getElementById(`input-imagen-${i}`);
+            if (preview && placeholder) {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+            if (inputFile) inputFile.value = '';
+            const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
+            if (btnEliminar) btnEliminar.style.display = 'none';
+        }
+        if (restaurarArtista && artistaActual) {
+            document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        }
+    }
+
+    document.getElementById('btn-limpiar-campos').addEventListener('click', () => limpiarFormularioCompleto(true));
+    document.getElementById('btn-ir-registro').addEventListener('click', () => {
         document.getElementById('modal-login').classList.add('hidden');
         document.getElementById('modal-login').classList.remove('modal-fullscreen');
         document.getElementById('modal-registro').classList.remove('hidden');
         document.getElementById('modal-registro').classList.add('modal-fullscreen');
     });
-    document.getElementById('btn-ir-login')?.addEventListener('click', () => {
+    document.getElementById('btn-ir-login').addEventListener('click', () => {
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         document.getElementById('modal-login').classList.remove('hidden');
         document.getElementById('modal-login').classList.add('modal-fullscreen');
     });
-
-    // Restablecer contraseña
-    document.getElementById('btn-olvide-contrasena')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-restablecimiento').classList.remove('hidden');
+    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
+        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
     });
-    document.getElementById('solicitar-restablecimiento-form')?.addEventListener('submit', async (e) => {
+    document.getElementById('solicitar-restablecimiento-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('reset-email').value;
         const messageEl = document.getElementById('reset-message');
@@ -1014,12 +1123,7 @@ function setupEvents() {
             messageEl.style.color = '#dc3545';
         }
     });
-
-    // Confirmar eliminación de cuenta
-    document.getElementById('btn-eliminar-cuenta')?.addEventListener('click', () => {
-        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-    });
-    document.getElementById('confirmar-eliminacion-form')?.addEventListener('submit', async (e) => {
+    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const password = document.getElementById('confirmar-password').value;
         const mensajeError = document.getElementById('mensaje-error');
@@ -1051,8 +1155,6 @@ function setupEvents() {
             mensajeError.style.display = 'block';
         }
     });
-
-    // Cerrar modales al hacer clic en la X
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -1076,7 +1178,7 @@ async function init() {
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         setupEvents();
         setupImagePreviews();
-        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
+        cargarSelectoresFecha();
         poblarCiudades('');
         await fetchActiveSessionsCount();
     } else {
@@ -1091,7 +1193,7 @@ async function init() {
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         setupEvents();
         setupImagePreviews();
-        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
+        cargarSelectoresFecha();
         poblarCiudades('');
     }
 }
