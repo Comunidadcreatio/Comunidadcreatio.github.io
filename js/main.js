@@ -601,6 +601,147 @@ async function verificarSesionBackend() {
     }
 }
 
+
+// ============================================
+// FORMULARIO DE REGISTRO PASO A PASO (WIZARD)
+// ============================================
+
+// Variables para el wizard
+let currentStep = 1;
+const totalSteps = 5;
+
+// Función para mostrar un paso y ocultar los demás
+function showStep(step) {
+    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
+    const target = document.querySelector(`.step[data-step="${step}"]`);
+    if (target) target.style.display = 'block';
+    currentStep = step;
+
+    // Cargar selectores de fecha al llegar al paso 2
+    if (step === 2) {
+        cargarSelectoresFecha();
+    }
+
+    // Poblar ciudades al llegar al paso 3
+    if (step === 3) {
+        const paisSelect = document.getElementById('reg-pais');
+        if (paisSelect && paisSelect.value) {
+            poblarCiudades(paisSelect.value);
+        }
+    }
+}
+
+// Validación de campos del paso actual antes de avanzar
+function validateStep(step) {
+    const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
+    if (!stepContainer) return true;
+    
+    const inputs = stepContainer.querySelectorAll('input, select');
+    for (let input of inputs) {
+        if (input.hasAttribute('required') && !input.value.trim()) {
+            alert(`❌ El campo "${input.previousElementSibling?.textContent || input.placeholder}" es obligatorio.`);
+            input.focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+// Navegación con los botones < y >
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.nav-btn')) {
+        const btn = e.target.closest('.nav-btn');
+        const step = parseInt(btn.dataset.step);
+        const isPrev = btn.classList.contains('prev-btn');
+        
+        if (isPrev) {
+            // Botón atrás (<)
+            if (step === 1) {
+                // En el paso 1, atrás lleva al login (cerrar registro y abrir login)
+                document.getElementById('modal-registro').classList.add('hidden');
+                document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+                document.getElementById('modal-login').classList.remove('hidden');
+                document.getElementById('modal-login').classList.add('modal-fullscreen');
+                return;
+            }
+            const newStep = step - 1;
+            showStep(newStep);
+        } else {
+            // Botón siguiente (>)
+            if (!validateStep(step)) return;
+            const newStep = step + 1;
+            if (newStep <= totalSteps) {
+                showStep(newStep);
+            }
+        }
+    }
+});
+
+// Botón Registrarse (final)
+document.getElementById('registro-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Validar el paso 5
+    if (!validateStep(5)) return;
+    
+    // Recoger todos los datos del formulario
+    const nombre_artista = document.getElementById('reg-nombre-artista').value;
+    const nombres = document.getElementById('reg-nombres').value;
+    const apellidos = document.getElementById('reg-apellidos').value;
+    const nombre_real = `${nombres} ${apellidos}`.trim();
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-pass').value;
+    const telefono = document.getElementById('reg-telefono').value;
+    const pais = document.getElementById('reg-pais').value;
+    const ciudad = document.getElementById('reg-ciudad').value;
+    const genero = document.getElementById('reg-genero').value;
+    const dia = document.getElementById('reg-dia').value;
+    const mes = document.getElementById('reg-mes').value;
+    const ano = document.getElementById('reg-ano').value;
+    
+    // Validaciones adicionales (fecha, edad, etc.)
+    if (!dia || !mes || !ano) {
+        alert("❌ Todos los campos de fecha son obligatorios.");
+        return;
+    }
+    const fechaNac = new Date(ano, mes - 1, dia);
+    if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
+        alert("❌ La fecha seleccionada no es válida.");
+        return;
+    }
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mesDiff = hoy.getMonth() - fechaNac.getMonth();
+    if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
+    if (edad < 18) {
+        alert("⚠️ Debes tener al menos 18 años para registrarte.");
+        return;
+    }
+    const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    
+    // Llamada a la API (igual que antes)
+    const result = await register(
+        nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
+    );
+    
+    if (result.success) {
+        alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+        document.getElementById('modal-registro').classList.add('hidden');
+        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+        document.getElementById('modal-login').classList.remove('hidden');
+        document.getElementById('modal-login').classList.add('modal-fullscreen');
+        document.getElementById('registro-form').reset();
+        // Reiniciar a paso 1
+        showStep(1);
+    } else {
+        mostrarErrores(result);
+    }
+});
+
+// Inicializar mostrando el paso 1
+showStep(1);
+
+
 // ============================================
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
