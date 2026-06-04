@@ -24,6 +24,40 @@
     color: #000;
 }
 
+.nav-btn {
+    background: transparent;  /* Elimina el fondo azul */
+    border: none;            /* Elimina el borde */
+    border-radius: 0;        /* Elimina el redondeado */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: opacity 0.2s;
+}
+
+.nav-btn:hover {
+    opacity: 0.7;  /* Un pequeño efecto al pasar el mouse */
+}
+
+.nav-btn img {
+    width: 24px;   /* Ajusta el tamaño de la flecha a tu gusto */
+    height: 24px;
+    display: block;
+}
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.nav-btn:hover img {
+    transform: scale(1.1);  /* La flecha se agranda un poco */
+    transition: transform 0.2s;
+}
+
 #obra-form textarea {
     min-height: 80px;
     resize: vertical;
@@ -193,39 +227,7 @@
     gap: 10px;
 }
 
-.nav-btn {
-    background: transparent;  /* Elimina el fondo azul */
-    border: none;            /* Elimina el borde */
-    border-radius: 0;        /* Elimina el redondeado */
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-    transition: opacity 0.2s;
-}
 
-.nav-btn:hover {
-    opacity: 0.7;  /* Un pequeño efecto al pasar el mouse */
-}
-
-.nav-btn img {
-    width: 24px;   /* Ajusta el tamaño de la flecha a tu gusto */
-    height: 24px;
-    display: block;
-}
-.nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.nav-btn:hover img {
-    transform: scale(1.1);  /* La flecha se agranda un poco */
-    transition: transform 0.2s;
-}
 
 #btn-registrarse-final {
     width: 100%;
