@@ -193,38 +193,10 @@
     gap: 10px;
 }
 
-.nav-btn {
-    background: transparent;  /* Elimina el fondo azul */
-    border: none;            /* Elimina el borde */
-    border-radius: 0;        /* Elimina el redondeado */
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-    transition: opacity 0.2s;
-}
 
-.nav-btn:hover {
-    opacity: 0.7;  /* Un pequeño efecto al pasar el mouse */
-}
-
-.nav-btn img {
-    width: 24px;   /* Ajusta el tamaño de la flecha a tu gusto */
-    height: 24px;
-    display: block;
-}
 .nav-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.nav-btn:hover img {
-    transform: scale(1.1);  /* La flecha se agranda un poco */
-    transition: transform 0.2s;
 }
 
 #btn-registrarse-final {
@@ -260,4 +232,40 @@
 #solicitar-restablecimiento-form button[type="submit"]:hover,
 #confirmar-eliminacion-form button[type="submit"]:hover {
     background: #0056b3;
+}
+
+/* Forzar eliminación de bordes en los botones de navegación */
+.nav-btn,
+.nav-btn *,
+.nav-btn::before,
+.nav-btn::after {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: opacity 0.2s;
+}
+
+.nav-btn:hover {
+    opacity: 0.7;
+}
+
+.nav-btn img {
+    width: 24px;
+    height: 24px;
+    display: block;
 }
