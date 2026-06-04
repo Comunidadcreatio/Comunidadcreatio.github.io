@@ -190,27 +190,88 @@
    DISEÑO RESPONSIVO - MODALES
    ============================================== */
 @media (max-width: 768px) {
-    /* Modales a pantalla completa */
+    /* El modal de registro debe ocupar toda la pantalla y centrar su contenido */
     #modal-registro .modal-content {
-        width: 95%;
-        max-width: 95%;
-        height: 100vh;
-        max-height: 100vh;
-        border: none;
-        border-radius: 0;
-        padding: 2rem 1.5rem 4rem;
-        overflow-y: auto;
-        background: white;
-        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;       /* Ocupa toda la altura */
+        padding: 2rem 1.5rem;
+        box-sizing: border-box;
     }
-    #modal-registro .cerrar-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 30px;
-        color: #333;
-        cursor: pointer;
-        z-index: 10;
+
+    /* Cada paso individual */
+    #modal-registro .step {
+        width: 100%;
+        max-width: 400px;        /* Ancho máximo para que no se vea demasiado ancho */
+        margin: 0 auto;          /* Centrado horizontalmente */
+        display: flex;
+        flex-direction: column;
+        align-items: center;     /* Centra los inputs y botones */
+    }
+
+    /* Inputs y selects dentro del paso */
+    #modal-registro .step input,
+    #modal-registro .step select {
+        width: 100%;            /* Ocupan todo el ancho del contenedor */
+        max-width: 350px;       /* Pero limitados para no estirarse demasiado */
+        margin-bottom: 12px;
+        text-align: center;     /* Centra el texto dentro del input */
+    }
+
+    /* Labels */
+    #modal-registro .step label {
+        width: 100%;
+        max-width: 350px;
+        text-align: left;
+        margin-bottom: 4px;
+    }
+
+    /* Botones de navegación (flechas) - centrados */
+    .step-navigation {
+        width: 100%;
+        max-width: 350px;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    /* Botón Registrarse (paso 5) */
+    #btn-registrarse-final {
+        width: 100%;
+        max-width: 350px;
+        margin-top: 10px;
+    }
+
+    /* Ajuste para el logo (si está en el modal de registro) */
+    #modal-registro .login-logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+    }
+
+    /* Contenedores flex para filas (ej. Nombres y Apellidos, Fecha) */
+    #modal-registro .form-row {
+        width: 100%;
+        max-width: 350px;
+        display: flex;
+        gap: 10px;
+    }
+    #modal-registro .form-row .form-group {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Fecha de nacimiento (día, mes, año) */
+    .date-group {
+        width: 100%;
+        max-width: 350px;
+        display: flex;
+        gap: 8px;
+    }
+    .date-group select {
+        flex: 1;
+        min-width: 0;
     }
 }
 
