@@ -188,7 +188,7 @@
 .step-navigation {
     display: flex;
     justify-content: center;
-    gap: 8px;                  /* Espacio pequeño entre las flechas */
+    gap: 3px;                  /* Espacio pequeño entre las flechas */
     width: 100%;
     max-width: 350px;          /* Ancho máximo para que no se estiren demasiado */
     margin: 15px auto 0;
