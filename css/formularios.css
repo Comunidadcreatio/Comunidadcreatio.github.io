@@ -259,6 +259,8 @@
     -webkit-appearance: none;
     appearance: none;
     transition: opacity 0.2s;
+    margin: 0 !important;
+    flex: 0 0 auto;           /* No se estiran, solo ocupan su tamaño */
 }
 
 .nav-btn:hover {
