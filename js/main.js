@@ -743,6 +743,9 @@ showStep(1);
 // ============================================
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
+// ============================================
+// CONFIGURACIÓN DE EVENTOS (setupEvents CORREGIDO)
+// ============================================
 function setupEvents() {
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
@@ -807,7 +810,7 @@ function setupEvents() {
         });
     }
 
-    // ----- Menú principal unificado (Galería + Panel) -----
+    // ----- Menú principal unificado -----
     const menuBtn = document.getElementById('btn-menu-principal');
     if (menuBtn) {
         menuBtn.addEventListener('click', (e) => {
@@ -914,140 +917,153 @@ function setupEvents() {
         });
     }
 
-    // ========== RESTO DE EVENTOS (filtros, login, etc.) ==========
-    document.getElementById('btn-aplicar-filtros').addEventListener('click', () => {
-        currentSearch = document.getElementById('search-input').value;
-        currentSortBy = document.getElementById('sort-select').value;
-        currentOrder = document.getElementById('order-select').value;
-        currentLimit = parseInt(document.getElementById('limit-select').value);
-        currentPage = 1;
-        refrescarTabla();
-    });
+    // ========== LISTENERS CON VERIFICACIÓN DE EXISTENCIA ==========
 
-    document.getElementById('reg-pais').addEventListener('change', function() {
-        poblarCiudades(this.value);
-    });
-
-    document.getElementById('btn-prev').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
+    // ✅ Filtros (solo si el usuario está logueado y los elementos existen)
+    const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
+    if (btnAplicarFiltros) {
+        btnAplicarFiltros.addEventListener('click', () => {
+            currentSearch = document.getElementById('search-input').value;
+            currentSortBy = document.getElementById('sort-select').value;
+            currentOrder = document.getElementById('order-select').value;
+            currentLimit = parseInt(document.getElementById('limit-select').value);
+            currentPage = 1;
             refrescarTabla();
-        }
-    });
+        });
+    }
 
-    document.getElementById('btn-next').addEventListener('click', () => {
-        const totalPages = Math.ceil(totalObras / currentLimit);
-        if (currentPage < totalPages) {
-            currentPage++;
-            refrescarTabla();
-        }
-    });
+    // ✅ Paginación (solo si existen)
+    const btnPrev = document.getElementById('btn-prev');
+    if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                refrescarTabla();
+            }
+        });
+    }
+    const btnNext = document.getElementById('btn-next');
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            const totalPages = Math.ceil(totalObras / currentLimit);
+            if (currentPage < totalPages) {
+                currentPage++;
+                refrescarTabla();
+            }
+        });
+    }
 
+    // ✅ Perfil (siempre existe)
     btnPerfil.addEventListener('click', () => {
         if (token) mostrarPanelArtista();
         else document.getElementById('modal-login').classList.remove('hidden');
     });
 
-    // Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-pass').value;
-        const result = await login(email, password);
-        if (result.success) {
-            const modalLogin = document.getElementById('modal-login');
-            modalLogin.classList.add('hidden');
-            modalLogin.classList.remove('modal-fullscreen');
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-            document.getElementById('toggle-panel').classList.remove('hidden');
-            mostrarPaginaBlanca();
-            await fetchActiveSessionsCount();
-        } else {
-            mostrarErrores(result);
-        }
-    });
-
-    // Guardar obra
-    obraForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('input-titulo').value;
-        const artista = document.getElementById('input-artista').value;
-        const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
-        const idEdicion = document.getElementById('input-id-edicion').value;
-        const ano = document.getElementById('input-ano').value;
-        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-        const soporte = document.getElementById('input-soporte').value;
-        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-        const estado_obra = document.getElementById('input-estado-obra').value;
-        const procedencia = document.getElementById('input-procedencia').value;
-        const marcos = document.getElementById('input-marcos').value;
-        const certificado = document.getElementById('input-certificado').value;
-        const status = document.getElementById('input-status').value;
-        const ancho = document.getElementById('input-ancho').value;
-        const alto = document.getElementById('input-alto').value;
-        const firma = document.getElementById('input-firma').value;
-        const conservacion = document.getElementById('input-conservacion').value;
-        const etiquetas = document.getElementById('input-etiquetas').value;
-        const archivos = [
-            document.getElementById('input-imagen-0'),
-            document.getElementById('input-imagen-1'),
-            document.getElementById('input-imagen-2'),
-            document.getElementById('input-imagen-3'),
-            document.getElementById('input-imagen-4')
-        ];
-        let imagenFinalVisible = false;
-        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
-                imagenFinalVisible = true;
-                break;
-            }
-        }
-        if (!hayArchivosNuevos && !imagenFinalVisible) {
-            alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
-            return;
-        }
-        const formData = new FormData();
-        formData.append('titulo', titulo);
-        formData.append('artista', artista);
-        formData.append('precio', precio);
-        formData.append('id_obra', idPersonalizado);
-        formData.append('ano', ano);
-        formData.append('descripcion_tecnica', descripcion_tecnica);
-        formData.append('soporte', soporte);
-        formData.append('descripcion_artistica', descripcion_artistica);
-        formData.append('estado_obra', estado_obra);
-        formData.append('procedencia', procedencia);
-        formData.append('marcos', marcos);
-        formData.append('certificado', certificado);
-        formData.append('status', status);
-        formData.append('ancho', ancho);
-        formData.append('alto', alto);
-        formData.append('firma', firma);
-        formData.append('conservacion', conservacion);
-        formData.append('etiquetas', etiquetas);
-        if (imagenesAEliminar.size > 0) {
-            formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
-        }
-        archivos.forEach((input, index) => {
-            if (input && input.files && input.files.length > 0) {
-                formData.append(`imagen_${index}`, input.files[0]);
+    // ✅ Login (siempre existe)
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+            const result = await login(email, password);
+            if (result.success) {
+                const modalLogin = document.getElementById('modal-login');
+                modalLogin.classList.add('hidden');
+                modalLogin.classList.remove('modal-fullscreen');
+                document.getElementById('modal-registro').classList.add('hidden');
+                document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+                document.getElementById('toggle-panel').classList.remove('hidden');
+                mostrarPaginaBlanca();
+                await fetchActiveSessionsCount();
+            } else {
+                mostrarErrores(result);
             }
         });
-        const result = await guardarObra(token, formData, idEdicion || null);
-        if (result.success) {
-            alert("Obra guardada correctamente.");
-            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-            imagenesAEliminar.clear();
-            limpiarFormularioCompleto(true);
-            await refrescarTabla();
-        } else {
-            mostrarErrores(result);
-        }
-    });
+    }
+
+    // ✅ Guardar obra (solo si existe el formulario)
+    if (obraForm) {
+        obraForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const titulo = document.getElementById('input-titulo').value;
+            const artista = document.getElementById('input-artista').value;
+            const precio = document.getElementById('input-precio').value;
+            const idPersonalizado = document.getElementById('input-id-personalizado').value;
+            const idEdicion = document.getElementById('input-id-edicion').value;
+            const ano = document.getElementById('input-ano').value;
+            const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
+            const soporte = document.getElementById('input-soporte').value;
+            const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
+            const estado_obra = document.getElementById('input-estado-obra').value;
+            const procedencia = document.getElementById('input-procedencia').value;
+            const marcos = document.getElementById('input-marcos').value;
+            const certificado = document.getElementById('input-certificado').value;
+            const status = document.getElementById('input-status').value;
+            const ancho = document.getElementById('input-ancho').value;
+            const alto = document.getElementById('input-alto').value;
+            const firma = document.getElementById('input-firma').value;
+            const conservacion = document.getElementById('input-conservacion').value;
+            const etiquetas = document.getElementById('input-etiquetas').value;
+            const archivos = [
+                document.getElementById('input-imagen-0'),
+                document.getElementById('input-imagen-1'),
+                document.getElementById('input-imagen-2'),
+                document.getElementById('input-imagen-3'),
+                document.getElementById('input-imagen-4')
+            ];
+            let imagenFinalVisible = false;
+            const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
+            for (let i = 0; i < 5; i++) {
+                const preview = document.getElementById(`preview-${i}`);
+                if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
+                    imagenFinalVisible = true;
+                    break;
+                }
+            }
+            if (!hayArchivosNuevos && !imagenFinalVisible) {
+                alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
+                return;
+            }
+            const formData = new FormData();
+            formData.append('titulo', titulo);
+            formData.append('artista', artista);
+            formData.append('precio', precio);
+            formData.append('id_obra', idPersonalizado);
+            formData.append('ano', ano);
+            formData.append('descripcion_tecnica', descripcion_tecnica);
+            formData.append('soporte', soporte);
+            formData.append('descripcion_artistica', descripcion_artistica);
+            formData.append('estado_obra', estado_obra);
+            formData.append('procedencia', procedencia);
+            formData.append('marcos', marcos);
+            formData.append('certificado', certificado);
+            formData.append('status', status);
+            formData.append('ancho', ancho);
+            formData.append('alto', alto);
+            formData.append('firma', firma);
+            formData.append('conservacion', conservacion);
+            formData.append('etiquetas', etiquetas);
+            if (imagenesAEliminar.size > 0) {
+                formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
+            }
+            archivos.forEach((input, index) => {
+                if (input && input.files && input.files.length > 0) {
+                    formData.append(`imagen_${index}`, input.files[0]);
+                }
+            });
+            const result = await guardarObra(token, formData, idEdicion || null);
+            if (result.success) {
+                alert("Obra guardada correctamente.");
+                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+                imagenesAEliminar.clear();
+                limpiarFormularioCompleto(true);
+                await refrescarTabla();
+            } else {
+                mostrarErrores(result);
+            }
+        });
+    }
 
     function limpiarFormularioCompleto(restaurarArtista = true) {
         obraForm.reset();
@@ -1073,56 +1089,78 @@ function setupEvents() {
         }
     }
 
-    document.getElementById('btn-limpiar-campos').addEventListener('click', () => limpiarFormularioCompleto(true));
-    document.getElementById('btn-ir-registro').addEventListener('click', () => {
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('modal-fullscreen');
-        document.getElementById('modal-registro').classList.remove('hidden');
-        document.getElementById('modal-registro').classList.add('modal-fullscreen');
-    });
-    document.getElementById('btn-ir-login').addEventListener('click', () => {
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        document.getElementById('modal-login').classList.remove('hidden');
-        document.getElementById('modal-login').classList.add('modal-fullscreen');
-    });
-    document.getElementById('btn-eliminar-cuenta').addEventListener('click', () => {
-        document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
-    });
-    document.getElementById('confirmar-eliminacion-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const password = document.getElementById('confirmar-password').value;
-        const mensajeError = document.getElementById('mensaje-error');
-        mensajeError.style.display = 'none';
-        try {
-            const res = await apiRequest('/api/artistas/eliminar-cuenta', {
-                method: 'POST',
-                body: JSON.stringify({ password })
-            });
-            if (res && res.success) {
-                alert("✅ Tu cuenta ha sido eliminada correctamente.");
-                logout();
-                location.reload();
-            } else if (res && (res.errors || res.error)) {
-                if (Array.isArray(res.errors) && res.errors.length > 0) {
-                    mensajeError.textContent = '❌ ' + res.errors.join('\n');
-                } else if (res.error) {
-                    mensajeError.textContent = '❌ ' + res.error;
+    // ✅ Limpiar campos (solo si existe)
+    const btnLimpiar = document.getElementById('btn-limpiar-campos');
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', () => limpiarFormularioCompleto(true));
+    }
+
+    // ✅ Navegación entre modales (siempre existen)
+    const btnIrRegistro = document.getElementById('btn-ir-registro');
+    if (btnIrRegistro) {
+        btnIrRegistro.addEventListener('click', () => {
+            document.getElementById('modal-login').classList.add('hidden');
+            document.getElementById('modal-login').classList.remove('modal-fullscreen');
+            document.getElementById('modal-registro').classList.remove('hidden');
+            document.getElementById('modal-registro').classList.add('modal-fullscreen');
+        });
+    }
+    const btnIrLogin = document.getElementById('btn-ir-login');
+    if (btnIrLogin) {
+        btnIrLogin.addEventListener('click', () => {
+            document.getElementById('modal-registro').classList.add('hidden');
+            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+            document.getElementById('modal-login').classList.remove('hidden');
+            document.getElementById('modal-login').classList.add('modal-fullscreen');
+        });
+    }
+
+    // ✅ Eliminar cuenta (solo si existe el botón)
+    const btnEliminarCuenta = document.getElementById('btn-eliminar-cuenta');
+    if (btnEliminarCuenta) {
+        btnEliminarCuenta.addEventListener('click', () => {
+            document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+        });
+    }
+
+    // ✅ Confirmar eliminación (solo si existe el formulario)
+    const confirmarEliminacionForm = document.getElementById('confirmar-eliminacion-form');
+    if (confirmarEliminacionForm) {
+        confirmarEliminacionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('confirmar-password').value;
+            const mensajeError = document.getElementById('mensaje-error');
+            mensajeError.style.display = 'none';
+            try {
+                const res = await apiRequest('/api/artistas/eliminar-cuenta', {
+                    method: 'POST',
+                    body: JSON.stringify({ password })
+                });
+                if (res && res.success) {
+                    alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                    logout();
+                    location.reload();
+                } else if (res && (res.errors || res.error)) {
+                    if (Array.isArray(res.errors) && res.errors.length > 0) {
+                        mensajeError.textContent = '❌ ' + res.errors.join('\n');
+                    } else if (res.error) {
+                        mensajeError.textContent = '❌ ' + res.error;
+                    } else {
+                        mensajeError.textContent = '❌ Error desconocido.';
+                    }
+                    mensajeError.style.display = 'block';
                 } else {
-                    mensajeError.textContent = '❌ Error desconocido.';
+                    mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
+                    mensajeError.style.display = 'block';
                 }
-                mensajeError.style.display = 'block';
-            } else {
+            } catch (error) {
                 mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
                 mensajeError.style.display = 'block';
             }
-        } catch (error) {
-            mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-            mensajeError.style.display = 'block';
-        }
-    });
+        });
+    }
 
-    // ✅ Listener de "Olvidé mi contraseña" (ahora seguro, solo si el elemento existe)
+    // ✅ Olvidé mi contraseña (siempre existe)
     const olvideContrasena = document.getElementById('btn-olvide-contrasena');
     if (olvideContrasena) {
         olvideContrasena.addEventListener('click', (e) => {
@@ -1132,7 +1170,7 @@ function setupEvents() {
         });
     }
 
-    // ✅ Listener de solicitar restablecimiento (seguro)
+    // ✅ Solicitar restablecimiento (siempre existe)
     const solicitarForm = document.getElementById('solicitar-restablecimiento-form');
     if (solicitarForm) {
         solicitarForm.addEventListener('submit', async (e) => {
@@ -1165,7 +1203,7 @@ function setupEvents() {
         });
     }
 
-    // Cerrar modales al hacer clic en la X
+    // ✅ Cerrar modales (siempre existen)
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
