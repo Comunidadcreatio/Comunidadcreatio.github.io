@@ -86,114 +86,6 @@ function mostrarErrores(result) {
 }
 
 // ============================================
-// VERIFICACIÓN COMPLETA DE UN PASO
-// ============================================
-
-async function verificarPaso(step) {
-    const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
-    if (!stepContainer) return true;
-
-    // Limpiar errores previos visuales (pero mantener los mensajes)
-    stepContainer.querySelectorAll('.input-error, .input-available, .input-unavailable').forEach(el => {
-        el.classList.remove('input-error', 'input-available', 'input-unavailable');
-    });
-    stepContainer.querySelectorAll('.validation-message.unavailable').forEach(el => el.classList.remove('unavailable'));
-
-    // Obtener el botón "siguiente" de este paso (si existe)
-    const nextBtn = stepContainer.querySelector('.next-btn');
-    let isValid = true;
-
-    // 1. Validar campos obligatorios
-    const inputs = stepContainer.querySelectorAll('input[required], select[required]');
-    for (let input of inputs) {
-        if (!input.value.trim()) {
-            input.classList.add('input-error');
-            // Mostrar mensaje de error (crearlo si no existe)
-            let errorMsg = input.parentElement.querySelector('.error-message-field');
-            if (!errorMsg) {
-                errorMsg = document.createElement('div');
-                errorMsg.className = 'error-message-field';
-                errorMsg.textContent = 'Este campo no puede quedar vacío';
-                input.parentElement.appendChild(errorMsg);
-            }
-            errorMsg.classList.add('visible');
-            isValid = false;
-        }
-    }
-
-    // 2. Validar disponibilidad de email (paso 4)
-    if (step === 4) {
-        const emailInput = stepContainer.querySelector('#reg-email');
-        if (emailInput && emailInput.value.trim()) {
-            const res = await apiRequest(`/api/artistas/verificar-email/${encodeURIComponent(emailInput.value)}`);
-            if (!res.available) {
-                emailInput.classList.add('input-unavailable');
-                let msg = emailInput.parentElement.querySelector('.validation-message');
-                if (!msg) {
-                    msg = document.createElement('div');
-                    msg.className = 'validation-message';
-                    emailInput.parentElement.appendChild(msg);
-                }
-                msg.className = 'validation-message unavailable';
-                msg.textContent = '❌ Este correo ya está registrado';
-                isValid = false;
-            } else {
-                // Disponible: borde verde sin texto
-                emailInput.classList.add('input-available');
-                const msg = emailInput.parentElement.querySelector('.validation-message');
-                if (msg) {
-                    msg.classList.remove('unavailable');
-                    msg.style.display = 'none';
-                }
-            }
-        }
-    }
-
-    // 3. Validar disponibilidad de nombre de usuario (paso 5)
-    if (step === 5) {
-        const nombreInput = stepContainer.querySelector('#reg-nombre-artista');
-        if (nombreInput && nombreInput.value.trim()) {
-            const res = await apiRequest(`/api/artistas/verificar-nombre/${encodeURIComponent(nombreInput.value)}`);
-            if (!res.available) {
-                nombreInput.classList.add('input-unavailable');
-                let msg = nombreInput.parentElement.querySelector('.validation-message');
-                if (!msg) {
-                    msg = document.createElement('div');
-                    msg.className = 'validation-message';
-                    nombreInput.parentElement.appendChild(msg);
-                }
-                msg.className = 'validation-message unavailable';
-                msg.textContent = '❌ Este nombre de usuario ya está en uso';
-                isValid = false;
-            } else {
-                // Disponible: borde verde sin texto
-                nombreInput.classList.add('input-available');
-                const msg = nombreInput.parentElement.querySelector('.validation-message');
-                if (msg) {
-                    msg.classList.remove('unavailable');
-                    msg.style.display = 'none';
-                }
-            }
-        }
-    }
-
-    // 4. Habilitar o deshabilitar el botón "siguiente"
-    if (nextBtn) {
-        if (isValid) {
-            nextBtn.disabled = false;
-            nextBtn.style.opacity = '1';
-            nextBtn.style.cursor = 'pointer';
-        } else {
-            nextBtn.disabled = true;
-            nextBtn.style.opacity = '0.5';
-            nextBtn.style.cursor = 'not-allowed';
-        }
-    }
-
-    return isValid;
-}
-
-// ============================================
 // VERIFICACIÓN EN TIEMPO REAL
 // ============================================
 
@@ -210,13 +102,13 @@ function debounce(func, wait) {
     };
 }
 
+// Verificar disponibilidad de email o nombre de usuario (sin texto para disponible)
 async function verificarDisponibilidad(tipo, valor, inputElement) {
     if (!valor.trim()) {
+        // Campo vacío: limpiar estado
         inputElement.classList.remove('input-available', 'input-unavailable');
         const msg = inputElement.parentElement.querySelector('.validation-message');
         if (msg) msg.remove();
-        // Revalidar el paso completo para actualizar el botón
-        await verificarPaso(currentStep);
         return;
     }
 
@@ -236,11 +128,13 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
         }
 
         if (res.available) {
+            // ✅ Disponible: solo borde verde + ícono (sin texto)
             inputElement.classList.remove('input-unavailable');
             inputElement.classList.add('input-available');
             msg.classList.remove('unavailable');
             msg.style.display = 'none';
         } else {
+            // ❌ No disponible: borde rojo + mensaje de error
             inputElement.classList.remove('input-available');
             inputElement.classList.add('input-unavailable');
             msg.className = 'validation-message unavailable';
@@ -250,8 +144,6 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
                 : '❌ Este nombre de usuario ya está en uso';
             msg.textContent = mensajeError;
         }
-        // Revalidar el paso completo para actualizar el botón
-        await verificarPaso(currentStep);
     } catch (error) {
         console.error('Error al verificar disponibilidad:', error);
     }
@@ -791,18 +683,21 @@ let currentStep = 1;
 const totalSteps = 5;
 
 // Función para mostrar un paso y ocultar los demás
-async function showStep(step) {
+function showStep(step) {
     document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
     const target = document.querySelector(`.step[data-step="${step}"]`);
     if (target) target.style.display = 'block';
     currentStep = step;
 
-    // Limpiar errores visuales al cambiar de paso
-    document.querySelectorAll('.input-error, .input-available, .input-unavailable').forEach(el => {
-        el.classList.remove('input-error', 'input-available', 'input-unavailable');
-    });
-    document.querySelectorAll('.validation-message.unavailable').forEach(el => el.classList.remove('unavailable'));
+    // 🔥 Limpiar errores al cambiar de paso
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
+
+        // Limpiar estados de validación al cambiar de paso
+    document.querySelectorAll('.input-available, .input-unavailable').forEach(el => {
+        el.classList.remove('input-available', 'input-unavailable');
+    });
+    document.querySelectorAll('.validation-message').forEach(el => el.remove());
 
     // Cargar selectores de fecha al llegar al paso 2
     if (step === 2) {
@@ -832,9 +727,6 @@ async function showStep(step) {
             }
         }
     }
-
-    // 🔥 Revalidar el paso completo al mostrarlo (incluye consultas al backend)
-    await verificarPaso(step);
 }
 
 // Función manejadora para el evento change del país
@@ -880,7 +772,7 @@ function validateStep(step) {
 }
 
 // Navegación con los botones < y >
-document.addEventListener('click', async function(e) {  // ← AGREGAR 'async' AQUÍ
+document.addEventListener('click', function(e) {
     if (e.target.closest('.nav-btn')) {
         const btn = e.target.closest('.nav-btn');
         const step = parseInt(btn.dataset.step);
@@ -900,11 +792,7 @@ document.addEventListener('click', async function(e) {  // ← AGREGAR 'async' A
             showStep(newStep);
         } else {
             // Botón siguiente (>)
-            const isValid = await verificarPaso(step);
-            if (!isValid) {
-                // No avanzar, ya se resaltaron los errores y el botón está deshabilitado
-                return;
-            }
+            if (!validateStep(step)) return;
             const newStep = step + 1;
             if (newStep <= totalSteps) {
                 showStep(newStep);
@@ -917,10 +805,8 @@ document.addEventListener('click', async function(e) {  // ← AGREGAR 'async' A
 document.getElementById('registro-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const isValid = await verificarPaso(5);
-    if (!isValid) {
-        return; // No enviar si hay errores
-    }
+    // Validar el paso 5
+    if (!validateStep(5)) return;
     
     // Recoger todos los datos del formulario
     const nombre_artista = document.getElementById('reg-nombre-artista').value;
@@ -1460,31 +1346,30 @@ function setupEvents() {
             }
         }
     });
-
-
+    
 
 
         // --- VERIFICACIÓN EN TIEMPO REAL ---
     // Paso 4: Email
-    const emailInput = document.getElementById('reg-email');
+        const emailInput = document.getElementById('reg-email');
     if (emailInput) {
-        emailInput.addEventListener('input', async function() {
-            // Limpiar estados visuales mientras escribe
+        emailInput.addEventListener('input', function() {
+            // Mientras escribe, no mostramos nada (se limpia visualmente)
             this.classList.remove('input-available', 'input-unavailable');
             const msg = this.parentElement.querySelector('.validation-message');
             if (msg) {
                 msg.classList.remove('unavailable');
                 msg.style.display = 'none';
             }
-            // Revalidar el paso completo después de un debounce
+            // Llamar al debounce (solo al dejar de escribir se validará)
             verificarEmailDebounced(this.value, this);
         });
     }
 
         // Paso 5: Nombre de usuario
-        const nombreInput = document.getElementById('reg-nombre-artista');
+    const nombreInput = document.getElementById('reg-nombre-artista');
     if (nombreInput) {
-        nombreInput.addEventListener('input', async function() {
+        nombreInput.addEventListener('input', function() {
             this.classList.remove('input-available', 'input-unavailable');
             const msg = this.parentElement.querySelector('.validation-message');
             if (msg) {
