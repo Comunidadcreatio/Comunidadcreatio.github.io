@@ -690,6 +690,12 @@ function showStep(step) {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
 
+        // Dentro de showStep, en la parte donde limpiamos errores
+    document.querySelectorAll('.input-available, .input-unavailable').forEach(el => {
+        el.classList.remove('input-available', 'input-unavailable');
+    });
+    document.querySelectorAll('.validation-message').forEach(el => el.remove());
+
     // Cargar selectores de fecha al llegar al paso 2
     if (step === 2) {
         cargarSelectoresFecha();
@@ -1354,6 +1360,18 @@ function setupEvents() {
         nombreInput.addEventListener('input', function() {
             verificarNombreDebounced(this.value, this);
         });
+    }
+
+        // Antes de enviar la petición, verificar estados
+    const emailInput = document.getElementById('reg-email');
+    const nombreInput = document.getElementById('reg-nombre-artista');
+    if (emailInput.classList.contains('input-unavailable')) {
+        alert('❌ El correo ingresado ya está registrado.');
+        return;
+    }
+    if (nombreInput.classList.contains('input-unavailable')) {
+        alert('❌ El nombre de usuario ingresado ya está en uso.');
+        return;
     }
 
 }
