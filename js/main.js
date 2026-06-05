@@ -880,7 +880,7 @@ function validateStep(step) {
 }
 
 // Navegación con los botones < y >
-document.addEventListener('click', async function(e) {
+document.addEventListener('click', async function(e) {  // ← AGREGAR 'async' AQUÍ
     if (e.target.closest('.nav-btn')) {
         const btn = e.target.closest('.nav-btn');
         const step = parseInt(btn.dataset.step);
