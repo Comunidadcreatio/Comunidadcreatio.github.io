@@ -86,6 +86,76 @@ function mostrarErrores(result) {
 }
 
 // ============================================
+// VERIFICACIÓN EN TIEMPO REAL
+// ============================================
+
+// Debounce para evitar peticiones excesivas
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Verificar disponibilidad de email o nombre de usuario
+async function verificarDisponibilidad(tipo, valor, inputElement) {
+    if (!valor.trim()) {
+        // Campo vacío: limpiar estado
+        inputElement.classList.remove('input-available', 'input-unavailable');
+        const msg = inputElement.parentElement.querySelector('.validation-message');
+        if (msg) msg.remove();
+        return;
+    }
+
+    try {
+        const endpoint = tipo === 'email' 
+            ? `/api/artistas/verificar-email/${encodeURIComponent(valor)}`
+            : `/api/artistas/verificar-nombre/${encodeURIComponent(valor)}`;
+        
+        const res = await apiRequest(endpoint);
+        
+        // Limpiar mensaje anterior
+        let msg = inputElement.parentElement.querySelector('.validation-message');
+        if (!msg) {
+            msg = document.createElement('div');
+            msg.className = 'validation-message';
+            inputElement.parentElement.appendChild(msg);
+        }
+
+        if (res.available) {
+            inputElement.classList.remove('input-unavailable');
+            inputElement.classList.add('input-available');
+            msg.className = 'validation-message available';
+            msg.textContent = '✅ Disponible';
+        } else {
+            inputElement.classList.remove('input-available');
+            inputElement.classList.add('input-unavailable');
+            msg.className = 'validation-message unavailable';
+            const mensajeError = tipo === 'email' 
+                ? '❌ Este correo ya está registrado' 
+                : '❌ Este nombre de usuario ya está en uso';
+            msg.textContent = mensajeError;
+        }
+    } catch (error) {
+        console.error('Error al verificar disponibilidad:', error);
+    }
+}
+
+// Versión con debounce
+const verificarEmailDebounced = debounce((valor, input) => {
+    verificarDisponibilidad('email', valor, input);
+}, 500);
+
+const verificarNombreDebounced = debounce((valor, input) => {
+    verificarDisponibilidad('nombre', valor, input);
+}, 500);
+
+// ============================================
 // MANEJO DE SESIONES (CERRAR TODAS)
 // ============================================
 async function fetchActiveSessionsCount() {
