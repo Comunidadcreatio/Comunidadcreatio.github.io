@@ -272,12 +272,20 @@
 }
 
 @media (max-width: 480px) {
+    /* ✅ Ajuste específico para que los botones de navegación se vean juntos */
     .step-navigation {
-    display: flex;
-    justify-content: center;
-    gap: 1px;                  /* Espacio pequeño entre las flechas */
-    width: 100%;
-    max-width: 100px;          /* Ancho máximo para que no se estiren demasiado */
-    margin: 15px auto 0;
+        display: flex;
+        justify-content: center;   /* Centra los botones en el medio */
+        gap: 1px;                  /* 🔥 Ahora se ven prácticamente pegados */
+        width: auto;               /* El contenedor se ajusta al ancho de los botones */
+        margin: 15px auto 0;
+        padding: 0;
+    }
+
+    /* Asegurar que los botones no tengan márgenes en móvil */
+    .nav-btn {
+        margin: 0 !important;
+        flex: 0 0 auto;
+        padding: 0 !important;
     }
 }
