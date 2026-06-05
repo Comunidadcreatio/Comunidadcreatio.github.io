@@ -1379,17 +1379,7 @@ function setupEvents() {
         });
     }
 
-        // Antes de enviar la petición, verificar estados
-    const emailInput = document.getElementById('reg-email');
-    const nombreInput = document.getElementById('reg-nombre-artista');
-    if (emailInput.classList.contains('input-unavailable')) {
-        alert('❌ El correo ingresado ya está registrado.');
-        return;
-    }
-    if (nombreInput.classList.contains('input-unavailable')) {
-        alert('❌ El nombre de usuario ingresado ya está en uso.');
-        return;
-    }
+    
 
 }
 
