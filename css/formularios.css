@@ -276,7 +276,7 @@
     .step-navigation {
         display: flex !important;
         justify-content: center !important;
-        gap: 2px !important;
+        gap: 1px !important;
         width: auto !important;
         max-width: 200px !important; /* 🔥 Límite para que no se separen */
         margin: 15px auto 0 !important;
