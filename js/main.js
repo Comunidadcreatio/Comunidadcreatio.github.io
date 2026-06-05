@@ -624,9 +624,38 @@ function showStep(step) {
     // Poblar ciudades al llegar al paso 3
     if (step === 3) {
         const paisSelect = document.getElementById('reg-pais');
-        if (paisSelect && paisSelect.value) {
-            poblarCiudades(paisSelect.value);
+        const ciudadSelect = document.getElementById('reg-ciudad');
+
+        // Asignar el listener de cambio de país (si no está ya asignado)
+        if (paisSelect) {
+            // Eliminar listener anterior para evitar duplicados
+            paisSelect.removeEventListener('change', paisChangeHandler);
+            // Asignar nuevo listener
+            paisSelect.addEventListener('change', paisChangeHandler);
+            // Si ya hay un país seleccionado, poblar ciudades
+            if (paisSelect.value) {
+                poblarCiudades(paisSelect.value);
+            } else {
+                // Limpiar ciudades si no hay país
+                if (ciudadSelect) {
+                    ciudadSelect.innerHTML = '';
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Selecciona tu ciudad';
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    ciudadSelect.appendChild(defaultOption);
+                }
+            }
         }
+    }
+}
+
+// Función manejadora para el evento change del país
+function paisChangeHandler() {
+    const paisSelect = document.getElementById('reg-pais');
+    if (paisSelect) {
+        poblarCiudades(paisSelect.value);
     }
 }
 
