@@ -1338,6 +1338,24 @@ function setupEvents() {
         }
     });
 
+
+        // --- VERIFICACIÓN EN TIEMPO REAL ---
+    // Paso 4: Email
+    const emailInput = document.getElementById('reg-email');
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            verificarEmailDebounced(this.value, this);
+        });
+    }
+
+    // Paso 5: Nombre de usuario
+    const nombreInput = document.getElementById('reg-nombre-artista');
+    if (nombreInput) {
+        nombreInput.addEventListener('input', function() {
+            verificarNombreDebounced(this.value, this);
+        });
+    }
+
 }
 
 // ============================================
