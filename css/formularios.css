@@ -271,21 +271,34 @@
     display: block;
 }
 
+/* ==============================================
+   MÓVIL (max-width: 768px)
+   ============================================== */
 @media (max-width: 768px) {
-    /* ✅ Ajuste específico para que los botones de navegación se vean juntos */
+    /* Forzar que los botones de navegación se vean juntos */
     .step-navigation {
-        display: flex;
-        justify-content: center;   /* Centra los botones en el medio */
-        gap: 1px;                  /* 🔥 Ahora se ven prácticamente pegados */
-        width: auto;               /* El contenedor se ajusta al ancho de los botones */
-        margin: 15px auto 0;
-        padding: 0;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 1px !important;
+        width: auto !important;
+        margin: 15px auto 0 !important;
+        padding: 0 !important;
     }
 
-    /* Asegurar que los botones no tengan márgenes en móvil */
+    /* Forzar que los botones no tengan márgenes */
     .nav-btn {
         margin: 0 !important;
-        flex: 0 0 auto;
+        flex: 0 0 auto !important;
         padding: 0 !important;
+    }
+
+    /* Opcional: asegurar que el contenedor del paso no tenga márgenes extra */
+    .step {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 }
