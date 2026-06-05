@@ -102,7 +102,7 @@ function debounce(func, wait) {
     };
 }
 
-// Verificar disponibilidad de email o nombre de usuario
+// Verificar disponibilidad de email o nombre de usuario (sin texto para disponible)
 async function verificarDisponibilidad(tipo, valor, inputElement) {
     if (!valor.trim()) {
         // Campo vacío: limpiar estado
@@ -128,14 +128,17 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
         }
 
         if (res.available) {
+            // ✅ Disponible: solo borde verde + ícono (sin texto)
             inputElement.classList.remove('input-unavailable');
             inputElement.classList.add('input-available');
-            msg.className = 'validation-message available';
-            msg.textContent = '✅ Disponible';
+            msg.classList.remove('unavailable');
+            msg.style.display = 'none';
         } else {
+            // ❌ No disponible: borde rojo + mensaje de error
             inputElement.classList.remove('input-available');
             inputElement.classList.add('input-unavailable');
             msg.className = 'validation-message unavailable';
+            msg.style.display = 'block';
             const mensajeError = tipo === 'email' 
                 ? '❌ Este correo ya está registrado' 
                 : '❌ Este nombre de usuario ya está en uso';
@@ -146,14 +149,14 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
     }
 }
 
-// Versión con debounce
+// Versión con debounce (800ms)
 const verificarEmailDebounced = debounce((valor, input) => {
     verificarDisponibilidad('email', valor, input);
-}, 500);
+}, 800);
 
 const verificarNombreDebounced = debounce((valor, input) => {
     verificarDisponibilidad('nombre', valor, input);
-}, 500);
+}, 800);
 
 // ============================================
 // MANEJO DE SESIONES (CERRAR TODAS)
@@ -690,7 +693,7 @@ function showStep(step) {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
 
-        // Dentro de showStep, en la parte donde limpiamos errores
+        // Limpiar estados de validación al cambiar de paso
     document.querySelectorAll('.input-available, .input-unavailable').forEach(el => {
         el.classList.remove('input-available', 'input-unavailable');
     });
@@ -1347,17 +1350,31 @@ function setupEvents() {
 
         // --- VERIFICACIÓN EN TIEMPO REAL ---
     // Paso 4: Email
-    const emailInput = document.getElementById('reg-email');
+        const emailInput = document.getElementById('reg-email');
     if (emailInput) {
         emailInput.addEventListener('input', function() {
+            // Mientras escribe, no mostramos nada (se limpia visualmente)
+            this.classList.remove('input-available', 'input-unavailable');
+            const msg = this.parentElement.querySelector('.validation-message');
+            if (msg) {
+                msg.classList.remove('unavailable');
+                msg.style.display = 'none';
+            }
+            // Llamar al debounce (solo al dejar de escribir se validará)
             verificarEmailDebounced(this.value, this);
         });
     }
 
-    // Paso 5: Nombre de usuario
+        // Paso 5: Nombre de usuario
     const nombreInput = document.getElementById('reg-nombre-artista');
     if (nombreInput) {
         nombreInput.addEventListener('input', function() {
+            this.classList.remove('input-available', 'input-unavailable');
+            const msg = this.parentElement.querySelector('.validation-message');
+            if (msg) {
+                msg.classList.remove('unavailable');
+                msg.style.display = 'none';
+            }
             verificarNombreDebounced(this.value, this);
         });
     }
