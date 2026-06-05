@@ -616,6 +616,10 @@ function showStep(step) {
     if (target) target.style.display = 'block';
     currentStep = step;
 
+    // 🔥 Limpiar errores al cambiar de paso
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
+
     // Cargar selectores de fecha al llegar al paso 2
     if (step === 2) {
         cargarSelectoresFecha();
@@ -626,17 +630,12 @@ function showStep(step) {
         const paisSelect = document.getElementById('reg-pais');
         const ciudadSelect = document.getElementById('reg-ciudad');
 
-        // Asignar el listener de cambio de país (si no está ya asignado)
         if (paisSelect) {
-            // Eliminar listener anterior para evitar duplicados
             paisSelect.removeEventListener('change', paisChangeHandler);
-            // Asignar nuevo listener
             paisSelect.addEventListener('change', paisChangeHandler);
-            // Si ya hay un país seleccionado, poblar ciudades
             if (paisSelect.value) {
                 poblarCiudades(paisSelect.value);
             } else {
-                // Limpiar ciudades si no hay país
                 if (ciudadSelect) {
                     ciudadSelect.innerHTML = '';
                     const defaultOption = document.createElement('option');
@@ -659,20 +658,38 @@ function paisChangeHandler() {
     }
 }
 
-// Validación de campos del paso actual antes de avanzar
+// Validación de campos del paso actual antes de avanzar (sin alert)
 function validateStep(step) {
     const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
     if (!stepContainer) return true;
     
+    // Limpiar errores previos del paso
+    stepContainer.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    stepContainer.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
+    
     const inputs = stepContainer.querySelectorAll('input, select');
+    let isValid = true;
+    
     for (let input of inputs) {
         if (input.hasAttribute('required') && !input.value.trim()) {
-            alert(`❌ El campo "${input.previousElementSibling?.textContent || input.placeholder}" es obligatorio.`);
-            input.focus();
-            return false;
+            // Marcar el campo como error
+            input.classList.add('input-error');
+            
+            // Buscar o crear el mensaje de error
+            let errorMsg = input.parentElement.querySelector('.error-message-field');
+            if (!errorMsg) {
+                errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message-field';
+                errorMsg.textContent = 'Este campo no puede quedar vacío';
+                input.parentElement.appendChild(errorMsg);
+            }
+            errorMsg.classList.add('visible');
+            
+            isValid = false;
         }
     }
-    return true;
+    
+    return isValid;
 }
 
 // Navegación con los botones < y >
@@ -1239,6 +1256,18 @@ function setupEvents() {
             if (modal) modal.classList.add('hidden');
         });
     });
+
+    // Limpiar errores al escribir en cualquier campo del formulario de registro
+    document.getElementById('registro-form').addEventListener('input', function(e) {
+        if (e.target.classList.contains('input-error')) {
+            e.target.classList.remove('input-error');
+            const errorMsg = e.target.parentElement.querySelector('.error-message-field.visible');
+            if (errorMsg) {
+                errorMsg.classList.remove('visible');
+            }
+        }
+    });
+
 }
 
 // ============================================
