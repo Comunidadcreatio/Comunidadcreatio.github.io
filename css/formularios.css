@@ -271,7 +271,7 @@
     display: block;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     /* ✅ Ajuste específico para que los botones de navegación se vean juntos */
     .step-navigation {
         display: flex;
