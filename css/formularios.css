@@ -300,3 +300,26 @@
         display: block !important;
     }
 }
+
+/* Estilos para validación visual */
+.input-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.error-message-field {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    display: none;
+}
+
+.error-message-field.visible {
+    display: block;
+}
+
+/* Ajuste para que los mensajes de error no desplacen demasiado */
+.form-group {
+    position: relative;
+}
