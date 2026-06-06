@@ -279,73 +279,106 @@
     color: #dc3545;
 }
 
-/* Posición relativa para cada paso, necesario para posicionar el botón atrás */
+/* ==============================================
+   ESTILOS PARA EL WIZARD DE REGISTRO
+   ============================================== */
+
+/* Cada paso debe tener posición relativa para posicionar el botón atrás */
 .step {
     position: relative;
-    padding-top: 50px; /* espacio para el botón atrás */
+    padding-top: 50px; /* espacio para que el botón atrás no tape el primer campo */
 }
 
-/* Botón atrás (flecha) - esquina superior izquierda */
+/* Botón "atrás" (flecha) - completamente limpio, sin bordes, solo la imagen */
 .prev-btn {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: transparent;
-    border: none;
+    top: 0;
+    left: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
     cursor: pointer;
     padding: 8px;
-    z-index: 5;
+    margin: 0;
+    z-index: 10;
 }
 
 .prev-btn img {
     width: 28px;
     height: 28px;
     display: block;
+    filter: none; /* asegurar que no tenga sombras extra */
 }
 
-/* Botón siguiente redondo con texto */
+/* Botón "Siguiente" redondo, negro con texto blanco */
 .next-redondo {
+    display: block;
     width: auto;
-    min-width: 120px;
+    min-width: 140px;
     padding: 12px 24px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 999px !important; /* totalmente circular */
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    border-radius: 999px !important;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    margin: 30px auto 0 auto;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efecto hover / active: fondo blanco, texto negro, borde negro */
+.next-redondo:hover,
+.next-redondo:active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+/* Botón "Registrarse" final (paso 5) también redondo y con efecto similar */
+#btn-registrarse-final {
+    display: block;
+    width: auto;
+    min-width: 140px;
+    padding: 12px 24px;
+    background-color: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 999px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin: 20px auto 0 auto;
-    display: block;
-    transition: background 0.2s;
+    margin: 30px auto 0 auto;
+    transition: all 0.2s ease-in-out;
 }
 
-.next-redondo:hover {
-    background-color: #0056b3;
+#btn-registrarse-final:hover,
+#btn-registrarse-final:active {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #000000;
 }
 
-/* Ajuste para que el botón Registrarse también sea redondo (si quieres) */
-#btn-registrarse-final {
-    border-radius: 999px;
-    background-color: #28a745;
-    width: auto;
-    min-width: 120px;
-    padding: 12px 24px;
-    margin: 20px auto 0 auto;
-    display: block;
-}
-
-/* En móviles, mantener posición del botón atrás */
+/* Ajustes para móviles: botón atrás más pequeño y no tape el título */
 @media (max-width: 768px) {
     .step {
         padding-top: 40px;
     }
     .prev-btn {
-        top: 5px;
-        left: 5px;
+        top: -5px;
+        left: -5px;
     }
-    .next-redondo {
+    .prev-btn img {
+        width: 24px;
+        height: 24px;
+    }
+    .next-redondo,
+    #btn-registrarse-final {
         width: 90%;
-        max-width: 250px;
+        max-width: 260px;
+        padding: 10px 20px;
+        font-size: 15px;
     }
 }
