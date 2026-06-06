@@ -689,19 +689,6 @@ function showStep(step) {
     if (target) target.style.display = 'block';
     currentStep = step;
 
-    // 🔥 Actualiza el botón atrás (único) con el paso actual
-    const backBtn = document.getElementById('back-btn-registro');
-    if (backBtn) {
-        // Mostrar/ocultar según el paso (opcional: ocultar en paso 1)
-        if (step === 1) {
-            backBtn.style.display = 'none';  // No mostrar atrás en paso 1
-        } else {
-            backBtn.style.display = 'block';
-        }
-        // Actualizar el paso al que debe retroceder
-        backBtn.dataset.step = step;
-    }
-
     // 🔥 Limpiar errores al cambiar de paso
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
@@ -786,27 +773,30 @@ function validateStep(step) {
 
 // Navegación con los botones < y >
 document.addEventListener('click', function(e) {
+    if (e.target.closest('.nav-btn')) {
         const btn = e.target.closest('.nav-btn');
-    if (!btn) return;
-    const step = parseInt(btn.dataset.step);
-    const isPrev = btn.classList.contains('prev-btn');
+        const step = parseInt(btn.dataset.step);
+        const isPrev = btn.classList.contains('prev-btn');
         
         if (isPrev) {
-        // Si es el botón atrás
-        if (step === 1) {
-            // Llevar al login (como ya tienes)
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-login').classList.remove('hidden');
-            return;
-        }
-        const newStep = step - 1;
-        showStep(newStep);
-    } else {
-        // Botón siguiente
-        if (!validateStep(step)) return;
-        const newStep = step + 1;
-        if (newStep <= totalSteps) {
+            // Botón atrás (<)
+            if (step === 1) {
+                // En el paso 1, atrás lleva al login (cerrar registro y abrir login)
+                document.getElementById('modal-registro').classList.add('hidden');
+                document.getElementById('modal-registro').classList.remove('modal-fullscreen');
+                document.getElementById('modal-login').classList.remove('hidden');
+                document.getElementById('modal-login').classList.add('modal-fullscreen');
+                return;
+            }
+            const newStep = step - 1;
             showStep(newStep);
+        } else {
+            // Botón siguiente (>)
+            if (!validateStep(step)) return;
+            const newStep = step + 1;
+            if (newStep <= totalSteps) {
+                showStep(newStep);
+            }
         }
     }
 });

@@ -381,10 +381,6 @@
     <div id="modal-registro" class="modal hidden">
         <div class="modal-content">
             <span class="cerrar-modal">&times;</span>
-            <!-- 🔥 Agrega aquí el botón atrás único -->
-            <button type="button" class="nav-btn prev-btn" data-step="1">
-                <img src="iconos/flecha-izquierda.svg" alt="Atrás">
-            </button>
             <h2>Registro de Artista</h2>
             <!-- Dentro de #modal-registro, reemplazar el formulario actual por esto -->
                 <form id="registro-form" class="compact-form">
@@ -401,7 +397,16 @@
                                 <input type="text" id="reg-apellidos" placeholder="Ej: Fernández Pérez" required>
                             </div>
                         </div>
-                        <button type="button" class="nav-btn next-btn next-redondo" data-step="1">Siguiente</button>
+                        <div class="step-navigation">
+                            <button type="button" class="nav-btn prev-btn" data-step="1">
+                                <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
+                            </button>
+
+                            <!-- Botón siguiente (>) -->
+                            <button type="button" class="nav-btn next-btn" data-step="1">
+                                <img src="iconos/flecha-derecha.svg" alt="Siguiente" style="width:20px; height:20px;">
+                            </button>
+                        </div>
                     </div>
 
                     <!-- PASO 2: Fecha de nacimiento y Género -->
@@ -429,7 +434,16 @@
                                 <option value="otro">Otro</option>
                             </select>
                         </div>
-                        <button type="button" class="nav-btn next-btn next-redondo" data-step="2">Siguiente</button>
+                        <div class="step-navigation">
+                            <button type="button" class="nav-btn prev-btn" data-step="2">
+                                <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
+                            </button>
+
+                            <!-- Botón siguiente (>) -->
+                            <button type="button" class="nav-btn next-btn" data-step="2">
+                                <img src="iconos/flecha-derecha.svg" alt="Siguiente" style="width:20px; height:20px;">
+                            </button>
+                        </div>
                     </div>
 
                     <!-- PASO 3: País y Ciudad -->
@@ -447,7 +461,16 @@
                                 <option value="" disabled selected>Selecciona tu ciudad</option>
                             </select>
                         </div>
-                        <button type="button" class="nav-btn next-btn next-redondo" data-step="3">Siguiente</button>
+                        <div class="step-navigation">
+                            <button type="button" class="nav-btn prev-btn" data-step="3">
+                                <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
+                            </button>
+
+                            <!-- Botón siguiente (>) -->
+                            <button type="button" class="nav-btn next-btn" data-step="3">
+                                <img src="iconos/flecha-derecha.svg" alt="Siguiente" style="width:20px; height:20px;">
+                            </button>
+                        </div>
                     </div>
 
                     <!-- PASO 4: Email y Teléfono -->
@@ -460,7 +483,16 @@
                             <label for="reg-telefono">Número de celular</label>
                             <input type="text" id="reg-telefono" placeholder="Ej: 04161234567" required>
                         </div>
-                            <button type="button" class="nav-btn next-btn next-redondo" data-step="4">Siguiente</button>
+                        <div class="step-navigation">
+                            <button type="button" class="nav-btn prev-btn" data-step="4">
+                                <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
+                            </button>
+
+                            <!-- Botón siguiente (>) -->
+                            <button type="button" class="nav-btn next-btn" data-step="4">
+                                <img src="iconos/flecha-derecha.svg" alt="Siguiente" style="width:20px; height:20px;">
+                            </button>
+                        </div>
                     </div>
 
                     <!-- PASO 5: Nombre de usuario y Contraseña + botón Registrarse -->
@@ -473,8 +505,13 @@
                             <label for="reg-pass">Contraseña</label>
                             <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required>
                         </div>
-                            <button type="submit" id="btn-registrarse-final">Enviar</button>
+                        <div class="step-navigation">
+                            <button type="button" class="nav-btn prev-btn" data-step="5">
+                                <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
+                            </button>
+                            <button type="submit" id="btn-registrarse-final">Registrarse</button>
                         </div>
+                    </div>
 
                 </form>
         </div>
