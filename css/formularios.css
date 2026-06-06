@@ -355,51 +355,53 @@
 }
 
 /* ==============================================
-   MODIFICACIONES VISUALES WIZARD DE REGISTRO
+   REUBICACIÓN DE BOTÓN ATRÁS A LA ESQUINA SUPERIOR
    ============================================== */
 
-/* 1. Limpiamos el contenedor del paso para que use el flujo normal */
-#modal-registro .step {
-    position: static !important; 
-    padding-top: 0 !important; 
+/* 1. Aseguramos que la caja blanca del modal sea el punto de referencia absoluto */
+#modal-registro .modal-content {
+    position: relative !important;
 }
 
-/* 2. Botón Atrás: Integrado en el diseño, seguro y sin flotar (LA CLAVE) */
-button.nav-btn.prev-btn {
-    position: static !important; /* Quitamos el absolute para que no se escape */
-    display: block !important;   /* Toma su propia línea arriba de los inputs */
+/* 2. Hacemos que el contenedor del paso sea 'static' para que el botón no se quede atrapado dentro de él */
+#modal-registro .step {
+    position: static !important;
+    padding-top: 15px !important; /* Espacio superior para que el contenido no choque arriba */
+}
+
+/* 3. Colocamos la flecha exactamente en la esquina superior izquierda */
+#modal-registro button.nav-btn.prev-btn {
+    position: absolute !important;
+    top: 15px !important;    /* Distancia exacta desde el borde superior de la pantalla/modal */
+    left: 15px !important;   /* Distancia exacta desde el borde izquierdo */
+    z-index: 1100 !important; /* Lo mantiene por encima de cualquier fondo o input */
     background: transparent !important;
     border: none !important;
-    padding: 0 !important;
-    margin-bottom: 15px !important; /* Espacio seguro entre la flecha y el primer input */
+    padding: 10px !important; /* Amplía el área de clic para que sea fácil de presionar en pantallas táctiles */
+    margin: 0 !important;
     cursor: pointer;
+    line-height: 0 !important;
 }
 
-/* 3. Prevenir estrictamente el scroll horizontal en el modal */
-#modal-registro .modal-content {
-    overflow-x: hidden !important;
-}
-
-/* 4. Ajustar el contenedor inferior para centrar el botón */
+/* 4. Estilos del bloque de navegación inferior (Siguiente / Enviar) */
 .step-navigation {
-    max-width: 100% !important; 
+    max-width: 100% !important;
     width: 100% !important;
-    box-sizing: border-box !important; 
+    box-sizing: border-box !important;
     display: flex !important;
-    justify-content: center !important; /* Centra el botón Siguiente/Enviar */
-    padding: 0 !important;
-    margin-top: 20px !important;
+    justify-content: center !important; /* Centra perfectamente el botón de avance */
+    margin-top: 25px !important;
     margin-bottom: 0 !important;
 }
 
-/* 5. Estilizar los botones "Siguiente" y "Enviar" (Diseño de píldora) */
+/* 5. Diseño estilo píldora para los botones de avance */
 button.nav-btn.next-btn,
 #btn-registrarse-final {
-    background: #007bff !important; 
+    background: #007bff !important;
     color: white !important;
-    border-radius: 50px !important; /* Vértices circulares */
+    border-radius: 50px !important; /* Bordes completamente circulares */
     padding: 10px 30px !important;
-    width: auto !important; 
+    width: auto !important;
     height: auto !important;
     font-size: 16px !important;
     font-weight: 600 !important;
@@ -410,6 +412,6 @@ button.nav-btn.next-btn,
 
 button.nav-btn.next-btn:hover,
 #btn-registrarse-final:hover {
-    background: #0056b3 !important; 
-    opacity: 1 !important; 
+    background: #0056b3 !important;
+    opacity: 1 !important;
 }
