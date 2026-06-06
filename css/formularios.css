@@ -285,30 +285,36 @@
 
 /* Cada paso debe tener posición relativa para posicionar el botón atrás */
 .step {
-    position: relative;
-    padding-top: 100px; /* espacio para que el botón atrás no tape el primer campo */
+    position: relative;   /* se mantiene para el botón siguiente */
+    padding-top: 0;       /* antes tenía 100px, lo quitamos */
+    margin-top: 20px;     /* opcional: espacio para que el contenido no quede pegado al título */
+}
+
+/* Ajuste del título para que no choque con el botón atrás */
+#modal-registro h2 {
+    padding-left: 50px;   /* espacio para el botón atrás */
+    text-align: left;     /* si quieres que quede alineado a la izquierda */
+    margin-top: 10px;
 }
 
 /* Botón "atrás" (flecha) - completamente limpio, sin bordes, solo la imagen */
 .prev-btn {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 15px;          /* Separación del borde superior */
+    left: 15px;         /* Separación del borde izquierdo */
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
     cursor: pointer;
-    padding: 8px;
-    margin: 0;
-    z-index: 10;
+    padding: 0;
+    z-index: 20;
 }
 
 .prev-btn img {
     width: 28px;
     height: 28px;
     display: block;
-    filter: none; /* asegurar que no tenga sombras extra */
 }
 
 /* Botón "Siguiente" redondo, negro con texto blanco */
