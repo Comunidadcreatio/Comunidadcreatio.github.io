@@ -689,6 +689,12 @@ function showStep(step) {
     if (target) target.style.display = 'block';
     currentStep = step;
 
+    // 🔥 Actualiza el botón atrás (único) con el paso actual
+    const prevBtn = document.querySelector('#modal-registro .prev-btn');
+    if (prevBtn) {
+        prevBtn.dataset.step = step;
+    }
+
     // 🔥 Limpiar errores al cambiar de paso
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
