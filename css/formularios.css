@@ -358,21 +358,20 @@
    MODIFICACIONES VISUALES WIZARD DE REGISTRO
    ============================================== */
 
-/* 1. Preparamos el contenedor de cada paso como referencia */
+/* 1. Limpiamos el contenedor del paso para que use el flujo normal */
 #modal-registro .step {
-    position: relative !important;
-    padding-top: 35px !important; /* Crea el área segura arriba para que nada choque */
+    position: static !important; 
+    padding-top: 0 !important; 
 }
 
-/* 2. Ubicamos el botón Atrás en la esquina superior izquierda */
+/* 2. Botón Atrás: Integrado en el diseño, seguro y sin flotar (LA CLAVE) */
 button.nav-btn.prev-btn {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important; 
-    z-index: 10;
+    position: static !important; /* Quitamos el absolute para que no se escape */
+    display: block !important;   /* Toma su propia línea arriba de los inputs */
     background: transparent !important;
     border: none !important;
-    padding: 5px !important; /* Un poco de área para que sea fácil darle clic */
+    padding: 0 !important;
+    margin-bottom: 15px !important; /* Espacio seguro entre la flecha y el primer input */
     cursor: pointer;
 }
 
@@ -381,21 +380,24 @@ button.nav-btn.prev-btn {
     overflow-x: hidden !important;
 }
 
-/* 4. Ajustar el contenedor de navegación inferior */
+/* 4. Ajustar el contenedor inferior para centrar el botón */
 .step-navigation {
     max-width: 100% !important; 
     width: 100% !important;
     box-sizing: border-box !important; 
-    justify-content: center !important; /* Centra el botón Siguiente */
+    display: flex !important;
+    justify-content: center !important; /* Centra el botón Siguiente/Enviar */
     padding: 0 !important;
-    margin: 0 !important;
+    margin-top: 20px !important;
+    margin-bottom: 0 !important;
 }
 
-/* 5. Estilizar el botón "Siguiente" (Texto y vértices circulares) */
-button.nav-btn.next-btn {
+/* 5. Estilizar los botones "Siguiente" y "Enviar" (Diseño de píldora) */
+button.nav-btn.next-btn,
+#btn-registrarse-final {
     background: #007bff !important; 
     color: white !important;
-    border-radius: 50px !important; /* Vértices totalmente circulares */
+    border-radius: 50px !important; /* Vértices circulares */
     padding: 10px 30px !important;
     width: auto !important; 
     height: auto !important;
@@ -403,19 +405,11 @@ button.nav-btn.next-btn {
     font-weight: 600 !important;
     letter-spacing: 0.5px;
     border: none !important;
+    cursor: pointer;
 }
 
-button.nav-btn.next-btn:hover {
+button.nav-btn.next-btn:hover,
+#btn-registrarse-final:hover {
     background: #0056b3 !important; 
     opacity: 1 !important; 
-}
-
-/* 6. Asegurar que en móviles se mantenga bien */
-@media (max-width: 768px) {
-    .step-navigation {
-        max-width: 100% !important;
-    }
-    #btn-registrarse-final {
-        border-radius: 50px !important;
-    }
 }
