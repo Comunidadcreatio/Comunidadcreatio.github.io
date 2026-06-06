@@ -286,7 +286,7 @@
 /* Cada paso debe tener posición relativa para posicionar el botón atrás */
 .step {
     position: relative;
-    padding-top: 50px; /* espacio para que el botón atrás no tape el primer campo */
+    padding-top: 100px; /* espacio para que el botón atrás no tape el primer campo */
 }
 
 /* Botón "atrás" (flecha) - completamente limpio, sin bordes, solo la imagen */
