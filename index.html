@@ -381,13 +381,16 @@
     <div id="modal-registro" class="modal hidden">
         <div class="modal-content">
             <span class="cerrar-modal">&times;</span>
+            <!-- 🔥 Agrega aquí el botón atrás único -->
+            <button type="button" class="nav-btn prev-btn" data-step="1">
+                <img src="iconos/flecha-izquierda.svg" alt="Atrás">
+            </button>
             <h2>Registro de Artista</h2>
             <!-- Dentro de #modal-registro, reemplazar el formulario actual por esto -->
                 <form id="registro-form" class="compact-form">
                     
                     <!-- PASO 1: Nombres y Apellidos -->
                     <div class="step" data-step="1">
-                        <button type="button" class="nav-btn prev-btn" data-step="1">
                             <img src="iconos/flecha-izquierda.svg" alt="Atrás">
                         </button>
                         <div class="form-row">
@@ -405,7 +408,6 @@
 
                     <!-- PASO 2: Fecha de nacimiento y Género -->
                     <div class="step" data-step="2" style="display:none;">
-                        <button type="button" class="nav-btn prev-btn" data-step="2">
                             <img src="iconos/flecha-izquierda.svg" alt="Atrás">
                         </button>
                         <div class="form-group">
@@ -436,7 +438,6 @@
 
                     <!-- PASO 3: País y Ciudad -->
                     <div class="step" data-step="3" style="display:none;">
-                        <button type="button" class="nav-btn prev-btn" data-step="3">
                             <img src="iconos/flecha-izquierda.svg" alt="Atrás">
                         </button>
                         <div class="form-group">
@@ -457,7 +458,6 @@
 
                     <!-- PASO 4: Email y Teléfono -->
                     <div class="step" data-step="4" style="display:none;">
-                        <button type="button" class="nav-btn prev-btn" data-step="4">
                             <img src="iconos/flecha-izquierda.svg" alt="Atrás">
                         </button>
                         <div class="form-group">
@@ -473,7 +473,6 @@
 
                     <!-- PASO 5: Nombre de usuario y Contraseña + botón Registrarse -->
                     <div class="step" data-step="5" style="display:none;">
-                        <button type="button" class="nav-btn prev-btn" data-step="5">
                             <img src="iconos/flecha-izquierda.svg" alt="Atrás">
                         </button>
                         <div class="form-group">
