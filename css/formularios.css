@@ -353,3 +353,52 @@
     display: block;
     color: #dc3545;
 }
+
+/* ==============================================
+   MODIFICACIONES VISUALES WIZARD DE REGISTRO
+   ============================================== */
+
+/* 1. Ubicar el botón "Atrás" en la esquina superior izquierda */
+button.nav-btn.prev-btn {
+    position: absolute !important;
+    top: 24px !important;
+    left: 24px !important;
+    z-index: 10;
+}
+
+/* 2. Ajustar el contenedor de navegación (para que el botón Siguiente no esté apretado) */
+.step-navigation {
+    max-width: 100% !important; /* Quitamos la restricción de 100px */
+    width: 100% !important;
+    justify-content: center !important; /* Centramos el botón Siguiente */
+}
+
+/* 3. Estilizar el botón "Siguiente" (Texto y vértices circulares) */
+button.nav-btn.next-btn {
+    background: #007bff !important; /* El azul principal de tu tema */
+    color: white !important;
+    border-radius: 50px !important; /* Vértices totalmente circulares */
+    padding: 10px 30px !important;
+    width: auto !important; /* Se adapta al texto */
+    height: auto !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+button.nav-btn.next-btn:hover {
+    background: #0056b3 !important; /* Azul oscuro al pasar el mouse */
+    opacity: 1 !important; 
+}
+
+/* 4. Asegurar que en móviles también tenga espacio para respirar */
+@media (max-width: 768px) {
+    .step-navigation {
+        max-width: 100% !important;
+    }
+    
+    /* Pequeño ajuste para que el botón 'Registrarse' del paso 5 tenga el mismo estilo redondeado */
+    #btn-registrarse-final {
+        border-radius: 50px !important;
+    }
+}
