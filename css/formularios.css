@@ -184,21 +184,6 @@
     background-color: #c82333;
 }
 
-/* Navegación por pasos */
-.step-navigation {
-    display: flex;
-    justify-content: center;
-    gap: 1px;                  /* Espacio pequeño entre las flechas */
-    width: 100%;
-    max-width: 100px;          /* Ancho máximo para que no se estiren demasiado */
-    margin: 15px auto 0;
-}
-
-
-.nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 
 #btn-registrarse-final {
     width: 100%;
@@ -235,70 +220,10 @@
     background: #0056b3;
 }
 
-/* Forzar eliminación de bordes en los botones de navegación */
-.nav-btn,
-.nav-btn *,
-.nav-btn::before,
-.nav-btn::after {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
 
-.nav-btn {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-    transition: opacity 0.2s;
-}
-
-.nav-btn:hover {
-    opacity: 0.7;
-}
-
-.nav-btn img {
-    width: 24px;
-    height: 24px;
-    display: block;
-}
 
 @media (max-width: 768px) {
-    /* Contenedor principal del paso: forzar alineación */
-    .step-navigation {
-        display: flex !important;
-        justify-content: center !important;
-        gap: 1px !important;
-        width: auto !important;
-        max-width: 200px !important; /* 🔥 Límite para que no se separen */
-        margin: 15px auto 0 !important;
-        padding: 0 !important;
-        flex-wrap: nowrap !important;
-    }
-
-    /* Botones: eliminar cualquier estiramiento */
-    .nav-btn {
-        margin: 0 !important;
-        padding: 0 !important;
-        flex: 0 0 auto !important; /* No se estiran */
-        width: 40px !important;
-        height: 40px !important;
-    }
-
-    /* También forzar que los SVGs no tengan márgenes */
-    .nav-btn img {
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
-    }
+    
 }
 
 /* Estilos para validación visual */
@@ -352,4 +277,75 @@
 .validation-message.unavailable {
     display: block;
     color: #dc3545;
+}
+
+/* Posición relativa para cada paso, necesario para posicionar el botón atrás */
+.step {
+    position: relative;
+    padding-top: 50px; /* espacio para el botón atrás */
+}
+
+/* Botón atrás (flecha) - esquina superior izquierda */
+.prev-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 5;
+}
+
+.prev-btn img {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+/* Botón siguiente redondo con texto */
+.next-redondo {
+    width: auto;
+    min-width: 120px;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 999px !important; /* totalmente circular */
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 20px auto 0 auto;
+    display: block;
+    transition: background 0.2s;
+}
+
+.next-redondo:hover {
+    background-color: #0056b3;
+}
+
+/* Ajuste para que el botón Registrarse también sea redondo (si quieres) */
+#btn-registrarse-final {
+    border-radius: 999px;
+    background-color: #28a745;
+    width: auto;
+    min-width: 120px;
+    padding: 12px 24px;
+    margin: 20px auto 0 auto;
+    display: block;
+}
+
+/* En móviles, mantener posición del botón atrás */
+@media (max-width: 768px) {
+    .step {
+        padding-top: 40px;
+    }
+    .prev-btn {
+        top: 5px;
+        left: 5px;
+    }
+    .next-redondo {
+        width: 90%;
+        max-width: 250px;
+    }
 }
