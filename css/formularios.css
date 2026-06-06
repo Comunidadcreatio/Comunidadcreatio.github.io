@@ -1,6 +1,8 @@
 /* css/formularios.css - Estilos de todos los formularios */
 
-/* --- Estilos generales para inputs, selects y textareas --- */
+/* ==============================================
+   1. ESTILOS GENERALES DE INPUTS, SELECTS Y TEXTAREAS
+   ============================================== */
 #obra-form input[type="text"],
 #obra-form input[type="number"],
 #obra-form select,
@@ -14,6 +16,7 @@
 #solicitar-restablecimiento-form input[type="email"],
 #confirmar-eliminacion-form input[type="password"] {
     width: 100%;
+    max-width: 100%;
     padding: 10px;
     margin-bottom: 12px;
     border: 1px solid #000;
@@ -33,26 +36,32 @@
     background-color: #f1f1f1;
 }
 
-/* --- Grupos de inputs --- */
+/* ==============================================
+   2. GRUPOS DE INPUTS (FILAS, FECHAS, DIMENSIONES)
+   ============================================== */
 .dimensiones-group,
 .name-group,
 .date-group {
     display: flex;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-/* Contenedor para poner dos campos en la misma fila */
 .form-row {
     display: flex;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .form-row .form-group {
-    flex: 1; /* Cada grupo ocupa el mismo ancho */
-    min-width: 0; /* Permite que se encojan si es necesario */
+    flex: 1;
+    min-width: 0;
 }
 
-/* Ajuste para que los labels no tengan margen extra */
 .form-group label {
     display: block;
     margin-bottom: 5px;
@@ -63,11 +72,13 @@
 .dimensiones-group input,
 .name-group input,
 .date-group select {
-    flex: 1; /* Cada selector ocupa el mismo ancho */
-    min-width: 0; /* Permite que se encojan si es necesario */
+    flex: 1;
+    min-width: 0;
 }
 
-/* --- Contenedor de imágenes --- */
+/* ==============================================
+   3. CONTENEDOR DE IMÁGENES (OBRA)
+   ============================================== */
 .imagenes-contenedor {
     display: flex;
     gap: 10px;
@@ -145,7 +156,9 @@
     margin-bottom: 15px;
 }
 
-/* --- Botones de acción del formulario --- */
+/* ==============================================
+   4. BOTONES DE ACCIÓN DEL FORMULARIO
+   ============================================== */
 .form-actions {
     display: flex;
     gap: 10px;
@@ -184,7 +197,6 @@
     background-color: #c82333;
 }
 
-
 #btn-registrarse-final {
     width: 100%;
     padding: 12px;
@@ -201,7 +213,7 @@
     background: #218838;
 }
 
-/* --- Botones de formularios en modales --- */
+/* Botones de formularios en modales */
 #login-form button[type="submit"],
 #registro-form button[type="submit"],
 #solicitar-restablecimiento-form button[type="submit"],
@@ -220,13 +232,9 @@
     background: #0056b3;
 }
 
-
-
-@media (max-width: 768px) {
-    
-}
-
-/* Estilos para validación visual */
+/* ==============================================
+   5. VALIDACIÓN VISUAL
+   ============================================== */
 .input-error {
     border-color: #dc3545 !important;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
@@ -244,13 +252,11 @@
     display: block;
 }
 
-/* Ajuste para que los mensajes de error no desplacen demasiado */
 .form-group {
     position: relative;
 }
 
-
-/* --- Validación visual en tiempo real --- */
+/* Validación en tiempo real */
 .input-available {
     border-color: #28a745 !important;
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
@@ -258,7 +264,7 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 18px;
-    padding-right: 35px; /* Espacio para el ícono */
+    padding-right: 35px;
 }
 
 .input-unavailable {
@@ -266,7 +272,6 @@
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
-/* Mensaje de error solo para no disponible */
 .validation-message {
     font-size: 12px;
     margin-top: 4px;
@@ -280,44 +285,48 @@
 }
 
 /* ==============================================
-   ESTILOS PARA EL WIZARD DE REGISTRO
+   6. WIZARD DE REGISTRO - PASOS Y BOTÓN ATRÁS
    ============================================== */
 
-/* Cada paso debe tener posición relativa para posicionar el botón atrás */
+/* --- Contenedor del paso --- */
 .step {
-    position: relative;   /* se mantiene para el botón siguiente */
-    padding-top: 0;       /* antes tenía 100px, lo quitamos */
-    margin-top: 20px;     /* opcional: espacio para que el contenido no quede pegado al título */
+    position: relative;
+    padding-top: 0;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-/* Ajuste del título para que no choque con el botón atrás */
+/* --- Título del modal de registro --- */
 #modal-registro h2 {
-    padding-left: 50px;   /* espacio para el botón atrás */
-    text-align: left;     /* si quieres que quede alineado a la izquierda */
+    padding-left: 50px;
+    text-align: left;
     margin-top: 10px;
+    margin-bottom: 20px;
 }
 
-/* Botón "atrás" (flecha) - completamente limpio, sin bordes, solo la imagen */
-.prev-btn {
-    position: absolute;
-    top: 15px;          /* Separación del borde superior */
-    left: 15px;         /* Separación del borde izquierdo */
+/* --- Botón ATRÁS (flecha) - Ahora con ID único --- */
+#back-btn-registro {
+    position: absolute !important;
+    top: 15px !important;
+    left: 15px !important;
     background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    padding: 0 !important;
+    z-index: 2000 !important;
     cursor: pointer;
-    padding: 0;
-    z-index: 20;
+    outline: none !important;
+    display: block; /* Asegura que se vea siempre */
 }
 
-.prev-btn img {
+#back-btn-registro img {
     width: 28px;
     height: 28px;
     display: block;
 }
 
-/* Botón "Siguiente" redondo, negro con texto blanco */
+/* --- Botón SIGUIENTE redondo --- */
 .next-redondo {
     display: block;
     width: auto;
@@ -335,7 +344,6 @@
     transition: all 0.2s ease-in-out;
 }
 
-/* Efecto hover / active: fondo blanco, texto negro, borde negro */
 .next-redondo:hover,
 .next-redondo:active {
     background-color: #ffffff !important;
@@ -343,7 +351,7 @@
     border-color: #000000 !important;
 }
 
-/* Botón "Registrarse" final (paso 5) también redondo y con efecto similar */
+/* --- Botón REGISTRARSE final (paso 5) --- */
 #btn-registrarse-final {
     display: block;
     width: auto;
@@ -367,24 +375,64 @@
     border-color: #000000;
 }
 
-/* Ajustes para móviles: botón atrás más pequeño y no tape el título */
+/* ==============================================
+   7. RESPONSIVE - MÓVILES (≤ 768px)
+   ============================================== */
 @media (max-width: 768px) {
-    .step {
-        padding-top: 40px;
+    /* --- Ajuste del botón atrás --- */
+    #back-btn-registro {
+        top: 10px !important;
+        left: 10px !important;
     }
-    .prev-btn {
-        top: -5px;
-        left: -5px;
-    }
-    .prev-btn img {
+    #back-btn-registro img {
         width: 24px;
         height: 24px;
     }
+
+    /* --- Ajuste del título --- */
+    #modal-registro h2 {
+        padding-left: 40px;
+        font-size: 1.3rem;
+        margin-top: 5px;
+    }
+
+    /* --- Ajuste de los pasos --- */
+    .step {
+        padding-top: 10px !important;
+        margin-top: 10px;
+    }
+
+    /* --- Inputs y selects --- */
+    #registro-form input,
+    #registro-form select {
+        max-width: 100%;
+    }
+
+    /* --- Botones redondos --- */
     .next-redondo,
     #btn-registrarse-final {
         width: 90%;
         max-width: 260px;
         padding: 10px 20px;
         font-size: 15px;
+    }
+
+    /* --- Grupos de fecha --- */
+    .date-group select {
+        min-width: 0;
+    }
+
+    /* --- Formulario de registro --- */
+    #registro-form {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* --- Contenedor del modal de registro --- */
+    #modal-registro .modal-content {
+        padding: 1.5rem;
+        overflow-x: hidden;
     }
 }

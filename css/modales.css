@@ -35,6 +35,7 @@
     padding: 2rem;
     background: white;
     overflow-y: auto;
+    overflow-x: hidden; /* Evita scroll horizontal */
 }
 
 .modal-content h2 {
