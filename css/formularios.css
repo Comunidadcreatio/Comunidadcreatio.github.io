@@ -364,40 +364,57 @@ button.nav-btn.prev-btn {
     top: 24px !important;
     left: 24px !important;
     z-index: 10;
+    background: transparent !important; /* Evita fondos que tapen el texto */
+    border: none !important;
 }
 
-/* 2. Ajustar el contenedor de navegación (para que el botón Siguiente no esté apretado) */
+/* NUEVO: Crear un "área segura" para que el texto no choque con el botón de atrás */
+#modal-registro .modal-content h2,
+#modal-registro .step {
+    margin-top: 20px !important; 
+}
+
+/* NUEVO: Prevenir estrictamente el scroll horizontal en el modal */
+#modal-registro .modal-content {
+    overflow-x: hidden !important;
+}
+
+/* 2. Ajustar el contenedor de navegación y eliminar el scroll */
 .step-navigation {
-    max-width: 100% !important; /* Quitamos la restricción de 100px */
+    max-width: 100% !important; 
     width: 100% !important;
-    justify-content: center !important; /* Centramos el botón Siguiente */
+    box-sizing: border-box !important; /* Clave: incluye márgenes/paddings en el 100% del ancho */
+    justify-content: center !important; 
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* 3. Estilizar el botón "Siguiente" (Texto y vértices circulares) */
 button.nav-btn.next-btn {
-    background: #007bff !important; /* El azul principal de tu tema */
+    background: #007bff !important; 
     color: white !important;
-    border-radius: 50px !important; /* Vértices totalmente circulares */
+    border-radius: 50px !important; /* Vértices circulares */
     padding: 10px 30px !important;
-    width: auto !important; /* Se adapta al texto */
+    width: auto !important; 
     height: auto !important;
     font-size: 16px !important;
     font-weight: 600 !important;
     letter-spacing: 0.5px;
+    border: none !important;
 }
 
 button.nav-btn.next-btn:hover {
-    background: #0056b3 !important; /* Azul oscuro al pasar el mouse */
+    background: #0056b3 !important; 
     opacity: 1 !important; 
 }
 
-/* 4. Asegurar que en móviles también tenga espacio para respirar */
+/* 4. Asegurar que en móviles se mantenga bien */
 @media (max-width: 768px) {
     .step-navigation {
         max-width: 100% !important;
     }
     
-    /* Pequeño ajuste para que el botón 'Registrarse' del paso 5 tenga el mismo estilo redondeado */
     #btn-registrarse-final {
         border-radius: 50px !important;
     }
