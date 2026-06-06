@@ -345,74 +345,73 @@
 }
 
 /* ==============================================
-   MODIFICACIONES VISUALES WIZARD DE REGISTRO
+   SOLUCIÓN DEFINITIVA: ALINEACIÓN Y SCROLLBAR
    ============================================== */
 
-/* 1. Limpiamos el contenedor del paso para que use el flujo normal */
+/* 1. Eliminamos por completo el scrollbar horizontal del modal y sus partes */
+#modal-registro,
+#modal-registro .modal-content,
+#modal-registro #registro-form,
 #modal-registro .step {
-    position: static !important;
-    padding-top: 15px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
 }
 
-/* 2. Botón Atrás: Integrado en el diseño, seguro y sin flotar (LA CLAVE) */
-button.nav-btn.prev-btn {
-    position: static !important; /* Quitamos el absolute para que no se escape */
-    display: block !important;   /* Toma su propia línea arriba de los inputs */
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    margin-bottom: 15px !important; /* Espacio seguro entre la flecha y el primer input */
-    cursor: pointer;
+/* 2. Forzamos que todo elemento interno respete estrictamente los límites del contenedor */
+#modal-registro *, 
+#modal-registro *::before, 
+#modal-registro *::after {
+    box-sizing: border-box !important;
 }
 
-/* 3. Colocamos la flecha exactamente en la esquina superior izquierda */
+/* 3. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
+#modal-registro .modal-content h2 {
+    text-align: left !important;
+    padding-left: 45px !important; /* Desplaza el texto a la derecha para evitar colisiones */
+    margin-top: 0 !important;
+    margin-bottom: 25px !important;
+}
+
+/* 4. Clavamos la flecha en la esquina superior izquierda, alineada con el nuevo margen del título */
 #modal-registro button.nav-btn.prev-btn {
     position: absolute !important;
-    top: 15px !important;    /* Distancia exacta desde el borde superior de la pantalla/modal */
-    left: 15px !important;   /* Distancia exacta desde el borde izquierdo */
-    z-index: 1100 !important; /* Lo mantiene por encima de cualquier fondo o input */
+    top: 34px !important;    /* Centrado verticalmente respecto a la primera línea del H2 */
+    left: 2rem !important;   /* Alineado perfectamente con el padding original del modal */
+    z-index: 1100 !important; /* Lo mantiene siempre por encima de cualquier capa */
     background: transparent !important;
     border: none !important;
-    padding: 10px !important; /* Amplía el área de clic para que sea fácil de presionar en pantallas táctiles */
+    padding: 5px !important;  /* Área de clic óptima */
     margin: 0 !important;
     cursor: pointer;
     line-height: 0 !important;
 }
 
-/* 3. Prevenir estrictamente el scroll horizontal en el modal */
-#modal-registro .modal-content {
-    position: relative !important;
-}
-
-/* 4. Ajustar el contenedor inferior para centrar el botón */
-.step-navigation {
-    max-width: 100% !important;
+/* 5. Ajustamos la navegación inferior para que no empuje las paredes del modal en escritorio */
+#modal-registro .step-navigation {
     width: 100% !important;
-    box-sizing: border-box !important;
+    max-width: 100% !important;
     display: flex !important;
-    justify-content: center !important; /* Centra perfectamente el botón de avance */
+    justify-content: center !important; /* Centra el botón Siguiente/Enviar */
     margin-top: 25px !important;
-    margin-bottom: 0 !important;
+    padding: 0 !important;
 }
 
-/* 5. Estilizar los botones "Siguiente" y "Enviar" (Diseño de píldora) */
-button.nav-btn.next-btn,
-#btn-registrarse-final {
+/* 6. Estilo estandarizado tipo píldora para los botones de avance */
+#modal-registro button.nav-btn.next-btn,
+#modal-registro #btn-registrarse-final {
     background: #007bff !important;
     color: white !important;
-    border-radius: 50px !important; /* Bordes completamente circulares */
-    padding: 10px 30px !important;
+    border-radius: 50px !important;
+    padding: 10px 35px !important;
     width: auto !important;
     height: auto !important;
     font-size: 16px !important;
     font-weight: 600 !important;
-    letter-spacing: 0.5px;
     border: none !important;
     cursor: pointer;
 }
 
-button.nav-btn.next-btn:hover,
-#btn-registrarse-final:hover {
-    background: #0056b3 !important; 
-    opacity: 1 !important; 
+#modal-registro button.nav-btn.next-btn:hover,
+#modal-registro #btn-registrarse-final:hover {
+    background: #0056b3 !important;
 }
