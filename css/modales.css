@@ -41,7 +41,7 @@
     margin-top: 0;
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--color-gray-dark);
 }
 
 
@@ -54,7 +54,7 @@
     right: 15px;
     font-size: 30px;
     font-weight: bold;
-    color: #666;
+    color: var(--color-gray-medium);
     line-height: 1;
     cursor: pointer;
     z-index: 10;
@@ -62,7 +62,7 @@
 }
 
 .cerrar-modal:hover {
-    color: #333;
+    color: var(--color-gray-dark);
 }
 
 
@@ -86,15 +86,15 @@
 }
 
 .modal-content button[type="submit"] {
-    background: #007bff;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-white);
     border: none;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .modal-content button[type="submit"]:hover {
-    background: #0056b3;
+    background: var(--color-primary-dark);
 }
 
 .modal-content .secondary-btn {
@@ -118,7 +118,7 @@
 }
 
 .forgot-password a {
-    color: #007bff;
+    color: var(--color-primary);
     font-size: 14px;
     text-decoration: none;
 }
@@ -134,7 +134,7 @@
 }
 
 .error-message {
-    color: #dc3545;
+    color: var(--color-danger);
     text-align: center;
     margin-top: 10px;
 }

@@ -1,13 +1,13 @@
 /* css/header.css - Estilos del encabezado */
 
 #main-header {
-    background-color: #ffffff;
-    color: #000;
+    background-color: var(--color-white);
+    color: var(--color-black);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid var(--color-black);
 }
 
 #brand-name {
@@ -24,8 +24,8 @@
 #btn-perfil,
 #btn-logout {
     background: none;
-    border: 1px solid #000;
-    color: #000;
+    border: 1px solid var(--color-black);
+    color: var(--color-black);
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -35,18 +35,18 @@
 
 #btn-perfil:hover,
 #btn-logout:hover {
-    background-color: #000;
-    color: #fff;
+    background-color: var(--color-black);
+    color: var(--color-white);
 }
 
 /* 🔥 CORRECCIÓN PARA EL HEADER */
 #btn-logout.hidden {
-    display: none !important;
+    display: none;
 }
 
 /* Opcional: también asegurar que el botón de perfil tenga el estado correcto */
 #btn-perfil.hidden {
-    display: none !important;
+    display: none;
 }
 
 /* ==============================================
@@ -54,8 +54,8 @@
    ============================================== */
 @media (min-width: 769px) {
     #main-header {
-        background-color: #ffffff;
-        border-bottom: 2px solid #000;
+        background-color: var(--color-white);
+        border-bottom: 2px solid var(--color-black);
         padding: 1rem 2rem;
         height: 70px;
         display: flex;

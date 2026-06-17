@@ -19,6 +19,41 @@
     display: none !important;
 }
 
+/* Clase para elementos ocultos visualmente pero accesibles para lectores de pantalla */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==============================================
+   VARIABLES CSS PARA COLORES
+   ============================================== */
+:root {
+    --color-primary: #007bff;
+    --color-primary-dark: #0056b3;
+    --color-success: #28a745;
+    --color-success-dark: #218838;
+    --color-danger: #dc3545;
+    --color-danger-dark: #c82333;
+    --color-warning: #ffc107;
+    --color-warning-dark: #e0a800;
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-gray-light: #f8f9fa;
+    --color-gray-medium: #6c757d;
+    --color-gray-dark: #333333;
+    --color-border: #000000;
+    --color-text: #000000;
+    --color-text-muted: #666666;
+}
+
 /* ==============================================
    TIPOGRAFÍA GLOBAL (Nunito)
    ============================================== */
@@ -52,8 +87,8 @@ input, select, textarea {
     z-index: 998;
     display: flex;
     align-items: center;
-    background-color: #ffffff;
-    border: 2px solid #000000;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -81,7 +116,7 @@ input, select, textarea {
     font-weight: 500;
     margin-left: 12px;
     white-space: nowrap;
-    color: #000000;
+    color: var(--color-black);
     font-family: sans-serif;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -101,7 +136,7 @@ input, select, textarea {
 
 .desktop-logout-panel.speech-bubble {
     position: absolute;
-    background: #000000;
+    background: var(--color-black);
     width: 240px;
     border-radius: 16px;
     padding: 8px 0;
@@ -119,7 +154,7 @@ input, select, textarea {
     height: 0;
     border-style: solid;
     border-width: 8px 10px 8px 0;
-    border-color: transparent #000000 transparent transparent;
+    border-color: transparent var(--color-black) transparent transparent;
 }
 .desktop-logout-panel.speech-bubble[data-placement="left"]::before {
     content: '';
@@ -130,12 +165,12 @@ input, select, textarea {
     height: 0;
     border-style: solid;
     border-width: 8px 0 8px 10px;
-    border-color: transparent transparent transparent #000000;
+    border-color: transparent transparent transparent var(--color-black);
 }
 
 /* Opciones de menú */
 .logout-option {
-    color: #ffffff !important;
+    color: var(--color-white);
     display: block;
     width: 100%;
     padding: 12px 20px;
@@ -154,33 +189,33 @@ input, select, textarea {
     opacity: 0.6;
 }
 .logout-option.enabled {
-    color: #ffffff;
+    color: var(--color-white);
     pointer-events: auto;
 }
 
 #desktop-logout-single.logout-option,
 #mobile-logout-single.logout-option {
-    color: #ffffff;
+    color: var(--color-white);
     font-weight: 600;
 }
 
 .divider {
     height: 1px;
-    background-color: #333333;
+    background-color: var(--color-gray-dark);
     margin: 4px 16px;
 }
 
 /* Página en blanco */
 #pagina-blanca {
     flex: 1;
-    background-color: #ffffff;
+    background-color: var(--color-white);
     min-height: calc(100vh - 70px);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 #pagina-blanca.hidden {
-    display: none !important;
+    display: none;
 }
 
 /* 2. Responsive - Escritorio (≥ 769px) */
@@ -203,9 +238,9 @@ input, select, textarea {
         bottom: 0;
         width: 56px;
         height: 100vh;
-        background-color: #ffffff;
+        background-color: var(--color-white);
         border: none;
-        border-right: 2px solid #000000;
+        border-right: 2px solid var(--color-black);
         box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         flex-direction: column;
         align-items: center;
@@ -229,7 +264,7 @@ input, select, textarea {
     /* Ocultar paneles móviles en escritorio */
     .mobile-logout-modal,
     #mobile-main-menu {
-        display: none !important;
+        display: none;
     }
 }
 
@@ -247,8 +282,8 @@ input, select, textarea {
         border-radius: 12px 12px 0 0;
         padding: 0 16px;
         justify-content: flex-end;
-        background-color: #ffffff;
-        border: 2px solid #000000;
+        background-color: var(--color-white);
+        border: 2px solid var(--color-black);
         border-bottom: none;
         box-sizing: border-box;
         gap: 10px;
@@ -270,7 +305,7 @@ input, select, textarea {
     /* Ocultar paneles de escritorio en móvil */
     .desktop-logout-modal,
     .desktop-main-menu {
-        display: none !important;
+        display: none;
     }
     
     /* Configuración del fondo transparente del panel móvil */
@@ -293,7 +328,7 @@ input, select, textarea {
     /* El bocadillo negro del menú en móvil */
     .mobile-logout-panel.speech-bubble {
         position: relative;
-        background: #000000;
+        background: var(--color-black);
         width: 260px;
         max-width: 85vw;
         margin: 0 16px 70px 0;
@@ -314,7 +349,7 @@ input, select, textarea {
         height: 0;
         border-left: 12px solid transparent;
         border-right: 12px solid transparent;
-        border-top: 12px solid #000000;
+        border-top: 12px solid var(--color-black);
         filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
     }
     
@@ -328,7 +363,7 @@ input, select, textarea {
     
     #mobile-main-menu button,
     #mobile-main-menu .logout-option {
-        color: #ffffff;
+        color: var(--color-white);
         pointer-events: auto;
         background: transparent;
         border: none;
@@ -339,7 +374,7 @@ input, select, textarea {
         cursor: pointer;
     }
     #mobile-main-menu button:active,
-    #mobile-main-menu .logout-option:active { background-color: #333333; }
+    #mobile-main-menu .logout-option:active { background-color: var(--color-gray-dark); }
     
     .mobile-logout-panel .logout-option,
     .logout-option {
