@@ -16,7 +16,7 @@
 }
 
 #panel-artista.hidden {
-    display: none !important;
+    display: none;
 }
 
 
@@ -50,15 +50,15 @@
 }
 
 .filter-controls button {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-white);
     border: none;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .filter-controls button:hover {
-    background-color: #0056b3;
+    background-color: var(--color-primary-dark);
 }
 
 
@@ -147,33 +147,33 @@
 
 /* Botones de acción de la tabla */
 .btn-editar {
-    color: #007bff;
-    border: 1px solid #007bff;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
 }
 
 .btn-editar:hover {
-    background: #007bff;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 .btn-eliminar {
-    color: #dc3545;
-    border: 1px solid #dc3545;
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
 }
 
 .btn-eliminar:hover {
-    background: #dc3545;
-    color: white;
+    background: var(--color-danger);
+    color: var(--color-white);
 }
 
 .btn-duplicar {
-    color: #28a745;
-    border: 1px solid #28a745;
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
 }
 
 .btn-duplicar:hover {
-    background: #28a745;
-    color: white;
+    background: var(--color-success);
+    color: var(--color-white);
 }
 
 
@@ -187,14 +187,14 @@
 }
 
 .danger-zone h3 {
-    color: #dc3545;
+    color: var(--color-danger);
     margin-bottom: 10px;
 }
 
 .danger-zone p {
     margin-bottom: 15px;
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-muted);
 }
 
 .danger-actions {
@@ -219,8 +219,8 @@
 }
 
 #btn-eliminar-cuenta {
-    background: #dc3545;
-    color: white;
+    background: var(--color-danger);
+    color: var(--color-white);
 }
 
 #btn-eliminar-cuenta:hover {
@@ -228,7 +228,7 @@
 }
 
 #btn-cerrar-todas-sesiones {
-    background: #ffc107;
+    background: var(--color-warning);
     color: #333;
 }
 

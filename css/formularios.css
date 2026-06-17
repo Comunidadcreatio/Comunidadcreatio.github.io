@@ -155,8 +155,8 @@
 #btn-guardar {
     width: 100%;
     padding: 12px;
-    background-color: #28a745;
-    color: white;
+    background-color: var(--color-success);
+    color: var(--color-white);
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -165,14 +165,14 @@
 }
 
 #btn-guardar:hover {
-    background-color: #218838;
+    background-color: var(--color-success-dark);
 }
 
 #btn-limpiar-campos {
     width: 100%;
     padding: 12px;
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--color-danger);
+    color: var(--color-white);
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -181,7 +181,7 @@
 }
 
 #btn-limpiar-campos:hover {
-    background-color: #c82333;
+    background-color: var(--color-danger-dark);
 }
 
 
@@ -193,8 +193,8 @@
 #btn-registrarse-final {
     width: 100%;
     padding: 12px;
-    background: #28a745;
-    color: white;
+    background: var(--color-success);
+    color: var(--color-white);
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -203,7 +203,7 @@
 }
 
 #btn-registrarse-final:hover {
-    background: #218838;
+    background: var(--color-success-dark);
 }
 
 /* --- Botones de formularios en modales --- */
@@ -211,8 +211,8 @@
 #registro-form button[type="submit"],
 #solicitar-restablecimiento-form button[type="submit"],
 #confirmar-eliminacion-form button[type="submit"] {
-    background: #007bff;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-white);
     border: none;
     cursor: pointer;
     transition: background 0.2s;
@@ -222,7 +222,7 @@
 #registro-form button[type="submit"]:hover,
 #solicitar-restablecimiento-form button[type="submit"]:hover,
 #confirmar-eliminacion-form button[type="submit"]:hover {
-    background: #0056b3;
+    background: var(--color-primary-dark);
 }
 
 /* Forzar eliminación de bordes en los botones de navegación */
@@ -230,13 +230,13 @@
 .nav-btn *,
 .nav-btn::before,
 .nav-btn::after {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .nav-btn {
@@ -264,41 +264,41 @@
 @media (max-width: 768px) {
     /* Contenedor principal del paso: forzar alineación */
     .step-navigation {
-        display: flex !important;
-        justify-content: center !important;
-        gap: 1px !important;
-        width: auto !important;
-        max-width: 200px !important; /* 🔥 Límite para que no se separen */
-        margin: 15px auto 0 !important;
-        padding: 0 !important;
-        flex-wrap: nowrap !important;
+        display: flex;
+        justify-content: center;
+        gap: 1px;
+        width: auto;
+        max-width: 200px; /* 🔥 Límite para que no se separen */
+        margin: 15px auto 0;
+        padding: 0;
+        flex-wrap: nowrap;
     }
 
     /* Botones: eliminar cualquier estiramiento */
     .nav-btn {
-        margin: 0 !important;
-        padding: 0 !important;
-        flex: 0 0 auto !important; /* No se estiran */
-        width: 40px !important;
-        height: 40px !important;
+        margin: 0;
+        padding: 0;
+        flex: 0 0 auto; /* No se estiran */
+        width: 40px;
+        height: 40px;
     }
 
     /* También forzar que los SVGs no tengan márgenes */
     .nav-btn img {
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
+        margin: 0;
+        padding: 0;
+        display: block;
     }
 }
 
 /* Estilos para validación visual */
 .input-error {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
 .error-message-field {
-    color: #dc3545;
+    color: var(--color-danger);
     font-size: 12px;
     margin-top: 4px;
     margin-bottom: 8px;
@@ -317,8 +317,8 @@
 
 /* --- Validación visual en tiempo real --- */
 .input-available {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2328a745' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
@@ -327,8 +327,8 @@
 }
 
 .input-unavailable {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
 /* Mensaje de error solo para no disponible */
@@ -341,7 +341,7 @@
 
 .validation-message.unavailable {
     display: block;
-    color: #dc3545;
+    color: var(--color-danger);
 }
 
 /* ==============================================
@@ -353,65 +353,65 @@
 #modal-registro .modal-content,
 #modal-registro #registro-form,
 #modal-registro .step {
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* 2. Forzamos que todo elemento interno respete estrictamente los límites del contenedor */
 #modal-registro *, 
 #modal-registro *::before, 
 #modal-registro *::after {
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
 
 /* 3. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
 #modal-registro .modal-content h2 {
-    text-align: left !important;
-    padding-left: 45px !important; /* Desplaza el texto a la derecha para evitar colisiones */
-    margin-top: 0 !important;
-    margin-bottom: 25px !important;
+    text-align: left;
+    padding-left: 45px; /* Desplaza el texto a la derecha para evitar colisiones */
+    margin-top: 0;
+    margin-bottom: 25px;
 }
 
 /* 4. Clavamos la flecha en la esquina superior izquierda, alineada con el nuevo margen del título */
 #modal-registro button.nav-btn.prev-btn {
-    position: absolute !important;
-    top: 34px !important;    /* Centrado verticalmente respecto a la primera línea del H2 */
-    left: 2rem !important;   /* Alineado perfectamente con el padding original del modal */
-    z-index: 1100 !important; /* Lo mantiene siempre por encima de cualquier capa */
-    background: transparent !important;
-    border: none !important;
-    padding: 5px !important;  /* Área de clic óptima */
-    margin: 0 !important;
+    position: absolute;
+    top: 34px;    /* Centrado verticalmente respecto a la primera línea del H2 */
+    left: 2rem;   /* Alineado perfectamente con el padding original del modal */
+    z-index: 1100; /* Lo mantiene siempre por encima de cualquier capa */
+    background: transparent;
+    border: none;
+    padding: 5px;  /* Área de clic óptima */
+    margin: 0;
     cursor: pointer;
-    line-height: 0 !important;
+    line-height: 0;
 }
 
 /* 5. Ajustamos la navegación inferior para que no empuje las paredes del modal en escritorio */
 #modal-registro .step-navigation {
-    width: 100% !important;
-    max-width: 100% !important;
-    display: flex !important;
-    justify-content: center !important; /* Centra el botón Siguiente/Enviar */
-    margin-top: 25px !important;
-    padding: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center; /* Centra el botón Siguiente/Enviar */
+    margin-top: 25px;
+    padding: 0;
 }
 
 /* 6. Estilo estandarizado tipo píldora para los botones de avance */
 #modal-registro button.nav-btn.next-btn,
 #modal-registro #btn-registrarse-final {
-    background: #007bff !important;
-    color: white !important;
-    border-radius: 50px !important;
-    padding: 10px 35px !important;
-    width: auto !important;
-    height: auto !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    border: none !important;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 50px;
+    padding: 10px 35px;
+    width: auto;
+    height: auto;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
     cursor: pointer;
 }
 
 #modal-registro button.nav-btn.next-btn:hover,
 #modal-registro #btn-registrarse-final:hover {
-    background: #0056b3 !important;
+    background: var(--color-primary-dark);
 }
