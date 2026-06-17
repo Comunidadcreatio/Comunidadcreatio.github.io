@@ -4,18 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería de Arte</title>
+    <title>Galería de Arte - Fundación Extramuros</title>
+    <meta name="description" content="Galería de arte de la Fundación Extramuros. Descubre obras de artistas, exhibiciones y colecciones de arte contemporáneo.">
+    <meta name="keywords" content="galería de arte, arte contemporáneo, artistas venezolanos, Fundación Extramuros, exhibiciones, colección de arte">
+    <meta name="author" content="Fundación Extramuros">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fundacionextramuros.github.io/">
+    <meta property="og:title" content="Galería de Arte - Fundación Extramuros">
+    <meta property="og:description" content="Descubre obras de arte y artistas en la galería de la Fundación Extramuros.">
+    <meta property="og:image" content="https://fundacionextramuros.github.io/iconos/Logo-temporal.svg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://fundacionextramuros.github.io/">
+    <meta property="twitter:title" content="Galería de Arte - Fundación Extramuros">
+    <meta property="twitter:description" content="Descubre obras de arte y artistas en la galería de la Fundación Extramuros.">
+    <meta property="twitter:image" content="https://fundacionextramuros.github.io/iconos/Logo-temporal.svg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://fundacionextramuros.github.io/">
+    
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notificaciones.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
 
-    <div id="toggle-panel" class="hidden">
-        <button id="btn-menu-principal">
+    <div id="toggle-panel" class="hidden" role="navigation" aria-label="Menú principal">
+        <button id="btn-menu-principal" aria-label="Abrir menú principal" aria-expanded="false">
             <img src="iconos/Menu.svg" alt="Menú" class="toggle-icon">
             <span class="toggle-label">Menú</span>
         </button>
-        <button id="btn-logout-sidebar">
+        <button id="btn-logout-sidebar" aria-label="Cerrar sesión">
             <img src="iconos/Cerrar sesion.svg" alt="Cerrar Sesión" class="toggle-icon">
             <span class="toggle-label">Cerrar Sesión</span>
         </button>
@@ -58,20 +83,21 @@
 
 
     <!-- HEADER -->
-    <header id="main-header">
-        <img src="iconos/Logo-temporal.svg" alt="Hagamos Arte Táchira" class="login-logo">
-        <div id="user-actions">
-            <button id="btn-perfil">👤</button>
+    <header id="main-header" role="banner">
+        <img src="iconos/Logo-temporal.svg" alt="Hagamos Arte Táchira - Fundación Extramuros" class="login-logo">
+        <div id="user-actions" role="group" aria-label="Acciones de usuario">
+            <button id="btn-perfil" aria-label="Perfil de usuario">👤</button>
         </div>
     </header>
 
     <!-- MAIN CONTENT -->
     <main>
         <!-- SECCIÓN PÚBLICA: GALERÍA -->
-        <section id="galeria-publica">
-            <div id="galeria-container">
+        <section id="galeria-publica" aria-labelledby="galeria-title" role="region">
+            <h2 id="galeria-title" class="visually-hidden">Galería Pública</h2>
+            <div id="galeria-container" role="feed" aria-busy="true">
                 <!-- Las tarjetas de obras se cargarán aquí -->
-                <p>Cargando galería...</p>
+                <p aria-live="polite">Cargando galería...</p>
             </div>
             
         </section>
@@ -81,36 +107,39 @@
         </section>
 
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
-        <section id="panel-artista" class="hidden">
-            <h2>Mi Panel</h2>
+        <section id="panel-artista" class="hidden" aria-labelledby="panel-title" role="region">
+            <h2 id="panel-title">Mi Panel</h2>
 
             <!-- Controles de búsqueda y filtros -->
-            <div class="filter-controls">
-                <input type="text" id="search-input" placeholder="Buscar por título, artista o ID...">
-                <select id="sort-select">
+            <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
+                <input type="text" id="search-input" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
+                <label for="sort-select" class="visually-hidden">Ordenar por</label>
+                <select id="sort-select" aria-label="Criterio de ordenamiento">
                     <option value="id">Ordenar por ID</option>
                     <option value="titulo">Ordenar por Título</option>
                     <option value="precio">Ordenar por Precio</option>
                     <option value="status">Ordenar por Status</option>
                 </select>
-                <select id="order-select">
+                <label for="order-select" class="visually-hidden">Orden</label>
+                <select id="order-select" aria-label="Orden de clasificación">
                     <option value="DESC">Descendente</option>
                     <option value="ASC">Ascendente</option>
                 </select>
-                <select id="limit-select">
+                <label for="limit-select" class="visually-hidden">Resultados por página</label>
+                <select id="limit-select" aria-label="Cantidad de resultados por página">
                     <option value="5">5 por página</option>
                     <option value="10" selected>10 por página</option>
                     <option value="20">20 por página</option>
                     <option value="50">50 por página</option>
                 </select>
-                <button id="btn-aplicar-filtros">Aplicar</button>
+                <button id="btn-aplicar-filtros" type="button">Aplicar</button>
             </div>
 
             <!-- Controles de paginación -->
-            <div class="pagination-controls">
-                <button id="btn-prev" class="pagination-btn">« Anterior</button>
-                <span id="page-info">Página 1</span>
-                <button id="btn-next" class="pagination-btn">Siguiente »</button>
+            <div class="pagination-controls" role="navigation" aria-label="Paginación de resultados">
+                <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
+                <span id="page-info" aria-live="polite">Página 1</span>
+                <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
             </div>
 
             <!-- Tabla de obras -->
@@ -133,18 +162,32 @@
             </div>
 
             <!-- Formulario para agregar/editar obra -->
-            <div id="formulario-obra">
-                <h3>Agregar / Editar Obra</h3>
-                <form id="obra-form">
+            <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
+                <h3 id="form-obra-title">Agregar / Editar Obra</h3>
+                <form id="obra-form" aria-label="Formulario de obra">
                     <!-- Datos básicos -->
-                    <input type="text" id="input-titulo" placeholder="Título" required>
-                    <input type="text" id="input-artista" placeholder="Artista" readonly>
-                    <input type="number" id="input-precio" placeholder="Precio" required>
-                    <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required>
+                    <div class="form-group">
+                        <label for="input-titulo">Título</label>
+                        <input type="text" id="input-titulo" placeholder="Título" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-artista">Artista</label>
+                        <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-precio">Precio</label>
+                        <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-id-personalizado">ID Personalizado</label>
+                        <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required aria-required="true">
+                    </div>
 
                     <!-- Técnica -->
-                    <select id="input-descripcion-tecnica" required>
-                        <option value="" disabled selected>Selecciona Técnica</option>
+                    <div class="form-group">
+                        <label for="input-descripcion-tecnica">Técnica</label>
+                        <select id="input-descripcion-tecnica" required aria-required="true">
+                            <option value="" disabled selected>Selecciona Técnica</option>
                         <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
                         <option value="Acrílico sobre lienzo">Acrílico sobre lienzo</option>
                         <option value="Acuarela">Acuarela</option>
@@ -177,8 +220,10 @@
                     </select>
 
                     <!-- Soporte -->
-                    <select id="input-soporte" required>
-                        <option value="" disabled selected>Selecciona Soporte</option>
+                    <div class="form-group">
+                        <label for="input-soporte">Soporte</label>
+                        <select id="input-soporte" required aria-required="true">
+                            <option value="" disabled selected>Selecciona Soporte</option>
                         <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
                         <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
                         <option value="Papel (acuarela, dibujo, grabado)">Papel (acuarela, dibujo, grabado)</option>
@@ -288,50 +333,53 @@
                     <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
 
                     <!-- Contenedor para los 5 recuadros de imágenes -->
-                    <div class="imagenes-contenedor">
+                    <div class="imagenes-contenedor" role="group" aria-label="Imágenes de la obra">
+                        <div class="form-group">
+                            <label>Imágenes de la obra (máximo 5)</label>
+                        </div>
                         <!-- Recuadro 1 (Imagen Principal - Obligatoria) -->
                         <div class="recuadro-imagen">
                             <label for="input-imagen-0">
                                 <span id="placeholder-0" class="placeholder-text">+<br>Principal</span>
-                                <img id="preview-0" src="" class="preview-img">
-                                <input type="file" id="input-imagen-0" accept="image/*">
-                                <button type="button" class="btn-eliminar-imagen" data-index="0">✕</button>
+                                <img id="preview-0" src="" class="preview-img" alt="Vista previa imagen principal">
+                                <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal" required>
+                                <button type="button" class="btn-eliminar-imagen" data-index="0" aria-label="Eliminar imagen principal">✕</button>
                             </label>
                         </div>
                         <!-- Recuadro 2 (Opcional) -->
                         <div class="recuadro-imagen">
                             <label for="input-imagen-1">
                                 <span id="placeholder-1" class="placeholder-text">+<br>Imagen 2</span>
-                                <img id="preview-1" src="" class="preview-img">
-                                <input type="file" id="input-imagen-1" accept="image/*">
-                                <button type="button" class="btn-eliminar-imagen" data-index="1">✕</button>
+                                <img id="preview-1" src="" class="preview-img" alt="Vista previa imagen 2">
+                                <input type="file" id="input-imagen-1" accept="image/*" aria-label="Subir imagen adicional 2">
+                                <button type="button" class="btn-eliminar-imagen" data-index="1" aria-label="Eliminar imagen 2">✕</button>
                             </label>
                         </div>
                         <!-- Recuadro 3 (Opcional) -->
                         <div class="recuadro-imagen">
                             <label for="input-imagen-2">
                                 <span id="placeholder-2" class="placeholder-text">+<br>Imagen 3</span>
-                                <img id="preview-2" src="" class="preview-img">
-                                <input type="file" id="input-imagen-2" accept="image/*">
-                                <button type="button" class="btn-eliminar-imagen" data-index="2">✕</button>
+                                <img id="preview-2" src="" class="preview-img" alt="Vista previa imagen 3">
+                                <input type="file" id="input-imagen-2" accept="image/*" aria-label="Subir imagen adicional 3">
+                                <button type="button" class="btn-eliminar-imagen" data-index="2" aria-label="Eliminar imagen 3">✕</button>
                             </label>
                         </div>
                         <!-- Recuadro 4 (Opcional) -->
                         <div class="recuadro-imagen">
                             <label for="input-imagen-3">
                                 <span id="placeholder-3" class="placeholder-text">+<br>Imagen 4</span>
-                                <img id="preview-3" src="" class="preview-img">
-                                <input type="file" id="input-imagen-3" accept="image/*">
-                                <button type="button" class="btn-eliminar-imagen" data-index="3">✕</button>
+                                <img id="preview-3" src="" class="preview-img" alt="Vista previa imagen 4">
+                                <input type="file" id="input-imagen-3" accept="image/*" aria-label="Subir imagen adicional 4">
+                                <button type="button" class="btn-eliminar-imagen" data-index="3" aria-label="Eliminar imagen 4">✕</button>
                             </label>
                         </div>
                         <!-- Recuadro 5 (Opcional) -->
                         <div class="recuadro-imagen">
                             <label for="input-imagen-4">
                                 <span id="placeholder-4" class="placeholder-text">+<br>Imagen 5</span>
-                                <img id="preview-4" src="" class="preview-img">
-                                <input type="file" id="input-imagen-4" accept="image/*">
-                                <button type="button" class="btn-eliminar-imagen" data-index="4">✕</button>
+                                <img id="preview-4" src="" class="preview-img" alt="Vista previa imagen 5">
+                                <input type="file" id="input-imagen-4" accept="image/*" aria-label="Subir imagen adicional 5">
+                                <button type="button" class="btn-eliminar-imagen" data-index="4" aria-label="Eliminar imagen 5">✕</button>
                             </label>
                         </div>
                     </div>
@@ -361,14 +409,16 @@
     </main>
  </div>
     <!-- MODALES -->
-    <div id="modal-login" class="modal hidden">
+    <div id="modal-login" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-title">
         <div class="modal-content">
-            <img src="iconos/Logo-temporal.svg" alt="Hagamos Arte Táchira" class="login-logo">
-            <span class="cerrar-modal">&times;</span>
-            <h2>Iniciar Sesión</h2>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-pass" placeholder="Contraseña" required>
+            <img src="iconos/Logo-temporal.svg" alt="Hagamos Arte Táchira - Fundación Extramuros" class="login-logo">
+            <button class="cerrar-modal" aria-label="Cerrar modal">&times;</button>
+            <h2 id="login-title">Iniciar Sesión</h2>
+            <form id="login-form" aria-label="Formulario de inicio de sesión">
+                <label for="login-email" class="visually-hidden">Email</label>
+                <input type="email" id="login-email" placeholder="Email" required aria-required="true" autocomplete="email">
+                <label for="login-pass" class="visually-hidden">Contraseña</label>
+                <input type="password" id="login-pass" placeholder="Contraseña" required aria-required="true" autocomplete="current-password">
                 <p class="forgot-password">
                     <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
                 </p>
@@ -378,25 +428,26 @@
         </div>
     </div>
 
-    <div id="modal-registro" class="modal hidden">
+    <div id="modal-registro" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="registro-title">
         <div class="modal-content">
-            <span class="cerrar-modal">&times;</span>
-            <h2>Registro de Artista</h2>
+            <button class="cerrar-modal" aria-label="Cerrar modal">&times;</button>
+            <h2 id="registro-title">Registro de Artista</h2>
             <!-- Dentro de #modal-registro, reemplazar el formulario actual por esto -->
-                <form id="registro-form" class="compact-form">
+                <form id="registro-form" class="compact-form" aria-label="Formulario de registro de artista">
                     
-    <div class="step" data-step="1">
-        <button type="button" class="nav-btn prev-btn" data-step="1">
+    <div class="step" data-step="1" role="group" aria-labelledby="step-1-title">
+        <h3 id="step-1-title" class="visually-hidden">Paso 1: Información personal</h3>
+        <button type="button" class="nav-btn prev-btn" data-step="1" aria-label="Atrás" disabled>
             <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
         </button>
         <div class="form-row">
             <div class="form-group">
                 <label for="reg-nombres">Nombres</label>
-                <input type="text" id="reg-nombres" placeholder="Ej: Edgar Antonio" required>
+                <input type="text" id="reg-nombres" placeholder="Ej: Edgar Antonio" required aria-required="true" autocomplete="given-name">
             </div>
             <div class="form-group">
                 <label for="reg-apellidos">Apellidos</label>
-                <input type="text" id="reg-apellidos" placeholder="Ej: Fernández Pérez" required>
+                <input type="text" id="reg-apellidos" placeholder="Ej: Fernández Pérez" required aria-required="true" autocomplete="family-name">
             </div>
         </div>
         <div class="step-navigation">
@@ -404,27 +455,33 @@
         </div>
     </div>
 
-    <div class="step" data-step="2" style="display:none;">
-        <button type="button" class="nav-btn prev-btn" data-step="2">
+    <div class="step" data-step="2" style="display:none;" role="group" aria-labelledby="step-2-title">
+        <h3 id="step-2-title" class="visually-hidden">Paso 2: Fecha de nacimiento y género</h3>
+        <button type="button" class="nav-btn prev-btn" data-step="2" aria-label="Atrás">
             <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
         </button>
         <div class="form-group">
-            <label>Fecha de Nacimiento</label>
-            <div class="date-group">
-                <select name="dia" id="reg-dia" required>
-                    <option value="" disabled selected>Día</option>
-                </select>
-                <select name="mes" id="reg-mes" required>
-                    <option value="" disabled selected>Mes</option>
-                </select>
-                <select name="ano" id="reg-ano" required>
-                    <option value="" disabled selected>Año</option>
-                </select>
-            </div>
+            <fieldset>
+                <legend>Fecha de Nacimiento</legend>
+                <div class="date-group">
+                    <label for="reg-dia" class="visually-hidden">Día</label>
+                    <select name="dia" id="reg-dia" required aria-required="true">
+                        <option value="" disabled selected>Día</option>
+                    </select>
+                    <label for="reg-mes" class="visually-hidden">Mes</label>
+                    <select name="mes" id="reg-mes" required aria-required="true">
+                        <option value="" disabled selected>Mes</option>
+                    </select>
+                    <label for="reg-ano" class="visually-hidden">Año</label>
+                    <select name="ano" id="reg-ano" required aria-required="true">
+                        <option value="" disabled selected>Año</option>
+                    </select>
+                </div>
+            </fieldset>
         </div>
         <div class="form-group">
             <label for="reg-genero">Género</label>
-            <select id="reg-genero" required>
+            <select id="reg-genero" required aria-required="true">
                 <option value="" disabled selected>Selecciona Género</option>
                 <option value="masculino">Masculino</option>
                 <option value="femenino">Femenino</option>
@@ -497,34 +554,35 @@
     </div>
 
     <!-- Modal para solicitar restablecimiento de contraseña -->
-    <div id="modal-restablecimiento" class="modal hidden">
+    <div id="modal-restablecimiento" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="restablecimiento-title">
         <div class="modal-content">
-            <span class="cerrar-modal">&times;</span>
-            <h2>Restablecer Contraseña</h2>
-            <form id="solicitar-restablecimiento-form">
+            <button class="cerrar-modal" aria-label="Cerrar modal">&times;</button>
+            <h2 id="restablecimiento-title">Restablecer Contraseña</h2>
+            <form id="solicitar-restablecimiento-form" aria-label="Formulario de restablecimiento de contraseña">
                 <label for="reset-email">Ingresa tu correo electrónico:</label>
-                <input type="email" id="reset-email" placeholder="Correo Electrónico" required>
+                <input type="email" id="reset-email" placeholder="Correo Electrónico" required aria-required="true" autocomplete="email">
                 <button type="submit">Enviar enlace</button>
             </form>
-            <p id="reset-message" class="form-message"></p>
+            <p id="reset-message" class="form-message" role="alert" aria-live="polite"></p>
         </div>
     </div>
 
     <!-- Modal para confirmar eliminación de cuenta -->
-    <div id="modal-confirmar-eliminacion" class="modal hidden">
+    <div id="modal-confirmar-eliminacion" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="eliminar-cuenta-title">
         <div class="modal-content">
-            <span class="cerrar-modal">&times;</span>
-            <h2>🗑️ Eliminar Cuenta</h2>
+            <button class="cerrar-modal" aria-label="Cerrar modal">&times;</button>
+            <h2 id="eliminar-cuenta-title">🗑️ Eliminar Cuenta</h2>
             <p>Para eliminar tu cuenta, por favor ingresa tu contraseña actual.</p>
-            <form id="confirmar-eliminacion-form">
-                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required>
+            <form id="confirmar-eliminacion-form" aria-label="Formulario de eliminación de cuenta">
+                <label for="confirmar-password" class="visually-hidden">Contraseña actual</label>
+                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required aria-required="true" autocomplete="current-password">
                 <button type="submit">Eliminar mi cuenta</button>
             </form>
-            <p id="mensaje-error" class="error-message"></p>
+            <p id="mensaje-error" class="error-message" role="alert" aria-live="polite"></p>
         </div>
     </div>
 
-    <div id="modal-detalles" class="modal hidden">
+    <div id="modal-detalles" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo">
         <div class="modal-content">
             <h2 id="detalle-titulo"></h2>
             <p id="detalle-artista"></p>
@@ -534,6 +592,9 @@
         </div>
     </div>
 
+    <!-- JS DE NOTIFICACIONES -->
+    <script src="js/notificaciones.js" type="module"></script>
+    
     <!-- JS PRINCIPAL (type="module") -->
     <script src="js/main.js" type="module"></script>
 </body>
