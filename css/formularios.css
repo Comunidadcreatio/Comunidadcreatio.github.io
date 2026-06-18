@@ -14,14 +14,31 @@
 #solicitar-restablecimiento-form input[type="email"],
 #confirmar-eliminacion-form input[type="password"] {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #000;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 16px;
     box-sizing: border-box;
-    background: white;
-    color: #000;
+    background: var(--color-white);
+    color: var(--color-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#obra-form input1t0ype="text"]:focus,
+#obra-form input[typ;
+    line-height: 1.5e="number"]:focus,
+#obra-form select:focus,
+#obra-form textarea:focus,
+#registro-form input[type="text"]:focus,
+#registro-form input[type="email"]:focus,
+#registro-form input[type="password"]:focus,
+#registro-form select:focus,
+#login-form input[type="email"]:focus,
+#login-form input[type="password"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 #obra-form textarea {
@@ -38,13 +55,14 @@
 .name-group,
 .date-group {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 /* Contenedor para poner dos campos en la misma fila */
 .form-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .form-row .form-group {
@@ -55,9 +73,10 @@
 /* Ajuste para que los labels no tengan margen extra */
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .dimensiones-group input,
@@ -70,15 +89,15 @@
 /* --- Contenedor de imágenes --- */
 .imagenes-contenedor {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .recuadro-imagen {
     width: 100px;
     height: 100px;
-    border: 2px dashed #000;
+    border: 2px dashed var(--color-border);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -86,11 +105,13 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.2s;
+    background: var(--color-gray-light);
 }
 
 .recuadro-imagen:hover {
-    border-color: #007bff;
+    border-color: var(--color-primary);
+    background: rgba(0, 123, 255, 0.05);
 }
 
 .recuadro-imagen label {
@@ -414,4 +435,157 @@
 #modal-registro button.nav-btn.next-btn:hover,
 #modal-registro #btn-registrarse-final:hover {
     background: var(--color-primary-dark);
+}
+
+/* ==============================================
+   MEJORAS PARA MÓVIL - FORMULARIO DE OBRA
+   ============================================== */
+
+@media (max-width: 768px) {
+    /* Ajustes generales del formulario en móvil */
+    #obra-form,
+    #modal-content {
+        padding: 20px 16px;
+    }
+    
+    /* Inputs y selects más grandes para touch */
+    #obra-form input[type="text"],
+    #obra-form input[type="number"],
+    #obra-form select,
+    #obra-form textarea {
+        padding: 14px 16px;
+        font-size: 16px; /* Previene zoom en iOS */
+        margin-bottom: 18px;
+        border-radius: 10px;
+    }
+    
+    /* Labels más legibles */
+    .form-group label {
+        font-size: 15px;
+        margin-bottom: 10px;
+        margin-top: 8px;
+    }
+    
+    /* Grupos de dimensiones en columna en móvil */
+    .dimensiones-group,
+    .name-group,
+    .date-group {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    /* Filas del formulario en columna en móvil */
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    /* Contenedor de imágenes más espaciado */
+    .imagenes-contenedor {
+        gap: 16px;
+        justify-content: center;
+    }
+    
+    /* Recuadros de imagen más grandes en móvil */
+    .recuadro-imagen {
+        width: 90px;
+        height: 90px;
+    }
+    
+    /* Botones del formulario */
+    #btn-guardar,
+    #btn-limpiar-campos {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 16px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    /* Modal en móvil */
+    .modal {
+        padding: 16px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+    
+    /* Títulos del modal */
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Selects con padding extra para el icono nativo */
+    #obra-form select {
+        padding-right: 40px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        appearance: none;
+    }
+    
+    /* Textarea más cómoda en móvil */
+    #obra-form textarea {
+        min-height: 120px;
+        padding: 14px 16px;
+    }
+    
+    /* Espacio adicional entre secciones del formulario */
+    #obra-form > div,
+    #obra-form > input,
+    #obra-form > select,
+    #obra-form > textarea {
+        margin-bottom: 20px;
+    }
+    
+    /* Ajuste para el contenedor del formulario en panel */
+    #panel-artista #obra-form {
+        padding: 16px;
+    }
+    
+    /* Prevenir desbordamiento horizontal */
+    #obra-form,
+    #modal-content,
+    .modal {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+    
+    /* Asegurar que los selects largos se muestren correctamente */
+    #obra-form select option {
+        padding: 12px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes adicionales para pantallas muy pequeñas */
+    #obra-form input[type="text"],
+    #obra-form input[type="number"],
+    #obra-form select,
+    #obra-form textarea {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    
+    .recuadro-imagen {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .modal-content {
+        padding: 16px 12px;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+    }
 }
