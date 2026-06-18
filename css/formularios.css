@@ -25,9 +25,8 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#obra-form input1t0ype="text"]:focus,
-#obra-form input[typ;
-    line-height: 1.5e="number"]:focus,
+#obra-form input[type="text"]:focus,
+#obra-form input[type="number"]:focus,
 #obra-form select:focus,
 #obra-form textarea:focus,
 #registro-form input[type="text"]:focus,
