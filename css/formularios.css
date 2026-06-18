@@ -546,6 +546,56 @@ form,
    ============================================== */
 
 @media (max-width: 768px) {
+
+    /* 1. Forzamos al fondo del modal a tener padding lateral exacto */
+    .modal, 
+    .modal-fullscreen {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        /* justify-content: center; (Opcional, si quieres que se centre verticalmente también) */
+    }
+    
+    /* 2. La caja blanca ahora ocupa el 100% del espacio permitido por los 20px de aire */
+    #modal-login .modal-content,
+    #modal-registro .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important; /* Ya no usamos auto, el flex y el padding hacen el trabajo */
+        padding: 24px 20px; /* Un poco más de aire por dentro de la caja blanca */
+        border-radius: 16px;
+        box-sizing: border-box !important;
+    }
+
+    /* Aseguramos que los formularios e inputs respeten esta nueva regla estricta */
+    #modal-login form, 
+    #modal-registro form {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    #modal-login input, 
+    #modal-login button,
+    #modal-registro input, 
+    #modal-registro select,
+    #modal-registro button {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Evitamos que el enlace de "Olvidaste tu contraseña" empuje la caja */
+    .modal-content a {
+        display: block;
+        width: 100%;
+        box-sizing: border-box !important;
+        margin-bottom: 15px;
+    }
+
     /* Ajustes generales en móvil */
     #formulario-obra {
         padding: 20px 16px;
