@@ -1,12 +1,13 @@
 /* css/formularios.css - Estilos de todos los formularios */
 
 /* ==============================================
-   RESETEO GLOBAL DE CAJAS PARA FORMULARIOS
+   RESETEO GLOBAL DE CAJAS PARA FORMULARIOS Y PANELES
    ============================================== */
-/* Esto garantiza que el padding y el borde no sumen ancho extra al 100% */
+/* Esto garantiza que el padding y el borde no sumen ancho extra al 100% en ningún contenedor */
 #formulario-obra *, 
 .modal-content *, 
-form * {
+form *,
+#panel-artista * {
     box-sizing: border-box !important;
 }
 
@@ -71,7 +72,7 @@ form * {
     width: 100%;
     max-width: 100%;
     padding: 14px 20px;
-    margin-bottom: 10px; /* Separación entre botones si hay varios */
+    margin-bottom: 10px;
 }
 
 #modal-login button[type="submit"] {
@@ -122,7 +123,8 @@ form * {
 #registro-form,
 #login-form,
 #solicitar-restablecimiento-form,
-#confirmar-eliminacion-form {
+#confirmar-eliminacion-form,
+#panel-artista form {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
@@ -140,7 +142,9 @@ form * {
 #login-form input[type="email"],
 #login-form input[type="password"],
 #solicitar-restablecimiento-form input[type="email"],
-#confirmar-eliminacion-form input[type="password"] {
+#confirmar-eliminacion-form input[type="password"],
+#panel-artista input,
+#panel-artista select {
     width: 100%;
     max-width: 100%;
     padding: 12px 14px;
@@ -164,7 +168,9 @@ form * {
 #registro-form input[type="password"]:focus,
 #registro-form select:focus,
 #login-form input[type="email"]:focus,
-#login-form input[type="password"]:focus {
+#login-form input[type="password"]:focus,
+#panel-artista input:focus,
+#panel-artista select:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
@@ -197,11 +203,10 @@ form * {
 }
 
 .form-row .form-group {
-    flex: 1; /* Cada grupo ocupa el mismo ancho */
-    min-width: 0; /* Permite que se encojan si es necesario */
+    flex: 1;
+    min-width: 0;
 }
 
-/* Ajuste para que los labels no tengan margen extra */
 .form-group {
     position: relative;
     width: 100%;
@@ -323,7 +328,9 @@ form * {
 /* --- Botones de acción del formulario --- */
 #btn-guardar,
 #btn-limpiar-campos,
-#btn-registrarse-final {
+#btn-registrarse-final,
+#panel-artista button[type="submit"],
+#panel-artista .btn-aplicar {
     width: 100%;
     padding: 14px 20px;
     border: none;
@@ -459,7 +466,7 @@ form * {
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 18px;
-    padding-right: 35px; /* Espacio para el ícono */
+    padding-right: 35px;
 }
 
 .input-unavailable {
@@ -483,12 +490,13 @@ form * {
    SOLUCIÓN DEFINITIVA: ALINEACIÓN Y SCROLLBAR
    ============================================== */
 
-/* 1. Eliminamos por completo el scrollbar horizontal de todos los modales */
+/* 1. Eliminamos por completo el scrollbar horizontal de todos los modales y contenedores */
 .modal-content,
 #modal-registro,
 #modal-login,
 form,
-.step {
+.step,
+#panel-artista {
     overflow-x: hidden !important;
 }
 
@@ -542,40 +550,64 @@ form,
 }
 
 /* ==============================================
-   MEJORAS PARA MÓVIL
+   MEJORAS PARA MÓVIL (MODALES Y PANELES)
    ============================================== */
 
 @media (max-width: 768px) {
-
-    /* 1. Forzamos al fondo del modal a tener padding lateral exacto */
+    
+    /* ----------------------------------------------
+       ESPACIADO GLOBAL DE PANTALLAS Y MODALES 
+       ---------------------------------------------- */
+    /* Forzamos al fondo del modal y al panel general a tener padding lateral exacto */
     .modal, 
-    .modal-fullscreen {
+    .modal-fullscreen,
+    #panel-artista {
         padding-left: 20px !important;
         padding-right: 20px !important;
         box-sizing: border-box !important;
+        width: 100% !important;
+    }
+    
+    .modal, 
+    .modal-fullscreen {
         display: flex !important;
         flex-direction: column;
         align-items: center;
-        /* justify-content: center; (Opcional, si quieres que se centre verticalmente también) */
-    }
-    
-    /* 2. La caja blanca ahora ocupa el 100% del espacio permitido por los 20px de aire */
-    #modal-login .modal-content,
-    #modal-registro .modal-content {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important; /* Ya no usamos auto, el flex y el padding hacen el trabajo */
-        padding: 24px 20px; /* Un poco más de aire por dentro de la caja blanca */
-        border-radius: 16px;
-        box-sizing: border-box !important;
+        padding-top: 20px;
     }
 
-    /* Aseguramos que los formularios e inputs respeten esta nueva regla estricta */
+    /* ----------------------------------------------
+       CAJAS INTERNAS (MODALES, FORMULARIOS DEL PANEL)
+       ---------------------------------------------- */
+    /* La caja blanca ocupa todo el espacio permitido por los 20px de aire exterior */
+    #modal-login .modal-content,
+    #modal-registro .modal-content,
+    #formulario-obra,
+    #panel-artista form {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important; 
+        padding: 24px 20px !important; 
+        border-radius: 16px;
+        box-sizing: border-box !important;
+        box-shadow: none;
+    }
+    
+    /* Para el panel específicamente: que las tablas tampoco se desborden ni choquen */
+    #panel-artista table,
+    #panel-artista .table-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+
+    /* Aseguramos que inputs y botones respeten esta nueva regla estricta */
     #modal-login form, 
-    #modal-registro form {
+    #modal-registro form,
+    #panel-artista form {
         width: 100% !important;
         margin: 0 !important;
-        padding: 0 !important;
         box-sizing: border-box !important;
     }
 
@@ -583,9 +615,15 @@ form,
     #modal-login button,
     #modal-registro input, 
     #modal-registro select,
-    #modal-registro button {
+    #modal-registro button,
+    #panel-artista input,
+    #panel-artista select,
+    #panel-artista button {
         width: 100% !important;
         box-sizing: border-box !important;
+        padding: 14px 12px; /* Mejor área táctil */
+        font-size: 16px; 
+        border-radius: 10px;
     }
     
     /* Evitamos que el enlace de "Olvidaste tu contraseña" empuje la caja */
@@ -594,44 +632,6 @@ form,
         width: 100%;
         box-sizing: border-box !important;
         margin-bottom: 15px;
-    }
-
-    /* Ajustes generales en móvil */
-    #formulario-obra {
-        padding: 20px 16px;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    
-    #obra-form,
-    .modal-content {
-        padding: 20px 16px;
-    }
-    
-    /* Modales en móvil centrados y sin desborde */
-    #modal-login .modal-content,
-    #modal-registro .modal-content {
-        max-width: 95%;
-        width: 95%;
-        padding: 24px 16px;
-        border-radius: 16px;
-        margin: 0 auto;
-    }
-    
-    #modal-login input[type="email"],
-    #modal-login input[type="password"] {
-        padding: 14px 12px;
-    }
-    
-    /* Inputs y selects más grandes para touch */
-    #obra-form input[type="text"],
-    #obra-form input[type="number"],
-    #obra-form select,
-    #obra-form textarea {
-        padding: 14px 12px;
-        font-size: 16px; 
-        margin-bottom: 18px;
-        border-radius: 10px;
     }
     
     /* Labels más legibles */
@@ -663,8 +663,7 @@ form,
     
     /* Modal scroll */
     .modal {
-        padding: 16px;
-        max-height: 95vh;
+        max-height: 100vh;
         overflow-y: auto;
     }
     
@@ -674,8 +673,9 @@ form,
     }
     
     /* Selects con padding extra para el icono nativo */
-    #obra-form select {
-        padding-right: 40px;
+    #obra-form select,
+    #panel-artista select {
+        padding-right: 40px !important;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 14px center;
@@ -684,6 +684,10 @@ form,
     
     #obra-form textarea {
         min-height: 120px;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px;
+        border-radius: 10px;
     }
     
     #obra-form > div,
@@ -691,16 +695,6 @@ form,
     #obra-form > select,
     #obra-form > textarea {
         margin-bottom: 20px;
-    }
-    
-    #panel-artista #formulario-obra {
-        padding: 16px;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    
-    #panel-artista #obra-form {
-        padding: 0;
     }
     
     /* Prevenir desbordamiento horizontal global en móvil */
@@ -722,17 +716,22 @@ form,
     #obra-form input[type="text"],
     #obra-form input[type="number"],
     #obra-form select,
-    #obra-form textarea {
+    #obra-form textarea,
+    #panel-artista input,
+    #panel-artista select {
         padding: 12px 10px;
         font-size: 15px;
     }
     
-    #obra-form select {
-        padding-right: 35px;
+    #obra-form select,
+    #panel-artista select {
+        padding-right: 35px !important;
     }
     
-    #formulario-obra {
-        padding: 20px 12px;
+    /* Aire sutil para pantallas muy pequeñas */
+    #formulario-obra,
+    #panel-artista form {
+        padding: 20px 15px !important;
     }
     
     .recuadro-imagen {
@@ -741,7 +740,7 @@ form,
     }
     
     .modal-content {
-        padding: 16px 12px;
+        padding: 16px 12px !important;
     }
     
     .modal-content h2 {
