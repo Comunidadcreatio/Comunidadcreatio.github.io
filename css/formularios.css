@@ -1,6 +1,17 @@
 /* css/formularios.css - Estilos de todos los formularios */
 
 /* ==============================================
+   RESETEO GLOBAL DE CAJAS PARA FORMULARIOS Y PANELES
+   ============================================== */
+/* Esto garantiza que el padding y el borde no sumen ancho extra al 100% en ningún contenedor */
+#formulario-obra *, 
+.modal-content *, 
+form *,
+#panel-artista * {
+    box-sizing: border-box !important;
+}
+
+/* ==============================================
    CONTENEDORES DE FORMULARIOS - CENTRADO Y ESPACIADO
    ============================================== */
 
@@ -14,7 +25,6 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow-x: hidden;
-    box-sizing: border-box;
 }
 
 /* Contenedor del formulario en panel del artista */
@@ -27,6 +37,7 @@
 
 /* Formularios en modales */
 .modal-content form {
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     padding: 10px 0;
@@ -39,10 +50,10 @@
     padding: 32px 20px;
     text-align: center;
     margin: 0 auto;
-    box-sizing: border-box;
 }
 
 #modal-login form {
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     overflow-x: hidden;
@@ -53,14 +64,18 @@
 #modal-login input[type="password"] {
     width: 100%;
     max-width: 100%;
-    box-sizing: border-box;
     overflow: hidden;
     padding: 14px 16px;
 }
 
-#modal-login button[type="submit"] {
+#modal-login button {
     width: 100%;
+    max-width: 100%;
     padding: 14px 20px;
+    margin-bottom: 10px;
+}
+
+#modal-login button[type="submit"] {
     background-color: var(--color-primary);
     color: var(--color-white);
     border: none;
@@ -90,12 +105,14 @@
 }
 
 #modal-registro form {
+    width: 100%;
     max-width: 100%;
     overflow-x: hidden;
 }
 
 /* Contenedor de pasos del registro */
 .step {
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     padding: 20px 0;
@@ -106,7 +123,8 @@
 #registro-form,
 #login-form,
 #solicitar-restablecimiento-form,
-#confirmar-eliminacion-form {
+#confirmar-eliminacion-form,
+#panel-artista form {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
@@ -124,7 +142,9 @@
 #login-form input[type="email"],
 #login-form input[type="password"],
 #solicitar-restablecimiento-form input[type="email"],
-#confirmar-eliminacion-form input[type="password"] {
+#confirmar-eliminacion-form input[type="password"],
+#panel-artista input,
+#panel-artista select {
     width: 100%;
     max-width: 100%;
     padding: 12px 14px;
@@ -132,7 +152,6 @@
     border: 1px solid var(--color-border);
     border-radius: 8px;
     font-size: 16px;
-    box-sizing: border-box;
     background: var(--color-white);
     color: var(--color-text);
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -149,7 +168,9 @@
 #registro-form input[type="password"]:focus,
 #registro-form select:focus,
 #login-form input[type="email"]:focus,
-#login-form input[type="password"]:focus {
+#login-form input[type="password"]:focus,
+#panel-artista input:focus,
+#panel-artista select:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
@@ -170,6 +191,7 @@
 .date-group {
     display: flex;
     gap: 12px;
+    width: 100%;
 }
 
 /* Contenedor para poner dos campos en la misma fila */
@@ -177,14 +199,19 @@
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .form-row .form-group {
-    flex: 1; /* Cada grupo ocupa el mismo ancho */
-    min-width: 0; /* Permite que se encojan si es necesario */
+    flex: 1;
+    min-width: 0;
 }
 
-/* Ajuste para que los labels no tengan margen extra */
+.form-group {
+    position: relative;
+    width: 100%;
+}
+
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -214,8 +241,8 @@
 .dimensiones-group input,
 .name-group input,
 .date-group select {
-    flex: 1; /* Cada selector ocupa el mismo ancho */
-    min-width: 0; /* Permite que se encojan si es necesario */
+    flex: 1; 
+    min-width: 0; 
 }
 
 /* --- Contenedor de imágenes --- */
@@ -299,17 +326,24 @@
 }
 
 /* --- Botones de acción del formulario --- */
-#btn-guardar {
+#btn-guardar,
+#btn-limpiar-campos,
+#btn-registrarse-final,
+#panel-artista button[type="submit"],
+#panel-artista .btn-aplicar {
     width: 100%;
     padding: 14px 20px;
-    background-color: var(--color-success);
-    color: var(--color-white);
     border: none;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
+}
+
+#btn-guardar {
+    background-color: var(--color-success);
+    color: var(--color-white);
 }
 
 #btn-guardar:hover {
@@ -317,21 +351,9 @@
     transform: translateY(-1px);
 }
 
-#btn-guardar:active {
-    transform: translateY(0);
-}
-
 #btn-limpiar-campos {
-    width: 100%;
-    padding: 14px 20px;
     background-color: var(--color-danger);
     color: var(--color-white);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
     margin-top: 12px;
 }
 
@@ -340,8 +362,13 @@
     transform: translateY(-1px);
 }
 
-#btn-limpiar-campos:active {
-    transform: translateY(0);
+#btn-registrarse-final {
+    background: var(--color-success);
+    color: var(--color-white);
+}
+
+#btn-registrarse-final:hover {
+    background: var(--color-success-dark);
 }
 
 /* Contenedor de botones del formulario */
@@ -351,67 +378,14 @@
     margin-top: 24px;
     padding-top: 20px;
     border-top: 1px solid var(--color-gray-light);
+    width: 100%;
 }
 
 .form-actions button {
     flex: 1;
 }
 
-
-.nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-#btn-registrarse-final {
-    width: 100%;
-    padding: 12px;
-    background: var(--color-success);
-    color: var(--color-white);
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-#btn-registrarse-final:hover {
-    background: var(--color-success-dark);
-}
-
-/* --- Botones de formularios en modales --- */
-#login-form button[type="submit"],
-#registro-form button[type="submit"],
-#solicitar-restablecimiento-form button[type="submit"],
-#confirmar-eliminacion-form button[type="submit"] {
-    background: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-#login-form button[type="submit"]:hover,
-#registro-form button[type="submit"]:hover,
-#solicitar-restablecimiento-form button[type="submit"]:hover,
-#confirmar-eliminacion-form button[type="submit"]:hover {
-    background: var(--color-primary-dark);
-}
-
-/* Forzar eliminación de bordes en los botones de navegación */
-.nav-btn,
-.nav-btn *,
-.nav-btn::before,
-.nav-btn::after {
-    border: none;
-    outline: none;
-    box-shadow: none;
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-}
-
+/* Botones de navegación (modales) */
 .nav-btn {
     width: 40px;
     height: 40px;
@@ -422,6 +396,18 @@
     -webkit-appearance: none;
     appearance: none;
     transition: opacity 0.2s;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .nav-btn:hover {
@@ -434,40 +420,30 @@
     display: block;
 }
 
-@media (max-width: 768px) {
-    /* Contenedor principal del paso: forzar alineación */
-    .step-navigation {
-        display: flex;
-        justify-content: center;
-        gap: 1px;
-        width: auto;
-        max-width: 200px; /* 🔥 Límite para que no se separen */
-        margin: 15px auto 0;
-        padding: 0;
-        flex-wrap: nowrap;
-    }
+/* --- Botones de formularios en modales --- */
+#login-form button[type="submit"],
+#registro-form button[type="submit"],
+#solicitar-restablecimiento-form button[type="submit"],
+#confirmar-eliminacion-form button[type="submit"] {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
 
-    /* Botones: eliminar cualquier estiramiento */
-    .nav-btn {
-        margin: 0;
-        padding: 0;
-        flex: 0 0 auto; /* No se estiran */
-        width: 40px;
-        height: 40px;
-    }
-
-    /* También forzar que los SVGs no tengan márgenes */
-    .nav-btn img {
-        margin: 0;
-        padding: 0;
-        display: block;
-    }
+#login-form button[type="submit"]:hover,
+#registro-form button[type="submit"]:hover,
+#solicitar-restablecimiento-form button[type="submit"]:hover,
+#confirmar-eliminacion-form button[type="submit"]:hover {
+    background: var(--color-primary-dark);
 }
 
 /* Estilos para validación visual */
 .input-error {
-    border-color: var(--color-danger);
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
 .error-message-field {
@@ -482,12 +458,6 @@
     display: block;
 }
 
-/* Ajuste para que los mensajes de error no desplacen demasiado */
-.form-group {
-    position: relative;
-}
-
-
 /* --- Validación visual en tiempo real --- */
 .input-available {
     border-color: var(--color-success);
@@ -496,7 +466,7 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 18px;
-    padding-right: 35px; /* Espacio para el ícono */
+    padding-right: 35px;
 }
 
 .input-unavailable {
@@ -504,7 +474,6 @@
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
-/* Mensaje de error solo para no disponible */
 .validation-message {
     font-size: 12px;
     margin-top: 4px;
@@ -521,57 +490,51 @@
    SOLUCIÓN DEFINITIVA: ALINEACIÓN Y SCROLLBAR
    ============================================== */
 
-/* 1. Eliminamos por completo el scrollbar horizontal del modal y sus partes */
+/* 1. Eliminamos por completo el scrollbar horizontal de todos los modales y contenedores */
+.modal-content,
 #modal-registro,
-#modal-registro .modal-content,
-#modal-registro #registro-form,
-#modal-registro .step {
-    overflow-x: hidden;
-    box-sizing: border-box;
+#modal-login,
+form,
+.step,
+#panel-artista {
+    overflow-x: hidden !important;
 }
 
-/* 2. Forzamos que todo elemento interno respete estrictamente los límites del contenedor */
-#modal-registro *, 
-#modal-registro *::before, 
-#modal-registro *::after {
-    box-sizing: border-box;
-}
-
-/* 3. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
-#modal-registro .modal-content h2 {
-    text-align: left;
-    padding-left: 45px; /* Desplaza el texto a la derecha para evitar colisiones */
+/* 2. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
+#modal-registro .modal-content h2,
+#modal-login .modal-content h2 {
+    text-align: center;
     margin-top: 0;
     margin-bottom: 25px;
 }
 
-/* 4. Clavamos la flecha en la esquina superior izquierda, alineada con el nuevo margen del título */
-#modal-registro button.nav-btn.prev-btn {
-    position: absolute;
-    top: 34px;    /* Centrado verticalmente respecto a la primera línea del H2 */
-    left: 2rem;   /* Alineado perfectamente con el padding original del modal */
-    z-index: 1100; /* Lo mantiene siempre por encima de cualquier capa */
-    background: transparent;
-    border: none;
-    padding: 5px;  /* Área de clic óptima */
-    margin: 0;
-    cursor: pointer;
-    line-height: 0;
+#modal-registro .modal-content h2 {
+    text-align: left;
+    padding-left: 45px; 
 }
 
-/* 5. Ajustamos la navegación inferior para que no empuje las paredes del modal en escritorio */
-#modal-registro .step-navigation {
+/* 3. Clavamos la flecha en la esquina superior izquierda */
+#modal-registro button.nav-btn.prev-btn {
+    position: absolute;
+    top: 34px;    
+    left: 2rem;   
+    z-index: 1100; 
+    background: transparent;
+    padding: 5px;  
+}
+
+/* 4. Ajustamos la navegación inferior */
+.step-navigation {
     width: 100%;
     max-width: 100%;
     display: flex;
-    justify-content: center; /* Centra el botón Siguiente/Enviar */
+    justify-content: center; 
     margin-top: 25px;
     padding: 0;
 }
 
-/* 6. Estilo estandarizado tipo píldora para los botones de avance */
-#modal-registro button.nav-btn.next-btn,
-#modal-registro #btn-registrarse-final {
+/* 5. Estilo estandarizado tipo píldora para los botones de avance */
+#modal-registro button.nav-btn.next-btn {
     background: var(--color-primary);
     color: var(--color-white);
     border-radius: 50px;
@@ -580,74 +543,106 @@
     height: auto;
     font-size: 16px;
     font-weight: 600;
-    border: none;
-    cursor: pointer;
 }
 
-#modal-registro button.nav-btn.next-btn:hover,
-#modal-registro #btn-registrarse-final:hover {
+#modal-registro button.nav-btn.next-btn:hover {
     background: var(--color-primary-dark);
 }
 
 /* ==============================================
-   MEJORAS PARA MÓVIL - FORMULARIO DE OBRA
+   MEJORAS PARA MÓVIL (MODALES Y PANELES)
    ============================================== */
 
 @media (max-width: 768px) {
-    /* Ajustes generales del formulario en móvil */
-    #formulario-obra {
-        max-width: 100%;
-        margin: 0;
-        padding: 20px 16px;
-        border-radius: 0;
+    
+    /* ----------------------------------------------
+       ESPACIADO GLOBAL DE PANTALLAS Y MODALES 
+       ---------------------------------------------- */
+    /* Forzamos al fondo del modal y al panel general a tener padding lateral exacto */
+    .modal, 
+    .modal-fullscreen,
+    #panel-artista {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+    }
+    
+    .modal, 
+    .modal-fullscreen {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+    }
+
+    /* ----------------------------------------------
+       CAJAS INTERNAS (MODALES, FORMULARIOS DEL PANEL)
+       ---------------------------------------------- */
+       
+    /* LOGIN: Centrado y angosto para respetar el diseño de la Mesa de Trabajo */
+    #modal-login .modal-content {
+        width: 100% !important;
+        max-width: 320px !important; 
+        margin: 0 auto !important; 
+        padding: 24px 0 !important; 
+        border-radius: 16px;
+        box-sizing: border-box !important;
+        box-shadow: none;
+    }
+
+    /* REGISTRO Y PANELES: Mantienen el 100% del ancho permitido */
+    #modal-registro .modal-content,
+    #formulario-obra,
+    #panel-artista form {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important; 
+        padding: 24px 20px !important; 
+        border-radius: 16px;
+        box-sizing: border-box !important;
         box-shadow: none;
     }
     
-    #obra-form,
-    #modal-content {
-        padding: 20px 16px;
+    /* Para el panel específicamente: que las tablas tampoco se desborden ni choquen */
+    #panel-artista table,
+    #panel-artista .table-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
     }
-    
-    /* Modales en móvil */
-    #modal-login .modal-content,
-    #modal-registro .modal-content {
-        max-width: 95%;
-        width: 95%;
-        padding: 24px 16px;
-        border-radius: 16px;
-        margin: 0 auto;
-        box-sizing: border-box;
+
+    /* Aseguramos que inputs y botones respeten esta nueva regla estricta */
+    #modal-login form, 
+    #modal-registro form,
+    #panel-artista form {
+        width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
-    
-    #modal-login .modal-content {
-        padding: 24px 16px;
-    }
-    
-    #modal-login input[type="email"],
-    #modal-login input[type="password"] {
-        padding: 14px 12px;
-    }
-    
-    /* Inputs y selects más grandes para touch */
-    #obra-form input[type="text"],
-    #obra-form input[type="number"],
-    #obra-form select,
-    #obra-form textarea {
-        padding: 14px 12px;
-        font-size: 16px; /* Previene zoom en iOS */
-        margin-bottom: 18px;
+
+    #modal-login input, 
+    #modal-login button,
+    #modal-registro input, 
+    #modal-registro select,
+    #modal-registro button,
+    #panel-artista input,
+    #panel-artista select,
+    #panel-artista button {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px; /* Mejor área táctil */
+        font-size: 16px; 
         border-radius: 10px;
-        max-width: 100%;
-        width: 100%;
-        box-sizing: border-box;
-        overflow: hidden;
     }
     
-    #obra-form select {
-        padding-right: 40px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
+    /* Evitamos que el enlace de "Olvidaste tu contraseña" empuje la caja */
+    .modal-content a {
+        display: block;
+        width: 100%;
+        box-sizing: border-box !important;
+        margin-bottom: 15px;
     }
     
     /* Labels más legibles */
@@ -657,78 +652,55 @@
         margin-top: 8px;
     }
     
-    /* Grupos de dimensiones en columna en móvil */
+    /* Grupos en columna en móvil */
     .dimensiones-group,
     .name-group,
-    .date-group {
-        flex-direction: column;
-        gap: 16px;
-    }
-    
-    /* Filas del formulario en columna en móvil */
+    .date-group,
     .form-row {
         flex-direction: column;
         gap: 16px;
     }
     
-    /* Contenedor de imágenes más espaciado */
+    /* Contenedor de imágenes */
     .imagenes-contenedor {
         gap: 16px;
         justify-content: center;
     }
     
-    /* Recuadros de imagen más grandes en móvil */
     .recuadro-imagen {
         width: 90px;
         height: 90px;
     }
     
-    /* Botones del formulario */
-    #btn-guardar,
-    #btn-limpiar-campos {
-        width: 100%;
-        padding: 14px 20px;
-        font-size: 16px;
-        margin-bottom: 12px;
-        border-radius: 10px;
-    }
-    
-    /* Modal en móvil */
+    /* Modal scroll */
     .modal {
-        padding: 16px;
-        max-height: 95vh;
+        max-height: 100vh;
         overflow-y: auto;
     }
     
-    .modal-content {
-        width: 100%;
-        max-width: 100%;
-        padding: 20px 16px;
-        border-radius: 16px;
-    }
-    
-    /* Títulos del modal */
     .modal-content h2 {
         font-size: 20px;
         margin-bottom: 20px;
     }
     
     /* Selects con padding extra para el icono nativo */
-    #obra-form select {
-        padding-right: 40px;
+    #obra-form select,
+    #panel-artista select {
+        padding-right: 40px !important;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 14px center;
         appearance: none;
     }
     
-    /* Textarea más cómoda en móvil */
     #obra-form textarea {
         min-height: 120px;
-        padding: 14px 16px;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px;
+        border-radius: 10px;
     }
     
-    /* Espacio adicional entre secciones del formulario */
     #obra-form > div,
     #obra-form > input,
     #obra-form > select,
@@ -736,63 +708,41 @@
         margin-bottom: 20px;
     }
     
-    /* Ajuste para el contenedor del formulario en panel */
-    #panel-artista #formulario-obra {
-        padding: 16px;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    
-    #panel-artista #obra-form {
-        padding: 0;
-    }
-    
-    /* Prevenir desbordamiento horizontal */
-    #obra-form,
-    #modal-content,
-    .modal {
+    /* Prevenir desbordamiento horizontal global en móvil */
+    body, html {
         overflow-x: hidden;
-        max-width: 100%;
     }
     
-    /* Asegurar que los selects largos se muestren correctamente */
-    #obra-form select option {
-        padding: 12px;
-        white-space: normal;
-        word-wrap: break-word;
+    /* Step Navigation móvil - forzar centrado */
+    .step-navigation {
+        flex-direction: row;
+        gap: 10px;
         max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    #obra-form select {
-        max-width: 100%;
-        width: 100%;
-        word-wrap: break-word;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        margin: 15px auto 0;
+        flex-wrap: nowrap;
     }
 }
 
 @media (max-width: 480px) {
-    /* Ajustes adicionales para pantallas muy pequeñas */
     #obra-form input[type="text"],
     #obra-form input[type="number"],
     #obra-form select,
-    #obra-form textarea {
+    #obra-form textarea,
+    #panel-artista input,
+    #panel-artista select {
         padding: 12px 10px;
         font-size: 15px;
-        max-width: 100%;
-        width: 100%;
-        box-sizing: border-box;
     }
     
-    #obra-form select {
-        padding-right: 35px;
+    #obra-form select,
+    #panel-artista select {
+        padding-right: 35px !important;
     }
     
-    #formulario-obra {
-        padding: 20px 12px;
+    /* Aire sutil para pantallas muy pequeñas */
+    #formulario-obra,
+    #panel-artista form {
+        padding: 20px 15px !important;
     }
     
     .recuadro-imagen {
@@ -801,7 +751,7 @@
     }
     
     .modal-content {
-        padding: 16px 12px;
+        padding: 16px 12px !important;
     }
     
     .modal-content h2 {
