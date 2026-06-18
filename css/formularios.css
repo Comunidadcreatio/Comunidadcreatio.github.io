@@ -579,19 +579,19 @@ form,
     /* ----------------------------------------------
        CAJAS INTERNAS (MODALES, FORMULARIOS DEL PANEL)
        ---------------------------------------------- */
-    
-    /* ESTILIZAMOS ESPECÍFICAMENTE EL LOGIN PARA QUE SE VEA ANGOSTO Y CENTRADO */
+       
+    /* LOGIN: Centrado y angosto para respetar el diseño de la Mesa de Trabajo */
     #modal-login .modal-content {
         width: 100% !important;
-        max-width: 320px !important; /* El ancho máximo que crea el efecto de tu diseño */
+        max-width: 320px !important; 
         margin: 0 auto !important; 
-        padding: 24px 0 !important; /* Quitamos padding lateral para no apretar los inputs */
+        padding: 24px 0 !important; 
         border-radius: 16px;
         box-sizing: border-box !important;
         box-shadow: none;
     }
 
-    /* MANTENEMOS EL REGISTRO Y LOS PANELES AMPLIOS POR LA CANTIDAD DE CAMPOS */
+    /* REGISTRO Y PANELES: Mantienen el 100% del ancho permitido */
     #modal-registro .modal-content,
     #formulario-obra,
     #panel-artista form {
