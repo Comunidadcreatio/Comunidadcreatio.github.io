@@ -7,11 +7,14 @@
 /* Contenedor principal del formulario de obra */
 #formulario-obra {
     max-width: 900px;
+    width: 100%;
     margin: 0 auto;
     padding: 30px;
     background: var(--color-white);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* Contenedor del formulario en panel del artista */
@@ -32,13 +35,24 @@
 /* Modal de login */
 #modal-login .modal-content {
     max-width: 400px;
-    padding: 32px;
+    width: 90%;
+    padding: 32px 24px;
     text-align: center;
+    margin: 0 auto;
 }
 
 #modal-login form {
     max-width: 100%;
     margin: 0 auto;
+    overflow-x: hidden;
+}
+
+#modal-login input[type="email"],
+#modal-login input[type="password"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 #modal-login button[type="submit"] {
@@ -66,7 +80,15 @@
 /* Modal de registro */
 #modal-registro .modal-content {
     max-width: 600px;
-    padding: 32px;
+    width: 90%;
+    padding: 32px 24px;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+#modal-registro form {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 /* Contenedor de pasos del registro */
@@ -83,8 +105,9 @@
 #solicitar-restablecimiento-form,
 #confirmar-eliminacion-form {
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
+    overflow-x: hidden;
 }
 
 #obra-form input[type="text"],
@@ -100,6 +123,7 @@
 #solicitar-restablecimiento-form input[type="email"],
 #confirmar-eliminacion-form input[type="password"] {
     width: 100%;
+    max-width: 100%;
     padding: 12px 14px;
     margin-bottom: 16px;
     border: 1px solid var(--color-border);
@@ -109,6 +133,8 @@
     background: var(--color-white);
     color: var(--color-text);
     transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #obra-form input[type="text"]:focus,
@@ -163,6 +189,8 @@
     font-weight: 600;
     color: var(--color-text);
     text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Títulos de secciones del formulario */
@@ -709,6 +737,12 @@
     #obra-form select option {
         padding: 12px;
         white-space: normal;
+        word-wrap: break-word;
+        max-width: 100%;
+    }
+    
+    #obra-form select {
+        max-width: 100%;
         word-wrap: break-word;
     }
 }
