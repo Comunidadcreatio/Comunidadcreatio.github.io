@@ -579,8 +579,19 @@ form,
     /* ----------------------------------------------
        CAJAS INTERNAS (MODALES, FORMULARIOS DEL PANEL)
        ---------------------------------------------- */
-    /* La caja blanca ocupa todo el espacio permitido por los 20px de aire exterior */
-    #modal-login .modal-content,
+    
+    /* ESTILIZAMOS ESPECÍFICAMENTE EL LOGIN PARA QUE SE VEA ANGOSTO Y CENTRADO */
+    #modal-login .modal-content {
+        width: 100% !important;
+        max-width: 320px !important; /* Tope máximo para forzar el look de diseño de la Imagen 2 */
+        margin: 0 auto !important; 
+        padding: 30px 20px !important; 
+        border-radius: 16px;
+        box-sizing: border-box !important;
+        box-shadow: none;
+    }
+
+    /* MANTENEMOS EL REGISTRO Y LOS PANELES AMPLIOS POR LA CANTIDAD DE CAMPOS */
     #modal-registro .modal-content,
     #formulario-obra,
     #panel-artista form {
