@@ -4,6 +4,7 @@ import { apiRequest } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
+import { showSuccess, showError, showWarning, showInfo, showLoadingOverlay, hideLoadingOverlay, setButtonLoading } from './notificaciones.js';
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
@@ -77,11 +78,11 @@ function poblarCiudades(paisSeleccionado) {
 function mostrarErrores(result) {
     if (Array.isArray(result.errors) && result.errors.length > 0) {
         const mensaje = result.errors.join('\n• ');
-        alert('❌ Se encontraron los siguientes errores:\n\n• ' + mensaje);
+        showError('Se encontraron los siguientes errores:\n\n• ' + mensaje);
     } else if (result.error) {
-        alert('❌ Error: ' + result.error);
+        showError('Error: ' + result.error);
     } else {
-        alert('❌ Ocurrió un error inesperado. Inténtalo de nuevo.');
+        showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     }
 }
 
@@ -204,20 +205,20 @@ function updateCerrarTodasSesionesButtonState() {
 
 async function closeAllSessions() {
     if (activeSessionsCount < 2) {
-        alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+        showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
         return;
     }
     if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
         try {
             const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
             if (res && res.success) {
-                alert("✅ Todas las sesiones han sido cerradas correctamente.");
+                showSuccess("Todas las sesiones han sido cerradas correctamente.");
             } else {
-                alert("❌ " + (res.error || "Error inesperado."));
+                showError((res.error || "Error inesperado."));
             }
         } catch (error) {
             console.error("Error al cerrar todas las sesiones:", error);
-            alert("❌ Error de conexión. Cerrando sesión local por seguridad.");
+            showError("Error de conexión. Cerrando sesión local por seguridad.");
         } finally {
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
@@ -370,7 +371,7 @@ async function refrescarTabla() {
     if (!result.success) {
         console.error("Error al cargar obras:", result.error);
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
-            alert("🔐 Tu sesión ha expirado. Serás redirigido a la página principal.");
+            showWarning("Tu sesión ha expirado. Serás redirigido a la página principal.");
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
             window.location.href = '/';
@@ -392,7 +393,7 @@ async function refrescarTabla() {
                 if (!data) return;
                 if (data.success === false) {
                     console.error('Error al obtener obra:', data.error);
-                    alert('Error al cargar la obra: ' + data.error);
+                    showError('Error al cargar la obra: ' + data.error);
                     return;
                 }
                 const obra = data;
@@ -474,22 +475,35 @@ async function refrescarTabla() {
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 console.error("Error al cargar datos de la obra:", error);
-                alert("Error al cargar la obra para editar");
+                showError("Error al cargar la obra para editar");
             }
         },
         async (id) => {
+            if (!confirm('¿Estás seguro de eliminar esta obra?')) return;
+            const btnEliminar = document.querySelector(`.btn-eliminar[data-id="${id}"]`);
+            if (btnEliminar) setButtonLoading(btnEliminar, true);
+            
             const exito = await eliminarObra(token, id);
+            if (btnEliminar) setButtonLoading(btnEliminar, false);
+            
             if (exito) {
+                showSuccess("Obra eliminada correctamente.");
                 await refrescarTabla();
             } else {
-                alert("❌ Error al eliminar la obra.");
+                showError("Error al eliminar la obra.");
             }
         },
         async (id) => {
             try {
+                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
+                if (btnDuplicar) setButtonLoading(btnDuplicar, true);
+                
                 const res = await apiRequest(`/obras/${id}`);
                 if (!res) return;
                 const obra = res;
+                
+                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
+                
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = obra.artista;
@@ -525,7 +539,9 @@ async function refrescarTabla() {
                 document.getElementById('input-id-personalizado').focus();
             } catch (error) {
                 console.error("Error al duplicar:", error);
-                alert("Error al duplicar.");
+                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
+                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
+                showError("Error al duplicar la obra.");
             }
         }
     );
@@ -825,12 +841,12 @@ document.getElementById('registro-form').addEventListener('submit', async functi
     
     // Validaciones adicionales (fecha, edad, etc.)
     if (!dia || !mes || !ano) {
-        alert("❌ Todos los campos de fecha son obligatorios.");
+        showWarning("Todos los campos de fecha son obligatorios.");
         return;
     }
     const fechaNac = new Date(ano, mes - 1, dia);
     if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
-        alert("❌ La fecha seleccionada no es válida.");
+        showWarning("La fecha seleccionada no es válida.");
         return;
     }
     const hoy = new Date();
@@ -838,7 +854,7 @@ document.getElementById('registro-form').addEventListener('submit', async functi
     const mesDiff = hoy.getMonth() - fechaNac.getMonth();
     if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
     if (edad < 18) {
-        alert("⚠️ Debes tener al menos 18 años para registrarte.");
+        showWarning("Debes tener al menos 18 años para registrarte.");
         return;
     }
     const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
@@ -849,7 +865,7 @@ document.getElementById('registro-form').addEventListener('submit', async functi
     );
     
     if (result.success) {
-        alert("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+        showSuccess("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
         document.getElementById('modal-registro').classList.add('hidden');
         document.getElementById('modal-registro').classList.remove('modal-fullscreen');
         document.getElementById('modal-login').classList.remove('hidden');
@@ -1031,7 +1047,7 @@ function setupEvents() {
             if (activeSessionsCount >= 2) {
                 await closeAllSessions();
             } else {
-                alert("No hay otras sesiones activas. Solo tienes la sesión actual.");
+                showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
             }
         });
     }
@@ -1147,9 +1163,13 @@ function setupEvents() {
                 }
             }
             if (!hayArchivosNuevos && !imagenFinalVisible) {
-                alert("❌ La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
+                showWarning("La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
                 return;
             }
+            
+            const btnGuardar = document.getElementById('btn-guardar');
+            setButtonLoading(btnGuardar, true);
+            
             const formData = new FormData();
             formData.append('titulo', titulo);
             formData.append('artista', artista);
@@ -1178,8 +1198,9 @@ function setupEvents() {
                 }
             });
             const result = await guardarObra(token, formData, idEdicion || null);
+            setButtonLoading(btnGuardar, false);
             if (result.success) {
-                alert("Obra guardada correctamente.");
+                showSuccess("Obra guardada correctamente.");
                 document.getElementById('btn-guardar').textContent = 'Guardar Obra';
                 imagenesAEliminar.clear();
                 limpiarFormularioCompleto(true);
@@ -1262,7 +1283,7 @@ function setupEvents() {
                     body: JSON.stringify({ password })
                 });
                 if (res && res.success) {
-                    alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                    showSuccess("Tu cuenta ha sido eliminada correctamente.");
                     logout();
                     location.reload();
                 } else if (res && (res.errors || res.error)) {
