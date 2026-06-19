@@ -130,9 +130,101 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
 // ============================================
 // VALIDACIONES DE FORMATO
 // ============================================
+
+// Dominios de correo desechable / temporal conocidos
+const DOMINIOS_DESECHABLES = [
+    'mailinator.com', 'tempmail.com', 'guerrillamail.com', 'throwam.com',
+    'sharklasers.com', 'guerrillamailblock.com', 'grr.la', 'guerrillamail.info',
+    'guerrillamail.biz', 'guerrillamail.de', 'guerrillamail.net', 'guerrillamail.org',
+    'spam4.me', 'trashmail.com', 'trashmail.me', 'trashmail.net', 'trashmail.at',
+    'trashmail.io', 'trashmail.xyz', 'yopmail.com', 'yopmail.fr', 'cool.fr.nf',
+    'jetable.fr.nf', 'nospam.ze.tc', 'nomail.xl.cx', 'mega.zik.dj', 'speed.1s.fr',
+    'courriel.fr.nf', 'moncourrier.fr.nf', 'monemail.fr.nf', 'monmail.fr.nf',
+    'dispostable.com', 'mailnull.com', 'maildrop.cc', 'discard.email',
+    'spamgourmet.com', 'spamgourmet.net', 'spamgourmet.org', 'spamgourmet.com',
+    'fakeinbox.com', 'throwam.com', 'tempr.email', 'discard.email',
+    'spamthisplease.com', 'binkmail.com', 'bobmail.info', 'chammy.info',
+    'devnullmail.com', 'ditchymail.com', 'dontmailme.org', 'dump-email.info',
+    'fudgerub.com', 'iheartspam.org', 'jetable.com', 'jetable.net', 'jetable.org',
+    'klzlk.com', 'lol.ovpn.to', 'lookugly.com', 'lortemail.dk', 'mail.mezimages.net',
+    'mailscrap.com', 'meltmail.com', 'migmail.net', 'migumail.com', 'mintemail.com',
+    'mt2009.com', 'mx0.wwwnew.eu', 'mytrashmail.com', 'noclickemail.com',
+    'nogmailspam.info', 'nospamfor.us', 'nowmymail.com', 'objectmail.com',
+    'obobbo.com', 'onewaymail.com', 'pookmail.com', 'proxymail.eu', 'rcpt.at',
+    'rfc822.org', 's0ny.net', 'safe-mail.net', 'shortmail.net', 'skeefmail.com',
+    'slopsbox.com', 'smellfear.com', 'snkmail.com', 'sofimail.com', 'sogetthis.com',
+    'soodonims.com', 'spam.la', 'spamavert.com', 'spambox.us', 'spamcannon.com',
+    'spamcannon.net', 'spamcon.org', 'spamevader.net', 'spamfree24.org',
+    'spamgob.com', 'spamherelots.com', 'spamhereplease.com', 'spamhole.com',
+    'spamify.com', 'spaminator.de', 'spamkill.info', 'spaml.de', 'spammotel.com',
+    'spamobox.com', 'spamoff.de', 'spamslicer.com', 'spamspot.com',
+    'spamthisplease.com', 'spamtrail.com', 'spamtrap.ro', 'speed.1s.fr',
+    'supergreatmail.com', 'supermailer.jp', 'suremail.info', 'tempe-mail.com',
+    'tempinbox.co.uk', 'tempinbox.com', 'temporary-mail.net', 'temporaryemail.net',
+    'temporaryemail.us', 'temporaryforwarding.com', 'temporaryinbox.com',
+    'temporarymailaddress.com', 'thanksnospam.info', 'thisisnotmyrealemail.com',
+    'throwam.com', 'throwaway.email', 'tilien.com', 'tittbit.in', 'tmailinator.com',
+    'tosunkaya.com', 'tradermail.info', 'trash-mail.com', 'trash-mail.de',
+    'trash-mail.ga', 'trash-mail.io', 'trash-mail.me', 'trash-mail.net',
+    'trashdevil.com', 'trashdevil.de', 'trashemail.de', 'trashimail.com',
+    'trashinbox.com', 'trashmail.at', 'trashmail.com', 'trashmail.de',
+    'trashmail.io', 'trashmail.me', 'trashmail.net', 'trashmail.org',
+    'trashmail.xyz', 'trashmailer.com', 'trashtimail.com', 'trashtymail.com',
+    'trbvm.com', 'turual.com', 'twinmail.de', 'tyldd.com', 'uggsrock.com',
+    'uroid.com', 'us.af', 'venompen.com', 'veryrealemail.com', 'viditag.com',
+    'viewcastmedia.com', 'viewcastmedia.net', 'viewcastmedia.org', 'webemail.me',
+    'webm4il.info', 'wegwerfmail.de', 'wegwerfmail.net', 'wegwerfmail.org',
+    'wilemail.com', 'willselfdestruct.com', 'wuzupmail.net', 'xagloo.com',
+    'xemaps.com', 'xents.com', 'xmaily.com', 'xoxy.net', 'xyzfree.net',
+    'yep.it', 'yogamaven.com', 'yopmail.com', 'yourdomain.com', 'ypmail.webarnak.fr.eu.org',
+    'yuurok.com', 'z1p.biz', 'za.com', 'zehnminuten.de', 'zehnminutenmail.de',
+    'zippymail.info', 'zoemail.net', 'zomg.info', 'temp-mail.org', 'temp-mail.io',
+    'tempmail.net', 'tempmail.org', 'tempmail.de', 'tempmail.co', 'tempemail.net',
+    'mohmal.com', 'mailnesia.com', 'mailnull.com', 'crazymailing.com'
+];
+
+// TLDs válidos más comunes (lista amplia pero razonable)
+const TLDS_VALIDOS = [
+    'com', 'net', 'org', 'edu', 'gov', 'mil', 'int',
+    'co', 've', 'mx', 'ar', 'cl', 'co', 'pe', 'ec', 'bo', 'py', 'uy', 'cr', 'gt',
+    'hn', 'sv', 'ni', 'pa', 'do', 'cu', 'pr', 'ht', 'jm', 'tt', 'bb', 'lc', 'vc',
+    'gd', 'ag', 'dm', 'kn', 'us', 'ca', 'es', 'fr', 'de', 'it', 'pt', 'uk', 'io',
+    'info', 'biz', 'app', 'dev', 'online', 'site', 'web', 'store', 'shop', 'tech',
+    'media', 'news', 'blog', 'art', 'music', 'live', 'pro', 'plus', 'studio',
+    'digital', 'solutions', 'services', 'global', 'world', 'network', 'group',
+    'com.ve', 'net.ve', 'org.ve', 'co.ve', 'com.mx', 'com.ar', 'com.co',
+    'com.pe', 'com.ec', 'com.bo', 'com.py', 'com.uy', 'com.gt', 'com.hn',
+    'com.sv', 'com.ni', 'com.pa', 'com.do', 'com.cu', 'com.pr', 'co.uk',
+    'org.uk', 'me.uk', 'ac.uk', 'gov.uk', 'edu.mx', 'gob.ve', 'gob.mx'
+];
+
 function esEmailValido(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email.trim());
+    const trimmed = email.trim().toLowerCase();
+    // Formato básico
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!re.test(trimmed)) return false;
+    // Verificar que el dominio tenga formato correcto
+    const dominio = trimmed.split('@')[1];
+    if (!dominio || dominio.length < 4) return false;
+    // Verificar TLD
+    const partes = dominio.split('.');
+    if (partes.length < 2) return false;
+    const tld = partes[partes.length - 1];
+    if (tld.length < 2 || tld.length > 10) return false;
+    return true;
+}
+
+function esDominioDesechable(email) {
+    const dominio = email.trim().toLowerCase().split('@')[1] || '';
+    return DOMINIOS_DESECHABLES.includes(dominio);
+}
+
+function esTLDSospechoso(email) {
+    const dominio = email.trim().toLowerCase().split('@')[1] || '';
+    const partes = dominio.split('.');
+    const tld = partes[partes.length - 1];
+    const dominioCompleto = partes.slice(-2).join('.');
+    return !TLDS_VALIDOS.includes(tld) && !TLDS_VALIDOS.includes(dominioCompleto);
 }
 
 function esTelefonoValido(telefono) {
@@ -346,6 +438,14 @@ function validateStep(step) {
             showWarning('Ingresa un correo electrónico válido.');
             return false;
         }
+        if (emailInput && esDominioDesechable(emailInput.value)) {
+            marcarInputError(emailInput);
+            showWarning('No se permiten correos temporales o desechables. Usa tu correo personal.');
+            return false;
+        }
+        if (emailInput && esTLDSospechoso(emailInput.value)) {
+            showWarning('El dominio de tu correo parece inusual. Verifica que sea correcto antes de continuar.');
+        }
         if (disponibilidad.email === false) {
             marcarInputError(emailInput);
             showWarning('Este correo ya está registrado. Usa otro.');
@@ -450,6 +550,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const regEmail = document.getElementById('reg-email');
     if (regEmail) {
         regEmail.addEventListener('input', function() {
+            const val = this.value.trim().toLowerCase();
+            // Advertencia inmediata de dominio desechable
+            let msgDesechable = this.parentElement.querySelector('.msg-desechable');
+            if (esEmailValido(val) && esDominioDesechable(val)) {
+                if (!msgDesechable) {
+                    msgDesechable = document.createElement('div');
+                    msgDesechable.className = 'validation-message unavailable msg-desechable';
+                    this.parentElement.appendChild(msgDesechable);
+                }
+                msgDesechable.textContent = '❌ Correos temporales no permitidos';
+                msgDesechable.style.display = 'block';
+                this.classList.add('input-unavailable');
+            } else {
+                if (msgDesechable) msgDesechable.remove();
+                this.classList.remove('input-unavailable');
+            }
             verificarEmailDebounced(this.value, this);
         });
     }
