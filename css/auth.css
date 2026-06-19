@@ -56,9 +56,9 @@ body {
                       radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 20%);
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 60px 20px 100px 20px;
     color: var(--color-text);
 }
 
@@ -79,23 +79,37 @@ body {
 }
 
 /* ==============================================
-   CONTENEDOR PRINCIPAL (40% más pequeño)
+   CONTENEDOR PRINCIPAL (transparente)
    ============================================== */
 .auth-container {
     width: 100%;
     max-width: 360px;
-    background: var(--color-white);
+    background: transparent;
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    overflow: hidden;
+    box-shadow: none;
+    overflow: visible;
     position: relative;
-    border: 1px solid var(--color-gray-200);
+    border: none;
 }
 
 .auth-section {
     padding: 32px 24px;
     width: 100%;
     position: relative;
+}
+
+/* Login section reducido 30% */
+#login-section {
+    transform: scale(0.7);
+    transform-origin: top center;
+    margin-bottom: -80px;
+}
+
+/* Registro section reducido 30% */
+#registro-section {
+    transform: scale(0.7);
+    transform-origin: top center;
+    margin-bottom: -80px;
 }
 
 /* ==============================================
@@ -142,7 +156,7 @@ form {
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     width: 100%;
 }
 
@@ -290,7 +304,7 @@ button[type="submit"]:active,
    ENLACES
    ============================================== */
 .forgot-password {
-    text-align: right;
+    text-align: center;
     margin-bottom: 16px;
 }
 
@@ -305,6 +319,11 @@ button[type="submit"]:active,
 .forgot-password a:hover {
     color: var(--color-primary-dark);
     text-decoration: underline;
+}
+
+/* Espacio específico entre email y password en login */
+#login-pass {
+    margin-top: 12px;
 }
 
 /* ==============================================
@@ -328,7 +347,7 @@ button[type="submit"]:active,
 
 .form-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 16px;
 }
 
@@ -340,6 +359,22 @@ button[type="submit"]:active,
 .date-group {
     display: flex;
     gap: 8px;
+    flex-wrap: nowrap;
+}
+
+/* Quitar borde de fieldset */
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+legend {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 6px;
+    display: block;
 }
 
 .date-group select {

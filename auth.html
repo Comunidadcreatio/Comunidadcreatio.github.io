@@ -37,12 +37,9 @@
 
         <!-- REGISTRO SECTION -->
         <div id="registro-section" class="auth-section hidden">
-            <button id="btn-volver-login" class="back-btn">
-                <img src="iconos/flecha-izquierda.svg" alt="Volver">
-            </button>
             <h1>Registro de Artista</h1>
             <form id="registro-form" class="compact-form">
-                
+
                 <div class="step" data-step="1">
                     <h2 class="visually-hidden">Paso 1: Información personal</h2>
                     <div class="form-row">
@@ -56,6 +53,7 @@
                         </div>
                     </div>
                     <div class="step-navigation">
+                        <button type="button" class="nav-btn prev-btn" data-step="1">Atrás</button>
                         <button type="button" class="nav-btn next-btn" data-step="1">Siguiente</button>
                     </div>
                 </div>
@@ -63,23 +61,21 @@
                 <div class="step" data-step="2" style="display:none;">
                     <h2 class="visually-hidden">Paso 2: Fecha de nacimiento y género</h2>
                     <div class="form-group">
-                        <fieldset>
-                            <legend>Fecha de Nacimiento</legend>
-                            <div class="date-group">
-                                <label for="reg-dia" class="visually-hidden">Día</label>
-                                <select name="dia" id="reg-dia" required>
-                                    <option value="" disabled selected>Día</option>
-                                </select>
-                                <label for="reg-mes" class="visually-hidden">Mes</label>
-                                <select name="mes" id="reg-mes" required>
-                                    <option value="" disabled selected>Mes</option>
-                                </select>
-                                <label for="reg-ano" class="visually-hidden">Año</label>
-                                <select name="ano" id="reg-ano" required>
-                                    <option value="" disabled selected>Año</option>
-                                </select>
-                            </div>
-                        </fieldset>
+                        <label>Fecha de Nacimiento</label>
+                        <div class="date-group">
+                            <label for="reg-dia" class="visually-hidden">Día</label>
+                            <select name="dia" id="reg-dia" required>
+                                <option value="" disabled selected>Día</option>
+                            </select>
+                            <label for="reg-mes" class="visually-hidden">Mes</label>
+                            <select name="mes" id="reg-mes" required>
+                                <option value="" disabled selected>Mes</option>
+                            </select>
+                            <label for="reg-ano" class="visually-hidden">Año</label>
+                            <select name="ano" id="reg-ano" required>
+                                <option value="" disabled selected>Año</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="reg-genero">Género</label>
@@ -91,9 +87,7 @@
                         </select>
                     </div>
                     <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="2">
-                            <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
-                        </button>
+                        <button type="button" class="nav-btn prev-btn" data-step="2">Atrás</button>
                         <button type="button" class="nav-btn next-btn" data-step="2">Siguiente</button>
                     </div>
                 </div>
@@ -114,9 +108,7 @@
                         </select>
                     </div>
                     <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="3">
-                            <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
-                        </button>
+                        <button type="button" class="nav-btn prev-btn" data-step="3">Atrás</button>
                         <button type="button" class="nav-btn next-btn" data-step="3">Siguiente</button>
                     </div>
                 </div>
@@ -132,9 +124,7 @@
                         <input type="text" id="reg-telefono" placeholder="Ej: 04161234567" required>
                     </div>
                     <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="4">
-                            <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
-                        </button>
+                        <button type="button" class="nav-btn prev-btn" data-step="4">Atrás</button>
                         <button type="button" class="nav-btn next-btn" data-step="4">Siguiente</button>
                     </div>
                 </div>
@@ -150,9 +140,7 @@
                         <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required>
                     </div>
                     <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="5">
-                            <img src="iconos/flecha-izquierda.svg" alt="Atrás" style="width:20px; height:20px;">
-                        </button>
+                        <button type="button" class="nav-btn prev-btn" data-step="5">Atrás</button>
                         <button type="submit" id="btn-registrarse-final">Enviar</button>
                     </div>
                 </div>
