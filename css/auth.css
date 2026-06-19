@@ -347,7 +347,7 @@ button[type="submit"]:active,
 
 .form-row {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 16px;
 }
 
@@ -405,13 +405,15 @@ legend {
 }
 
 .nav-btn.prev-btn {
-    background: var(--color-gray-200);
-    color: var(--color-text);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-white);
+    flex: 1;
 }
 
 .nav-btn.prev-btn:hover {
-    background: var(--color-gray-300);
-    color: var(--color-text);
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary-dark) 100%);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
 }
 
 .nav-btn.next-btn {
@@ -565,12 +567,12 @@ legend {
     }
 
     .step-navigation {
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
     }
 
     .nav-btn.next-btn {
-        width: 100%;
+        width: auto;
     }
 
     .form-group input,
