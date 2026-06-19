@@ -348,8 +348,8 @@ button[type="submit"]:active,
 .form-row {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    margin-bottom: 2px;
+    gap: 0.5px;
+    margin-bottom: 0.5px;
 }
 
 .form-row .form-group {
