@@ -347,7 +347,8 @@ button[type="submit"]:active,
 
 .form-row {
     display: flex;
-    gap: 4px;
+    flex-direction: column;
+    gap: 16px;
     margin-bottom: 16px;
 }
 
@@ -392,7 +393,7 @@ legend {
 .nav-btn {
     padding: 10px 16px;
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
