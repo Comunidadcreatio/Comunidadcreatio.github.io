@@ -3,7 +3,7 @@
 #main-header {
     background-color: var(--color-white);
     color: var(--color-black);
-    padding: 3px 1rem;
+    padding: 2px 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,7 +18,7 @@
 }
 
 .login-logo {
-    width: 54px;
+    width: 30px;
     height: auto;
     display: block;
     margin: auto;
@@ -63,30 +63,30 @@
    ============================================== */
 @media (min-width: 769px) {
     #main-header {
-        padding: 3px 1.25rem;
+        padding: 2px 1.25rem;
     }
     .login-logo {
-        width: 48px;
+        width: 26px;
         height: auto;
     }
 }
 
 @media (max-width: 768px) {
     #main-header {
-        padding: 3px 0.75rem;
+        padding: 2px 0.75rem;
     }
     .login-logo {
-        width: 42px;
+        width: 24px;
         height: auto;
     }
 }
 
 @media (max-width: 480px) {
     #main-header {
-        padding: 3px 0.5rem;
+        padding: 2px 0.5rem;
     }
     .login-logo {
-        width: 36px;
+        width: 22px;
         height: auto;
     }
 }
