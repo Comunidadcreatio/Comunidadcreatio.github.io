@@ -3,17 +3,29 @@
 #main-header {
     background-color: var(--color-white);
     color: var(--color-black);
-    padding: 1rem 2rem;
+    padding: 0.4rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--color-black);
+    border-bottom: 1px solid var(--color-gray-200);
+    position: relative;
 }
 
 #brand-name {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin: 0;
     font-weight: 600;
+}
+
+.login-logo {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    max-width: 52px;
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 #user-actions {
@@ -26,10 +38,10 @@
     background: none;
     border: 1px solid var(--color-black);
     color: var(--color-black);
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     transition: background 0.2s, color 0.2s;
 }
 
@@ -55,27 +67,38 @@
 @media (min-width: 769px) {
     #main-header {
         background-color: var(--color-white);
-        border-bottom: 2px solid var(--color-black);
-        padding: 1rem 2rem;
-        height: 70px;
+        border-bottom: 1px solid var(--color-gray-200);
+        padding: 0.4rem 2rem;
+        height: 52px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
     }
+    .login-logo {
+        max-width: 44px;
+    }
 }
 
 @media (max-width: 768px) {
     .login-logo {
-        max-width: 150px;
-        margin-bottom: 15px;
+        max-width: 40px;
+    }
+    #main-header {
+        padding: 0.3rem 1rem;
+        height: 46px;
     }
 }
 
 @media (max-width: 480px) {
     #main-header {
-        flex-direction: column;
-        gap: 0.5rem;
+        flex-direction: row;
+        gap: 0;
         text-align: center;
+        height: 44px;
+        padding: 0.25rem 0.75rem;
+    }
+    .login-logo {
+        max-width: 36px;
     }
 }
