@@ -39,42 +39,10 @@ let mobileOutsideClickListener = null;
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
 
-// Ciudades para el registro
-const ciudadesPorPais = {
-    'Venezuela': {
-        'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
-    }
-};
 
 // ============================================
 // FUNCIONES AUXILIARES
 // ============================================
-function poblarCiudades(paisSeleccionado) {
-    const ciudadSelect = document.getElementById('reg-ciudad');
-    if (!ciudadSelect) return;
-    ciudadSelect.innerHTML = '';
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'Selecciona tu ciudad';
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    ciudadSelect.appendChild(defaultOption);
-    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
-        const data = ciudadesPorPais[paisSeleccionado];
-        Object.keys(data).forEach(departamento => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = departamento;
-            data[departamento].forEach(ciudad => {
-                const option = document.createElement('option');
-                option.value = ciudad;
-                option.textContent = ciudad;
-                optgroup.appendChild(option);
-            });
-            ciudadSelect.appendChild(optgroup);
-        });
-    }
-}
-
 function mostrarErrores(result) {
     if (Array.isArray(result.errors) && result.errors.length > 0) {
         const mensaje = result.errors.join('\n• ');
@@ -85,79 +53,6 @@ function mostrarErrores(result) {
         showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     }
 }
-
-// ============================================
-// VERIFICACIÓN EN TIEMPO REAL
-// ============================================
-
-// Debounce para evitar peticiones excesivas
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Verificar disponibilidad de email o nombre de usuario (sin texto para disponible)
-async function verificarDisponibilidad(tipo, valor, inputElement) {
-    if (!valor.trim()) {
-        // Campo vacío: limpiar estado
-        inputElement.classList.remove('input-available', 'input-unavailable');
-        const msg = inputElement.parentElement.querySelector('.validation-message');
-        if (msg) msg.remove();
-        return;
-    }
-
-    try {
-        const endpoint = tipo === 'email' 
-            ? `/api/artistas/verificar-email/${encodeURIComponent(valor)}`
-            : `/api/artistas/verificar-nombre/${encodeURIComponent(valor)}`;
-        
-        const res = await apiRequest(endpoint);
-        
-        // Limpiar mensaje anterior
-        let msg = inputElement.parentElement.querySelector('.validation-message');
-        if (!msg) {
-            msg = document.createElement('div');
-            msg.className = 'validation-message';
-            inputElement.parentElement.appendChild(msg);
-        }
-
-        if (res.available) {
-            // ✅ Disponible: solo borde verde + ícono (sin texto)
-            inputElement.classList.remove('input-unavailable');
-            inputElement.classList.add('input-available');
-            msg.classList.remove('unavailable');
-            msg.style.display = 'none';
-        } else {
-            // ❌ No disponible: borde rojo + mensaje de error
-            inputElement.classList.remove('input-available');
-            inputElement.classList.add('input-unavailable');
-            msg.className = 'validation-message unavailable';
-            msg.style.display = 'block';
-            const mensajeError = tipo === 'email' 
-                ? '❌ Este correo ya está registrado' 
-                : '❌ Este nombre de usuario ya está en uso';
-            msg.textContent = mensajeError;
-        }
-    } catch (error) {
-        console.error('Error al verificar disponibilidad:', error);
-    }
-}
-
-// Versión con debounce (800ms)
-const verificarEmailDebounced = debounce((valor, input) => {
-    verificarDisponibilidad('email', valor, input);
-}, 800);
-
-const verificarNombreDebounced = debounce((valor, input) => {
-    verificarDisponibilidad('nombre', valor, input);
-}, 800);
 
 // ============================================
 // MANEJO DE SESIONES (CERRAR TODAS)
@@ -238,14 +133,7 @@ async function ejecutarLogout() {
         console.error("Error en logout backend:", error);
     } finally {
         logout();
-        document.getElementById('toggle-panel').classList.add('hidden');
-        document.getElementById('pagina-blanca').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.add('hidden');
-        document.getElementById('panel-artista').classList.add('hidden');
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.remove('hidden');
-        modalLogin.classList.add('modal-fullscreen');
-        document.getElementById('btn-perfil').classList.remove('hidden');
+        window.location.href = 'auth.html';
     }
 }
 
@@ -640,44 +528,6 @@ function setupImagePreviews() {
 }
 
 // ============================================
-// SELECTORES DE FECHA PARA REGISTRO
-// ============================================
-function cargarSelectoresFecha() {
-    const diaSelect = document.getElementById('reg-dia');
-    if (diaSelect) {
-        diaSelect.innerHTML = '<option value="" disabled selected>Día</option>';
-        for (let i = 1; i <= 31; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            diaSelect.appendChild(option);
-        }
-    }
-    const mesSelect = document.getElementById('reg-mes');
-    if (mesSelect) {
-        mesSelect.innerHTML = '<option value="" disabled selected>Mes</option>';
-        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        meses.forEach((nombre, i) => {
-            const option = document.createElement('option');
-            option.value = i + 1;
-            option.textContent = nombre;
-            mesSelect.appendChild(option);
-        });
-    }
-    const anoSelect = document.getElementById('reg-ano');
-    if (anoSelect) {
-        anoSelect.innerHTML = '<option value="" disabled selected>Año</option>';
-        const maxYear = new Date().getFullYear() - 18;
-        for (let i = maxYear; i >= 1900; i--) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            anoSelect.appendChild(option);
-        }
-    }
-}
-
-// ============================================
 // VERIFICAR SESIÓN EN BACKEND
 // ============================================
 async function verificarSesionBackend() {
@@ -691,201 +541,7 @@ async function verificarSesionBackend() {
 }
 
 // ============================================
-// FORMULARIO DE REGISTRO PASO A PASO (WIZARD) - UNA SOLA VEZ
-// ============================================
-
-// Variables para el wizard
-let currentStep = 1;
-const totalSteps = 5;
-
-// Función para mostrar un paso y ocultar los demás
-function showStep(step) {
-    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
-    const target = document.querySelector(`.step[data-step="${step}"]`);
-    if (target) target.style.display = 'block';
-    currentStep = step;
-
-    // 🔥 Limpiar errores al cambiar de paso
-    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-    document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
-
-        // Limpiar estados de validación al cambiar de paso
-    document.querySelectorAll('.input-available, .input-unavailable').forEach(el => {
-        el.classList.remove('input-available', 'input-unavailable');
-    });
-    document.querySelectorAll('.validation-message').forEach(el => el.remove());
-
-    // Cargar selectores de fecha al llegar al paso 2
-    if (step === 2) {
-        cargarSelectoresFecha();
-    }
-
-    // Poblar ciudades al llegar al paso 3
-    if (step === 3) {
-        const paisSelect = document.getElementById('reg-pais');
-        const ciudadSelect = document.getElementById('reg-ciudad');
-
-        if (paisSelect) {
-            paisSelect.removeEventListener('change', paisChangeHandler);
-            paisSelect.addEventListener('change', paisChangeHandler);
-            if (paisSelect.value) {
-                poblarCiudades(paisSelect.value);
-            } else {
-                if (ciudadSelect) {
-                    ciudadSelect.innerHTML = '';
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.textContent = 'Selecciona tu ciudad';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    ciudadSelect.appendChild(defaultOption);
-                }
-            }
-        }
-    }
-}
-
-// Función manejadora para el evento change del país
-function paisChangeHandler() {
-    const paisSelect = document.getElementById('reg-pais');
-    if (paisSelect) {
-        poblarCiudades(paisSelect.value);
-    }
-}
-
-// Validación de campos del paso actual antes de avanzar (sin alert)
-function validateStep(step) {
-    const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
-    if (!stepContainer) return true;
-    
-    // Limpiar errores previos del paso
-    stepContainer.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-    stepContainer.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
-    
-    const inputs = stepContainer.querySelectorAll('input, select');
-    let isValid = true;
-    
-    for (let input of inputs) {
-        if (input.hasAttribute('required') && !input.value.trim()) {
-            // Marcar el campo como error
-            input.classList.add('input-error');
-            
-            // Buscar o crear el mensaje de error
-            let errorMsg = input.parentElement.querySelector('.error-message-field');
-            if (!errorMsg) {
-                errorMsg = document.createElement('div');
-                errorMsg.className = 'error-message-field';
-                errorMsg.textContent = 'Este campo no puede quedar vacío';
-                input.parentElement.appendChild(errorMsg);
-            }
-            errorMsg.classList.add('visible');
-            
-            isValid = false;
-        }
-    }
-    
-    return isValid;
-}
-
-// Navegación con los botones < y >
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.nav-btn')) {
-        const btn = e.target.closest('.nav-btn');
-        const step = parseInt(btn.dataset.step);
-        const isPrev = btn.classList.contains('prev-btn');
-        
-        if (isPrev) {
-            // Botón atrás (<)
-            if (step === 1) {
-                // En el paso 1, atrás lleva al login (cerrar registro y abrir login)
-                document.getElementById('modal-registro').classList.add('hidden');
-                document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-                document.getElementById('modal-login').classList.remove('hidden');
-                document.getElementById('modal-login').classList.add('modal-fullscreen');
-                return;
-            }
-            const newStep = step - 1;
-            showStep(newStep);
-        } else {
-            // Botón siguiente (>)
-            if (!validateStep(step)) return;
-            const newStep = step + 1;
-            if (newStep <= totalSteps) {
-                showStep(newStep);
-            }
-        }
-    }
-});
-
-// Botón Registrarse (final)
-document.getElementById('registro-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Validar el paso 5
-    if (!validateStep(5)) return;
-    
-    // Recoger todos los datos del formulario
-    const nombre_artista = document.getElementById('reg-nombre-artista').value;
-    const nombres = document.getElementById('reg-nombres').value;
-    const apellidos = document.getElementById('reg-apellidos').value;
-    const nombre_real = `${nombres} ${apellidos}`.trim();
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-pass').value;
-    const telefono = document.getElementById('reg-telefono').value;
-    const pais = document.getElementById('reg-pais').value;
-    const ciudad = document.getElementById('reg-ciudad').value;
-    const genero = document.getElementById('reg-genero').value;
-    const dia = document.getElementById('reg-dia').value;
-    const mes = document.getElementById('reg-mes').value;
-    const ano = document.getElementById('reg-ano').value;
-    
-    // Validaciones adicionales (fecha, edad, etc.)
-    if (!dia || !mes || !ano) {
-        showWarning("Todos los campos de fecha son obligatorios.");
-        return;
-    }
-    const fechaNac = new Date(ano, mes - 1, dia);
-    if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
-        showWarning("La fecha seleccionada no es válida.");
-        return;
-    }
-    const hoy = new Date();
-    let edad = hoy.getFullYear() - fechaNac.getFullYear();
-    const mesDiff = hoy.getMonth() - fechaNac.getMonth();
-    if (mesDiff < 0 || (mesDiff === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
-    if (edad < 18) {
-        showWarning("Debes tener al menos 18 años para registrarte.");
-        return;
-    }
-    const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-    
-    // Llamada a la API (igual que antes)
-    const result = await register(
-        nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
-    );
-    
-    if (result.success) {
-        showSuccess("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        document.getElementById('modal-login').classList.remove('hidden');
-        document.getElementById('modal-login').classList.add('modal-fullscreen');
-        document.getElementById('registro-form').reset();
-        // Reiniciar a paso 1
-        showStep(1);
-    } else {
-        mostrarErrores(result);
-    }
-});
-
-// Inicializar mostrando el paso 1
-showStep(1);
-
-// ============================================
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
-// ============================================
-// ============================================
-// CONFIGURACIÓN DE EVENTOS (setupEvents CORREGIDO)
 // ============================================
 function setupEvents() {
     // ----- Panel de logout (escritorio y móvil) -----
@@ -1097,31 +753,8 @@ function setupEvents() {
     // ✅ Perfil (siempre existe)
     btnPerfil.addEventListener('click', () => {
         if (token) mostrarPanelArtista();
-        else document.getElementById('modal-login').classList.remove('hidden');
+        else window.location.href = 'auth.html';
     });
-
-    // ✅ Login (siempre existe)
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-pass').value;
-            const result = await login(email, password);
-            if (result.success) {
-                const modalLogin = document.getElementById('modal-login');
-                modalLogin.classList.add('hidden');
-                modalLogin.classList.remove('modal-fullscreen');
-                document.getElementById('modal-registro').classList.add('hidden');
-                document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-                document.getElementById('toggle-panel').classList.remove('hidden');
-                mostrarPaginaBlanca();
-                await fetchActiveSessionsCount();
-            } else {
-                mostrarErrores(result);
-            }
-        });
-    }
 
     // ✅ Guardar obra (solo si existe el formulario)
     if (obraForm) {
@@ -1306,49 +939,6 @@ function setupEvents() {
         });
     }
 
-    // ✅ Olvidé mi contraseña (siempre existe)
-    const olvideContrasena = document.getElementById('btn-olvide-contrasena');
-    if (olvideContrasena) {
-        olvideContrasena.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('modal-login').classList.add('hidden');
-            document.getElementById('modal-restablecimiento').classList.remove('hidden');
-        });
-    }
-
-    // ✅ Solicitar restablecimiento (siempre existe)
-    const solicitarForm = document.getElementById('solicitar-restablecimiento-form');
-    if (solicitarForm) {
-        solicitarForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('reset-email').value;
-            const messageEl = document.getElementById('reset-message');
-            messageEl.style.display = 'block';
-            messageEl.textContent = '⏳ Enviando solicitud...';
-            messageEl.style.color = '#555';
-            try {
-                const res = await apiRequest('/api/artistas/solicitar-restablecimiento', {
-                    method: 'POST',
-                    body: JSON.stringify({ email })
-                });
-                if (res && res.success) {
-                    messageEl.textContent = '✅ Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
-                    messageEl.style.color = '#28a745';
-                } else if (res && res.error) {
-                    messageEl.textContent = '❌ Error: ' + res.error;
-                    messageEl.style.color = '#dc3545';
-                } else {
-                    messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-                    messageEl.style.color = '#dc3545';
-                }
-            } catch (error) {
-                console.error('Error al solicitar restablecimiento:', error);
-                messageEl.textContent = '❌ Error de conexión. Inténtalo más tarde.';
-                messageEl.style.color = '#dc3545';
-            }
-        });
-    }
-
     // ✅ Cerrar modales (siempre existen)
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1357,52 +947,6 @@ function setupEvents() {
         });
     });
 
-    // Limpiar errores al escribir en cualquier campo del formulario de registro
-    document.getElementById('registro-form').addEventListener('input', function(e) {
-        if (e.target.classList.contains('input-error')) {
-            e.target.classList.remove('input-error');
-            const errorMsg = e.target.parentElement.querySelector('.error-message-field.visible');
-            if (errorMsg) {
-                errorMsg.classList.remove('visible');
-            }
-        }
-    });
-    
-
-
-        // --- VERIFICACIÓN EN TIEMPO REAL ---
-    // Paso 4: Email
-        const emailInput = document.getElementById('reg-email');
-    if (emailInput) {
-        emailInput.addEventListener('input', function() {
-            // Mientras escribe, no mostramos nada (se limpia visualmente)
-            this.classList.remove('input-available', 'input-unavailable');
-            const msg = this.parentElement.querySelector('.validation-message');
-            if (msg) {
-                msg.classList.remove('unavailable');
-                msg.style.display = 'none';
-            }
-            // Llamar al debounce (solo al dejar de escribir se validará)
-            verificarEmailDebounced(this.value, this);
-        });
-    }
-
-        // Paso 5: Nombre de usuario
-    const nombreInput = document.getElementById('reg-nombre-artista');
-    if (nombreInput) {
-        nombreInput.addEventListener('input', function() {
-            this.classList.remove('input-available', 'input-unavailable');
-            const msg = this.parentElement.querySelector('.validation-message');
-            if (msg) {
-                msg.classList.remove('unavailable');
-                msg.style.display = 'none';
-            }
-            verificarNombreDebounced(this.value, this);
-        });
-    }
-
-    
-
 }
 
 // ============================================
@@ -1410,34 +954,17 @@ function setupEvents() {
 // ============================================
 async function init() {
     const sesionValida = await verificarSesionBackend();
-    if (sesionValida) {
-        btnPerfil.classList.add('hidden');
-        document.getElementById('toggle-panel').classList.remove('hidden');
-        mostrarPaginaBlanca();
-        document.getElementById('modal-login').classList.add('hidden');
-        document.getElementById('modal-login').classList.remove('modal-fullscreen');
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        setupEvents();
-        setupImagePreviews();
-        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
-        poblarCiudades('');
-        await fetchActiveSessionsCount();
-    } else {
-        document.getElementById('panel-artista').classList.add('hidden');
-        document.getElementById('galeria-publica').classList.add('hidden');
-        document.getElementById('toggle-panel').classList.add('hidden');
-        btnPerfil.classList.add('hidden');
-        const modalLogin = document.getElementById('modal-login');
-        modalLogin.classList.remove('hidden');
-        modalLogin.classList.add('modal-fullscreen');
-        document.getElementById('modal-registro').classList.add('hidden');
-        document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-        setupEvents();
-        setupImagePreviews();
-        // Nota: cargarSelectoresFecha ahora se llama en showStep cuando se llega al paso 2
-        poblarCiudades('');
+    if (!sesionValida) {
+        window.location.href = 'auth.html';
+        return;
     }
+    
+    btnPerfil.classList.add('hidden');
+    document.getElementById('toggle-panel').classList.remove('hidden');
+    mostrarPaginaBlanca();
+    setupEvents();
+    setupImagePreviews();
+    await fetchActiveSessionsCount();
 }
 
 init();
