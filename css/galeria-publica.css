@@ -55,7 +55,7 @@
 }
 
 .obra-card button:hover {
-    background-color: var(--color-black);
+    background-color: var(--color-ink);
     color: var(--color-white);
 }
 

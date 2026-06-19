@@ -50,7 +50,7 @@
 }
 
 .filter-controls button {
-    background-color: var(--color-primary);
+    background-color: var(--color-ink);
     color: var(--color-white);
     border: none;
     cursor: pointer;
@@ -58,7 +58,7 @@
 }
 
 .filter-controls button:hover {
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-ink-light);
 }
 
 
@@ -147,33 +147,36 @@
 
 /* Botones de acción de la tabla */
 .btn-editar {
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
+    color: var(--color-ink);
+    border: 1px solid var(--color-gray-300);
 }
 
 .btn-editar:hover {
-    background: var(--color-primary);
+    background: var(--color-ink);
     color: var(--color-white);
+    border-color: var(--color-ink);
 }
 
 .btn-eliminar {
     color: var(--color-danger);
-    border: 1px solid var(--color-danger);
+    border: 1px solid var(--color-gray-300);
 }
 
 .btn-eliminar:hover {
     background: var(--color-danger);
     color: var(--color-white);
+    border-color: var(--color-danger);
 }
 
 .btn-duplicar {
-    color: var(--color-success);
-    border: 1px solid var(--color-success);
+    color: var(--color-ink);
+    border: 1px solid var(--color-gray-300);
 }
 
 .btn-duplicar:hover {
-    background: var(--color-success);
+    background: var(--color-ink);
     color: var(--color-white);
+    border-color: var(--color-ink);
 }
 
 
@@ -219,21 +222,25 @@
 }
 
 #btn-eliminar-cuenta {
-    background: var(--color-danger);
+    background: var(--color-ink);
     color: var(--color-white);
+    border: 1.5px solid var(--color-ink);
 }
 
 #btn-eliminar-cuenta:hover {
-    opacity: 0.9;
+    background: var(--color-danger);
+    border-color: var(--color-danger);
 }
 
 #btn-cerrar-todas-sesiones {
-    background: var(--color-warning);
-    color: #333;
+    background: var(--color-white);
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-gray-300);
 }
 
 #btn-cerrar-todas-sesiones:hover {
-    opacity: 0.9;
+    background: var(--color-gray-100);
+    border-color: var(--color-ink);
 }
 
 /* ==============================================
