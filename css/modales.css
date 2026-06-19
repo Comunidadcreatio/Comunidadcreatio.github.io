@@ -164,6 +164,11 @@
     display: none;
 }
 
+/* Ocultar la 'X' de cerrar en el modal de login */
+#modal-login .cerrar-modal {
+    display: none;
+}
+
 .modal-fullscreen h2 {
     text-align: center;
     font-size: 2rem;
@@ -179,6 +184,19 @@
     max-width: 250px;         /* Tamaño máximo en escritorio */
     width: 100%;
     height: auto;
+}
+
+/* Logo más pequeño en móvil */
+@media (max-width: 768px) {
+    #modal-login .login-logo {
+        max-width: 120px;
+        margin-bottom: 12px;
+    }
+
+    #modal-login .modal-content h2 {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
 }
 
 /* Ajuste para que el modal no quede muy alto con el logo */
