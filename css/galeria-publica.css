@@ -62,34 +62,10 @@
 /* ==============================================
    DISEÑO RESPONSIVO - GALERIA PUBLICA
    ============================================== */
-@media (max-width: 768px) {
-    #galeria-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-        padding: 0.75rem;
-    }
-    .obra-card img {
-        height: 116px;
-    }
-    .obra-card h3 {
-        font-size: 0.7rem;
-        margin: 6px 8px 3px;
-    }
-    .obra-card p {
-        font-size: 0.65rem;
-        margin: 0 8px 3px;
-    }
-    .obra-card button {
-        font-size: 0.65rem;
-        padding: 4px 8px;
-        margin: 6px 8px 8px;
-    }
-}
-
 @media (max-width: 480px) {
     #galeria-container {
         grid-template-columns: 1fr;
-        padding: 0.75rem;
+        padding: 1rem;
     }
 }
 

@@ -182,27 +182,37 @@ function positionDesktopPanel(triggerElement, panelElement) {
 
 function positionMobilePanel(triggerElement, panelElement) {
     if (!panelElement) return;
-    const rect = triggerElement.getBoundingClientRect();
     const panelDiv = panelElement.querySelector('.mobile-logout-panel');
     if (!panelDiv) return;
-    
+
+    // Reset any CSS-based anchoring so we control position fully from JS
     panelDiv.style.margin = '0';
     panelElement.style.bottom = 'auto';
     panelElement.style.right = 'auto';
-    
+    panelElement.style.left = 'auto';
+    panelElement.style.top = 'auto';
+
+    const iconRect = triggerElement.getBoundingClientRect();
     const panelRect = panelDiv.getBoundingClientRect();
-    let top = rect.top - panelRect.height - 8;
-    let left = rect.left;
-    if (top < 10) {
-        top = rect.bottom + 8;
-    }
-    if (left + panelRect.width > window.innerWidth) {
-        left = window.innerWidth - panelRect.width - 10;
-    }
-    if (left < 10) left = 10;
-    
+    const iconCenterX = iconRect.left + iconRect.width / 2;
+    const margin = 8;
+
+    // Place the bubble above the icon
+    let top = iconRect.top - panelRect.height - 12;
+    if (top < margin) top = iconRect.bottom + 12;
+
+    // Center the bubble on the icon, but keep it inside the viewport
+    let left = iconCenterX - panelRect.width / 2;
+    const maxLeft = window.innerWidth - panelRect.width - margin;
+    if (left > maxLeft) left = maxLeft;
+    if (left < margin) left = margin;
+
     panelElement.style.top = `${top}px`;
     panelElement.style.left = `${left}px`;
+
+    // Point the tail exactly under the icon, regardless of the bubble offset
+    const tailX = iconCenterX - left;
+    panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
 
 // ============================================
@@ -555,6 +565,7 @@ function setupEvents() {
                 if (mobileModal) {
                     if (mobileModal.classList.contains('hidden')) {
                         mobileModal.classList.remove('hidden');
+                        positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
                             document.addEventListener('click', function onClickOutsideMobile(e) {
                                 if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
@@ -635,6 +646,7 @@ function setupEvents() {
 
                 if (mobileMainMenu.classList.contains('hidden')) {
                     mobileMainMenu.classList.remove('hidden');
+                    positionMobilePanel(menuBtn, mobileMainMenu);
                     if (mobileOutsideClickListener) {
                         document.removeEventListener('click', mobileOutsideClickListener);
                     }

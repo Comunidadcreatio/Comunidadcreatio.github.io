@@ -359,27 +359,28 @@ input, select, textarea {
     .mobile-logout-panel.speech-bubble {
         position: relative;
         background: var(--color-black);
-        width: 260px;
-        max-width: 85vw;
-        margin: 0 16px 70px 0;
-        border-radius: 20px;
-        padding: 12px 0;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        width: 180px;
+        max-width: 80vw;
+        margin: 0;
+        border-radius: 14px;
+        padding: 6px 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         text-align: center;
         z-index: 2001;
     }
     
-    /* Cola móvil estándar */
+    /* Cola móvil: apunta exactamente bajo el icono via --tail-x */
     .mobile-logout-panel.speech-bubble::after {
         content: '';
         position: absolute;
-        bottom: -12px;
-        right: 20px;
+        bottom: -8px;
+        left: var(--tail-x, 50%);
+        transform: translateX(-50%);
         width: 0;
         height: 0;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-top: 12px solid var(--color-black);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid var(--color-black);
         filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
     }
     
@@ -388,8 +389,7 @@ input, select, textarea {
         pointer-events: auto !important;
         z-index: 1000 !important;
     }
-    #mobile-main-menu .mobile-logout-panel.speech-bubble { width: 240px; }
-    #mobile-main-menu .mobile-logout-panel.speech-bubble::after { right: 68px; }
+    #mobile-main-menu .mobile-logout-panel.speech-bubble { width: 160px; }
     
     #mobile-main-menu button,
     #mobile-main-menu .logout-option {
@@ -399,8 +399,8 @@ input, select, textarea {
         border: none;
         width: 100%;
         text-align: left;
-        padding: 12px 16px;
-        font-size: 16px;
+        padding: 8px 14px;
+        font-size: 13px;
         cursor: pointer;
     }
     #mobile-main-menu button:active,
@@ -408,8 +408,8 @@ input, select, textarea {
     
     .mobile-logout-panel .logout-option,
     .logout-option {
-        font-size: 16px;
-        padding: 12px 20px;
+        font-size: 13px;
+        padding: 8px 14px;
     }
 }
 
