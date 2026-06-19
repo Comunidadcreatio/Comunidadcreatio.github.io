@@ -491,12 +491,29 @@ function validateStep(step) {
 function showLoginSection() {
     document.getElementById('login-section').classList.remove('hidden');
     document.getElementById('registro-section').classList.add('hidden');
+    const forgotSection = document.getElementById('forgot-section');
+    if (forgotSection) forgotSection.classList.add('hidden');
 }
 
 function showRegistroSection() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('registro-section').classList.remove('hidden');
+    const forgotSection = document.getElementById('forgot-section');
+    if (forgotSection) forgotSection.classList.add('hidden');
     showStep(1);
+}
+
+function showForgotSection() {
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('registro-section').classList.add('hidden');
+    const forgotSection = document.getElementById('forgot-section');
+    if (forgotSection) {
+        forgotSection.classList.remove('hidden');
+        const msgEl = document.getElementById('forgot-msg');
+        if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
+        const emailInput = document.getElementById('forgot-email');
+        if (emailInput) emailInput.value = '';
+    }
 }
 
 // ============================================
@@ -520,6 +537,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnVolverLogin = document.getElementById('btn-volver-login');
     if (btnVolverLogin) {
         btnVolverLogin.addEventListener('click', showLoginSection);
+    }
+
+    // Enlace ¿Olvidaste tu contraseña? → mostrar sección de solicitud
+    const btnOlvide = document.getElementById('btn-olvide-contrasena');
+    if (btnOlvide) {
+        btnOlvide.addEventListener('click', function(e) {
+            e.preventDefault();
+            showForgotSection();
+        });
+    }
+
+    // Botón volver en la sección de olvidé contraseña
+    const btnVolverForgot = document.getElementById('btn-volver-login-forgot');
+    if (btnVolverForgot) {
+        btnVolverForgot.addEventListener('click', showLoginSection);
+    }
+
+    // Formulario de solicitud de restablecimiento
+    const forgotForm = document.getElementById('solicitar-restablecimiento-form');
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('forgot-email');
+            const msgEl = document.getElementById('forgot-msg');
+            const btn = document.getElementById('btn-enviar-reset');
+            const email = emailInput.value.trim();
+
+            if (!esEmailValido(email)) {
+                marcarInputError(emailInput);
+                msgEl.textContent = 'Ingresa un correo electrónico válido.';
+                msgEl.style.color = 'var(--color-danger)';
+                msgEl.style.display = 'block';
+                return;
+            }
+
+            setButtonLoading(btn, true);
+            msgEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/artistas/solicitar-restablecimiento`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                setButtonLoading(btn, false);
+                if (data.success || res.ok) {
+                    emailInput.value = '';
+                    emailInput.classList.remove('input-error');
+                    msgEl.textContent = 'Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
+                    msgEl.style.color = 'var(--color-success)';
+                    msgEl.style.display = 'block';
+                } else {
+                    msgEl.textContent = data.error || 'No se pudo procesar la solicitud. Inténtalo más tarde.';
+                    msgEl.style.color = 'var(--color-danger)';
+                    msgEl.style.display = 'block';
+                }
+            } catch (error) {
+                setButtonLoading(btn, false);
+                msgEl.textContent = 'Error de conexión. Inténtalo más tarde.';
+                msgEl.style.color = 'var(--color-danger)';
+                msgEl.style.display = 'block';
+            }
+        });
     }
 
     // Navegación de pasos del registro

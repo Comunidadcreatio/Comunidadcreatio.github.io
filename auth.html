@@ -31,11 +31,30 @@
                     <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
                 </div>
                 <p class="forgot-password">
-                    <a href="reset-password.html" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
+                    <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
                 </p>
                 <button type="submit">Entrar</button>
             </form>
             <button id="btn-ir-registro" class="secondary-btn">Registrarse</button>
+        </div>
+
+        <!-- OLVIDÉ MI CONTRASEÑA SECTION -->
+        <div id="forgot-section" class="auth-section hidden">
+            <button type="button" class="back-btn" id="btn-volver-login-forgot" aria-label="Volver">
+                <img src="iconos/arrow-left.svg" alt="Volver" onerror="this.style.display='none'; this.parentElement.innerHTML='&larr;';">
+            </button>
+            <h1>Recuperar contraseña</h1>
+            <p style="font-size:13px; color:var(--color-gray-500); margin-bottom:20px; text-align:center;">
+                Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña.
+            </p>
+            <form id="solicitar-restablecimiento-form">
+                <div class="form-group">
+                    <label for="forgot-email">Correo electrónico</label>
+                    <input type="email" id="forgot-email" placeholder="Ej: ejemplo@gmail.com" required autocomplete="email">
+                </div>
+                <button type="submit" id="btn-enviar-reset">Enviar enlace</button>
+            </form>
+            <div id="forgot-msg" class="error-message-field" style="text-align:center; margin-top:12px;"></div>
         </div>
 
         <!-- REGISTRO SECTION -->
