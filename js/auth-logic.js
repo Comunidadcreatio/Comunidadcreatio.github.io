@@ -217,31 +217,21 @@ function paisChangeHandler() {
 function validateStep(step) {
     const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
     if (!stepContainer) return true;
-    
+
     // Limpiar errores previos del paso
     stepContainer.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     stepContainer.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
-    
+
     const inputs = stepContainer.querySelectorAll('input, select');
     let isValid = true;
-    
+
     for (let input of inputs) {
         if (input.hasAttribute('required') && !input.value.trim()) {
             input.classList.add('input-error');
-            
-            let errorMsg = input.parentElement.querySelector('.error-message-field');
-            if (!errorMsg) {
-                errorMsg = document.createElement('div');
-                errorMsg.className = 'error-message-field';
-                errorMsg.textContent = 'Este campo no puede quedar vacío';
-                input.parentElement.appendChild(errorMsg);
-            }
-            errorMsg.classList.add('visible');
-            
             isValid = false;
         }
     }
-    
+
     return isValid;
 }
 
