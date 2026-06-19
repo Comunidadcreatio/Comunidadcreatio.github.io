@@ -8,7 +8,6 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--color-gray-200);
-    position: relative;
 }
 
 #brand-name {
@@ -18,14 +17,12 @@
 }
 
 .login-logo {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    max-width: 52px;
+    max-width: 36px;
     width: 100%;
     height: auto;
     display: block;
+    margin: auto auto;
+    flex-shrink: 0;
 }
 
 #user-actions {
@@ -76,13 +73,13 @@
         width: 100%;
     }
     .login-logo {
-        max-width: 44px;
+        max-width: 32px;
     }
 }
 
 @media (max-width: 768px) {
     .login-logo {
-        max-width: 40px;
+        max-width: 30px;
     }
     #main-header {
         padding: 0.3rem 1rem;
@@ -99,6 +96,6 @@
         padding: 0.25rem 0.75rem;
     }
     .login-logo {
-        max-width: 36px;
+        max-width: 28px;
     }
 }
