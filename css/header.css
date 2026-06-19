@@ -18,9 +18,8 @@
 }
 
 .login-logo {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
+    width: 90px;
+    height: auto;
     display: block;
     margin: auto;
     flex-shrink: 0;
@@ -68,8 +67,8 @@
         height: 42px;
     }
     .login-logo {
-        width: 26px;
-        height: 26px;
+        width: 80px;
+        height: auto;
     }
 }
 
@@ -79,8 +78,8 @@
         height: 40px;
     }
     .login-logo {
-        width: 24px;
-        height: 24px;
+        width: 70px;
+        height: auto;
     }
 }
 
@@ -90,7 +89,7 @@
         height: 38px;
     }
     .login-logo {
-        width: 22px;
-        height: 22px;
+        width: 60px;
+        height: auto;
     }
 }
