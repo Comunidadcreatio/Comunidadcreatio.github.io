@@ -1,13 +1,20 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
 import { login, register } from './auth.js';
-import { showSuccess, showError, showWarning, showInfo } from './notificaciones.js';
+import { API_BASE_URL, TOKEN_KEY } from './config.js';
+import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
 
 // ============================================
 // VARIABLES GLOBALES
 // ============================================
 let currentStep = 1;
 const totalSteps = 5;
+
+// Estado de disponibilidad de email y nombre de usuario
+const disponibilidad = {
+    email: null,   // true | false | null (sin verificar)
+    nombre: null
+};
 
 // Ciudades para el registro
 const ciudadesPorPais = {
@@ -72,21 +79,24 @@ function debounce(func, wait) {
 }
 
 async function verificarDisponibilidad(tipo, valor, inputElement) {
+    const clave = tipo === 'email' ? 'email' : 'nombre';
+
     if (!valor.trim()) {
         inputElement.classList.remove('input-available', 'input-unavailable');
         const msg = inputElement.parentElement.querySelector('.validation-message');
         if (msg) msg.remove();
+        disponibilidad[clave] = null;
         return;
     }
 
     try {
-        const endpoint = tipo === 'email' 
+        const endpoint = tipo === 'email'
             ? `/api/artistas/verificar-email/${encodeURIComponent(valor)}`
             : `/api/artistas/verificar-nombre/${encodeURIComponent(valor)}`;
-        
-        const res = await fetch(`https://backend-fundacion-atpe.onrender.com${endpoint}`);
+
+        const res = await fetch(`${API_BASE_URL}${endpoint}`);
         const data = await res.json();
-        
+
         let msg = inputElement.parentElement.querySelector('.validation-message');
         if (!msg) {
             msg = document.createElement('div');
@@ -99,19 +109,43 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
             inputElement.classList.add('input-available');
             msg.classList.remove('unavailable');
             msg.style.display = 'none';
+            disponibilidad[clave] = true;
         } else {
             inputElement.classList.remove('input-available');
             inputElement.classList.add('input-unavailable');
             msg.className = 'validation-message unavailable';
             msg.style.display = 'block';
-            const mensajeError = tipo === 'email' 
-                ? '❌ Este correo ya está registrado' 
+            const mensajeError = tipo === 'email'
+                ? '❌ Este correo ya está registrado'
                 : '❌ Este nombre de usuario ya está en uso';
             msg.textContent = mensajeError;
+            disponibilidad[clave] = false;
         }
     } catch (error) {
         console.error('Error al verificar disponibilidad:', error);
+        disponibilidad[clave] = null;
     }
+}
+
+// ============================================
+// VALIDACIONES DE FORMATO
+// ============================================
+function esEmailValido(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email.trim());
+}
+
+function esTelefonoValido(telefono) {
+    // Acepta 7 a 15 dígitos, opcionalmente con + inicial
+    const limpio = telefono.replace(/[\s-]/g, '');
+    const re = /^\+?\d{7,15}$/;
+    return re.test(limpio);
+}
+
+// Marca un input con borde rojo y devuelve false
+function marcarInputError(input) {
+    if (input) input.classList.add('input-error');
+    return false;
 }
 
 const verificarEmailDebounced = debounce((valor, input) => {
@@ -225,6 +259,7 @@ function validateStep(step) {
     const inputs = stepContainer.querySelectorAll('input, select');
     let isValid = true;
 
+    // 1. Validar campos requeridos vacíos (solo borde rojo)
     for (let input of inputs) {
         if (input.hasAttribute('required') && !input.value.trim()) {
             input.classList.add('input-error');
@@ -232,7 +267,47 @@ function validateStep(step) {
         }
     }
 
-    return isValid;
+    if (!isValid) return false;
+
+    // 2. Validaciones específicas por paso
+    if (step === 4) {
+        const emailInput = document.getElementById('reg-email');
+        const telefonoInput = document.getElementById('reg-telefono');
+
+        if (emailInput && !esEmailValido(emailInput.value)) {
+            marcarInputError(emailInput);
+            showWarning('Ingresa un correo electrónico válido.');
+            return false;
+        }
+        if (disponibilidad.email === false) {
+            marcarInputError(emailInput);
+            showWarning('Este correo ya está registrado. Usa otro.');
+            return false;
+        }
+        if (telefonoInput && !esTelefonoValido(telefonoInput.value)) {
+            marcarInputError(telefonoInput);
+            showWarning('Ingresa un número de celular válido (solo dígitos).');
+            return false;
+        }
+    }
+
+    if (step === 5) {
+        const nombreInput = document.getElementById('reg-nombre-artista');
+        const passInput = document.getElementById('reg-pass');
+
+        if (disponibilidad.nombre === false) {
+            marcarInputError(nombreInput);
+            showWarning('Este nombre de usuario ya está en uso. Elige otro.');
+            return false;
+        }
+        if (passInput && passInput.value.length < 8) {
+            marcarInputError(passInput);
+            showWarning('La contraseña debe tener al menos 8 caracteres.');
+            return false;
+        }
+    }
+
+    return true;
 }
 
 // ============================================
@@ -254,7 +329,7 @@ function showRegistroSection() {
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar si ya está logueado
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
         window.location.href = 'index.html';
         return;
@@ -311,22 +386,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Limpiar borde rojo al escribir/cambiar en cualquier input o select
+    document.querySelectorAll('#login-form input, #registro-form input, #registro-form select').forEach(el => {
+        const evento = el.tagName === 'SELECT' ? 'change' : 'input';
+        el.addEventListener(evento, function() {
+            this.classList.remove('input-error');
+        });
+    });
+
+    // Mostrar/ocultar contraseña
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            this.classList.toggle('visible', isPassword);
+            this.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+    });
+
     // Formulario de login
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-pass').value;
-            
-            const result = await login(email, password);
-            if (result.success) {
-                showSuccess('¡Inicio de sesión exitoso!');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                mostrarErrores(result);
+            const emailInput = document.getElementById('login-email');
+            const passInput = document.getElementById('login-pass');
+            const email = emailInput.value;
+            const password = passInput.value;
+
+            // Validación de formato antes de enviar
+            emailInput.classList.remove('input-error');
+            passInput.classList.remove('input-error');
+            if (!esEmailValido(email)) {
+                marcarInputError(emailInput);
+                showWarning('Ingresa un correo electrónico válido.');
+                return;
+            }
+            if (!password) {
+                marcarInputError(passInput);
+                showWarning('Ingresa tu contraseña.');
+                return;
+            }
+
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            setButtonLoading(submitBtn, true);
+            try {
+                const result = await login(email, password);
+                if (result.success) {
+                    showSuccess('¡Inicio de sesión exitoso!');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    setButtonLoading(submitBtn, false);
+                    mostrarErrores(result);
+                }
+            } catch (error) {
+                setButtonLoading(submitBtn, false);
+                showError('Error de conexión. Inténtalo más tarde.');
             }
         });
     }
@@ -371,18 +491,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-            
-            const result = await register(
-                nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
-            );
-            
-            if (result.success) {
-                showSuccess("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
-                registroForm.reset();
-                showStep(1);
-                showLoginSection();
-            } else {
-                mostrarErrores(result);
+
+            const submitBtn = document.getElementById('btn-registrarse-final');
+            setButtonLoading(submitBtn, true);
+            try {
+                const result = await register(
+                    nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
+                );
+
+                if (result.success) {
+                    showSuccess("¡Registro exitoso! Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y SPAM.");
+                    registroForm.reset();
+                    disponibilidad.email = null;
+                    disponibilidad.nombre = null;
+                    showStep(1);
+                    showLoginSection();
+                    setButtonLoading(submitBtn, false);
+                } else {
+                    setButtonLoading(submitBtn, false);
+                    mostrarErrores(result);
+                }
+            } catch (error) {
+                setButtonLoading(submitBtn, false);
+                showError('Error de conexión. Inténtalo más tarde.');
             }
         });
     }
