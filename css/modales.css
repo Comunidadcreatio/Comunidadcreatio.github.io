@@ -189,13 +189,13 @@
 /* Logo más pequeño en móvil */
 @media (max-width: 768px) {
     #modal-login .login-logo {
-        max-width: 120px;
-        margin-bottom: 12px;
+        max-width: 100px;
+        margin-bottom: 8px;
     }
 
     #modal-login .modal-content h2 {
-        font-size: 14px;
-        margin-bottom: 12px;
+        font-size: 12px;
+        margin-bottom: 8px;
     }
 }
 
