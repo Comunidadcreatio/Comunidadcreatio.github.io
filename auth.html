@@ -141,9 +141,22 @@
                     <div class="form-group">
                         <label for="reg-pass">Contraseña</label>
                         <div class="password-wrapper">
-                            <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required>
+                            <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
                             <button type="button" class="toggle-password" data-target="reg-pass" aria-label="Mostrar contraseña"></button>
                         </div>
+                        <div class="password-strength" id="password-strength" aria-live="polite">
+                            <div class="strength-bar">
+                                <span class="strength-bar-fill"></span>
+                            </div>
+                            <span class="strength-label"></span>
+                        </div>
+                        <ul class="password-requirements" id="password-requirements">
+                            <li data-req="length">Al menos 8 caracteres</li>
+                            <li data-req="lower">Una letra minúscula</li>
+                            <li data-req="upper">Una letra mayúscula</li>
+                            <li data-req="number">Un número</li>
+                            <li data-req="special">Un símbolo (!@#$...)</li>
+                        </ul>
                     </div>
                     <div class="step-navigation">
                         <button type="button" class="nav-btn prev-btn" data-step="5">Atrás</button>

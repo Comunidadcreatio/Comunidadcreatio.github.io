@@ -371,6 +371,128 @@ button[type="submit"]:active,
 }
 
 /* ==============================================
+   MEDIDOR DE FORTALEZA DE CONTRASEÑA
+   ============================================== */
+.password-strength {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, max-height 0.2s ease;
+}
+
+.password-strength.active {
+    opacity: 1;
+    max-height: 40px;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 6px;
+    background-color: var(--color-gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.strength-bar-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-label {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 56px;
+    text-align: right;
+}
+
+/* Niveles de fortaleza */
+.password-strength[data-level="1"] .strength-bar-fill {
+    width: 25%;
+    background-color: var(--color-danger);
+}
+.password-strength[data-level="1"] .strength-label {
+    color: var(--color-danger);
+}
+
+.password-strength[data-level="2"] .strength-bar-fill {
+    width: 50%;
+    background-color: var(--color-warning);
+}
+.password-strength[data-level="2"] .strength-label {
+    color: var(--color-warning);
+}
+
+.password-strength[data-level="3"] .strength-bar-fill {
+    width: 75%;
+    background-color: #3b82f6;
+}
+.password-strength[data-level="3"] .strength-label {
+    color: #3b82f6;
+}
+
+.password-strength[data-level="4"] .strength-bar-fill {
+    width: 100%;
+    background-color: var(--color-success);
+}
+.password-strength[data-level="4"] .strength-label {
+    color: var(--color-success);
+}
+
+/* Lista de requisitos */
+.password-requirements {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 12px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, max-height 0.2s ease;
+}
+
+.password-requirements.active {
+    opacity: 1;
+    max-height: 120px;
+}
+
+.password-requirements li {
+    font-size: 11px;
+    color: var(--color-text-light);
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.6;
+    transition: color 0.2s ease;
+}
+
+.password-requirements li::before {
+    content: '○';
+    position: absolute;
+    left: 0;
+    color: var(--color-gray-400);
+    font-size: 12px;
+}
+
+.password-requirements li.met {
+    color: var(--color-success);
+}
+
+.password-requirements li.met::before {
+    content: '✓';
+    color: var(--color-success);
+    font-weight: 700;
+}
+
+/* ==============================================
    FORMULARIO DE REGISTRO POR PASOS
    ============================================== */
 .step {

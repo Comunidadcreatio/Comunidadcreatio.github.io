@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-// Sistema de notificaciones y toasts
+﻿// Sistema de notificaciones y toasts
 
 // Crear contenedor de notificaciones si no existe
 function initNotificationContainer() {
@@ -10,7 +9,7 @@ function initNotificationContainer() {
     }
 }
 
-// Mostrar notificación
+// Mostrar notificaciÃ³n
 function showNotification(message, type = 'info', duration = 5000) {
     initNotificationContainer();
     
@@ -18,16 +17,16 @@ function showNotification(message, type = 'info', duration = 5000) {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     
-    // Icono según tipo
-    let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'error') icon = '❌';
-    if (type === 'warning') icon = '⚠️';
+    // Icono segÃºn tipo
+    let icon = 'â„¹ï¸';
+    if (type === 'success') icon = 'âœ…';
+    if (type === 'error') icon = 'âŒ';
+    if (type === 'warning') icon = 'âš ï¸';
     
     notification.innerHTML = `
         <span class="notification-icon">${icon}</span>
         <span class="notification-message">${message}</span>
-        <button class="notification-close" aria-label="Cerrar notificación">×</button>
+        <button class="notification-close" aria-label="Cerrar notificaciÃ³n">Ã—</button>
     `;
     
     // Evento de cerrar
@@ -37,7 +36,7 @@ function showNotification(message, type = 'info', duration = 5000) {
     
     container.appendChild(notification);
     
-    // Auto cerrar después de duration
+    // Auto cerrar despuÃ©s de duration
     if (duration > 0) {
         setTimeout(() => {
             closeNotification(notification);
@@ -47,7 +46,7 @@ function showNotification(message, type = 'info', duration = 5000) {
     return notification;
 }
 
-// Cerrar notificación
+// Cerrar notificaciÃ³n
 function closeNotification(notification) {
     notification.classList.add('slide-out');
     notification.addEventListener('animationend', () => {
@@ -55,22 +54,22 @@ function closeNotification(notification) {
     });
 }
 
-// Mostrar notificación de éxito
+// Mostrar notificaciÃ³n de Ã©xito
 function showSuccess(message, duration = 5000) {
     return showNotification(message, 'success', duration);
 }
 
-// Mostrar notificación de error
+// Mostrar notificaciÃ³n de error
 function showError(message, duration = 5000) {
     return showNotification(message, 'error', duration);
 }
 
-// Mostrar notificación de advertencia
+// Mostrar notificaciÃ³n de advertencia
 function showWarning(message, duration = 5000) {
     return showNotification(message, 'warning', duration);
 }
 
-// Mostrar notificación de información
+// Mostrar notificaciÃ³n de informaciÃ³n
 function showInfo(message, duration = 5000) {
     return showNotification(message, 'info', duration);
 }
@@ -115,7 +114,7 @@ function hideLoadingOverlay() {
     }
 }
 
-// Agregar estado de carga a un botón
+// Agregar estado de carga a un botÃ³n
 function setButtonLoading(button, loading = true, originalText = '') {
     if (loading) {
         button.dataset.originalText = button.textContent;
@@ -142,7 +141,7 @@ function showInlineLoading(container, text = 'Cargando...') {
     return loading;
 }
 
-// Agregar estado de validación a un input
+// Agregar estado de validaciÃ³n a un input
 function setInputValidation(input, valid = true) {
     input.classList.remove('input-valid', 'input-invalid');
     if (valid) {
@@ -152,19 +151,19 @@ function setInputValidation(input, valid = true) {
     }
 }
 
-// Limpiar estado de validación de un input
+// Limpiar estado de validaciÃ³n de un input
 function clearInputValidation(input) {
     input.classList.remove('input-valid', 'input-invalid');
 }
 
-// Reemplazar alert nativo con notificación
+// Reemplazar alert nativo con notificaciÃ³n
 function alert(message) {
     showInfo(message, 5000);
 }
 
-// Reemplazar confirm nativo con diálogo personalizado (opcional)
+// Reemplazar confirm nativo con diÃ¡logo personalizado (opcional)
 function confirm(message) {
-    return window.confirm(message); // Por ahora usar el nativo, se puede mejorar después
+    return window.confirm(message); // Por ahora usar el nativo, se puede mejorar despuÃ©s
 }
 
 // Exportar funciones
@@ -182,188 +181,3 @@ export {
     setInputValidation,
     clearInputValidation
 };
-=======
-// Sistema de notificaciones y toasts
-
-// Crear contenedor de notificaciones si no existe
-function initNotificationContainer() {
-    if (!document.querySelector('.notification-container')) {
-        const container = document.createElement('div');
-        container.className = 'notification-container';
-        document.body.appendChild(container);
-    }
-}
-
-// Mostrar notificación
-function showNotification(message, type = 'info', duration = 5000) {
-    initNotificationContainer();
-    
-    const container = document.querySelector('.notification-container');
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    
-    // Icono según tipo
-    let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'error') icon = '❌';
-    if (type === 'warning') icon = '⚠️';
-    
-    notification.innerHTML = `
-        <span class="notification-icon">${icon}</span>
-        <span class="notification-message">${message}</span>
-        <button class="notification-close" aria-label="Cerrar notificación">×</button>
-    `;
-    
-    // Evento de cerrar
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        closeNotification(notification);
-    });
-    
-    container.appendChild(notification);
-    
-    // Auto cerrar después de duration
-    if (duration > 0) {
-        setTimeout(() => {
-            closeNotification(notification);
-        }, duration);
-    }
-    
-    return notification;
-}
-
-// Cerrar notificación
-function closeNotification(notification) {
-    notification.classList.add('slide-out');
-    notification.addEventListener('animationend', () => {
-        notification.remove();
-    });
-}
-
-// Mostrar notificación de éxito
-function showSuccess(message, duration = 5000) {
-    return showNotification(message, 'success', duration);
-}
-
-// Mostrar notificación de error
-function showError(message, duration = 5000) {
-    return showNotification(message, 'error', duration);
-}
-
-// Mostrar notificación de advertencia
-function showWarning(message, duration = 5000) {
-    return showNotification(message, 'warning', duration);
-}
-
-// Mostrar notificación de información
-function showInfo(message, duration = 5000) {
-    return showNotification(message, 'info', duration);
-}
-
-// Mostrar toast simple
-function showToast(message, type = 'info', duration = 3000) {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, 20px)';
-        toast.style.transition = 'all 0.3s ease-out';
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
-    
-    return toast;
-}
-
-// Mostrar overlay de carga
-function showLoadingOverlay(text = 'Cargando...') {
-    let overlay = document.querySelector('.loading-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        overlay.innerHTML = `
-            <div class="loading-spinner"></div>
-            <div class="loading-text">${text}</div>
-        `;
-        document.body.appendChild(overlay);
-    }
-    return overlay;
-}
-
-// Ocultar overlay de carga
-function hideLoadingOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
-}
-
-// Agregar estado de carga a un botón
-function setButtonLoading(button, loading = true, originalText = '') {
-    if (loading) {
-        button.dataset.originalText = button.textContent;
-        button.classList.add('button-loading');
-        button.textContent = '';
-        button.disabled = true;
-    } else {
-        button.classList.remove('button-loading');
-        button.textContent = button.dataset.originalText || originalText;
-        button.disabled = false;
-        delete button.dataset.originalText;
-    }
-}
-
-// Mostrar indicador de carga inline
-function showInlineLoading(container, text = 'Cargando...') {
-    const loading = document.createElement('div');
-    loading.className = 'loading-inline';
-    loading.innerHTML = `
-        <div class="spinner-small"></div>
-        <span>${text}</span>
-    `;
-    container.appendChild(loading);
-    return loading;
-}
-
-// Agregar estado de validación a un input
-function setInputValidation(input, valid = true) {
-    input.classList.remove('input-valid', 'input-invalid');
-    if (valid) {
-        input.classList.add('input-valid');
-    } else {
-        input.classList.add('input-invalid');
-    }
-}
-
-// Limpiar estado de validación de un input
-function clearInputValidation(input) {
-    input.classList.remove('input-valid', 'input-invalid');
-}
-
-// Reemplazar alert nativo con notificación
-function alert(message) {
-    showInfo(message, 5000);
-}
-
-// Reemplazar confirm nativo con diálogo personalizado (opcional)
-function confirm(message) {
-    return window.confirm(message); // Por ahora usar el nativo, se puede mejorar después
-}
-
-// Exportar funciones
-export {
-    showNotification,
-    showSuccess,
-    showError,
-    showWarning,
-    showInfo,
-    showToast,
-    showLoadingOverlay,
-    hideLoadingOverlay,
-    setButtonLoading,
-    showInlineLoading,
-    setInputValidation,
-    clearInputValidation
-};
->>>>>>> 5a00e39b7f12599c328e00c56ce8087a67cb9a47

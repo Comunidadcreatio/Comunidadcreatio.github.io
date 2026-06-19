@@ -142,6 +142,73 @@ function esTelefonoValido(telefono) {
     return re.test(limpio);
 }
 
+// Nivel mínimo aceptado para registrarse (3 = "Buena")
+const NIVEL_MIN_PASSWORD = 3;
+
+// Evalúa los requisitos de una contraseña
+function evaluarRequisitosPassword(password) {
+    return {
+        length: password.length >= 8,
+        lower: /[a-z]/.test(password),
+        upper: /[A-Z]/.test(password),
+        number: /\d/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+    };
+}
+
+// Calcula el nivel de fortaleza (0 a 4) y su etiqueta
+function calcularFortalezaPassword(password) {
+    if (!password) {
+        return { nivel: 0, etiqueta: '', requisitos: evaluarRequisitosPassword('') };
+    }
+
+    const req = evaluarRequisitosPassword(password);
+    let puntos = Object.values(req).filter(Boolean).length;
+
+    // Bonus por longitud generosa
+    if (password.length >= 12) puntos++;
+
+    let nivel;
+    if (puntos <= 2) nivel = 1;       // Débil
+    else if (puntos === 3) nivel = 2; // Media
+    else if (puntos === 4) nivel = 3; // Buena
+    else nivel = 4;                   // Fuerte
+
+    // Sin la longitud mínima nunca pasa de débil
+    if (!req.length) nivel = 1;
+
+    const etiquetas = { 1: 'Débil', 2: 'Media', 3: 'Buena', 4: 'Fuerte' };
+    return { nivel, etiqueta: etiquetas[nivel], requisitos: req };
+}
+
+// Actualiza la UI del medidor en tiempo real
+function actualizarMedidorPassword(password) {
+    const strengthEl = document.getElementById('password-strength');
+    const requirementsEl = document.getElementById('password-requirements');
+    if (!strengthEl || !requirementsEl) return;
+
+    const labelEl = strengthEl.querySelector('.strength-label');
+    const { nivel, etiqueta, requisitos } = calcularFortalezaPassword(password);
+
+    if (!password) {
+        strengthEl.classList.remove('active');
+        requirementsEl.classList.remove('active');
+        strengthEl.removeAttribute('data-level');
+        if (labelEl) labelEl.textContent = '';
+    } else {
+        strengthEl.classList.add('active');
+        requirementsEl.classList.add('active');
+        strengthEl.setAttribute('data-level', nivel);
+        if (labelEl) labelEl.textContent = etiqueta;
+    }
+
+    // Marcar requisitos cumplidos
+    requirementsEl.querySelectorAll('li').forEach(li => {
+        const clave = li.dataset.req;
+        li.classList.toggle('met', !!requisitos[clave]);
+    });
+}
+
 // Marca un input con borde rojo y devuelve false
 function marcarInputError(input) {
     if (input) input.classList.add('input-error');
@@ -300,10 +367,18 @@ function validateStep(step) {
             showWarning('Este nombre de usuario ya está en uso. Elige otro.');
             return false;
         }
-        if (passInput && passInput.value.length < 8) {
-            marcarInputError(passInput);
-            showWarning('La contraseña debe tener al menos 8 caracteres.');
-            return false;
+        if (passInput) {
+            if (passInput.value.length < 8) {
+                marcarInputError(passInput);
+                showWarning('La contraseña debe tener al menos 8 caracteres.');
+                return false;
+            }
+            const { nivel } = calcularFortalezaPassword(passInput.value);
+            if (nivel < NIVEL_MIN_PASSWORD) {
+                marcarInputError(passInput);
+                showWarning('Tu contraseña es muy débil. Combina mayúsculas, minúsculas, números y símbolos.');
+                return false;
+            }
         }
     }
 
@@ -383,6 +458,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (regNombreArtista) {
         regNombreArtista.addEventListener('input', function() {
             verificarNombreDebounced(this.value, this);
+        });
+    }
+
+    // Medidor de fortaleza de contraseña en tiempo real
+    const regPass = document.getElementById('reg-pass');
+    if (regPass) {
+        regPass.addEventListener('input', function() {
+            actualizarMedidorPassword(this.value);
         });
     }
 
@@ -504,6 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     registroForm.reset();
                     disponibilidad.email = null;
                     disponibilidad.nombre = null;
+                    actualizarMedidorPassword('');
                     showStep(1);
                     showLoginSection();
                     setButtonLoading(submitBtn, false);
