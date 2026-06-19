@@ -585,7 +585,7 @@ form,
         width: 100% !important;
         max-width: 200px !important; 
         margin: 0 auto !important; 
-        padding: 16px 12px !important; 
+        padding: 8px 12px !important; 
         border-radius: 12px;
         box-sizing: border-box !important;
         box-shadow: none;
@@ -635,15 +635,25 @@ form,
         border-radius: 10px;
     }
 
-    /* Inputs y botones específicos del login - más estrechos y centrados */
-    #modal-login input,
+    /* Inputs específicos del login - más bajos y con texto más pequeño */
+    #modal-login input {
+        width: 85% !important;
+        box-sizing: border-box !important;
+        padding: 4px 8px;
+        font-size: 9px; 
+        border-radius: 6px;
+        margin: 0 auto 6px auto !important;
+        display: block;
+    }
+
+    /* Botones del login - mantener tamaño normal */
     #modal-login button {
         width: 85% !important;
         box-sizing: border-box !important;
-        padding: 10px 8px;
-        font-size: 12px; 
-        border-radius: 8px;
-        margin: 0 auto 8px auto !important;
+        padding: 8px 8px;
+        font-size: 11px; 
+        border-radius: 6px;
+        margin: 0 auto 6px auto !important;
         display: block;
     }
     
@@ -652,8 +662,9 @@ form,
         display: block;
         width: 100%;
         box-sizing: border-box !important;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         text-align: center;
+        font-size: 9px;
     }
     
     /* Labels más legibles */
