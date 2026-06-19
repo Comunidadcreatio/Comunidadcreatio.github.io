@@ -585,7 +585,7 @@ form,
         width: 100% !important;
         max-width: 320px !important; 
         margin: 0 auto !important; 
-        padding: 24px 0 !important; 
+        padding: 24px 20px !important; 
         border-radius: 16px;
         box-sizing: border-box !important;
         box-shadow: none;
@@ -622,8 +622,6 @@ form,
         box-sizing: border-box !important;
     }
 
-    #modal-login input, 
-    #modal-login button,
     #modal-registro input, 
     #modal-registro select,
     #modal-registro button,
@@ -636,6 +634,18 @@ form,
         font-size: 16px; 
         border-radius: 10px;
     }
+
+    /* Inputs y botones específicos del login - más estrechos y centrados */
+    #modal-login input,
+    #modal-login button {
+        width: 85% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px;
+        font-size: 16px; 
+        border-radius: 10px;
+        margin: 0 auto 12px auto !important;
+        display: block;
+    }
     
     /* Evitamos que el enlace de "Olvidaste tu contraseña" empuje la caja */
     .modal-content a {
@@ -643,6 +653,7 @@ form,
         width: 100%;
         box-sizing: border-box !important;
         margin-bottom: 15px;
+        text-align: center;
     }
     
     /* Labels más legibles */
