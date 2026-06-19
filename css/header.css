@@ -18,7 +18,7 @@
 }
 
 .login-logo {
-    width: 30px;
+    width: 14px;
     height: auto;
     display: block;
     margin: auto;
@@ -66,7 +66,7 @@
         padding: 2px 1.25rem;
     }
     .login-logo {
-        width: 26px;
+        width: 12px;
         height: auto;
     }
 }
@@ -76,7 +76,7 @@
         padding: 2px 0.75rem;
     }
     .login-logo {
-        width: 24px;
+        width: 12px;
         height: auto;
     }
 }
@@ -86,7 +86,7 @@
         padding: 2px 0.5rem;
     }
     .login-logo {
-        width: 22px;
+        width: 10px;
         height: auto;
     }
 }
