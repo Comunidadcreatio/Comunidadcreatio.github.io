@@ -280,9 +280,73 @@ function toggleMiCuenta() {
         galeria.classList.add('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
+        const emailInput = document.getElementById('cuenta-email-actual');
+        if (emailInput && artistaActual) {
+            emailInput.value = artistaActual.email || artistaActual.correo || '';
+        }
     } else {
         miCuenta.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
+    }
+}
+
+// ============================================
+// HELPERS DE PREVISUALIZACIÓN DE IMÁGENES
+// ============================================
+function aplicarPreviewImagen(index, url) {
+    const preview = document.getElementById(`preview-${index}`);
+    const placeholder = document.getElementById(`placeholder-${index}`);
+    if (!preview || !placeholder) return;
+    preview.src = url;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
+    if (!recuadro) return;
+    const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
+    if (btnExistente) btnExistente.remove();
+    const btnEliminar = document.createElement('button');
+    btnEliminar.type = 'button';
+    btnEliminar.className = 'btn-eliminar-imagen';
+    btnEliminar.dataset.index = index;
+    btnEliminar.textContent = '✕';
+    btnEliminar.style.display = 'block';
+    recuadro.style.position = 'relative';
+    recuadro.appendChild(btnEliminar);
+    btnEliminar.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.index);
+        const previewImg = document.getElementById(`preview-${idx}`);
+        const placeholderSpan = document.getElementById(`placeholder-${idx}`);
+        const inputFile = document.getElementById(`input-imagen-${idx}`);
+        if (previewImg.src && previewImg.src !== '') {
+            imagenesAEliminar.add(idx);
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+            placeholderSpan.style.display = 'block';
+            if (inputFile) inputFile.value = '';
+            this.style.display = 'none';
+        }
+    });
+}
+
+// Descarga una imagen existente (por URL) y la coloca como archivo en el input,
+// para que al duplicar una obra esas imágenes se guarden en la nueva obra.
+async function cargarUrlEnInput(index, url) {
+    try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const ext = (blob.type && blob.type.split('/')[1]) || 'jpg';
+        const file = new File([blob], `duplicada-${index}.${ext}`, { type: blob.type || 'image/jpeg' });
+        const input = document.getElementById(`input-imagen-${index}`);
+        if (input) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+        }
+        return true;
+    } catch (err) {
+        console.error('No se pudo cargar la imagen para duplicar:', url, err);
+        return false;
     }
 }
 
@@ -322,7 +386,7 @@ async function refrescarTabla() {
                 const obra = data;
                 document.getElementById('input-id-edicion').value = obra.id;
                 document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = obra.artista;
+                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = obra.id_personalizado;
                 document.getElementById('input-ano').value = obra.ano || '';
@@ -429,7 +493,7 @@ async function refrescarTabla() {
                 
                 document.getElementById('input-id-edicion').value = '';
                 document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = obra.artista;
+                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = '';
                 document.getElementById('input-ano').value = obra.ano || '';
@@ -446,6 +510,10 @@ async function refrescarTabla() {
                 document.getElementById('input-firma').value = obra.firma || '';
                 document.getElementById('input-conservacion').value = obra.conservacion || '';
                 document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+
+                // Reiniciar imágenes y marcas de eliminación
+                imagenesAEliminar.clear();
+                document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
                 for (let i = 0; i < 5; i++) {
                     const preview = document.getElementById(`preview-${i}`);
                     const placeholder = document.getElementById(`placeholder-${i}`);
@@ -454,12 +522,38 @@ async function refrescarTabla() {
                         preview.style.display = 'none';
                         placeholder.style.display = 'block';
                     }
-                    document.getElementById(`input-imagen-${i}`).value = '';
+                    const inputImg = document.getElementById(`input-imagen-${i}`);
+                    if (inputImg) inputImg.value = '';
                 }
+
                 document.getElementById('btn-guardar').textContent = 'Guardar Obra';
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
+
+                // Mostrar las imágenes de la obra original y cargarlas como archivos
+                // para que la obra duplicada se guarde con las mismas imágenes.
+                const imagenesDuplicar = [
+                    obra.imagen_url,
+                    obra.imagen_url_1,
+                    obra.imagen_url_2,
+                    obra.imagen_url_3,
+                    obra.imagen_url_4
+                ];
+                imagenesDuplicar.forEach((url, index) => {
+                    if (url) aplicarPreviewImagen(index, url);
+                });
+                let algunaCargada = false;
+                for (let index = 0; index < imagenesDuplicar.length; index++) {
+                    const url = imagenesDuplicar[index];
+                    if (url) {
+                        const ok = await cargarUrlEnInput(index, url);
+                        if (ok) algunaCargada = true;
+                    }
+                }
+                if (!algunaCargada && imagenesDuplicar.some(Boolean)) {
+                    showWarning("No se pudieron cargar automáticamente las imágenes. Vuelve a subirlas antes de guardar la obra duplicada.");
+                }
             } catch (error) {
                 console.error("Error al duplicar:", error);
                 const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
@@ -985,6 +1079,135 @@ function setupEvents() {
                 mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
                 mensajeError.style.display = 'block';
             }
+        });
+    }
+
+    // ============================================
+    // MI CUENTA > SEGURIDAD (UI - pendiente de backend)
+    // ============================================
+    const ocultarFormularioCuenta = (id) => {
+        const form = document.getElementById(id);
+        if (!form) return;
+        form.reset && form.reset();
+        form.classList.add('hidden');
+        form.querySelectorAll('.cuenta-error').forEach(e => (e.textContent = ''));
+        const strength = form.querySelector('#cuenta-password-strength');
+        if (strength) strength.removeAttribute('data-level');
+        const strengthText = form.querySelector('.strength-text');
+        if (strengthText) strengthText.textContent = '';
+    };
+
+    // Botones "Cancelar" de cualquier formulario de cuenta
+    document.querySelectorAll('.btn-cuenta-cancelar[data-cancelar]').forEach(btn => {
+        btn.addEventListener('click', () => ocultarFormularioCuenta(btn.dataset.cancelar));
+    });
+
+    // --- Cambiar correo electrónico ---
+    const btnCambiarEmail = document.getElementById('btn-cambiar-email');
+    const formCambiarEmail = document.getElementById('form-cambiar-email');
+    const formConfirmarEmail = document.getElementById('form-confirmar-email');
+    if (btnCambiarEmail && formCambiarEmail) {
+        btnCambiarEmail.addEventListener('click', () => {
+            ocultarFormularioCuenta('form-confirmar-email');
+            formCambiarEmail.classList.toggle('hidden');
+        });
+
+        // Paso 1 -> Paso 2 (confirmar contraseña)
+        formCambiarEmail.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
+            const errorEl = document.getElementById('error-nuevo-email');
+            errorEl.textContent = '';
+            const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail);
+            if (!emailValido) {
+                errorEl.textContent = 'Ingresa un correo electrónico válido.';
+                return;
+            }
+            const emailActual = (document.getElementById('cuenta-email-actual').value || '').trim().toLowerCase();
+            if (nuevoEmail.toLowerCase() === emailActual) {
+                errorEl.textContent = 'El nuevo correo debe ser diferente al actual.';
+                return;
+            }
+            formCambiarEmail.classList.add('hidden');
+            formConfirmarEmail.classList.remove('hidden');
+        });
+    }
+
+    if (formConfirmarEmail) {
+        // Paso 2: confirmar con contraseña (UI - sin backend aún)
+        formConfirmarEmail.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('email-password').value;
+            const errorEl = document.getElementById('error-email-password');
+            errorEl.textContent = '';
+            if (!password) {
+                errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
+                return;
+            }
+            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
+            ocultarFormularioCuenta('form-confirmar-email');
+            ocultarFormularioCuenta('form-cambiar-email');
+            showInfo(`Se enviaría un enlace de verificación a ${nuevoEmail}. (Pendiente de conectar el backend)`);
+        });
+    }
+
+    // --- Cambiar contraseña ---
+    const btnCambiarPassword = document.getElementById('btn-cambiar-password');
+    const formCambiarPassword = document.getElementById('form-cambiar-password');
+    if (btnCambiarPassword && formCambiarPassword) {
+        btnCambiarPassword.addEventListener('click', () => {
+            formCambiarPassword.classList.toggle('hidden');
+        });
+
+        // Medidor de fuerza de la nueva contraseña
+        const passNueva = document.getElementById('pass-nueva');
+        const strengthWidget = document.getElementById('cuenta-password-strength');
+        const strengthText = strengthWidget ? strengthWidget.querySelector('.strength-text') : null;
+        if (passNueva && strengthWidget) {
+            passNueva.addEventListener('input', () => {
+                const val = passNueva.value;
+                if (!val) {
+                    strengthWidget.removeAttribute('data-level');
+                    if (strengthText) strengthText.textContent = '';
+                    return;
+                }
+                let score = 0;
+                if (val.length >= 8) score++;
+                if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+                if (/\d/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
+                const nivel = Math.max(1, score);
+                strengthWidget.setAttribute('data-level', String(nivel));
+                if (strengthText) {
+                    strengthText.textContent = nivel === 1 ? 'Débil' : nivel === 2 ? 'Media' : 'Fuerte';
+                }
+            });
+        }
+
+        formCambiarPassword.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const actual = document.getElementById('pass-actual').value;
+            const nueva = document.getElementById('pass-nueva').value;
+            const confirmar = document.getElementById('pass-confirmar').value;
+            const errorEl = document.getElementById('error-pass-confirmar');
+            errorEl.textContent = '';
+            if (!actual || !nueva || !confirmar) {
+                errorEl.textContent = 'Completa todos los campos.';
+                return;
+            }
+            if (nueva.length < 8) {
+                errorEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.';
+                return;
+            }
+            if (nueva === actual) {
+                errorEl.textContent = 'La nueva contraseña debe ser diferente a la actual.';
+                return;
+            }
+            if (nueva !== confirmar) {
+                errorEl.textContent = 'Las contraseñas no coinciden.';
+                return;
+            }
+            ocultarFormularioCuenta('form-cambiar-password');
+            showInfo('Tu contraseña se actualizaría correctamente. (Pendiente de conectar el backend)');
         });
     }
 

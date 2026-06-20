@@ -454,8 +454,81 @@
 
             <div class="cuenta-seccion">
                 <h3>Seguridad</h3>
+
+                <!-- Correo electrónico -->
+                <div class="cuenta-item">
+                    <h4>Correo electrónico</h4>
+                    <p class="cuenta-item-desc">Esta es la dirección de correo asociada a tu cuenta.</p>
+                    <div class="cuenta-campo">
+                        <input type="email" id="cuenta-email-actual" readonly aria-label="Correo electrónico actual">
+                        <button type="button" id="btn-cambiar-email" class="btn-cuenta-secundario">Cambiar correo electrónico</button>
+                    </div>
+
+                    <!-- Paso 1: nuevo correo -->
+                    <form id="form-cambiar-email" class="cuenta-form hidden" aria-label="Cambiar correo electrónico">
+                        <h5>Cambiar correo electrónico</h5>
+                        <div class="form-group">
+                            <label for="nuevo-email">Nuevo correo electrónico</label>
+                            <input type="email" id="nuevo-email" placeholder="ejemplo@correo.com" required autocomplete="email">
+                            <span class="cuenta-error" id="error-nuevo-email"></span>
+                        </div>
+                        <div class="cuenta-form-acciones">
+                            <button type="button" class="btn-cuenta-cancelar" data-cancelar="form-cambiar-email">Cancelar</button>
+                            <button type="submit" class="btn-cuenta-enviar">Enviar</button>
+                        </div>
+                    </form>
+
+                    <!-- Paso 2: confirmar con contraseña -->
+                    <form id="form-confirmar-email" class="cuenta-form hidden" aria-label="Confirmar cambio de correo">
+                        <h5>Confirma tu identidad</h5>
+                        <p class="cuenta-form-info">Por seguridad, ingresa tu contraseña. Enviaremos un enlace de verificación a tu nuevo correo para completar el cambio.</p>
+                        <div class="form-group">
+                            <label for="email-password">Contraseña actual</label>
+                            <input type="password" id="email-password" required autocomplete="current-password">
+                            <span class="cuenta-error" id="error-email-password"></span>
+                        </div>
+                        <div class="cuenta-form-acciones">
+                            <button type="button" class="btn-cuenta-cancelar" data-cancelar="form-confirmar-email">Cancelar</button>
+                            <button type="submit" class="btn-cuenta-enviar">Confirmar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="cuenta-item">
+                    <h4>Contraseña</h4>
+                    <p class="cuenta-item-desc">Cambia tu contraseña periódicamente para mantener tu cuenta segura.</p>
+                    <button type="button" id="btn-cambiar-password" class="btn-cuenta-secundario">Cambiar contraseña</button>
+
+                    <form id="form-cambiar-password" class="cuenta-form hidden" aria-label="Cambiar contraseña">
+                        <h5>Cambiar contraseña</h5>
+                        <div class="form-group">
+                            <label for="pass-actual">Contraseña actual</label>
+                            <input type="password" id="pass-actual" required autocomplete="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="pass-nueva">Nueva contraseña</label>
+                            <input type="password" id="pass-nueva" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+                            <div class="password-strength" id="cuenta-password-strength" aria-live="polite">
+                                <div class="strength-bar"><span class="strength-bar-fill"></span></div>
+                                <span class="strength-text"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pass-confirmar">Confirmar nueva contraseña</label>
+                            <input type="password" id="pass-confirmar" required autocomplete="new-password">
+                            <span class="cuenta-error" id="error-pass-confirmar"></span>
+                        </div>
+                        <div class="cuenta-form-acciones">
+                            <button type="button" class="btn-cuenta-cancelar" data-cancelar="form-cambiar-password">Cancelar</button>
+                            <button type="submit" class="btn-cuenta-enviar">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Eliminar cuenta -->
                 <div class="danger-zone">
-                    <h4>⚠️ Zona de Peligro</h4>
+                    <h4>Eliminar cuenta</h4>
                     <p>Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
                     <button id="btn-eliminar-cuenta">🗑️ Eliminar mi cuenta</button>
                 </div>

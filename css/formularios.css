@@ -752,6 +752,15 @@ form,
         line-height: 24px !important;
     }
 
+    /* Los botones de iconos de la tabla no deben estirarse en móvil */
+    #panel-artista .acciones-obra .btn-accion {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border-radius: 8px !important;
+    }
+
     /* Botones de acción del formulario apilados y del mismo ancho en móvil */
     .form-actions {
         flex-direction: column;

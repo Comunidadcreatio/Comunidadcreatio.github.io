@@ -141,48 +141,70 @@
     border-bottom: none;
 }
 
-#tabla-obras-container td button {
-    margin-right: 4px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s;
-    background: white;
+/* ==============================================
+   COLUMNA STATUS (texto simple de color)
+   ============================================== */
+.status-text {
+    font-weight: 700;
+    font-size: 13px;
 }
 
-/* Botones de acción de la tabla */
-.btn-editar {
-    color: var(--color-ink);
+.status-text.status-activo {
+    color: var(--color-success, #28a745);
+}
+
+.status-text.status-inactivo {
+    color: var(--color-danger, #dc3545);
+}
+
+.status-text.status-desconocido {
+    color: var(--color-text-muted, #6c757d);
+}
+
+/* ==============================================
+   BOTONES DE ACCIÓN (iconos)
+   ============================================== */
+.acciones-obra {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+#tabla-obras-container td .btn-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin: 0;
     border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.btn-editar:hover {
+.btn-accion svg {
+    display: block;
+}
+
+.btn-accion.btn-editar:hover,
+.btn-accion.btn-duplicar:hover {
     background: var(--color-ink);
     color: var(--color-white);
     border-color: var(--color-ink);
 }
 
-.btn-eliminar {
+.btn-accion.btn-eliminar {
     color: var(--color-danger);
-    border: 1px solid var(--color-gray-300);
 }
 
-.btn-eliminar:hover {
+.btn-accion.btn-eliminar:hover {
     background: var(--color-danger);
     color: var(--color-white);
     border-color: var(--color-danger);
-}
-
-.btn-duplicar {
-    color: var(--color-ink);
-    border: 1px solid var(--color-gray-300);
-}
-
-.btn-duplicar:hover {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
 }
 
 
@@ -230,6 +252,197 @@
     margin: 0 0 10px 0;
     font-size: 1rem;
 }
+
+/* --- Ítems de seguridad (correo / contraseña) --- */
+.cuenta-item {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.cuenta-item h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.cuenta-item-desc {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.cuenta-campo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cuenta-campo input[readonly] {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: var(--color-gray-100);
+    color: var(--color-text);
+    font-size: 14px;
+    cursor: default;
+}
+
+.btn-cuenta-secundario {
+    padding: 10px 18px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-cuenta-secundario:hover {
+    background: var(--color-ink);
+    color: var(--color-white);
+}
+
+/* --- Formularios desplegables --- */
+.cuenta-form {
+    margin-top: 16px;
+    padding: 18px;
+    background: var(--color-gray-50, #fafafa);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 10px;
+}
+
+.cuenta-form.hidden {
+    display: none;
+}
+
+.cuenta-form h5 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.cuenta-form-info {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.cuenta-form .form-group {
+    margin-bottom: 14px;
+}
+
+.cuenta-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.cuenta-form input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.cuenta-form input:focus {
+    outline: none;
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.10);
+}
+
+.cuenta-error {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-danger);
+    min-height: 0;
+}
+
+.cuenta-form-acciones {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-cuenta-cancelar,
+.btn-cuenta-enviar {
+    flex: 1;
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-cuenta-cancelar {
+    background: var(--color-white);
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-gray-300);
+}
+
+.btn-cuenta-cancelar:hover {
+    border-color: var(--color-ink);
+    background: var(--color-gray-100);
+}
+
+.btn-cuenta-enviar {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border: 1.5px solid var(--color-ink);
+}
+
+.btn-cuenta-enviar:hover {
+    background: var(--color-ink-light);
+    border-color: var(--color-ink-light);
+}
+
+/* --- Medidor de fuerza (autocontenido para Mi Cuenta) --- */
+#cuenta-password-strength {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+#cuenta-password-strength .strength-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--color-gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#cuenta-password-strength .strength-bar-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-gray-400);
+    transition: width 0.2s, background 0.2s;
+}
+
+#cuenta-password-strength .strength-text {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    min-width: 56px;
+}
+
+#cuenta-password-strength[data-level="1"] .strength-bar-fill { width: 33%; background: var(--color-danger); }
+#cuenta-password-strength[data-level="2"] .strength-bar-fill { width: 66%; background: #f0ad4e; }
+#cuenta-password-strength[data-level="3"] .strength-bar-fill { width: 100%; background: var(--color-success, #28a745); }
 
 
 /* ==============================================
