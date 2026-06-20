@@ -404,7 +404,7 @@
 
 .btn-cuenta-secundario.btn-danger {
     border-color: var(--color-danger);
-    color: var(--color-danger);
+    color: var(--color-ink);
 }
 
 .btn-cuenta-secundario.btn-danger:hover {
