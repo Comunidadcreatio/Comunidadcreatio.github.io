@@ -461,11 +461,14 @@
 
                 <!-- Correo electrónico -->
                 <div class="cuenta-item">
-                    <h4>Correo electrónico</h4>
-                    <p class="cuenta-item-desc">Esta es la dirección de correo asociada a tu cuenta.</p>
-                    <div class="cuenta-campo">
-                        <input type="email" id="cuenta-email-actual" readonly aria-label="Correo electrónico actual">
-                        <button type="button" id="btn-cambiar-email" class="btn-cuenta-secundario">Cambiar correo electrónico</button>
+                    <div class="cuenta-item-header">
+                        <div class="cuenta-item-info">
+                            <h4>Correo electrónico</h4>
+                            <p class="cuenta-item-desc">Esta es la dirección de correo asociada a tu cuenta.</p>
+                        </div>
+                        <div class="cuenta-item-actions">
+                            <button type="button" id="btn-cambiar-email" class="btn-cuenta-secundario">Cambiar correo electrónico</button>
+                        </div>
                     </div>
 
                     <!-- Paso 1: nuevo correo -->
@@ -500,9 +503,15 @@
 
                 <!-- Contraseña -->
                 <div class="cuenta-item">
-                    <h4>Contraseña</h4>
-                    <p class="cuenta-item-desc">Cambia tu contraseña periódicamente para mantener tu cuenta segura.</p>
-                    <button type="button" id="btn-cambiar-password" class="btn-cuenta-secundario">Cambiar contraseña</button>
+                    <div class="cuenta-item-header">
+                        <div class="cuenta-item-info">
+                            <h4>Contraseña</h4>
+                            <p class="cuenta-item-desc">Cambia tu contraseña periódicamente para mantener tu cuenta segura.</p>
+                        </div>
+                        <div class="cuenta-item-actions">
+                            <button type="button" id="btn-cambiar-password" class="btn-cuenta-secundario">Cambiar contraseña</button>
+                        </div>
+                    </div>
 
                     <form id="form-cambiar-password" class="cuenta-form hidden" aria-label="Cambiar contraseña">
                         <h5>Cambiar contraseña</h5>

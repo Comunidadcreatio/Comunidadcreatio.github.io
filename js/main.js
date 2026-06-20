@@ -1101,8 +1101,15 @@ function setupEvents() {
             accordionSeguridad.setAttribute('aria-expanded', !isExpanded);
             if (isExpanded) {
                 seguridadContent.hidden = true;
+                seguridadContent.style.maxHeight = '0';
+                seguridadContent.style.padding = '0 0';
             } else {
                 seguridadContent.hidden = false;
+                // Pequeño delay para permitir que la transición funcione
+                setTimeout(() => {
+                    seguridadContent.style.maxHeight = '2000px';
+                    seguridadContent.style.padding = '20px 0';
+                }, 10);
             }
         });
     }

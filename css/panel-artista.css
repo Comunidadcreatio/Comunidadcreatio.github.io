@@ -249,24 +249,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    padding: 20px 0;
     background: none;
     border: none;
     border-bottom: 1px solid var(--color-gray-200);
     cursor: pointer;
     text-align: left;
+    transition: background 0.2s ease;
+}
+
+.accordion-header:hover {
+    background: var(--color-gray-50, #fafafa);
 }
 
 .accordion-header h3 {
     margin: 0;
     padding: 0;
     border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .accordion-icon {
-    font-size: 12px;
+    font-size: 14px;
     transition: transform 0.3s ease;
     color: var(--color-text-muted);
+    padding: 8px;
 }
 
 .accordion-header[aria-expanded="true"] .accordion-icon {
@@ -274,7 +283,19 @@
 }
 
 .accordion-content {
-    padding: 16px 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+    padding: 0 0;
+}
+
+.accordion-content[hidden] {
+    display: none;
+}
+
+.accordion-content:not([hidden]) {
+    max-height: 2000px;
+    padding: 20px 0;
 }
 
 .cuenta-seccion .danger-zone {
@@ -289,21 +310,47 @@
 
 /* --- Ítems de seguridad (correo / contraseña) --- */
 .cuenta-item {
-    padding: 18px 0;
+    padding: 24px 0;
     border-bottom: 1px solid var(--color-gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cuenta-item:last-child {
+    border-bottom: none;
+}
+
+.cuenta-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.cuenta-item-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .cuenta-item h4 {
-    margin: 0 0 4px 0;
+    margin: 0 0 6px 0;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--color-text);
 }
 
 .cuenta-item-desc {
-    margin: 0 0 12px 0;
-    font-size: 13px;
+    margin: 0;
+    font-size: 14px;
     color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.cuenta-item-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .cuenta-campo {
@@ -315,18 +362,24 @@
 
 .cuenta-campo input[readonly] {
     flex: 1;
-    min-width: 220px;
-    padding: 10px 12px;
+    min-width: 250px;
+    padding: 12px 16px;
     border: 1px solid var(--color-gray-300);
     border-radius: 8px;
     background: var(--color-gray-100);
     color: var(--color-text);
     font-size: 14px;
     cursor: default;
+    transition: border-color 0.2s ease;
+}
+
+.cuenta-campo input[readonly]:focus {
+    outline: none;
+    border-color: var(--color-gray-400);
 }
 
 .btn-cuenta-secundario {
-    padding: 10px 18px;
+    padding: 12px 20px;
     border: 1.5px solid var(--color-ink);
     border-radius: 8px;
     background: var(--color-white);
@@ -335,21 +388,39 @@
     font-size: 14px;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s, color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .btn-cuenta-secundario:hover {
     background: var(--color-ink);
     color: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cuenta-secundario:active {
+    transform: translateY(0);
 }
 
 /* --- Formularios desplegables --- */
 .cuenta-form {
-    margin-top: 16px;
-    padding: 18px;
+    margin-top: 20px;
+    padding: 24px;
     background: var(--color-gray-50, #fafafa);
     border: 1px solid var(--color-gray-200);
-    border-radius: 10px;
+    border-radius: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .cuenta-form.hidden {
@@ -357,69 +428,71 @@
 }
 
 .cuenta-form h5 {
-    margin: 0 0 6px 0;
-    font-size: 0.95rem;
-    font-weight: 700;
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--color-text);
 }
 
 .cuenta-form-info {
-    margin: 0 0 14px 0;
-    font-size: 13px;
+    margin: 0 0 20px 0;
+    font-size: 14px;
     color: var(--color-text-muted);
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .cuenta-form .form-group {
-    margin-bottom: 14px;
+    margin-bottom: 20px;
 }
 
 .cuenta-form label {
     display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
+    margin-bottom: 8px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text);
 }
 
 .cuenta-form input {
     width: 100%;
-    padding: 11px 12px;
+    padding: 12px 16px;
     border: 1px solid var(--color-gray-300);
     border-radius: 8px;
     font-size: 14px;
     box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cuenta-form input:focus {
     outline: none;
     border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.10);
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
 }
 
 .cuenta-error {
     display: block;
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 13px;
     color: var(--color-danger);
     min-height: 0;
+    line-height: 1.4;
 }
 
 .cuenta-form-acciones {
     display: flex;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: 24px;
 }
 
 .btn-cuenta-cancelar,
 .btn-cuenta-enviar {
     flex: 1;
-    padding: 11px 16px;
+    padding: 12px 20px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .btn-cuenta-cancelar {
