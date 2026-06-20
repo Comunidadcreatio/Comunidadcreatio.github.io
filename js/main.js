@@ -222,8 +222,10 @@ function mostrarPaginaBlanca() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
     if (galeria) galeria.classList.add('hidden');
     if (panel) panel.classList.add('hidden');
+    if (miCuenta) miCuenta.classList.add('hidden');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
 }
 
@@ -231,10 +233,12 @@ function toggleGaleria() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
     if (galeria.classList.contains('hidden')) {
         galeria.classList.remove('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
+        if (miCuenta) miCuenta.classList.add('hidden');
         cargarGaleria(galeriaContainer).then(obras => {
             mostrarGaleria(obras, galeriaContainer, (id) => {
                 console.log("Ver detalles de obra con ID:", id);
@@ -250,13 +254,31 @@ function togglePanel() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
+        if (miCuenta) miCuenta.classList.add('hidden');
         refrescarTabla();
     } else {
         panel.classList.add('hidden');
+        paginaBlanca.classList.remove('hidden');
+    }
+}
+
+function toggleMiCuenta() {
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
+    if (miCuenta.classList.contains('hidden')) {
+        miCuenta.classList.remove('hidden');
+        galeria.classList.add('hidden');
+        panel.classList.add('hidden');
+        paginaBlanca.classList.add('hidden');
+    } else {
+        miCuenta.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
     }
 }
@@ -638,6 +660,10 @@ function setupEvents() {
                         cerrarMenuMovil();
                         togglePanel();
                     });
+                    document.getElementById('mobile-menu-mi-cuenta')?.addEventListener('click', () => {
+                        cerrarMenuMovil();
+                        toggleMiCuenta();
+                    });
 
                     mobileMainMenu.addEventListener('click', (evento) => {
                         if (evento.target === mobileMainMenu) cerrarMenuMovil();
@@ -670,6 +696,10 @@ function setupEvents() {
                     document.getElementById('menu-panel')?.addEventListener('click', () => {
                         cerrarDesktopMainMenu();
                         togglePanel();
+                    });
+                    document.getElementById('menu-mi-cuenta')?.addEventListener('click', () => {
+                        cerrarDesktopMainMenu();
+                        toggleMiCuenta();
                     });
                 }
 
@@ -790,7 +820,11 @@ function setupEvents() {
             const alto = document.getElementById('input-alto').value;
             const firma = document.getElementById('input-firma').value;
             const conservacion = document.getElementById('input-conservacion').value;
-            const etiquetas = document.getElementById('input-etiquetas').value;
+            const etiquetas = document.getElementById('input-etiquetas').value
+                .split(',')
+                .map(t => t.trim())
+                .filter(Boolean)
+                .join(', ');
             const archivos = [
                 document.getElementById('input-imagen-0'),
                 document.getElementById('input-imagen-1'),

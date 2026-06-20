@@ -70,6 +70,8 @@
             <button id="menu-galeria" class="logout-option">Galería Pública</button>
             <div class="divider"></div>
             <button id="menu-panel" class="logout-option">Registro de Obra</button>
+            <div class="divider"></div>
+            <button id="menu-mi-cuenta" class="logout-option">Mi cuenta</button>
         </div>
     </div>
 
@@ -78,6 +80,8 @@
             <button id="mobile-menu-galeria" class="logout-option">Galería Pública</button>
             <div class="divider"></div>
             <button id="mobile-menu-panel" class="logout-option">Registro de Obra</button>
+            <div class="divider"></div>
+            <button id="mobile-menu-mi-cuenta" class="logout-option">Mi cuenta</button>
         </div>
     </div>
 
@@ -137,9 +141,11 @@
 
             <!-- Controles de paginación -->
             <div class="pagination-controls" role="navigation" aria-label="Paginación de resultados">
-                <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
                 <span id="page-info" aria-live="polite">Página 1</span>
-                <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
+                <div class="pagination-buttons">
+                    <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
+                    <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
+                </div>
             </div>
 
             <!-- Tabla de obras -->
@@ -165,22 +171,62 @@
             <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
                 <h3 id="form-obra-title">Agregar / Editar Obra</h3>
                 <form id="obra-form" aria-label="Formulario de obra">
-                    <!-- Datos básicos -->
+                    <!-- 1. Título -->
                     <div class="form-group">
                         <label for="input-titulo">Título</label>
                         <input type="text" id="input-titulo" placeholder="Título" required aria-required="true">
                     </div>
-                    <div class="form-group">
-                        <label for="input-artista">Artista</label>
-                        <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
+
+                    <!-- 2. ID Personalizado + Año -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="input-id-personalizado">ID Personalizado</label>
+                            <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-ano">Año</label>
+                            <input type="number" id="input-ano" placeholder="Año" required aria-required="true">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="input-precio">Precio</label>
-                        <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01">
+
+                    <!-- 3. Artista + Precio -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="input-artista">Artista</label>
+                            <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-precio">Precio</label>
+                            <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01">
+                        </div>
                     </div>
+
+                    <!-- 4. Ancho + Alto -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="input-ancho">Ancho (cm)</label>
+                            <input type="number" id="input-ancho" placeholder="Ancho (cm)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-alto">Alto (cm)</label>
+                            <input type="number" id="input-alto" placeholder="Alto (cm)" required>
+                        </div>
+                    </div>
+
+                    <!-- 5. Descripción Artística -->
                     <div class="form-group">
-                        <label for="input-id-personalizado">ID Personalizado</label>
-                        <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required aria-required="true">
+                        <label for="input-descripcion-artistica">Descripción Artística</label>
+                        <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required></textarea>
+                    </div>
+
+                    <!-- 6. Status -->
+                    <div class="form-group">
+                        <label for="input-status">Status</label>
+                        <select id="input-status" required>
+                            <option value="" disabled selected>Selecciona Status</option>
+                            <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
+                            <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
+                        </select>
                     </div>
 
                     <!-- Técnica -->
@@ -217,7 +263,8 @@
                         <option value="Performance documentada">Performance documentada</option>
                         <option value="Arte objeto/ready-made">Arte objeto/ready-made</option>
                         <option value="Técnica mixta (multidisciplinar)">Técnica mixta (multidisciplinar)</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Soporte -->
                     <div class="form-group">
@@ -237,17 +284,14 @@
                         <option value="Muro (fresco, mural - no transportable)">Muro (fresco, mural - no transportable)</option>
                         <option value="Digital (archivo, sin soporte físico)">Digital (archivo, sin soporte físico)</option>
                         <option value="Mixto (varios materiales)">Mixto (varios materiales)</option>
-                    </select>
-
-                    <!-- Año -->
-                    <input type="number" id="input-ano" placeholder="Año" required>
-
-                    <!-- Descripción Artística -->
-                    <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required></textarea>
+                        </select>
+                    </div>
 
                     <!-- Estado de la Obra -->
-                    <select id="input-estado-obra" required>
-                        <option value="" disabled selected>Selecciona Estado</option>
+                    <div class="form-group">
+                        <label for="input-estado-obra">Estado</label>
+                        <select id="input-estado-obra" required>
+                            <option value="" disabled selected>Selecciona Estado</option>
                         <option value="Disponible (en venta)">Disponible (en venta)</option>
                         <option value="Reservado">Reservado</option>
                         <option value="Vendido">Vendido</option>
@@ -255,11 +299,14 @@
                         <option value="En préstamo (fuera de galería)">En préstamo (fuera de galería)</option>
                         <option value="Solo para exhibición (no venta)">Solo para exhibición (no venta)</option>
                         <option value="Retirado del inventario">Retirado del inventario</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Procedencia -->
-                    <select id="input-procedencia" required>
-                        <option value="" disabled selected>Selecciona Procedencia</option>
+                    <div class="form-group">
+                        <label for="input-procedencia">Procedencia</label>
+                        <select id="input-procedencia" required>
+                            <option value="" disabled selected>Selecciona Procedencia</option>
                         <option value="Colección privada">Colección privada</option>
                         <option value="Taller del artista">Taller del artista</option>
                         <option value="Herencia familiar">Herencia familiar</option>
@@ -268,44 +315,40 @@
                         <option value="Donación">Donación</option>
                         <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
                         <option value="Desconocida">Desconocida</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Marcos -->
-                    <select id="input-marcos" required>
-                        <option value="" disabled selected>Selecciona Marcos</option>
+                    <div class="form-group">
+                        <label for="input-marcos">Marcos</label>
+                        <select id="input-marcos" required>
+                            <option value="" disabled selected>Selecciona Marcos</option>
                         <option value="Ya enmarcada (listo para colgar)">Ya enmarcada (listo para colgar)</option>
                         <option value="Sin enmarcar (solo lienzo/bastidor)">Sin enmarcar (solo lienzo/bastidor)</option>
                         <option value="Enmarcado opcional (el cliente elige después)">Enmarcado opcional (el cliente elige después)</option>
                         <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
                         <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Certificado -->
-                    <select id="input-certificado" required>
-                        <option value="" disabled selected>Selecciona Certificado</option>
+                    <div class="form-group">
+                        <label for="input-certificado">Certificado</label>
+                        <select id="input-certificado" required>
+                            <option value="" disabled selected>Selecciona Certificado</option>
                         <option value="Sí (autenticado)">Sí (autenticado)</option>
                         <option value="No">No</option>
                         <option value="En trámite">En trámite</option>
                         <option value="Certificado digital disponible">Certificado digital disponible</option>
                         <option value="Certificado físico disponible">Certificado físico disponible</option>
-                    </select>
-
-                    <!-- Status -->
-                    <select id="input-status" required>
-                        <option value="" disabled selected>Selecciona Status</option>
-                        <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
-                        <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
-                    </select>
-
-                    <!-- Dimensiones -->
-                    <div class="dimensiones-group">
-                        <input type="number" id="input-ancho" placeholder="Ancho (cm)" required>
-                        <input type="number" id="input-alto" placeholder="Alto (cm)" required>
+                        </select>
                     </div>
 
                     <!-- Firma -->
-                    <select id="input-firma" required>
-                        <option value="" disabled selected>Selecciona Firma</option>
+                    <div class="form-group">
+                        <label for="input-firma">Firma</label>
+                        <select id="input-firma" required>
+                            <option value="" disabled selected>Selecciona Firma</option>
                         <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
                         <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
                         <option value="Firmada en el bastidor">Firmada en el bastidor</option>
@@ -316,21 +359,28 @@
                         <option value="Firma ilegible">Firma ilegible</option>
                         <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
                         <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Conservación -->
-                    <select id="input-conservacion" required>
-                        <option value="" disabled selected>Selecciona Conservación</option>
+                    <div class="form-group">
+                        <label for="input-conservacion">Conservación</label>
+                        <select id="input-conservacion" required>
+                            <option value="" disabled selected>Selecciona Conservación</option>
                         <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
                         <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
                         <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
                         <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
                         <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
                         <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
-                    </select>
+                        </select>
+                    </div>
 
                     <!-- Etiquetas -->
-                    <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
+                    <div class="form-group">
+                        <label for="input-etiquetas">Etiquetas</label>
+                        <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
+                    </div>
 
                     <!-- Contenedor para los 5 recuadros de imágenes -->
                     <div class="imagenes-contenedor" role="group" aria-label="Imágenes de la obra">
@@ -395,13 +445,20 @@
 
                 </form>
 
-                <!-- Sección de peligro al final del panel -->
-                    <div class="danger-zone">
-                        <h3>⚠️ Zona de Peligro</h3>
-                        <p>Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
-                        <button id="btn-eliminar-cuenta">🗑️ Eliminar mi cuenta</button>
-                    </div>
+            </div>
+        </section>
 
+        <!-- SECCIÓN PRIVADA: MI CUENTA -->
+        <section id="mi-cuenta" class="hidden" aria-labelledby="mi-cuenta-title" role="region">
+            <h2 id="mi-cuenta-title">Mi Cuenta</h2>
+
+            <div class="cuenta-seccion">
+                <h3>Seguridad</h3>
+                <div class="danger-zone">
+                    <h4>⚠️ Zona de Peligro</h4>
+                    <p>Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
+                    <button id="btn-eliminar-cuenta">🗑️ Eliminar mi cuenta</button>
+                </div>
             </div>
         </section>
 

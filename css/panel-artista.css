@@ -24,14 +24,13 @@
    CONTROLES DE BÚSQUEDA Y FILTROS
    ============================================== */
 .filter-controls {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
     align-items: center;
-    padding: 10px;
-    border: 1px solid #000;
-    border-radius: 4px;
+    padding: 0;
+    border: none;
 }
 
 .filter-controls input[type="text"],
@@ -42,14 +41,11 @@
     border-radius: 4px;
     font-size: 14px;
     background: white;
+    width: 100%;
 }
 
-.filter-controls input[type="text"] {
-    flex: 1;
-    min-width: 150px;
-}
-
-.filter-controls button {
+.filter-controls #btn-aplicar-filtros {
+    grid-column: 1 / -1;
     background-color: var(--color-ink);
     color: var(--color-white);
     border: none;
@@ -67,9 +63,15 @@
    ============================================== */
 .pagination-controls {
     display: flex;
-    gap: 10px;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     margin: 1rem 0 2rem;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 10px;
 }
 
 .pagination-btn {
@@ -181,6 +183,52 @@
 
 
 /* ==============================================
+   SECCIÓN MI CUENTA
+   ============================================== */
+#mi-cuenta {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+#mi-cuenta.hidden {
+    display: none;
+}
+
+#mi-cuenta h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.cuenta-seccion {
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 1.5rem;
+}
+
+.cuenta-seccion > h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.cuenta-seccion .danger-zone {
+    margin-top: 0;
+}
+
+.cuenta-seccion .danger-zone h4 {
+    color: var(--color-danger);
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+}
+
+
+/* ==============================================
    ZONA DE PELIGRO (Acciones críticas)
    ============================================== */
 .danger-zone {
@@ -247,12 +295,11 @@
    DISEÑO RESPONSIVO - PANEL DE ARTISTA
    ============================================== */
 @media (max-width: 768px) {
-    /* Controles de filtro apilados */
+    /* Controles de filtro en grid de 2 columnas */
     .filter-controls {
-        flex-direction: column;
         width: 100%;
-        padding: 10px;
-        gap: 10px;
+        padding: 0;
+        gap: 8px;
     }
     .filter-controls input[type="text"],
     .filter-controls select,
