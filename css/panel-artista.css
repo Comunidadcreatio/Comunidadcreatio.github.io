@@ -402,6 +402,17 @@
     transform: translateY(0);
 }
 
+.btn-cuenta-secundario.btn-danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.btn-cuenta-secundario.btn-danger:hover {
+    background: var(--color-danger);
+    color: var(--color-white);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
 /* --- Formularios desplegables --- */
 .cuenta-form {
     margin-top: 20px;
