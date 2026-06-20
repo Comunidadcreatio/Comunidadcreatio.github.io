@@ -453,7 +453,11 @@
             <h2 id="mi-cuenta-title">Mi Cuenta</h2>
 
             <div class="cuenta-seccion">
-                <h3>Seguridad</h3>
+                <button class="accordion-header" id="accordion-seguridad" aria-expanded="false" aria-controls="seguridad-content">
+                    <h3>Seguridad</h3>
+                    <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-content" id="seguridad-content" hidden>
 
                 <!-- Correo electrónico -->
                 <div class="cuenta-item">
@@ -531,6 +535,7 @@
                     <h4>Eliminar cuenta</h4>
                     <p>Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
                     <button id="btn-eliminar-cuenta">🗑️ Eliminar mi cuenta</button>
+                </div>
                 </div>
             </div>
         </section>

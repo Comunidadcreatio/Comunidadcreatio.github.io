@@ -262,6 +262,13 @@ function togglePanel() {
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
+        // Establecer el nombre del artista por defecto al abrir el panel
+        if (artistaActual && artistaActual.nombre_artista) {
+            const inputArtista = document.getElementById('input-artista');
+            if (inputArtista && !inputArtista.value) {
+                inputArtista.value = artistaActual.nombre_artista;
+            }
+        }
         refrescarTabla();
     } else {
         panel.classList.add('hidden');
@@ -1085,6 +1092,21 @@ function setupEvents() {
     // ============================================
     // MI CUENTA > SEGURIDAD (UI - pendiente de backend)
     // ============================================
+    // Accordion para sección Seguridad
+    const accordionSeguridad = document.getElementById('accordion-seguridad');
+    const seguridadContent = document.getElementById('seguridad-content');
+    if (accordionSeguridad && seguridadContent) {
+        accordionSeguridad.addEventListener('click', () => {
+            const isExpanded = accordionSeguridad.getAttribute('aria-expanded') === 'true';
+            accordionSeguridad.setAttribute('aria-expanded', !isExpanded);
+            if (isExpanded) {
+                seguridadContent.hidden = true;
+            } else {
+                seguridadContent.hidden = false;
+            }
+        });
+    }
+
     const ocultarFormularioCuenta = (id) => {
         const form = document.getElementById(id);
         if (!form) return;
@@ -1134,8 +1156,8 @@ function setupEvents() {
     }
 
     if (formConfirmarEmail) {
-        // Paso 2: confirmar con contraseña (UI - sin backend aún)
-        formConfirmarEmail.addEventListener('submit', (e) => {
+        // Paso 2: confirmar con contraseña (conectado al backend)
+        formConfirmarEmail.addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = document.getElementById('email-password').value;
             const errorEl = document.getElementById('error-email-password');
@@ -1145,9 +1167,36 @@ function setupEvents() {
                 return;
             }
             const nuevoEmail = document.getElementById('nuevo-email').value.trim();
-            ocultarFormularioCuenta('form-confirmar-email');
-            ocultarFormularioCuenta('form-cambiar-email');
-            showInfo(`Se enviaría un enlace de verificación a ${nuevoEmail}. (Pendiente de conectar el backend)`);
+            const btnSubmit = formConfirmarEmail.querySelector('button[type="submit"]');
+            setButtonLoading(btnSubmit, true);
+            
+            try {
+                const res = await apiRequest('/api/artistas/cambiar-email', {
+                    method: 'POST',
+                    body: JSON.stringify({ nuevo_email: nuevoEmail, password })
+                });
+                
+                setButtonLoading(btnSubmit, false);
+                
+                if (res && res.success) {
+                    showSuccess(res.message);
+                    ocultarFormularioCuenta('form-confirmar-email');
+                    ocultarFormularioCuenta('form-cambiar-email');
+                } else if (res && (res.errors || res.error)) {
+                    if (Array.isArray(res.errors) && res.errors.length > 0) {
+                        errorEl.textContent = '❌ ' + res.errors.join('\n');
+                    } else if (res.error) {
+                        errorEl.textContent = '❌ ' + res.error;
+                    } else {
+                        errorEl.textContent = '❌ Error desconocido.';
+                    }
+                } else {
+                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+                }
+            } catch (error) {
+                setButtonLoading(btnSubmit, false);
+                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+            }
         });
     }
 
@@ -1183,7 +1232,7 @@ function setupEvents() {
             });
         }
 
-        formCambiarPassword.addEventListener('submit', (e) => {
+        formCambiarPassword.addEventListener('submit', async (e) => {
             e.preventDefault();
             const actual = document.getElementById('pass-actual').value;
             const nueva = document.getElementById('pass-nueva').value;
@@ -1206,8 +1255,35 @@ function setupEvents() {
                 errorEl.textContent = 'Las contraseñas no coinciden.';
                 return;
             }
-            ocultarFormularioCuenta('form-cambiar-password');
-            showInfo('Tu contraseña se actualizaría correctamente. (Pendiente de conectar el backend)');
+            const btnSubmit = formCambiarPassword.querySelector('button[type="submit"]');
+            setButtonLoading(btnSubmit, true);
+            
+            try {
+                const res = await apiRequest('/api/artistas/cambiar-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ password_actual: actual, password_nueva: nueva })
+                });
+                
+                setButtonLoading(btnSubmit, false);
+                
+                if (res && res.success) {
+                    showSuccess(res.message);
+                    ocultarFormularioCuenta('form-cambiar-password');
+                } else if (res && (res.errors || res.error)) {
+                    if (Array.isArray(res.errors) && res.errors.length > 0) {
+                        errorEl.textContent = '❌ ' + res.errors.join('\n');
+                    } else if (res.error) {
+                        errorEl.textContent = '❌ ' + res.error;
+                    } else {
+                        errorEl.textContent = '❌ Error desconocido.';
+                    }
+                } else {
+                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+                }
+            } catch (error) {
+                setButtonLoading(btnSubmit, false);
+                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+            }
         });
     }
 
