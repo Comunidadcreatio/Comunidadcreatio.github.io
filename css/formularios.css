@@ -245,6 +245,29 @@ form *,
     min-width: 0; 
 }
 
+/* --- Espaciado compacto y uniforme del formulario de obra --- */
+#obra-form .form-group {
+    margin-bottom: 12px;
+}
+
+#obra-form .form-group > input,
+#obra-form .form-group > select,
+#obra-form .form-group > textarea {
+    margin-bottom: 0;
+}
+
+#obra-form .form-row {
+    margin-bottom: 12px;
+}
+
+#obra-form .form-row .form-group {
+    margin-bottom: 0;
+}
+
+#obra-form .form-group label {
+    margin-bottom: 6px;
+}
+
 /* --- Contenedor de imágenes --- */
 .imagenes-contenedor {
     display: flex;
@@ -677,6 +700,12 @@ form,
         margin-top: 8px;
     }
     
+    /* Labels compactos en el formulario de obra */
+    #obra-form .form-group label {
+        margin-bottom: 6px;
+        margin-top: 0;
+    }
+    
     /* Grupos en columna en móvil */
     .dimensiones-group,
     .name-group,
@@ -684,6 +713,12 @@ form,
     .form-row {
         flex-direction: column;
         gap: 16px;
+    }
+    
+    /* Filas del formulario de obra: gap compacto al apilar */
+    #obra-form .form-row {
+        gap: 12px;
+        margin-bottom: 12px;
     }
     
     /* Contenedor de imágenes */
@@ -730,7 +765,7 @@ form,
     #obra-form > input,
     #obra-form > select,
     #obra-form > textarea {
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
     
     /* Prevenir desbordamiento horizontal global en móvil */
