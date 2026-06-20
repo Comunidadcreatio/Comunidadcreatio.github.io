@@ -252,47 +252,24 @@
     color: var(--color-text-muted);
 }
 
-.danger-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-#btn-eliminar-cuenta,
-#btn-cerrar-todas-sesiones {
+#btn-eliminar-cuenta {
+    display: inline-block;
     padding: 10px 20px;
-    border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 600;
     font-size: 14px;
-    flex: 1;
-    min-width: 150px;
-    max-width: 250px;
-    transition: opacity 0.2s;
-}
-
-#btn-eliminar-cuenta {
+    min-width: 180px;
+    max-width: 100%;
     background: var(--color-ink);
     color: var(--color-white);
     border: 1.5px solid var(--color-ink);
+    transition: background 0.2s, border-color 0.2s;
 }
 
 #btn-eliminar-cuenta:hover {
     background: var(--color-danger);
     border-color: var(--color-danger);
-}
-
-#btn-cerrar-todas-sesiones {
-    background: var(--color-white);
-    color: var(--color-ink);
-    border: 1.5px solid var(--color-gray-300);
-}
-
-#btn-cerrar-todas-sesiones:hover {
-    background: var(--color-gray-100);
-    border-color: var(--color-ink);
 }
 
 /* ==============================================

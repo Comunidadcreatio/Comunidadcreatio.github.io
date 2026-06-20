@@ -234,6 +234,7 @@ function toggleGaleria() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    if (!galeria || !panel || !paginaBlanca) return;
     if (galeria.classList.contains('hidden')) {
         galeria.classList.remove('hidden');
         panel.classList.add('hidden');
@@ -255,6 +256,7 @@ function togglePanel() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    if (!galeria || !panel || !paginaBlanca) return;
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         galeria.classList.add('hidden');
@@ -272,6 +274,7 @@ function toggleMiCuenta() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    if (!galeria || !panel || !paginaBlanca || !miCuenta) return;
     if (miCuenta.classList.contains('hidden')) {
         miCuenta.classList.remove('hidden');
         galeria.classList.add('hidden');

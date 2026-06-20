@@ -44,6 +44,17 @@
     color: var(--color-gray-dark);
 }
 
+/* Las imágenes dentro de modales nunca deben desbordar su contenedor
+   (se excluye el logo del login, que tiene su propio tamaño) */
+.modal-content img:not(.login-logo) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
 
 /* ==============================================
    BOTÓN DE CERRAR (X)

@@ -1,6 +1,5 @@
 // js/config.js
 export const API_BASE_URL = 'https://backend-fundacion-atpe.onrender.com';
-export const JWT_SECRET = 'your_super_secret_key';
 export const ARTISTA_KEY = 'artistaData';
 export const TOKEN_KEY = 'artistaToken';
 
