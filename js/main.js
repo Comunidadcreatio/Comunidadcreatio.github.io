@@ -43,6 +43,18 @@ let activeSessionsCount = 0;
 // ============================================
 // FUNCIONES AUXILIARES
 // ============================================
+
+// Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").
+// El backend usa express-validator .escape() que codifica caracteres
+// especiales al guardar; esto los revierte para que el valor coincida
+// con las opciones de los <select> al editar o duplicar una obra.
+function decodeHTMLEntities(str) {
+    if (str === null || str === undefined) return '';
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = String(str);
+    return textarea.value;
+}
+
 function mostrarErrores(result) {
     if (Array.isArray(result.errors) && result.errors.length > 0) {
         const mensaje = result.errors.join('\n• ');
@@ -397,19 +409,19 @@ async function refrescarTabla() {
                 document.getElementById('input-precio').value = obra.precio;
                 document.getElementById('input-id-personalizado').value = obra.id_personalizado;
                 document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
-                document.getElementById('input-soporte').value = obra.soporte || '';
-                document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
-                document.getElementById('input-estado-obra').value = obra.estado_obra || '';
-                document.getElementById('input-procedencia').value = obra.procedencia || '';
-                document.getElementById('input-marcos').value = obra.marcos || '';
-                document.getElementById('input-certificado').value = obra.certificado || '';
-                document.getElementById('input-status').value = obra.status || '';
+                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
+                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
+                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
+                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
+                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
+                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
+                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
+                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
                 document.getElementById('input-ancho').value = obra.ancho || '';
                 document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = obra.firma || '';
-                document.getElementById('input-conservacion').value = obra.conservacion || '';
-                document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
+                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
+                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
                 const imagenes = [
                     obra.imagen_url,
@@ -502,21 +514,21 @@ async function refrescarTabla() {
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
                 document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = '';
+                document.getElementById('input-id-personalizado').value = decodeHTMLEntities(obra.id_personalizado);
                 document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
-                document.getElementById('input-soporte').value = obra.soporte || '';
-                document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
-                document.getElementById('input-estado-obra').value = obra.estado_obra || '';
-                document.getElementById('input-procedencia').value = obra.procedencia || '';
-                document.getElementById('input-marcos').value = obra.marcos || '';
-                document.getElementById('input-certificado').value = obra.certificado || '';
-                document.getElementById('input-status').value = obra.status || '';
+                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
+                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
+                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
+                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
+                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
+                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
+                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
+                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
                 document.getElementById('input-ancho').value = obra.ancho || '';
                 document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = obra.firma || '';
-                document.getElementById('input-conservacion').value = obra.conservacion || '';
-                document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
+                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
+                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
 
                 // Reiniciar imágenes y marcas de eliminación
                 imagenesAEliminar.clear();
@@ -1187,6 +1199,17 @@ function setupEvents() {
                 
                 if (res && res.success) {
                     showSuccess(res.message);
+                    // Reflejar el nuevo correo en el input no editable y persistirlo.
+                    const emailInput = document.getElementById('cuenta-email-actual');
+                    if (emailInput) emailInput.value = nuevoEmail;
+                    if (artistaActual) {
+                        artistaActual.email = nuevoEmail;
+                        try {
+                            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+                        } catch (e) {
+                            console.error('No se pudo actualizar el correo en localStorage:', e);
+                        }
+                    }
                     ocultarFormularioCuenta('form-confirmar-email');
                     ocultarFormularioCuenta('form-cambiar-email');
                 } else if (res && (res.errors || res.error)) {

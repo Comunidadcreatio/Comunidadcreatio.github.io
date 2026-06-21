@@ -1,183 +1,133 @@
-﻿// Sistema de notificaciones y toasts
+// js/notificaciones.js
+// Sistema de notificaciones (toasts) y estados de carga.
 
-// Crear contenedor de notificaciones si no existe
+// Crea el contenedor de notificaciones si aún no existe.
 function initNotificationContainer() {
-    if (!document.querySelector('.notification-container')) {
-        const container = document.createElement('div');
+    let container = document.querySelector('.notification-container');
+    if (!container) {
+        container = document.createElement('div');
         container.className = 'notification-container';
         document.body.appendChild(container);
     }
+    return container;
 }
 
-// Mostrar notificaciÃ³n
+// Iconos SVG por tipo (evita problemas de codificación con emojis).
+const NOTIF_ICONS = {
+    success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+};
+
+const CLOSE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+// Mostrar notificación.
 function showNotification(message, type = 'info', duration = 5000) {
-    initNotificationContainer();
-    
-    const container = document.querySelector('.notification-container');
+    const container = initNotificationContainer();
+
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
-    
-    // Icono segÃºn tipo
-    let icon = 'â„¹ï¸';
-    if (type === 'success') icon = 'âœ…';
-    if (type === 'error') icon = 'âŒ';
-    if (type === 'warning') icon = 'âš ï¸';
-    
+    notification.setAttribute('role', 'alert');
+
+    const icon = NOTIF_ICONS[type] || NOTIF_ICONS.info;
+
     notification.innerHTML = `
         <span class="notification-icon">${icon}</span>
-        <span class="notification-message">${message}</span>
-        <button class="notification-close" aria-label="Cerrar notificaciÃ³n">Ã—</button>
+        <span class="notification-message"></span>
+        <button class="notification-close" type="button" aria-label="Cerrar notificación">${CLOSE_ICON}</button>
     `;
-    
-    // Evento de cerrar
+    // Insertar el mensaje como texto para evitar inyección de HTML
+    // y preservar saltos de línea.
+    notification.querySelector('.notification-message').textContent = message;
+
     notification.querySelector('.notification-close').addEventListener('click', () => {
         closeNotification(notification);
     });
-    
+
     container.appendChild(notification);
-    
-    // Auto cerrar despuÃ©s de duration
+
     if (duration > 0) {
         setTimeout(() => {
             closeNotification(notification);
         }, duration);
     }
-    
+
     return notification;
 }
 
-// Cerrar notificaciÃ³n
+// Cerrar (con animación de salida).
 function closeNotification(notification) {
+    if (!notification || !notification.parentElement) return;
     notification.classList.add('slide-out');
-    notification.addEventListener('animationend', () => {
-        notification.remove();
-    });
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.parentElement.removeChild(notification);
+        }
+    }, 300);
 }
 
-// Mostrar notificaciÃ³n de Ã©xito
-function showSuccess(message, duration = 5000) {
+// Atajos por tipo.
+export function showSuccess(message, duration = 4000) {
     return showNotification(message, 'success', duration);
 }
 
-// Mostrar notificaciÃ³n de error
-function showError(message, duration = 5000) {
+export function showError(message, duration = 6000) {
     return showNotification(message, 'error', duration);
 }
 
-// Mostrar notificaciÃ³n de advertencia
-function showWarning(message, duration = 5000) {
+export function showWarning(message, duration = 5000) {
     return showNotification(message, 'warning', duration);
 }
 
-// Mostrar notificaciÃ³n de informaciÃ³n
-function showInfo(message, duration = 5000) {
+export function showInfo(message, duration = 5000) {
     return showNotification(message, 'info', duration);
 }
 
-// Mostrar toast simple
-function showToast(message, type = 'info', duration = 3000) {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, 20px)';
-        toast.style.transition = 'all 0.3s ease-out';
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
-    
-    return toast;
-}
+// ============================================
+// INDICADORES DE CARGA
+// ============================================
 
-// Mostrar overlay de carga
-function showLoadingOverlay(text = 'Cargando...') {
+// Overlay de carga a pantalla completa.
+export function showLoadingOverlay(text = 'Cargando...') {
     let overlay = document.querySelector('.loading-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.className = 'loading-overlay';
         overlay.innerHTML = `
-            <div class="loading-spinner"></div>
-            <div class="loading-text">${text}</div>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text"></div>
+            </div>
         `;
         document.body.appendChild(overlay);
     }
+    overlay.querySelector('.loading-text').textContent = text;
+    overlay.style.display = 'flex';
     return overlay;
 }
 
-// Ocultar overlay de carga
-function hideLoadingOverlay() {
+export function hideLoadingOverlay() {
     const overlay = document.querySelector('.loading-overlay');
     if (overlay) {
-        overlay.remove();
+        overlay.style.display = 'none';
     }
 }
 
-// Agregar estado de carga a un botÃ³n
-function setButtonLoading(button, loading = true, originalText = '') {
-    if (loading) {
-        button.dataset.originalText = button.textContent;
+// Estado de carga en un botón (spinner + deshabilitado).
+export function setButtonLoading(button, isLoading) {
+    if (!button) return;
+    if (isLoading) {
+        if (!button.dataset.originalText) {
+            button.dataset.originalText = button.textContent;
+        }
         button.classList.add('button-loading');
-        button.textContent = '';
         button.disabled = true;
     } else {
         button.classList.remove('button-loading');
-        button.textContent = button.dataset.originalText || originalText;
         button.disabled = false;
-        delete button.dataset.originalText;
+        if (button.dataset.originalText) {
+            delete button.dataset.originalText;
+        }
     }
 }
-
-// Mostrar indicador de carga inline
-function showInlineLoading(container, text = 'Cargando...') {
-    const loading = document.createElement('div');
-    loading.className = 'loading-inline';
-    loading.innerHTML = `
-        <div class="spinner-small"></div>
-        <span>${text}</span>
-    `;
-    container.appendChild(loading);
-    return loading;
-}
-
-// Agregar estado de validaciÃ³n a un input
-function setInputValidation(input, valid = true) {
-    input.classList.remove('input-valid', 'input-invalid');
-    if (valid) {
-        input.classList.add('input-valid');
-    } else {
-        input.classList.add('input-invalid');
-    }
-}
-
-// Limpiar estado de validaciÃ³n de un input
-function clearInputValidation(input) {
-    input.classList.remove('input-valid', 'input-invalid');
-}
-
-// Reemplazar alert nativo con notificaciÃ³n
-function alert(message) {
-    showInfo(message, 5000);
-}
-
-// Reemplazar confirm nativo con diÃ¡logo personalizado (opcional)
-function confirm(message) {
-    return window.confirm(message); // Por ahora usar el nativo, se puede mejorar despuÃ©s
-}
-
-// Exportar funciones
-export {
-    showNotification,
-    showSuccess,
-    showError,
-    showWarning,
-    showInfo,
-    showToast,
-    showLoadingOverlay,
-    hideLoadingOverlay,
-    setButtonLoading,
-    showInlineLoading,
-    setInputValidation,
-    clearInputValidation
-};

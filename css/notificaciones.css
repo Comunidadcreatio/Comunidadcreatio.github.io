@@ -13,21 +13,21 @@
     gap: 10px;
 }
 
-/* NotificaciÃ³n individual */
+/* Notificación individual */
 .notification {
     min-width: 300px;
     max-width: 400px;
     padding: 16px 20px;
     border-radius: 8px;
-    background: var(--color-white);
-    color: var(--color-text);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+    background: var(--color-white, #ffffff);
+    color: var(--color-text, #1a1a1a);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     animation: slideIn 0.3s ease-out;
-    border-left: 4px solid var(--color-ink);
+    border-left: 4px solid var(--color-ink, #1a1a1a);
 }
 
 @keyframes slideIn {
@@ -56,43 +56,63 @@
     animation: slideOut 0.3s ease-out forwards;
 }
 
-/* Tipos de notificaciÃ³n */
+/* Tipos de notificación */
 .notification.success {
-    border-left-color: var(--color-success);
+    border-left-color: var(--color-success, #16a34a);
+}
+
+.notification.success .notification-icon {
+    color: var(--color-success, #16a34a);
 }
 
 .notification.error {
-    border-left-color: var(--color-danger);
+    border-left-color: var(--color-danger, #dc2626);
+}
+
+.notification.error .notification-icon {
+    color: var(--color-danger, #dc2626);
 }
 
 .notification.warning {
-    border-left-color: var(--color-warning);
+    border-left-color: var(--color-warning, #d97706);
+}
+
+.notification.warning .notification-icon {
+    color: var(--color-warning, #d97706);
 }
 
 .notification.info {
-    border-left-color: var(--color-ink);
+    border-left-color: var(--color-ink, #1a1a1a);
 }
 
-/* Icono de notificaciÃ³n */
+.notification.info .notification-icon {
+    color: var(--color-ink, #1a1a1a);
+}
+
+/* Icono de notificación */
 .notification-icon {
-    font-size: 20px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Mensaje de notificaciÃ³n */
+/* Mensaje de notificación */
 .notification-message {
     flex: 1;
     font-size: 14px;
     line-height: 1.4;
+    color: var(--color-text, #1a1a1a);
+    white-space: pre-line;
+    word-break: break-word;
 }
 
-/* BotÃ³n de cerrar notificaciÃ³n */
+/* Botón de cerrar notificación */
 .notification-close {
     background: none;
     border: none;
-    color: var(--color-gray-medium);
+    color: var(--color-gray-medium, #a3a3a3);
     cursor: pointer;
-    font-size: 18px;
     padding: 0;
     width: 24px;
     height: 24px;
@@ -105,8 +125,8 @@
 }
 
 .notification-close:hover {
-    background-color: var(--color-gray-light);
-    color: var(--color-gray-dark);
+    background-color: var(--color-gray-light, #f5f5f5);
+    color: var(--color-gray-dark, #404040);
 }
 
 /* Indicador de carga */
@@ -237,4 +257,28 @@
 .toast.warning {
     background: var(--color-ink);
     color: var(--color-white);
+}
+
+/* ==============================================
+   RESPONSIVE - MÓVIL
+   ============================================== */
+@media (max-width: 600px) {
+    .notification-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+    }
+
+    .notification {
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 14px 16px;
+        gap: 10px;
+        box-sizing: border-box;
+    }
+
+    .notification-message {
+        font-size: 13.5px;
+    }
 }

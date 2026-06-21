@@ -353,6 +353,27 @@
     align-items: center;
 }
 
+/* Valor mostrado (correo actual, solo lectura) */
+.cuenta-item-valor {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: var(--color-gray-100);
+    color: var(--color-text);
+    font-size: 14px;
+    cursor: default;
+    box-sizing: border-box;
+}
+
+.cuenta-item-valor:focus {
+    outline: none;
+    border-color: var(--color-gray-400);
+}
+
 .cuenta-campo {
     display: flex;
     gap: 12px;
@@ -554,43 +575,9 @@
 
 /* ==============================================
    ZONA DE PELIGRO (Acciones críticas)
+   El botón #btn-eliminar-cuenta usa la clase .btn-cuenta-secundario
+   para verse idéntico a los demás botones de la sección Seguridad.
    ============================================== */
-.danger-zone {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 2px solid #dc3545;
-}
-
-.danger-zone h3 {
-    color: var(--color-danger);
-    margin-bottom: 10px;
-}
-
-.danger-zone p {
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: var(--color-text-muted);
-}
-
-#btn-eliminar-cuenta {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    min-width: 180px;
-    max-width: 100%;
-    background: var(--color-ink);
-    color: var(--color-white);
-    border: 1.5px solid var(--color-ink);
-    transition: background 0.2s, border-color 0.2s;
-}
-
-#btn-eliminar-cuenta:hover {
-    background: var(--color-danger);
-    border-color: var(--color-danger);
-}
 
 /* ==============================================
    DISEÑO RESPONSIVO - PANEL DE ARTISTA
@@ -625,5 +612,33 @@
     
     .imagenes-contenedor {
         justify-content: center;
+    }
+
+    /* Sección Seguridad / Mi Cuenta: apilar info y botón */
+    .cuenta-item-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .cuenta-item-actions {
+        width: 100%;
+    }
+
+    .cuenta-item-actions .btn-cuenta-secundario {
+        width: 100%;
+        text-align: center;
+    }
+
+    .cuenta-item-valor {
+        max-width: 100%;
+    }
+
+    .cuenta-form {
+        padding: 18px 16px;
+    }
+
+    .cuenta-form-acciones {
+        flex-direction: column-reverse;
     }
 }
