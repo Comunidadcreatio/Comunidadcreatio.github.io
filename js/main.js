@@ -13,8 +13,13 @@ const galeriaContainer = document.getElementById('galeria-container');
 const panelArtista = document.getElementById('panel-artista');
 const tablaBody = document.getElementById('tabla-obras-body');
 const obraForm = document.getElementById('obra-form');
-const btnPerfil = document.getElementById('btn-perfil');
+const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
 const imagenesAEliminar = new Set();
+
+// Paneles flotantes del menú de perfil
+let desktopPerfilMenu = null;
+let mobilePerfilMenu = null;
+let clickOutsideHandlerPerfil = null;
 
 // Variables para paginación y filtros
 let currentPage = 1;
@@ -64,6 +69,58 @@ function mostrarErrores(result) {
     } else {
         showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     }
+}
+
+// ============================================
+// PERFIL DE USUARIO (avatar + datos)
+// ============================================
+const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
+
+function getFotoPerfilKey() {
+    const id = (artistaActual && (artistaActual.email || artistaActual.correo || artistaActual.id)) || 'anon';
+    return `fotoPerfil_${id}`;
+}
+
+function getFotoPerfil() {
+    if (artistaActual && artistaActual.foto_perfil) return artistaActual.foto_perfil;
+    try {
+        return localStorage.getItem(getFotoPerfilKey()) || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function guardarFotoPerfil(dataUrl) {
+    try {
+        localStorage.setItem(getFotoPerfilKey(), dataUrl);
+    } catch (e) {
+        console.error('No se pudo guardar la foto de perfil:', e);
+    }
+    if (artistaActual) {
+        artistaActual.foto_perfil = dataUrl;
+        try {
+            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+        } catch (e) {
+            console.error('No se pudo actualizar el artista en localStorage:', e);
+        }
+    }
+}
+
+function actualizarPerfilUI() {
+    const src = getFotoPerfil() || AVATAR_DEFAULT;
+    ['perfil-avatar-mini', 'perfil-avatar-grande-desktop', 'perfil-avatar-grande-mobile'].forEach(id => {
+        const img = document.getElementById(id);
+        if (img) img.src = src;
+    });
+    const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
+    const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
+    document.querySelectorAll('.perfil-nombre-artista').forEach(el => { el.textContent = nombreArtista; });
+    document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
+}
+
+function cerrarMenusPerfil() {
+    document.getElementById('desktop-perfil-menu')?.classList.add('hidden');
+    document.getElementById('mobile-perfil-menu')?.classList.add('hidden');
 }
 
 // ============================================
@@ -586,7 +643,6 @@ async function refrescarTabla() {
 async function mostrarPanelArtista() {
     document.getElementById('galeria-publica').classList.add('hidden');
     panelArtista.classList.remove('hidden');
-    btnPerfil.textContent = '👤 Artista';
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
@@ -908,11 +964,73 @@ function setupEvents() {
         });
     }
 
-    // ✅ Perfil (siempre existe)
-    btnPerfil.addEventListener('click', () => {
-        if (token) mostrarPanelArtista();
-        else window.location.href = 'auth.html';
+    // ----- Menú de perfil (avatar circular en la barra) -----
+    if (btnPerfilSidebar) {
+        btnPerfilSidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actualizarPerfilUI();
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                mobilePerfilMenu = document.getElementById('mobile-perfil-menu');
+                if (!mobilePerfilMenu) return;
+                if (mobilePerfilMenu.classList.contains('hidden')) {
+                    mobilePerfilMenu.classList.remove('hidden');
+                    positionMobilePanel(btnPerfilSidebar, mobilePerfilMenu);
+                    if (clickOutsideHandlerPerfil) document.removeEventListener('click', clickOutsideHandlerPerfil);
+                    clickOutsideHandlerPerfil = (evt) => {
+                        if (!mobilePerfilMenu.contains(evt.target) && !btnPerfilSidebar.contains(evt.target)) {
+                            mobilePerfilMenu.classList.add('hidden');
+                            document.removeEventListener('click', clickOutsideHandlerPerfil);
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerPerfil), 0);
+                } else {
+                    mobilePerfilMenu.classList.add('hidden');
+                }
+            } else {
+                desktopPerfilMenu = document.getElementById('desktop-perfil-menu');
+                if (!desktopPerfilMenu) return;
+                if (desktopPerfilMenu.classList.contains('hidden')) {
+                    positionDesktopPanel(btnPerfilSidebar, desktopPerfilMenu);
+                    desktopPerfilMenu.classList.remove('hidden');
+                    if (clickOutsideHandlerPerfil) document.removeEventListener('click', clickOutsideHandlerPerfil);
+                    clickOutsideHandlerPerfil = (evt) => {
+                        if (!desktopPerfilMenu.contains(evt.target) && !btnPerfilSidebar.contains(evt.target)) {
+                            desktopPerfilMenu.classList.add('hidden');
+                            document.removeEventListener('click', clickOutsideHandlerPerfil);
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerPerfil), 0);
+                } else {
+                    desktopPerfilMenu.classList.add('hidden');
+                }
+            }
+        });
+    }
+
+    // ----- Cambiar foto de perfil -----
+    const inputFotoPerfil = document.getElementById('input-foto-perfil');
+    ['desktop-cambiar-foto', 'mobile-cambiar-foto'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', () => {
+            cerrarMenusPerfil();
+            inputFotoPerfil?.click();
+        });
     });
+    if (inputFotoPerfil) {
+        inputFotoPerfil.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                guardarFotoPerfil(e.target.result);
+                actualizarPerfilUI();
+                showSuccess('Foto de perfil actualizada.');
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+    }
 
     // ✅ Guardar obra (solo si existe el formulario)
     if (obraForm) {
@@ -1337,8 +1455,8 @@ async function init() {
         return;
     }
     
-    btnPerfil.classList.add('hidden');
     document.getElementById('toggle-panel').classList.remove('hidden');
+    actualizarPerfilUI();
     mostrarPaginaBlanca();
     setupEvents();
     setupImagePreviews();

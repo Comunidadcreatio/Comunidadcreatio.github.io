@@ -36,6 +36,9 @@
 <body>
 
     <div id="toggle-panel" class="hidden" role="navigation" aria-label="Menú principal">
+        <button id="btn-perfil-sidebar" class="btn-perfil-circular" aria-label="Perfil de usuario" aria-expanded="false">
+            <img id="perfil-avatar-mini" class="perfil-avatar-img" src="iconos/avatar-default.svg" alt="Foto de perfil">
+        </button>
         <button id="btn-menu-principal" aria-label="Abrir menú principal" aria-expanded="false">
             <img src="iconos/Menu.svg" alt="Menú" class="toggle-icon">
             <span class="toggle-label">Menú</span>
@@ -45,6 +48,8 @@
             <span class="toggle-label">Cerrar Sesión</span>
         </button>
     </div>
+
+    <input type="file" id="input-foto-perfil" accept="image/*" hidden>
 
      <div class="app-container">
 
@@ -85,13 +90,44 @@
         </div>
     </div>
 
+    <!-- Menú de perfil (escritorio) -->
+    <div id="desktop-perfil-menu" class="desktop-logout-modal hidden">
+        <div class="desktop-logout-panel speech-bubble perfil-bubble">
+            <div class="perfil-cabecera">
+                <span class="perfil-avatar-grande">
+                    <img id="perfil-avatar-grande-desktop" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
+                </span>
+                <span class="perfil-datos">
+                    <span class="perfil-nombre-artista"></span>
+                    <span class="perfil-nombre-real"></span>
+                </span>
+            </div>
+            <div class="divider"></div>
+            <button id="desktop-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
+        </div>
+    </div>
+
+    <!-- Menú de perfil (móvil) -->
+    <div id="mobile-perfil-menu" class="mobile-logout-modal hidden">
+        <div class="mobile-logout-panel speech-bubble perfil-bubble">
+            <div class="perfil-cabecera">
+                <span class="perfil-avatar-grande">
+                    <img id="perfil-avatar-grande-mobile" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
+                </span>
+                <span class="perfil-datos">
+                    <span class="perfil-nombre-artista"></span>
+                    <span class="perfil-nombre-real"></span>
+                </span>
+            </div>
+            <div class="divider"></div>
+            <button id="mobile-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
+        </div>
+    </div>
+
 
     <!-- HEADER -->
     <header id="main-header" role="banner">
         <img src="iconos/Logo-temporal.svg?v=2" alt="Creatio" class="login-logo">
-        <div id="user-actions" role="group" aria-label="Acciones de usuario">
-            <button id="btn-perfil" aria-label="Perfil de usuario">👤</button>
-        </div>
     </header>
 
     <!-- MAIN CONTENT -->

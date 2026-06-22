@@ -152,6 +152,84 @@ input, select, textarea {
     transition: opacity 0.3s ease;
 }
 
+/* ===== Botón de perfil circular ===== */
+.btn-perfil-circular {
+    pointer-events: auto;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: conic-gradient(from 0deg,
+        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+    flex-shrink: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-perfil-circular:hover {
+    transform: scale(1.05);
+}
+.btn-perfil-circular .perfil-avatar-img {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-white);
+}
+
+/* Cabecera del panel de perfil (foto grande + datos) */
+.perfil-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-align: left;
+}
+.perfil-avatar-grande {
+    flex-shrink: 0;
+    display: inline-flex;
+    border-radius: 50%;
+    padding: 3px;
+    background-image: conic-gradient(from 0deg,
+        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+}
+.perfil-avatar-img-grande {
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
+}
+.perfil-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow: hidden;
+}
+.perfil-nombre-artista {
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.perfil-nombre-real {
+    color: #bdbdbd;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Paneles flotantes (bocadillos) */
 .desktop-logout-modal,
 .desktop-main-menu {
@@ -278,7 +356,12 @@ input, select, textarea {
         z-index: 1000;
     }
     .toggle-icon { width: 28px; height: 28px; }
-    
+
+    /* Botón de perfil en la parte superior de la barra lateral */
+    #btn-perfil-sidebar {
+        margin: 0 0 14px 0;
+    }
+
     #btn-menu-principal,
     #btn-logout-sidebar {
         width: 100%;
@@ -317,6 +400,20 @@ input, select, textarea {
         border-bottom: none;
         box-sizing: border-box;
         gap: 7px;
+        overflow: visible;
+    }
+
+    /* Botón de perfil centrado y sobresaliente en la barra inferior */
+    #btn-perfil-sidebar {
+        position: absolute;
+        left: 50%;
+        bottom: 4px;
+        transform: translateX(-50%);
+        z-index: 1001;
+    }
+    #btn-perfil-sidebar .perfil-avatar-img {
+        width: 46px;
+        height: 46px;
     }
     .toggle-label { display: none !important; }
     .toggle-icon { width: 20px; height: 20px; }
@@ -423,4 +520,14 @@ input, select, textarea {
         width: 18px;
         height: 18px;
     }
+}
+
+/* Ancho del bocadillo de perfil (sobrescribe el ancho por defecto del menú) */
+.speech-bubble.perfil-bubble {
+    width: 260px !important;
+    max-width: 88vw;
+    text-align: left;
+}
+.perfil-bubble .logout-option {
+    text-align: left;
 }
