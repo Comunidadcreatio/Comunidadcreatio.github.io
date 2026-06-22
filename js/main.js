@@ -1,5 +1,5 @@
 // js/main.js
-import { TOKEN_KEY, ARTISTA_KEY } from './config.js';
+import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL } from './config.js';
 import { apiRequest } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js';
@@ -121,6 +121,39 @@ function actualizarPerfilUI() {
 function cerrarMenusPerfil() {
     document.getElementById('desktop-perfil-menu')?.classList.add('hidden');
     document.getElementById('mobile-perfil-menu')?.classList.add('hidden');
+}
+
+// Sube la foto de perfil al servidor (Cloudinary vía backend) y devuelve la URL.
+async function subirFotoPerfilServidor(file) {
+    const formData = new FormData();
+    formData.append('foto', file);
+    const authToken = localStorage.getItem(TOKEN_KEY);
+    const res = await fetch(`${API_BASE_URL}/api/artistas/foto-perfil`, {
+        method: 'POST',
+        headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
+        body: formData
+    });
+    return await res.json();
+}
+
+// Refresca la foto de perfil desde el servidor (para sesiones ya iniciadas
+// que aún no tienen la URL guardada en localStorage).
+async function refrescarPerfilDesdeServidor() {
+    try {
+        const res = await apiRequest('/api/artistas/perfil');
+        if (res && res.success && res.artista) {
+            if (artistaActual) {
+                artistaActual.foto_perfil = res.artista.foto_perfil || artistaActual.foto_perfil || '';
+                if (res.artista.nombre_real) artistaActual.nombre_real = res.artista.nombre_real;
+                try {
+                    localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+                } catch (e) { /* noop */ }
+            }
+            actualizarPerfilUI();
+        }
+    } catch (e) {
+        // Si falla, se mantiene la foto local/por defecto.
+    }
 }
 
 // ============================================
@@ -1020,15 +1053,35 @@ function setupEvents() {
     if (inputFotoPerfil) {
         inputFotoPerfil.addEventListener('change', function() {
             const file = this.files[0];
+            this.value = '';
             if (!file) return;
+
+            // 1) Vista previa local inmediata
             const reader = new FileReader();
             reader.onload = (e) => {
-                guardarFotoPerfil(e.target.result);
-                actualizarPerfilUI();
-                showSuccess('Foto de perfil actualizada.');
+                ['perfil-avatar-mini', 'perfil-avatar-grande-desktop', 'perfil-avatar-grande-mobile'].forEach(id => {
+                    const img = document.getElementById(id);
+                    if (img) img.src = e.target.result;
+                });
             };
             reader.readAsDataURL(file);
-            this.value = '';
+
+            // 2) Subida al servidor (Cloudinary)
+            showInfo('Subiendo foto de perfil...');
+            subirFotoPerfilServidor(file).then((res) => {
+                if (res && res.success && res.foto_perfil) {
+                    guardarFotoPerfil(res.foto_perfil);
+                    actualizarPerfilUI();
+                    showSuccess('Foto de perfil actualizada.');
+                } else {
+                    const msg = (res && res.error) ? res.error : 'No se pudo guardar la foto en el servidor.';
+                    showError(msg);
+                    actualizarPerfilUI();
+                }
+            }).catch(() => {
+                showError('Error de conexión al subir la foto de perfil.');
+                actualizarPerfilUI();
+            });
         });
     }
 
@@ -1461,6 +1514,7 @@ async function init() {
     setupEvents();
     setupImagePreviews();
     await fetchActiveSessionsCount();
+    refrescarPerfilDesdeServidor();
 }
 
 init();
