@@ -360,6 +360,22 @@ input, select, textarea {
     /* Botón de perfil en la parte superior de la barra lateral */
     #btn-perfil-sidebar {
         margin: 0 0 14px 0;
+        width: 48px;               /* Un poco más grande para el borde */
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--color-black); /* Borde negro al contenedor */
+        background: var(--color-white);       /* Fondo blanco para resaltar el borde */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #btn-perfil-sidebar .perfil-avatar-img {
+        width: 40px;               /* Tamaño original de la imagen */
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--color-black); /* Borde negro grueso alrededor de la imagen */
     }
 
     #btn-menu-principal,
@@ -407,13 +423,24 @@ input, select, textarea {
     #btn-perfil-sidebar {
         position: absolute;
         left: 50%;
-        bottom: 4px;
+        bottom: 6px; /* Ajustado para centrar mejor con el nuevo tamaño */
         transform: translateX(-50%);
         z-index: 1001;
+        width: 70px;          /* Aumentamos el contenedor */
+        height: 70px;
+        border-radius: 50%;
+        border: 2px solid var(--color-black); /* Borde negro al contenedor */
+        background: var(--color-white);       /* Fondo blanco para que se vea el borde */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     #btn-perfil-sidebar .perfil-avatar-img {
-        width: 46px;
-        height: 46px;
+        width: 70px;          /* Avatar más grande */
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--color-black); /* Borde negro grueso alrededor de la imagen */
     }
     .toggle-label { display: none !important; }
     .toggle-icon { width: 20px; height: 20px; }
