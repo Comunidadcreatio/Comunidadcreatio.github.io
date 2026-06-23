@@ -113,17 +113,15 @@
 
         <!-- SECCIÓN PRIVADA: PERFIL DE USUARIO -->
         <section id="perfil-usuario" class="hidden" aria-labelledby="perfil-usuario-title" role="region">
-            <h2 id="perfil-usuario-title">Mi Perfil</h2>
-
             <div class="perfil-seccion cuenta-seccion">
                 <div class="perfil-seccion-layout">
-                    <div class="perfil-avatar-contenedor">
+                    <button type="button" id="perfil-avatar-btn" class="perfil-avatar-btn" aria-label="Cambiar foto de perfil">
+                        <span class="perfil-avatar-overlay">+</span>
                         <img id="perfil-avatar-seccion" class="perfil-avatar-img-seccion" src="iconos/avatar-default.svg" alt="Foto de perfil">
-                    </div>
+                    </button>
                     <div class="perfil-seccion-info">
                         <p class="perfil-nombre-real perfil-nombre-real-seccion"></p>
                         <p class="perfil-nombre-artista perfil-nombre-artista-seccion"></p>
-                        <button type="button" id="btn-cambiar-foto-perfil" class="btn-cuenta-secundario btn-cambiar-foto-perfil">Cambiar foto de perfil</button>
                     </div>
                 </div>
             </div>
