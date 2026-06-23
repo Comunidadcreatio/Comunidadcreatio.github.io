@@ -16,11 +16,6 @@ const obraForm = document.getElementById('obra-form');
 const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
 const imagenesAEliminar = new Set();
 
-// Paneles flotantes del menú de perfil
-let desktopPerfilMenu = null;
-let mobilePerfilMenu = null;
-let clickOutsideHandlerPerfil = null;
-
 // Variables para paginación y filtros
 let currentPage = 1;
 let currentLimit = 10;
@@ -108,7 +103,7 @@ function guardarFotoPerfil(dataUrl) {
 
 function actualizarPerfilUI() {
     const src = getFotoPerfil() || AVATAR_DEFAULT;
-    ['perfil-avatar-mini', 'perfil-avatar-grande-desktop', 'perfil-avatar-grande-mobile'].forEach(id => {
+    ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
         const img = document.getElementById(id);
         if (img) img.src = src;
     });
@@ -116,11 +111,6 @@ function actualizarPerfilUI() {
     const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
     document.querySelectorAll('.perfil-nombre-artista').forEach(el => { el.textContent = nombreArtista; });
     document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
-}
-
-function cerrarMenusPerfil() {
-    document.getElementById('desktop-perfil-menu')?.classList.add('hidden');
-    document.getElementById('mobile-perfil-menu')?.classList.add('hidden');
 }
 
 // Sube la foto de perfil al servidor (Cloudinary vía backend) y devuelve la URL.
@@ -325,10 +315,13 @@ function mostrarPaginaBlanca() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
     if (galeria) galeria.classList.add('hidden');
     if (panel) panel.classList.add('hidden');
     if (miCuenta) miCuenta.classList.add('hidden');
+    if (perfilUsuario) perfilUsuario.classList.add('hidden');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
+    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 }
 
 function toggleGaleria() {
@@ -336,12 +329,15 @@ function toggleGaleria() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
     if (!galeria || !panel || !paginaBlanca) return;
     if (galeria.classList.contains('hidden')) {
         galeria.classList.remove('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
+        if (perfilUsuario) perfilUsuario.classList.add('hidden');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         cargarGaleria(galeriaContainer).then(obras => {
             mostrarGaleria(obras, galeriaContainer, (id) => {
                 console.log("Ver detalles de obra con ID:", id);
@@ -358,12 +354,15 @@ function togglePanel() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
     if (!galeria || !panel || !paginaBlanca) return;
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
+        if (perfilUsuario) perfilUsuario.classList.add('hidden');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         // Establecer el nombre del artista por defecto al abrir el panel
         if (artistaActual && artistaActual.nombre_artista) {
             const inputArtista = document.getElementById('input-artista');
@@ -383,12 +382,15 @@ function toggleMiCuenta() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
     if (!galeria || !panel || !paginaBlanca || !miCuenta) return;
     if (miCuenta.classList.contains('hidden')) {
         miCuenta.classList.remove('hidden');
         galeria.classList.add('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
+        if (perfilUsuario) perfilUsuario.classList.add('hidden');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         const emailInput = document.getElementById('cuenta-email-actual');
         if (emailInput && artistaActual) {
             emailInput.value = artistaActual.email || artistaActual.correo || '';
@@ -396,6 +398,47 @@ function toggleMiCuenta() {
     } else {
         miCuenta.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
+    }
+}
+
+function setupPerfilInteracciones() {
+    const btn = document.getElementById('btn-perfil-sidebar');
+    if (!btn) return;
+
+    const abrirPerfil = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePerfil();
+    };
+
+    btn.addEventListener('click', abrirPerfil);
+
+    document.getElementById('btn-cambiar-foto-perfil')?.addEventListener('click', () => {
+        document.getElementById('input-foto-perfil')?.click();
+    });
+}
+
+function togglePerfil() {
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    if (!galeria || !panel || !paginaBlanca || !perfilUsuario) return;
+
+    actualizarPerfilUI();
+
+    if (perfilUsuario.classList.contains('hidden')) {
+        perfilUsuario.classList.remove('hidden');
+        galeria.classList.add('hidden');
+        panel.classList.add('hidden');
+        paginaBlanca.classList.add('hidden');
+        if (miCuenta) miCuenta.classList.add('hidden');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
+    } else {
+        perfilUsuario.classList.add('hidden');
+        paginaBlanca.classList.remove('hidden');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
     }
 }
 
@@ -675,7 +718,9 @@ async function refrescarTabla() {
 
 async function mostrarPanelArtista() {
     document.getElementById('galeria-publica').classList.add('hidden');
+    document.getElementById('perfil-usuario')?.classList.add('hidden');
     panelArtista.classList.remove('hidden');
+    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
     if (artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
     }
@@ -684,7 +729,9 @@ async function mostrarPanelArtista() {
 
 function mostrarGaleriaPublica() {
     document.getElementById('panel-artista').classList.add('hidden');
+    document.getElementById('perfil-usuario')?.classList.add('hidden');
     document.getElementById('galeria-publica').classList.remove('hidden');
+    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
     cargarGaleria(galeriaContainer).then(obras => {
         mostrarGaleria(obras, galeriaContainer, (id) => {
             console.log("Ver detalles de obra con ID:", id);
@@ -997,59 +1044,11 @@ function setupEvents() {
         });
     }
 
-    // ----- Menú de perfil (avatar circular en la barra) -----
-    if (btnPerfilSidebar) {
-        btnPerfilSidebar.addEventListener('click', (e) => {
-            e.stopPropagation();
-            actualizarPerfilUI();
-            const isMobile = window.innerWidth <= 768;
-
-            if (isMobile) {
-                mobilePerfilMenu = document.getElementById('mobile-perfil-menu');
-                if (!mobilePerfilMenu) return;
-                if (mobilePerfilMenu.classList.contains('hidden')) {
-                    mobilePerfilMenu.classList.remove('hidden');
-                    positionMobilePanel(btnPerfilSidebar, mobilePerfilMenu);
-                    if (clickOutsideHandlerPerfil) document.removeEventListener('click', clickOutsideHandlerPerfil);
-                    clickOutsideHandlerPerfil = (evt) => {
-                        if (!mobilePerfilMenu.contains(evt.target) && !btnPerfilSidebar.contains(evt.target)) {
-                            mobilePerfilMenu.classList.add('hidden');
-                            document.removeEventListener('click', clickOutsideHandlerPerfil);
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerPerfil), 0);
-                } else {
-                    mobilePerfilMenu.classList.add('hidden');
-                }
-            } else {
-                desktopPerfilMenu = document.getElementById('desktop-perfil-menu');
-                if (!desktopPerfilMenu) return;
-                if (desktopPerfilMenu.classList.contains('hidden')) {
-                    positionDesktopPanel(btnPerfilSidebar, desktopPerfilMenu);
-                    desktopPerfilMenu.classList.remove('hidden');
-                    if (clickOutsideHandlerPerfil) document.removeEventListener('click', clickOutsideHandlerPerfil);
-                    clickOutsideHandlerPerfil = (evt) => {
-                        if (!desktopPerfilMenu.contains(evt.target) && !btnPerfilSidebar.contains(evt.target)) {
-                            desktopPerfilMenu.classList.add('hidden');
-                            document.removeEventListener('click', clickOutsideHandlerPerfil);
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', clickOutsideHandlerPerfil), 0);
-                } else {
-                    desktopPerfilMenu.classList.add('hidden');
-                }
-            }
-        });
-    }
+    // ----- Sección de perfil (avatar circular en la barra) -----
+    setupPerfilInteracciones();
 
     // ----- Cambiar foto de perfil -----
     const inputFotoPerfil = document.getElementById('input-foto-perfil');
-    ['desktop-cambiar-foto', 'mobile-cambiar-foto'].forEach(id => {
-        document.getElementById(id)?.addEventListener('click', () => {
-            cerrarMenusPerfil();
-            inputFotoPerfil?.click();
-        });
-    });
     if (inputFotoPerfil) {
         inputFotoPerfil.addEventListener('change', function() {
             const file = this.files[0];
@@ -1059,7 +1058,7 @@ function setupEvents() {
             // 1) Vista previa local inmediata
             const reader = new FileReader();
             reader.onload = (e) => {
-                ['perfil-avatar-mini', 'perfil-avatar-grande-desktop', 'perfil-avatar-grande-mobile'].forEach(id => {
+                ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
                     const img = document.getElementById(id);
                     if (img) img.src = e.target.result;
                 });
