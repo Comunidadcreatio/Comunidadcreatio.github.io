@@ -574,6 +574,102 @@
 
 
 /* ==============================================
+   SECCIÓN PERFIL DE USUARIO
+   ============================================== */
+#perfil-usuario {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+#perfil-usuario.hidden {
+    display: none;
+}
+
+#perfil-usuario h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.perfil-seccion {
+    text-align: left;
+}
+
+.perfil-seccion-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+}
+
+.perfil-avatar-contenedor {
+    flex-shrink: 0;
+    display: inline-flex;
+    border-radius: 50%;
+    padding: 3px;
+    background-image: conic-gradient(from 0deg,
+        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+}
+
+.perfil-avatar-img-seccion {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
+}
+
+.perfil-seccion-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+    padding-top: 4px;
+}
+
+.perfil-nombre-real-seccion {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--color-text);
+}
+
+.perfil-nombre-artista-seccion {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-seccion-info .btn-cambiar-foto-perfil {
+    margin-top: 12px;
+}
+
+@media (min-width: 769px) {
+    .perfil-seccion-layout {
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .perfil-seccion-info {
+        padding-top: 0;
+    }
+
+    .perfil-nombre-real-seccion {
+        font-size: 1.2rem;
+    }
+
+    .perfil-nombre-artista-seccion {
+        font-size: 1rem;
+    }
+}
+
+/* ==============================================
    ZONA DE PELIGRO (Acciones críticas)
    El botón #btn-eliminar-cuenta usa la clase .btn-cuenta-secundario
    para verse idéntico a los demás botones de la sección Seguridad.
@@ -640,5 +736,38 @@
 
     .cuenta-form-acciones {
         flex-direction: column-reverse;
+    }
+
+    #perfil-usuario {
+        margin: 1.25rem auto;
+        padding: 0 0.75rem;
+    }
+
+    .perfil-seccion-layout {
+        gap: 1rem;
+    }
+
+    .perfil-avatar-img-seccion {
+        width: 64px;
+        height: 64px;
+    }
+
+    .perfil-seccion-info {
+        padding-top: 2px;
+    }
+
+    .perfil-nombre-real-seccion {
+        font-size: 1.05rem;
+    }
+
+    .perfil-nombre-artista-seccion {
+        font-size: 0.9rem;
+    }
+
+    .perfil-seccion-info .btn-cambiar-foto-perfil {
+        margin-top: 10px;
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
     }
 }
