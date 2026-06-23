@@ -90,41 +90,6 @@
         </div>
     </div>
 
-    <!-- Menú de perfil (escritorio) -->
-    <div id="desktop-perfil-menu" class="desktop-logout-modal hidden">
-        <div class="desktop-logout-panel speech-bubble perfil-bubble">
-            <div class="perfil-cabecera">
-                <span class="perfil-avatar-grande">
-                    <img id="perfil-avatar-grande-desktop" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
-                </span>
-                <span class="perfil-datos">
-                    <span class="perfil-nombre-artista"></span>
-                    <span class="perfil-nombre-real"></span>
-                </span>
-            </div>
-            <div class="divider"></div>
-            <button id="desktop-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
-        </div>
-    </div>
-
-    <!-- Menú de perfil (móvil) -->
-    <div id="mobile-perfil-menu" class="mobile-logout-modal hidden">
-        <div class="mobile-logout-panel speech-bubble perfil-bubble">
-            <div class="perfil-cabecera">
-                <span class="perfil-avatar-grande">
-                    <img id="perfil-avatar-grande-mobile" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
-                </span>
-                <span class="perfil-datos">
-                    <span class="perfil-nombre-artista"></span>
-                    <span class="perfil-nombre-real"></span>
-                </span>
-            </div>
-            <div class="divider"></div>
-            <button id="mobile-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
-        </div>
-    </div>
-
-
     <!-- HEADER -->
     <header id="main-header" role="banner">
         <img src="iconos/Logo-temporal.svg?v=2" alt="Creatio" class="login-logo">
@@ -144,6 +109,24 @@
 
         <section id="pagina-blanca" class="hidden">
             <!-- Esta sección está vacía a propósito y su CSS le dará el fondo blanco -->
+        </section>
+
+        <!-- SECCIÓN PRIVADA: PERFIL DE USUARIO -->
+        <section id="perfil-usuario" class="hidden" aria-labelledby="perfil-usuario-title" role="region">
+            <h2 id="perfil-usuario-title">Mi Perfil</h2>
+
+            <div class="perfil-seccion cuenta-seccion">
+                <div class="perfil-seccion-layout">
+                    <div class="perfil-avatar-contenedor">
+                        <img id="perfil-avatar-seccion" class="perfil-avatar-img-seccion" src="iconos/avatar-default.svg" alt="Foto de perfil">
+                    </div>
+                    <div class="perfil-seccion-info">
+                        <p class="perfil-nombre-real perfil-nombre-real-seccion"></p>
+                        <p class="perfil-nombre-artista perfil-nombre-artista-seccion"></p>
+                        <button type="button" id="btn-cambiar-foto-perfil" class="btn-cuenta-secundario btn-cambiar-foto-perfil">Cambiar foto de perfil</button>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
@@ -625,6 +608,6 @@
     <script src="js/notificaciones.js" type="module"></script>
     
     <!-- JS PRINCIPAL (type="module") -->
-    <script src="js/main.js" type="module"></script>
+    <script src="js/main.js?v=20250623" type="module"></script>
 </body>
 </html>
