@@ -586,10 +586,12 @@
     display: none;
 }
 
-#perfil-usuario h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+/* Eliminar el borde y fondo gris del contenedor */
+#perfil-usuario .perfil-seccion {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
 .perfil-seccion {
@@ -602,13 +604,84 @@
     gap: 1.25rem;
 }
 
-.perfil-avatar-contenedor {
+/* Botón avatar: sin padding, el anillo se hace con ::before */
+.perfil-avatar-btn {
     flex-shrink: 0;
-    display: inline-flex;
+    display: inline-block;  /* o flex, pero mejor inline-block para que funcione ::before */
     border-radius: 50%;
-    padding: 3px;
+    padding: 0;
+    background: none;
+    border: none;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* Anillo de colores (pseudo-elemento) */
+.perfil-avatar-btn::before {
+    content: '';
+    position: absolute;
+    top: -4px;        /* Grosor del anillo: 4px a cada lado */
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
     background-image: conic-gradient(from 0deg,
         #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+    z-index: 0;
+}
+
+.perfil-avatar-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Overlay "+" */
+.perfil-avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 2rem;
+    font-weight: 300;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.perfil-avatar-btn:hover .perfil-avatar-overlay {
+    opacity: 1;
+}
+
+/* Imagen dentro del botón */
+.perfil-avatar-img-seccion {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+/* Ajuste para móviles */
+@media (max-width: 768px) {
+    .perfil-avatar-btn {
+        width: 64px;
+        height: 64px;
+    }
 }
 
 .perfil-avatar-img-seccion {
