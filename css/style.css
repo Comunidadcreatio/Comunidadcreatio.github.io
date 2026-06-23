@@ -289,8 +289,25 @@ input, select, textarea {
         width: auto;
     }
     main {
-        flex: 1;
-        padding: 20px;
+        margin-left: 56px;          /* Ancho de la barra lateral */
+        width: calc(100% - 56px);   /* Ajustar el ancho para no desbordar */
+        padding: 20px;              /* Mantener el padding interno */
+        box-sizing: border-box;
+    }
+
+     /* Asegurar que las secciones internas también respeten el margen */
+    #galeria-publica,
+    #panel-artista,
+    #perfil-usuario,
+    #mi-cuenta,
+    #pagina-blanca {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Ajustar el contenedor de la galería para que no se salga */
+    #galeria-container {
+        max-width: 100%;
     }
     
     /* Barra lateral fija a la izquierda */
