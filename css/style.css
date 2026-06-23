@@ -125,7 +125,8 @@ input, select, textarea {
 }
 
 #btn-menu-principal,
-#btn-logout-sidebar {
+#btn-logout-sidebar,
+#btn-perfil-sidebar {
     pointer-events: auto;
     background: none;
     border: none;
@@ -180,54 +181,7 @@ input, select, textarea {
     object-fit: cover;
     background-color: var(--color-white);
     border: 2px solid var(--color-white);
-}
-
-/* Cabecera del panel de perfil (foto grande + datos) */
-.perfil-cabecera {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    text-align: left;
-}
-.perfil-avatar-grande {
-    flex-shrink: 0;
-    display: inline-flex;
-    border-radius: 50%;
-    padding: 3px;
-    background-image: conic-gradient(from 0deg,
-        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
-}
-.perfil-avatar-img-grande {
-    display: block;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: var(--color-white);
-    border: 2px solid var(--color-black);
-}
-.perfil-datos {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-    overflow: hidden;
-}
-.perfil-nombre-artista {
-    color: var(--color-white);
-    font-weight: 700;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.perfil-nombre-real {
-    color: #bdbdbd;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    pointer-events: none;
 }
 
 /* Paneles flotantes (bocadillos) */
@@ -421,19 +375,22 @@ input, select, textarea {
 
     /* Botón de perfil centrado y sobresaliente en la barra inferior */
     #btn-perfil-sidebar {
-        position: absolute;
+        position: fixed;
         left: 50%;
-        bottom: 6px; /* Ajustado para centrar mejor con el nuevo tamaño */
+        bottom: 6px;
         transform: translateX(-50%);
         z-index: 1001;
-        width: 70px;          /* Aumentamos el contenedor */
+        width: 70px;
         height: 70px;
         border-radius: 50%;
-        border: 2px solid var(--color-black); /* Borde negro al contenedor */
-        background: var(--color-white);       /* Fondo blanco para que se vea el borde */
+        border: 2px solid var(--color-black);
+        background: var(--color-white);
         display: flex;
         align-items: center;
         justify-content: center;
+        pointer-events: auto;
+        cursor: pointer;
+        touch-action: manipulation;
     }
     #btn-perfil-sidebar .perfil-avatar-img {
         width: 70px;          /* Avatar más grande */
@@ -547,14 +504,4 @@ input, select, textarea {
         width: 18px;
         height: 18px;
     }
-}
-
-/* Ancho del bocadillo de perfil (sobrescribe el ancho por defecto del menú) */
-.speech-bubble.perfil-bubble {
-    width: 260px !important;
-    max-width: 88vw;
-    text-align: left;
-}
-.perfil-bubble .logout-option {
-    text-align: left;
 }
