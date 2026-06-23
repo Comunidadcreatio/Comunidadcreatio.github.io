@@ -410,10 +410,10 @@ function setupPerfilInteracciones() {
         e.stopPropagation();
         togglePerfil();
     };
-
     btn.addEventListener('click', abrirPerfil);
 
-    document.getElementById('btn-cambiar-foto-perfil')?.addEventListener('click', () => {
+    // Nuevo: clic en el avatar abre el selector de archivos
+    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
         document.getElementById('input-foto-perfil')?.click();
     });
 }
