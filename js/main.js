@@ -39,11 +39,51 @@ let mobileOutsideClickListener = null;
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
 
+// ============================================
+// ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
+// ============================================
+// Definimos la función y la exponemos globalmente para que sea accesible desde cualquier parte
+async function actualizarEstadisticas() {
+    const statsCavents = document.getElementById('stats-cavents');
+    const statsProblogs = document.getElementById('stats-problogs');
+    const statsComcons = document.getElementById('stats-comcons');
+
+    if (!statsCavents) {
+        console.warn('Elemento #stats-cavents no encontrado (el perfil no está visible)');
+        return;
+    }
+
+    try {
+        console.log('Actualizando estadísticas...');
+        const res = await apiRequest('/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC');
+        console.log('Respuesta de obras:', res);
+
+        let activas = 0;
+        if (res && res.success && Array.isArray(res.obras)) {
+            activas = res.obras.filter(obra => 
+                obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+            ).length;
+        } else if (Array.isArray(res)) {
+            activas = res.filter(obra => 
+                obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+            ).length;
+        }
+
+        console.log(`Obras activas encontradas: ${activas}`);
+        statsCavents.textContent = activas;
+        if (statsProblogs) statsProblogs.textContent = '0';
+        if (statsComcons) statsComcons.textContent = '0';
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+        statsCavents.textContent = '0';
+    }
+}
+// EXPONER AL ÁMBITO GLOBAL (para módulos)
+window.actualizarEstadisticas = actualizarEstadisticas;
 
 // ============================================
 // FUNCIONES AUXILIARES
 // ============================================
-
 // Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").
 // El backend usa express-validator .escape() que codifica caracteres
 // especiales al guardar; esto los revierte para que el valor coincida
@@ -401,23 +441,6 @@ function toggleMiCuenta() {
     }
 }
 
-function setupPerfilInteracciones() {
-    const btn = document.getElementById('btn-perfil-sidebar');
-    if (!btn) return;
-
-    const abrirPerfil = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        togglePerfil();
-    };
-    btn.addEventListener('click', abrirPerfil);
-
-    // Nuevo: clic en el avatar abre el selector de archivos
-    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
-        document.getElementById('input-foto-perfil')?.click();
-    });
-}
-
 function togglePerfil() {
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
@@ -435,11 +458,31 @@ function togglePerfil() {
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
+
+        // LLAMADA A LA FUNCIÓN EXPUESTA GLOBALMENTE
+        window.actualizarEstadisticas(); 
     } else {
         perfilUsuario.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
     }
+}
+
+function setupPerfilInteracciones() {
+    const btn = document.getElementById('btn-perfil-sidebar');
+    if (!btn) return;
+
+    const abrirPerfil = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePerfil();
+    };
+    btn.addEventListener('click', abrirPerfil);
+
+    // Nuevo: clic en el avatar abre el selector de archivos
+    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
+        document.getElementById('input-foto-perfil')?.click();
+    });
 }
 
 // ============================================
@@ -628,6 +671,9 @@ async function refrescarTabla() {
             if (exito) {
                 showSuccess("Obra eliminada correctamente.");
                 await refrescarTabla();
+
+                // 🔥 ACTUALIZAR ESTADÍSTICAS SIEMPRE (sin condición)
+                window.actualizarEstadisticas();
             } else {
                 showError("Error al eliminar la obra.");
             }
@@ -1170,6 +1216,9 @@ function setupEvents() {
                 imagenesAEliminar.clear();
                 limpiarFormularioCompleto(true);
                 await refrescarTabla();
+
+                // 🔥 ACTUALIZAR ESTADÍSTICAS SIEMPRE (sin condición)
+                window.actualizarEstadisticas();
             } else {
                 mostrarErrores(result);
             }
