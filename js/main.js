@@ -149,8 +149,13 @@ function actualizarPerfilUI() {
     });
     const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
     const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
-    document.querySelectorAll('.perfil-nombre-artista').forEach(el => { el.textContent = nombreArtista; });
+    const ciudad = (artistaActual && artistaActual.ciudad) || '';
+    
     document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
+    document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
+    document.querySelectorAll('.perfil-ciudad').forEach(el => {
+        el.textContent = ciudad ? ciudad : '';
+    });
 }
 
 // Sube la foto de perfil al servidor (Cloudinary vía backend) y devuelve la URL.
