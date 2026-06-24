@@ -710,9 +710,9 @@
 .perfil-nombre-artista-wrapper {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 1px;
-    font-size: 0.75rem;
+    align-items: baseline;
+    gap: 3px;
+    font-size: 0.8rem;
     color: var(--color-text-muted, #666);
 }
 
@@ -730,7 +730,7 @@
 }
 
 .perfil-ciudad::before {
-    content: "de ";
+    content: " de ";
     font-weight: 400;
 }
 
@@ -797,8 +797,8 @@
     }
 
     .perfil-nombre-artista-wrapper {
-        font-size: 0.75rem;
-        gap: -1px;
+        font-size: 0.6rem;
+        gap: 3px;
     }
 
 }
