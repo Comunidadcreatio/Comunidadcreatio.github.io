@@ -574,13 +574,238 @@
 
 
 /* ==============================================
-   ZONA DE PELIGRO (Acciones críticas)
-   El botón #btn-eliminar-cuenta usa la clase .btn-cuenta-secundario
-   para verse idéntico a los demás botones de la sección Seguridad.
+   SECCIÓN PERFIL DE USUARIO (ACTUALIZADA)
    ============================================== */
+#perfil-usuario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    min-height: 50px;
+}
+
+#perfil-usuario.hidden {
+    display: none;
+}
+
+#perfil-usuario .perfil-seccion {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.perfil-seccion {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.perfil-seccion-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;   /* ← CAMBIO: de center a flex-start para subir los nombres */
+    justify-content: center;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+/* Botón avatar (sin cambios) */
+.perfil-avatar-btn {
+    flex-shrink: 0;
+    display: inline-block;
+    border-radius: 50%;
+    padding: 0;
+    background: none;
+    border: none;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.perfil-avatar-btn::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background-image: conic-gradient(from 0deg,
+        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+    z-index: 0;
+}
+
+.perfil-avatar-btn:hover {
+    transform: scale(1.05);
+}
+
+.perfil-avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 2rem;
+    font-weight: 300;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.perfil-avatar-btn:hover .perfil-avatar-overlay {
+    opacity: 1;
+}
+
+.perfil-avatar-img-seccion {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+.perfil-seccion-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 0;
+    flex: 1;
+    padding-top: 0;             /* ← opcional: quitar padding para que arranque más arriba */
+    margin-top: -5px;           /* ← CAMBIO: sube el bloque de texto 6px (ajusta a tu gusto) */
+}
+
+.perfil-nombre-real-seccion {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--color-text);
+}
+
+.perfil-nombre-artista-seccion {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: var(--color-text-muted, #666);
+}
+
+/* Contenedor del nombre de usuario + ciudad */
+.perfil-nombre-artista-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 3px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #666);
+}
+
+/* El nombre de usuario hereda el tamaño y color */
+.perfil-nombre-artista-seccion {
+    margin: 0;
+    font-size: inherit;
+    line-height: 1.3;
+}
+
+/* La ciudad se muestra con "de " antes */
+.perfil-ciudad {
+    font-weight: 400;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-ciudad::before {
+    content: " de ";
+    font-weight: 400;
+}
+
+/* --- ESTADÍSTICAS DEL PERFIL --- */
+.perfil-estadisticas {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #666);
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.perfil-estadisticas .stat-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.perfil-estadisticas .separator {
+    color: var(--color-gray-400);
+    margin: 0 2px;
+}
+
+/* ========== RESPONSIVE MÓVIL ========== */
+@media (max-width: 768px) {
+    #perfil-usuario {
+        padding: 0 24px;
+        min-height: auto;
+    }
+    .perfil-seccion {
+        max-width: 100%;
+    }
+    .perfil-seccion-layout {
+        gap: 1rem;
+        justify-content: center;
+        align-items: flex-start;   /* también en móvil */
+    }
+    .perfil-avatar-btn {
+        width: 64px;
+        height: 64px;
+    }
+    .perfil-avatar-img-seccion {
+        width: 64px;
+        height: 64px;
+    }
+    .perfil-nombre-real-seccion {
+        font-size: 0.9rem;
+    }
+    .perfil-nombre-artista-seccion {
+        font-size: 0.75rem;
+    }
+    .perfil-seccion-info {
+        padding-top: 0;
+        gap: 1px;
+        margin-top: -2px;   /* un poco menos en móvil si lo deseas */
+    }
+
+    .perfil-estadisticas {
+        font-size: 0.65rem;
+        gap: 3px;
+        margin-top: 1px;
+    }
+
+    .perfil-nombre-artista-wrapper {
+        font-size: 0.6rem;
+        gap: 3px;
+    }
+
+}
+
 
 /* ==============================================
-   DISEÑO RESPONSIVO - PANEL DE ARTISTA
+   DISEÑO RESPONSIVO - PANEL DE ARTISTA (general)
    ============================================== */
 @media (max-width: 768px) {
     /* Controles de filtro en grid de 2 columnas */
@@ -640,5 +865,31 @@
 
     .cuenta-form-acciones {
         flex-direction: column-reverse;
+    }
+
+    #perfil-usuario {
+        margin: 1.25rem auto;
+        padding: 0 24px;
+    }
+
+    .perfil-seccion-layout {
+        gap: 1rem;
+    }
+
+    .perfil-avatar-img-seccion {
+        width: 64px;
+        height: 64px;
+    }
+
+    .perfil-seccion-info {
+        padding-top: 1px;
+    }
+
+    .perfil-nombre-real-seccion {
+        font-size: 0.7rem;
+    }
+
+    .perfil-nombre-artista-seccion {
+        font-size: 0.6rem;
     }
 }

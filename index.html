@@ -51,9 +51,7 @@
 
     <input type="file" id="input-foto-perfil" accept="image/*" hidden>
 
-     <div class="app-container">
-
-        <!-- Panel flotante para escritorio (bocadillo) -->
+    <!-- Paneles flotantes (fuera de app-container para correcto posicionamiento fixed) -->
     <div id="desktop-logout-options" class="desktop-logout-modal hidden">
         <div class="desktop-logout-panel speech-bubble">
             <button id="desktop-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
@@ -81,7 +79,7 @@
     </div>
 
     <div id="mobile-main-menu" class="mobile-logout-modal hidden">
-    <div class="mobile-logout-panel speech-bubble">
+        <div class="mobile-logout-panel speech-bubble">
             <button id="mobile-menu-galeria" class="logout-option">Galería Pública</button>
             <div class="divider"></div>
             <button id="mobile-menu-panel" class="logout-option">Registro de Obra</button>
@@ -90,40 +88,7 @@
         </div>
     </div>
 
-    <!-- Menú de perfil (escritorio) -->
-    <div id="desktop-perfil-menu" class="desktop-logout-modal hidden">
-        <div class="desktop-logout-panel speech-bubble perfil-bubble">
-            <div class="perfil-cabecera">
-                <span class="perfil-avatar-grande">
-                    <img id="perfil-avatar-grande-desktop" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
-                </span>
-                <span class="perfil-datos">
-                    <span class="perfil-nombre-artista"></span>
-                    <span class="perfil-nombre-real"></span>
-                </span>
-            </div>
-            <div class="divider"></div>
-            <button id="desktop-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
-        </div>
-    </div>
-
-    <!-- Menú de perfil (móvil) -->
-    <div id="mobile-perfil-menu" class="mobile-logout-modal hidden">
-        <div class="mobile-logout-panel speech-bubble perfil-bubble">
-            <div class="perfil-cabecera">
-                <span class="perfil-avatar-grande">
-                    <img id="perfil-avatar-grande-mobile" class="perfil-avatar-img-grande" src="iconos/avatar-default.svg" alt="Foto de perfil">
-                </span>
-                <span class="perfil-datos">
-                    <span class="perfil-nombre-artista"></span>
-                    <span class="perfil-nombre-real"></span>
-                </span>
-            </div>
-            <div class="divider"></div>
-            <button id="mobile-cambiar-foto" class="logout-option">Cambiar foto de perfil</button>
-        </div>
-    </div>
-
+    <div class="app-container">
 
     <!-- HEADER -->
     <header id="main-header" role="banner">
@@ -144,6 +109,33 @@
 
         <section id="pagina-blanca" class="hidden">
             <!-- Esta sección está vacía a propósito y su CSS le dará el fondo blanco -->
+        </section>
+
+        <!-- SECCIÓN PRIVADA: PERFIL DE USUARIO -->
+        <section id="perfil-usuario" class="hidden" aria-labelledby="perfil-usuario-title" role="region">
+            <div class="perfil-seccion cuenta-seccion">
+                <div class="perfil-seccion-layout">
+                    <button type="button" id="perfil-avatar-btn" class="perfil-avatar-btn" aria-label="Cambiar foto de perfil">
+                        <span class="perfil-avatar-overlay">+</span>
+                        <img id="perfil-avatar-seccion" class="perfil-avatar-img-seccion" src="iconos/avatar-default.svg" alt="Foto de perfil">
+                    </button>
+                    <div class="perfil-seccion-info">
+                        <p class="perfil-nombre-real perfil-nombre-real-seccion"></p>
+                        <div class="perfil-nombre-artista-wrapper">
+                            <span class="perfil-nombre-artista perfil-nombre-artista-seccion"></span>
+                            <span class="perfil-ciudad"></span>
+                        </div>
+
+                        <div class="perfil-estadisticas" id="perfil-estadisticas">
+                            <span class="stat-value" id="stats-cavents">0</span> Cavents
+                            <span class="separator">|</span>
+                            <span class="stat-value" id="stats-problogs">0</span> Problogs
+                            <span class="separator">|</span>
+                            <span class="stat-value" id="stats-comcons">0</span> Comcons
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
@@ -625,6 +617,6 @@
     <script src="js/notificaciones.js" type="module"></script>
     
     <!-- JS PRINCIPAL (type="module") -->
-    <script src="js/main.js" type="module"></script>
+    <script src="js/main.js?v=20250623" type="module"></script>
 </body>
 </html>
