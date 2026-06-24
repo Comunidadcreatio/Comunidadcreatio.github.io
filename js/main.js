@@ -279,6 +279,16 @@ function cerrarMobileLogoutModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+function cerrarMenuMovil() {
+    if (mobileMainMenu) {
+        mobileMainMenu.classList.add('hidden');
+    }
+    if (mobileOutsideClickListener) {
+        document.removeEventListener('click', mobileOutsideClickListener);
+        mobileOutsideClickListener = null;
+    }
+}
+
 function cerrarDesktopLogoutModal() {
     if (desktopLogoutModal) desktopLogoutModal.classList.add('hidden');
     if (clickOutsideHandlerLogout) {
@@ -352,33 +362,24 @@ function positionMobilePanel(triggerElement, panelElement) {
     const panelDiv = panelElement.querySelector('.mobile-logout-panel');
     if (!panelDiv) return;
 
-    // Reset any CSS-based anchoring so we control position fully from JS
-    panelDiv.style.transform = 'none';
-    panelDiv.style.margin = '0';
-    panelElement.style.bottom = 'auto';
-    panelElement.style.right = 'auto';
-    panelElement.style.left = 'auto';
-    panelElement.style.top = 'auto';
-
     const iconRect = triggerElement.getBoundingClientRect();
     const panelRect = panelDiv.getBoundingClientRect();
     const iconCenterX = iconRect.left + iconRect.width / 2;
     const margin = 8;
 
-    // Place the bubble above the icon (barra inferior)
+    // Position the panel directly with fixed positioning
     let top = iconRect.top - panelRect.height - 12;
     if (top < margin) top = margin;
 
-    // Center the bubble on the icon, but keep it inside the viewport
     let left = iconCenterX - panelRect.width / 2;
     const maxLeft = window.innerWidth - panelRect.width - margin;
     if (left > maxLeft) left = maxLeft;
     if (left < margin) left = margin;
 
-    panelElement.style.top = `${top}px`;
-    panelElement.style.left = `${left}px`;
+    panelDiv.style.top = `${top}px`;
+    panelDiv.style.left = `${left}px`;
 
-    // Point the tail exactly under the icon, regardless of the bubble offset
+    // Point the tail exactly under the icon
     const tailX = iconCenterX - left;
     panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
@@ -926,7 +927,12 @@ function setupEvents() {
                         positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
                             document.addEventListener('click', function onClickOutsideMobile(e) {
-                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon) {
+                                // No cerrar si el clic es en otros botones de la barra de navegación
+                                const target = e.target;
+                                const isNavButton = target.closest('#btn-menu-principal') ||
+                                                  target.closest('#btn-perfil-sidebar');
+                                
+                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
                                     mobileModal.classList.add('hidden');
                                     document.removeEventListener('click', onClickOutsideMobile);
                                 }
@@ -980,6 +986,26 @@ function setupEvents() {
     // ----- Menú principal unificado -----
     const menuBtn = document.getElementById('btn-menu-principal');
     if (menuBtn) {
+        // Agregar listeners para cerrar el panel móvil al hacer clic en otros botones
+        const logoutBtn = document.getElementById('btn-logout-sidebar');
+        const perfilBtn = document.getElementById('btn-perfil-sidebar');
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (mobileMainMenu && !mobileMainMenu.classList.contains('hidden')) {
+                    cerrarMenuMovil();
+                }
+            });
+        }
+        
+        if (perfilBtn) {
+            perfilBtn.addEventListener('click', () => {
+                if (mobileMainMenu && !mobileMainMenu.classList.contains('hidden')) {
+                    cerrarMenuMovil();
+                }
+            });
+        }
+
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isMobile = window.innerWidth <= 768;
@@ -1057,16 +1083,6 @@ function setupEvents() {
                 }
             }
         });
-    }
-
-    function cerrarMenuMovil() {
-        if (mobileMainMenu) {
-            mobileMainMenu.classList.add('hidden');
-        }
-        if (mobileOutsideClickListener) {
-            document.removeEventListener('click', mobileOutsideClickListener);
-            mobileOutsideClickListener = null;
-        }
     }
 
     // ----- Botones del panel móvil de logout -----

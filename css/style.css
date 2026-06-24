@@ -437,7 +437,7 @@ input, select, textarea {
         left: 50%;
         bottom: 6px;
         transform: translateX(-50%);
-        z-index: 1001;
+        z-index: 3000;
         width: 70px;
         height: 70px;
         border-radius: 50%;
@@ -468,6 +468,8 @@ input, select, textarea {
         justify-content: center;
         margin: 0;
         flex-shrink: 0;
+        z-index: 3000;
+        position: relative;
     }
     #btn-logout-sidebar { margin-left: 0; }
     
@@ -481,23 +483,27 @@ input, select, textarea {
     .mobile-logout-modal {
         position: fixed;
         z-index: 9999;
-        pointer-events: none;
+        pointer-events: none; /* El contenedor no bloquea clics */
+        width: 0;
+        height: 0;
+        overflow: visible; /* Permitir que el panel interno se vea fuera del contenedor */
     }
     .mobile-logout-modal.hidden { display: none; }
-    .mobile-logout-modal:not(.hidden) { pointer-events: auto; }
+    .mobile-logout-modal:not(.hidden) { pointer-events: none; }
     
     /* El bocadillo negro del menú en móvil */
     .mobile-logout-panel.speech-bubble {
-        position: relative;
+        position: fixed;
         background: var(--color-black);
-        width: 180px;
-        max-width: 80vw;
+        width: 140px;
+        max-width: 60vw;
         margin: 0;
         border-radius: 14px;
         padding: 6px 0;
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         text-align: center;
         z-index: 2001;
+        pointer-events: auto; /* Permitir clics dentro del panel */
     }
     
     /* Cola móvil: apunta exactamente bajo el icono via --tail-x */
