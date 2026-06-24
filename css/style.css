@@ -413,6 +413,11 @@ input, select, textarea {
 @media (max-width: 768px) {
     body { padding-bottom: 45px; }
     
+    /* Centrar contenido con aire en ambos lados */
+    main {
+        padding: 0 24px;
+    }
+    
     /* Convertir barra lateral en barra inferior */
     #toggle-panel {
         bottom: 0;
