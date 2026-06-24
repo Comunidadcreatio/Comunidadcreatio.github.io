@@ -295,6 +295,30 @@ function cerrarDesktopMainMenu() {
     }
 }
 
+function cerrarTodosLosPaneles() {
+    // Cerrar paneles de escritorio
+    const desktopLogoutModal = document.getElementById('desktop-logout-options');
+    if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
+        cerrarDesktopLogoutModal();
+    }
+
+    const desktopMainMenu = document.getElementById('desktop-main-menu');
+    if (desktopMainMenu && !desktopMainMenu.classList.contains('hidden')) {
+        cerrarDesktopMainMenu();
+    }
+
+    // Cerrar paneles móviles
+    const mobileLogoutModal = document.getElementById('mobile-logout-options');
+    if (mobileLogoutModal && !mobileLogoutModal.classList.contains('hidden')) {
+        cerrarMobileLogoutModal();
+    }
+
+    const mobileMainMenu = document.getElementById('mobile-main-menu');
+    if (mobileMainMenu && !mobileMainMenu.classList.contains('hidden')) {
+        cerrarMenuMovil();
+    }
+}
+
 function positionDesktopPanel(triggerElement, panelElement) {
     if (!panelElement) return;
     const rect = triggerElement.getBoundingClientRect();
@@ -487,6 +511,7 @@ function setupPerfilInteracciones() {
     const abrirPerfil = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        cerrarTodosLosPaneles();
         togglePerfil();
     };
     btn.addEventListener('click', abrirPerfil);
@@ -896,6 +921,7 @@ function setupEvents() {
                 const mobileModal = document.getElementById('mobile-logout-options');
                 if (mobileModal) {
                     if (mobileModal.classList.contains('hidden')) {
+                        cerrarTodosLosPaneles();
                         mobileModal.classList.remove('hidden');
                         positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
@@ -929,6 +955,7 @@ function setupEvents() {
                     }
                 }
                 if (desktopLogoutModal.classList.contains('hidden')) {
+                    cerrarTodosLosPaneles();
                     updateCerrarTodasSesionesButtonState();
                     desktopLogoutModal.classList.remove('hidden');
                     positionDesktopPanel(logoutIcon, desktopLogoutModal);
@@ -981,6 +1008,7 @@ function setupEvents() {
                 }
 
                 if (mobileMainMenu.classList.contains('hidden')) {
+                    cerrarTodosLosPaneles();
                     mobileMainMenu.classList.remove('hidden');
                     positionMobilePanel(menuBtn, mobileMainMenu);
                     if (mobileOutsideClickListener) {
@@ -1014,6 +1042,7 @@ function setupEvents() {
                 }
 
                 if (desktopMainMenu.classList.contains('hidden')) {
+                    cerrarTodosLosPaneles();
                     desktopMainMenu.classList.remove('hidden');
                     positionDesktopPanel(menuBtn, desktopMainMenu);
                     if (clickOutsideHandlerMainMenu) document.removeEventListener('click', clickOutsideHandlerMainMenu);
