@@ -706,6 +706,28 @@
     color: var(--color-text-muted, #666);
 }
 
+/* --- ESTADÍSTICAS DEL PERFIL --- */
+.perfil-estadisticas {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #666);
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.perfil-estadisticas .stat-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.perfil-estadisticas .separator {
+    color: var(--color-gray-400);
+    margin: 0 2px;
+}
+
 /* ========== RESPONSIVE MÓVIL ========== */
 @media (max-width: 768px) {
     #perfil-usuario {
@@ -738,6 +760,12 @@
         padding-top: 0;
         gap: 1px;
         margin-top: -2px;   /* un poco menos en móvil si lo deseas */
+    }
+
+    .perfil-estadisticas {
+        font-size: 0.65rem;
+        gap: 3px;
+        margin-top: 1px;
     }
 }
 
