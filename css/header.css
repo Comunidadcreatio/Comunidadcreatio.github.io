@@ -24,22 +24,29 @@
    ============================================== */
 .login-logo {
     display: block;
-    height: 100%;          /* Ocupa la altura del header */
     width: auto;          /* Mantiene la proporción */
-    max-width: 120px;     /* Ancho máximo para evitar desbordamiento */
+    max-width: 32px;     /* Ancho máximo para evitar desbordamiento */
+    max-height: 32px;
+    height: 32px;
     object-fit: contain;
     object-position: center;
     flex-shrink: 0;       /* Evita que el logo se encoja */
     margin: 0;            /* Eliminar cualquier margen */
     padding: 0;           /* Eliminar cualquier padding */
+    transform: translateY(9px);
 }
 
 /* Contenedor picture para el logo */
 picture {
     display: flex;
     align-items: center;
-    height: 100%;
+    justify-content: center;
     flex-shrink: 0;
+    height: 40px;
+    max-height: 40px ;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 /* ==============================================
