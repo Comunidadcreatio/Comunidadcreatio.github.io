@@ -160,7 +160,7 @@ picture {
     border-radius: 20px;
     box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
     z-index: 99998;
-    padding: 60px 0 12px 0;
+    padding: 50px 0 12px 0;
     display: none;
     margin-top: 0px;
     animation: fadeIn 0.2s ease-out;
