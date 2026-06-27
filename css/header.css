@@ -246,16 +246,16 @@ picture {
     }
 
     picture {
-        max-width: 70px;
+        max-width: 36px;
         height: 100%;
         display: flex;
         align-items: center;
     }
 
     .login-logo {
-        height: 32px;      /* Altura fija para alinear con iconos */
+        height: 28px;      /* Similar al tamaño de los iconos */
         width: auto;
-        max-width: 70px;
+        max-width: 36px;
         object-fit: contain;
     }
 
@@ -336,12 +336,12 @@ picture {
     }
 
     picture {
-        max-width: 60px;
+        max-width: 32px;
     }
 
     .login-logo {
-        height: 28px;
-        max-width: 60px;
+        height: 24px;
+        max-width: 32px;
     }
 
     .header-icon {
