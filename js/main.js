@@ -925,6 +925,8 @@ function setupEvents() {
     const searchBtn = document.getElementById('search-btn');
     const searchDropdown = document.getElementById('search-results-dropdown');
 
+    console.log("Elementos del buscador:", { searchInput, searchBtn, searchDropdown });
+
     if (searchInput && searchBtn && searchDropdown) {
         console.log("Buscador inicializado correctamente");
 
@@ -943,6 +945,7 @@ function setupEvents() {
 
         // Cerrar el dropdown al hacer clic fuera
         const cerrarDropdown = () => {
+            console.log("Cerrando dropdown");
             searchDropdown.classList.add('hidden');
             searchInput.classList.remove('input-available', 'input-unavailable');
         };
@@ -955,11 +958,13 @@ function setupEvents() {
 
         // Renderizar resultados en el dropdown
         const renderizarResultadosDropdown = (usuarios) => {
+            console.log("Renderizando dropdown con usuarios:", usuarios);
             searchDropdown.innerHTML = '';
             
             if (!usuarios || usuarios.length === 0) {
                 searchDropdown.innerHTML = `<div class="search-no-results">No se encontraron usuarios</div>`;
                 searchDropdown.classList.remove('hidden');
+                console.log("Dropdown mostrado (sin resultados)");
                 return;
             }
 
@@ -993,11 +998,20 @@ function setupEvents() {
                 searchDropdown.appendChild(item);
             });
 
+            // Calcular posición dinámica del dropdown
+            const inputRect = searchInput.getBoundingClientRect();
+            searchDropdown.style.top = `${inputRect.bottom + 8}px`;
+            searchDropdown.style.left = `${inputRect.left}px`;
+            searchDropdown.style.width = `${inputRect.width}px`;
+
             searchDropdown.classList.remove('hidden');
+            console.log("Dropdown mostrado con resultados. Clases:", searchDropdown.className);
+            console.log("Estilo computed:", window.getComputedStyle(searchDropdown).display);
         };
 
         // Función de búsqueda en tiempo real (CON TOKEN)
         const buscarUsuariosTiempoReal = async (query) => {
+            console.log("Buscando usuarios con query:", query);
             if (query.length < 1) {
                 searchDropdown.classList.add('hidden');
                 return;
@@ -1071,6 +1085,8 @@ function setupEvents() {
                 cerrarDropdown();
             }
         });
+    } else {
+        console.error("No se encontraron los elementos del buscador");
     }
 
     // ----- Botón de configuración -----
