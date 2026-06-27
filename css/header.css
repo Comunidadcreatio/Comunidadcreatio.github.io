@@ -1,169 +1,345 @@
 /* css/header.css - Estilos del encabezado */
 
+/* ==============================================
+   HEADER - BASE
+   ============================================== */
 #main-header {
     background-color: var(--color-white);
     color: var(--color-black);
-    padding: 10px 1.5rem;
+    height: 64px;                /* Altura fija para igualar todos los elementos */
+    padding: 0 1.5rem;
     display: flex;
+    align-items: center;         /* Centrado vertical de todos los hijos */
     justify-content: space-between;
-    align-items: center;
     border-bottom: 1px solid var(--color-gray-200);
     gap: 1rem;
+    box-sizing: border-box;
+    overflow: hidden; /* Evita que cualquier hijo se salga del header */
+
+
 }
 
-/* Iconos del header */
+/* ==============================================
+   LOGO (con soporte para versión móvil)
+   ============================================== */
+.login-logo {
+    display: block;
+    height: 100%;          /* Ocupa la altura del header */
+    width: auto;          /* Mantiene la proporción */
+    max-width: 120px;     /* Ancho máximo para evitar desbordamiento */
+    object-fit: contain;
+    object-position: center;
+    flex-shrink: 0;       /* Evita que el logo se encoja */
+}
+
+/* Contenedor picture para el logo */
+picture {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+/* ==============================================
+   ICONOS DEL HEADER
+   ============================================== */
 .header-icon {
     background: none;
     border: none;
     color: var(--color-black);
     cursor: pointer;
-    padding: 8px;
+    padding: 0;                  /* Sin padding para control exacto */
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;                 /* Tamaño fijo del botón */
+    height: 40px;
+    flex-shrink: 0;
 }
 
 .header-icon:hover {
     background-color: var(--color-gray-100);
-    color: var(--color-black);
 }
 
-.header-icon:active {
-    background-color: var(--color-gray-200);
-}
-
-/* Logo */
-.login-logo {
-    width: auto;
-    height: 40px;
+.header-icon svg {
+    width: 24px;
+    height: 24px;
     display: block;
-    flex-shrink: 0;
 }
 
-/* Buscador en el centro */
+/* ==============================================
+   BUSCADOR (escritorio)
+   ============================================== */
 .header-search {
     display: flex;
+    flex-direction: column;      /* Para el dropdown */
     align-items: center;
     flex: 1;
     max-width: 400px;
     margin: 0 auto;
+    position: relative;
+    justify-content: center;
+    height: 100%;                /* Ocupa toda la altura del header */
+}
+
+.search-input-wrapper {
+    display: flex;
+    width: 100%;
+    height: 40px;                /* Misma altura que logo e iconos */
+    border-radius: 20px;
+    border: 1.5px solid var(--color-gray-300);
+    background: var(--color-white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    align-items: center;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
 }
 
 #search-input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 20px 0 0 20px;
+    height: 100%;
+    padding: 0 14px;             /* Sin padding vertical para centrar texto */
+    border: none;
+    background: transparent;
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s;
+    color: var(--color-text);
+    font-family: 'Nunito', sans-serif;
+    line-height: 40px;           /* Igual a la altura para centrar texto */
 }
 
-#search-input:focus {
-    border-color: var(--color-black);
+#search-input::placeholder {
+    color: var(--color-gray-400);
+    line-height: 40px;           /* Asegura que el placeholder también se centre */
 }
 
 .search-button {
-    background-color: var(--color-black);
-    color: var(--color-white);
-    border: 1px solid var(--color-black);
-    border-radius: 0 20px 20px 0;
-    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--color-gray-400);
+    padding: 0 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    height: 100%;
 }
 
 .search-button:hover {
-    background-color: var(--color-gray-800);
-}
-
-/* Ocultar elementos cuando sea necesario */
-#btn-logout-header.hidden {
-    display: none;
-}
-
-#btn-configuracion.hidden {
-    display: none;
+    color: var(--color-ink);
 }
 
 /* ==============================================
-   DISEÑO RESPONSIVO - HEADER Y LOGO
+   DROPDOWN DE BÚSQUEDA
    ============================================== */
-@media (min-width: 769px) {
-    #main-header {
-        padding: 10px 1.5rem;
-    }
-    .login-logo {
-        height: 40px;
-    }
-    .header-search {
-        max-width: 400px;
-    }
+.search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 9999;
+    padding: 4px 0;
+    display: none;
 }
 
+.search-dropdown:not(.hidden) {
+    display: block;
+}
+
+.search-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: 10px;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.search-result-item:hover {
+    background-color: var(--color-gray-100);
+}
+
+.search-result-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--color-gray-200);
+}
+
+.search-result-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-600);
+    font-weight: 700;
+    font-size: 14px;
+    border: 1px solid var(--color-gray-300);
+}
+
+.search-result-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.search-result-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-result-real-name {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-no-results {
+    padding: 16px;
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+/* ==============================================
+   RESPONSIVE - MÓVIL
+   ============================================== */
 @media (max-width: 768px) {
     #main-header {
-        padding: 8px 1rem;
+        height: 56px;
+        padding: 0 0.75rem;
         gap: 0.5rem;
     }
-    .login-logo {
-        height: 30px;
+
+    picture {
+        max-width: 80px; /* Reducir ancho máximo en móvil */
     }
+
+    .login-logo {
+        height: 100%;      /* Ocupa toda la altura del header */
+        width: auto;
+        max-width: 80px;   /* Ancho máximo en móvil */
+    }
+
     .header-icon {
-        padding: 6px;
+        width: 34px;
+        height: 34px;
     }
     .header-icon svg {
         width: 20px;
         height: 20px;
     }
-    .header-search {
-        max-width: 200px;
+
+    .search-input-wrapper {
+        height: 34px;            /* Misma altura que logo e iconos */
     }
+
     #search-input {
-        padding: 6px 10px;
+        padding: 0 10px;
         font-size: 13px;
+        line-height: 34px;       /* Centrado vertical */
     }
+    #search-input::placeholder {
+        line-height: 34px;
+    }
+
     .search-button {
-        padding: 6px 10px;
+        padding: 0 8px;
     }
     .search-button svg {
         width: 16px;
         height: 16px;
     }
+
+    .header-search {
+        max-width: 180px;
+    }
+
+    .search-dropdown {
+        max-height: 250px;
+    }
 }
 
 @media (max-width: 480px) {
     #main-header {
-        padding: 6px 0.75rem;
+        height: 48px;
+        padding: 0 0.5rem;
         gap: 0.25rem;
     }
-    .login-logo {
-        height: 25px;
+
+    picture {
+        max-width: 60px; /* Reducir aún más en pantallas pequeñas */
     }
+
+    .login-logo {
+        height: 100%;
+        width: auto;
+        max-width: 60px;   /* Ancho máximo en pantallas pequeñas */
+    }
+
     .header-icon {
-        padding: 4px;
+        width: 30px;
+        height: 30px;
     }
     .header-icon svg {
         width: 18px;
         height: 18px;
     }
-    .header-search {
-        max-width: 150px;
+
+    .search-input-wrapper {
+        height: 30px;
     }
+
     #search-input {
-        padding: 5px 8px;
+        padding: 0 8px;
         font-size: 12px;
+        line-height: 30px;
     }
+    #search-input::placeholder {
+        line-height: 30px;
+    }
+
     .search-button {
-        padding: 5px 8px;
+        padding: 0 6px;
     }
     .search-button svg {
         width: 14px;
         height: 14px;
+    }
+
+    .header-search {
+        max-width: 120px;
     }
 }
