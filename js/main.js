@@ -1000,9 +1000,12 @@ function setupEvents() {
 
             // Calcular posición dinámica del dropdown
             const inputRect = searchInput.getBoundingClientRect();
-            searchDropdown.style.top = `${inputRect.bottom + 8}px`;
-            searchDropdown.style.left = `${inputRect.left}px`;
-            searchDropdown.style.width = `${inputRect.width}px`;
+            const inputWrapper = searchInput.closest('.search-input-wrapper');
+            const wrapperRect = inputWrapper.getBoundingClientRect();
+            
+            searchDropdown.style.top = `${wrapperRect.top}px`;
+            searchDropdown.style.left = `${wrapperRect.left}px`;
+            searchDropdown.style.width = `${wrapperRect.width}px`;
 
             searchDropdown.classList.remove('hidden');
             console.log("Dropdown mostrado con resultados. Clases:", searchDropdown.className);
