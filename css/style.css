@@ -476,7 +476,10 @@ input, select, textarea {
         z-index: 3000;
         position: relative;
     }
-    #btn-logout-sidebar { margin-left: 0; }
+    #btn-logout-sidebar { 
+        margin-left: 0;
+        display: none; /* Ocultar logout de barra inferior en móvil, ahora está en header */
+    }
     
     /* Ocultar paneles de escritorio en móvil */
     .desktop-logout-modal,

@@ -912,6 +912,56 @@ async function verificarSesionBackend() {
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
 function setupEvents() {
+    // ----- Botón de logout del header -----
+    const logoutHeaderBtn = document.getElementById('btn-logout-header');
+    if (logoutHeaderBtn) {
+        logoutHeaderBtn.addEventListener('click', () => {
+            ejecutarLogout();
+        });
+    }
+
+    // ----- Buscador de usuarios -----
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    
+    if (searchInput && searchBtn) {
+        const buscarUsuario = async () => {
+            const query = searchInput.value.trim();
+            if (query.length < 2) {
+                alert('El término de búsqueda debe tener al menos 2 caracteres');
+                return;
+            }
+            
+            try {
+                const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
+                if (response && response.success && response.usuarios.length > 0) {
+                    mostrarResultadosBusqueda(response.usuarios);
+                } else {
+                    alert('No se encontraron usuarios con ese nombre');
+                }
+            } catch (error) {
+                console.error('Error al buscar usuarios:', error);
+                alert('Error al buscar usuarios. Por favor intenta nuevamente.');
+            }
+        };
+
+        searchBtn.addEventListener('click', buscarUsuario);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                buscarUsuario();
+            }
+        });
+    }
+
+    // ----- Botón de configuración -----
+    const configBtn = document.getElementById('btn-configuracion');
+    if (configBtn) {
+        configBtn.addEventListener('click', () => {
+            // Por ahora, mostrar un mensaje de que la configuración está en desarrollo
+            alert('Configuración en desarrollo');
+        });
+    }
+
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
     if (logoutIcon) {
@@ -1601,6 +1651,87 @@ function setupEvents() {
         });
     });
 
+}
+
+// ============================================
+// MOSTRAR RESULTADOS DE BÚSQUEDA
+// ============================================
+function mostrarResultadosBusqueda(usuarios) {
+    // Crear modal de resultados
+    const modal = document.createElement('div');
+    modal.className = 'search-results-modal';
+    modal.innerHTML = `
+        <div class="search-results-content">
+            <div class="search-results-header">
+                <h3>Resultados de búsqueda</h3>
+                <button class="close-results" aria-label="Cerrar">✕</button>
+            </div>
+            <div class="search-results-list">
+                ${usuarios.map(usuario => `
+                    <div class="search-result-item" data-user-id="${usuario.id}">
+                        <div class="user-avatar">
+                            ${usuario.foto_perfil 
+                                ? `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}">`
+                                : `<div class="avatar-placeholder">${usuario.nombre_artista.charAt(0).toUpperCase()}</div>`
+                            }
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">${usuario.nombre_artista}</div>
+                            <div class="user-real-name">${usuario.nombre_real || ''}</div>
+                            ${usuario.ciudad ? `<div class="user-city">${usuario.ciudad}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Event listeners
+    const closeBtn = modal.querySelector('.close-results');
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+
+    // Cerrar al hacer clic fuera del modal
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+
+    // Al hacer clic en un usuario, mostrar su perfil
+    modal.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const userId = item.dataset.userId;
+            verPerfilUsuario(userId);
+            document.body.removeChild(modal);
+        });
+    });
+}
+
+// ============================================
+// VER PERFIL DE USUARIO
+// ============================================
+async function verPerfilUsuario(userId) {
+    try {
+        const response = await apiRequest(`/api/artistas/perfil/${userId}`);
+        if (response && response.success) {
+            // Aquí puedes implementar la lógica para mostrar el perfil del usuario
+            // Por ahora, mostraremos una alerta con la información básica
+            const usuario = response.usuario;
+            alert(`Perfil de: ${usuario.nombre_artista}\nNombre real: ${usuario.nombre_real || 'No especificado'}\nCiudad: ${usuario.ciudad || 'No especificada'}\nBio: ${usuario.bio || 'No especificada'}`);
+            
+            // TODO: Implementar la visualización completa del perfil
+            // Similar a como se muestra el perfil propio en la sección mi-cuenta
+        } else {
+            alert('Error al cargar el perfil del usuario');
+        }
+    } catch (error) {
+        console.error('Error al cargar perfil:', error);
+        alert('Error al cargar el perfil del usuario');
+    }
 }
 
 // ============================================

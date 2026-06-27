@@ -3,58 +3,91 @@
 #main-header {
     background-color: var(--color-white);
     color: var(--color-black);
-    padding: 5px 0.75rem;
+    padding: 10px 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--color-gray-200);
+    gap: 1rem;
 }
 
-#brand-name {
-    font-size: 1.25rem;
-    margin: 0;
-    font-weight: 600;
+/* Iconos del header */
+.header-icon {
+    background: none;
+    border: none;
+    color: var(--color-black);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.header-icon:hover {
+    background-color: var(--color-gray-100);
+    color: var(--color-black);
+}
+
+.header-icon:active {
+    background-color: var(--color-gray-200);
+}
+
+/* Logo */
 .login-logo {
     width: auto;
-    height: 8px;
+    height: 40px;
     display: block;
-    margin: 0 auto;
-    align-self: center;
     flex-shrink: 0;
 }
 
-#user-actions {
+/* Buscador en el centro */
+.header-search {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    flex: 1;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-#btn-perfil,
-#btn-logout {
-    background: none;
-    border: 1px solid var(--color-black);
-    color: var(--color-black);
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: background 0.2s, color 0.2s;
+#search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px 0 0 20px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-#btn-perfil:hover,
-#btn-logout:hover {
+#search-input:focus {
+    border-color: var(--color-black);
+}
+
+.search-button {
     background-color: var(--color-black);
     color: var(--color-white);
+    border: 1px solid var(--color-black);
+    border-radius: 0 20px 20px 0;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
 }
 
-/* 🔥 CORRECCIÓN PARA EL HEADER */
-#btn-logout.hidden {
+.search-button:hover {
+    background-color: var(--color-gray-800);
+}
+
+/* Ocultar elementos cuando sea necesario */
+#btn-logout-header.hidden {
     display: none;
 }
 
-/* Opcional: también asegurar que el botón de perfil tenga el estado correcto */
-#btn-perfil.hidden {
+#btn-configuracion.hidden {
     display: none;
 }
 
@@ -63,30 +96,74 @@
    ============================================== */
 @media (min-width: 769px) {
     #main-header {
-        padding: 5px 1.25rem;
+        padding: 10px 1.5rem;
     }
     .login-logo {
-        width: auto;
-        height: 8px;
+        height: 40px;
+    }
+    .header-search {
+        max-width: 400px;
     }
 }
 
 @media (max-width: 768px) {
     #main-header {
-        padding: 5px 0.75rem;
+        padding: 8px 1rem;
+        gap: 0.5rem;
     }
     .login-logo {
-        width: auto;
-        height: 8px;
+        height: 30px;
+    }
+    .header-icon {
+        padding: 6px;
+    }
+    .header-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    .header-search {
+        max-width: 200px;
+    }
+    #search-input {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    .search-button {
+        padding: 6px 10px;
+    }
+    .search-button svg {
+        width: 16px;
+        height: 16px;
     }
 }
 
 @media (max-width: 480px) {
     #main-header {
-        padding: 5px 0.5rem;
+        padding: 6px 0.75rem;
+        gap: 0.25rem;
     }
     .login-logo {
-        width: auto;
-        height: 8px;
+        height: 25px;
+    }
+    .header-icon {
+        padding: 4px;
+    }
+    .header-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    .header-search {
+        max-width: 150px;
+    }
+    #search-input {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+    .search-button {
+        padding: 5px 8px;
+    }
+    .search-button svg {
+        width: 14px;
+        height: 14px;
     }
 }
