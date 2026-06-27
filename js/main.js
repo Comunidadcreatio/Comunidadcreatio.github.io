@@ -920,38 +920,158 @@ function setupEvents() {
         });
     }
 
-    // ----- Buscador de usuarios -----
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    
-    if (searchInput && searchBtn) {
-        const buscarUsuario = async () => {
-            const query = searchInput.value.trim();
-            if (query.length < 2) {
-                alert('El término de búsqueda debe tener al menos 2 caracteres');
-                return;
-            }
-            
-            try {
-                const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
-                if (response && response.success && response.usuarios.length > 0) {
-                    mostrarResultadosBusqueda(response.usuarios);
-                } else {
-                    alert('No se encontraron usuarios con ese nombre');
-                }
-            } catch (error) {
-                console.error('Error al buscar usuarios:', error);
-                alert('Error al buscar usuarios. Por favor intenta nuevamente.');
-            }
-        };
+    // ----- Buscador de usuarios en tiempo real -----
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const searchDropdown = document.getElementById('search-results-dropdown');
 
-        searchBtn.addEventListener('click', buscarUsuario);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                buscarUsuario();
-            }
-        });
+if (searchInput && searchBtn && searchDropdown) {
+    console.log("Buscador inicializado correctamente");
+
+    // Debounce para no saturar el servidor
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
+
+    // Cerrar el dropdown al hacer clic fuera
+    const cerrarDropdown = () => {
+        searchDropdown.classList.add('hidden');
+        searchInput.classList.remove('input-available', 'input-unavailable');
+    };
+
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+            cerrarDropdown();
+        }
+    });
+
+    // Renderizar resultados en el dropdown
+    const renderizarResultadosDropdown = (usuarios) => {
+        searchDropdown.innerHTML = '';
+        
+        if (!usuarios || usuarios.length === 0) {
+            searchDropdown.innerHTML = `<div class="search-no-results">No se encontraron usuarios</div>`;
+            searchDropdown.classList.remove('hidden');
+            return;
+        }
+
+        usuarios.forEach(usuario => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+
+            let avatarHTML = '';
+            if (usuario.foto_perfil) {
+                avatarHTML = `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}" class="search-result-avatar">`;
+            } else {
+                const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
+                avatarHTML = `<div class="search-result-avatar-placeholder">${inicial}</div>`;
+            }
+
+            const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${usuario.nombre_real}</div>` : '';
+
+            item.innerHTML = `
+                ${avatarHTML}
+                <div class="search-result-info">
+                    <div class="search-result-name">${usuario.nombre_artista}</div>
+                    ${nombreReal}
+                </div>
+            `;
+
+            item.addEventListener('click', () => {
+                cerrarDropdown();
+                verPerfilUsuario(usuario.id);
+            });
+
+            searchDropdown.appendChild(item);
+        });
+
+        searchDropdown.classList.remove('hidden');
+    };
+
+    // Función de búsqueda en tiempo real (CON TOKEN)
+    const buscarUsuariosTiempoReal = async (query) => {
+        if (query.length < 1) {
+            searchDropdown.classList.add('hidden');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem(TOKEN_KEY);
+            const response = await fetch(`${API_BASE_URL}/api/artistas/buscar?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            });
+            const data = await response.json();
+            console.log("Respuesta del backend:", data);
+            
+            if (data && data.success && Array.isArray(data.usuarios)) {
+                renderizarResultadosDropdown(data.usuarios);
+            } else {
+                console.warn("El backend no devolvió usuarios en el formato esperado:", data);
+                renderizarResultadosDropdown([]);
+            }
+        } catch (error) {
+            console.error('Error en búsqueda en tiempo real:', error);
+            searchDropdown.classList.add('hidden');
+        }
+    };
+
+    // Versión con debounce de 500ms
+    const buscarConDebounce = debounce((query) => {
+        buscarUsuariosTiempoReal(query);
+    }, 500);
+
+    // Evento input
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        console.log(`Input: "${query}"`); // Para depuración
+        if (query.length >= 1) {
+            buscarConDebounce(query);
+            searchInput.classList.add('input-available');
+        } else {
+            searchDropdown.classList.add('hidden');
+            searchInput.classList.remove('input-available', 'input-unavailable');
+        }
+    });
+
+    // Botón de búsqueda tradicional
+    const buscarUsuarioConBoton = async () => {
+        const query = searchInput.value.trim();
+        if (query.length < 2) {
+            alert('El término de búsqueda debe tener al menos 2 caracteres');
+            return;
+        }
+        
+        try {
+            const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
+            if (response && response.success && response.usuarios.length > 0) {
+                mostrarResultadosBusqueda(response.usuarios);
+            } else {
+                alert('No se encontraron usuarios con ese nombre');
+            }
+        } catch (error) {
+            console.error('Error al buscar usuarios:', error);
+            alert('Error al buscar usuarios. Por favor intenta nuevamente.');
+        }
+    };
+
+    searchBtn.addEventListener('click', buscarUsuarioConBoton);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            buscarUsuarioConBoton();
+            cerrarDropdown();
+        }
+    });
+}
 
     // ----- Botón de configuración -----
     const configBtn = document.getElementById('btn-configuracion');
