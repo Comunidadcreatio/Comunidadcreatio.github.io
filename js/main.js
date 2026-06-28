@@ -1119,18 +1119,31 @@ function setupEvents() {
             });
 
             // Calcular posición dinámica del dropdown
-            const inputRect = searchInput.getBoundingClientRect();
-            const inputWrapper = searchInput.closest('.search-input-wrapper');
-            const wrapperRect = inputWrapper.getBoundingClientRect();
-            
-            searchDropdown.style.top = `${wrapperRect.top}px`;
-            searchDropdown.style.left = `${wrapperRect.left}px`;
-            searchDropdown.style.width = `${wrapperRect.width}px`;
+            posicionarDropdown();
 
             searchDropdown.classList.remove('hidden');
             console.log("Dropdown mostrado con resultados. Clases:", searchDropdown.className);
             console.log("Estilo computed:", window.getComputedStyle(searchDropdown).display);
         };
+
+        // Reposicionar el dropdown según el wrapper del input (responsive en tiempo real)
+        const posicionarDropdown = () => {
+            const inputWrapper = searchInput.closest('.search-input-wrapper');
+            if (!inputWrapper) return;
+            const wrapperRect = inputWrapper.getBoundingClientRect();
+            searchDropdown.style.top = `${wrapperRect.top}px`;
+            searchDropdown.style.left = `${wrapperRect.left}px`;
+            searchDropdown.style.width = `${wrapperRect.width}px`;
+        };
+
+        // Mantener el dropdown alineado al cambiar tamaño de ventana o al hacer scroll
+        const reposicionarSiVisible = () => {
+            if (!searchDropdown.classList.contains('hidden')) {
+                posicionarDropdown();
+            }
+        };
+        window.addEventListener('resize', reposicionarSiVisible);
+        window.addEventListener('scroll', reposicionarSiVisible, true);
 
         // Función de búsqueda en tiempo real (CON TOKEN)
         const buscarUsuariosTiempoReal = async (query) => {
