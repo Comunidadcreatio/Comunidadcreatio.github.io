@@ -29,8 +29,8 @@ form *,
 
 /* Contenedor del formulario en panel del artista */
 #panel-artista #formulario-obra {
-    max-width: 100%;
-    margin: 0;
+    max-width: 700px;
+    margin: 0 auto;
     padding: 24px;
     border-radius: 8px;
 }

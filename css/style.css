@@ -326,12 +326,17 @@ input, select, textarea {
 
      /* Asegurar que las secciones internas también respeten el margen */
     #galeria-publica,
-    #panel-artista,
     #perfil-usuario,
-    #mi-cuenta,
     #pagina-blanca {
         max-width: 100%;
         margin: 0 auto;
+    }
+
+    /* Panel de obras y Mi cuenta más estrechos en escritorio (más aire a los lados) */
+    #panel-artista,
+    #mi-cuenta {
+        max-width: 700px;
+        margin: 2rem auto;
     }
 
     /* Ajustar el contenedor de la galería para que no se salga */

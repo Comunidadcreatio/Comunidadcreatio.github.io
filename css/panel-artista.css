@@ -4,9 +4,9 @@
    CONTENEDOR PRINCIPAL DEL PANEL
    ============================================== */
 #panel-artista {
-    max-width: 1000px;
+    max-width: 700px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1rem 140px;
 }
 
 #panel-artista h2 {
@@ -42,6 +42,9 @@
     font-size: 14px;
     background: white;
     width: 100%;
+    height: 40px;
+    line-height: 1.2;
+    box-sizing: border-box;
 }
 
 .filter-controls #btn-aplicar-filtros {
@@ -212,9 +215,9 @@
    SECCIÓN MI CUENTA
    ============================================== */
 #mi-cuenta {
-    max-width: 1000px;
+    max-width: 700px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1rem 140px;
 }
 
 #mi-cuenta.hidden {
