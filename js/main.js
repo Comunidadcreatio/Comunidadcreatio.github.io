@@ -472,6 +472,11 @@ function toggleMiCuenta() {
         if (emailInput && artistaActual) {
             emailInput.value = artistaActual.email || artistaActual.correo || '';
         }
+        // Restaurar botón de avatar para perfil propio
+        const avatarBtn = document.getElementById('perfil-avatar-btn');
+        if (avatarBtn) {
+            avatarBtn.style.display = 'flex';
+        }
     } else {
         miCuenta.classList.add('hidden');
         paginaBlanca.classList.remove('hidden');
@@ -495,6 +500,12 @@ function togglePerfil() {
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
+
+        // Restaurar botón de avatar para perfil propio
+        const avatarBtn = document.getElementById('perfil-avatar-btn');
+        if (avatarBtn) {
+            avatarBtn.style.display = 'flex';
+        }
 
         // LLAMADA A LA FUNCIÓN EXPUESTA GLOBALMENTE
         window.actualizarEstadisticas(); 
@@ -1857,19 +1868,67 @@ async function verPerfilUsuario(userId) {
     try {
         const response = await apiRequest(`/api/artistas/perfil/${userId}`);
         if (response && response.success) {
-            // Aquí puedes implementar la lógica para mostrar el perfil del usuario
-            // Por ahora, mostraremos una alerta con la información básica
             const usuario = response.usuario;
-            alert(`Perfil de: ${usuario.nombre_artista}\nNombre real: ${usuario.nombre_real || 'No especificado'}\nCiudad: ${usuario.ciudad || 'No especificada'}\nBio: ${usuario.bio || 'No especificada'}`);
             
-            // TODO: Implementar la visualización completa del perfil
-            // Similar a como se muestra el perfil propio en la sección mi-cuenta
+            // Ocultar todas las secciones
+            const galeria = document.getElementById('galeria-publica');
+            const panel = document.getElementById('panel-artista');
+            const paginaBlanca = document.getElementById('pagina-blanca');
+            const miCuenta = document.getElementById('mi-cuenta');
+            const perfilUsuario = document.getElementById('perfil-usuario');
+            
+            if (galeria) galeria.classList.add('hidden');
+            if (panel) panel.classList.add('hidden');
+            if (paginaBlanca) paginaBlanca.classList.add('hidden');
+            if (miCuenta) miCuenta.classList.add('hidden');
+            
+            // Mostrar sección de perfil
+            if (perfilUsuario) perfilUsuario.classList.remove('hidden');
+            
+            // Poblar datos del perfil
+            const avatarImg = document.getElementById('perfil-avatar-seccion');
+            const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
+            const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
+            const ciudad = document.querySelector('.perfil-ciudad');
+            const avatarBtn = document.getElementById('perfil-avatar-btn');
+            
+            if (avatarImg) {
+                avatarImg.src = usuario.foto_perfil || 'iconos/avatar-default.svg';
+            }
+            if (nombreReal) {
+                nombreReal.textContent = usuario.nombre_real || '';
+            }
+            if (nombreArtista) {
+                nombreArtista.textContent = usuario.nombre_artista || '';
+            }
+            if (ciudad) {
+                ciudad.textContent = usuario.ciudad || '';
+            }
+            
+            // Ocultar botón de cambio de avatar (modo no editable)
+            if (avatarBtn) {
+                avatarBtn.style.display = 'none';
+            }
+            
+            // Poblar estadísticas si están disponibles
+            const statsCavents = document.getElementById('stats-cavents');
+            const statsProblogs = document.getElementById('stats-problogs');
+            const statsComcons = document.getElementById('stats-comcons');
+            
+            if (statsCavents) statsCavents.textContent = usuario.cavents || '0';
+            if (statsProblogs) statsProblogs.textContent = usuario.problogs || '0';
+            if (statsComcons) statsComcons.textContent = usuario.comcons || '0';
+            
         } else {
-            alert('Error al cargar el perfil del usuario');
+            alert('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
         }
     } catch (error) {
         console.error('Error al cargar perfil:', error);
-        alert('Error al cargar el perfil del usuario');
+        if (error.response && error.response.status === 500) {
+            alert('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
+        } else {
+            alert('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
+        }
     }
 }
 
