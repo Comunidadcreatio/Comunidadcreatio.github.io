@@ -494,6 +494,7 @@ function togglePerfil() {
     const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
     const perfilUsuario = document.getElementById('perfil-usuario');
+    const resultadosBusqueda = document.getElementById('resultados-busqueda');
     if (!galeria || !panel || !paginaBlanca || !perfilUsuario) return;
 
     actualizarPerfilUI();
@@ -504,6 +505,7 @@ function togglePerfil() {
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
+        if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
 
         // Restaurar botón de avatar para perfil propio
