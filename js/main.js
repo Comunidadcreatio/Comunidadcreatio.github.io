@@ -1817,58 +1817,51 @@ function setupEvents() {
 // MOSTRAR RESULTADOS DE BÚSQUEDA
 // ============================================
 function mostrarResultadosBusqueda(usuarios) {
-    // Crear modal de resultados
-    const modal = document.createElement('div');
-    modal.className = 'search-results-modal';
-    modal.innerHTML = `
-        <div class="search-results-content">
-            <div class="search-results-header">
-                <h3>Resultados de búsqueda</h3>
-                <button class="close-results" aria-label="Cerrar">✕</button>
+    // Ocultar todas las secciones
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    const resultadosBusqueda = document.getElementById('resultados-busqueda');
+
+    if (galeria) galeria.classList.add('hidden');
+    if (panel) panel.classList.add('hidden');
+    if (paginaBlanca) paginaBlanca.classList.add('hidden');
+    if (miCuenta) miCuenta.classList.add('hidden');
+    if (perfilUsuario) perfilUsuario.classList.add('hidden');
+
+    // Mostrar sección de resultados de búsqueda
+    if (resultadosBusqueda) resultadosBusqueda.classList.remove('hidden');
+
+    // Llenar la lista de resultados
+    const resultadosLista = document.getElementById('resultados-busqueda-lista');
+    if (resultadosLista) {
+        resultadosLista.innerHTML = usuarios.map(usuario => `
+            <div class="resultado-item" data-user-id="${usuario.id}">
+                <div class="resultado-avatar">
+                    ${usuario.foto_perfil
+                        ? `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}">`
+                        : `<div class="avatar-placeholder">${usuario.nombre_artista.charAt(0).toUpperCase()}</div>`
+                    }
+                </div>
+                <div class="resultado-info">
+                    <div class="resultado-nombre">${usuario.nombre_artista}</div>
+                    <div class="resultado-nombre-real">${usuario.nombre_real || ''}</div>
+                    ${usuario.ciudad ? `<div class="resultado-ciudad">${usuario.ciudad}</div>` : ''}
+                </div>
             </div>
-            <div class="search-results-list">
-                ${usuarios.map(usuario => `
-                    <div class="search-result-item" data-user-id="${usuario.id}">
-                        <div class="user-avatar">
-                            ${usuario.foto_perfil 
-                                ? `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}">`
-                                : `<div class="avatar-placeholder">${usuario.nombre_artista.charAt(0).toUpperCase()}</div>`
-                            }
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">${usuario.nombre_artista}</div>
-                            <div class="user-real-name">${usuario.nombre_real || ''}</div>
-                            ${usuario.ciudad ? `<div class="user-city">${usuario.ciudad}</div>` : ''}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
+        `).join('');
 
-    document.body.appendChild(modal);
-
-    // Event listeners
-    const closeBtn = modal.querySelector('.close-results');
-    closeBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-    });
-
-    // Cerrar al hacer clic fuera del modal
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
-        }
-    });
-
-    // Al hacer clic en un usuario, mostrar su perfil
-    modal.querySelectorAll('.search-result-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const userId = item.dataset.userId;
-            verPerfilUsuario(userId);
-            document.body.removeChild(modal);
+        // Event listener para ver perfil de usuario
+        const resultadoItems = resultadosLista.querySelectorAll('.resultado-item');
+        resultadoItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const userId = item.getAttribute('data-user-id');
+                verPerfilUsuario(userId);
+            });
         });
-    });
+    }
 }
 
 // ============================================
