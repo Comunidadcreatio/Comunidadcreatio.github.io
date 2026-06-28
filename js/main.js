@@ -1879,12 +1879,14 @@ async function verPerfilUsuario(userId) {
             const paginaBlanca = document.getElementById('pagina-blanca');
             const miCuenta = document.getElementById('mi-cuenta');
             const perfilUsuario = document.getElementById('perfil-usuario');
-            
+            const resultadosBusqueda = document.getElementById('resultados-busqueda');
+
             if (galeria) galeria.classList.add('hidden');
             if (panel) panel.classList.add('hidden');
             if (paginaBlanca) paginaBlanca.classList.add('hidden');
             if (miCuenta) miCuenta.classList.add('hidden');
-            
+            if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
+
             // Mostrar sección de perfil
             if (perfilUsuario) perfilUsuario.classList.remove('hidden');
             
