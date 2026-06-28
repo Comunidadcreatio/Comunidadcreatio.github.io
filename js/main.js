@@ -32,6 +32,8 @@ let desktopMainMenu = null;
 let mobileMainMenu = null;
 let clickOutsideHandlerLogout = null;
 let clickOutsideHandlerMainMenu = null;
+let headerConfigOutsideHandler = null;
+let headerLogoutOutsideHandler = null;
 
 // Control de estado del menú móvil
 let mobileOutsideClickListener = null;
@@ -233,6 +235,18 @@ function updateCerrarTodasSesionesButtonState() {
             desktopLogoutAllBtn.classList.remove('enabled');
         }
     }
+    const headerAllBtn = document.getElementById('header-logout-all');
+    if (headerAllBtn) {
+        if (isEnabled) {
+            headerAllBtn.classList.remove('disabled');
+            headerAllBtn.classList.add('enabled');
+            headerAllBtn.style.color = '#ffffff';
+        } else {
+            headerAllBtn.classList.add('disabled');
+            headerAllBtn.classList.remove('enabled');
+            headerAllBtn.style.color = '#a0a0a0';
+        }
+    }
 }
 
 async function closeAllSessions() {
@@ -305,6 +319,19 @@ function cerrarDesktopMainMenu() {
     }
 }
 
+function cerrarHeaderPopover(panelElement) {
+    if (!panelElement) return;
+    panelElement.classList.add('hidden');
+    if (panelElement.id === 'header-config-menu' && headerConfigOutsideHandler) {
+        document.removeEventListener('click', headerConfigOutsideHandler);
+        headerConfigOutsideHandler = null;
+    }
+    if (panelElement.id === 'header-logout-menu' && headerLogoutOutsideHandler) {
+        document.removeEventListener('click', headerLogoutOutsideHandler);
+        headerLogoutOutsideHandler = null;
+    }
+}
+
 function cerrarTodosLosPaneles() {
     // Cerrar paneles de escritorio
     const desktopLogoutModal = document.getElementById('desktop-logout-options');
@@ -327,6 +354,33 @@ function cerrarTodosLosPaneles() {
     if (mobileMainMenu && !mobileMainMenu.classList.contains('hidden')) {
         cerrarMenuMovil();
     }
+}
+
+function positionHeaderPopover(triggerElement, panelElement) {
+    if (!panelElement) return;
+    const rect = triggerElement.getBoundingClientRect();
+    const panelDiv = panelElement.querySelector('.header-popover-panel');
+    if (!panelDiv) return;
+
+    const panelRect = panelDiv.getBoundingClientRect();
+    const margin = 8;
+    const iconCenterX = rect.left + rect.width / 2;
+
+    // Posicionar el panel DEBAJO del icono del header
+    const top = rect.bottom + 12;
+
+    // Centrar horizontalmente sobre el icono, manteniendo aire con los bordes
+    let left = iconCenterX - panelRect.width / 2;
+    const maxLeft = window.innerWidth - panelRect.width - margin;
+    if (left > maxLeft) left = maxLeft;
+    if (left < margin) left = margin;
+
+    panelElement.style.top = `${top}px`;
+    panelElement.style.left = `${left}px`;
+
+    // Apuntar la cola exactamente bajo el icono
+    const tailX = iconCenterX - left;
+    panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
 
 function positionDesktopPanel(triggerElement, panelElement) {
@@ -480,7 +534,7 @@ function toggleMiCuenta() {
             avatarBtn.style.cursor = 'pointer';
         }
         if (avatarOverlay) {
-            avatarOverlay.style.display = 'block';
+            avatarOverlay.style.display = 'flex';
         }
     } else {
         miCuenta.classList.add('hidden');
@@ -497,9 +551,13 @@ function togglePerfil() {
     const resultadosBusqueda = document.getElementById('resultados-busqueda');
     if (!galeria || !panel || !paginaBlanca || !perfilUsuario) return;
 
-    actualizarPerfilUI();
+    // Detectar si actualmente se está mostrando el perfil de otro usuario
+    const viendoPerfilExterno = perfilUsuario.dataset.viewing === 'external';
 
-    if (perfilUsuario.classList.contains('hidden')) {
+    if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
+        // Mostrar perfil propio con datos del usuario autenticado
+        actualizarPerfilUI();
+        perfilUsuario.dataset.viewing = 'own';
         perfilUsuario.classList.remove('hidden');
         galeria.classList.add('hidden');
         panel.classList.add('hidden');
@@ -516,7 +574,7 @@ function togglePerfil() {
             avatarBtn.style.cursor = 'pointer';
         }
         if (avatarOverlay) {
-            avatarOverlay.style.display = 'block';
+            avatarOverlay.style.display = 'flex';
         }
 
         // LLAMADA A LA FUNCIÓN EXPUESTA GLOBALMENTE
@@ -935,11 +993,50 @@ async function verificarSesionBackend() {
 // CONFIGURACIÓN DE EVENTOS (setupEvents)
 // ============================================
 function setupEvents() {
-    // ----- Botón de logout del header -----
+    // ----- Botón de logout del header (bocadillo con opciones) -----
     const logoutHeaderBtn = document.getElementById('btn-logout-header');
     if (logoutHeaderBtn) {
-        logoutHeaderBtn.addEventListener('click', () => {
-            ejecutarLogout();
+        const headerLogoutMenu = document.getElementById('header-logout-menu');
+        const headerLogoutSingle = document.getElementById('header-logout-single');
+        const headerLogoutAll = document.getElementById('header-logout-all');
+
+        if (headerLogoutSingle) {
+            headerLogoutSingle.addEventListener('click', async () => {
+                cerrarHeaderPopover(headerLogoutMenu);
+                await ejecutarLogout();
+            });
+        }
+        if (headerLogoutAll) {
+            headerLogoutAll.addEventListener('click', () => {
+                closeAllSessions();
+                cerrarHeaderPopover(headerLogoutMenu);
+            });
+        }
+
+        logoutHeaderBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!headerLogoutMenu) {
+                ejecutarLogout();
+                return;
+            }
+            if (headerLogoutMenu.classList.contains('hidden')) {
+                cerrarTodosLosPaneles();
+                cerrarHeaderPopover(document.getElementById('header-config-menu'));
+                updateCerrarTodasSesionesButtonState();
+                headerLogoutMenu.classList.remove('hidden');
+                positionHeaderPopover(logoutHeaderBtn, headerLogoutMenu);
+                if (headerLogoutOutsideHandler) {
+                    document.removeEventListener('click', headerLogoutOutsideHandler);
+                }
+                headerLogoutOutsideHandler = (event) => {
+                    if (!headerLogoutMenu.contains(event.target) && event.target !== logoutHeaderBtn && !logoutHeaderBtn.contains(event.target)) {
+                        cerrarHeaderPopover(headerLogoutMenu);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', headerLogoutOutsideHandler), 0);
+            } else {
+                cerrarHeaderPopover(headerLogoutMenu);
+            }
         });
     }
 
@@ -1115,12 +1212,39 @@ function setupEvents() {
         console.error("No se encontraron los elementos del buscador");
     }
 
-    // ----- Botón de configuración -----
+    // ----- Botón de configuración (bocadillo con "Mi cuenta") -----
     const configBtn = document.getElementById('btn-configuracion');
     if (configBtn) {
-        configBtn.addEventListener('click', () => {
-            // Por ahora, mostrar un mensaje de que la configuración está en desarrollo
-            alert('Configuración en desarrollo');
+        const configMenu = document.getElementById('header-config-menu');
+        const configMiCuenta = document.getElementById('config-mi-cuenta');
+
+        if (configMiCuenta) {
+            configMiCuenta.addEventListener('click', () => {
+                cerrarHeaderPopover(configMenu);
+                toggleMiCuenta();
+            });
+        }
+
+        configBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!configMenu) return;
+            if (configMenu.classList.contains('hidden')) {
+                cerrarTodosLosPaneles();
+                cerrarHeaderPopover(document.getElementById('header-logout-menu'));
+                configMenu.classList.remove('hidden');
+                positionHeaderPopover(configBtn, configMenu);
+                if (headerConfigOutsideHandler) {
+                    document.removeEventListener('click', headerConfigOutsideHandler);
+                }
+                headerConfigOutsideHandler = (event) => {
+                    if (!configMenu.contains(event.target) && event.target !== configBtn && !configBtn.contains(event.target)) {
+                        cerrarHeaderPopover(configMenu);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', headerConfigOutsideHandler), 0);
+            } else {
+                cerrarHeaderPopover(configMenu);
+            }
         });
     }
 
@@ -1889,8 +2013,11 @@ async function verPerfilUsuario(userId) {
             if (miCuenta) miCuenta.classList.add('hidden');
             if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
 
-            // Mostrar sección de perfil
-            if (perfilUsuario) perfilUsuario.classList.remove('hidden');
+            // Mostrar sección de perfil y marcarla como perfil externo
+            if (perfilUsuario) {
+                perfilUsuario.classList.remove('hidden');
+                perfilUsuario.dataset.viewing = 'external';
+            }
             
             // Poblar datos del perfil
             const avatarImg = document.getElementById('perfil-avatar-seccion');

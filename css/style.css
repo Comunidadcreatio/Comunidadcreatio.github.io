@@ -224,6 +224,42 @@ input, select, textarea {
     filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
 }
 
+/* ==============================================
+   BOCADILLOS DEL HEADER (engranaje y cerrar sesión)
+   Cola apuntando hacia ARRIBA (aparecen debajo del icono)
+   ============================================== */
+.header-popover {
+    position: fixed;
+    z-index: 100001;
+    display: none;
+}
+.header-popover:not(.hidden) {
+    display: block;
+}
+.header-popover-panel {
+    position: absolute;
+    background: var(--color-black);
+    width: 200px;
+    max-width: 80vw;
+    border-radius: 14px;
+    padding: 6px 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    text-align: center;
+}
+.header-popover-panel::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: var(--tail-x, 50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--color-black);
+    filter: drop-shadow(2px -2px 2px rgba(0,0,0,0.15));
+}
+
 /* Opciones de menú */
 .logout-option {
     color: var(--color-white);

@@ -44,10 +44,6 @@
             <img src="iconos/Menu.svg" alt="Menú" class="toggle-icon">
             <span class="toggle-label">Menú</span>
         </button>
-        <button id="btn-logout-sidebar" aria-label="Cerrar sesión">
-            <img src="iconos/Cerrar sesion.svg" alt="Cerrar Sesión" class="toggle-icon">
-            <span class="toggle-label">Cerrar Sesión</span>
-        </button>
     </div>
 
     <input type="file" id="input-foto-perfil" accept="image/*" hidden>
@@ -74,8 +70,22 @@
             <button id="menu-galeria" class="logout-option">Galería Pública</button>
             <div class="divider"></div>
             <button id="menu-panel" class="logout-option">Registro de Obra</button>
+        </div>
+    </div>
+
+    <!-- Bocadillo de configuración (engranaje, header superior izquierda) -->
+    <div id="header-config-menu" class="header-popover hidden">
+        <div class="header-popover-panel">
+            <button id="config-mi-cuenta" class="logout-option">Mi cuenta</button>
+        </div>
+    </div>
+
+    <!-- Bocadillo de cerrar sesión (header superior derecha) -->
+    <div id="header-logout-menu" class="header-popover hidden">
+        <div class="header-popover-panel">
+            <button id="header-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
             <div class="divider"></div>
-            <button id="menu-mi-cuenta" class="logout-option">Mi cuenta</button>
+            <button id="header-logout-single" class="logout-option">Cerrar Sesión</button>
         </div>
     </div>
 
@@ -84,8 +94,6 @@
             <button id="mobile-menu-galeria" class="logout-option">Galería Pública</button>
             <div class="divider"></div>
             <button id="mobile-menu-panel" class="logout-option">Registro de Obra</button>
-            <div class="divider"></div>
-            <button id="mobile-menu-mi-cuenta" class="logout-option">Mi cuenta</button>
         </div>
     </div>
 
