@@ -474,8 +474,13 @@ function toggleMiCuenta() {
         }
         // Restaurar botón de avatar para perfil propio
         const avatarBtn = document.getElementById('perfil-avatar-btn');
+        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
         if (avatarBtn) {
-            avatarBtn.style.display = 'flex';
+            avatarBtn.style.pointerEvents = 'auto';
+            avatarBtn.style.cursor = 'pointer';
+        }
+        if (avatarOverlay) {
+            avatarOverlay.style.display = 'block';
         }
     } else {
         miCuenta.classList.add('hidden');
@@ -503,8 +508,13 @@ function togglePerfil() {
 
         // Restaurar botón de avatar para perfil propio
         const avatarBtn = document.getElementById('perfil-avatar-btn');
+        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
         if (avatarBtn) {
-            avatarBtn.style.display = 'flex';
+            avatarBtn.style.pointerEvents = 'auto';
+            avatarBtn.style.cursor = 'pointer';
+        }
+        if (avatarOverlay) {
+            avatarOverlay.style.display = 'block';
         }
 
         // LLAMADA A LA FUNCIÓN EXPUESTA GLOBALMENTE
@@ -1905,9 +1915,15 @@ async function verPerfilUsuario(userId) {
                 ciudad.textContent = usuario.ciudad || '';
             }
             
-            // Ocultar botón de cambio de avatar (modo no editable)
+            // Ocultar overlay de cambio de avatar (modo no editable)
+            const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
+            if (avatarOverlay) {
+                avatarOverlay.style.display = 'none';
+            }
+            // Deshabilitar click en el botón de avatar
             if (avatarBtn) {
-                avatarBtn.style.display = 'none';
+                avatarBtn.style.pointerEvents = 'none';
+                avatarBtn.style.cursor = 'default';
             }
             
             // Poblar estadísticas si están disponibles
