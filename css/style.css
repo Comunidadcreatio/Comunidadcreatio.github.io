@@ -146,11 +146,11 @@
 }
 
 [data-theme="dark"] .header-icon:hover {
-    background-color: #262626;
+    background-color: #1a1a1a;
 }
 
 [data-theme="dark"] .search-input-wrapper input {
-    background-color: #262626;
+    background-color: #121212;
     border-color: #e5e5e5;
     color: var(--color-ink);
 }
@@ -169,13 +169,13 @@
 }
 
 [data-theme="dark"] .search-result-item:hover {
-    background-color: #262626;
+    background-color: #1a1a1a;
 }
 
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-    background-color: #262626;
+    background-color: #121212;
     border-color: #e5e5e5;
     color: var(--color-ink);
 }
@@ -199,7 +199,7 @@
 }
 
 [data-theme="dark"] .logout-option:hover {
-    background-color: #262626;
+    background-color: #1a1a1a;
 }
 
 /* ==============================================

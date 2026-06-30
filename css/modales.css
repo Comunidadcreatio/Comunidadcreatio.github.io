@@ -390,3 +390,64 @@
     margin: 0;
     min-height: 0;
 }
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] .modal-content {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .modal-content h2 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content .cerrar-modal {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content .cerrar-modal:hover {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .modal-content input[type="text"],
+[data-theme="dark"] .modal-content input[type="email"],
+[data-theme="dark"] .modal-content input[type="password"],
+[data-theme="dark"] .modal-content select,
+[data-theme="dark"] .modal-content button:not(.cerrar-modal) {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content input::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .modal-content button:not(.cerrar-modal) {
+    background-color: #121212;
+}
+
+[data-theme="dark"] .modal-content button:not(.cerrar-modal):hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .modal-content button[type="submit"] {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] #modal-confirmar-eliminacion .modal-content > p {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password::placeholder {
+    color: var(--color-gray-400);
+}

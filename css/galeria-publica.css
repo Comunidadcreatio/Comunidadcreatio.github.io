@@ -69,3 +69,33 @@
     }
 }
 
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] .obra-card {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .obra-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .obra-card h3 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-card p {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-card button {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-card button:hover {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}

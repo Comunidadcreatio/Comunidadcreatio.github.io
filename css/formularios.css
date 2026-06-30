@@ -846,12 +846,135 @@ form,
         width: 80px;
         height: 80px;
     }
-    
-    .modal-content {
-        padding: 16px 12px !important;
-    }
-    
-    .modal-content h2 {
-        font-size: 18px;
-    }
+}
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] #formulario-obra {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] #formulario-obra h2,
+[data-theme="dark"] #formulario-obra h3 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #formulario-obra label {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #formulario-obra input[type="text"],
+[data-theme="dark"] #formulario-obra input[type="number"],
+[data-theme="dark"] #formulario-obra input[type="email"],
+[data-theme="dark"] #formulario-obra input[type="password"],
+[data-theme="dark"] #formulario-obra select,
+[data-theme="dark"] #formulario-obra textarea {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #formulario-obra input::placeholder,
+[data-theme="dark"] #formulario-obra textarea::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] #formulario-obra button {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #formulario-obra button[type="submit"] {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .modal-content h2 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content label {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content input[type="text"],
+[data-theme="dark"] .modal-content input[type="email"],
+[data-theme="dark"] .modal-content input[type="password"],
+[data-theme="dark"] .modal-content select,
+[data-theme="dark"] .modal-content textarea {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content input::placeholder,
+[data-theme="dark"] .modal-content textarea::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .modal-content button {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .modal-content button[type="submit"] {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] #modal-login button[type="submit"] {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] #modal-login button[type="submit"]:hover {
+    background-color: var(--color-ink-light);
+}
+
+[data-theme="dark"] .step-indicator {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .step-number {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .step-number.active {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .step-navigation button {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .step-navigation button:hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .step-navigation button[type="submit"] {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .recuadro-imagen {
+    border-color: #e5e5e5;
+    background-color: #121212;
+}
+
+[data-theme="dark"] .form-section {
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .form-section h3 {
+    color: var(--color-ink);
 }

@@ -896,8 +896,140 @@
     .perfil-nombre-real-seccion {
         font-size: 0.7rem;
     }
+}
 
-    .perfil-nombre-artista-seccion {
-        font-size: 0.6rem;
-    }
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] #panel-artista h2 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .filter-controls input[type="text"],
+[data-theme="dark"] .filter-controls select {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .filter-controls input[type="text"]::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .filter-controls #btn-aplicar-filtros {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] #panel-artista .pagination-btn {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .pagination-btn:hover:not(:disabled) {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] #page-info {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #tabla-obras-container {
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] #tabla-obras-container table {
+    background-color: #121212;
+}
+
+[data-theme="dark"] #tabla-obras-container th,
+[data-theme="dark"] #tabla-obras-container td {
+    border-bottom-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #tabla-obras-container th {
+    background-color: #121212;
+}
+
+[data-theme="dark"] #tabla-obras-container td img {
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .btn-accion {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .btn-accion:hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .cuenta-item {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .cuenta-item-label {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .cuenta-item-valor {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .btn-cuenta-secundario {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .btn-cuenta-secundario:hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .cuenta-form {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .cuenta-form input,
+[data-theme="dark"] .cuenta-form select {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .cuenta-form input::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .btn-cuenta-primario {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .btn-cuenta-cancelar {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #perfil-usuario {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .perfil-seccion-info h3 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .perfil-seccion-info p {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .perfil-nombre-real-seccion {
+    color: var(--color-gray-400);
 }

@@ -747,6 +747,61 @@ legend {
     .nav-btn,
     .secondary-btn {
         padding: 10px 16px;
-        font-size: 13px;
     }
+}
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] body {
+    background-color: #121212;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .auth-section h1 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .auth-section p {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .form-group label {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .form-group input::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] button[type="submit"],
+[data-theme="dark"] .nav-btn {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] button[type="submit"]:hover,
+[data-theme="dark"] .nav-btn:hover {
+    background-color: var(--color-ink-light);
+}
+
+[data-theme="dark"] .secondary-btn {
+    background-color: #121212;
+    border-color: #e5e5e5;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .secondary-btn:hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .auth-logo {
+    filter: brightness(0) invert(1);
 }

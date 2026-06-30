@@ -164,3 +164,54 @@
         font-size: 12px;
     }
 }
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] .search-results-content {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .search-results-header {
+    border-bottom-color: #e5e5e5;
+}
+
+[data-theme="dark"] .search-results-header h3 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .close-results {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .close-results:hover {
+    background-color: #1a1a1a;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .search-result-item:hover {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .user-avatar {
+    background-color: #121212;
+    border-color: #e5e5e5;
+}
+
+[data-theme="dark"] .avatar-placeholder {
+    color: var(--color-ink);
+    background-color: #121212;
+}
+
+[data-theme="dark"] .user-name {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .user-real-name {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .user-city {
+    color: var(--color-gray-400);
+}
