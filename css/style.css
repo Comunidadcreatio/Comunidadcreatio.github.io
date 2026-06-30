@@ -85,6 +85,52 @@
 }
 
 /* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] {
+    /* === PALETA MODO OSCURO === */
+    --color-ink: #e5e5e5;           /* Blanco suave para texto principal */
+    --color-ink-light: #d4d4d4;     /* Blanco suave para hover */
+    --color-white: #1a1a1a;         /* Fondo oscuro */
+    --color-bg: #121212;            /* Fondo principal oscuro */
+
+    /* Grises neutros invertidos */
+    --color-gray-50:  #262626;
+    --color-gray-100: #404040;
+    --color-gray-200: #525252;
+    --color-gray-300: #737373;
+    --color-gray-400: #a3a3a3;
+    --color-gray-500: #d4d4d4;
+    --color-gray-600: #e5e5e5;
+    --color-gray-700: #f5f5f5;
+    --color-gray-800: #fafafa;
+
+    /* Semánticos — ajustados para modo oscuro */
+    --color-success: #22c55e;
+    --color-success-dark: #16a34a;
+    --color-danger: #ef4444;
+    --color-danger-dark: #dc2626;
+    --color-warning: #f59e0b;
+    --color-warning-dark: #d97706;
+
+    /* Aliases de compatibilidad */
+    --color-primary: var(--color-ink);
+    --color-primary-dark: var(--color-ink-light);
+    --color-black: #e5e5e5;
+    --color-border: var(--color-gray-600);
+    --color-text: var(--color-ink);
+    --color-text-muted: var(--color-gray-400);
+    --color-gray-light: var(--color-gray-100);
+    --color-gray-medium: var(--color-gray-400);
+    --color-gray-dark: var(--color-gray-700);
+
+    /* Sombras sutiles para modo oscuro */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+/* ==============================================
    TIPOGRAFÍA GLOBAL (Nunito)
    ============================================== */
 body, input, button, select, textarea, .filter-controls input, .filter-controls select, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
