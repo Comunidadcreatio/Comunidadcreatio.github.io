@@ -205,7 +205,19 @@
 }
 
 [data-theme="dark"] .logout-option.disabled {
-    color: #888888;
+    color: #666666 !important;
+}
+
+[data-theme="dark"] #header-logout-all.logout-option.disabled {
+    color: #666666 !important;
+}
+
+[data-theme="dark"] #desktop-logout-all.logout-option.disabled {
+    color: #666666 !important;
+}
+
+[data-theme="dark"] #mobile-logout-all.logout-option.disabled {
+    color: #666666 !important;
 }
 
 [data-theme="dark"] .logout-option.enabled {
