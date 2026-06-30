@@ -160,16 +160,18 @@
 }
 
 [data-theme="dark"] .search-dropdown {
-    background-color: #121212;
+    background-color: #ffffff;
     border-color: #e5e5e5;
 }
 
 [data-theme="dark"] .search-result-item {
     border-bottom-color: #e5e5e5;
+    color: #1a1a1a;
 }
 
 [data-theme="dark"] .search-result-item:hover {
-    background-color: #1a1a1a;
+    color: #000000;
+    background-color: transparent;
 }
 
 [data-theme="dark"] input,
@@ -190,16 +192,34 @@
 }
 
 [data-theme="dark"] .header-popover-panel {
-    background-color: #121212;
+    background-color: #ffffff;
     border-color: #e5e5e5;
 }
 
+[data-theme="dark"] .header-popover-panel::after {
+    border-bottom-color: #ffffff;
+}
+
 [data-theme="dark"] .logout-option {
-    color: var(--color-ink);
+    color: #1a1a1a;
+}
+
+[data-theme="dark"] .logout-option.disabled {
+    color: #888888;
+}
+
+[data-theme="dark"] .logout-option.enabled {
+    color: #1a1a1a;
+}
+
+[data-theme="dark"] #desktop-logout-single.logout-option,
+[data-theme="dark"] #mobile-logout-single.logout-option {
+    color: #1a1a1a;
 }
 
 [data-theme="dark"] .logout-option:hover {
-    background-color: #1a1a1a;
+    color: #000000;
+    background-color: transparent;
 }
 
 /* ==============================================
