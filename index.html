@@ -37,12 +37,26 @@
 <body>
 
     <div id="toggle-panel" class="hidden" role="navigation" aria-label="Menú principal">
+        <div class="bottom-bar-left">
+            <button id="btn-galeria-sidebar" class="toggle-nav-btn" aria-label="Galería pública">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span class="toggle-label">Galería</span>
+            </button>
+            <button id="btn-registro-sidebar" class="toggle-nav-btn" aria-label="Registro de obra">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span class="toggle-label">Registro</span>
+            </button>
+        </div>
         <button id="btn-perfil-sidebar" class="btn-perfil-circular" aria-label="Perfil de usuario" aria-expanded="false">
             <img id="perfil-avatar-mini" class="perfil-avatar-img" src="iconos/avatar-default.svg" alt="Foto de perfil">
-        </button>
-        <button id="btn-menu-principal" aria-label="Abrir menú principal" aria-expanded="false">
-            <img src="iconos/Menu.svg" alt="Menú" class="toggle-icon">
-            <span class="toggle-label">Menú</span>
         </button>
     </div>
 
@@ -65,14 +79,6 @@
         </div>
     </div>
 
-    <div id="desktop-main-menu" class="desktop-logout-modal hidden">
-        <div class="desktop-logout-panel speech-bubble">
-            <button id="menu-galeria" class="logout-option">Galería Pública</button>
-            <div class="divider"></div>
-            <button id="menu-panel" class="logout-option">Registro de Obra</button>
-        </div>
-    </div>
-
     <!-- Bocadillo de configuración (engranaje, header superior izquierda) -->
     <div id="header-config-menu" class="header-popover hidden">
         <div class="header-popover-panel">
@@ -89,26 +95,10 @@
         </div>
     </div>
 
-    <div id="mobile-main-menu" class="mobile-logout-modal hidden">
-        <div class="mobile-logout-panel speech-bubble">
-            <button id="mobile-menu-galeria" class="logout-option">Galería Pública</button>
-            <div class="divider"></div>
-            <button id="mobile-menu-panel" class="logout-option">Registro de Obra</button>
-        </div>
-    </div>
-
     <div class="app-container">
 
     <!-- HEADER -->
     <header id="main-header" role="banner">
-        <!-- Icono de configuración (izquierda) -->
-        <button id="btn-configuracion" class="header-icon" aria-label="Configuración">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-        </button>
-
        <picture>
            <source media="(max-width: 768px)" srcset="iconos/Logo-temporal2.svg">
     <!-- Versión para pantallas de hasta 768px (móvil) -->
@@ -131,6 +121,13 @@
         <div id="search-results-dropdown" class="search-dropdown hidden"></div>
     </div>
 
+        <!-- Icono de configuración (junto al de cerrar sesión) -->
+        <button id="btn-configuracion" class="header-icon" aria-label="Configuración">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
         <!-- Icono de cerrar sesión (derecha) -->
         <button id="btn-logout-header" class="header-icon" aria-label="Cerrar sesión">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
