@@ -130,11 +130,89 @@
     --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
 }
 
+/* Ajustes específicos para modo oscuro */
+[data-theme="dark"] #main-header {
+    background-color: #1a1a1a;
+    border-bottom-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] #toggle-panel {
+    background-color: #1a1a1a;
+    border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .header-icon {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .header-icon:hover {
+    background-color: var(--color-gray-200);
+}
+
+[data-theme="dark"] .search-input-wrapper input {
+    background-color: var(--color-gray-100);
+    border-color: var(--color-gray-600);
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .search-input-wrapper input::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .search-dropdown {
+    background-color: #1a1a1a;
+    border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .search-result-item {
+    border-bottom-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .search-result-item:hover {
+    background-color: var(--color-gray-200);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background-color: var(--color-gray-100);
+    border-color: var(--color-gray-600);
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] button {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .header-popover-panel {
+    background-color: #1a1a1a;
+    border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .logout-option {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .logout-option:hover {
+    background-color: var(--color-gray-200);
+}
+
 /* ==============================================
    TIPOGRAFÍA GLOBAL (Nunito)
    ============================================== */
 body, input, button, select, textarea, .filter-controls input, .filter-controls select, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
     font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6, #brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
