@@ -546,7 +546,7 @@ input, select, textarea {
     #btn-perfil-sidebar {
         position: fixed;
         left: 50%;
-        bottom: 6px;
+        bottom: 15px;
         transform: translateX(-50%);
         z-index: 3000;
         width: 70px;
