@@ -26,7 +26,7 @@
     display: block;
     width: auto;          /* Mantiene la proporción */
     max-width: 25px;     /* Ancho máximo para evitar desbordamiento */
-    max-height: 25x;
+    max-height: 25px;
     height: 25px;
     object-fit: contain;
     object-position: center;

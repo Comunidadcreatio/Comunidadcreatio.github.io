@@ -30,6 +30,14 @@
     border-left: 4px solid var(--color-ink, #1a1a1a);
 }
 
+/* En modo oscuro, las notificaciones necesitan un fondo más claro
+   que el fondo general para destacar visualmente */
+[data-theme="dark"] .notification {
+    background: #1e1e1e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid #333;
+}
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);

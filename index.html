@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creatio</title>
     <meta name="description" content="Conecta con el arte en el Táchira. Descubre artistas locales y sus obras. Invitamos a todos los creadores del estado a unirse a nuestra comunidad, participar en concursos y ganar grandes premios. ¡Fortalezcamos juntos el talento tachirense!">
-    <meta name="keywords" content="galería de arte, arte contemporáneo, artistas venezolanos, creatio, exhibiciones, colección de arte, concursos, premios
+    <meta name="keywords" content="galería de arte, arte contemporáneo, artistas venezolanos, creatio, exhibiciones, colección de arte, concursos, premios">
     <meta name="author" content="Creatio">
     <meta name="robots" content="index, follow">
     
@@ -201,7 +201,7 @@
 
             <!-- Controles de búsqueda y filtros -->
             <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
-                <input type="text" id="search-input" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
+                <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
                 <label for="sort-select" class="visually-hidden">Ordenar por</label>
                 <select id="sort-select" aria-label="Criterio de ordenamiento">
                     <option value="id">Ordenar por ID</option>
@@ -255,7 +255,7 @@
             <!-- Formulario para agregar/editar obra -->
             <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
                 <h3 id="form-obra-title">Agregar / Editar Obra</h3>
-                <form id="obra-form" aria-label="Formulario de obra">
+                <form id="obra-form" aria-label="Formulario de obra" novalidate>
                     <!-- 1. Título -->
                     <div class="form-group">
                         <label for="input-titulo">Título</label>
@@ -477,7 +477,7 @@
                             <label for="input-imagen-0">
                                 <span id="placeholder-0" class="placeholder-text">+<br>Principal</span>
                                 <img id="preview-0" src="" class="preview-img" alt="Vista previa imagen principal">
-                                <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal" required>
+                                <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal">
                                 <button type="button" class="btn-eliminar-imagen" data-index="0" aria-label="Eliminar imagen principal">✕</button>
                             </label>
                         </div>
@@ -669,10 +669,7 @@
         </div>
     </div>
 
-    <!-- JS DE NOTIFICACIONES -->
-    <script src="js/notificaciones.js" type="module"></script>
-    
-    <!-- JS PRINCIPAL (type="module") -->
+    <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/main.js?v=20250623" type="module"></script>
 </body>
 </html>

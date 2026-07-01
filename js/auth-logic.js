@@ -356,6 +356,14 @@ function cargarSelectoresFecha() {
 // ============================================
 // MANEJO DE PASOS DEL REGISTRO
 // ============================================
+
+function paisChangeHandler() {
+    const paisSelect = document.getElementById('reg-pais');
+    if (paisSelect) {
+        poblarCiudades(paisSelect.value);
+    }
+}
+
 function showStep(step) {
     document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
     const target = document.querySelector(`.step[data-step="${step}"]`);
@@ -397,13 +405,6 @@ function showStep(step) {
                 }
             }
         }
-    }
-}
-
-function paisChangeHandler() {
-    const paisSelect = document.getElementById('reg-pais');
-    if (paisSelect) {
-        poblarCiudades(paisSelect.value);
     }
 }
 

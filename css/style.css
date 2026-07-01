@@ -234,6 +234,35 @@
     background-color: transparent;
 }
 
+/* Modo oscuro para bocadillos de escritorio y móvil */
+[data-theme="dark"] .desktop-logout-panel.speech-bubble {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+}
+
+[data-theme="dark"] .desktop-logout-panel.speech-bubble::after {
+    border-top-color: #ffffff;
+}
+
+[data-theme="dark"] .mobile-logout-panel.speech-bubble {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+}
+
+[data-theme="dark"] .mobile-logout-panel.speech-bubble::after {
+    border-top-color: #ffffff;
+}
+
+[data-theme="dark"] .desktop-logout-panel .logout-option.enabled,
+[data-theme="dark"] .mobile-logout-panel .logout-option.enabled {
+    color: #1a1a1a;
+}
+
+[data-theme="dark"] .desktop-logout-panel .logout-option.disabled,
+[data-theme="dark"] .mobile-logout-panel .logout-option.disabled {
+    color: #666666 !important;
+}
+
 /* ==============================================
    TIPOGRAFÍA GLOBAL (Nunito)
    ============================================== */
@@ -518,21 +547,6 @@ input, select, textarea {
         max-width: 100%;
     }
     
-    /* Barra lateral fija a la izquierda */
-    @media (min-width: 769px) {
-    .app-container {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        width: auto;
-    }
-    main {
-        flex: 1;
-        padding: 20px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
     /* Barra inferior (en lugar de lateral) */
     #toggle-panel {
         position: fixed;
@@ -646,7 +660,7 @@ input, select, textarea {
         display: none;
     }
 
-        /* Contenedor del panel (el que pasas como panelElement) */
+    /* Contenedor del panel (el que pasas como panelElement) */
     .desktop-panel-container {
         position: fixed;   /* ya lo forzamos con JS, pero es bueno tenerlo en CSS también */
         z-index: 2000;     /* por encima de la barra (z-index: 1000) */
@@ -657,7 +671,6 @@ input, select, textarea {
         pointer-events: auto;
         /* tus estilos de fondo, sombra, borde, etc. */
     }
-}
 }
 
 /* 3. Responsive - Móviles (≤ 768px) */

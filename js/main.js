@@ -216,11 +216,9 @@ function updateCerrarTodasSesionesButtonState() {
         if (isEnabled) {
             mobileAllBtn.classList.remove('disabled');
             mobileAllBtn.classList.add('enabled');
-            mobileAllBtn.style.color = '#ffffff';
         } else {
             mobileAllBtn.classList.add('disabled');
             mobileAllBtn.classList.remove('enabled');
-            mobileAllBtn.style.color = '#a0a0a0';
         }
     }
     if (desktopLogoutAllBtn) {
@@ -237,11 +235,9 @@ function updateCerrarTodasSesionesButtonState() {
         if (isEnabled) {
             headerAllBtn.classList.remove('disabled');
             headerAllBtn.classList.add('enabled');
-            headerAllBtn.style.color = '#ffffff';
         } else {
             headerAllBtn.classList.add('disabled');
             headerAllBtn.classList.remove('enabled');
-            headerAllBtn.style.color = '#a0a0a0';
         }
     }
 }
@@ -326,7 +322,7 @@ function cerrarTodosLosPaneles() {
 }
 
 function positionHeaderPopover(triggerElement, panelElement) {
-    if (!panelElement) return;
+    if (!panelElement || !triggerElement) return;
     const rect = triggerElement.getBoundingClientRect();
     const panelDiv = panelElement.querySelector('.header-popover-panel');
     if (!panelDiv) return;
@@ -353,7 +349,7 @@ function positionHeaderPopover(triggerElement, panelElement) {
 }
 
 function positionDesktopPanel(triggerElement, panelElement) {
-    if (!panelElement) return;
+    if (!panelElement || !triggerElement) return;
     const rect = triggerElement.getBoundingClientRect();
     const panelDiv = panelElement.querySelector('.desktop-logout-panel');
     if (!panelDiv) return;
@@ -381,7 +377,7 @@ function positionDesktopPanel(triggerElement, panelElement) {
 }
 
 function positionMobilePanel(triggerElement, panelElement) {
-    if (!panelElement) return;
+    if (!panelElement || !triggerElement) return;
     const panelDiv = panelElement.querySelector('.mobile-logout-panel');
     if (!panelDiv) return;
 
@@ -1406,7 +1402,7 @@ function setupEvents() {
     const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
     if (btnAplicarFiltros) {
         btnAplicarFiltros.addEventListener('click', () => {
-            currentSearch = document.getElementById('search-input').value;
+            currentSearch = document.getElementById('search-input-panel').value;
             currentSortBy = document.getElementById('sort-select').value;
             currentOrder = document.getElementById('order-select').value;
             currentLimit = parseInt(document.getElementById('limit-select').value);
