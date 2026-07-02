@@ -2095,9 +2095,6 @@ async function init() {
         return;
     }
     
-    // Asegurar que el preloader se oculte si ya pasó el timeout
-    ocultarPreloader();
-    
     document.getElementById('toggle-panel').classList.remove('hidden');
     actualizarPerfilUI();
     mostrarPaginaBlanca();
