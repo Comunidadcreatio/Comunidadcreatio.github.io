@@ -2080,6 +2080,11 @@ async function init() {
         if (!preloaderOcultado && preloader) {
             preloaderOcultado = true;
             preloader.classList.add('hidden');
+            // Activar el fade-in suave del contenido principal
+            const appContainer = document.querySelector('.app-container');
+            if (appContainer) {
+                appContainer.classList.add('visible');
+            }
         }
     };
     setTimeout(ocultarPreloader, 4000);

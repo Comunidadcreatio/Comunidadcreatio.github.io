@@ -205,7 +205,7 @@
     <!-- auth-logic.js importa notificaciones.js como módulo -->
     <script type="module" src="js/auth-logic.js"></script>
 
-    <!-- Ocultar preloader después de 4 segundos -->
+    <!-- Ocultar preloader después de 4 segundos y activar fade-in del contenido -->
     <script>
         (function() {
             var preloader = document.getElementById('preloader');
@@ -214,6 +214,11 @@
                 if (!ocultado && preloader) {
                     ocultado = true;
                     preloader.classList.add('hidden');
+                    // Activar el fade-in suave del contenido
+                    var authContainer = document.querySelector('.auth-container');
+                    if (authContainer) {
+                        authContainer.classList.add('visible');
+                    }
                 }
             }
             setTimeout(ocultar, 4000);
