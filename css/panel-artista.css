@@ -38,12 +38,13 @@
 }
 
 /* Asegurar que las flechas de los selects se posicionen correctamente */
-.filter-controls select {
-    background-repeat: no-repeat;
-    background-position: right 12px center;
+#panel-artista .filter-controls select {
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    padding-right: 42px !important;
 }
 
 .filter-controls #btn-aplicar-filtros {
