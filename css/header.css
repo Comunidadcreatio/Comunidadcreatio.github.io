@@ -171,7 +171,6 @@ picture {
     padding: 50px 0 12px 0;
     display: none;
     margin-top: 0px;
-    animation: fadeIn 0.2s ease-out;
 }
 
 .search-input-wrapper {
@@ -179,7 +178,7 @@ picture {
     z-index: 99999;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInDropdown {
     from {
         opacity: 0;
         transform: translateY(-8px);
@@ -188,6 +187,10 @@ picture {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.search-dropdown {
+    animation: fadeInDropdown 0.2s ease-out;
 }
 
 .search-dropdown:not(.hidden) {

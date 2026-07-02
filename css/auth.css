@@ -68,18 +68,14 @@ body {
     position: relative;
 }
 
-/* Login section reducido 30% */
+/* Login section */
 #login-section {
-    transform: scale(0.7);
-    transform-origin: top center;
-    margin-bottom: -80px;
+    margin-bottom: 0;
 }
 
-/* Registro section reducido 30% */
+/* Registro section */
 #registro-section {
-    transform: scale(0.7);
-    transform-origin: top center;
-    margin-bottom: -80px;
+    margin-bottom: 0;
 }
 
 /* ==============================================

@@ -308,8 +308,7 @@ function cerrarHeaderPopover(panelElement) {
 }
 
 function cerrarTodosLosPaneles() {
-    // Cerrar paneles de escritorio
-    const desktopLogoutModal = document.getElementById('desktop-logout-options');
+    // Cerrar paneles de escritorio usando la variable global
     if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
         cerrarDesktopLogoutModal();
     }
@@ -903,7 +902,6 @@ function mostrarGaleriaPublica() {
 // PREVISUALIZACIÓN DE IMÁGENES
 // ============================================
 function setupImagePreviews() {
-    const idEdicion = document.getElementById('input-id-edicion').value;
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
         const preview = document.getElementById(`preview-${i}`);
@@ -950,7 +948,9 @@ function setupImagePreviews() {
                                 placeholderSpan.style.display = 'block';
                                 inputFile.value = '';
                                 this.remove();
-                                if (idEdicion) {
+                                // Leer dinámicamente para detectar si estamos en modo edición
+                                const editId = document.getElementById('input-id-edicion').value;
+                                if (editId) {
                                     imagenesAEliminar.add(idx);
                                 }
                             }
