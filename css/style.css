@@ -77,6 +77,18 @@
     filter: brightness(0) invert(1);
 }
 
+/* Fade-in suave para el contenido principal después del preloader */
+.app-container,
+.auth-container {
+    opacity: 0;
+    transition: opacity 0.8s ease 0.3s;
+}
+
+.app-container.visible,
+.auth-container.visible {
+    opacity: 1;
+}
+
 /* Clase para elementos ocultos visualmente pero accesibles para lectores de pantalla */
 .visually-hidden {
     position: absolute;
