@@ -2072,12 +2072,26 @@ async function verPerfilUsuario(userId) {
 // INICIALIZACIÓN
 // ============================================
 async function init() {
-    // Iniciar verificación de sesión en paralelo con el preloader
+    // El preloader se oculta DESPUÉS de 4 segundos, sin importar
+    // si la verificación de sesión ya terminó o no
+    const preloader = document.getElementById('preloader');
+    let preloaderOcultado = false;
+    const ocultarPreloader = () => {
+        if (!preloaderOcultado && preloader) {
+            preloaderOcultado = true;
+            preloader.classList.add('hidden');
+        }
+    };
+    setTimeout(ocultarPreloader, 4000);
+
     const sesionValida = await verificarSesionBackend();
     if (!sesionValida) {
         window.location.href = 'auth.html';
         return;
     }
+    
+    // Asegurar que el preloader se oculte si ya pasó el timeout
+    ocultarPreloader();
     
     document.getElementById('toggle-panel').classList.remove('hidden');
     actualizarPerfilUI();
@@ -2087,14 +2101,6 @@ async function init() {
     setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
-    
-    // Ocultar el preloader después de 4 segundos desde que cargó la página
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        setTimeout(() => {
-            preloader.classList.add('hidden');
-        }, 4000);
-    }
 }
 
 init();
