@@ -25,7 +25,7 @@
    ============================================== */
 .filter-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 1.5rem;
     align-items: center;
@@ -33,7 +33,11 @@
     border: none;
 }
 
-.filter-controls #search-input {
+.filter-controls #search-input-panel {
+    grid-column: auto;
+}
+
+.filter-controls #btn-aplicar-filtros {
     grid-column: 1 / -1;
 }
 

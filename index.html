@@ -209,6 +209,7 @@
 
             <!-- Controles de búsqueda y filtros -->
             <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
+                <!-- Fila 1: Buscar + Ordenar por -->
                 <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
                 <label for="sort-select" class="visually-hidden">Ordenar por</label>
                 <select id="sort-select" aria-label="Criterio de ordenamiento">
@@ -217,6 +218,7 @@
                     <option value="precio">Ordenar por Precio</option>
                     <option value="status">Ordenar por Status</option>
                 </select>
+                <!-- Fila 2: Orden + Resultados por página -->
                 <label for="order-select" class="visually-hidden">Orden</label>
                 <select id="order-select" aria-label="Orden de clasificación">
                     <option value="DESC">Descendente</option>
@@ -229,6 +231,7 @@
                     <option value="20">20 por página</option>
                     <option value="50">50 por página</option>
                 </select>
+                <!-- Fila 3: Botón Aplicar -->
                 <button id="btn-aplicar-filtros" type="button">Aplicar</button>
             </div>
 
