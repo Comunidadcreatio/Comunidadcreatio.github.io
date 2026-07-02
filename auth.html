@@ -15,6 +15,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
+    <!-- PRELOADER -->
+    <div id="preloader" role="status" aria-label="Cargando">
+        <div class="preloader-logo">
+            <img src="iconos/Logo-temporal.svg" alt="Creatio" class="preloader-logo-img">
+        </div>
+    </div>
+
     <!-- Contenedor de notificaciones -->
     <div id="notification-container" class="notification-container"></div>
 
@@ -197,5 +204,24 @@
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
     <script type="module" src="js/auth-logic.js"></script>
+
+    <!-- Ocultar preloader después de 4 segundos -->
+    <script>
+        (function() {
+            var preloader = document.getElementById('preloader');
+            var ocultado = false;
+            function ocultar() {
+                if (!ocultado && preloader) {
+                    ocultado = true;
+                    preloader.classList.add('hidden');
+                }
+            }
+            setTimeout(ocultar, 4000);
+            // También ocultar cuando el DOM esté completamente cargado + 500ms
+            window.addEventListener('load', function() {
+                setTimeout(ocultar, 500);
+            });
+        })();
+    </script>
 </body>
 </html>
