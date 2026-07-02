@@ -19,6 +19,64 @@
     display: none !important;
 }
 
+/* ==============================================
+   PRELOADER (PANTALLA DE CARGA CON LOGO)
+   ============================================== */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.preloader-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: preloaderPulse 1.5s ease-in-out infinite;
+}
+
+.preloader-logo-img {
+    width: 120px;
+    height: auto;
+    max-width: 60vw;
+    object-fit: contain;
+    display: block;
+}
+
+@keyframes preloaderPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.08);
+    }
+}
+
+/* Modo oscuro para el preloader */
+[data-theme="dark"] #preloader {
+    background-color: #121212;
+}
+
+[data-theme="dark"] .preloader-logo-img {
+    filter: brightness(0) invert(1);
+}
+
 /* Clase para elementos ocultos visualmente pero accesibles para lectores de pantalla */
 .visually-hidden {
     position: absolute;
