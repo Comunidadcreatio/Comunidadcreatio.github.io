@@ -458,13 +458,12 @@ function toggleGaleria() {
     const perfilUsuario = document.getElementById('perfil-usuario');
     if (!galeria || !panel || !paginaBlanca) return;
     if (galeria.classList.contains('hidden')) {
-        galeria.classList.remove('hidden');
-        galeria.classList.add('seccion-aparecer');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
         if (perfilUsuario) perfilUsuario.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
+        galeria.classList.remove('hidden');
         cargarGaleria(galeriaContainer).then(obras => {
             mostrarGaleria(obras, galeriaContainer, (id) => {
                 console.log("Ver detalles de obra con ID:", id);
@@ -485,7 +484,6 @@ function togglePanel() {
     if (!galeria || !panel || !paginaBlanca) return;
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
-        panel.classList.add('seccion-aparecer');
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
@@ -514,7 +512,6 @@ function toggleMiCuenta() {
     if (!galeria || !panel || !paginaBlanca || !miCuenta) return;
     if (miCuenta.classList.contains('hidden')) {
         miCuenta.classList.remove('hidden');
-        miCuenta.classList.add('seccion-aparecer');
         galeria.classList.add('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');

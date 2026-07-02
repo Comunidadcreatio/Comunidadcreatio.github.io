@@ -503,24 +503,11 @@ input, select, textarea {
 /* ==============================================
    TRANSICIONES SUAVES ENTRE SECCIONES
    ============================================== */
-.seccion-transicion {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.seccion-transicion.hidden {
-    display: none !important;
-}
-
-.seccion-transicion.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Animación de entrada para secciones */
-@keyframes fadeInUp {
+/* Animación de deslizamiento hacia arriba */
+@keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -528,8 +515,33 @@ input, select, textarea {
     }
 }
 
-.seccion-aparecer {
-    animation: fadeInUp 0.35s ease-out;
+/* Las secciones principales usan transición de opacidad */
+#galeria-publica,
+#panel-artista,
+#mi-cuenta,
+#perfil-usuario,
+#resultados-busqueda {
+    transition: opacity 0.25s ease;
+}
+
+/* Cuando están ocultas, se ocultan completamente */
+#galeria-publica.hidden,
+#panel-artista.hidden,
+#mi-cuenta.hidden,
+#perfil-usuario.hidden,
+#resultados-busqueda.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
+/* Cuando están visibles, opacidad completa + animación de deslizamiento */
+#galeria-publica:not(.hidden),
+#panel-artista:not(.hidden),
+#mi-cuenta:not(.hidden),
+#perfil-usuario:not(.hidden),
+#resultados-busqueda:not(.hidden) {
+    opacity: 1;
+    animation: slideUp 0.35s ease-out;
 }
 
 /* Página en blanco */
