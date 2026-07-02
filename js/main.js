@@ -2087,7 +2087,7 @@ async function init() {
             }
         }
     };
-    setTimeout(ocultarPreloader, 4000);
+    setTimeout(ocultarPreloader, 6000);
 
     const sesionValida = await verificarSesionBackend();
     if (!sesionValida) {
