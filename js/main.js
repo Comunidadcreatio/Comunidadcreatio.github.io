@@ -404,6 +404,33 @@ function positionMobilePanel(triggerElement, panelElement) {
 }
 
 // ============================================
+// VARIABLE PARA RASTREAR CAMBIOS NO GUARDADOS
+// ============================================
+let hayCambiosNoGuardados = false;
+
+// Marcar cuando hay cambios en el formulario de obra
+function setupFormChangeTracking() {
+    const form = document.getElementById('obra-form');
+    if (!form) return;
+    
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        const evento = input.tagName === 'SELECT' ? 'change' : 'input';
+        input.addEventListener(evento, () => {
+            hayCambiosNoGuardados = true;
+        });
+    });
+}
+
+// Preguntar antes de descartar cambios
+function confirmarDescartarCambios() {
+    if (hayCambiosNoGuardados) {
+        return confirm('⚠️ Tienes cambios sin guardar en el formulario. ¿Estás seguro de que quieres descartarlos?');
+    }
+    return true;
+}
+
+// ============================================
 // MANEJO DE VISTAS (Galería, Panel, Página Blanca)
 // ============================================
 function mostrarPaginaBlanca() {
@@ -421,6 +448,9 @@ function mostrarPaginaBlanca() {
 }
 
 function toggleGaleria() {
+    // Verificar cambios no guardados antes de cambiar de sección
+    if (!confirmarDescartarCambios()) return;
+    
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
@@ -429,6 +459,7 @@ function toggleGaleria() {
     if (!galeria || !panel || !paginaBlanca) return;
     if (galeria.classList.contains('hidden')) {
         galeria.classList.remove('hidden');
+        galeria.classList.add('seccion-aparecer');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
@@ -454,6 +485,7 @@ function togglePanel() {
     if (!galeria || !panel || !paginaBlanca) return;
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
+        panel.classList.add('seccion-aparecer');
         galeria.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
         if (miCuenta) miCuenta.classList.add('hidden');
@@ -482,6 +514,7 @@ function toggleMiCuenta() {
     if (!galeria || !panel || !paginaBlanca || !miCuenta) return;
     if (miCuenta.classList.contains('hidden')) {
         miCuenta.classList.remove('hidden');
+        miCuenta.classList.add('seccion-aparecer');
         galeria.classList.add('hidden');
         panel.classList.add('hidden');
         paginaBlanca.classList.add('hidden');
@@ -1886,6 +1919,23 @@ function setupEvents() {
         });
     });
 
+    // ✅ Tecla Escape para cerrar modales y paneles
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // Cerrar modales
+            document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
+                modal.classList.add('hidden');
+            });
+            // Cerrar paneles flotantes
+            cerrarTodosLosPaneles();
+            cerrarHeaderPopover(document.getElementById('header-config-menu'));
+            cerrarHeaderPopover(document.getElementById('header-logout-menu'));
+            // Cerrar dropdown de búsqueda
+            const searchDropdown = document.getElementById('search-results-dropdown');
+            if (searchDropdown) searchDropdown.classList.add('hidden');
+        }
+    });
+
 }
 
 // ============================================
@@ -2036,6 +2086,7 @@ async function init() {
     mostrarPaginaBlanca();
     setupEvents();
     setupImagePreviews();
+    setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
 }

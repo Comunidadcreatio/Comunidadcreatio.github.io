@@ -500,6 +500,38 @@ input, select, textarea {
     margin: 4px 16px;
 }
 
+/* ==============================================
+   TRANSICIONES SUAVES ENTRE SECCIONES
+   ============================================== */
+.seccion-transicion {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.seccion-transicion.hidden {
+    display: none !important;
+}
+
+.seccion-transicion.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Animación de entrada para secciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.seccion-aparecer {
+    animation: fadeInUp 0.35s ease-out;
+}
+
 /* Página en blanco */
 #pagina-blanca {
     flex: 1;

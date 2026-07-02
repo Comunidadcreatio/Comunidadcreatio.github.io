@@ -1,0 +1,129 @@
+/* css/skeleton.css - Skeleton loaders para pantalla de carga */
+
+/* ==============================================
+   SKELETON LOADER - Galería
+   ============================================== */
+.skeleton-galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 20px 0;
+}
+
+.skeleton-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.skeleton-card-img {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-card-body {
+    padding: 16px;
+}
+
+.skeleton-line {
+    height: 14px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-line:last-child {
+    width: 60%;
+}
+
+.skeleton-line-sm {
+    height: 10px;
+    width: 40%;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ==============================================
+   SKELETON LOADER - Tabla del Panel
+   ============================================== */
+.skeleton-tabla {
+    width: 100%;
+}
+
+.skeleton-fila {
+    display: grid;
+    grid-template-columns: 60px 1fr 80px 70px 90px 120px;
+    gap: 12px;
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--color-gray-200);
+    align-items: center;
+}
+
+.skeleton-fila .skeleton-line {
+    margin-bottom: 0;
+}
+
+.skeleton-fila-img {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ==============================================
+   SKELETON LOADER - Perfil
+   ============================================== */
+.skeleton-perfil {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+}
+
+.skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.skeleton-perfil-info {
+    flex: 1;
+}
+
+/* ==============================================
+   ANIMACIÓN SHIMMER
+   ============================================== */
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+[data-theme="dark"] .skeleton-card-img,
+[data-theme="dark"] .skeleton-line,
+[data-theme="dark"] .skeleton-line-sm,
+[data-theme="dark"] .skeleton-fila-img,
+[data-theme="dark"] .skeleton-avatar {
+    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+}

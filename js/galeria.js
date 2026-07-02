@@ -1,21 +1,46 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
 
+// Genera HTML de skeleton loader para la galería
+function generarSkeletonGaleria(cantidad = 6) {
+    let html = '<div class="skeleton-galeria">';
+    for (let i = 0; i < cantidad; i++) {
+        html += `
+            <div class="skeleton-card">
+                <div class="skeleton-card-img"></div>
+                <div class="skeleton-card-body">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line-sm"></div>
+                </div>
+            </div>
+        `;
+    }
+    html += '</div>';
+    return html;
+}
+
 export async function cargarGaleria(container) {
-    container.innerHTML = '<p>Cargando obras...</p>';
+    // Mostrar skeleton loader inmediatamente
+    container.innerHTML = generarSkeletonGaleria();
+    container.setAttribute('aria-busy', 'true');
+    
     try {
         const data = await apiRequest('/obras');
         // Si apiRequest devolvió un error (success: false)
         if (data && data.success === false) {
             console.error('Error al cargar galería:', data.error);
             container.innerHTML = '<p>Error al cargar las obras.</p>';
+            container.setAttribute('aria-busy', 'false');
             return [];
         }
         // Si es un array de obras, devolverlo
+        container.setAttribute('aria-busy', 'false');
         return Array.isArray(data) ? data : [];
     } catch (error) {
         console.error("Error al cargar la galería:", error);
         container.innerHTML = '<p>Error al cargar las obras.</p>';
+        container.setAttribute('aria-busy', 'false');
         return [];
     }
 }
