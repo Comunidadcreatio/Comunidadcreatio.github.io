@@ -2072,6 +2072,7 @@ async function verPerfilUsuario(userId) {
 // INICIALIZACIÓN
 // ============================================
 async function init() {
+    // Iniciar verificación de sesión en paralelo con el preloader
     const sesionValida = await verificarSesionBackend();
     if (!sesionValida) {
         window.location.href = 'auth.html';
@@ -2086,6 +2087,14 @@ async function init() {
     setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
+    
+    // Ocultar el preloader después de 4 segundos desde que cargó la página
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hidden');
+        }, 4000);
+    }
 }
 
 init();
