@@ -133,18 +133,15 @@ form *,
 
 #obra-form input[type="text"],
 #obra-form input[type="number"],
-#obra-form select,
 #obra-form textarea,
 #registro-form input[type="text"],
 #registro-form input[type="email"],
 #registro-form input[type="password"],
-#registro-form select,
 #login-form input[type="email"],
 #login-form input[type="password"],
 #solicitar-restablecimiento-form input[type="email"],
 #confirmar-eliminacion-form input[type="password"],
-#panel-artista input,
-#panel-artista select {
+#panel-artista input {
     width: 100%;
     max-width: 100%;
     padding: 12px 14px;
@@ -157,6 +154,28 @@ form *,
     transition: border-color 0.2s, box-shadow 0.2s;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Selects: padding-right amplio para la flecha, heredan resto de estilos de inputs */
+#obra-form select,
+#registro-form select,
+#panel-artista select {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 40px 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 16px;
+    background: var(--color-white);
+    color: var(--color-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 #obra-form input[type="text"]:focus,
