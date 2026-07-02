@@ -46,7 +46,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: preloaderPulse 1.5s ease-in-out infinite;
+    animation: logoFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px rgba(26, 26, 26, 0.15));
+    transition: filter 0.3s ease;
 }
 
 .preloader-logo-img {
@@ -55,16 +57,44 @@
     max-width: 60vw;
     object-fit: contain;
     display: block;
+    animation: logoBreathe 3s ease-in-out infinite;
 }
 
-@keyframes preloaderPulse {
+@keyframes logoFloat {
     0%, 100% {
-        opacity: 1;
-        transform: scale(1);
+        transform: translateY(0) rotateY(0deg);
+        filter: drop-shadow(0 0 12px rgba(26, 26, 26, 0.15));
+    }
+    25% {
+        transform: translateY(-12px) rotateY(5deg);
+        filter: drop-shadow(0 12px 24px rgba(26, 26, 26, 0.25));
     }
     50% {
-        opacity: 0.7;
-        transform: scale(1.08);
+        transform: translateY(-4px) rotateY(-3deg);
+        filter: drop-shadow(0 4px 16px rgba(26, 26, 26, 0.3));
+    }
+    75% {
+        transform: translateY(-16px) rotateY(3deg);
+        filter: drop-shadow(0 16px 28px rgba(26, 26, 26, 0.2));
+    }
+}
+
+@keyframes logoBreathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    30% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(0.96);
+        opacity: 0.85;
+    }
+    85% {
+        transform: scale(1.03);
+        opacity: 0.95;
     }
 }
 
