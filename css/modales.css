@@ -91,7 +91,6 @@
 .modal-content input[type="text"],
 .modal-content input[type="email"],
 .modal-content input[type="password"],
-.modal-content select,
 .modal-content button:not(.cerrar-modal) {
     width: 100%;
     padding: 10px;
@@ -102,6 +101,24 @@
     font-size: 14px;
     background: white;
     color: #000;
+}
+
+.modal-content select {
+    width: 100%;
+    padding: 10px 36px 10px 10px;
+    margin-bottom: 12px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background: white;
+    color: #000;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .modal-content button[type="submit"] {
@@ -450,4 +467,9 @@
 
 [data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password::placeholder {
     color: var(--color-gray-400);
+}
+
+/* Flecha blanca para selects en modales en modo oscuro */
+[data-theme="dark"] .modal-content select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
 }
