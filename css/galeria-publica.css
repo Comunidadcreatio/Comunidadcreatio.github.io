@@ -6,8 +6,8 @@
 #galeria-container {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
-    padding: 2rem 1.5rem;
+    gap: 3.5rem;
+    padding: 4rem 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -531,8 +531,8 @@
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 2rem 0.5rem;
-        gap: 3rem;
+        padding: 3rem 0.5rem;
+        gap: 3.5rem;
     }
 
     .obra-card {
