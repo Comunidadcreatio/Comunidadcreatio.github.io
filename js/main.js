@@ -432,151 +432,141 @@ function confirmarDescartarCambios() {
 // ============================================
 // MANEJO DE VISTAS (Galería, Panel, Página Blanca)
 // ============================================
+// Helper: anima salida de sección actual y entrada de la nueva sincronizadas
+function switchSection(sectionSaliente, sectionEntrante, callback) {
+    if (sectionSaliente && sectionSaliente !== sectionEntrante) {
+        // Limpiar clases previas
+        sectionSaliente.classList.remove('section-entering');
+        sectionSaliente.classList.add('section-exiting');
+        const onExitEnd = () => {
+            sectionSaliente.removeEventListener('animationend', onExitEnd);
+            sectionSaliente.classList.remove('section-exiting');
+            sectionSaliente.classList.add('hidden');
+            mostrarSeccion(sectionEntrante, callback);
+        };
+        sectionSaliente.addEventListener('animationend', onExitEnd);
+    } else if (sectionEntrante) {
+        mostrarSeccion(sectionEntrante, callback);
+    }
+}
+
+function mostrarSeccion(section, callback) {
+    if (!section) return;
+    section.classList.remove('hidden', 'section-exiting');
+    section.classList.add('section-entering');
+    const onEnterEnd = () => {
+        section.removeEventListener('animationend', onEnterEnd);
+        section.classList.remove('section-entering');
+        if (callback) callback();
+    };
+    section.addEventListener('animationend', onEnterEnd);
+}
+
+function ocultarTodasLasSecciones(excepciones = []) {
+    const todas = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
+    todas.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !excepciones.includes(el)) {
+            el.classList.remove('section-entering');
+            el.classList.add('hidden');
+        }
+    });
+}
+
 function mostrarPaginaBlanca() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
+    ocultarTodasLasSecciones();
     const paginaBlanca = document.getElementById('pagina-blanca');
-    const miCuenta = document.getElementById('mi-cuenta');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    if (galeria) galeria.classList.add('hidden');
-    if (panel) panel.classList.add('hidden');
-    if (miCuenta) miCuenta.classList.add('hidden');
-    if (perfilUsuario) perfilUsuario.classList.add('hidden');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
     if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 }
 
 function toggleGaleria() {
-    // Verificar cambios no guardados antes de cambiar de sección
     if (!confirmarDescartarCambios()) return;
     
     const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    const miCuenta = document.getElementById('mi-cuenta');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    if (!galeria || !panel || !paginaBlanca) return;
+    if (!galeria) return;
+
     if (galeria.classList.contains('hidden')) {
-        panel.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        if (miCuenta) miCuenta.classList.add('hidden');
-        if (perfilUsuario) perfilUsuario.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        galeria.classList.remove('hidden');
-        cargarGaleria(galeriaContainer).then(obras => {
-            mostrarGaleria(obras, galeriaContainer, (id) => {
-                console.log("Ver detalles de obra con ID:", id);
+        // Encontrar la sección actual visible (no oculta)
+        const secciones = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
+        let actual = document.getElementById('pagina-blanca');
+        for (const id of secciones) {
+            const el = document.getElementById(id);
+            if (el && !el.classList.contains('hidden')) { actual = el; break; }
+        }
+        switchSection(actual, galeria, () => {
+            cargarGaleria(galeriaContainer).then(obras => {
+                mostrarGaleria(obras, galeriaContainer, (id) => {
+                    console.log("Ver detalles de obra con ID:", id);
+                });
             });
         });
     } else {
-        galeria.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
+        switchSection(galeria, document.getElementById('pagina-blanca'));
     }
 }
 
 function togglePanel() {
-    const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
-    const miCuenta = document.getElementById('mi-cuenta');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    if (!galeria || !panel || !paginaBlanca) return;
+    if (!panel || !paginaBlanca) return;
+
     if (panel.classList.contains('hidden')) {
-        panel.classList.remove('hidden');
-        galeria.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        if (miCuenta) miCuenta.classList.add('hidden');
-        if (perfilUsuario) perfilUsuario.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        // Establecer el nombre del artista por defecto al abrir el panel
         if (artistaActual && artistaActual.nombre_artista) {
             const inputArtista = document.getElementById('input-artista');
             if (inputArtista && !inputArtista.value) {
                 inputArtista.value = artistaActual.nombre_artista;
             }
         }
-        refrescarTabla();
+        switchSection(paginaBlanca, panel, () => { refrescarTabla(); });
     } else {
-        panel.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
+        switchSection(panel, paginaBlanca);
     }
 }
 
 function toggleMiCuenta() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
     const miCuenta = document.getElementById('mi-cuenta');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    if (!galeria || !panel || !paginaBlanca || !miCuenta) return;
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    if (!miCuenta || !paginaBlanca) return;
+
     if (miCuenta.classList.contains('hidden')) {
-        miCuenta.classList.remove('hidden');
-        galeria.classList.add('hidden');
-        panel.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        if (perfilUsuario) perfilUsuario.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         const emailInput = document.getElementById('cuenta-email-actual');
         if (emailInput && artistaActual) {
             emailInput.value = artistaActual.email || artistaActual.correo || '';
         }
-        // Restaurar botón de avatar para perfil propio
         const avatarBtn = document.getElementById('perfil-avatar-btn');
         const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) {
-            avatarBtn.style.pointerEvents = 'auto';
-            avatarBtn.style.cursor = 'pointer';
-        }
-        if (avatarOverlay) {
-            avatarOverlay.style.display = 'flex';
-        }
+        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
+        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
+        switchSection(paginaBlanca, miCuenta);
     } else {
-        miCuenta.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
+        switchSection(miCuenta, paginaBlanca);
     }
 }
 
 function togglePerfil() {
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    const miCuenta = document.getElementById('mi-cuenta');
     const perfilUsuario = document.getElementById('perfil-usuario');
-    const resultadosBusqueda = document.getElementById('resultados-busqueda');
-    if (!galeria || !panel || !paginaBlanca || !perfilUsuario) return;
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    if (!perfilUsuario || !paginaBlanca) return;
 
-    // Detectar si actualmente se está mostrando el perfil de otro usuario
     const viendoPerfilExterno = perfilUsuario.dataset.viewing === 'external';
 
     if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
-        // Mostrar perfil propio con datos del usuario autenticado
         actualizarPerfilUI();
         perfilUsuario.dataset.viewing = 'own';
-        perfilUsuario.classList.remove('hidden');
-        galeria.classList.add('hidden');
-        panel.classList.add('hidden');
-        paginaBlanca.classList.add('hidden');
-        if (miCuenta) miCuenta.classList.add('hidden');
-        if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
-
-        // Restaurar botón de avatar para perfil propio
         const avatarBtn = document.getElementById('perfil-avatar-btn');
         const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) {
-            avatarBtn.style.pointerEvents = 'auto';
-            avatarBtn.style.cursor = 'pointer';
-        }
-        if (avatarOverlay) {
-            avatarOverlay.style.display = 'flex';
-        }
-
-        // LLAMADA A LA FUNCIÓN EXPUESTA GLOBALMENTE
-        window.actualizarEstadisticas(); 
+        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
+        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
+        window.actualizarEstadisticas();
+        switchSection(paginaBlanca, perfilUsuario);
     } else {
-        perfilUsuario.classList.add('hidden');
-        paginaBlanca.classList.remove('hidden');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
+        switchSection(perfilUsuario, paginaBlanca);
     }
 }
 

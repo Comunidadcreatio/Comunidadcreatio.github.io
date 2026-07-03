@@ -624,11 +624,11 @@ input, select, textarea {
 /* ==============================================
    TRANSICIONES SUAVES ENTRE SECCIONES
    ============================================== */
-/* Animación de deslizamiento hacia arriba */
-@keyframes slideUp {
+/* Animación de entrada: fade-in + slide-up suave */
+@keyframes sectionEnter {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(16px);
     }
     to {
         opacity: 1;
@@ -636,13 +636,33 @@ input, select, textarea {
     }
 }
 
-/* Las secciones principales usan animación de deslizamiento al hacerse visibles */
-#galeria-publica:not(.hidden),
-#panel-artista:not(.hidden),
-#mi-cuenta:not(.hidden),
-#perfil-usuario:not(.hidden),
-#resultados-busqueda:not(.hidden) {
-    animation: slideUp 0.35s ease-out;
+/* Animación de salida: fade-out + slide-down suave */
+@keyframes sectionExit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
+/* Las secciones obtienen animación solo cuando JS lo activa */
+#galeria-publica.section-entering,
+#panel-artista.section-entering,
+#mi-cuenta.section-entering,
+#perfil-usuario.section-entering,
+#resultados-busqueda.section-entering {
+    animation: sectionEnter 0.35s ease-out forwards;
+}
+
+#galeria-publica.section-exiting,
+#panel-artista.section-exiting,
+#mi-cuenta.section-exiting,
+#perfil-usuario.section-exiting,
+#resultados-busqueda.section-exiting {
+    animation: sectionExit 0.25s ease-in forwards;
 }
 
 /* Página en blanco */
