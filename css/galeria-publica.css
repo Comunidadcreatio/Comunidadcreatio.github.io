@@ -531,7 +531,7 @@
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 3rem 0.5rem;
+        padding: 4rem 0.5rem;
         gap: 3.5rem;
     }
 
