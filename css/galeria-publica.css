@@ -531,8 +531,8 @@
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 1rem 0.5rem;
-        gap: 2rem;
+        padding: 2rem 0.5rem;
+        gap: 3rem;
     }
 
     .obra-card {
@@ -607,8 +607,8 @@
 
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 0.75rem 0.25rem;
-        gap: 1.5rem;
+        padding: 1.5rem 0.5rem;
+        gap: 2rem;
     }
 
     .obra-avatar-esquina,
