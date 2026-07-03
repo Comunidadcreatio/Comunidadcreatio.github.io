@@ -94,12 +94,8 @@ function crearObraCard(obra) {
     const precio = obra.precio || 'N/A';
 
     card.innerHTML = `
-        <!-- Header: avatar + nombre + métricas -->
+        <!-- Header: nombre + métricas (avatar está dentro de la imagen) -->
         <div class="obra-header">
-            ${tieneAvatar 
-                ? `<img src="${obra.foto_artista}" alt="${nombreArtista}" class="obra-header-avatar">`
-                : `<div class="obra-header-avatar-placeholder">${inicial}</div>`
-            }
             <div class="obra-header-info">
                 <span class="obra-header-nombre">${nombreArtista}</span>
                 <div class="obra-header-metricas">
@@ -123,8 +119,12 @@ function crearObraCard(obra) {
             </div>
         </div>
 
-        <!-- Imagen principal -->
+        <!-- Imagen principal + avatar anclado a la esquina -->
         <div class="obra-imagen-container">
+            ${tieneAvatar 
+                ? `<img src="${obra.foto_artista}" alt="${nombreArtista}" class="obra-avatar-esquina">`
+                : `<div class="obra-avatar-esquina-placeholder">${inicial}</div>`
+            }
             <img src="${imgSrc}" alt="${titulo}" class="obra-imagen" loading="lazy">
         </div>
 
