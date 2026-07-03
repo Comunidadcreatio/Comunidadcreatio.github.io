@@ -432,42 +432,86 @@ function confirmarDescartarCambios() {
 // ============================================
 // MANEJO DE VISTAS (Galería, Panel, Página Blanca)
 // ============================================
-// Helper: anima salida de sección actual y entrada de la nueva sincronizadas
+// ============================================
+// SISTEMA DE TRANSICIONES ENTRE SECCIONES
+// ============================================
+let isTransitioning = false;
+const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
+
+function encontrarSeccionActual() {
+    for (const id of SECCIONES) {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('hidden')) return el;
+    }
+    return document.getElementById('pagina-blanca');
+}
+
+// Oculta una sección con animación de salida, luego muestra la entrante
 function switchSection(sectionSaliente, sectionEntrante, callback) {
-    if (sectionSaliente && sectionSaliente !== sectionEntrante) {
-        // Limpiar clases previas
+    if (isTransitioning) return; // Bloquear clics durante transición
+    if (!sectionEntrante) return;
+    if (sectionSaliente === sectionEntrante) return;
+
+    isTransitioning = true;
+
+    // Timeout de seguridad: si animationend no se dispara, forzar después de 800ms
+    const safetyTimeout = setTimeout(() => {
+        isTransitioning = false;
+        for (const id of SECCIONES) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('section-entering', 'section-exiting');
+                el.classList.add('hidden');
+            }
+        }
+        if (sectionEntrante) {
+            sectionEntrante.classList.remove('hidden');
+            if (callback) callback();
+        }
+    }, 800);
+
+    function finish() {
+        clearTimeout(safetyTimeout);
+        isTransitioning = false;
+    }
+
+    if (sectionSaliente) {
         sectionSaliente.classList.remove('section-entering');
         sectionSaliente.classList.add('section-exiting');
-        const onExitEnd = () => {
-            sectionSaliente.removeEventListener('animationend', onExitEnd);
+        sectionSaliente.addEventListener('animationend', function onExit() {
+            sectionSaliente.removeEventListener('animationend', onExit);
             sectionSaliente.classList.remove('section-exiting');
             sectionSaliente.classList.add('hidden');
+            finish();
             mostrarSeccion(sectionEntrante, callback);
-        };
-        sectionSaliente.addEventListener('animationend', onExitEnd);
-    } else if (sectionEntrante) {
+        }, { once: true });
+    } else {
+        finish();
         mostrarSeccion(sectionEntrante, callback);
     }
 }
 
 function mostrarSeccion(section, callback) {
     if (!section) return;
+    // Usar requestAnimationFrame para que el display se aplique antes de la animación
     section.classList.remove('hidden', 'section-exiting');
-    section.classList.add('section-entering');
-    const onEnterEnd = () => {
-        section.removeEventListener('animationend', onEnterEnd);
-        section.classList.remove('section-entering');
-        if (callback) callback();
-    };
-    section.addEventListener('animationend', onEnterEnd);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            section.classList.add('section-entering');
+            section.addEventListener('animationend', function onEnter() {
+                section.removeEventListener('animationend', onEnter);
+                section.classList.remove('section-entering');
+                if (callback) callback();
+            }, { once: true });
+        });
+    });
 }
 
-function ocultarTodasLasSecciones(excepciones = []) {
-    const todas = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
-    todas.forEach(id => {
+function ocultarTodasLasSecciones() {
+    SECCIONES.forEach(id => {
         const el = document.getElementById(id);
-        if (el && !excepciones.includes(el)) {
-            el.classList.remove('section-entering');
+        if (el) {
+            el.classList.remove('section-entering', 'section-exiting');
             el.classList.add('hidden');
         }
     });
@@ -481,21 +525,14 @@ function mostrarPaginaBlanca() {
 }
 
 function toggleGaleria() {
-    if (!confirmarDescartarCambios()) return;
+    if (isTransitioning || !confirmarDescartarCambios()) return;
     
     const galeria = document.getElementById('galeria-publica');
     if (!galeria) return;
 
     if (galeria.classList.contains('hidden')) {
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        // Encontrar la sección actual visible (no oculta)
-        const secciones = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
-        let actual = document.getElementById('pagina-blanca');
-        for (const id of secciones) {
-            const el = document.getElementById(id);
-            if (el && !el.classList.contains('hidden')) { actual = el; break; }
-        }
-        switchSection(actual, galeria, () => {
+        switchSection(encontrarSeccionActual(), galeria, () => {
             cargarGaleria(galeriaContainer).then(obras => {
                 mostrarGaleria(obras, galeriaContainer, (id) => {
                     console.log("Ver detalles de obra con ID:", id);
@@ -508,6 +545,8 @@ function toggleGaleria() {
 }
 
 function togglePanel() {
+    if (isTransitioning) return;
+    
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (!panel || !paginaBlanca) return;
@@ -520,13 +559,15 @@ function togglePanel() {
                 inputArtista.value = artistaActual.nombre_artista;
             }
         }
-        switchSection(paginaBlanca, panel, () => { refrescarTabla(); });
+        switchSection(encontrarSeccionActual(), panel, () => { refrescarTabla(); });
     } else {
         switchSection(panel, paginaBlanca);
     }
 }
 
 function toggleMiCuenta() {
+    if (isTransitioning) return;
+    
     const miCuenta = document.getElementById('mi-cuenta');
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (!miCuenta || !paginaBlanca) return;
@@ -541,13 +582,15 @@ function toggleMiCuenta() {
         const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
         if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
         if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
-        switchSection(paginaBlanca, miCuenta);
+        switchSection(encontrarSeccionActual(), miCuenta);
     } else {
         switchSection(miCuenta, paginaBlanca);
     }
 }
 
 function togglePerfil() {
+    if (isTransitioning) return;
+    
     const perfilUsuario = document.getElementById('perfil-usuario');
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (!perfilUsuario || !paginaBlanca) return;
@@ -563,7 +606,7 @@ function togglePerfil() {
         if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
         if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
         window.actualizarEstadisticas();
-        switchSection(paginaBlanca, perfilUsuario);
+        switchSection(encontrarSeccionActual(), perfilUsuario);
     } else {
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         switchSection(perfilUsuario, paginaBlanca);
