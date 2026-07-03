@@ -653,7 +653,8 @@ input, select, textarea {
 #panel-artista.section-entering,
 #mi-cuenta.section-entering,
 #perfil-usuario.section-entering,
-#resultados-busqueda.section-entering {
+#resultados-busqueda.section-entering,
+#pagina-blanca.section-entering {
     animation: sectionEnter 0.35s ease-out forwards;
 }
 
@@ -661,7 +662,8 @@ input, select, textarea {
 #panel-artista.section-exiting,
 #mi-cuenta.section-exiting,
 #perfil-usuario.section-exiting,
-#resultados-busqueda.section-exiting {
+#resultados-busqueda.section-exiting,
+#pagina-blanca.section-exiting {
     animation: sectionExit 0.25s ease-in forwards;
 }
 
