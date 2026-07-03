@@ -30,15 +30,17 @@
    sobre la imagen, a la derecha del avatar)
    ============================================== */
 .obra-header {
-    /* Posicionado absolutamente respecto a la tarjeta */
+    /* Posicionado absolutamente respecto a la tarjeta,
+       ocupa desde la derecha del avatar hasta el borde de la imagen */
     position: absolute;
     top: -30px;
-    left: 68px;
+    left: 80px;
+    right: 0;
     z-index: 11;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
     white-space: nowrap;
 }
 
