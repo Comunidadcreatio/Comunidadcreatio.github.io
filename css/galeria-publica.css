@@ -20,7 +20,7 @@
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto 1fr auto;
     position: relative;
-    max-width: 540px;
+    max-width: 270px;
     margin: 0 auto;
     width: 100%;
 }
@@ -234,7 +234,7 @@
     position: relative;
     z-index: 3;
     transition: all 0.3s ease;
-    width: 170px;
+    width: 85px;
 }
 
 .obra-comentarios-panel {
