@@ -1,101 +1,694 @@
-/* css/galeria-publica.css - Estilos de la galería pública */
+/* css/galeria-publica.css - Nuevo diseño modular de tarjetas de obras */
 
+/* ==============================================
+   CONTENEDOR DE LA GALERÍA
+   ============================================== */
 #galeria-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 16px;
-    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding: 2rem 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
+/* ==============================================
+   TARJETA DE OBRA - GRID PRINCIPAL
+   ============================================== */
 .obra-card {
-    background: var(--color-white);
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--color-black);
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
-}
-
-.obra-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-.obra-card img {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto 1fr auto;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
     width: 100%;
-    height: 168px;
-    object-fit: cover;
-}
-
-.obra-card h3 {
-    font-size: 0.95rem;
-    margin: 8px 12px 4px;
-    color: var(--color-black);
-}
-
-.obra-card p {
-    margin: 0 12px 4px;
-    font-size: 0.8rem;
-    color: var(--color-gray-dark);
-}
-
-.obra-card button {
-    margin: 8px 12px 12px;
-    padding: 6px 10px;
-    border: 1px solid var(--color-black);
-    background-color: var(--color-white);
-    color: var(--color-black);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: background 0.2s, color 0.2s;
-}
-
-.obra-card button:hover {
-    background-color: var(--color-ink);
-    color: var(--color-white);
 }
 
 /* ==============================================
-   DISEÑO RESPONSIVO - GALERIA PUBLICA
+   HEADER DE LA OBRA (avatar + nombre + métricas)
    ============================================== */
+.obra-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 0 0.75rem 0;
+    position: relative;
+    z-index: 2;
+}
+
+.obra-header-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    background: var(--color-gray-200);
+}
+
+.obra-header-avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-200);
+    border: 3px solid var(--color-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gray-500);
+}
+
+.obra-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.obra-header-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    line-height: 1.2;
+}
+
+.obra-header-metricas {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-gray-500);
+}
+
+.obra-header-metricas .metrica-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.obra-header-metricas .metrica-item svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-ink);
+}
+
+/* ==============================================
+   PANEL DE REDES SOCIALES (lateral izquierdo)
+   ============================================== */
+.obra-redes-sociales {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.obra-redes-bar {
+    background: var(--color-ink);
+    border-radius: 0 0 6px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    width: 40px;
+    position: relative;
+}
+
+.obra-redes-bar .redes-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.2s ease, max-height 0.3s ease;
+}
+
+.obra-redes-bar .redes-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--color-white);
+    transition: transform 0.2s ease;
+}
+
+.obra-redes-bar .redes-icons a:hover {
+    transform: scale(1.2);
+    color: var(--color-gray-300);
+}
+
+.obra-redes-bar .redes-icons svg {
+    width: 20px;
+    height: 20px;
+}
+
+.obra-redes-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0 0 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+/* Estado contraído */
+.obra-redes-sociales.collapsed .obra-redes-bar {
+    width: 16px;
+    padding: 8px 2px;
+    border-radius: 0 4px 4px 0;
+}
+
+.obra-redes-sociales.collapsed .redes-icons {
+    opacity: 0;
+    max-height: 0;
+    pointer-events: none;
+}
+
+.obra-redes-sociales.collapsed .obra-redes-toggle {
+    transform: rotate(180deg);
+    padding: 4px 0;
+}
+
+/* ==============================================
+   IMAGEN PRINCIPAL
+   ============================================== */
+.obra-imagen-container {
+    grid-column: 2;
+    grid-row: 2;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--color-gray-100);
+}
+
+.obra-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==============================================
+   PANEL DE COMENTARIOS (lateral derecho)
+   ============================================== */
+.obra-comentarios {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    z-index: 3;
+    transition: all 0.3s ease;
+    width: 280px;
+}
+
+.obra-comentarios-panel {
+    width: 100%;
+    background: var(--color-white);
+    border: 1px solid var(--color-ink);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.obra-comentarios-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.obra-comentarios-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-ink);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.obra-comentarios-lista {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 300px;
+    transition: opacity 0.2s ease, max-height 0.3s ease;
+}
+
+/* Scrollbar personalizada */
+.obra-comentarios-lista::-webkit-scrollbar {
+    width: 6px;
+}
+.obra-comentarios-lista::-webkit-scrollbar-track {
+    background: transparent;
+}
+.obra-comentarios-lista::-webkit-scrollbar-thumb {
+    background: var(--color-ink);
+    border-radius: 3px;
+}
+
+.comentario-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.comentario-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comentario-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.comentario-avatar svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-500);
+}
+
+.comentario-nombre {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-ink);
+}
+
+.comentario-texto {
+    font-size: 0.75rem;
+    color: var(--color-gray-600);
+    line-height: 1.4;
+    padding-left: 36px;
+}
+
+.comentario-acciones {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 36px;
+    font-size: 0.7rem;
+    color: var(--color-gray-400);
+}
+
+.comentario-acciones .mini-accion {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--color-gray-500);
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.comentario-acciones .mini-accion:hover {
+    color: var(--color-ink);
+}
+
+.comentario-acciones .mini-accion svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Input de comentario */
+.obra-comentarios-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--color-gray-200);
+    transition: opacity 0.2s ease;
+}
+
+.obra-comentarios-input input {
+    flex: 1;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    background: var(--color-white);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.obra-comentarios-input input::placeholder {
+    color: var(--color-gray-400);
+}
+
+.obra-comentarios-input input:focus {
+    border-color: var(--color-ink);
+}
+
+.obra-comentarios-input button {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    background: var(--color-ink);
+    color: var(--color-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.obra-comentarios-input button:hover {
+    background: var(--color-ink-light);
+}
+
+.obra-comentarios-input button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Estado contraído */
+.obra-comentarios.collapsed {
+    width: 24px;
+}
+
+.obra-comentarios.collapsed .obra-comentarios-panel {
+    width: 24px;
+}
+
+.obra-comentarios.collapsed .obra-comentarios-lista,
+.obra-comentarios.collapsed .obra-comentarios-input {
+    opacity: 0;
+    max-height: 0;
+    pointer-events: none;
+    padding: 0;
+}
+
+.obra-comentarios.collapsed .obra-comentarios-toggle {
+    transform: rotate(180deg);
+}
+
+/* ==============================================
+   BARRA INFERIOR (título + precio)
+   ============================================== */
+.obra-footer {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    z-index: 2;
+    margin-top: -1px;
+    transition: all 0.3s ease;
+}
+
+.obra-footer-info {
+    display: flex;
+    flex: 1;
+    align-items: stretch;
+    transition: all 0.3s ease;
+}
+
+.obra-footer-titulo {
+    background: var(--color-ink);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 6px 0 0 6px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 0;
+}
+
+.obra-footer-titulo .footer-toggle-icon {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.obra-footer-titulo .footer-titulo-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+.obra-footer-precio {
+    background: var(--color-white);
+    border: 2px solid var(--color-ink);
+    border-left: none;
+    color: var(--color-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 0 6px 6px 0;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Estado contraído de la barra inferior */
+.obra-footer.collapsed .obra-footer-titulo {
+    flex: 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-right: 8px;
+}
+
+.obra-footer.collapsed .obra-footer-titulo .footer-titulo-texto {
+    opacity: 0;
+    max-width: 0;
+    pointer-events: none;
+}
+
+.obra-footer.collapsed .obra-footer-titulo .footer-toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* ==============================================
+   RESPONSIVE - MÓVIL
+   ============================================== */
+@media (max-width: 768px) {
+    #galeria-container {
+        padding: 1rem 0.5rem;
+        gap: 2rem;
+    }
+
+    .obra-card {
+        max-width: 100%;
+    }
+
+    .obra-header {
+        padding: 0 0 0.5rem 0;
+        gap: 0.75rem;
+    }
+
+    .obra-header-avatar,
+    .obra-header-avatar-placeholder {
+        width: 46px;
+        height: 46px;
+    }
+
+    .obra-header-nombre {
+        font-size: 0.9rem;
+    }
+
+    .obra-header-metricas {
+        font-size: 0.7rem;
+        gap: 0.75rem;
+    }
+
+    .obra-redes-bar {
+        width: 34px;
+        padding: 10px 6px;
+        gap: 4px;
+    }
+
+    .obra-redes-bar .redes-icons svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .obra-redes-sociales.collapsed .obra-redes-bar {
+        width: 14px;
+        padding: 6px 2px;
+    }
+
+    .obra-comentarios {
+        width: 240px;
+    }
+
+    .obra-comentarios.collapsed {
+        width: 20px;
+    }
+
+    .obra-comentarios.collapsed .obra-comentarios-panel {
+        width: 20px;
+    }
+
+    .obra-comentarios-lista {
+        max-height: 200px;
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .obra-footer-titulo {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+
+    .obra-footer-precio {
+        font-size: 1rem;
+        padding: 8px 14px;
+    }
+}
+
 @media (max-width: 480px) {
     #galeria-container {
-        grid-template-columns: 1fr;
-        padding: 1rem;
+        padding: 0.75rem 0.25rem;
+        gap: 1.5rem;
+    }
+
+    .obra-header-avatar,
+    .obra-header-avatar-placeholder {
+        width: 38px;
+        height: 38px;
+    }
+
+    .obra-header-nombre {
+        font-size: 0.8rem;
+    }
+
+    .obra-redes-bar {
+        width: 28px;
+        padding: 8px 4px;
+        gap: 3px;
+    }
+
+    .obra-redes-bar .redes-icons svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .obra-comentarios {
+        width: 200px;
+    }
+
+    .obra-footer-titulo {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .obra-footer-precio {
+        font-size: 0.9rem;
+        padding: 6px 10px;
     }
 }
 
 /* ==============================================
    MODO OSCURO
    ============================================== */
-[data-theme="dark"] .obra-card {
+[data-theme="dark"] .obra-header-nombre {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-comentarios-panel {
     background-color: #121212;
-    border-color: #e5e5e5;
+    border-color: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+[data-theme="dark"] .obra-comentarios-header {
+    border-bottom-color: var(--color-gray-300);
 }
 
-[data-theme="dark"] .obra-card h3 {
+[data-theme="dark"] .obra-comentarios-toggle {
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-card p {
-    color: var(--color-ink);
+[data-theme="dark"] .obra-comentarios-lista::-webkit-scrollbar-thumb {
+    background: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-card button {
+[data-theme="dark"] .obra-comentarios-input {
+    border-top-color: var(--color-gray-300);
+}
+
+[data-theme="dark"] .obra-comentarios-input input {
     background-color: #121212;
-    border-color: #e5e5e5;
+    border-color: var(--color-ink);
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-card button:hover {
-    background-color: var(--color-ink);
-    color: var(--color-white);
+[data-theme="dark"] .obra-comentarios-input input::placeholder {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .obra-comentarios-input button {
+    background: var(--color-ink);
+    color: #121212;
+}
+
+[data-theme="dark"] .obra-footer-precio {
+    background-color: #121212;
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-footer-titulo {
+    background: var(--color-ink);
+    color: #121212;
+}
+
+[data-theme="dark"] .obra-redes-bar {
+    background: var(--color-ink);
+}
+
+[data-theme="dark"] .obra-redes-bar .redes-icons a {
+    color: #121212;
+}
+
+[data-theme="dark"] .obra-redes-toggle {
+    color: #121212;
 }
