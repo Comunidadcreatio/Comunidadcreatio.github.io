@@ -2072,24 +2072,44 @@ async function verPerfilUsuario(userId) {
 // INICIALIZACIÓN
 // ============================================
 async function init() {
-    // El preloader se oculta DESPUÉS de 4 segundos, sin importar
-    // si la verificación de sesión ya terminó o no
+    // El preloader actúa como indicador de que el backend está
+    // despertando. Se muestra hasta que la primera API responde
+    // correctamente (servidor despierto) o hasta un timeout máximo.
     const preloader = document.getElementById('preloader');
     let preloaderOcultado = false;
     const ocultarPreloader = () => {
         if (!preloaderOcultado && preloader) {
             preloaderOcultado = true;
             preloader.classList.add('hidden');
-            // Activar el fade-in suave del contenido principal
             const appContainer = document.querySelector('.app-container');
             if (appContainer) {
                 appContainer.classList.add('visible');
             }
         }
     };
-    setTimeout(ocultarPreloader, 4000);
+
+    // Timeout máximo de seguridad: 15 segundos
+    const MAX_TIMEOUT = 15000;
+    let timeoutId = setTimeout(ocultarPreloader, MAX_TIMEOUT);
+
+    // Si el servidor tarda > 2s, se ve el preloader al menos ese tiempo
+    const MIN_DISPLAY_MS = 2000;
+    let minDisplayPassed = false;
+    setTimeout(() => { minDisplayPassed = true; }, MIN_DISPLAY_MS);
 
     const sesionValida = await verificarSesionBackend();
+    // Servidor YA respondió (despertó). Ocultar preloader cuando pasó el mínimo.
+    if (minDisplayPassed) {
+        ocultarPreloader();
+        clearTimeout(timeoutId);
+    } else {
+        const remaining = MIN_DISPLAY_MS - (performance.now() - performance.timing?.navigationStart || 0) % MIN_DISPLAY_MS;
+        setTimeout(() => {
+            ocultarPreloader();
+            clearTimeout(timeoutId);
+        }, Math.max(0, remaining));
+    }
+
     if (!sesionValida) {
         window.location.href = 'auth.html';
         return;
