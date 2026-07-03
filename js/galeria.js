@@ -1,5 +1,6 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
+import { artistaActual } from './auth.js';
 
 // Genera HTML de skeleton loader para la galería
 function generarSkeletonGaleria(cantidad = 6) {
@@ -89,7 +90,9 @@ function crearObraCard(obra) {
     const imgSrc = obra.imagen_thumbnail_url || obra.imagen_url || '';
     const nombreArtista = obra.artista || 'Artista';
     const inicial = nombreArtista.charAt(0).toUpperCase();
-    const tieneAvatar = !!(obra.foto_artista);
+    // Usar foto de perfil de la obra o del usuario logueado como fallback
+    const fotoArtista = obra.foto_artista || (artistaActual && artistaActual.foto_perfil) || '';
+    const tieneAvatar = !!fotoArtista;
     const titulo = obra.titulo || 'Sin título';
     const precio = obra.precio || 'N/A';
 
@@ -122,7 +125,7 @@ function crearObraCard(obra) {
         <!-- Imagen principal + avatar anclado a la esquina -->
         <div class="obra-imagen-container">
             ${tieneAvatar 
-                ? `<img src="${obra.foto_artista}" alt="${nombreArtista}" class="obra-avatar-esquina">`
+                ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-esquina">`
                 : `<div class="obra-avatar-esquina-placeholder">${inicial}</div>`
             }
             <img src="${imgSrc}" alt="${titulo}" class="obra-imagen" loading="lazy">
@@ -164,7 +167,6 @@ function crearObraCard(obra) {
     if (redesToggle && redesPanel) {
         redesToggle.addEventListener('click', () => {
             redesPanel.classList.toggle('collapsed');
-            // Actualizar ícono
             redesToggle.innerHTML = redesPanel.classList.contains('collapsed') 
                 ? ICON_TRIANGULO_ARRIBA 
                 : ICON_TRIANGULO_ABAJO;
