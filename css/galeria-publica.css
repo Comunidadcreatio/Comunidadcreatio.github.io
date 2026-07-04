@@ -31,7 +31,7 @@
    ============================================== */
 .obra-header {
     position: absolute;
-    top: -30px;
+    top: -37px;
     left: 120px;
     right: 0;
     z-index: 11;
@@ -42,7 +42,7 @@
 }
 
 .obra-header-nombre {
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--color-ink);
     line-height: 1.2;
@@ -75,12 +75,12 @@
     align-items: center;
     gap: 3px;
     color: var(--color-ink);
-    font-size: 0.65rem;
+    font-size: 0.79rem;
 }
 
 .obra-metricas-bar .metrica-item svg {
-    width: 18px;
-    height: 18px;
+    width: 29px;
+    height: 29px;
     color: var(--color-ink);
 }
 
@@ -122,29 +122,7 @@
 }
 
 /* ==============================================
-   IMAGEN PRINCIPAL
-   ============================================== */
-.obra-imagen-container {
-    grid-column: 2;
-    grid-row: 2;
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: visible;
-    border-radius: 8px;
-    background: var(--color-gray-100);
-}
-
-.obra-imagen {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 8px;
-}
-
-/* ==============================================
-   CARRUSEL DE IMÁGENES (slider táctil con 5 imágenes)
+   IMAGEN PRINCIPAL / CARRUSEL
    ============================================== */
 .obra-carousel {
     grid-column: 2;
@@ -185,7 +163,7 @@
     display: block;
 }
 
-/* Dots del carrusel — posicionados debajo del viewport, en el espacio del margin-top del footer */
+/* Dots del carrusel */
 .obra-carousel-dots {
     position: absolute;
     bottom: -20px;
@@ -220,13 +198,7 @@
     transform: scale(1.15);
 }
 
-/* Avatar va sobre el carrusel (mismo que antes pero con z-index mayor) */
-.obra-avatar-esquina,
-.obra-avatar-esquina-placeholder {
-    z-index: 10;
-}
-
-/* Ocultar imagen-container original, usar carrusel */
+/* Ocultar contenedor de imagen simple (ya no se usa) */
 .obra-imagen-container {
     display: none;
 }
@@ -298,7 +270,7 @@
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 8rem 0.5rem 3rem;
+        padding: 6rem 0.5rem 3rem;
         gap: 3.5rem;
     }
 
@@ -308,7 +280,7 @@
 
     .obra-header {
         top: -22px;
-        left: 80px;
+        left: 100px;
         gap: 8px;
     }
 
@@ -334,12 +306,12 @@
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.6rem;
+        font-size: 0.73rem;
     }
 
     .obra-footer-titulo {
@@ -355,20 +327,61 @@
 
 /* ==============================================
    RESPONSIVE - MÓVIL
-   Versión centrada: cada obra ocupa el centro
-   con escala aumentada un 20%
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 8rem 0.25rem 2rem;
+        padding: 4rem 0.5rem 2rem;
         gap: 2rem;
     }
 
     .obra-card {
-        transform: scale(0.86);
-        transform-origin: center center;
-        max-width: 460px;
-        margin: 0 auto;
+        max-width: 100%;
+    }
+
+    .obra-avatar-esquina,
+    .obra-avatar-esquina-placeholder {
+        width: 60px;
+        height: 60px;
+    }
+
+    .obra-avatar-esquina-placeholder {
+        font-size: 1.2rem;
+    }
+
+    .obra-header {
+        left: 82px;
+        top: -16px;
+        gap: 6px;
+    }
+
+    .obra-header-nombre {
+        font-size: 0.8rem;
+    }
+
+    .obra-metricas-bar {
+        margin: 0 10px 0 0;
+        padding-left: 4px;
+        padding-top: 36px;
+        gap: 14px;
+    }
+
+    .obra-metricas-bar .metrica-item svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .obra-metricas-bar .metrica-item {
+        font-size: 0.67rem;
+    }
+
+    .obra-footer-titulo {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .obra-footer-precio {
+        font-size: 0.9rem;
+        padding: 6px 10px;
     }
 }
 
@@ -379,6 +392,13 @@
     color: var(--color-ink);
 }
 
+[data-theme="dark"] .obra-metricas-bar .metrica-item {
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .obra-metricas-bar .metrica-item svg {
+    color: var(--color-white);
+}
 
 [data-theme="dark"] .obra-footer-precio {
     background-color: #121212;
