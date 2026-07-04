@@ -120,23 +120,27 @@ function initCarrusel(card) {
         });
     });
 
-    // Soporte táctil (swipe)
+    // Soporte táctil (swipe) — deshabilitado cuando la lupa está activa
+    const viewport = track.parentElement;
+
     track.addEventListener('touchstart', (e) => {
+        if (viewport.classList.contains('lupa-activa')) return;
         startX = e.touches[0].clientX;
         isDragging = true;
         track.style.transition = 'none';
     }, { passive: true });
 
     track.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
+        if (!isDragging || viewport.classList.contains('lupa-activa')) return;
         const diff = e.touches[0].clientX - startX;
-        const containerWidth = track.parentElement.offsetWidth;
+        const containerWidth = viewport.offsetWidth;
         dragOffset = (diff / containerWidth) * 100;
         const baseOffset = -currentIndex * 100;
         track.style.transform = `translateX(${baseOffset + dragOffset}%)`;
     }, { passive: true });
 
     track.addEventListener('touchend', () => {
+        if (viewport.classList.contains('lupa-activa')) return;
         isDragging = false;
         track.style.transition = 'transform 0.35s ease';
         if (Math.abs(dragOffset) > 20) {
