@@ -267,121 +267,37 @@
 
 /* ==============================================
    RESPONSIVE - TABLET
+   Escala reducida manteniendo proporciones idénticas
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 6rem 0.5rem 3rem;
-        gap: 3.5rem;
+        padding: 5rem 1rem 3rem;
+        gap: 4rem;
     }
 
     .obra-card {
-        max-width: 100%;
-    }
-
-    .obra-header {
-        top: -22px;
-        left: 100px;
-        gap: 8px;
-    }
-
-    .obra-avatar-esquina,
-    .obra-avatar-esquina-placeholder {
-        width: 72px;
-        height: 72px;
-    }
-
-    .obra-avatar-esquina-placeholder {
-        font-size: 1.5rem;
-    }
-
-    .obra-header-nombre {
-        font-size: 0.85rem;
-    }
-
-    .obra-metricas-bar {
-        margin: 0 12px 0 0;
-        padding-left: 5px;
-        padding-top: 42px;
-        gap: 16px;
-    }
-
-    .obra-metricas-bar .metrica-item svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    .obra-metricas-bar .metrica-item {
-        font-size: 0.73rem;
-    }
-
-    .obra-footer-titulo {
-        font-size: 0.85rem;
-        padding: 8px 12px;
-    }
-
-    .obra-footer-precio {
-        font-size: 1rem;
-        padding: 8px 14px;
+        max-width: 410px;
+        transform: scale(0.85);
+        transform-origin: top center;
+        margin-bottom: -2rem;
     }
 }
 
 /* ==============================================
    RESPONSIVE - MÓVIL
+   Escala reducida manteniendo proporciones idénticas
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 4rem 0.5rem 2rem;
-        gap: 2rem;
+        padding: 4rem 0.75rem 2rem;
+        gap: 3rem;
     }
 
     .obra-card {
-        max-width: 100%;
-    }
-
-    .obra-avatar-esquina,
-    .obra-avatar-esquina-placeholder {
-        width: 60px;
-        height: 60px;
-    }
-
-    .obra-avatar-esquina-placeholder {
-        font-size: 1.2rem;
-    }
-
-    .obra-header {
-        left: 82px;
-        top: -16px;
-        gap: 6px;
-    }
-
-    .obra-header-nombre {
-        font-size: 0.8rem;
-    }
-
-    .obra-metricas-bar {
-        margin: 0 10px 0 0;
-        padding-left: 4px;
-        padding-top: 36px;
-        gap: 14px;
-    }
-
-    .obra-metricas-bar .metrica-item svg {
-        width: 17px;
-        height: 17px;
-    }
-
-    .obra-metricas-bar .metrica-item {
-        font-size: 0.67rem;
-    }
-
-    .obra-footer-titulo {
-        font-size: 0.75rem;
-        padding: 6px 10px;
-    }
-
-    .obra-footer-precio {
-        font-size: 0.9rem;
-        padding: 6px 10px;
+        max-width: 410px;
+        transform: scale(0.7);
+        transform-origin: top center;
+        margin-bottom: -3rem;
     }
 }
 
