@@ -198,6 +198,85 @@
     transform: scale(1.15);
 }
 
+/* Ícono de lupa activo */
+.metrica-item--lupa {
+    cursor: pointer;
+}
+
+.metrica-item--lupa svg {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                color 0.35s ease,
+                filter 0.35s ease;
+}
+
+.metrica-item--lupa:hover svg {
+    transform: scale(1.15);
+}
+
+/* Estado activo: gira 360°, cambia de color y brilla */
+.metrica-item--lupa.activo svg {
+    transform: rotate(360deg) scale(1.1);
+    color: #e74c3c;
+    filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.7));
+    animation: lupa-pulse 2s ease-in-out infinite;
+}
+
+@keyframes lupa-pulse {
+    0%, 100% { 
+        filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.7));
+    }
+    50% { 
+        filter: drop-shadow(0 0 14px rgba(231, 76, 60, 1));
+    }
+}
+
+/* Animación de desactivación (se aplica vía JS) */
+.metrica-item--lupa.desactivando svg {
+    animation: lupa-reset 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes lupa-reset {
+    0% {
+        transform: rotate(360deg) scale(1.1);
+        color: #e74c3c;
+        filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.7));
+    }
+    100% {
+        transform: rotate(0deg) scale(1);
+        color: var(--color-ink);
+        filter: drop-shadow(0 0 0px transparent);
+    }
+}
+
+/* Lente de lupa sobre la imagen */
+.obra-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--color-white);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    background-repeat: no-repeat;
+    background-size: 600% 600%;
+    transition: opacity 0.15s ease;
+    display: none;
+}
+
+.obra-lens.visible {
+    opacity: 1;
+}
+
+/* Viewport con lupa activa: mostrar el lente y cambiar cursor */
+.obra-carousel-viewport.lupa-activa {
+    cursor: none;
+}
+
 /* Ocultar contenedor de imagen simple (ya no se usa) */
 .obra-imagen-container {
     display: none;
