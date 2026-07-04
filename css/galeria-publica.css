@@ -132,10 +132,10 @@
     overflow: visible;
 }
 
-/* Viewport interno: recorta el slide, mantiene el aspect ratio */
+/* Viewport interno: recorta el slide, mantiene el aspect ratio 3:4 */
 .obra-carousel-viewport {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
     border-radius: 8px;
     background: var(--color-gray-100);
