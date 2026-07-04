@@ -1,4 +1,4 @@
-/* css/galeria-publica.css - Nuevo diseño modular de tarjetas de obras */
+﻿/* css/galeria-publica.css - Nuevo diseño simplificado de tarjetas de obras */
 
 /* ==============================================
    CONTENEDOR DE LA GALERÍA
@@ -17,7 +17,7 @@
    ============================================== */
 .obra-card {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr auto;
     position: relative;
     max-width: 410px;
@@ -26,26 +26,19 @@
 }
 
 /* ==============================================
-   HEADER DE LA OBRA (nombre + métricas flotando
-   sobre la imagen, a la derecha del avatar)
+   HEADER DE LA OBRA (nombre del artista flotando
+   sobre la imagen, con espacio después del avatar)
    ============================================== */
 .obra-header {
-    /* Posicionado absolutamente respecto a la tarjeta,
-       ocupa desde la derecha del avatar hasta el borde de la imagen */
     position: absolute;
     top: -30px;
-    left: 110px;
+    left: 120px;
     right: 0;
     z-index: 11;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     white-space: nowrap;
-}
-
-.obra-header-info {
-    display: contents; /* Para que los hijos se integren en el flex row del header */
 }
 
 .obra-header-nombre {
@@ -56,150 +49,55 @@
     white-space: nowrap;
 }
 
-.obra-header-metricas {
+/* ==============================================
+   BARRA DE MÉTRICAS (lateral izquierdo)
+   Iconos de ojo y like en disposición vertical,
+   sin fondo, iniciando justo debajo del avatar.
+   ============================================== */
+.obra-metricas-bar {
+    grid-column: 1;
+    grid-row: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 14px;
-    font-size: 0.8rem;
-    color: var(--color-gray-500);
+    justify-content: flex-start;
+    gap: 20px;
+    position: relative;
+    z-index: 3;
+    margin: 0 12px 0 0;
+    padding-left: 6px;
+    padding-top: 72px;
 }
 
-.obra-header-metricas .metrica-item {
+.obra-metricas-bar .metrica-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 3px;
+    color: var(--color-ink);
+    font-size: 0.65rem;
 }
 
-.obra-header-metricas .metrica-item svg {
-    width: 16px;
-    height: 16px;
+.obra-metricas-bar .metrica-item svg {
+    width: 18px;
+    height: 18px;
     color: var(--color-ink);
 }
 
 /* ==============================================
-   PANEL DE REDES SOCIALES (lateral izquierdo)
-   Rectángulo vertical que baja desde el borde
-   inferior de la cabecera hasta el borde superior
-   de la barra inferior, alineado a la extrema
-   izquierda. Solo esquinas izquierdas redondeadas.
-   Margen: 6px a la derecha y 6px arriba respecto
-   a la imagen principal.
-   ============================================== */
-.obra-redes-sociales {
-    grid-column: 1;
-    grid-row: 2;
-    display: flex;
-    align-items: stretch;
-    position: relative;
-    z-index: 3;
-    transition: all 0.3s ease;
-    /* La barra empieza desde la mitad (centro) del círculo
-       (margin-top: 0). El círculo (z-index:10) tapa la parte
-       superior de la barra (z-index:3).
-       Borde izquierdo alineado con el extremo izquierdo del círculo
-       (radio=52.5px, barra=52px → coinciden visualmente).
-       Margen derecho: 14px de separación con la imagen. */
-    margin: 0 12px 0 0;
-}
-
-.obra-redes-bar {
-    background: var(--color-ink);
-    /* Esquinas izquierdas (superior e inferior) redondeadas a 8px */
-    border-radius: 0px 0px 0px 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 15px;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    width: 70px;
-    position: relative;
-}
-
-.obra-redes-bar .redes-icons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding-top: 16px;
-    transition: opacity 0.2s ease, max-height 0.3s ease;
-}
-
-.obra-redes-bar .redes-icons a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    color: var(--color-white);
-    transition: transform 0.2s ease;
-}
-
-.obra-redes-bar .redes-icons a:hover {
-    transform: scale(1.2);
-    color: var(--color-gray-300);
-}
-
-.obra-redes-bar .redes-icons svg {
-    width: 20px;
-    height: 20px;
-}
-
-.obra-redes-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* Flecha anclada al fondo de la barra, centrada entre los vértices redondeados */
-    margin-top: auto;
-    padding: 0 0 10px 0;
-    background: none;
-    border: none;
-    color: var(--color-white);
-    font-size: 10px;
-    flex-shrink: 0;
-    /* Estático por ahora — sin funcionalidad de toggle */
-    cursor: default;
-    pointer-events: none;
-}
-
-/* Estado contraído (la flecha se mantiene visible y estática al fondo) */
-.obra-redes-sociales.collapsed .obra-redes-bar {
-    width: 25px;
-    padding: 0 3px;
-    border-radius: 0px 0px 0px 0px;
-}
-
-.obra-redes-sociales.collapsed .redes-icons {
-    opacity: 0;
-    max-height: 0;
-    pointer-events: none;
-    margin: 0;
-    gap: 0;
-    padding: 0;
-}
-
-.obra-redes-sociales.collapsed .obra-redes-toggle {
-    padding: 0 0 8px 0;
-}
-
-/* ==============================================
    AVATAR ANCLADO A LA ESQUINA SUPERIOR IZQUIERDA
-   Centro del círculo = vértice del contenedor
-   ~25% solapa la imagen, ~75% sobresale
+   Tamaño aumentado a 125px
    ============================================== */
 .obra-avatar-esquina {
     position: absolute;
-    /* Centro del círculo en el vértice superior izquierdo del contenedor */
     top: 0;
     left: 0;
     transform: translate(-50%, -50%);
-    width: 105px;
-    height: 105px;
+    width: 125px;
+    height: 125px;
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--color-white);
-    box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.35);
     z-index: 10;
     background: var(--color-gray-200);
 }
@@ -209,17 +107,16 @@
     top: 0;
     left: 0;
     transform: translate(-50%, -50%);
-    width: 105px;
-    height: 105px;
+    width: 125px;
+    height: 125px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--color-gray-200);
     border: 4px solid var(--color-white);
-    box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.35);
     z-index: 10;
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: var(--color-gray-500);
 }
@@ -233,7 +130,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 1 / 1;
-    overflow: visible; /* Permitir que el avatar sobresalga */
+    overflow: visible;
     border-radius: 8px;
     background: var(--color-gray-100);
 }
@@ -247,232 +144,105 @@
 }
 
 /* ==============================================
-   PANEL DE COMENTARIOS (lateral derecho)
+   CARRUSEL DE IMÁGENES (slider táctil con 5 imágenes)
    ============================================== */
-.obra-comentarios {
-    grid-column: 3;
+.obra-carousel {
+    grid-column: 2;
     grid-row: 2;
-    display: flex;
-    align-items: stretch;
     position: relative;
-    z-index: 3;
-    transition: all 0.3s ease;
-    width: 280px;
-}
-
-.obra-comentarios-panel {
     width: 100%;
-    background: var(--color-white);
-    border: 1px solid var(--color-ink);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
+    overflow: visible;
+}
+
+/* Viewport interno: recorta el slide, mantiene el aspect ratio */
+.obra-carousel-viewport {
+    width: 100%;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    background: var(--color-gray-100);
 }
 
-.obra-comentarios-header {
+.obra-carousel-track {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--color-gray-200);
+    width: 100%;
+    height: 100%;
+    transition: transform 0.35s ease;
+    will-change: transform;
+    touch-action: pan-y;
 }
 
-.obra-comentarios-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-ink);
-    padding: 4px;
+.obra-carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    position: relative;
+}
+
+.obra-carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Dots del carrusel — posicionados debajo del viewport, en el espacio del margin-top del footer */
+.obra-carousel-dots {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
     display: flex;
-    align-items: center;
-    transition: transform 0.3s ease;
-}
-
-.obra-comentarios-lista {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-height: 300px;
-    transition: opacity 0.2s ease, max-height 0.3s ease;
-}
-
-/* Scrollbar personalizada */
-.obra-comentarios-lista::-webkit-scrollbar {
-    width: 6px;
-}
-.obra-comentarios-lista::-webkit-scrollbar-track {
-    background: transparent;
-}
-.obra-comentarios-lista::-webkit-scrollbar-thumb {
-    background: var(--color-ink);
-    border-radius: 3px;
-}
-
-.comentario-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.comentario-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.comentario-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-gray-300);
-    display: flex;
-    align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-}
-
-.comentario-avatar svg {
-    width: 16px;
-    height: 16px;
-    color: var(--color-gray-500);
-}
-
-.comentario-nombre {
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: var(--color-ink);
-}
-
-.comentario-texto {
-    font-size: 0.75rem;
-    color: var(--color-gray-600);
-    line-height: 1.4;
-    padding-left: 36px;
-}
-
-.comentario-acciones {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-left: 36px;
-    font-size: 0.7rem;
-    color: var(--color-gray-400);
-}
-
-.comentario-acciones .mini-accion {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--color-gray-500);
-    font-size: 0.7rem;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.2s;
-}
-
-.comentario-acciones .mini-accion:hover {
-    color: var(--color-ink);
-}
-
-.comentario-acciones .mini-accion svg {
-    width: 12px;
-    height: 12px;
-}
-
-/* Input de comentario */
-.obra-comentarios-input {
-    display: flex;
-    align-items: center;
     gap: 8px;
-    padding: 10px 12px;
-    border-top: 1px solid var(--color-gray-200);
-    transition: opacity 0.2s ease;
-}
-
-.obra-comentarios-input input {
-    flex: 1;
-    border: 1px solid var(--color-gray-200);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    background: var(--color-white);
-    color: var(--color-text);
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.obra-comentarios-input input::placeholder {
-    color: var(--color-gray-400);
-}
-
-.obra-comentarios-input input:focus {
-    border-color: var(--color-ink);
-}
-
-.obra-comentarios-input button {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    border: none;
-    background: var(--color-ink);
-    color: var(--color-white);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.2s;
-}
-
-.obra-comentarios-input button:hover {
-    background: var(--color-ink-light);
-}
-
-.obra-comentarios-input button svg {
-    width: 16px;
-    height: 16px;
-}
-
-/* Estado contraído */
-.obra-comentarios.collapsed {
-    width: 24px;
-}
-
-.obra-comentarios.collapsed .obra-comentarios-panel {
-    width: 24px;
-}
-
-.obra-comentarios.collapsed .obra-comentarios-lista,
-.obra-comentarios.collapsed .obra-comentarios-input {
-    opacity: 0;
-    max-height: 0;
+    z-index: 5;
     pointer-events: none;
+}
+
+.obra-carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease;
+    pointer-events: auto;
     padding: 0;
 }
 
-.obra-comentarios.collapsed .obra-comentarios-toggle {
-    transform: rotate(180deg);
+.obra-carousel-dot:hover {
+    transform: scale(1.2);
+}
+
+.obra-carousel-dot.active {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    transform: scale(1.15);
+}
+
+/* Avatar va sobre el carrusel (mismo que antes pero con z-index mayor) */
+.obra-avatar-esquina,
+.obra-avatar-esquina-placeholder {
+    z-index: 10;
+}
+
+/* Ocultar imagen-container original, usar carrusel */
+.obra-imagen-container {
+    display: none;
 }
 
 /* ==============================================
    BARRA INFERIOR (título + precio)
+   Separada del carrusel con margin-top
    ============================================== */
 .obra-footer {
-    grid-column: 1 / -1;
+    grid-column: 2;
     grid-row: 3;
     display: flex;
     align-items: stretch;
     position: relative;
     z-index: 2;
-    margin-top: -1px;
+    margin-top: 32px;
     transition: all 0.3s ease;
 }
 
@@ -499,11 +269,6 @@
     min-width: 0;
 }
 
-.obra-footer-titulo .footer-toggle-icon {
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-}
-
 .obra-footer-titulo .footer-titulo-texto {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -528,26 +293,8 @@
     flex-shrink: 0;
 }
 
-/* Estado contraído de la barra inferior */
-.obra-footer.collapsed .obra-footer-titulo {
-    flex: 0;
-    padding: 10px 12px;
-    border-radius: 6px;
-    margin-right: 8px;
-}
-
-.obra-footer.collapsed .obra-footer-titulo .footer-titulo-texto {
-    opacity: 0;
-    max-width: 0;
-    pointer-events: none;
-}
-
-.obra-footer.collapsed .obra-footer-titulo .footer-toggle-icon {
-    transform: rotate(180deg);
-}
-
 /* ==============================================
-   RESPONSIVE - MÓVIL
+   RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
@@ -561,92 +308,38 @@
 
     .obra-header {
         top: -22px;
-        left: 50px;
+        left: 80px;
         gap: 8px;
     }
 
     .obra-avatar-esquina,
     .obra-avatar-esquina-placeholder {
-        width: 60px;
-        height: 60px;
+        width: 72px;
+        height: 72px;
+    }
+
+    .obra-avatar-esquina-placeholder {
+        font-size: 1.5rem;
     }
 
     .obra-header-nombre {
         font-size: 0.85rem;
     }
 
-    .obra-header-metricas {
-        font-size: 0.7rem;
-        gap: 10px;
-    }
-
-    .obra-redes-sociales {
-        /* La barra empieza desde la mitad del círculo (z-index lo tapa).
-           margin-top: 0, el círculo (z-index:10) tapa la parte superior.
-           Ancho 42px alineado con el radio del círculo (30px).
-           Margen derecho: 12px de separación con la imagen. */
+    .obra-metricas-bar {
         margin: 0 12px 0 0;
+        padding-left: 5px;
+        padding-top: 42px;
+        gap: 16px;
     }
 
-    .obra-redes-bar {
-        width: 46px;
-        padding: 0 10px;
-        border-radius: 7px 0 0 7px;
+    .obra-metricas-bar .metrica-item svg {
+        width: 16px;
+        height: 16px;
     }
 
-    .obra-redes-bar .redes-icons {
-        gap: 13px;
-        padding-top: 14px;
-    }
-
-    .obra-redes-bar .redes-icons svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .obra-redes-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* Flecha anclada al fondo */
-        margin-top: auto;
-        padding: 0 0 9px 0;
-        background: none;
-        border: none;
-        color: var(--color-white);
-        font-size: 9px;
-        flex-shrink: 0;
-        cursor: default;
-        pointer-events: none;
-    }
-
-    .obra-redes-sociales.collapsed .obra-redes-bar {
-        width: 20px;
-        padding: 0 2px;
-        border-radius: 0px 0px 0px 0px;
-    }
-
-    .obra-redes-sociales.collapsed .obra-redes-toggle {
-        padding: 0 0 7px 0;
-    }
-
-    .obra-comentarios {
-        width: 240px;
-    }
-
-    .obra-comentarios.collapsed {
-        width: 20px;
-    }
-
-    .obra-comentarios.collapsed .obra-comentarios-panel {
-        width: 20px;
-    }
-
-    .obra-comentarios-lista {
-        max-height: 200px;
-        padding: 8px;
-        gap: 10px;
+    .obra-metricas-bar .metrica-item {
+        font-size: 0.6rem;
     }
 
     .obra-footer-titulo {
@@ -660,91 +353,24 @@
     }
 }
 
+/* ==============================================
+   RESPONSIVE - MÓVIL
+   ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 4rem 0.5rem 2rem;
-        gap: 2rem;
+        padding: 5rem 0.25rem 2rem;
+        gap: 3rem;
     }
 
-    .obra-avatar-esquina,
-    .obra-avatar-esquina-placeholder {
-        width: 50px;
-        height: 50px;
+    .obra-card {
+        transform: scale(0.72);
+        transform-origin: top center;
+        max-width: 450px;
+        margin-bottom: -1.5rem;
     }
 
-    .obra-header {
-        left: 38px;
-        top: -16px;
-        gap: 6px;
-    }
-
-    .obra-header-nombre {
-        font-size: 0.8rem;
-    }
-
-    .obra-redes-sociales {
-        /* La barra empieza desde la mitad del círculo (z-index lo tapa).
-           margin-top: 0, el círculo (z-index:10) tapa la parte superior.
-           Ancho 36px alineado con el radio del círculo (25px).
-           Margen derecho: 10px de separación con la imagen. */
-        margin: 0 10px 0 0;
-    }
-
-    .obra-redes-bar {
-        width: 40px;
-        padding: 0 8px;
-        border-radius: 6px 0 0 6px;
-    }
-
-    .obra-redes-bar .redes-icons {
-        gap: 11px;
-        padding-top: 12px;
-    }
-
-    .obra-redes-bar .redes-icons svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .obra-redes-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* Flecha anclada al fondo */
-        margin-top: auto;
-        padding: 0 0 8px 0;
-        background: none;
-        border: none;
-        color: var(--color-white);
-        font-size: 8px;
-        flex-shrink: 0;
-        cursor: default;
-        pointer-events: none;
-    }
-
-    .obra-redes-sociales.collapsed .obra-redes-bar {
-        width: 18px;
-        padding: 0 2px;
-        border-radius: 0px 0px 0px 0px;
-    }
-
-    .obra-redes-sociales.collapsed .obra-redes-toggle {
-        padding: 0 0 6px 0;
-    }
-
-    .obra-comentarios {
-        width: 200px;
-    }
-
-    .obra-footer-titulo {
-        font-size: 0.75rem;
-        padding: 6px 10px;
-    }
-
-    .obra-footer-precio {
-        font-size: 0.9rem;
-        padding: 6px 10px;
+    .obra-card:last-child {
+        margin-bottom: 0;
     }
 }
 
@@ -755,41 +381,6 @@
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-comentarios-panel {
-    background-color: #121212;
-    border-color: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-comentarios-header {
-    border-bottom-color: var(--color-gray-300);
-}
-
-[data-theme="dark"] .obra-comentarios-toggle {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-comentarios-lista::-webkit-scrollbar-thumb {
-    background: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-comentarios-input {
-    border-top-color: var(--color-gray-300);
-}
-
-[data-theme="dark"] .obra-comentarios-input input {
-    background-color: #121212;
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-comentarios-input input::placeholder {
-    color: var(--color-gray-400);
-}
-
-[data-theme="dark"] .obra-comentarios-input button {
-    background: var(--color-ink);
-    color: #121212;
-}
 
 [data-theme="dark"] .obra-footer-precio {
     background-color: #121212;
@@ -799,17 +390,5 @@
 
 [data-theme="dark"] .obra-footer-titulo {
     background: var(--color-ink);
-    color: #121212;
-}
-
-[data-theme="dark"] .obra-redes-bar {
-    background: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-redes-bar .redes-icons a {
-    color: #121212;
-}
-
-[data-theme="dark"] .obra-redes-toggle {
     color: #121212;
 }
