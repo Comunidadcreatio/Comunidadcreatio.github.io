@@ -253,8 +253,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 120px;
-    height: 120px;
+    width: 126px;
+    height: 126px;
     border-radius: 50%;
     border: 3px solid var(--color-white);
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.15);
@@ -263,7 +263,7 @@
     opacity: 0;
     transform: translate(-50%, -50%);
     background-repeat: no-repeat;
-    background-size: 600% 600%;
+    background-size: 1200% 1200%;
     transition: opacity 0.15s ease;
     display: none;
 }
