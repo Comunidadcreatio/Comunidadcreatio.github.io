@@ -310,11 +310,24 @@ function initLupa(card) {
         // viewportRect.width es el tamaño visual (afectado por scale() en responsive)
         const scaleFactor = viewport.offsetWidth / viewportRect.width;
 
-        // Posición del lente centrado en el cursor, mapeada al espacio de layout
-        let lensX = (clientX - viewportRect.left) * scaleFactor - lensW / 2;
-        let lensY = (clientY - viewportRect.top) * scaleFactor - lensH / 2;
+        // Offset para que el dedo no tape el lente (solo en touch)
+        const isTouch = !!e.touches;
+        const offsetX = isTouch ? -55 : 0;
+        const offsetY = isTouch ? -65 : 0;
 
-        // Clampear dentro del viewport (usando tamaño de layout)
+        // Posición del punto de inspección (cursor o dedo), mapeada al espacio de layout
+        const inspectX = (clientX - viewportRect.left) * scaleFactor;
+        const inspectY = (clientY - viewportRect.top) * scaleFactor;
+
+        // Clampear punto de inspección dentro del viewport
+        const clampedInspectX = Math.max(0, Math.min(inspectX, viewport.offsetWidth));
+        const clampedInspectY = Math.max(0, Math.min(inspectY, viewport.offsetHeight));
+
+        // Posición del lente: centrado en el punto de inspección + offset
+        let lensX = clampedInspectX + offsetX - lensW / 2;
+        let lensY = clampedInspectY + offsetY - lensH / 2;
+
+        // Clampear lente dentro del viewport
         lensX = Math.max(0, Math.min(lensX, viewport.offsetWidth - lensW));
         lensY = Math.max(0, Math.min(lensY, viewport.offsetHeight - lensH));
 
@@ -322,9 +335,9 @@ function initLupa(card) {
         lens.style.top = (lensY + lensH / 2) + 'px';
         lens.classList.add('visible');
 
-        // Calcular background-position para el zoom (en espacio de layout)
-        const cursorRelX = ((clientX - viewportRect.left) * scaleFactor) / viewport.offsetWidth;
-        const cursorRelY = ((clientY - viewportRect.top) * scaleFactor) / viewport.offsetHeight;
+        // Calcular background-position para el zoom (usando el punto de inspección, no el lente)
+        const cursorRelX = clampedInspectX / viewport.offsetWidth;
+        const cursorRelY = clampedInspectY / viewport.offsetHeight;
 
         const bgX = cursorRelX * 100;
         const bgY = cursorRelY * 100;
@@ -358,13 +371,30 @@ function initLupa(card) {
         }
     });
 
-    // --- Eventos de mouse ---
+    // --- Eventos de mouse (solo dentro del viewport) ---
     viewport.addEventListener('mousemove', moveLens);
     viewport.addEventListener('mouseleave', hideLens);
 
-    // --- Eventos táctiles ---
-    viewport.addEventListener('touchmove', moveLens, { passive: false });
-    viewport.addEventListener('touchend', hideLens);
+    // --- Eventos táctiles (en todo el documento para no tapar el lente) ---
+    document.addEventListener('touchmove', (e) => {
+        if (!lupaActiva) return;
+        // Verificar que el touch está cerca de la card
+        const cardRect = card.getBoundingClientRect();
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const margin = 80; // permitir tocar un poco fuera de la card
+        const isNearCard = 
+            touchX >= cardRect.left - margin &&
+            touchX <= cardRect.right + margin &&
+            touchY >= cardRect.top - margin &&
+            touchY <= cardRect.bottom + margin;
+        if (!isNearCard) return;
+        moveLens(e);
+    }, { passive: false });
+    document.addEventListener('touchend', (e) => {
+        if (!lupaActiva) return;
+        hideLens();
+    });
 }
 
 export function mostrarGaleria(obras, container, onDetalle) {
