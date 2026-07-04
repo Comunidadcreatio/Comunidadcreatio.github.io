@@ -308,14 +308,6 @@
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .obra-metricas-bar .metrica-item {
-    color: var(--color-white);
-}
-
-[data-theme="dark"] .obra-metricas-bar .metrica-item svg {
-    color: var(--color-white);
-}
-
 [data-theme="dark"] .obra-footer-precio {
     background-color: #121212;
     border-color: var(--color-ink);
