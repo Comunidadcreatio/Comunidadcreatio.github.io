@@ -23,6 +23,8 @@
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
+    transform: scale(1.05) translateY(8%);
+    transform-origin: top center;
 }
 
 /* ==============================================
@@ -356,7 +358,7 @@
 
     .obra-card {
         max-width: 410px;
-        transform: scale(0.85);
+        transform: scale(0.8925) translateY(8%);
         transform-origin: top center;
         margin-bottom: -2rem;
     }
@@ -374,7 +376,7 @@
 
     .obra-card {
         max-width: 410px;
-        transform: scale(0.7) translateX(-15%);
+        transform: scale(0.735) translateX(-15%) translateY(8%);
         transform-origin: top center;
         margin-bottom: -3rem;
     }
