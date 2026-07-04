@@ -295,7 +295,7 @@
 
     .obra-card {
         max-width: 410px;
-        transform: scale(0.7);
+        transform: scale(0.7) translateX(-15%);
         transform-origin: top center;
         margin-bottom: -3rem;
     }
