@@ -360,7 +360,7 @@
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 4rem 0.25rem 2rem;
+        padding: 6rem 0.25rem 2rem;
         gap: 2rem;
     }
 
