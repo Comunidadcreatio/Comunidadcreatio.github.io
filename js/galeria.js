@@ -47,6 +47,7 @@ export async function cargarGaleria(container) {
 const ICON_OJO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 const ICON_LIKE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
 const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+const ICON_LUPA = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>';
 
 /**
  * Crea el HTML del carrusel de imágenes para una obra.
@@ -219,6 +220,7 @@ function crearObraCard(obra) {
             <span class="metrica-item">${ICON_OJO} <span>0</span></span>
             <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
             <span class="metrica-item">${ICON_LIKE} <span>0</span></span>
+            <span class="metrica-item metrica-item--lupa">${ICON_LUPA}</span>
         </div>
 
         <!-- Carrusel de imágenes (incluye avatar y dots) -->
@@ -235,10 +237,128 @@ function crearObraCard(obra) {
         </div>
     `;
 
-    // Inicializar carrusel después de agregar al DOM
-    requestAnimationFrame(() => initCarrusel(card));
+    // Inicializar carrusel y lupa después de agregar al DOM
+    requestAnimationFrame(() => {
+        initCarrusel(card);
+        initLupa(card);
+    });
 
     return card;
+}
+
+/**
+ * Inicializa la lupa: toggle desde el icono, lente circular que sigue mouse/touch
+ * y muestra la imagen con zoom 3x.
+ */
+function initLupa(card) {
+    const btnLupa = card.querySelector('.metrica-item--lupa');
+    const viewport = card.querySelector('.obra-carousel-viewport');
+    if (!btnLupa || !viewport) return;
+
+    // Crear el lente de lupa
+    const lens = document.createElement('div');
+    lens.className = 'obra-lens';
+    viewport.appendChild(lens);
+
+    let lupaActiva = false;
+
+    // --- HELPERS para obtener el slide activo y su imagen ---
+    function getActiveSlideImg() {
+        const track = card.querySelector('.obra-carousel-track');
+        if (!track) return null;
+        const computedTransform = getComputedStyle(track).transform;
+        // Por defecto usamos el primer slide
+        const slides = track.querySelectorAll('.obra-carousel-slide');
+        if (slides.length === 0) return null;
+        // Intentamos deducir el índice desde la matriz de transformación
+        // pero es más seguro usar la clase active del dot
+        const activeDot = card.querySelector('.obra-carousel-dot.active');
+        const index = activeDot ? parseInt(activeDot.dataset.index) : 0;
+        const slide = slides[index];
+        return slide ? slide.querySelector('img') : slides[0].querySelector('img');
+    }
+
+    // --- Posicionar lente y actualizar background ---
+    function moveLens(e) {
+        if (!lupaActiva) return;
+        const img = getActiveSlideImg();
+        if (!img) return;
+
+        lens.style.display = 'block';
+        lens.style.backgroundImage = `url(${img.src})`;
+
+        const viewportRect = viewport.getBoundingClientRect();
+        const scale = 300 / 100; // background-size es 300%, zoom = 3x
+        const lensW = lens.offsetWidth;
+        const lensH = lens.offsetHeight;
+
+        // Obtener coordenadas (mouse o touch)
+        let clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+            e.preventDefault();
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        // Posición del lente centrado en el cursor, limitado al viewport
+        let lensX = clientX - viewportRect.left - lensW / 2;
+        let lensY = clientY - viewportRect.top - lensH / 2;
+
+        // Clampear dentro del viewport
+        lensX = Math.max(0, Math.min(lensX, viewportRect.width - lensW));
+        lensY = Math.max(0, Math.min(lensY, viewportRect.height - lensH));
+
+        lens.style.left = (lensX + lensW / 2) + 'px';
+        lens.style.top = (lensY + lensH / 2) + 'px';
+        lens.classList.add('visible');
+
+        // Calcular background-position para el zoom
+        // La posición relativa del cursor dentro del viewport determina qué parte de la imagen mostrar
+        const cursorRelX = (clientX - viewportRect.left) / viewportRect.width;
+        const cursorRelY = (clientY - viewportRect.top) / viewportRect.height;
+
+        const bgX = cursorRelX * 100;
+        const bgY = cursorRelY * 100;
+
+        lens.style.backgroundPosition = `${bgX}% ${bgY}%`;
+    }
+
+    function hideLens() {
+        lens.classList.remove('visible');
+        lens.style.display = 'none';
+    }
+
+    // --- Toggle al hacer clic en la lupa ---
+    btnLupa.addEventListener('click', () => {
+        lupaActiva = !lupaActiva;
+        if (lupaActiva) {
+            // Activar
+            btnLupa.classList.remove('desactivando');
+            btnLupa.classList.add('activo');
+            viewport.classList.add('lupa-activa');
+        } else {
+            // Desactivar con animación
+            btnLupa.classList.remove('activo');
+            btnLupa.classList.add('desactivando');
+            viewport.classList.remove('lupa-activa');
+            hideLens();
+            // Limpiar la clase de animación al terminar
+            setTimeout(() => {
+                btnLupa.classList.remove('desactivando');
+            }, 550);
+        }
+    });
+
+    // --- Eventos de mouse ---
+    viewport.addEventListener('mousemove', moveLens);
+    viewport.addEventListener('mouseleave', hideLens);
+
+    // --- Eventos táctiles ---
+    viewport.addEventListener('touchmove', moveLens, { passive: false });
+    viewport.addEventListener('touchend', hideLens);
 }
 
 export function mostrarGaleria(obras, container, onDetalle) {
