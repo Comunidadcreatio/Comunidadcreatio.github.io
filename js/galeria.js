@@ -292,7 +292,6 @@ function initLupa(card) {
         lens.style.backgroundImage = `url(${img.src})`;
 
         const viewportRect = viewport.getBoundingClientRect();
-        const scale = 300 / 100; // background-size es 300%, zoom = 3x
         const lensW = lens.offsetWidth;
         const lensH = lens.offsetHeight;
 
@@ -307,22 +306,25 @@ function initLupa(card) {
             clientY = e.clientY;
         }
 
-        // Posición del lente centrado en el cursor, limitado al viewport
-        let lensX = clientX - viewportRect.left - lensW / 2;
-        let lensY = clientY - viewportRect.top - lensH / 2;
+        // Factor de escala: viewport.offsetWidth es el tamaño de layout (410px),
+        // viewportRect.width es el tamaño visual (afectado por scale() en responsive)
+        const scaleFactor = viewport.offsetWidth / viewportRect.width;
 
-        // Clampear dentro del viewport
-        lensX = Math.max(0, Math.min(lensX, viewportRect.width - lensW));
-        lensY = Math.max(0, Math.min(lensY, viewportRect.height - lensH));
+        // Posición del lente centrado en el cursor, mapeada al espacio de layout
+        let lensX = (clientX - viewportRect.left) * scaleFactor - lensW / 2;
+        let lensY = (clientY - viewportRect.top) * scaleFactor - lensH / 2;
+
+        // Clampear dentro del viewport (usando tamaño de layout)
+        lensX = Math.max(0, Math.min(lensX, viewport.offsetWidth - lensW));
+        lensY = Math.max(0, Math.min(lensY, viewport.offsetHeight - lensH));
 
         lens.style.left = (lensX + lensW / 2) + 'px';
         lens.style.top = (lensY + lensH / 2) + 'px';
         lens.classList.add('visible');
 
-        // Calcular background-position para el zoom
-        // La posición relativa del cursor dentro del viewport determina qué parte de la imagen mostrar
-        const cursorRelX = (clientX - viewportRect.left) / viewportRect.width;
-        const cursorRelY = (clientY - viewportRect.top) / viewportRect.height;
+        // Calcular background-position para el zoom (en espacio de layout)
+        const cursorRelX = ((clientX - viewportRect.left) * scaleFactor) / viewport.offsetWidth;
+        const cursorRelY = ((clientY - viewportRect.top) * scaleFactor) / viewport.offsetHeight;
 
         const bgX = cursorRelX * 100;
         const bgY = cursorRelY * 100;
