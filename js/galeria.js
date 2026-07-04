@@ -252,7 +252,10 @@ function crearObraCard(obra) {
 
 /**
  * Inicializa la lupa: toggle desde el icono, lente circular que sigue mouse/touch
- * y muestra la imagen con zoom 3x.
+ * y muestra la imagen con zoom 6x.
+ * 
+ * En móvil usa tracking relativo: el primer toque (en cualquier parte) fija el
+ * punto de referencia, y el lente se mueve proporcionalmente al arrastre.
  */
 function initLupa(card) {
     const btnLupa = card.querySelector('.metrica-item--lupa');
@@ -265,24 +268,48 @@ function initLupa(card) {
     viewport.appendChild(lens);
 
     let lupaActiva = false;
+    // Para tracking relativo en touch
+    let touchOriginX = 0;
+    let touchOriginY = 0;
+    let lensStartX = 0;
+    let lensStartY = 0;
+    let inspectStartX = 0;
+    let inspectStartY = 0;
+    let touchActive = false;
 
     // --- HELPERS para obtener el slide activo y su imagen ---
     function getActiveSlideImg() {
+        const activeDot = card.querySelector('.obra-carousel-dot.active');
         const track = card.querySelector('.obra-carousel-track');
         if (!track) return null;
-        const computedTransform = getComputedStyle(track).transform;
-        // Por defecto usamos el primer slide
         const slides = track.querySelectorAll('.obra-carousel-slide');
         if (slides.length === 0) return null;
-        // Intentamos deducir el índice desde la matriz de transformación
-        // pero es más seguro usar la clase active del dot
-        const activeDot = card.querySelector('.obra-carousel-dot.active');
         const index = activeDot ? parseInt(activeDot.dataset.index) : 0;
-        const slide = slides[index];
+        const slide = slides[index] || slides[0];
         return slide ? slide.querySelector('img') : slides[0].querySelector('img');
     }
 
-    // --- Posicionar lente y actualizar background ---
+    function getScaleFactor() {
+        return viewport.offsetWidth / viewport.getBoundingClientRect().width;
+    }
+
+    // Centrar el lente en la imagen (usado al activar)
+    function centerLens() {
+        const img = getActiveSlideImg();
+        if (!img) return;
+        lens.style.display = 'block';
+        lens.style.backgroundImage = `url(${img.src})`;
+        const lensW = lens.offsetWidth;
+        const lensH = lens.offsetHeight;
+        const cx = (viewport.offsetWidth - lensW) / 2;
+        const cy = (viewport.offsetHeight - lensH) / 2;
+        lens.style.left = (cx + lensW / 2) + 'px';
+        lens.style.top = (cy + lensH / 2) + 'px';
+        lens.style.backgroundPosition = '50% 50%';
+        lens.classList.add('visible');
+    }
+
+    // --- Posicionar lente y actualizar background (mouse: absoluto; touch: relativo) ---
     function moveLens(e) {
         if (!lupaActiva) return;
         const img = getActiveSlideImg();
@@ -294,10 +321,11 @@ function initLupa(card) {
         const viewportRect = viewport.getBoundingClientRect();
         const lensW = lens.offsetWidth;
         const lensH = lens.offsetHeight;
+        const sf = getScaleFactor();
 
-        // Obtener coordenadas (mouse o touch)
         let clientX, clientY;
-        if (e.touches) {
+        const isTouch = !!e.touches;
+        if (isTouch) {
             clientX = e.touches[0].clientX;
             clientY = e.touches[0].clientY;
             e.preventDefault();
@@ -306,48 +334,72 @@ function initLupa(card) {
             clientY = e.clientY;
         }
 
-        // Factor de escala: viewport.offsetWidth es el tamaño de layout (410px),
-        // viewportRect.width es el tamaño visual (afectado por scale() en responsive)
-        const scaleFactor = viewport.offsetWidth / viewportRect.width;
+        let inspectX, inspectY;
+        if (isTouch && touchActive) {
+            // Tracking relativo: mover proporcionalmente al delta desde el origen
+            const deltaX = (clientX - touchOriginX) * sf;
+            const deltaY = (clientY - touchOriginY) * sf;
+            inspectX = inspectStartX + deltaX;
+            inspectY = inspectStartY + deltaY;
+        } else {
+            // Modo absoluto (mouse o primer toque)
+            inspectX = (clientX - viewportRect.left) * sf;
+            inspectY = (clientY - viewportRect.top) * sf;
+        }
+
+        // Clampear punto de inspección dentro del viewport
+        inspectX = Math.max(0, Math.min(inspectX, viewport.offsetWidth));
+        inspectY = Math.max(0, Math.min(inspectY, viewport.offsetHeight));
 
         // Offset para que el dedo no tape el lente (solo en touch)
-        const isTouch = !!e.touches;
         const offsetX = isTouch ? -55 : 0;
         const offsetY = isTouch ? -65 : 0;
 
-        // Posición del punto de inspección (cursor o dedo), mapeada al espacio de layout
-        const inspectX = (clientX - viewportRect.left) * scaleFactor;
-        const inspectY = (clientY - viewportRect.top) * scaleFactor;
+        // Posición del lente
+        let lensCX = inspectX + offsetX;
+        let lensCY = inspectY + offsetY;
+        const halfW = lensW / 2;
+        const halfH = lensH / 2;
+        lensCX = Math.max(halfW, Math.min(lensCX, viewport.offsetWidth - halfW));
+        lensCY = Math.max(halfH, Math.min(lensCY, viewport.offsetHeight - halfH));
 
-        // Clampear punto de inspección dentro del viewport
-        const clampedInspectX = Math.max(0, Math.min(inspectX, viewport.offsetWidth));
-        const clampedInspectY = Math.max(0, Math.min(inspectY, viewport.offsetHeight));
-
-        // Posición del lente: centrado en el punto de inspección + offset
-        let lensX = clampedInspectX + offsetX - lensW / 2;
-        let lensY = clampedInspectY + offsetY - lensH / 2;
-
-        // Clampear lente dentro del viewport
-        lensX = Math.max(0, Math.min(lensX, viewport.offsetWidth - lensW));
-        lensY = Math.max(0, Math.min(lensY, viewport.offsetHeight - lensH));
-
-        lens.style.left = (lensX + lensW / 2) + 'px';
-        lens.style.top = (lensY + lensH / 2) + 'px';
+        lens.style.left = lensCX + 'px';
+        lens.style.top = lensCY + 'px';
         lens.classList.add('visible');
 
-        // Calcular background-position para el zoom (usando el punto de inspección, no el lente)
-        const cursorRelX = clampedInspectX / viewport.offsetWidth;
-        const cursorRelY = clampedInspectY / viewport.offsetHeight;
-
-        const bgX = cursorRelX * 100;
-        const bgY = cursorRelY * 100;
-
+        // Background-position desde el punto de inspección
+        const bgX = (inspectX / viewport.offsetWidth) * 100;
+        const bgY = (inspectY / viewport.offsetHeight) * 100;
         lens.style.backgroundPosition = `${bgX}% ${bgY}%`;
     }
 
     function hideLens() {
         lens.classList.remove('visible');
         lens.style.display = 'none';
+    }
+
+    // --- Touch: iniciar tracking relativo desde donde el usuario ponga el dedo ---
+    function onTouchStart(e) {
+        if (!lupaActiva) return;
+        const touch = e.touches[0];
+        touchOriginX = touch.clientX;
+        touchOriginY = touch.clientY;
+        const sf = getScaleFactor();
+        const viewportRect = viewport.getBoundingClientRect();
+        // Punto de inspección actual (donde está el lente ahora mapeado al viewport)
+        const currentLeft = parseFloat(lens.style.left) || viewport.offsetWidth / 2;
+        const currentTop = parseFloat(lens.style.top) || viewport.offsetHeight / 2;
+        // El lente está desplazado por el offset, así que revertimos para obtener inspect
+        inspectStartX = currentLeft + 55; // revertir offsetX
+        inspectStartY = currentTop + 65;  // revertir offsetY
+        lensStartX = currentLeft;
+        lensStartY = currentTop;
+        touchActive = true;
+    }
+
+    function onTouchEnd(e) {
+        if (!lupaActiva) return;
+        touchActive = false;
     }
 
     // --- Toggle al hacer clic en la lupa ---
@@ -358,12 +410,15 @@ function initLupa(card) {
             btnLupa.classList.remove('desactivando');
             btnLupa.classList.add('activo');
             viewport.classList.add('lupa-activa');
+            // Mostrar lente en el centro de la imagen
+            centerLens();
         } else {
             // Desactivar con animación
             btnLupa.classList.remove('activo');
             btnLupa.classList.add('desactivando');
             viewport.classList.remove('lupa-activa');
             hideLens();
+            touchActive = false;
             // Limpiar la clase de animación al terminar
             setTimeout(() => {
                 btnLupa.classList.remove('desactivando');
@@ -375,26 +430,13 @@ function initLupa(card) {
     viewport.addEventListener('mousemove', moveLens);
     viewport.addEventListener('mouseleave', hideLens);
 
-    // --- Eventos táctiles (en todo el documento para no tapar el lente) ---
+    // --- Eventos táctiles globales ---
+    document.addEventListener('touchstart', onTouchStart, { passive: false });
     document.addEventListener('touchmove', (e) => {
         if (!lupaActiva) return;
-        // Verificar que el touch está cerca de la card
-        const cardRect = card.getBoundingClientRect();
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
-        const margin = 80; // permitir tocar un poco fuera de la card
-        const isNearCard = 
-            touchX >= cardRect.left - margin &&
-            touchX <= cardRect.right + margin &&
-            touchY >= cardRect.top - margin &&
-            touchY <= cardRect.bottom + margin;
-        if (!isNearCard) return;
         moveLens(e);
     }, { passive: false });
-    document.addEventListener('touchend', (e) => {
-        if (!lupaActiva) return;
-        hideLens();
-    });
+    document.addEventListener('touchend', onTouchEnd);
 }
 
 export function mostrarGaleria(obras, container, onDetalle) {
