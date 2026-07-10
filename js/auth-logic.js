@@ -524,9 +524,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Verificar si ya está logueado
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
+        // Prevenir bucle de redirección: si venimos de index.html hace poco,
+        // no redirigir de vuelta (el token probablemente está expirado)
+        const redirectFlag = sessionStorage.getItem('auth_redirect_flag');
+        const now = Date.now();
+        if (redirectFlag && (now - parseInt(redirectFlag)) < 5000) {
+            // Venimos de un intento reciente de redirección → token probablemente expirado
+            console.warn('Bucle de redirección detectado. Limpiando token expirado.');
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(ARTISTA_KEY);
+            sessionStorage.removeItem('auth_redirect_flag');
+            return;
+        }
+        // Primera vez: establecer flag e intentar redirigir
+        sessionStorage.setItem('auth_redirect_flag', now.toString());
         window.location.href = 'index.html';
         return;
     }
+    // Limpiar flag si no hay token (llegada normal)
+    sessionStorage.removeItem('auth_redirect_flag');
 
     // Botón para ir a registro
     const btnIrRegistro = document.getElementById('btn-ir-registro');
