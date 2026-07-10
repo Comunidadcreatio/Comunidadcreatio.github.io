@@ -691,7 +691,7 @@ input, select, textarea {
         width: auto;
     }
     main {
-        padding: 20px 24px;
+        padding: 84px 24px 20px;
         width: 100%;
         box-sizing: border-box;
     }
@@ -733,7 +733,7 @@ input, select, textarea {
     body { padding-bottom: 45px; }
 
     main {
-        padding: 0 24px;
+        padding: 50px 24px 0;
     }
 
     .toggle-icon {
