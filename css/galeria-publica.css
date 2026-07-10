@@ -1,145 +1,85 @@
-﻿/* css/galeria-publica.css - Nuevo diseño simplificado de tarjetas de obras */
-
+﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
    CONTENEDOR DE LA GALERÍA
    ============================================== */
 #galeria-container {
     display: flex;
     flex-direction: column;
-    gap: 5rem;
-    padding: 4rem 1.5rem;
+    gap: 4rem;
+    padding: 3rem 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 /* ==============================================
-   TARJETA DE OBRA - GRID PRINCIPAL
+   TARJETA DE OBRA
    ============================================== */
 .obra-card {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr auto;
-    position: relative;
+    display: flex;
+    flex-direction: column;
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
 }
 
 /* ==============================================
-   HEADER DE LA OBRA (nombre del artista flotando
-   sobre la imagen, con espacio después del avatar)
+   FILA ARTISTA: avatar + nombre (encima del carrusel)
    ============================================== */
-.obra-header {
-    position: absolute;
-    top: -30px;
-    left: 178px;
-    right: 0;
-    z-index: 11;
+.obra-artista-row {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    white-space: nowrap;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.obra-header-nombre {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-ink);
-    line-height: 1.2;
-    white-space: nowrap;
-}
-
-/* ==============================================
-   BARRA DE MÉTRICAS (lateral izquierdo)
-   Iconos de ojo y like en disposición vertical,
-   sin fondo, iniciando justo debajo del avatar.
-   ============================================== */
-.obra-metricas-bar {
-    grid-column: 1;
-    grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 20px;
-    position: relative;
-    z-index: 3;
-    margin: 0 12px 0 0;
-    padding-left: 6px;
-    padding-top: 72px;
-}
-
-.obra-metricas-bar .metrica-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    color: var(--color-ink);
-    font-size: 0.65rem;
-}
-
-.obra-metricas-bar .metrica-item svg {
-    width: 18px;
-    height: 18px;
-    color: var(--color-ink);
-}
-
-/* ==============================================
-   AVATAR ANCLADO A LA ESQUINA SUPERIOR IZQUIERDA
-   Tamaño aumentado a 125px
-   ============================================== */
-.obra-avatar-esquina {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
-    width: 125px;
-    height: 125px;
+.obra-avatar-round {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--color-white);
-    box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.35);
-    z-index: 10;
+    flex-shrink: 0;
     background: var(--color-gray-200);
 }
 
-.obra-avatar-esquina-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
-    width: 125px;
-    height: 125px;
+.obra-avatar-placeholder {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--color-gray-200);
-    border: 4px solid var(--color-white);
-    box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.35);
-    z-index: 10;
-    font-size: 2.2rem;
+    flex-shrink: 0;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--color-gray-500);
 }
 
+.obra-artista-nombre {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ==============================================
-   IMAGEN PRINCIPAL / CARRUSEL
+   CARRUSEL DE IMÁGENES
    ============================================== */
 .obra-carousel {
-    grid-column: 2;
-    grid-row: 2;
     position: relative;
     width: 100%;
     overflow: visible;
 }
 
-/* Viewport interno: recorta el slide, mantiene el aspect ratio */
 .obra-carousel-viewport {
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    border-radius: 8px;
+    /* Sin border-radius para bordes rectos */
+    border-radius: 0;
     background: var(--color-gray-100);
 }
 
@@ -165,10 +105,12 @@
     display: block;
 }
 
-/* Dots del carrusel */
+/* ==============================================
+   DOTS DEL CARRUSEL
+   ============================================== */
 .obra-carousel-dots {
     position: absolute;
-    bottom: -20px;
+    bottom: 10px;
     left: 0;
     right: 0;
     display: flex;
@@ -200,31 +142,48 @@
     transform: scale(1.15);
 }
 
-/* Ocultar contenedor de imagen simple (ya no se usa) */
-.obra-imagen-container {
-    display: none;
+/* ==============================================
+   BARRA DE MÉTRICAS (horizontal, debajo del carrusel)
+   ============================================== */
+.obra-metricas-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 4px 8px;
+}
+
+.obra-metricas-bar .metrica-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    color: var(--color-ink);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.obra-metricas-bar .metrica-item svg {
+    width: 18px;
+    height: 18px;
+    color: var(--color-ink);
 }
 
 /* ==============================================
-   BARRA INFERIOR (título + precio)
-   Separada del carrusel con margin-top
+   FOOTER: título + precio
    ============================================== */
 .obra-footer {
-    grid-column: 2;
-    grid-row: 3;
     display: flex;
     align-items: stretch;
     position: relative;
     z-index: 2;
-    margin-top: 32px;
-    transition: all 0.3s ease;
+    margin-top: 4px;
 }
 
 .obra-footer-info {
     display: flex;
     flex: 1;
     align-items: stretch;
-    transition: all 0.3s ease;
 }
 
 .obra-footer-titulo {
@@ -238,7 +197,6 @@
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
     font-size: 1rem;
-    transition: all 0.3s ease;
     flex: 1;
     min-width: 0;
 }
@@ -247,7 +205,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: opacity 0.2s ease;
 }
 
 .obra-footer-precio {
@@ -267,44 +224,41 @@
     flex-shrink: 0;
 }
 
+/* Ocultar contenedor de imagen simple (ya no se usa) */
+.obra-imagen-container {
+    display: none;
+}
+
 /* ==============================================
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        padding: 6rem 0.5rem 3rem;
-        gap: 3.5rem;
+        padding: 5rem 1rem 2.5rem;
+        gap: 3rem;
     }
 
     .obra-card {
         max-width: 100%;
     }
 
-    .obra-header {
-        top: -22px;
-        left: 100px;
-        gap: 8px;
+    .obra-avatar-round,
+    .obra-avatar-placeholder {
+        width: 32px;
+        height: 32px;
     }
 
-    .obra-avatar-esquina,
-    .obra-avatar-esquina-placeholder {
-        width: 72px;
-        height: 72px;
+    .obra-avatar-placeholder {
+        font-size: 0.9rem;
     }
 
-    .obra-avatar-esquina-placeholder {
-        font-size: 1.5rem;
-    }
-
-    .obra-header-nombre {
+    .obra-artista-nombre {
         font-size: 0.85rem;
     }
 
     .obra-metricas-bar {
-        margin: 0 12px 0 0;
-        padding-left: 5px;
-        padding-top: 42px;
-        gap: 16px;
+        gap: 20px;
+        padding: 10px 2px 6px;
     }
 
     .obra-metricas-bar .metrica-item svg {
@@ -313,7 +267,7 @@
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
     }
 
     .obra-footer-titulo {
@@ -328,52 +282,57 @@
 }
 
 /* ==============================================
-   RESPONSIVE - MÓVIL
+   RESPONSIVE - MÓVIL: carrusel a ancho completo
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        padding: 4rem 0.5rem 2rem;
-        gap: 2rem;
+        padding: 3rem 0 2rem;
+        gap: 2.5rem;
     }
 
     .obra-card {
         max-width: 100%;
     }
 
-    .obra-avatar-esquina,
-    .obra-avatar-esquina-placeholder {
-        width: 60px;
-        height: 60px;
+    /* Carrusel ocupa todo el ancho de la pantalla */
+    .obra-carousel-viewport {
+        border-radius: 0;
     }
 
-    .obra-avatar-esquina-placeholder {
-        font-size: 1.2rem;
+    .obra-artista-row {
+        padding: 0 12px;
     }
 
-    .obra-header {
-        left: 82px;
-        top: -16px;
-        gap: 6px;
+    .obra-avatar-round,
+    .obra-avatar-placeholder {
+        width: 30px;
+        height: 30px;
     }
 
-    .obra-header-nombre {
+    .obra-avatar-placeholder {
+        font-size: 0.85rem;
+    }
+
+    .obra-artista-nombre {
         font-size: 0.8rem;
     }
 
     .obra-metricas-bar {
-        margin: 0 10px 0 0;
-        padding-left: 4px;
-        padding-top: 36px;
-        gap: 14px;
+        padding: 8px 12px 4px;
+        gap: 18px;
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 14px;
-        height: 14px;
+        width: 15px;
+        height: 15px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.55rem;
+        font-size: 0.65rem;
+    }
+
+    .obra-footer {
+        padding: 0 8px;
     }
 
     .obra-footer-titulo {
@@ -390,7 +349,7 @@
 /* ==============================================
    MODO OSCURO
    ============================================== */
-[data-theme="dark"] .obra-header-nombre {
+[data-theme="dark"] .obra-artista-nombre {
     color: var(--color-ink);
 }
 
