@@ -208,11 +208,14 @@ function crearObraCard(obra) {
     const carruselHTML = crearCarruselHTML(obra, '');
 
     card.innerHTML = `
-        <!-- Header: avatar + nombre del artista + precio (derecha) -->
+        <!-- Header: avatar + nombre artista | título marquee | precio -->
         <div class="obra-artista-row">
             <div class="obra-artista-left">
                 ${avatarHTML}
                 <span class="obra-artista-nombre">${nombreArtista}</span>
+            </div>
+            <div class="obra-titulo-marquee">
+                <span class="marquee-text">${titulo}</span>
             </div>
             <span class="obra-precio-top">$${precio}</span>
         </div>
@@ -225,11 +228,6 @@ function crearObraCard(obra) {
             <span class="metrica-item">${ICON_OJO} <span>0</span></span>
             <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
             <span class="metrica-item">${ICON_LIKE} <span>0</span></span>
-        </div>
-
-        <!-- Título con efecto marquee debajo de las métricas -->
-        <div class="obra-titulo-marquee">
-            <span class="marquee-text">${titulo}</span>
         </div>
     `;
 

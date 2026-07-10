@@ -23,22 +23,22 @@
 }
 
 /* ==============================================
-   FILA ARTISTA: avatar + nombre | precio (derecha)
+   FILA ARTISTA: avatar + nombre | título marquee | precio
    ============================================== */
 .obra-artista-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 10px;
 }
 
 .obra-artista-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-shrink: 0;
+    max-width: 40%;
     min-width: 0;
-    flex: 1;
 }
 
 .obra-avatar-round {
@@ -72,9 +72,56 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
 }
 
-/* Precio en la esquina superior derecha */
+/* Título marquee: ocupa el espacio flexible entre artista y precio */
+.obra-titulo-marquee {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+    );
+}
+
+.marquee-text {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+    animation: marqueeScroll 10s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.obra-titulo-marquee:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+/* Precio en la esquina derecha */
 .obra-precio-top {
     font-family: 'Nunito', sans-serif;
     font-weight: 800;
@@ -186,56 +233,6 @@
     width: 18px;
     height: 18px;
     color: var(--color-ink);
-}
-
-/* ==============================================
-   TÍTULO MARQUEE (scroll horizontal con fade)
-   ============================================== */
-.obra-titulo-marquee {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    padding: 4px 0;
-    /* Máscara de degradado: fade en los bordes */
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 15%,
-        black 85%,
-        transparent 100%
-    );
-    mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 15%,
-        black 85%,
-        transparent 100%
-    );
-}
-
-.marquee-text {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--color-ink);
-    animation: marqueeScroll 10s linear infinite;
-    padding-left: 100%;
-}
-
-@keyframes marqueeScroll {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-/* Pausar animación al hacer hover */
-.obra-titulo-marquee:hover .marquee-text {
-    animation-play-state: paused;
 }
 
 /* ==============================================
