@@ -294,11 +294,13 @@
         max-width: 100%;
     }
 
-    /* Carrusel ocupa todo el ancho de la pantalla */
+    /* Carrusel: sin bordes y 8% más alto */
     .obra-carousel-viewport {
         border-radius: 0;
+        aspect-ratio: 1 / 1.08;
     }
 
+    /* Sin padding lateral: todo pegado a los bordes */
     .obra-artista-row {
         padding: 0 12px;
     }
@@ -331,8 +333,9 @@
         font-size: 0.65rem;
     }
 
+    /* Footer pegado a los bordes (sin padding lateral) */
     .obra-footer {
-        padding: 0 8px;
+        padding: 0;
     }
 
     .obra-footer-titulo {
