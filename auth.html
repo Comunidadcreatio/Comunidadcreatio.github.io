@@ -205,14 +205,12 @@
     <!-- auth-logic.js importa notificaciones.js como módulo -->
     <script type="module" src="js/auth-logic.js"></script>
 
-    <!-- Preloader que espera a que el backend despierte y activa fade-in del contenido -->
+    <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>
         (function() {
             var preloader = document.getElementById('preloader');
             var ocultado = false;
-            var MIN_DISPLAY_MS = 2000;
-            var MAX_TIMEOUT = 15000;
-            var startTime = Date.now();
+            var MIN_DISPLAY_MS = 500;
 
             function ocultarPreloader() {
                 if (!ocultado && preloader) {
@@ -225,57 +223,9 @@
                 }
             }
 
-            // Timeout máximo de seguridad: 15s
-            var maxTimeoutId = setTimeout(ocultarPreloader, MAX_TIMEOUT);
-
-            // Hacer un ping al backend (endpoint público) para despertarlo
-            fetch(window.location.origin + '/api/health', { method: 'HEAD', mode: 'no-cors' })
-                .then(function() { /* despertó */ })
-                .catch(function() { /* ignorar error, el backend igual despertó */ });
-
-            // Intentar verificar sesión. Si el backend está dormido, la
-            // llamada tardará ~7-10s en responder. El preloader se mantiene
-            // visible hasta que responda + MÍNIMO 2 segundos.
-            var TOKEN_KEY = 'auth_token';
-            var ARTISTA_KEY = 'artista_actual';
-            var API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-                ? 'http://localhost:3000'
-                : 'https://fundacionextramuros-backend.onrender.com';
-
-            var token = localStorage.getItem(TOKEN_KEY);
-            if (token) {
-                fetch(API_BASE_URL + '/api/artistas/mis-obras?page=1&limit=1', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(function(res) {
-                    var elapsed = Date.now() - startTime;
-                    var remaining = MIN_DISPLAY_MS - elapsed;
-                    if (remaining > 0) {
-                        setTimeout(function() {
-                            ocultarPreloader();
-                            clearTimeout(maxTimeoutId);
-                        }, remaining);
-                    } else {
-                        ocultarPreloader();
-                        clearTimeout(maxTimeoutId);
-                    }
-                })
-                .catch(function() {
-                    // Si falla (CORS, timeout), ocultar con el mínimo
-                    var elapsed = Date.now() - startTime;
-                    var remaining = MIN_DISPLAY_MS - elapsed;
-                    setTimeout(function() {
-                        ocultarPreloader();
-                        clearTimeout(maxTimeoutId);
-                    }, Math.max(0, remaining));
-                });
-            } else {
-                // No hay sesión: mostrar preloader al menos 2s y luego ocultar
-                setTimeout(function() {
-                    ocultarPreloader();
-                    clearTimeout(maxTimeoutId);
-                }, MIN_DISPLAY_MS);
-            }
+            // Esperar que el módulo ES evalúe su DOMContentLoaded, luego ocultar
+            // El timeout es corto porque el módulo auth-logic.js ya maneja la lógica de sesión
+            setTimeout(ocultarPreloader, MIN_DISPLAY_MS);
         })();
     </script>
 </body>
