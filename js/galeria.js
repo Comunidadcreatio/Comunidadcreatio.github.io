@@ -196,7 +196,7 @@ function crearObraCard(obra) {
 
     const nombreArtista = obra.artista || 'Artista';
     const inicial = nombreArtista.charAt(0).toUpperCase();
-    const fotoArtista = obra.foto_artista || (artistaActual && artistaActual.foto_perfil) || '';
+    const fotoArtista = obra.foto_artista || '';
     const tieneAvatar = !!fotoArtista;
     const titulo = obra.titulo || 'Sin título';
     const precio = obra.precio || 'N/A';
