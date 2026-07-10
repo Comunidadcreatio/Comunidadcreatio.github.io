@@ -23,13 +23,22 @@
 }
 
 /* ==============================================
-   FILA ARTISTA: avatar + nombre (encima del carrusel)
+   FILA ARTISTA: avatar + nombre | precio (derecha)
    ============================================== */
 .obra-artista-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 10px;
+}
+
+.obra-artista-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
 }
 
 .obra-avatar-round {
@@ -65,6 +74,16 @@
     text-overflow: ellipsis;
 }
 
+/* Precio en la esquina superior derecha */
+.obra-precio-top {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--color-ink);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 /* ==============================================
    CARRUSEL DE IMÁGENES
    ============================================== */
@@ -78,7 +97,6 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    /* Sin border-radius para bordes rectos */
     border-radius: 0;
     background: var(--color-gray-100);
 }
@@ -143,14 +161,15 @@
 }
 
 /* ==============================================
-   BARRA DE MÉTRICAS (horizontal, debajo del carrusel)
+   MÉTRICAS: centradas debajo del carrusel
    ============================================== */
 .obra-metricas-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 24px;
-    padding: 12px 4px 8px;
+    padding: 12px 0 8px;
 }
 
 .obra-metricas-bar .metrica-item {
@@ -170,63 +189,53 @@
 }
 
 /* ==============================================
-   FOOTER: título + precio
+   TÍTULO MARQUEE (scroll horizontal con fade)
    ============================================== */
-.obra-footer {
-    display: flex;
-    align-items: stretch;
+.obra-titulo-marquee {
+    width: 100%;
+    overflow: hidden;
     position: relative;
-    z-index: 2;
-    margin-top: 4px;
+    padding: 4px 0;
+    /* Máscara de degradado: fade en los bordes */
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 15%,
+        black 85%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 15%,
+        black 85%,
+        transparent 100%
+    );
 }
 
-.obra-footer-info {
-    display: flex;
-    flex: 1;
-    align-items: stretch;
-}
-
-.obra-footer-titulo {
-    background: var(--color-ink);
-    color: var(--color-white);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 6px 0 0 6px;
+.marquee-text {
+    display: inline-block;
+    white-space: nowrap;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
-    font-size: 1rem;
-    flex: 1;
-    min-width: 0;
-}
-
-.obra-footer-titulo .footer-titulo-texto {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.obra-footer-precio {
-    background: var(--color-white);
-    border: 2px solid var(--color-ink);
-    border-left: none;
+    font-size: 0.9rem;
     color: var(--color-ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    border-radius: 0 6px 6px 0;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: 1.2rem;
-    white-space: nowrap;
-    flex-shrink: 0;
+    animation: marqueeScroll 10s linear infinite;
+    padding-left: 100%;
 }
 
-/* Ocultar contenedor de imagen simple (ya no se usa) */
-.obra-imagen-container {
-    display: none;
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Pausar animación al hacer hover */
+.obra-titulo-marquee:hover .marquee-text {
+    animation-play-state: paused;
 }
 
 /* ==============================================
@@ -256,9 +265,13 @@
         font-size: 0.85rem;
     }
 
+    .obra-precio-top {
+        font-size: 1rem;
+    }
+
     .obra-metricas-bar {
         gap: 20px;
-        padding: 10px 2px 6px;
+        padding: 10px 0 6px;
     }
 
     .obra-metricas-bar .metrica-item svg {
@@ -270,19 +283,13 @@
         font-size: 0.7rem;
     }
 
-    .obra-footer-titulo {
-        font-size: 0.85rem;
-        padding: 8px 12px;
-    }
-
-    .obra-footer-precio {
-        font-size: 1rem;
-        padding: 8px 14px;
+    .marquee-text {
+        font-size: 0.8rem;
     }
 }
 
 /* ==============================================
-   RESPONSIVE - MÓVIL: carrusel a ancho completo
+   RESPONSIVE - MÓVIL
    ============================================== */
 @media (max-width: 480px) {
     /* Contrarrestar el padding de <main> (24px) para que la galería ocupe todo el ancho */
@@ -301,13 +308,11 @@
         max-width: 100%;
     }
 
-    /* Carrusel: sin bordes y 8% más alto */
     .obra-carousel-viewport {
         border-radius: 0;
         aspect-ratio: 1 / 1.08;
     }
 
-    /* Sin padding lateral: todo pegado a los bordes */
     .obra-artista-row {
         padding: 0 12px;
     }
@@ -326,6 +331,10 @@
         font-size: 0.8rem;
     }
 
+    .obra-precio-top {
+        font-size: 0.9rem;
+    }
+
     .obra-metricas-bar {
         padding: 8px 12px 4px;
         gap: 18px;
@@ -340,26 +349,17 @@
         font-size: 0.65rem;
     }
 
-    /* Footer pegado a los bordes (sin padding lateral) */
-    .obra-footer {
-        padding: 0;
-    }
-
-    .obra-footer-titulo {
+    .marquee-text {
         font-size: 0.75rem;
-        padding: 6px 10px;
-    }
-
-    .obra-footer-precio {
-        font-size: 0.9rem;
-        padding: 6px 10px;
     }
 }
 
 /* ==============================================
    MODO OSCURO
    ============================================== */
-[data-theme="dark"] .obra-artista-nombre {
+[data-theme="dark"] .obra-artista-nombre,
+[data-theme="dark"] .obra-precio-top,
+[data-theme="dark"] .marquee-text {
     color: var(--color-ink);
 }
 
@@ -371,13 +371,8 @@
     color: var(--color-white);
 }
 
-[data-theme="dark"] .obra-footer-precio {
-    background-color: #121212;
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .obra-footer-titulo {
-    background: var(--color-ink);
-    color: #121212;
+/* Ocultar elementos legacy (ya no se usan) */
+.obra-imagen-container,
+.obra-footer {
+    display: none;
 }
