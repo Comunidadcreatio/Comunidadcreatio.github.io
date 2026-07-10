@@ -285,9 +285,16 @@
    RESPONSIVE - MÓVIL: carrusel a ancho completo
    ============================================== */
 @media (max-width: 480px) {
+    /* Contrarrestar el padding de <main> (24px) para que la galería ocupe todo el ancho */
+    #galeria-publica {
+        margin-left: -24px;
+        margin-right: -24px;
+    }
+
     #galeria-container {
         padding: 3rem 0 2rem;
         gap: 2.5rem;
+        max-width: none;
     }
 
     .obra-card {
