@@ -47,7 +47,6 @@ export async function cargarGaleria(container) {
 const ICON_OJO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 const ICON_LIKE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
 const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-const ICON_LUPA = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>';
 
 /**
  * Crea el HTML del carrusel de imágenes para una obra.
@@ -120,27 +119,23 @@ function initCarrusel(card) {
         });
     });
 
-    // Soporte táctil (swipe) — deshabilitado cuando la lupa está activa
-    const viewport = track.parentElement;
-
+    // Soporte táctil (swipe)
     track.addEventListener('touchstart', (e) => {
-        if (viewport.classList.contains('lupa-activa')) return;
         startX = e.touches[0].clientX;
         isDragging = true;
         track.style.transition = 'none';
     }, { passive: true });
 
     track.addEventListener('touchmove', (e) => {
-        if (!isDragging || viewport.classList.contains('lupa-activa')) return;
+        if (!isDragging) return;
         const diff = e.touches[0].clientX - startX;
-        const containerWidth = viewport.offsetWidth;
+        const containerWidth = track.parentElement.offsetWidth;
         dragOffset = (diff / containerWidth) * 100;
         const baseOffset = -currentIndex * 100;
         track.style.transform = `translateX(${baseOffset + dragOffset}%)`;
     }, { passive: true });
 
     track.addEventListener('touchend', () => {
-        if (viewport.classList.contains('lupa-activa')) return;
         isDragging = false;
         track.style.transition = 'transform 0.35s ease';
         if (Math.abs(dragOffset) > 20) {
@@ -224,7 +219,6 @@ function crearObraCard(obra) {
             <span class="metrica-item">${ICON_OJO} <span>0</span></span>
             <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
             <span class="metrica-item">${ICON_LIKE} <span>0</span></span>
-            <span class="metrica-item metrica-item--lupa">${ICON_LUPA}</span>
         </div>
 
         <!-- Carrusel de imágenes (incluye avatar y dots) -->
@@ -241,202 +235,10 @@ function crearObraCard(obra) {
         </div>
     `;
 
-    // Inicializar carrusel y lupa después de agregar al DOM
-    requestAnimationFrame(() => {
-        initCarrusel(card);
-        initLupa(card);
-    });
+    // Inicializar carrusel después de agregar al DOM
+    requestAnimationFrame(() => initCarrusel(card));
 
     return card;
-}
-
-/**
- * Inicializa la lupa: toggle desde el icono, lente circular que sigue mouse/touch
- * y muestra la imagen con zoom 6x.
- * 
- * En móvil usa tracking relativo: el primer toque (en cualquier parte) fija el
- * punto de referencia, y el lente se mueve proporcionalmente al arrastre.
- */
-function initLupa(card) {
-    const btnLupa = card.querySelector('.metrica-item--lupa');
-    const viewport = card.querySelector('.obra-carousel-viewport');
-    if (!btnLupa || !viewport) return;
-
-    // Crear el lente de lupa
-    const lens = document.createElement('div');
-    lens.className = 'obra-lens';
-    viewport.appendChild(lens);
-
-    let lupaActiva = false;
-    // Para tracking relativo en touch
-    let touchOriginX = 0;
-    let touchOriginY = 0;
-    let lensStartX = 0;
-    let lensStartY = 0;
-    let inspectStartX = 0;
-    let inspectStartY = 0;
-    let touchActive = false;
-
-    // --- HELPERS para obtener el slide activo y su imagen ---
-    function getActiveSlideImg() {
-        const activeDot = card.querySelector('.obra-carousel-dot.active');
-        const track = card.querySelector('.obra-carousel-track');
-        if (!track) return null;
-        const slides = track.querySelectorAll('.obra-carousel-slide');
-        if (slides.length === 0) return null;
-        const index = activeDot ? parseInt(activeDot.dataset.index) : 0;
-        const slide = slides[index] || slides[0];
-        return slide ? slide.querySelector('img') : slides[0].querySelector('img');
-    }
-
-    function getScaleFactor() {
-        return viewport.offsetWidth / viewport.getBoundingClientRect().width;
-    }
-
-    // Centrar el lente en la imagen (usado al activar)
-    function centerLens() {
-        const img = getActiveSlideImg();
-        if (!img) return;
-        lens.style.display = 'block';
-        lens.style.backgroundImage = `url(${img.src})`;
-        const lensW = lens.offsetWidth;
-        const lensH = lens.offsetHeight;
-        const cx = (viewport.offsetWidth - lensW) / 2;
-        const cy = (viewport.offsetHeight - lensH) / 2;
-        lens.style.left = (cx + lensW / 2) + 'px';
-        lens.style.top = (cy + lensH / 2) + 'px';
-        lens.style.backgroundPosition = '50% 50%';
-        lens.classList.add('visible');
-    }
-
-    // --- Posicionar lente y actualizar background (mouse: absoluto; touch: relativo) ---
-    function moveLens(e) {
-        if (!lupaActiva) return;
-        const img = getActiveSlideImg();
-        if (!img) return;
-
-        lens.style.display = 'block';
-        lens.style.backgroundImage = `url(${img.src})`;
-
-        const viewportRect = viewport.getBoundingClientRect();
-        const lensW = lens.offsetWidth;
-        const lensH = lens.offsetHeight;
-        const sf = getScaleFactor();
-
-        let clientX, clientY;
-        const isTouch = !!e.touches;
-        if (isTouch) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-            e.preventDefault();
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-
-        let inspectX, inspectY;
-        if (isTouch && touchActive) {
-            // Tracking relativo: mover proporcionalmente al delta desde el origen
-            const deltaX = (clientX - touchOriginX) * sf;
-            const deltaY = (clientY - touchOriginY) * sf;
-            inspectX = inspectStartX + deltaX;
-            inspectY = inspectStartY + deltaY;
-        } else {
-            // Modo absoluto (mouse o primer toque)
-            inspectX = (clientX - viewportRect.left) * sf;
-            inspectY = (clientY - viewportRect.top) * sf;
-        }
-
-        // Clampear punto de inspección dentro del viewport
-        inspectX = Math.max(0, Math.min(inspectX, viewport.offsetWidth));
-        inspectY = Math.max(0, Math.min(inspectY, viewport.offsetHeight));
-
-        // Offset para que el dedo no tape el lente (solo en touch)
-        const offsetX = isTouch ? -55 : 0;
-        const offsetY = isTouch ? -65 : 0;
-
-        // Posición del lente
-        let lensCX = inspectX + offsetX;
-        let lensCY = inspectY + offsetY;
-        const halfW = lensW / 2;
-        const halfH = lensH / 2;
-        lensCX = Math.max(halfW, Math.min(lensCX, viewport.offsetWidth - halfW));
-        lensCY = Math.max(halfH, Math.min(lensCY, viewport.offsetHeight - halfH));
-
-        lens.style.left = lensCX + 'px';
-        lens.style.top = lensCY + 'px';
-        lens.classList.add('visible');
-
-        // Background-position desde el punto de inspección
-        const bgX = (inspectX / viewport.offsetWidth) * 100;
-        const bgY = (inspectY / viewport.offsetHeight) * 100;
-        lens.style.backgroundPosition = `${bgX}% ${bgY}%`;
-    }
-
-    function hideLens() {
-        lens.classList.remove('visible');
-        lens.style.display = 'none';
-    }
-
-    // --- Touch: iniciar tracking relativo desde donde el usuario ponga el dedo ---
-    function onTouchStart(e) {
-        if (!lupaActiva) return;
-        const touch = e.touches[0];
-        touchOriginX = touch.clientX;
-        touchOriginY = touch.clientY;
-        const sf = getScaleFactor();
-        const viewportRect = viewport.getBoundingClientRect();
-        // Punto de inspección actual (donde está el lente ahora mapeado al viewport)
-        const currentLeft = parseFloat(lens.style.left) || viewport.offsetWidth / 2;
-        const currentTop = parseFloat(lens.style.top) || viewport.offsetHeight / 2;
-        // El lente está desplazado por el offset, así que revertimos para obtener inspect
-        inspectStartX = currentLeft + 55; // revertir offsetX
-        inspectStartY = currentTop + 65;  // revertir offsetY
-        lensStartX = currentLeft;
-        lensStartY = currentTop;
-        touchActive = true;
-    }
-
-    function onTouchEnd(e) {
-        if (!lupaActiva) return;
-        touchActive = false;
-    }
-
-    // --- Toggle al hacer clic en la lupa ---
-    btnLupa.addEventListener('click', () => {
-        lupaActiva = !lupaActiva;
-        if (lupaActiva) {
-            // Activar
-            btnLupa.classList.remove('desactivando');
-            btnLupa.classList.add('activo');
-            viewport.classList.add('lupa-activa');
-            // Mostrar lente en el centro de la imagen
-            centerLens();
-        } else {
-            // Desactivar con animación
-            btnLupa.classList.remove('activo');
-            btnLupa.classList.add('desactivando');
-            viewport.classList.remove('lupa-activa');
-            hideLens();
-            touchActive = false;
-            // Limpiar la clase de animación al terminar
-            setTimeout(() => {
-                btnLupa.classList.remove('desactivando');
-            }, 550);
-        }
-    });
-
-    // --- Eventos de mouse (solo dentro del viewport) ---
-    viewport.addEventListener('mousemove', moveLens);
-    viewport.addEventListener('mouseleave', hideLens);
-
-    // --- Eventos táctiles globales ---
-    document.addEventListener('touchstart', onTouchStart, { passive: false });
-    document.addEventListener('touchmove', (e) => {
-        if (!lupaActiva) return;
-        moveLens(e);
-    }, { passive: false });
-    document.addEventListener('touchend', onTouchEnd);
 }
 
 export function mostrarGaleria(obras, container, onDetalle) {

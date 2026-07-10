@@ -2144,6 +2144,8 @@ async function init() {
     }
 
     if (!sesionValida) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(ARTISTA_KEY);
         window.location.href = 'auth.html';
         return;
     }
