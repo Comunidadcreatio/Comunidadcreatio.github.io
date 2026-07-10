@@ -236,11 +236,11 @@
             // Intentar verificar sesión. Si el backend está dormido, la
             // llamada tardará ~7-10s en responder. El preloader se mantiene
             // visible hasta que responda + MÍNIMO 2 segundos.
-            var TOKEN_KEY = 'artistaToken';
-            var ARTISTA_KEY = 'artistaData';
+            var TOKEN_KEY = 'auth_token';
+            var ARTISTA_KEY = 'artista_actual';
             var API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
                 ? 'http://localhost:3000'
-                : 'https://backend-fundacion-atpe.onrender.com';
+                : 'https://fundacionextramuros-backend.onrender.com';
 
             var token = localStorage.getItem(TOKEN_KEY);
             if (token) {
