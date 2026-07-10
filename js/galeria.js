@@ -196,33 +196,33 @@ function crearObraCard(obra) {
 
     const nombreArtista = obra.artista || 'Artista';
     const inicial = nombreArtista.charAt(0).toUpperCase();
-    // Usar foto de perfil de la obra o del usuario logueado como fallback
     const fotoArtista = obra.foto_artista || (artistaActual && artistaActual.foto_perfil) || '';
     const tieneAvatar = !!fotoArtista;
     const titulo = obra.titulo || 'Sin título';
     const precio = obra.precio || 'N/A';
 
     const avatarHTML = tieneAvatar 
-        ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-esquina">`
-        : `<div class="obra-avatar-esquina-placeholder">${inicial}</div>`;
+        ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round">`
+        : `<div class="obra-avatar-placeholder">${inicial}</div>`;
 
-    const carruselHTML = crearCarruselHTML(obra, avatarHTML);
+    const carruselHTML = crearCarruselHTML(obra, '');
 
     card.innerHTML = `
-        <!-- Header: nombre del artista -->
-        <div class="obra-header">
-            <span class="obra-header-nombre">${nombreArtista}</span>
+        <!-- Header: avatar + nombre del artista, encima del carrusel -->
+        <div class="obra-artista-row">
+            ${avatarHTML}
+            <span class="obra-artista-nombre">${nombreArtista}</span>
         </div>
 
-        <!-- Barra de métricas (izquierda, vertical) -->
+        <!-- Carrusel de imágenes (sin avatar superpuesto) -->
+        ${carruselHTML}
+
+        <!-- Barra de métricas (horizontal, debajo del carrusel) -->
         <div class="obra-metricas-bar">
             <span class="metrica-item">${ICON_OJO} <span>0</span></span>
             <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
             <span class="metrica-item">${ICON_LIKE} <span>0</span></span>
         </div>
-
-        <!-- Carrusel de imágenes (incluye avatar y dots) -->
-        ${carruselHTML}
 
         <!-- Barra inferior: título + precio -->
         <div class="obra-footer">
