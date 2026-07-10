@@ -417,73 +417,72 @@ input, select, textarea {
    MENÚ LATERAL, ESTRUCTURA Y PANELES FLOTANTES
    ============================================== */
 
-/* 1. Estilos Base (Aplicables siempre) */
+/* 1. Estilos Base — BARRA INFERIOR UNIFICADA (web + móvil) */
 #toggle-panel {
-    pointer-events: none;
+    pointer-events: auto;
     position: fixed;
+    bottom: 0;
+    left: 0;
     z-index: 998;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
     background-color: var(--color-white);
-    border: 2px solid var(--color-black);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
+    border: none;
+    border-top: 2px solid var(--color-black);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.08);
+    box-sizing: border-box;
 }
 
-#btn-menu-principal,
-#btn-logout-sidebar,
-#btn-perfil-sidebar,
+/* Contenedor de iconos de navegación (Galería, Registro) — izquierda absoluta */
+.bottom-bar-left {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    height: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    transform: translateX(-96px);
+    z-index: 1;
+}
+
 .toggle-nav-btn {
     pointer-events: auto;
     background: none;
     border: none;
-    z-index: 100000;
     display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-/* Botones de navegación de la barra inferior (Galería y Registro) */
-.toggle-nav-btn {
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 4px 8px;
+    gap: 1px;
+    padding: 2px 6px;
     color: var(--color-black);
+    cursor: pointer;
+    z-index: 10;
 }
 .toggle-nav-btn svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: block;
 }
-.toggle-nav-btn .toggle-label {
-    margin-left: 0;
-}
+
+.toggle-label { display: none !important; }
 
 .toggle-icon {
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
     flex-shrink: 0;
 }
 
-.toggle-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 12px;
-    white-space: nowrap;
-    color: var(--color-black);
-    font-family: sans-serif;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-/* ===== Botón de perfil circular ===== */
+/* ===== Botón de perfil circular — DENTRO de la barra, centrado ===== */
 .btn-perfil-circular {
     pointer-events: auto;
     background: none;
-    border: none;
+    border: 2px solid var(--color-black);
     padding: 0;
     margin: 0;
     cursor: pointer;
@@ -491,22 +490,24 @@ input, select, textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: conic-gradient(from 0deg,
-        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
+    background: var(--color-white);
     flex-shrink: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 2;
+    position: relative;
+    width: 36px;
+    height: 36px;
+    transition: transform 0.2s ease;
 }
 .btn-perfil-circular:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 .btn-perfil-circular .perfil-avatar-img {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
-    background-color: var(--color-white);
-    border: 2px solid var(--color-white);
+    background-color: var(--color-gray-200);
     pointer-events: none;
 }
 
@@ -695,7 +696,6 @@ input, select, textarea {
         box-sizing: border-box;
     }
 
-     /* Asegurar que las secciones internas también respeten el margen */
     #galeria-publica,
     #perfil-usuario,
     #pagina-blanca {
@@ -703,262 +703,70 @@ input, select, textarea {
         margin: 0 auto;
     }
 
-    /* Panel de obras y Mi cuenta más estrechos en escritorio (más aire a los lados) */
     #panel-artista,
     #mi-cuenta {
         max-width: 700px;
         margin: 2rem auto;
     }
 
-    /* Ajustar el contenedor de la galería para que no se salga */
     #galeria-container {
         max-width: 100%;
     }
-    
-    /* Barra inferior (en lugar de lateral) */
-    #toggle-panel {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 70px;
-        background-color: var(--color-white);
-        border-top: 2px solid var(--color-black);
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
-        box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        z-index: 1000;
-        pointer-events: auto;
-        display: flex;
-        box-sizing: border-box;
-        overflow: visible !important; /* Permite que el botón sobresalga */
-    }
 
-    /* Contenedor para iconos de navegación junto al perfil en escritorio */
-    .bottom-bar-left {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-165px);
-        display: flex;
-        gap: 15px;
-        align-items: center;
-    }
-
-    /* Botones de navegación en escritorio */
-    .toggle-nav-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        padding: 8px 12px;
-        color: var(--color-black);
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .toggle-nav-btn:hover {
-        background-color: var(--color-gray-100);
-        border-radius: 8px;
-    }
-    .toggle-nav-btn svg {
-        width: 28px;
-        height: 28px;
-    }
-    .toggle-nav-btn .toggle-label {
-        font-size: 12px;
-        font-weight: 500;
-        margin-left: 0;
-        opacity: 1;
-    }
-
-    /* Botón de perfil (igual que móvil) */
-    #btn-perfil-sidebar {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: -55px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 2px solid var(--color-black);
-        background: var(--color-white);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 1000;
-    }
-
-    #btn-perfil-sidebar .perfil-avatar-img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--color-black);
-    }
-
-    #btn-menu-principal,
-    #btn-logout-sidebar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px;
-    }
-
-    .toggle-label {
-        display: none !important;
-    }
-
-    .toggle-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-    }
-
-    /* Ocultar paneles móviles */
     .mobile-logout-modal,
     #mobile-main-menu {
         display: none;
     }
 
-    /* Contenedor del panel (el que pasas como panelElement) */
     .desktop-panel-container {
-        position: fixed;   /* ya lo forzamos con JS, pero es bueno tenerlo en CSS también */
-        z-index: 2000;     /* por encima de la barra (z-index: 1000) */
-        pointer-events: none; /* para no bloquear clics mientras está oculto, luego el panel interno sí debe tener pointer-events: auto */
+        position: fixed;
+        z-index: 2000;
+        pointer-events: none;
     }
-
     .desktop-logout-panel {
         pointer-events: auto;
-        /* tus estilos de fondo, sombra, borde, etc. */
     }
 }
 
 /* 3. Responsive - Móviles (≤ 768px) */
 @media (max-width: 768px) {
     body { padding-bottom: 45px; }
-    
-    /* Centrar contenido con aire en ambos lados */
+
     main {
         padding: 0 24px;
     }
-    
-    /* Convertir barra lateral en barra inferior */
-    #toggle-panel {
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 38px;
-        border-bottom: none;
-        border-radius: 0;
-        padding: 0;
-        justify-content: center;
-        background-color: var(--color-white);
-        border: 2px solid var(--color-black);
-        border-bottom: none;
-        box-sizing: border-box;
-        overflow: visible !important;
+
+    .toggle-icon {
+        width: 20px;
+        height: 20px;
     }
 
-    /* Contenedor para iconos de navegación junto al perfil */
-    .bottom-bar-left {
-        position: fixed;
-        left: 50%;
-        bottom: 6px;
-        transform: translateX(-110px);
-        display: flex;
-        gap: 7px;
-        align-items: center;
-        z-index: 3000;
-    }
-
-    /* Botón de perfil centrado y sobresaliente en la barra inferior */
-    #btn-perfil-sidebar {
-        position: fixed;
-        left: 50%;
-        bottom: 15px;
-        transform: translateX(-50%);
-        z-index: 3000;
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        border: 2px solid var(--color-black);
-        background: var(--color-white);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: auto;
-        cursor: pointer;
-        touch-action: manipulation;
-    }
-    #btn-perfil-sidebar .perfil-avatar-img {
-        width: 70px;          /* Avatar más grande */
-        height: 70px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--color-black); /* Borde negro grueso alrededor de la imagen */
-    }
-    .toggle-label { display: none !important; }
-    .toggle-icon { width: 20px; height: 20px; }
-
-    /* Botones de navegación en móvil (Galería y Registro) */
-    .toggle-nav-btn {
-        width: auto;
-        min-width: 30px;
-        padding: 5px;
-        justify-content: center;
-        margin: 0;
-        flex-shrink: 0;
-        z-index: 3000;
-        position: relative;
-    }
     .toggle-nav-btn svg {
         width: 20px;
         height: 20px;
     }
 
-    #btn-menu-principal,
-    #btn-logout-sidebar {
-        width: auto;
-        min-width: 30px;
-        padding: 5px;
-        justify-content: center;
-        margin: 0;
-        flex-shrink: 0;
-        z-index: 3000;
-        position: relative;
-    }
     #btn-logout-sidebar { 
         margin-left: 0;
-        display: none; /* Ocultar logout de barra inferior en móvil, ahora está en header */
+        display: none;
     }
-    
-    /* Ocultar paneles de escritorio en móvil */
+
     .desktop-logout-modal,
     .desktop-main-menu {
         display: none;
     }
-    
-    /* Configuración del fondo transparente del panel móvil */
+
     .mobile-logout-modal {
         position: fixed;
         z-index: 9999;
-        pointer-events: none; /* El contenedor no bloquea clics */
+        pointer-events: none;
         width: 0;
         height: 0;
-        overflow: visible; /* Permitir que el panel interno se vea fuera del contenedor */
+        overflow: visible;
     }
     .mobile-logout-modal.hidden { display: none; }
     .mobile-logout-modal:not(.hidden) { pointer-events: none; }
-    
-    /* El bocadillo negro del menú en móvil */
+
     .mobile-logout-panel.speech-bubble {
         position: fixed;
         background: var(--color-black);
@@ -970,10 +778,9 @@ input, select, textarea {
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         text-align: center;
         z-index: 2001;
-        pointer-events: auto; /* Permitir clics dentro del panel */
+        pointer-events: auto;
     }
-    
-    /* Cola móvil: apunta exactamente bajo el icono via --tail-x */
+
     .mobile-logout-panel.speech-bubble::after {
         content: '';
         position: absolute;
@@ -987,14 +794,13 @@ input, select, textarea {
         border-top: 8px solid var(--color-black);
         filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
     }
-    
-    /* Menú principal móvil */
+
     #mobile-main-menu {
         pointer-events: auto !important;
         z-index: 2000 !important;
     }
     #mobile-main-menu .mobile-logout-panel.speech-bubble { width: 160px; }
-    
+
     #mobile-main-menu button,
     #mobile-main-menu .logout-option {
         color: var(--color-white);
@@ -1009,23 +815,11 @@ input, select, textarea {
     }
     #mobile-main-menu button:active,
     #mobile-main-menu .logout-option:active { background-color: var(--color-gray-dark); }
-    
+
     .mobile-logout-panel .logout-option,
     .logout-option {
         font-size: 13px;
         padding: 8px 14px;
-    }
-}
-
-/* 4. Responsive - Móviles muy pequeños (≤ 480px) */
-@media (max-width: 480px) {
-    #toggle-panel {
-        padding: 0 8px;
-        gap: 6px;
-    }
-    .toggle-icon {
-        width: 18px;
-        height: 18px;
     }
 }
 
