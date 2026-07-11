@@ -172,7 +172,7 @@ html, body {
 
 .obra-carousel-viewport {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 5;            /* Más alto que ancho (era 1/1 cuadrado) */
     overflow: hidden;
     border-radius: 0;
     background: var(--color-gray-100);
@@ -375,7 +375,7 @@ html, body {
 
     .obra-carousel-viewport {
         border-radius: 0;
-        aspect-ratio: 1 / 1.08;
+        aspect-ratio: 9 / 16;       /* Proporción vertical estilo historia */
     }
 
     .obra-artista-row {
