@@ -14,14 +14,14 @@ html {
 #galeria-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0;
     padding: 0.5rem 1.5rem 5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 /* ==============================================
-   TARJETA DE OBRA
+   TARJETA DE OBRA — ocupa el viewport completo
    ============================================== */
 .obra-card {
     display: flex;
@@ -29,7 +29,10 @@ html {
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    min-height: fit-content;
+    /* Altura mínima: viewport - header (64px) - barra (50px) - padding del contenedor (~1rem) */
+    min-height: calc(100vh - 64px - 50px - 1rem);
+    box-sizing: border-box;
+    padding-bottom: 2rem;
     /* Snap magnético */
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -258,11 +261,12 @@ html {
 
     #galeria-container {
         padding: 0.5rem 1rem 4rem;
-        gap: 2rem;
+        gap: 0;
     }
 
     .obra-card {
         max-width: 100%;
+        min-height: calc(100vh - 50px - 50px - 1rem); /* header 50px, barra 50px */
     }
 
     .obra-avatar-round,
@@ -317,12 +321,13 @@ html {
 
     #galeria-container {
         padding: 0.25rem 0 3rem;
-        gap: 1.5rem;
+        gap: 0;
         max-width: none;
     }
 
     .obra-card {
         max-width: 100%;
+        min-height: calc(100vh - 48px - 50px - 1rem); /* header 48px, barra 50px */
     }
 
     .obra-carousel-viewport {
