@@ -183,9 +183,10 @@ function crearObraCard(obra) {
     const titulo = obra.titulo || 'Sin título';
     const precio = obra.precio || 'N/A';
 
+    const artistaUserId = obra.artista_user_id !== undefined && obra.artista_user_id !== null ? obra.artista_user_id : '';
     const avatarHTML = tieneAvatar 
-        ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round">`
-        : `<div class="obra-avatar-placeholder">${inicial}</div>`;
+        ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
+        : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
     const carruselHTML = crearCarruselHTML(obra);
 
@@ -224,7 +225,7 @@ function crearObraCard(obra) {
     return card;
 }
 
-export function mostrarGaleria(obras, container, onDetalle) {
+export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
     container.innerHTML = '';
     if (!obras || obras.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:var(--color-gray-400); padding: 2rem;">No hay obras disponibles.</p>';
@@ -232,6 +233,20 @@ export function mostrarGaleria(obras, container, onDetalle) {
     }
     obras.forEach(obra => {
         const card = crearObraCard(obra);
+
+        // Clic en el avatar del artista: abre su perfil (tiene prioridad sobre
+        // el clic general de la tarjeta, por eso detiene la propagación).
+        if (onAvatarClick) {
+            const avatarEl = card.querySelector('.obra-avatar-clickable');
+            if (avatarEl) {
+                avatarEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const artistaId = avatarEl.dataset.artistaId;
+                    if (artistaId) onAvatarClick(artistaId);
+                });
+            }
+        }
+
         if (onDetalle) {
             card.addEventListener('click', (e) => {
                 // No navegar si el clic fue en los dots del carrusel (paginación)

@@ -597,6 +597,19 @@ function salirDeModoGrid(onComplete) {
     }
 }
 
+// Se invoca al hacer clic en el avatar de un artista dentro de una tarjeta de
+// la galería (funciona tanto en modo azul como en modo grid/amarillo): abre
+// el perfil de ese artista y deja la galería en un estado limpio para cuando
+// el usuario vuelva a ella.
+function verPerfilArtistaDesdeGaleria(artistaId) {
+    galeriaModo = 0;
+    gridEntering = false;
+    gridExiting = false;
+    const galeriaContainerLocal = obtenerGaleriaContainer();
+    if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
+    verPerfilUsuario(artistaId);
+}
+
 // Se invoca al hacer clic en una obra mientras la galería está en modo grid
 // (amarillo): sale del grid y muestra esa misma obra en modo normal (azul),
 // desplazando la vista hasta ella.
@@ -651,6 +664,8 @@ function toggleGaleria() {
             cargarGaleria(galeriaContainer).then(obras => {
                 mostrarGaleria(obras, galeriaContainer, (id) => {
                     seleccionarObraDesdeGrid(id);
+                }, (artistaId) => {
+                    verPerfilArtistaDesdeGaleria(artistaId);
                 });
                 // Animar entrada al modo normal
                 if (galeriaContainerLocal) {
@@ -2184,6 +2199,7 @@ async function verPerfilUsuario(userId) {
                 perfilUsuario.classList.remove('hidden');
                 perfilUsuario.dataset.viewing = 'external';
             }
+            actualizarEstadoNavButtons();
             
             // Poblar datos del perfil
             const avatarImg = document.getElementById('perfil-avatar-seccion');
