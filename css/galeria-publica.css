@@ -571,15 +571,19 @@ html, body {
     flex-shrink: 0;
 }
 
-/* ---- Métricas ultra compactas, fondo igual al de la página ---- */
+/* ---- Métricas y botón en columna, centrados, fondo igual al de la página ---- */
 #galeria-container.modo-grid .obra-metricas-bar {
+    flex-direction: column;            /* Métricas arriba, botón abajo */
+    align-items: center;
+    justify-content: center;
     padding: 4px 3px;
     gap: 3px;
-    background: var(--color-bg);       /* Mismo color que el fondo de la página */
+    background: var(--color-bg);
 }
 
 #galeria-container.modo-grid .metrica-left {
     gap: 3px;
+    justify-content: center;
 }
 
 #galeria-container.modo-grid .metrica-item {
