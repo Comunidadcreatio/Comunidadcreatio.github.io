@@ -5,7 +5,13 @@
 html {
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    scroll-padding-top: 64px;       /* Compensa header desktop */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+body {
+    overscroll-behavior-y: none;
+    overflow-x: hidden;
 }
 
 /* ==============================================
@@ -21,7 +27,7 @@ html {
 }
 
 /* ==============================================
-   TARJETA DE OBRA — ocupa el viewport completo
+   TARJETA DE OBRA — snap magnético
    ============================================== */
 .obra-card {
     display: flex;
@@ -29,13 +35,10 @@ html {
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    /* Altura mínima: viewport - header (64px) - barra (50px) - padding del contenedor (~1rem) */
-    min-height: calc(100vh - 64px - 50px - 1rem);
-    box-sizing: border-box;
     padding-bottom: 2rem;
+    box-sizing: border-box;
     /* Snap magnético */
     scroll-snap-align: start;
-    scroll-snap-stop: always;
 }
 
 /* ==============================================
