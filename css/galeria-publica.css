@@ -551,9 +551,9 @@ html, body {
 
 #galeria-container.modo-grid .obra-avatar-round,
 #galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 21px;
-    height: 21px;
-    font-size: 0.64rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
 }
 
 #galeria-container.modo-grid .obra-titulo-marquee {
@@ -564,7 +564,7 @@ html, body {
 }
 
 #galeria-container.modo-grid .marquee-text {
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     animation: none;
     padding-left: 0;
     white-space: nowrap;
@@ -574,7 +574,7 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.64rem;
+    font-size: 0.78rem;
     flex-shrink: 0;
     order: 2;                          /* Precio abajo */
 }
@@ -584,33 +584,33 @@ html, body {
     flex-direction: column;            /* Métricas arriba, botón abajo */
     align-items: center;
     justify-content: center;
-    padding: 6px 8px;
-    gap: 5px;
+    padding: 8px 10px;
+    gap: 6px;
     background: var(--color-bg);
 }
 
 #galeria-container.modo-grid .metrica-left {
-    gap: 14px;
+    gap: 16px;
     justify-content: center;
 }
 
 #galeria-container.modo-grid .metrica-item {
-    font-size: 0.74rem;
+    font-size: 0.85rem;
     color: var(--color-ink);
     text-shadow: none;
-    gap: 5px;                          /* Espacio entre icono y número */
+    gap: 6px;                          /* Espacio entre icono y número */
 }
 
 #galeria-container.modo-grid .metrica-item svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     color: var(--color-ink);
     filter: none;
 }
 
 #galeria-container.modo-grid .btn-ver-detalles {
-    font-size: 0.6rem;
-    padding: 3px 10px;
+    font-size: 0.7rem;
+    padding: 4px 12px;
     border-width: 1px;
     border-radius: 3px;
     color: var(--color-ink);
