@@ -7,22 +7,23 @@ html, body {
     height: 100%;
 }
 
-/* Contenedor de la galería: scroll-snap container con altura fija */
+/* Contenedor de la galería: scroll-snap container */
 #galeria-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: 0 1.5rem 3rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 0 0.5rem 3rem;
+    max-width: 100%;
+    margin: 0;
     /* Snap container */
     overflow-y: auto;
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
-    /* Altura: viewport - header (64px + 12px aire) - barra (50px) */
-    height: calc(100vh - 76px - 50px);
-    margin-top: 76px;               /* 64px header + 12px aire */
+    /* Ocupa todo el espacio entre header (64px) y barra (50px) */
+    height: calc(100vh - 64px - 50px);
+    margin-top: 64px;
+    scroll-padding-top: 0.5rem;
 }
 
 /* Tarjeta: hija directa del snap container */
@@ -34,9 +35,8 @@ html, body {
     width: 100%;
     min-height: 100%;
     box-sizing: border-box;
-    padding: 0.5rem 0 2rem;
+    padding: 0.25rem 0 2rem;
     flex-shrink: 0;
-    /* Snap magnético */
     scroll-snap-align: start;
     scroll-snap-stop: always;
 }
@@ -259,9 +259,10 @@ html, body {
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        height: calc(100vh - 62px - 50px);  /* header 50px+12px aire, barra 50px */
-        margin-top: 62px;
-        padding: 0.5rem 1rem 3rem;
+        height: calc(100vh - 50px - 50px);   /* header 50px, barra 50px */
+        margin-top: 50px;
+        padding: 0 0.5rem 3rem;
+        scroll-padding-top: 0.25rem;
     }
 
     .obra-card {
@@ -311,9 +312,9 @@ html, body {
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        height: calc(100vh - 60px - 50px);  /* header 48px+12px aire, barra 50px */
-        margin-top: 60px;
-        padding: 0.25rem 0 3rem;
+        height: calc(100vh - 48px - 50px);   /* header 48px, barra 50px */
+        margin-top: 48px;
+        padding: 0 0 3rem;
         max-width: none;
     }
 
