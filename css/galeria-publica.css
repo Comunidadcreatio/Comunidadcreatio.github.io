@@ -431,8 +431,8 @@ html, body {
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 40px;
-        height: 40px;
+        width: 21px;
+        height: 21px;
     }
 
     .obra-metricas-bar .metrica-item {
@@ -491,7 +491,7 @@ html, body {
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
     padding: 2px;
-    align-items: start;
+    align-items: stretch;              /* Cada fila ocupa su altura completa, sin solaparse */
     overflow-y: auto;
     scroll-snap-type: none;
 }
@@ -506,7 +506,7 @@ html, body {
     scroll-snap-stop: normal;
     align-self: auto;
     border-radius: 0;
-    overflow: hidden;
+    overflow: visible;                 /* Permite ver contenido completo sin recortar */
     display: flex;
     flex-direction: column;
 }
@@ -672,9 +672,9 @@ html, body {
 
     #galeria-container.modo-grid .obra-avatar-round,
     #galeria-container.modo-grid .obra-avatar-placeholder {
-        width: 14px;
-        height: 14px;
-        font-size: 0.45rem;
+        width: 18px;
+        height: 18px;
+        font-size: 0.58rem;
     }
 
     #galeria-container.modo-grid .marquee-text {
@@ -682,7 +682,7 @@ html, body {
     }
 
     #galeria-container.modo-grid .obra-precio-top {
-        font-size: 0.5rem;
+        font-size: 0.65rem;
     }
 
     #galeria-container.modo-grid .obra-metricas-bar {
