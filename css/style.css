@@ -429,6 +429,7 @@ input, select, textarea {
     justify-content: center;
     width: 100%;
     height: 50px;
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* Espacio para barra de navegación del sistema */
     background-color: var(--color-white);
     border: none;
     border-top: 2px solid var(--color-black);

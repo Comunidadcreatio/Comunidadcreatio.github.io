@@ -388,9 +388,7 @@ html, body {
     .obra-card {
         max-width: 100%;
         align-self: stretch;
-        height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
-        min-height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
-        max-height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
+        height: 100%;               /* Hereda altura del contenedor, evita bug 100vh en Android */
         padding: 0;
     }
 
