@@ -26,12 +26,10 @@ html, body {
     scroll-padding-top: 0.5rem;
 }
 
-/* Tarjeta: hija directa del snap container */
+/* Tarjeta: ocupa todo el ancho, sin límite de max-width */
 .obra-card {
     display: flex;
     flex-direction: column;
-    max-width: 410px;
-    margin: 0 auto;
     width: 100%;
     min-height: 100%;
     box-sizing: border-box;
