@@ -489,8 +489,8 @@ html, body {
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-    padding: 0;
+    gap: 2px;
+    padding: 2px;
     align-items: start;
     overflow-y: auto;
     scroll-snap-type: none;
@@ -551,9 +551,9 @@ html, body {
 
 #galeria-container.modo-grid .obra-avatar-round,
 #galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 20px;
-    height: 20px;
-    font-size: 0.6rem;
+    width: 21px;
+    height: 21px;
+    font-size: 0.64rem;
 }
 
 #galeria-container.modo-grid .obra-titulo-marquee {
@@ -574,7 +574,7 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.6rem;
+    font-size: 0.64rem;
     flex-shrink: 0;
     order: 2;                          /* Precio abajo */
 }
@@ -636,8 +636,8 @@ html, body {
 /* Responsive: solo ajusta espaciado, mantiene 3 columnas */
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
-        gap: 0;
-        padding: 0;
+        gap: 2px;
+        padding: 2px;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
@@ -656,8 +656,8 @@ html, body {
 
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
-        gap: 0;
-        padding: 0;
+        gap: 2px;
+        padding: 2px;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
