@@ -4,15 +4,15 @@
    ============================================== */
 html {
     scroll-behavior: smooth;
-}
-
-body {
     scroll-snap-type: y mandatory;
     scroll-padding-top: 64px;       /* Compensa header desktop */
     scroll-padding-bottom: 50px;    /* Compensa barra inferior */
     overflow-y: scroll;
+}
+
+body {
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain; /* Previene scroll fantasma */
 }
 
 /* ==============================================
@@ -258,7 +258,7 @@ body {
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
-    body {
+    html {
         scroll-padding-top: 50px;    /* Header móvil: 50px */
         scroll-padding-bottom: 50px;
     }
