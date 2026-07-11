@@ -167,7 +167,7 @@ html, body {
 .obra-carousel {
     position: relative;
     width: 100%;
-    overflow: visible;
+    overflow: hidden;               /* Contiene dots y métricas superpuestas */
 }
 
 .obra-carousel-viewport {
@@ -201,23 +201,23 @@ html, body {
 }
 
 /* ==============================================
-   DOTS DEL CARRUSEL
+   DOTS DEL CARRUSEL (centrados arriba, más pequeños)
    ============================================== */
 .obra-carousel-dots {
     position: absolute;
-    bottom: 10px;
+    top: 8px;
     left: 0;
     right: 0;
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     z-index: 5;
     pointer-events: none;
 }
 
 .obra-carousel-dot {
-    width: 10px;
-    height: 10px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.7);
     border: 1.5px solid rgba(0, 0, 0, 0.3);
@@ -237,15 +237,19 @@ html, body {
     transform: scale(1.15);
 }
 
-/* ==============================================
-   MÉTRICAS + BOTÓN VER DETALLES (superpuestas en la imagen)
-   ============================================== */
-.obra-carousel {
-    position: relative;
-    width: 100%;
-    overflow: hidden;               /* Contiene los elementos superpuestos */
+[data-theme="dark"] .obra-carousel-dot {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
+[data-theme="dark"] .obra-carousel-dot.active {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+}
+
+/* ==============================================
+   MÉTRICAS + BOTÓN VER DETALLES (superpuestas)
+   ============================================== */
 .obra-metricas-bar {
     display: flex;
     flex-direction: row;
@@ -253,14 +257,18 @@ html, body {
     justify-content: center;
     gap: 18px;
     padding: 8px 0.5rem 10px;
-    /* Superpuesto en la parte inferior de la imagen, 5% más arriba */
     position: absolute;
     bottom: 5%;
     left: 0;
     right: 0;
     z-index: 6;
-    /* Fondo semitransparente para legibilidad */
+    /* Degradado oscuro para light mode (iconos blancos) */
     background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+}
+
+/* Modo oscuro: degradado claro (iconos oscuros) */
+[data-theme="dark"] .obra-metricas-bar {
+    background: linear-gradient(to top, rgba(255,255,255,0.25) 0%, transparent 100%);
 }
 
 .metrica-left {
@@ -275,7 +283,7 @@ html, body {
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    color: #ffffff;                 /* Blanco sobre fondo oscuro */
+    color: #ffffff;
     font-size: 1.05rem;
     font-weight: 600;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
