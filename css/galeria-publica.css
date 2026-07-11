@@ -672,9 +672,9 @@ html, body {
 
     #galeria-container.modo-grid .obra-avatar-round,
     #galeria-container.modo-grid .obra-avatar-placeholder {
-        width: 18px;
-        height: 18px;
-        font-size: 0.58rem;
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
     }
 
     #galeria-container.modo-grid .marquee-text {
