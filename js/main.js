@@ -610,15 +610,19 @@ function seleccionarObraDesdeGrid(obraId) {
         const galeriaContainerLocal = obtenerGaleriaContainer();
         if (!galeriaContainerLocal) return;
 
-        const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-        const targetCard = galeriaContainerLocal.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
+        // Esperar un frame a que el layout normal (tarjetas a tamaño de viewport)
+        // se aplique tras quitar 'modo-grid', para calcular el offset correcto y
+        // que el "magnetismo" (scroll-snap) quede exactamente ajustado a la tarjeta.
+        requestAnimationFrame(() => {
+            const targetCard = galeriaContainerLocal.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
+            if (targetCard) {
+                galeriaContainerLocal.scrollTop = targetCard.offsetTop;
+            }
 
-        if (targetCard) {
-            targetCard.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }
-
-        // Animar entrada al modo normal (igual que al abrir la galería normalmente)
-        cards.forEach(c => c.classList.add('modo-flex-enter'));
+            // Animar entrada al modo normal (igual que al abrir la galería normalmente)
+            const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
+            cards.forEach(c => c.classList.add('modo-flex-enter'));
+        });
     });
 }
 
