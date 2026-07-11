@@ -258,17 +258,17 @@ html, body {
     gap: 18px;
     padding: 8px 0.5rem 10px;
     position: absolute;
-    bottom: 0;                      /* Pegado a la base de la imagen */
+    bottom: 10%;                    /* Subir 5% más la posición */
     left: 0;
     right: 0;
     z-index: 6;
-    /* Degradado oscuro para light mode (iconos blancos) */
-    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+    /* Degradado oscuro para light mode (+8% opacidad) */
+    background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
 }
 
 /* Modo oscuro: degradado claro (iconos oscuros) */
 [data-theme="dark"] .obra-metricas-bar {
-    background: linear-gradient(to top, rgba(255,255,255,0.25) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(255,255,255,0.29) 0%, transparent 100%);
 }
 
 .metrica-left {
@@ -318,8 +318,8 @@ html, body {
 }
 
 [data-theme="dark"] .btn-ver-detalles {
-    color: var(--color-ink);       /* #e5e5e5 en modo oscuro */
-    border-color: var(--color-ink);
+    color: #1a1a1a;                /* Negro en modo oscuro */
+    border-color: #1a1a1a;
 }
 
 /* ==============================================
