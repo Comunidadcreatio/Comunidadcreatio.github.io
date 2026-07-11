@@ -431,6 +431,7 @@ function confirmarDescartarCambios() {
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal (azul), 2=vista grid (amarillo)
 let galeriaModo = 0;
+let gridExiting = false;   // Bloquea doble clic durante animación de salida del grid
 
 // Referencia al contenedor de galería para el modo grid
 function obtenerGaleriaContainer() {
@@ -599,7 +600,9 @@ function toggleGaleria() {
         actualizarEstadoNavButtons();
     } else {
         // Salir del modo grid con animación de salida
+        if (gridExiting) return;   // Evita doble clic durante la animación de salida
         galeriaModo = 0;
+        gridExiting = true;
         if (galeriaContainerLocal) {
             const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
             cards.forEach(c => c.classList.add('modo-grid-exit'));
@@ -607,6 +610,7 @@ function toggleGaleria() {
             // Esperar a que termine la animación antes de quitar modo-grid
             const lastCard = cards[cards.length - 1];
             const onAnimEnd = () => {
+                gridExiting = false;
                 galeriaContainerLocal.classList.remove('modo-grid');
                 cards.forEach(c => c.classList.remove('modo-grid-exit'));
                 switchSection(galeria, document.getElementById('pagina-blanca'));
@@ -617,9 +621,11 @@ function toggleGaleria() {
                 // Timeout de seguridad por si animationend no se dispara
                 setTimeout(onAnimEnd, 600);
             } else {
+                gridExiting = false;
                 onAnimEnd();
             }
         } else {
+            gridExiting = false;
             switchSection(galeria, document.getElementById('pagina-blanca'));
         }
     }
