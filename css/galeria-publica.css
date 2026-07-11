@@ -489,8 +489,8 @@ html, body {
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-    padding: 2px;
+    gap: 0;
+    padding: 0;
     align-items: stretch;              /* Cada fila ocupa su altura completa, sin solaparse */
     overflow-y: auto;
     scroll-snap-type: none;
@@ -636,8 +636,8 @@ html, body {
 /* Responsive: solo ajusta espaciado, mantiene 3 columnas */
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
-        gap: 2px;
-        padding: 2px;
+        gap: 0;
+        padding: 0;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
@@ -656,8 +656,8 @@ html, body {
 
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
-        gap: 2px;
-        padding: 2px;
+        gap: 0;
+        padding: 0;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
