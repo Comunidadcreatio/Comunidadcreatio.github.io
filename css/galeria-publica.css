@@ -53,11 +53,11 @@ html, body {
     height: 25%;
     z-index: 1;                     /* Debajo de iconos y botón */
     pointer-events: none;
-    background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.56) 0%, transparent 100%);
 }
 
 [data-theme="dark"] .obra-card::after {
-    background: linear-gradient(to top, rgba(255,255,255,0.29) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(255,255,255,0.33) 0%, transparent 100%);
 }
 
 /* Wrapper interno: padding mínimo */
