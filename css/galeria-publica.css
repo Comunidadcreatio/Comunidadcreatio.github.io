@@ -497,9 +497,11 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-card {
-    max-width: 100%;
-    width: 100%;
-    height: auto;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
     scroll-snap-align: none;
     scroll-snap-stop: normal;
     align-self: auto;
@@ -580,10 +582,10 @@ html, body {
 
 #galeria-container.modo-grid .marquee-text {
     font-size: 0.7rem;
-    animation-duration: 6s;         /* Más rápido en grid */
+    animation-duration: 6s;
 }
 
-/* Responsive: 2 columnas en tablet, 1 en móvil */
+/* Responsive: 2 columnas en tablet, 1 columnas en móvil para legibilidad */
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -594,8 +596,51 @@ html, body {
 
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        padding: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 6px;
+    }
+
+    #galeria-container.modo-grid .obra-metricas-bar {
+        padding: 8px 0.4rem;
+        gap: 4px;
+    }
+
+    #galeria-container.modo-grid .metrica-left {
+        gap: 6px;
+    }
+
+    #galeria-container.modo-grid .metrica-item {
+        font-size: 0.7rem;
+    }
+
+    #galeria-container.modo-grid .metrica-item svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    #galeria-container.modo-grid .btn-ver-detalles {
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-width: 1px;
+    }
+
+    #galeria-container.modo-grid .obra-artista-nombre {
+        font-size: 0.65rem;
+    }
+
+    #galeria-container.modo-grid .obra-precio-top {
+        font-size: 0.7rem;
+    }
+
+    #galeria-container.modo-grid .marquee-text {
+        font-size: 0.62rem;
+    }
+
+    #galeria-container.modo-grid .obra-avatar-round,
+    #galeria-container.modo-grid .obra-avatar-placeholder {
+        width: 18px;
+        height: 18px;
+        font-size: 0.55rem;
     }
 }
