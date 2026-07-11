@@ -11,6 +11,7 @@ html, body {
 #galeria-container {
     display: flex;
     flex-direction: column;
+    align-items: center;            /* Centra las tarjetas horizontalmente */
     gap: 0;
     padding: 0;
     margin: 0;
@@ -33,6 +34,7 @@ html, body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    max-width: 500px;               /* Limita el ancho en escritorio, centrado vertical */
     height: calc(100% + 8px);       /* 8px extra = solapa la siguiente tarjeta, impide verla */
     box-sizing: border-box;
     padding: 0;
@@ -41,6 +43,7 @@ html, body {
     scroll-snap-align: start;
     scroll-snap-stop: always;
     position: relative;
+    align-self: center;             /* Centra la tarjeta horizontalmente en el flex container */
 }
 
 /* Barra horizontal debajo de los iconos */
@@ -191,7 +194,7 @@ html, body {
 
 .obra-carousel-viewport {
     width: 100%;
-    aspect-ratio: 4 / 5;            /* Más alto que ancho (era 1/1 cuadrado) */
+    aspect-ratio: 9 / 16;           /* Proporción vertical estilo historia (móvil) */
     overflow: hidden;
     border-radius: 0;
     background: var(--color-gray-100);
@@ -403,6 +406,8 @@ html, body {
     }
 
     .obra-card {
+        max-width: 100%;            /* Quita límite de ancho en móvil */
+        align-self: stretch;        /* Ocupa todo el ancho en móvil */
         height: calc(100vh - 48px - 50px);
         min-height: calc(100vh - 48px - 50px);
         max-height: calc(100vh - 48px - 50px);
