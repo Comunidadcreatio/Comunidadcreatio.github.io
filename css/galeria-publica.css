@@ -35,7 +35,7 @@ html, body {
     flex-direction: column;
     width: 100%;
     max-width: 500px;               /* Limita el ancho en escritorio, centrado vertical */
-    height: calc(100% + 8px);       /* 8px extra = solapa la siguiente tarjeta, impide verla */
+    height: 100%;                   /* Ajuste exacto para que la barra de métricas sea visible */
     box-sizing: border-box;
     padding: 0;
     flex-shrink: 0;
