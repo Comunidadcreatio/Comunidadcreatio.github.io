@@ -1,39 +1,43 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
-   SCROLL SNAPPING — contenedor de galería como snap container
+   SCROLL SNAPPING — contenedor fixed como snap container
    ============================================== */
 html, body {
     overflow: hidden;
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-/* Contenedor de la galería: scroll-snap container */
+/* Contenedor: position fixed ocupa todo el espacio disponible */
 #galeria-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: 0 0.5rem 3rem;
-    max-width: 100%;
+    padding: 0 0 2rem;
     margin: 0;
+    max-width: 100%;
     /* Snap container */
     overflow-y: auto;
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
-    /* Ocupa todo el espacio entre header (64px) y barra (50px) */
-    height: calc(100vh - 64px - 50px);
-    margin-top: 64px;
-    scroll-padding-top: 0.5rem;
+    /* Posición fija entre header y barra */
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 50px;
 }
 
-/* Tarjeta: ocupa todo el ancho, sin límite de max-width */
+/* Tarjeta: hija directa del snap container */
 .obra-card {
     display: flex;
     flex-direction: column;
     width: 100%;
     min-height: 100%;
     box-sizing: border-box;
-    padding: 0.25rem 0 2rem;
+    padding: 0.5rem 0 2rem;
     flex-shrink: 0;
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -257,15 +261,12 @@ html, body {
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        height: calc(100vh - 50px - 50px);   /* header 50px, barra 50px */
-        margin-top: 50px;
-        padding: 0 0.5rem 3rem;
-        scroll-padding-top: 0.25rem;
+        top: 50px;
+        bottom: 50px;
     }
 
     .obra-card {
-        max-width: 100%;
-        min-height: 100%;
+        padding: 0.5rem 0.5rem 2rem;
     }
 
     .obra-avatar-round,
@@ -310,15 +311,12 @@ html, body {
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        height: calc(100vh - 48px - 50px);   /* header 48px, barra 50px */
-        margin-top: 48px;
-        padding: 0 0 3rem;
-        max-width: none;
+        top: 48px;
+        bottom: 50px;
     }
 
     .obra-card {
-        max-width: 100%;
-        min-height: 100%;
+        padding: 0.25rem 0 1.5rem;
     }
 
     .obra-carousel-viewport {
