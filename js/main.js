@@ -429,6 +429,21 @@ function confirmarDescartarCambios() {
     return true;
 }
 
+// Actualiza el estado visual de los botones de navegación inferior
+function actualizarEstadoNavButtons() {
+    const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
+    const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+
+    if (galeria && btnGaleriaSidebar) {
+        btnGaleriaSidebar.classList.toggle('nav-btn-active', !galeria.classList.contains('hidden'));
+    }
+    if (panel && btnRegistroSidebar) {
+        btnRegistroSidebar.classList.toggle('nav-btn-active', !panel.classList.contains('hidden'));
+    }
+}
+
 // ============================================
 // MANEJO DE VISTAS (Galería, Panel, Página Blanca)
 // ============================================
@@ -495,6 +510,7 @@ function mostrarSeccion(section, callback) {
     if (!section) return;
     // Usar requestAnimationFrame para que el display se aplique antes de la animación
     section.classList.remove('hidden', 'section-exiting');
+    actualizarEstadoNavButtons();    // Sincroniza indicador visual de botones de navegación
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             section.classList.add('section-entering');
