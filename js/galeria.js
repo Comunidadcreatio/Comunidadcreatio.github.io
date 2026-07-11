@@ -2,27 +2,7 @@
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
 
-// Genera HTML de skeleton loader para la galería
-function generarSkeletonGaleria(cantidad = 6) {
-    let html = '<div class="skeleton-galeria">';
-    for (let i = 0; i < cantidad; i++) {
-        html += `
-            <div class="skeleton-card">
-                <div class="skeleton-card-img"></div>
-                <div class="skeleton-card-body">
-                    <div class="skeleton-line"></div>
-                    <div class="skeleton-line"></div>
-                    <div class="skeleton-line-sm"></div>
-                </div>
-            </div>
-        `;
-    }
-    html += '</div>';
-    return html;
-}
-
 export async function cargarGaleria(container) {
-    container.innerHTML = generarSkeletonGaleria();
     container.setAttribute('aria-busy', 'true');
     
     try {
