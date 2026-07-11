@@ -1,13 +1,18 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
-   SCROLL SNAPPING GLOBAL (html)
+   SCROLL SNAPPING GLOBAL
    ============================================== */
 html {
+    scroll-behavior: smooth;
+}
+
+body {
     scroll-snap-type: y mandatory;
-    scroll-padding-top: 64px;       /* Compensa altura del header fixed */
+    scroll-padding-top: 64px;       /* Compensa header desktop */
     scroll-padding-bottom: 50px;    /* Compensa barra inferior */
     overflow-y: scroll;
-    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ==============================================
@@ -253,9 +258,14 @@ html {
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
+    body {
+        scroll-padding-top: 50px;    /* Header móvil: 50px */
+        scroll-padding-bottom: 50px;
+    }
+
     #galeria-container {
-        padding: 5rem 1rem 2.5rem;
-        gap: 3rem;
+        padding: 4.5rem 1rem 2.5rem;
+        gap: 2.5rem;
     }
 
     .obra-card {
