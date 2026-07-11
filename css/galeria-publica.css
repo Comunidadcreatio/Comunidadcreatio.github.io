@@ -28,7 +28,7 @@ html, body {
     bottom: 50px;
 }
 
-/* Tarjeta: altura con margen de seguridad para sellar contra la siguiente */
+/* Tarjeta: altura con margen de seguridad + degradado en la base */
 .obra-card {
     display: flex;
     flex-direction: column;
@@ -40,6 +40,24 @@ html, body {
     overflow: hidden;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    position: relative;
+}
+
+/* Degradado en la base de la tarjeta, pegado a la barra inferior */
+.obra-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 25%;
+    z-index: 7;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
+}
+
+[data-theme="dark"] .obra-card::after {
+    background: linear-gradient(to top, rgba(255,255,255,0.29) 0%, transparent 100%);
 }
 
 /* Wrapper interno: padding mínimo */
@@ -258,30 +276,10 @@ html, body {
     gap: 18px;
     padding: 8px 0.5rem 10px;
     position: absolute;
-    bottom: 5%;                     /* Solo afecta iconos y botón */
+    bottom: 5%;
     left: 0;
     right: 0;
-    z-index: 6;
-    /* Sin background — el degradado está en ::before */
-}
-
-/* Degradado independiente: va desde la base hasta los iconos */
-.obra-metricas-bar::before {
-    content: '';
-    position: absolute;
-    bottom: 0;                      /* Pegado a la base de la imagen */
-    left: 0;
-    right: 0;
-    height: 120%;                   /* Cubre desde bottom=0 hasta más arriba que los iconos */
-    z-index: -1;                    /* Detrás de iconos y botón */
-    pointer-events: none;
-    /* Light mode */
-    background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
-}
-
-/* Modo oscuro: degradado claro */
-[data-theme="dark"] .obra-metricas-bar::before {
-    background: linear-gradient(to top, rgba(255,255,255,0.29) 0%, transparent 100%);
+    z-index: 7;
 }
 
 .metrica-left {
