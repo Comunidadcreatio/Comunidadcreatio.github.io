@@ -528,11 +528,15 @@ html, body {
     height: auto;
 }
 
-/* ---- Artista row: avatar + título estático + precio (nombre artista OCULTO) ---- */
+/* ---- Artista row en columna: avatar centrado, título debajo, precio abajo ---- */
 #galeria-container.modo-grid .obra-artista-row {
-    padding: 2px 3px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 6px;
     margin-bottom: 0;
     gap: 2px;
+    background: var(--color-bg);
 }
 
 #galeria-container.modo-grid .obra-artista-nombre {
@@ -542,22 +546,25 @@ html, body {
 #galeria-container.modo-grid .obra-artista-left {
     max-width: none;
     flex-shrink: 0;
+    order: 0;                          /* Avatar primero */
 }
 
 #galeria-container.modo-grid .obra-avatar-round,
 #galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 16px;
-    height: 16px;
-    font-size: 0.5rem;
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
 }
 
 #galeria-container.modo-grid .obra-titulo-marquee {
-    flex: 1;
+    flex: none;
     min-width: 0;
+    max-width: 100%;
+    order: 1;                          /* Título en medio */
 }
 
 #galeria-container.modo-grid .marquee-text {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     animation: none;
     padding-left: 0;
     white-space: nowrap;
@@ -567,8 +574,9 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.58rem;
+    font-size: 0.6rem;
     flex-shrink: 0;
+    order: 2;                          /* Precio abajo */
 }
 
 /* ---- Métricas y botón en columna, centrados, con aire a los lados ---- */
@@ -653,9 +661,13 @@ html, body {
     }
 
     #galeria-container.modo-grid .obra-artista-row {
-        padding: 1px 1px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 5px;
         margin-bottom: 0;
         gap: 1px;
+        background: var(--color-bg);
     }
 
     #galeria-container.modo-grid .obra-avatar-round,
