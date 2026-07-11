@@ -489,8 +489,8 @@ html, body {
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    padding: 12px;
+    gap: 4px;
+    padding: 4px;
     align-items: start;
     overflow-y: auto;
     scroll-snap-type: none;
@@ -505,7 +505,7 @@ html, body {
     scroll-snap-align: none;
     scroll-snap-stop: normal;
     align-self: auto;
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -528,112 +528,121 @@ html, body {
     height: auto;
 }
 
-/* Métricas ligeramente compactas en grid */
-#galeria-container.modo-grid .obra-metricas-bar {
-    padding: 10px 0.5rem;
-    gap: 8px;
-}
-
-#galeria-container.modo-grid .metrica-left {
-    gap: 10px;
-}
-
-#galeria-container.modo-grid .metrica-item {
-    font-size: 0.82rem;
-}
-
-#galeria-container.modo-grid .metrica-item svg {
-    width: 18px;
-    height: 18px;
-}
-
-#galeria-container.modo-grid .btn-ver-detalles {
-    font-size: 0.88rem;
-    padding: 6px 14px;
-    border-width: 1.5px;
-}
-
-/* Artista row compacto en grid */
+/* ---- Artista row: avatar + título estático + precio (nombre artista OCULTO) ---- */
 #galeria-container.modo-grid .obra-artista-row {
-    padding: 4px 6px;
-    margin-bottom: 2px;
-    gap: 4px;
+    padding: 3px 4px;
+    margin-bottom: 1px;
+    gap: 3px;
+}
+
+#galeria-container.modo-grid .obra-artista-nombre {
+    display: none;
+}
+
+#galeria-container.modo-grid .obra-artista-left {
+    max-width: none;
+    flex-shrink: 0;
 }
 
 #galeria-container.modo-grid .obra-avatar-round,
 #galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 22px;
-    height: 22px;
-    font-size: 0.65rem;
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
 }
 
-#galeria-container.modo-grid .obra-artista-nombre {
-    font-size: 0.72rem;
-}
-
-#galeria-container.modo-grid .obra-artista-left {
-    max-width: 45%;
-    flex-shrink: 1;
-}
-
-#galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.78rem;
+#galeria-container.modo-grid .obra-titulo-marquee {
+    flex: 1;
+    min-width: 0;
 }
 
 #galeria-container.modo-grid .marquee-text {
-    font-size: 0.7rem;
-    animation-duration: 6s;
+    font-size: 0.65rem;
+    animation: none;                   /* Título estático, sin scroll */
+    padding-left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
-/* Responsive: mantiene 3 columnas en todos los tamaños, solo ajusta espaciado */
+#galeria-container.modo-grid .obra-precio-top {
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+/* ---- Métricas ultra compactas ---- */
+#galeria-container.modo-grid .obra-metricas-bar {
+    padding: 6px 4px;
+    gap: 4px;
+}
+
+#galeria-container.modo-grid .metrica-left {
+    gap: 5px;
+}
+
+#galeria-container.modo-grid .metrica-item {
+    font-size: 0.58rem;
+}
+
+#galeria-container.modo-grid .metrica-item svg {
+    width: 12px;
+    height: 12px;
+}
+
+#galeria-container.modo-grid .btn-ver-detalles {
+    font-size: 0.6rem;
+    padding: 3px 7px;
+    border-width: 1px;
+    border-radius: 3px;
+}
+
+/* ---- Ocultar dots del carrusel en grid (ahorran espacio) ---- */
+#galeria-container.modo-grid .obra-carousel-dots {
+    display: none;
+}
+
+/* ---- Ocultar línea decorativa en grid ---- */
+#galeria-container.modo-grid .obra-card::after {
+    display: none;
+}
+
+/* ---- Sin máscara de gradiente en marquee (título estático) ---- */
+#galeria-container.modo-grid .obra-titulo-marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+/* Responsive: solo ajusta espaciado, mantiene 3 columnas */
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
-        gap: 8px;
-        padding: 8px;
+        gap: 3px;
+        padding: 3px;
+    }
+
+    #galeria-container.modo-grid .obra-artista-row {
+        padding: 2px 3px;
+    }
+
+    #galeria-container.modo-grid .obra-metricas-bar {
+        padding: 5px 3px;
+        gap: 3px;
+    }
+
+    #galeria-container.modo-grid .metrica-left {
+        gap: 3px;
     }
 }
 
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
-        gap: 5px;
-        padding: 5px;
+        gap: 2px;
+        padding: 2px;
     }
 
-    #galeria-container.modo-grid .obra-metricas-bar {
-        padding: 6px 0.3rem;
-        gap: 3px;
-    }
-
-    #galeria-container.modo-grid .metrica-left {
-        gap: 4px;
-    }
-
-    #galeria-container.modo-grid .metrica-item {
-        font-size: 0.62rem;
-    }
-
-    #galeria-container.modo-grid .metrica-item svg {
-        width: 11px;
-        height: 11px;
-    }
-
-    #galeria-container.modo-grid .btn-ver-detalles {
-        font-size: 0.65rem;
-        padding: 3px 6px;
-        border-width: 1px;
-    }
-
-    #galeria-container.modo-grid .obra-artista-nombre {
-        font-size: 0.6rem;
-    }
-
-    #galeria-container.modo-grid .obra-precio-top {
-        font-size: 0.65rem;
-    }
-
-    #galeria-container.modo-grid .marquee-text {
-        font-size: 0.58rem;
-        animation-duration: 4s;
+    #galeria-container.modo-grid .obra-artista-row {
+        padding: 1px 2px;
+        margin-bottom: 0;
     }
 
     #galeria-container.modo-grid .obra-avatar-round,
@@ -641,5 +650,36 @@ html, body {
         width: 16px;
         height: 16px;
         font-size: 0.5rem;
+    }
+
+    #galeria-container.modo-grid .marquee-text {
+        font-size: 0.55rem;
+    }
+
+    #galeria-container.modo-grid .obra-precio-top {
+        font-size: 0.6rem;
+    }
+
+    #galeria-container.modo-grid .obra-metricas-bar {
+        padding: 4px 2px;
+        gap: 2px;
+    }
+
+    #galeria-container.modo-grid .metrica-left {
+        gap: 2px;
+    }
+
+    #galeria-container.modo-grid .metrica-item {
+        font-size: 0.5rem;
+    }
+
+    #galeria-container.modo-grid .metrica-item svg {
+        width: 9px;
+        height: 9px;
+    }
+
+    #galeria-container.modo-grid .btn-ver-detalles {
+        font-size: 0.52rem;
+        padding: 2px 5px;
     }
 }
