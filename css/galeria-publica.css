@@ -3,6 +3,7 @@
    SCROLL SNAPPING GLOBAL
    ============================================== */
 html {
+    scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
     scroll-padding-top: 68px;       /* 64px header + 4px aire */
 }
