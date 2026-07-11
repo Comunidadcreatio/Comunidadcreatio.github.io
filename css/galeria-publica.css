@@ -258,16 +258,29 @@ html, body {
     gap: 18px;
     padding: 8px 0.5rem 10px;
     position: absolute;
-    bottom: 5%;                     /* Posición anterior del degradado */
+    bottom: 5%;                     /* Solo afecta iconos y botón */
     left: 0;
     right: 0;
     z-index: 6;
-    /* Degradado oscuro para light mode (+8% opacidad) */
+    /* Sin background — el degradado está en ::before */
+}
+
+/* Degradado independiente: va desde la base hasta los iconos */
+.obra-metricas-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;                      /* Pegado a la base de la imagen */
+    left: 0;
+    right: 0;
+    height: 120%;                   /* Cubre desde bottom=0 hasta más arriba que los iconos */
+    z-index: -1;                    /* Detrás de iconos y botón */
+    pointer-events: none;
+    /* Light mode */
     background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
 }
 
-/* Modo oscuro: degradado claro (iconos oscuros) */
-[data-theme="dark"] .obra-metricas-bar {
+/* Modo oscuro: degradado claro */
+[data-theme="dark"] .obra-metricas-bar::before {
     background: linear-gradient(to top, rgba(255,255,255,0.29) 0%, transparent 100%);
 }
 
