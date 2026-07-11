@@ -42,12 +42,12 @@ html, body {
     scroll-snap-stop: always;
 }
 
-/* Wrapper interno para el padding (no interfiere con height:100%) */
+/* Wrapper interno: padding mínimo */
 .obra-card-inner {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 0.25rem 0.5rem 0;
+    padding: 0.25rem 0 0;
     overflow: hidden;
     min-height: 0;
 }
@@ -275,7 +275,7 @@ html, body {
     }
 
     .obra-card-inner {
-        padding: 0.5rem 0.5rem 1.5rem;
+        padding: 0.25rem 0 1.5rem;
     }
 
     .obra-avatar-round,
