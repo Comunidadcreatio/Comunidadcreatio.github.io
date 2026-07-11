@@ -429,15 +429,33 @@ function confirmarDescartarCambios() {
     return true;
 }
 
+// Variable de control para el modo de galería: 0=oculta, 1=vista normal (azul), 2=vista grid (amarillo)
+let galeriaModo = 0;
+
+// Referencia al contenedor de galería para el modo grid
+function obtenerGaleriaContainer() {
+    return document.getElementById('galeria-container');
+}
+
 // Actualiza el estado visual de los botones de navegación inferior
 function actualizarEstadoNavButtons() {
     const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
     const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
+    const galeriaContainer = obtenerGaleriaContainer();
 
     if (galeria && btnGaleriaSidebar) {
-        btnGaleriaSidebar.classList.toggle('nav-btn-active', !galeria.classList.contains('hidden'));
+        const galeriaVisible = !galeria.classList.contains('hidden');
+        btnGaleriaSidebar.classList.remove('nav-btn-active', 'nav-btn-grid');
+
+        if (galeriaVisible) {
+            if (galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
+                btnGaleriaSidebar.classList.add('nav-btn-grid');
+            } else {
+                btnGaleriaSidebar.classList.add('nav-btn-active');
+            }
+        }
     }
     if (panel && btnRegistroSidebar) {
         btnRegistroSidebar.classList.toggle('nav-btn-active', !panel.classList.contains('hidden'));
@@ -544,9 +562,14 @@ function toggleGaleria() {
     if (isTransitioning || !confirmarDescartarCambios()) return;
     
     const galeria = document.getElementById('galeria-publica');
+    const galeriaContainerLocal = obtenerGaleriaContainer();
     if (!galeria) return;
 
+    // Ciclo: oculta(0) → normal/azul(1) → grid/amarillo(2) → oculta(0)
     if (galeria.classList.contains('hidden')) {
+        // Mostrar en modo normal (azul)
+        galeriaModo = 1;
+        if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         switchSection(encontrarSeccionActual(), galeria, () => {
             cargarGaleria(galeriaContainer).then(obras => {
@@ -555,7 +578,15 @@ function toggleGaleria() {
                 });
             });
         });
+    } else if (galeriaModo === 1) {
+        // Cambiar a modo grid (amarillo)
+        galeriaModo = 2;
+        if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
+        actualizarEstadoNavButtons();
     } else {
+        // Ocultar galería
+        galeriaModo = 0;
+        if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
         switchSection(galeria, document.getElementById('pagina-blanca'));
     }
 }
@@ -566,6 +597,11 @@ function togglePanel() {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (!panel || !paginaBlanca) return;
+
+    // Resetear modo galería al cambiar de sección
+    galeriaModo = 0;
+    const gc = obtenerGaleriaContainer();
+    if (gc) gc.classList.remove('modo-grid');
 
     if (panel.classList.contains('hidden')) {
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');

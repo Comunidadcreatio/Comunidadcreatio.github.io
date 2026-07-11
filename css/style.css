@@ -487,9 +487,9 @@ input, select, textarea {
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Estado activo: SVG con relleno azul cielo, indicador visible */
+/* Estado activo (azul): SVG con relleno azul cielo, indicador visible */
 .toggle-nav-btn.nav-btn-active {
-    color: #5BA0D9;                    /* Azul cielo */
+    color: #5BA0D9;
 }
 
 .toggle-nav-btn.nav-btn-active svg {
@@ -499,7 +499,22 @@ input, select, textarea {
 
 .toggle-nav-btn.nav-btn-active::after {
     transform: translateX(-50%) scaleX(1);
-    background: #5BA0D9;               /* Indicador también azul cielo */
+    background: #5BA0D9;
+}
+
+/* Estado grid (amarillo): SVG con relleno amarillo, indicador amarillo */
+.toggle-nav-btn.nav-btn-grid {
+    color: #F5C542;
+}
+
+.toggle-nav-btn.nav-btn-grid svg {
+    fill: #F5C542;
+    stroke: none;
+}
+
+.toggle-nav-btn.nav-btn-grid::after {
+    transform: translateX(-50%) scaleX(1);
+    background: #F5C542;
 }
 
 /* Efecto de pulso al hacer clic */
