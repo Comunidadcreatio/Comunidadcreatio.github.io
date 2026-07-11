@@ -1,22 +1,13 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
-   SCROLL SNAPPING GLOBAL (dual: html + body para compatibilidad)
+   SCROLL SNAPPING — contenedor dedicado
    ============================================== */
-html {
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-    scroll-padding-top: 76px;       /* 64px header + 12px aire */
+html, body {
+    overflow: hidden;
+    height: 100%;
 }
 
-body {
-    scroll-snap-type: y mandatory;  /* móvil: body es el scroll container */
-    scroll-padding-top: 76px;
-    overflow-x: hidden;
-}
-
-/* ==============================================
-   CONTENEDOR DE LA GALERÍA
-   ============================================== */
+/* El contenedor de la galería ES el scroll-snap container */
 #galeria-container {
     display: flex;
     flex-direction: column;
@@ -24,11 +15,20 @@ body {
     padding: 0 1.5rem 4rem;
     max-width: 1200px;
     margin: 0 auto;
+    /* Scroll snap */
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Ocupa todo el espacio entre header y barra */
+    position: fixed;
+    top: 76px;              /* 64px header + 12px aire */
+    left: 0;
+    right: 0;
+    bottom: 50px;           /* barra inferior */
 }
 
-/* ==============================================
-   TARJETA DE OBRA — cada una es un snap point
-   ============================================== */
+/* Tarjeta: hija directa del snap container → snap funciona */
 .obra-card {
     display: flex;
     flex-direction: column;
@@ -38,6 +38,7 @@ body {
     min-height: calc(100vh - 76px - 50px);
     box-sizing: border-box;
     padding: 0.5rem 0 2rem;
+    flex-shrink: 0;
     /* Snap magnético */
     scroll-snap-align: start;
 }
@@ -259,22 +260,16 @@ body {
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
-    html {
-        scroll-padding-top: 62px;    /* Header 50px + 12px aire */
-    }
-
-    body {
-        scroll-padding-top: 62px;    /* Mismo valor para body (scroll container en móvil) */
-    }
-
     #galeria-container {
+        top: 62px;                   /* Header 50px + 12px aire */
+        bottom: 50px;
         padding: 0.5rem 1rem 4rem;
         gap: 0;
     }
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 62px - 50px); /* scroll-padding 62px, barra 50px */
+        min-height: calc(100vh - 62px - 50px);
     }
 
     .obra-avatar-round,
@@ -318,20 +313,9 @@ body {
    RESPONSIVE - MÓVIL
    ============================================== */
 @media (max-width: 480px) {
-    html {
-        scroll-padding-top: 60px;    /* Header 48px + 12px aire */
-    }
-
-    body {
-        scroll-padding-top: 60px;    /* Mismo valor para body */
-    }
-
-    #galeria-publica {
-        margin-left: -24px;
-        margin-right: -24px;
-    }
-
     #galeria-container {
+        top: 60px;                   /* Header 48px + 12px aire */
+        bottom: 50px;
         padding: 0.25rem 0 3rem;
         gap: 0;
         max-width: none;
@@ -339,7 +323,7 @@ body {
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 60px - 50px); /* scroll-padding 60px, barra 50px */
+        min-height: calc(100vh - 60px - 50px);
     }
 
     .obra-carousel-viewport {
