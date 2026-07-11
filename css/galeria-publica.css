@@ -258,7 +258,7 @@ html, body {
     gap: 18px;
     padding: 8px 0.5rem 10px;
     position: absolute;
-    bottom: 10%;                    /* Subir 5% más la posición */
+    bottom: 5%;                     /* Posición anterior del degradado */
     left: 0;
     right: 0;
     z-index: 6;
