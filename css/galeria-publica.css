@@ -4,17 +4,13 @@
    ============================================== */
 html {
     scroll-behavior: smooth;
-    overflow: hidden;
-    height: 100%;
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 64px;       /* Compensa header desktop */
 }
 
-body {
-    overflow: hidden;
-    height: 100%;
-    overscroll-behavior-y: contain;
-}
-
-/* El contenedor de la galería es el scroll-snap container */
+/* ==============================================
+   CONTENEDOR DE LA GALERÍA
+   ============================================== */
 #galeria-container {
     display: flex;
     flex-direction: column;
@@ -22,29 +18,18 @@ body {
     padding: 0.5rem 1.5rem 5rem;
     max-width: 1200px;
     margin: 0 auto;
-    /* Scroll snap container */
-    overflow-y: scroll;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    scroll-padding-top: 1rem;
-    scroll-padding-bottom: 2rem;
-    -webkit-overflow-scrolling: touch;
-    /* Ocupa el espacio entre header y barra inferior */
-    position: fixed;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 50px;
 }
 
-/* Tarjeta: hija directa del snap container */
+/* ==============================================
+   TARJETA DE OBRA
+   ============================================== */
 .obra-card {
     display: flex;
     flex-direction: column;
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    flex-shrink: 0;
+    min-height: fit-content;
     /* Snap magnético */
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -267,10 +252,12 @@ body {
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
+    html {
+        scroll-padding-top: 50px;    /* Header tablet: 50px */
+    }
+
     #galeria-container {
-        top: 50px;                   /* Header tablet: 50px */
-        bottom: 50px;
-        padding: 0.5rem 1rem 5rem;
+        padding: 0.5rem 1rem 4rem;
         gap: 2rem;
     }
 
@@ -319,10 +306,17 @@ body {
    RESPONSIVE - MÓVIL
    ============================================== */
 @media (max-width: 480px) {
+    html {
+        scroll-padding-top: 48px;    /* Header móvil: 48px */
+    }
+
+    #galeria-publica {
+        margin-left: -24px;
+        margin-right: -24px;
+    }
+
     #galeria-container {
-        top: 48px;                   /* Header móvil: 48px */
-        bottom: 50px;
-        padding: 0.25rem 0 4rem;
+        padding: 0.25rem 0 3rem;
         gap: 1.5rem;
         max-width: none;
     }
