@@ -674,25 +674,39 @@ html, body {
     }
 
     #galeria-container.modo-grid .obra-metricas-bar {
-        padding: 2px 1px;
-        gap: 1px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 6px;
+        gap: 4px;
+        background: var(--color-bg);
     }
 
     #galeria-container.modo-grid .metrica-left {
-        gap: 1px;
+        gap: 10px;
+        justify-content: center;
     }
 
     #galeria-container.modo-grid .metrica-item {
-        font-size: 0.42rem;
+        font-size: 0.65rem;
+        color: var(--color-ink);
+        text-shadow: none;
+        gap: 4px;
     }
 
     #galeria-container.modo-grid .metrica-item svg {
-        width: 8px;
-        height: 8px;
+        width: 14px;
+        height: 14px;
+        color: var(--color-ink);
+        filter: none;
     }
 
     #galeria-container.modo-grid .btn-ver-detalles {
-        font-size: 0.45rem;
-        padding: 1px 4px;
+        font-size: 0.55rem;
+        padding: 3px 8px;
+        border-width: 1px;
+        border-radius: 3px;
+        color: var(--color-ink);
+        border-color: var(--color-ink);
     }
 }
