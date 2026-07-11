@@ -546,6 +546,7 @@ html, body {
     overflow: visible;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
     animation: gridCardEnter 0.35s ease-out both;
 }
 

@@ -172,6 +172,9 @@ function initCarrusel(card) {
 function crearObraCard(obra) {
     const card = document.createElement('div');
     card.className = 'obra-card';
+    if (obra.id !== undefined && obra.id !== null) {
+        card.dataset.obraId = obra.id;
+    }
 
     const nombreArtista = obra.artista || 'Artista';
     const inicial = nombreArtista.charAt(0).toUpperCase();
@@ -229,6 +232,13 @@ export function mostrarGaleria(obras, container, onDetalle) {
     }
     obras.forEach(obra => {
         const card = crearObraCard(obra);
+        if (onDetalle) {
+            card.addEventListener('click', (e) => {
+                // No navegar si el clic fue en los dots del carrusel (paginación)
+                if (e.target.closest('.obra-carousel-dot')) return;
+                onDetalle(obra.id);
+            });
+        }
         container.appendChild(card);
     });
 }

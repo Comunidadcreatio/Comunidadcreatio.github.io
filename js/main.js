@@ -560,6 +560,68 @@ function mostrarPaginaBlanca() {
     if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 }
 
+// Ejecuta la animación de salida del modo grid (amarillo) sobre las tarjetas
+// actuales y, al terminar, invoca onComplete. No cambia galeriaModo ni realiza
+// ningún cambio de sección: eso lo decide quien llama a esta función.
+function salirDeModoGrid(onComplete) {
+    const galeriaContainerLocal = obtenerGaleriaContainer();
+    gridExiting = true;
+
+    if (!galeriaContainerLocal) {
+        gridExiting = false;
+        if (onComplete) onComplete();
+        return;
+    }
+
+    const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
+    cards.forEach(c => c.classList.add('modo-grid-exit'));
+
+    let animEndHandled = false;
+    const lastCard = cards[cards.length - 1];
+    const onAnimEnd = () => {
+        if (animEndHandled) return;   // Evita ejecutar dos veces (animationend + timeout)
+        animEndHandled = true;
+        gridExiting = false;
+        galeriaContainerLocal.classList.remove('modo-grid');
+        cards.forEach(c => c.classList.remove('modo-grid-exit'));
+        if (onComplete) onComplete();
+    };
+
+    if (lastCard) {
+        lastCard.addEventListener('animationend', onAnimEnd, { once: true });
+        // Timeout de seguridad por si animationend no se dispara
+        setTimeout(onAnimEnd, 600);
+    } else {
+        gridExiting = false;
+        onAnimEnd();
+    }
+}
+
+// Se invoca al hacer clic en una obra mientras la galería está en modo grid
+// (amarillo): sale del grid y muestra esa misma obra en modo normal (azul),
+// desplazando la vista hasta ella.
+function seleccionarObraDesdeGrid(obraId) {
+    if (galeriaModo !== 2 || gridExiting || gridEntering) return;
+
+    galeriaModo = 1;
+    actualizarEstadoNavButtons();
+
+    salirDeModoGrid(() => {
+        const galeriaContainerLocal = obtenerGaleriaContainer();
+        if (!galeriaContainerLocal) return;
+
+        const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
+        const targetCard = galeriaContainerLocal.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
+
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+
+        // Animar entrada al modo normal (igual que al abrir la galería normalmente)
+        cards.forEach(c => c.classList.add('modo-flex-enter'));
+    });
+}
+
 function toggleGaleria() {
     if (isTransitioning || gridEntering || gridExiting || !confirmarDescartarCambios()) return;
     
@@ -584,7 +646,7 @@ function toggleGaleria() {
         switchSection(encontrarSeccionActual(), galeria, () => {
             cargarGaleria(galeriaContainer).then(obras => {
                 mostrarGaleria(obras, galeriaContainer, (id) => {
-                    console.log("Ver detalles de obra con ID:", id);
+                    seleccionarObraDesdeGrid(id);
                 });
                 // Animar entrada al modo normal
                 if (galeriaContainerLocal) {
@@ -606,35 +668,7 @@ function toggleGaleria() {
     } else {
         // Salir del modo grid con animación de salida
         galeriaModo = 0;
-        gridExiting = true;
-        if (galeriaContainerLocal) {
-            const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-            cards.forEach(c => c.classList.add('modo-grid-exit'));
-            
-            // Esperar a que termine la animación antes de quitar modo-grid
-            let animEndHandled = false;
-            const lastCard = cards[cards.length - 1];
-            const onAnimEnd = () => {
-                if (animEndHandled) return;   // Evita ejecutar dos veces (animationend + timeout)
-                animEndHandled = true;
-                gridExiting = false;
-                galeriaContainerLocal.classList.remove('modo-grid');
-                cards.forEach(c => c.classList.remove('modo-grid-exit'));
-                switchSection(galeria, document.getElementById('pagina-blanca'));
-            };
-            
-            if (lastCard) {
-                lastCard.addEventListener('animationend', onAnimEnd, { once: true });
-                // Timeout de seguridad por si animationend no se dispara
-                setTimeout(onAnimEnd, 600);
-            } else {
-                gridExiting = false;
-                onAnimEnd();
-            }
-        } else {
-            gridExiting = false;
-            switchSection(galeria, document.getElementById('pagina-blanca'));
-        }
+        salirDeModoGrid(() => switchSection(galeria, document.getElementById('pagina-blanca')));
     }
 }
 
