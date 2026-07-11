@@ -571,23 +571,57 @@ function toggleGaleria() {
         galeriaModo = 1;
         if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
+        
+        // Limpiar clases de animación anteriores
+        if (galeriaContainerLocal) {
+            galeriaContainerLocal.querySelectorAll('.obra-card').forEach(c => {
+                c.classList.remove('modo-grid-exit', 'modo-flex-enter');
+            });
+        }
+
         switchSection(encontrarSeccionActual(), galeria, () => {
             cargarGaleria(galeriaContainer).then(obras => {
                 mostrarGaleria(obras, galeriaContainer, (id) => {
                     console.log("Ver detalles de obra con ID:", id);
                 });
+                // Animar entrada al modo normal
+                if (galeriaContainerLocal) {
+                    galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c, i) => {
+                        c.classList.add('modo-flex-enter');
+                    });
+                }
             });
         });
     } else if (galeriaModo === 1) {
-        // Cambiar a modo grid (amarillo)
+        // Cambiar a modo grid (amarillo) — animación CSS automática
         galeriaModo = 2;
         if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
         actualizarEstadoNavButtons();
     } else {
-        // Ocultar galería
+        // Salir del modo grid con animación de salida
         galeriaModo = 0;
-        if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
-        switchSection(galeria, document.getElementById('pagina-blanca'));
+        if (galeriaContainerLocal) {
+            const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
+            cards.forEach(c => c.classList.add('modo-grid-exit'));
+            
+            // Esperar a que termine la animación antes de quitar modo-grid
+            const lastCard = cards[cards.length - 1];
+            const onAnimEnd = () => {
+                galeriaContainerLocal.classList.remove('modo-grid');
+                cards.forEach(c => c.classList.remove('modo-grid-exit'));
+                switchSection(galeria, document.getElementById('pagina-blanca'));
+            };
+            
+            if (lastCard) {
+                lastCard.addEventListener('animationend', onAnimEnd, { once: true });
+                // Timeout de seguridad por si animationend no se dispara
+                setTimeout(onAnimEnd, 600);
+            } else {
+                onAnimEnd();
+            }
+        } else {
+            switchSection(galeria, document.getElementById('pagina-blanca'));
+        }
     }
 }
 
