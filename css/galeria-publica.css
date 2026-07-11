@@ -1,12 +1,23 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
+   SCROLL SNAPPING GLOBAL (html)
+   ============================================== */
+html {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 64px;       /* Compensa altura del header fixed */
+    scroll-padding-bottom: 50px;    /* Compensa barra inferior */
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+}
+
+/* ==============================================
    CONTENEDOR DE LA GALERÍA
    ============================================== */
 #galeria-container {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
-    padding: 3rem 1.5rem;
+    gap: 2rem;
+    padding: 1.5rem 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -20,6 +31,9 @@
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
+    /* Snap magnético */
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 /* ==============================================
