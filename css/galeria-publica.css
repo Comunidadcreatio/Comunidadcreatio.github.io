@@ -19,6 +19,7 @@ html, body {
     overflow-y: scroll;
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
+    scroll-padding-top: 0.5rem;      /* Aire dentro del contenedor al hacer snap */
     -webkit-overflow-scrolling: touch;
     /* Ocupa todo el espacio entre header y barra */
     position: fixed;
