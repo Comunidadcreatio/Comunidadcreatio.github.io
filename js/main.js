@@ -432,6 +432,7 @@ function confirmarDescartarCambios() {
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal (azul), 2=vista grid (amarillo)
 let galeriaModo = 0;
 let gridExiting = false;   // Bloquea doble clic durante animación de salida del grid
+let gridEntering = false;  // Bloquea doble clic durante animación de entrada al grid
 
 // Referencia al contenedor de galería para el modo grid
 function obtenerGaleriaContainer() {
@@ -560,7 +561,7 @@ function mostrarPaginaBlanca() {
 }
 
 function toggleGaleria() {
-    if (isTransitioning || !confirmarDescartarCambios()) return;
+    if (isTransitioning || gridEntering || gridExiting || !confirmarDescartarCambios()) return;
     
     const galeria = document.getElementById('galeria-publica');
     const galeriaContainerLocal = obtenerGaleriaContainer();
@@ -596,11 +597,14 @@ function toggleGaleria() {
     } else if (galeriaModo === 1) {
         // Cambiar a modo grid (amarillo) — animación CSS automática
         galeriaModo = 2;
+        gridEntering = true;   // Evita doble clic mientras las tarjetas animan su entrada al grid
         if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
         actualizarEstadoNavButtons();
+
+        // Duración máxima de la animación de entrada (gridCardEnter 0.35s + mayor delay 0.35s)
+        setTimeout(() => { gridEntering = false; }, 700);
     } else {
         // Salir del modo grid con animación de salida
-        if (gridExiting) return;   // Evita doble clic durante la animación de salida
         galeriaModo = 0;
         gridExiting = true;
         if (galeriaContainerLocal) {
@@ -608,8 +612,11 @@ function toggleGaleria() {
             cards.forEach(c => c.classList.add('modo-grid-exit'));
             
             // Esperar a que termine la animación antes de quitar modo-grid
+            let animEndHandled = false;
             const lastCard = cards[cards.length - 1];
             const onAnimEnd = () => {
+                if (animEndHandled) return;   // Evita ejecutar dos veces (animationend + timeout)
+                animEndHandled = true;
                 gridExiting = false;
                 galeriaContainerLocal.classList.remove('modo-grid');
                 cards.forEach(c => c.classList.remove('modo-grid-exit'));
