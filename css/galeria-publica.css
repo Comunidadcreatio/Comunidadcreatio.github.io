@@ -258,7 +258,7 @@ html, body {
     gap: 18px;
     padding: 8px 0.5rem 10px;
     position: absolute;
-    bottom: 5%;
+    bottom: 0;                      /* Pegado a la base de la imagen */
     left: 0;
     right: 0;
     z-index: 6;
@@ -296,11 +296,11 @@ html, body {
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 
-/* Botón "Ver detalles" — sin relleno, con borde */
+/* Botón "Ver detalles" — outline, visible en ambos modos */
 .btn-ver-detalles {
     background: transparent;
-    color: var(--color-ink);
-    border: 2px solid var(--color-ink);
+    color: #ffffff;                 /* Siempre blanco en light mode */
+    border: 2px solid #ffffff;
     border-radius: 5px;
     padding: 11px 25px;
     font-family: 'Nunito', sans-serif;
@@ -315,6 +315,11 @@ html, body {
 
 .btn-ver-detalles:hover {
     opacity: 0.85;
+}
+
+[data-theme="dark"] .btn-ver-detalles {
+    color: var(--color-ink);       /* #e5e5e5 en modo oscuro */
+    border-color: var(--color-ink);
 }
 
 /* ==============================================
