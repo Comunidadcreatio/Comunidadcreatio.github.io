@@ -5,7 +5,7 @@
 html {
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    scroll-padding-top: 68px;       /* 64px header + 4px aire */
+    scroll-padding-top: 76px;       /* 64px header + 12px aire */
 }
 
 body {
@@ -33,7 +33,7 @@ body {
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    min-height: calc(100vh - 68px - 50px);
+    min-height: calc(100vh - 76px - 50px); /* scroll-padding 76px + barra 50px */
     box-sizing: border-box;
     padding: 0.5rem 0 2rem;
     /* Snap magnético */
@@ -258,7 +258,7 @@ body {
    ============================================== */
 @media (max-width: 768px) {
     html {
-        scroll-padding-top: 50px;    /* Header tablet: 50px */
+        scroll-padding-top: 62px;    /* Header 50px + 12px aire */
     }
 
     #galeria-container {
@@ -268,7 +268,7 @@ body {
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 50px - 50px - 1rem); /* header 50px, barra 50px */
+        min-height: calc(100vh - 62px - 50px); /* scroll-padding 62px, barra 50px */
     }
 
     .obra-avatar-round,
@@ -313,7 +313,7 @@ body {
    ============================================== */
 @media (max-width: 480px) {
     html {
-        scroll-padding-top: 48px;    /* Header móvil: 48px */
+        scroll-padding-top: 60px;    /* Header 48px + 12px aire */
     }
 
     #galeria-publica {
@@ -329,7 +329,7 @@ body {
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 48px - 50px - 1rem); /* header 48px, barra 50px */
+        min-height: calc(100vh - 60px - 50px); /* scroll-padding 60px, barra 50px */
     }
 
     .obra-carousel-viewport {
