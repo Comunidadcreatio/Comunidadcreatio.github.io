@@ -1,6 +1,6 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
-   SCROLL SNAPPING GLOBAL
+   SCROLL SNAPPING GLOBAL (dual: html + body para compatibilidad)
    ============================================== */
 html {
     scroll-behavior: smooth;
@@ -9,6 +9,8 @@ html {
 }
 
 body {
+    scroll-snap-type: y mandatory;  /* móvil: body es el scroll container */
+    scroll-padding-top: 76px;
     overflow-x: hidden;
 }
 
@@ -33,7 +35,7 @@ body {
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    min-height: calc(100vh - 76px - 50px); /* scroll-padding 76px + barra 50px */
+    min-height: calc(100vh - 76px - 50px);
     box-sizing: border-box;
     padding: 0.5rem 0 2rem;
     /* Snap magnético */
@@ -261,6 +263,10 @@ body {
         scroll-padding-top: 62px;    /* Header 50px + 12px aire */
     }
 
+    body {
+        scroll-padding-top: 62px;    /* Mismo valor para body (scroll container en móvil) */
+    }
+
     #galeria-container {
         padding: 0.5rem 1rem 4rem;
         gap: 0;
@@ -314,6 +320,10 @@ body {
 @media (max-width: 480px) {
     html {
         scroll-padding-top: 60px;    /* Header 48px + 12px aire */
+    }
+
+    body {
+        scroll-padding-top: 60px;    /* Mismo valor para body */
     }
 
     #galeria-publica {
