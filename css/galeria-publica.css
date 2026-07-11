@@ -238,15 +238,29 @@ html, body {
 }
 
 /* ==============================================
-   MÉTRICAS + BOTÓN VER DETALLES
+   MÉTRICAS + BOTÓN VER DETALLES (superpuestas en la imagen)
    ============================================== */
+.obra-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;               /* Contiene los elementos superpuestos */
+}
+
 .obra-metricas-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 18px;
-    padding: 10px 0.35rem 6px;
+    padding: 8px 0.5rem 10px;
+    /* Superpuesto en la parte inferior de la imagen */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    /* Fondo semitransparente para legibilidad */
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
 }
 
 .metrica-left {
@@ -261,26 +275,28 @@ html, body {
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    color: var(--color-ink);
-    font-size: 1.05rem;             /* 0.81rem + 30% */
+    color: #ffffff;                 /* Blanco sobre fondo oscuro */
+    font-size: 1.05rem;
     font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .obra-metricas-bar .metrica-item svg {
-    width: 25px;                    /* 19px + 30% */
+    width: 25px;
     height: 25px;
-    color: var(--color-ink);
+    color: #ffffff;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 
-/* Botón "Ver detalles" — +40% (+30% base + 10% extra) */
+/* Botón "Ver detalles" */
 .btn-ver-detalles {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
     border-radius: 5px;
-    padding: 11px 25px;             /* 10px 23px + 10% */
+    padding: 11px 25px;
     font-family: 'Nunito', sans-serif;
-    font-size: 1.21rem;             /* 1.1rem + 10% */
+    font-size: 1.21rem;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;

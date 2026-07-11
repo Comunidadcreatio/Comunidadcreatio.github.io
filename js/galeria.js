@@ -205,7 +205,19 @@ function crearObraCard(obra) {
         ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round">`
         : `<div class="obra-avatar-placeholder">${inicial}</div>`;
 
-    const carruselHTML = crearCarruselHTML(obra, '');
+    const metricaBarHTML = `
+        <!-- Métricas superpuestas en la imagen -->
+        <div class="obra-metricas-bar">
+            <div class="metrica-left">
+                <span class="metrica-item">${ICON_OJO} <span>0</span></span>
+                <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
+                <span class="metrica-item">${ICON_CORAZON} <span>0</span></span>
+            </div>
+            <button class="btn-ver-detalles">Ver detalles</button>
+        </div>
+    `;
+
+    const carruselHTML = crearCarruselHTML(obra, metricaBarHTML);
 
     card.innerHTML = `
         <div class="obra-card-inner">
@@ -221,18 +233,8 @@ function crearObraCard(obra) {
                 <span class="obra-precio-top">$${precio}</span>
             </div>
 
-            <!-- Carrusel de imágenes -->
+            <!-- Carrusel de imágenes (incluye métricas superpuestas) -->
             ${carruselHTML}
-
-            <!-- Métricas + botón Ver detalles debajo del carrusel -->
-            <div class="obra-metricas-bar">
-                <div class="metrica-left">
-                    <span class="metrica-item">${ICON_OJO} <span>0</span></span>
-                    <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
-                    <span class="metrica-item">${ICON_CORAZON} <span>0</span></span>
-                </div>
-                <button class="btn-ver-detalles">Ver detalles</button>
-            </div>
         </div>
     `;
 
