@@ -574,11 +574,11 @@ function toggleGaleria() {
         if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         
-        // Limpiar clases de animación anteriores
+        // Vaciar tarjetas residuales del ciclo anterior para evitar que se muestren
+        // brevemente (sin animar) mientras la sección hace fade-in, antes de ser
+        // reemplazadas por las nuevas tarjetas cargadas en el callback.
         if (galeriaContainerLocal) {
-            galeriaContainerLocal.querySelectorAll('.obra-card').forEach(c => {
-                c.classList.remove('modo-grid-exit', 'modo-flex-enter');
-            });
+            galeriaContainerLocal.innerHTML = '';
         }
 
         switchSection(encontrarSeccionActual(), galeria, () => {
