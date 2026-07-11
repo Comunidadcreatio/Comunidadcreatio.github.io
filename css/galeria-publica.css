@@ -489,8 +489,8 @@ html, body {
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 4px;
+    gap: 0;
+    padding: 0;
     align-items: start;
     overflow-y: auto;
     scroll-snap-type: none;
@@ -505,7 +505,7 @@ html, body {
     scroll-snap-align: none;
     scroll-snap-stop: normal;
     align-self: auto;
-    border-radius: 4px;
+    border-radius: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -530,9 +530,9 @@ html, body {
 
 /* ---- Artista row: avatar + título estático + precio (nombre artista OCULTO) ---- */
 #galeria-container.modo-grid .obra-artista-row {
-    padding: 3px 4px;
-    margin-bottom: 1px;
-    gap: 3px;
+    padding: 2px 3px;
+    margin-bottom: 0;
+    gap: 2px;
 }
 
 #galeria-container.modo-grid .obra-artista-nombre {
@@ -546,9 +546,9 @@ html, body {
 
 #galeria-container.modo-grid .obra-avatar-round,
 #galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 20px;
-    height: 20px;
-    font-size: 0.6rem;
+    width: 16px;
+    height: 16px;
+    font-size: 0.5rem;
 }
 
 #galeria-container.modo-grid .obra-titulo-marquee {
@@ -557,8 +557,8 @@ html, body {
 }
 
 #galeria-container.modo-grid .marquee-text {
-    font-size: 0.65rem;
-    animation: none;                   /* Título estático, sin scroll */
+    font-size: 0.55rem;
+    animation: none;
     padding-left: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -567,34 +567,35 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.7rem;
+    font-size: 0.58rem;
     flex-shrink: 0;
 }
 
-/* ---- Métricas ultra compactas ---- */
+/* ---- Métricas ultra compactas, fondo igual al de la página ---- */
 #galeria-container.modo-grid .obra-metricas-bar {
-    padding: 6px 4px;
-    gap: 4px;
+    padding: 4px 3px;
+    gap: 3px;
+    background: var(--color-bg);       /* Mismo color que el fondo de la página */
 }
 
 #galeria-container.modo-grid .metrica-left {
-    gap: 5px;
+    gap: 3px;
 }
 
 #galeria-container.modo-grid .metrica-item {
-    font-size: 0.58rem;
+    font-size: 0.5rem;
 }
 
 #galeria-container.modo-grid .metrica-item svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
 }
 
 #galeria-container.modo-grid .btn-ver-detalles {
-    font-size: 0.6rem;
-    padding: 3px 7px;
+    font-size: 0.5rem;
+    padding: 2px 5px;
     border-width: 1px;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 /* ---- Ocultar dots del carrusel en grid (ahorran espacio) ---- */
@@ -616,70 +617,71 @@ html, body {
 /* Responsive: solo ajusta espaciado, mantiene 3 columnas */
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
-        gap: 3px;
-        padding: 3px;
+        gap: 0;
+        padding: 0;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
-        padding: 2px 3px;
+        padding: 1px 2px;
     }
 
     #galeria-container.modo-grid .obra-metricas-bar {
-        padding: 5px 3px;
-        gap: 3px;
+        padding: 3px 2px;
+        gap: 2px;
     }
 
     #galeria-container.modo-grid .metrica-left {
-        gap: 3px;
+        gap: 2px;
     }
 }
 
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
-        gap: 2px;
-        padding: 2px;
+        gap: 0;
+        padding: 0;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
-        padding: 1px 2px;
+        padding: 1px 1px;
         margin-bottom: 0;
+        gap: 1px;
     }
 
     #galeria-container.modo-grid .obra-avatar-round,
     #galeria-container.modo-grid .obra-avatar-placeholder {
-        width: 16px;
-        height: 16px;
-        font-size: 0.5rem;
+        width: 14px;
+        height: 14px;
+        font-size: 0.45rem;
     }
 
     #galeria-container.modo-grid .marquee-text {
-        font-size: 0.55rem;
+        font-size: 0.48rem;
     }
 
     #galeria-container.modo-grid .obra-precio-top {
-        font-size: 0.6rem;
-    }
-
-    #galeria-container.modo-grid .obra-metricas-bar {
-        padding: 4px 2px;
-        gap: 2px;
-    }
-
-    #galeria-container.modo-grid .metrica-left {
-        gap: 2px;
-    }
-
-    #galeria-container.modo-grid .metrica-item {
         font-size: 0.5rem;
     }
 
+    #galeria-container.modo-grid .obra-metricas-bar {
+        padding: 2px 1px;
+        gap: 1px;
+    }
+
+    #galeria-container.modo-grid .metrica-left {
+        gap: 1px;
+    }
+
+    #galeria-container.modo-grid .metrica-item {
+        font-size: 0.42rem;
+    }
+
     #galeria-container.modo-grid .metrica-item svg {
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
     }
 
     #galeria-container.modo-grid .btn-ver-detalles {
-        font-size: 0.52rem;
-        padding: 2px 5px;
+        font-size: 0.45rem;
+        padding: 1px 4px;
     }
 }
