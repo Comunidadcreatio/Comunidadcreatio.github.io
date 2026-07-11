@@ -1,47 +1,38 @@
 ﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
-   SCROLL SNAPPING — contenedor dedicado
+   SCROLL SNAPPING — scroll nativo del documento
    ============================================== */
-html, body {
-    overflow: hidden;
-    height: 100%;
+html {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 76px;       /* 64px header + 12px aire */
 }
 
-/* El contenedor de la galería ES el scroll-snap container */
+/* ==============================================
+   CONTENEDOR DE LA GALERÍA (flujo normal)
+   ============================================== */
 #galeria-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: 0 1.5rem 4rem;
+    padding: 0 1.5rem 75vh;          /* padding-bottom enorme para forzar altura y más snap targets */
     max-width: 1200px;
     margin: 0 auto;
-    /* Scroll snap */
-    overflow-y: scroll;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    scroll-padding-top: 0.5rem;      /* Aire dentro del contenedor al hacer snap */
-    -webkit-overflow-scrolling: touch;
-    /* Ocupa todo el espacio entre header y barra */
-    position: fixed;
-    top: 76px;              /* 64px header + 12px aire */
-    left: 0;
-    right: 0;
-    bottom: 50px;           /* barra inferior */
 }
 
-/* Tarjeta: hija directa del snap container → snap funciona */
+/* ==============================================
+   TARJETA DE OBRA — snap point
+   ============================================== */
 .obra-card {
     display: flex;
     flex-direction: column;
     max-width: 410px;
-    margin: 0 auto;
+    margin: 0 auto 0;
     width: 100%;
-    min-height: calc(100vh - 76px - 50px);
     box-sizing: border-box;
     padding: 0.5rem 0 2rem;
-    flex-shrink: 0;
     /* Snap magnético */
     scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 /* ==============================================
@@ -261,16 +252,16 @@ html, body {
    RESPONSIVE - TABLET
    ============================================== */
 @media (max-width: 768px) {
+    html {
+        scroll-padding-top: 62px;    /* Header 50px + 12px aire */
+    }
+
     #galeria-container {
-        top: 62px;                   /* Header 50px + 12px aire */
-        bottom: 50px;
-        padding: 0.5rem 1rem 4rem;
-        gap: 0;
+        padding: 0.5rem 1rem 60vh;
     }
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 62px - 50px);
     }
 
     .obra-avatar-round,
@@ -314,17 +305,22 @@ html, body {
    RESPONSIVE - MÓVIL
    ============================================== */
 @media (max-width: 480px) {
+    html {
+        scroll-padding-top: 60px;    /* Header 48px + 12px aire */
+    }
+
+    #galeria-publica {
+        margin-left: -24px;
+        margin-right: -24px;
+    }
+
     #galeria-container {
-        top: 60px;                   /* Header 48px + 12px aire */
-        bottom: 50px;
-        padding: 0.25rem 0 3rem;
-        gap: 0;
+        padding: 0.25rem 0 50vh;
         max-width: none;
     }
 
     .obra-card {
         max-width: 100%;
-        min-height: calc(100vh - 60px - 50px);
     }
 
     .obra-carousel-viewport {
