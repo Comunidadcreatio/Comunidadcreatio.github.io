@@ -3,9 +3,8 @@
    SCROLL SNAPPING GLOBAL
    ============================================== */
 html {
-    scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    scroll-padding-top: 64px;
+    scroll-padding-top: 68px;       /* 64px header + 4px aire */
 }
 
 body {
@@ -19,13 +18,13 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: 0.5rem 1.5rem 5rem;
+    padding: 0 1.5rem 4rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 /* ==============================================
-   TARJETA DE OBRA — snap magnético
+   TARJETA DE OBRA — cada una es un snap point
    ============================================== */
 .obra-card {
     display: flex;
@@ -33,8 +32,9 @@ body {
     max-width: 410px;
     margin: 0 auto;
     width: 100%;
-    padding-bottom: 2rem;
+    min-height: calc(100vh - 68px - 50px);
     box-sizing: border-box;
+    padding: 0.5rem 0 2rem;
     /* Snap magnético */
     scroll-snap-align: start;
 }
