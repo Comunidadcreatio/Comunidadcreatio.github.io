@@ -51,7 +51,7 @@ html, body {
     left: 0;
     right: 0;
     height: 25%;
-    z-index: 7;
+    z-index: 1;                     /* Debajo de iconos y botón */
     pointer-events: none;
     background: linear-gradient(to top, rgba(0,0,0,0.49) 0%, transparent 100%);
 }
@@ -279,7 +279,7 @@ html, body {
     bottom: 5%;
     left: 0;
     right: 0;
-    z-index: 7;
+    z-index: 8;                     /* Encima del degradado */
 }
 
 .metrica-left {
