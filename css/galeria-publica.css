@@ -253,9 +253,9 @@ html, body {
     justify-content: center;
     gap: 18px;
     padding: 8px 0.5rem 10px;
-    /* Superpuesto en la parte inferior de la imagen */
+    /* Superpuesto en la parte inferior de la imagen, 5% más arriba */
     position: absolute;
-    bottom: 0;
+    bottom: 5%;
     left: 0;
     right: 0;
     z-index: 6;
@@ -288,11 +288,11 @@ html, body {
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 
-/* Botón "Ver detalles" */
+/* Botón "Ver detalles" — sin relleno, con borde */
 .btn-ver-detalles {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border: none;
+    background: transparent;
+    color: var(--color-ink);
+    border: 2px solid var(--color-ink);
     border-radius: 5px;
     padding: 11px 25px;
     font-family: 'Nunito', sans-serif;
@@ -307,11 +307,6 @@ html, body {
 
 .btn-ver-detalles:hover {
     opacity: 0.85;
-}
-
-[data-theme="dark"] .btn-ver-detalles {
-    background: var(--color-ink);
-    color: #121212;
 }
 
 /* ==============================================
