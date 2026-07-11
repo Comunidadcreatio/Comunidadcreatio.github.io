@@ -30,19 +30,28 @@ html, body {
     bottom: 50px;
 }
 
-/* Tarjeta: ocupa exactamente el viewport disponible */
+/* Tarjeta: altura con margen de seguridad para sellar contra la siguiente */
 .obra-card {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: calc(100vh - 64px - 50px); /* Misma altura del contenedor */
-    max-height: calc(100vh - 64px - 50px);
+    height: calc(100% + 8px);       /* 8px extra = solapa la siguiente tarjeta, impide verla */
     box-sizing: border-box;
-    padding: 0.25rem 0 0;
+    padding: 0;
     flex-shrink: 0;
     overflow: hidden;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+}
+
+/* Wrapper interno para el padding (no interfiere con height:100%) */
+.obra-card-inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0.25rem 0.5rem 0;
+    overflow: hidden;
+    min-height: 0;
 }
 
 /* ==============================================
@@ -267,10 +276,8 @@ html, body {
         bottom: 50px;
     }
 
-    .obra-card {
-        height: calc(100vh - 50px - 50px);  /* Misma altura del contenedor */
-        max-height: calc(100vh - 50px - 50px);
-        padding: 0.5rem 0.5rem 2rem;
+    .obra-card-inner {
+        padding: 0.5rem 0.5rem 1.5rem;
     }
 
     .obra-avatar-round,
@@ -320,7 +327,8 @@ html, body {
     }
 
     .obra-card {
-        height: calc(100vh - 48px - 50px);  /* Misma altura del contenedor */
+        height: calc(100vh - 48px - 50px);
+        min-height: calc(100vh - 48px - 50px);
         max-height: calc(100vh - 48px - 50px);
         padding: 0.25rem 0 1.5rem;
     }
