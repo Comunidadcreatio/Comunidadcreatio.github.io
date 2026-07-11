@@ -244,9 +244,16 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;        /* Todo centrado */
+    justify-content: center;
     gap: 18px;
     padding: 10px 0.35rem 6px;
+}
+
+.metrica-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
 }
 
 .obra-metricas-bar .metrica-item {
@@ -322,6 +329,10 @@ html, body {
         font-size: 1rem;
     }
 
+    .metrica-left {
+        gap: 16px;
+    }
+
     .obra-metricas-bar {
         gap: 16px;
         padding: 10px 0 6px;
@@ -387,6 +398,10 @@ html, body {
 
     .obra-precio-top {
         font-size: 0.9rem;
+    }
+
+    .metrica-left {
+        gap: 14px;
     }
 
     .obra-metricas-bar {
