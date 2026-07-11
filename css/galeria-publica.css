@@ -245,8 +245,7 @@ html, body {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 12px 0.5rem 8px;
+    padding: 10px 0.35rem 6px;
 }
 
 .metrica-left {
@@ -254,6 +253,7 @@ html, body {
     flex-direction: row;
     align-items: center;
     gap: 18px;
+    padding-left: 2%;               /* 5% más a la derecha relativo al viewport */
 }
 
 .obra-metricas-bar .metrica-item {
@@ -262,30 +262,32 @@ html, body {
     align-items: center;
     gap: 5px;
     color: var(--color-ink);
-    font-size: 0.81rem;             /* 0.75rem + 8% */
+    font-size: 0.81rem;
     font-weight: 600;
 }
 
 .obra-metricas-bar .metrica-item svg {
-    width: 19px;                    /* 18px + 8% ≈ 19.4px */
+    width: 19px;
     height: 19px;
     color: var(--color-ink);
 }
 
-/* Botón "Ver detalles" alineado a la derecha */
+/* Botón "Ver detalles" — 10% más grande, alineado con iconos */
 .btn-ver-detalles {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
-    border-radius: 4px;
-    padding: 5px 12px;
+    border-radius: 5px;
+    padding: 6px 14px;              /* 5px 12px + ~10% */
     font-family: 'Nunito', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.77rem;             /* 0.7rem + 10% */
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     transition: opacity 0.2s ease;
+    line-height: 1.2;
+    margin-right: -2%;              /* 5% más a la izquierda relativo al viewport */
 }
 
 .btn-ver-detalles:hover {
