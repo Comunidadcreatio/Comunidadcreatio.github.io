@@ -582,19 +582,19 @@ html, body {
 }
 
 #galeria-container.modo-grid .metrica-left {
-    gap: 8px;
+    gap: 12px;
     justify-content: center;
 }
 
 #galeria-container.modo-grid .metrica-item {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     color: var(--color-ink);
     text-shadow: none;
 }
 
 #galeria-container.modo-grid .metrica-item svg {
-    width: 13px;
-    height: 13px;
+    width: 15px;
+    height: 15px;
     color: var(--color-ink);
     filter: none;
 }
