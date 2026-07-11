@@ -27,6 +27,12 @@ html, body {
     left: 0;
     right: 0;
     bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+    /* Ocultar la barra de scroll (escritorio y móvil) sin desactivar el scroll */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#galeria-container::-webkit-scrollbar {
+    display: none;
 }
 
 /* Tarjeta: altura con margen de seguridad + degradado en la base */
