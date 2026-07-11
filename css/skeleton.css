@@ -117,6 +117,24 @@
 }
 
 /* ==============================================
+   COMPATIBILIDAD CON MODO GRID
+   ============================================== */
+#galeria-container.modo-grid > .skeleton-galeria {
+    grid-column: 1 / -1;                /* Ocupa todo el ancho del grid */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 20px 0;
+}
+
+/* Evitar que el skeleton herede animaciones de las tarjetas reales */
+#galeria-container.modo-grid .skeleton-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* ==============================================
    MODO OSCURO
    ============================================== */
 [data-theme="dark"] .skeleton-card-img,
