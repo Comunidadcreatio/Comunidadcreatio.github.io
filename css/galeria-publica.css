@@ -244,16 +244,9 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 0.35rem 6px;
-}
-
-.metrica-left {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    justify-content: center;        /* Todo centrado */
     gap: 18px;
-    padding-left: 2%;               /* 5% más a la derecha relativo al viewport */
+    padding: 10px 0.35rem 6px;
 }
 
 .obra-metricas-bar .metrica-item {
@@ -272,22 +265,21 @@ html, body {
     color: var(--color-ink);
 }
 
-/* Botón "Ver detalles" — +30% */
+/* Botón "Ver detalles" — +40% (+30% base + 10% extra) */
 .btn-ver-detalles {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
     border-radius: 5px;
-    padding: 10px 23px;             /* 8px 18px + 30% */
+    padding: 11px 25px;             /* 10px 23px + 10% */
     font-family: 'Nunito', sans-serif;
-    font-size: 1.1rem;              /* 0.85rem + 30% */
+    font-size: 1.21rem;             /* 1.1rem + 10% */
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     transition: opacity 0.2s ease;
     line-height: 1.2;
-    margin-right: 1.2rem;
 }
 
 .btn-ver-detalles:hover {
@@ -330,11 +322,8 @@ html, body {
         font-size: 1rem;
     }
 
-    .metrica-left {
-        gap: 16px;
-    }
-
     .obra-metricas-bar {
+        gap: 16px;
         padding: 10px 0 6px;
     }
 
@@ -348,8 +337,8 @@ html, body {
     }
 
     .btn-ver-detalles {
-        font-size: 0.85rem;         /* 0.65rem + 30% */
-        padding: 5px 13px;          /* 4px 10px + 30% */
+        font-size: 0.94rem;         /* 0.85rem + 10% */
+        padding: 6px 14px;          /* 5px 13px + 10% */
     }
 
     .marquee-text {
@@ -400,11 +389,8 @@ html, body {
         font-size: 0.9rem;
     }
 
-    .metrica-left {
-        gap: 14px;
-    }
-
     .obra-metricas-bar {
+        gap: 14px;
         padding: 8px 0.25rem 4px;
     }
 
@@ -418,8 +404,8 @@ html, body {
     }
 
     .btn-ver-detalles {
-        font-size: 0.78rem;         /* 0.6rem + 30% */
-        padding: 4px 10px;          /* 3px 8px + 30% */
+        font-size: 0.86rem;         /* 0.78rem + 10% */
+        padding: 4px 11px;          /* 4px 10px + 10% */
     }
 
     .marquee-text {
