@@ -486,6 +486,30 @@ html, body {
 /* ==============================================
    MODO GRID — misma proporción que vista normal, 3 columnas
    ============================================== */
+
+/* Animación de entrada para las tarjetas al activar modo grid */
+@keyframes gridCardEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes gridCardExit {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -494,8 +518,15 @@ html, body {
     align-items: stretch;              /* Cada fila ocupa su altura completa, sin solaparse */
     overflow-y: auto;
     scroll-snap-type: none;
+    animation: gridContainerEnter 0.4s ease-out;
 }
 
+@keyframes gridContainerEnter {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* Las tarjetas se animan al entrar en modo grid */
 #galeria-container.modo-grid .obra-card {
     max-width: 100% !important;
     width: 100% !important;
@@ -506,10 +537,20 @@ html, body {
     scroll-snap-stop: normal;
     align-self: auto;
     border-radius: 0;
-    overflow: visible;                 /* Permite ver contenido completo sin recortar */
+    overflow: visible;
     display: flex;
     flex-direction: column;
+    animation: gridCardEnter 0.35s ease-out both;
 }
+
+/* Stagger: cada tarjeta se anima con un ligero retraso */
+#galeria-container.modo-grid .obra-card:nth-child(1) { animation-delay: 0.05s; }
+#galeria-container.modo-grid .obra-card:nth-child(2) { animation-delay: 0.10s; }
+#galeria-container.modo-grid .obra-card:nth-child(3) { animation-delay: 0.15s; }
+#galeria-container.modo-grid .obra-card:nth-child(4) { animation-delay: 0.20s; }
+#galeria-container.modo-grid .obra-card:nth-child(5) { animation-delay: 0.25s; }
+#galeria-container.modo-grid .obra-card:nth-child(6) { animation-delay: 0.30s; }
+#galeria-container.modo-grid .obra-card:nth-child(n+7) { animation-delay: 0.35s; }
 
 #galeria-container.modo-grid .obra-card-inner {
     padding: 0;
