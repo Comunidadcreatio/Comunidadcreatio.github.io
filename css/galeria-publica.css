@@ -8,28 +8,30 @@ html {
 }
 
 /* ==============================================
-   CONTENEDOR DE LA GALERÍA (flujo normal)
+   CONTENEDOR DE LA GALERÍA
    ============================================== */
 #galeria-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    padding: 0 1.5rem 75vh;          /* padding-bottom enorme para forzar altura y más snap targets */
+    padding: 0 1.5rem 3rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 /* ==============================================
-   TARJETA DE OBRA — snap point
+   TARJETA DE OBRA — ocupa el viewport completo
    ============================================== */
 .obra-card {
     display: flex;
     flex-direction: column;
     max-width: 410px;
-    margin: 0 auto 0;
+    margin: 0 auto;
     width: 100%;
+    min-height: calc(100vh - 76px - 50px);
     box-sizing: border-box;
     padding: 0.5rem 0 2rem;
+    flex-shrink: 0;
     /* Snap magnético */
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -257,11 +259,12 @@ html {
     }
 
     #galeria-container {
-        padding: 0.5rem 1rem 60vh;
+        padding: 0.5rem 1rem 3rem;
     }
 
     .obra-card {
         max-width: 100%;
+        min-height: calc(100vh - 62px - 50px);
     }
 
     .obra-avatar-round,
@@ -315,12 +318,13 @@ html {
     }
 
     #galeria-container {
-        padding: 0.25rem 0 50vh;
+        padding: 0.25rem 0 3rem;
         max-width: none;
     }
 
     .obra-card {
         max-width: 100%;
+        min-height: calc(100vh - 60px - 50px);
     }
 
     .obra-carousel-viewport {
