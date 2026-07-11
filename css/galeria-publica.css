@@ -43,21 +43,22 @@ html, body {
     position: relative;
 }
 
-/* Degradado en la base de la tarjeta, pegado a la barra inferior */
+/* Barra horizontal debajo de los iconos */
 .obra-card::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 25%;
-    z-index: 1;                     /* Debajo de iconos y botón */
+    bottom: 2%;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    z-index: 1;
     pointer-events: none;
-    background: linear-gradient(to top, rgba(0,0,0,0.56) 0%, transparent 100%);
+    background: var(--color-ink);
+    opacity: 0.3;
 }
 
 [data-theme="dark"] .obra-card::after {
-    background: linear-gradient(to top, rgba(255,255,255,0.33) 0%, transparent 100%);
+    opacity: 0.5;
 }
 
 /* Wrapper interno: padding mínimo */
