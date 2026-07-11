@@ -272,22 +272,22 @@ html, body {
     color: var(--color-ink);
 }
 
-/* Botón "Ver detalles" — 10% más grande, alineado con iconos */
+/* Botón "Ver detalles" — más grande, movido a la izquierda */
 .btn-ver-detalles {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
     border-radius: 5px;
-    padding: 6px 14px;              /* 5px 12px + ~10% */
+    padding: 8px 18px;              /* Más grande */
     font-family: 'Nunito', sans-serif;
-    font-size: 0.77rem;             /* 0.7rem + 10% */
+    font-size: 0.85rem;             /* Más grande */
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     transition: opacity 0.2s ease;
     line-height: 1.2;
-    margin-right: -2%;              /* 5% más a la izquierda relativo al viewport */
+    margin-right: 1.2rem;           /* 20% más a la izquierda */
 }
 
 .btn-ver-detalles:hover {
