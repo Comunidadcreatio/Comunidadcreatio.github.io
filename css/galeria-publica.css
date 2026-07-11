@@ -3,8 +3,15 @@
    SCROLL SNAPPING — scroll nativo del documento
    ============================================== */
 html {
+    scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
     scroll-padding-top: 76px;       /* 64px header + 12px aire */
+    scroll-snap-stop: normal;       /* El stop se define por tarjeta */
+}
+
+body {
+    scroll-snap-type: y mandatory;  /* Refuerzo: navegadores que usan body como scroll container */
+    scroll-padding-top: 76px;
 }
 
 /* ==============================================
@@ -258,6 +265,10 @@ html {
         scroll-padding-top: 62px;    /* Header 50px + 12px aire */
     }
 
+    body {
+        scroll-padding-top: 62px;    /* Mismo en body */
+    }
+
     #galeria-container {
         padding: 0.5rem 1rem 3rem;
     }
@@ -310,6 +321,10 @@ html {
 @media (max-width: 480px) {
     html {
         scroll-padding-top: 60px;    /* Header 48px + 12px aire */
+    }
+
+    body {
+        scroll-padding-top: 60px;    /* Mismo en body */
     }
 
     #galeria-publica {
