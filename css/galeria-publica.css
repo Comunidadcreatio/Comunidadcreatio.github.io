@@ -21,12 +21,12 @@ html, body {
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
-    /* Posición fija entre header y barra */
+    /* Posición fija entre header y barra inferior (respeta safe-area en móviles) */
     position: fixed;
     top: 64px;
     left: 0;
     right: 0;
-    bottom: 50px;
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Tarjeta: altura con margen de seguridad + degradado en la base */
@@ -323,7 +323,7 @@ html, body {
 @media (max-width: 768px) {
     #galeria-container {
         top: 50px;
-        bottom: 50px;
+        bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
     .obra-artista-row {
@@ -382,15 +382,15 @@ html, body {
 @media (max-width: 480px) {
     #galeria-container {
         top: 48px;
-        bottom: 50px;
+        bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
     .obra-card {
         max-width: 100%;
         align-self: stretch;
-        height: calc(100vh - 48px - 50px);
-        min-height: calc(100vh - 48px - 50px);
-        max-height: calc(100vh - 48px - 50px);
+        height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
+        min-height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
+        max-height: calc(100vh - 48px - 50px - env(safe-area-inset-bottom, 0px));
         padding: 0;
     }
 
