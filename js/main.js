@@ -607,6 +607,14 @@ function verPerfilArtistaDesdeGaleria(artistaId) {
     gridExiting = false;
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
+
+    // Ocultar la galería de inmediato (sin pasar visualmente por el modo azul)
+    // mientras se carga el perfil del artista, así se evita el destello previo
+    // durante el tiempo que tarda la petición al backend.
+    const galeria = document.getElementById('galeria-publica');
+    if (galeria) galeria.classList.add('hidden');
+    mostrarPaginaBlanca();
+
     verPerfilUsuario(artistaId);
 }
 
