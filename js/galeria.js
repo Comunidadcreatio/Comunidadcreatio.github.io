@@ -45,7 +45,7 @@ export async function cargarGaleria(container) {
 
 // SVG inline reutilizables
 const ICON_OJO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-const ICON_LIKE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
+const ICON_CORAZON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
 /**
@@ -224,11 +224,14 @@ function crearObraCard(obra) {
             <!-- Carrusel de imágenes -->
             ${carruselHTML}
 
-            <!-- Métricas centradas debajo del carrusel -->
+            <!-- Métricas + botón Ver detalles debajo del carrusel -->
             <div class="obra-metricas-bar">
-                <span class="metrica-item">${ICON_OJO} <span>0</span></span>
-                <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
-                <span class="metrica-item">${ICON_LIKE} <span>0</span></span>
+                <div class="metrica-left">
+                    <span class="metrica-item">${ICON_OJO} <span>0</span></span>
+                    <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
+                    <span class="metrica-item">${ICON_CORAZON} <span>0</span></span>
+                </div>
+                <button class="btn-ver-detalles">Ver detalles</button>
             </div>
         </div>
     `;

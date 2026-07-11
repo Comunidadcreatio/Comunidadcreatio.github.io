@@ -238,15 +238,22 @@ html, body {
 }
 
 /* ==============================================
-   MÉTRICAS: centradas debajo del carrusel
+   MÉTRICAS + BOTÓN VER DETALLES
    ============================================== */
 .obra-metricas-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 24px;
-    padding: 12px 0 8px;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 0.5rem 8px;
+}
+
+.metrica-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
 }
 
 .obra-metricas-bar .metrica-item {
@@ -255,14 +262,39 @@ html, body {
     align-items: center;
     gap: 5px;
     color: var(--color-ink);
-    font-size: 0.75rem;
+    font-size: 0.81rem;             /* 0.75rem + 8% */
     font-weight: 600;
 }
 
 .obra-metricas-bar .metrica-item svg {
-    width: 18px;
-    height: 18px;
+    width: 19px;                    /* 18px + 8% ≈ 19.4px */
+    height: 19px;
     color: var(--color-ink);
+}
+
+/* Botón "Ver detalles" alineado a la derecha */
+.btn-ver-detalles {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+
+.btn-ver-detalles:hover {
+    opacity: 0.85;
+}
+
+[data-theme="dark"] .btn-ver-detalles {
+    background: var(--color-ink);
+    color: #121212;
 }
 
 /* ==============================================
@@ -296,18 +328,26 @@ html, body {
         font-size: 1rem;
     }
 
+    .metrica-left {
+        gap: 16px;
+    }
+
     .obra-metricas-bar {
-        gap: 20px;
         padding: 10px 0 6px;
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 16px;
-        height: 16px;
+        width: 17px;                /* 16px + 8% */
+        height: 17px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.7rem;
+        font-size: 0.76rem;
+    }
+
+    .btn-ver-detalles {
+        font-size: 0.65rem;
+        padding: 4px 10px;
     }
 
     .marquee-text {
@@ -358,18 +398,26 @@ html, body {
         font-size: 0.9rem;
     }
 
+    .metrica-left {
+        gap: 14px;
+    }
+
     .obra-metricas-bar {
-        padding: 8px 12px 4px;
-        gap: 18px;
+        padding: 8px 0.25rem 4px;
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 15px;
-        height: 15px;
+        width: 16px;                /* 15px + 8% */
+        height: 16px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
+    }
+
+    .btn-ver-detalles {
+        font-size: 0.6rem;
+        padding: 3px 8px;
     }
 
     .marquee-text {
