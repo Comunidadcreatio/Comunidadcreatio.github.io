@@ -53,7 +53,7 @@ const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" heig
  * Soporta hasta 5 imágenes (imagen_url, imagen_url_1..4).
  * Acepta avatarHTML para insertarlo dentro del carrusel (posición esquina).
  */
-function crearCarruselHTML(obra, avatarHTML) {
+function crearCarruselHTML(obra) {
     const urls = [
         obra.imagen_url || obra.imagen_thumbnail_url || '',
         obra.imagen_url_1 || '',
@@ -81,7 +81,6 @@ function crearCarruselHTML(obra, avatarHTML) {
                     ${slides}
                 </div>
             </div>
-            ${avatarHTML}
             <div class="obra-carousel-dots">
                 ${dots}
             </div>
@@ -205,19 +204,7 @@ function crearObraCard(obra) {
         ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round">`
         : `<div class="obra-avatar-placeholder">${inicial}</div>`;
 
-    const metricaBarHTML = `
-        <!-- Métricas superpuestas en la imagen -->
-        <div class="obra-metricas-bar">
-            <div class="metrica-left">
-                <span class="metrica-item">${ICON_OJO} <span>0</span></span>
-                <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
-                <span class="metrica-item">${ICON_CORAZON} <span>0</span></span>
-            </div>
-            <button class="btn-ver-detalles">Ver detalles</button>
-        </div>
-    `;
-
-    const carruselHTML = crearCarruselHTML(obra, metricaBarHTML);
+    const carruselHTML = crearCarruselHTML(obra);
 
     card.innerHTML = `
         <div class="obra-card-inner">
@@ -233,8 +220,18 @@ function crearObraCard(obra) {
                 <span class="obra-precio-top">$${precio}</span>
             </div>
 
-            <!-- Carrusel de imágenes (incluye métricas superpuestas) -->
+            <!-- Carrusel de imágenes -->
             ${carruselHTML}
+
+            <!-- Barra inferior sólida: métricas + botón ver detalles -->
+            <div class="obra-metricas-bar">
+                <div class="metrica-left">
+                    <span class="metrica-item">${ICON_OJO} <span>0</span></span>
+                    <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
+                    <span class="metrica-item">${ICON_CORAZON} <span>0</span></span>
+                </div>
+                <button class="btn-ver-detalles">Ver detalles</button>
+            </div>
         </div>
     `;
 
