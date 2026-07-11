@@ -262,32 +262,32 @@ html, body {
     align-items: center;
     gap: 5px;
     color: var(--color-ink);
-    font-size: 0.81rem;
+    font-size: 1.05rem;             /* 0.81rem + 30% */
     font-weight: 600;
 }
 
 .obra-metricas-bar .metrica-item svg {
-    width: 19px;
-    height: 19px;
+    width: 25px;                    /* 19px + 30% */
+    height: 25px;
     color: var(--color-ink);
 }
 
-/* Botón "Ver detalles" — más grande, movido a la izquierda */
+/* Botón "Ver detalles" — +30% */
 .btn-ver-detalles {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
     border-radius: 5px;
-    padding: 8px 18px;              /* Más grande */
+    padding: 10px 23px;             /* 8px 18px + 30% */
     font-family: 'Nunito', sans-serif;
-    font-size: 0.85rem;             /* Más grande */
+    font-size: 1.1rem;              /* 0.85rem + 30% */
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     transition: opacity 0.2s ease;
     line-height: 1.2;
-    margin-right: 1.2rem;           /* 20% más a la izquierda */
+    margin-right: 1.2rem;
 }
 
 .btn-ver-detalles:hover {
@@ -339,17 +339,17 @@ html, body {
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 17px;                /* 16px + 8% */
-        height: 17px;
+        width: 22px;                /* 17px + 30% */
+        height: 22px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.76rem;
+        font-size: 0.99rem;         /* 0.76rem + 30% */
     }
 
     .btn-ver-detalles {
-        font-size: 0.65rem;
-        padding: 4px 10px;
+        font-size: 0.85rem;         /* 0.65rem + 30% */
+        padding: 5px 13px;          /* 4px 10px + 30% */
     }
 
     .marquee-text {
@@ -409,17 +409,17 @@ html, body {
     }
 
     .obra-metricas-bar .metrica-item svg {
-        width: 16px;                /* 15px + 8% */
-        height: 16px;
+        width: 21px;                /* 16px + 30% */
+        height: 21px;
     }
 
     .obra-metricas-bar .metrica-item {
-        font-size: 0.7rem;
+        font-size: 0.91rem;         /* 0.7rem + 30% */
     }
 
     .btn-ver-detalles {
-        font-size: 0.6rem;
-        padding: 3px 8px;
+        font-size: 0.78rem;         /* 0.6rem + 30% */
+        padding: 4px 10px;          /* 3px 8px + 30% */
     }
 
     .marquee-text {
