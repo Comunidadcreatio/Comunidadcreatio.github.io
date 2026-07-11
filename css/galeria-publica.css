@@ -30,17 +30,24 @@ html, body {
     bottom: 50px;
 }
 
-/* Tarjeta: hija directa del snap container */
+/* Tarjeta: contenida exactamente en el viewport */
 .obra-card {
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100%;
+    height: 100%;                   /* Altura exacta del viewport */
+    max-height: 100%;               /* Forzar que no se expanda más */
     box-sizing: border-box;
-    padding: 0.5rem 0 2rem;
+    padding: 0.25rem 0 0;
     flex-shrink: 0;
+    overflow: hidden;
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+}
+
+/* Contenedor interno flexible para distribuir contenido */
+.obra-card > * {
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 /* ==============================================
