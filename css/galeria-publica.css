@@ -82,6 +82,10 @@ html, body {
     min-width: 0;
 }
 
+.obra-avatar-clickable {
+    cursor: pointer;
+}
+
 .obra-avatar-round {
     width: 36px;
     height: 36px;
