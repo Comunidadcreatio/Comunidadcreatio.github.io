@@ -156,13 +156,23 @@ function actualizarPerfilUI() {
         el.textContent = ciudad ? ciudad : '';
     });
 
-    // Mostrar indicador de estado en línea solo si el usuario está activo (sesión iniciada)
+    // Mostrar indicador de estado en línea
+    // Para perfil propio: mostrar si el usuario tiene sesión iniciada
+    // Para perfil externo: se maneja en verPerfilUsuario basado en datos del usuario externo
     const onlineIndicator = document.getElementById('perfil-online-indicator');
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    const viendoPerfilExterno = perfilUsuario && perfilUsuario.dataset.viewing === 'external';
+    
     if (onlineIndicator) {
-        if (token && artistaActual) {
+        if (!viendoPerfilExterno && token && artistaActual) {
+            // Perfil propio: mostrar si el usuario tiene sesión iniciada
             onlineIndicator.classList.remove('offline');
             onlineIndicator.style.display = 'block';
+        } else if (viendoPerfilExterno) {
+            // Perfil externo: no cambiar el estado (ya se maneja en verPerfilUsuario)
+            // Mantener el estado actual del indicador
         } else {
+            // No hay sesión o no es perfil propio
             onlineIndicator.classList.add('offline');
             onlineIndicator.style.display = 'none';
         }
@@ -2266,6 +2276,20 @@ async function verPerfilUsuario(userId) {
             if (statsCavents) statsCavents.textContent = usuario.cavents || '0';
             if (statsProblogs) statsProblogs.textContent = usuario.problogs || '0';
             if (statsComcons) statsComcons.textContent = usuario.comcons || '0';
+            
+            // Actualizar indicador de estado en línea para perfil externo
+            const onlineIndicator = document.getElementById('perfil-online-indicator');
+            if (onlineIndicator) {
+                // Verificar si el usuario externo está activo (basado en campo activo/online si existe)
+                const usuarioActivo = usuario.activo === true || usuario.online === true;
+                if (usuarioActivo) {
+                    onlineIndicator.classList.remove('offline');
+                    onlineIndicator.style.display = 'block';
+                } else {
+                    onlineIndicator.classList.add('offline');
+                    onlineIndicator.style.display = 'none';
+                }
+            }
             
         } else {
             alert('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
