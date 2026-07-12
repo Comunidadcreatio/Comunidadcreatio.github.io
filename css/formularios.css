@@ -370,7 +370,6 @@ form *,
 /* --- Botones de acción del formulario --- */
 #btn-guardar,
 #btn-limpiar-campos,
-#btn-registrarse-final,
 #panel-artista button[type="submit"],
 #panel-artista .btn-aplicar {
     width: 100%;
