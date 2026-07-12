@@ -189,16 +189,12 @@ form {
 /* ==============================================
    BOTONES
    ============================================== */
-button[type="submit"],
-.nav-btn.next-btn,
-#btn-registrarse-final {
-    width: 100%;
-    padding: 12px 20px;
+button[type="submit"]:not(.nav-btn),
+.nav-btn.next-btn {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
     border-radius: var(--radius-md);
-    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -207,16 +203,20 @@ button[type="submit"],
     overflow: hidden;
 }
 
-button[type="submit"]:hover,
-.nav-btn.next-btn:hover,
-#btn-registrarse-final:hover {
+button[type="submit"]:not(.nav-btn) {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+}
+
+button[type="submit"]:not(.nav-btn):hover,
+.nav-btn.next-btn:hover {
     background: var(--color-ink-light);
     transform: translateY(-1px);
 }
 
-button[type="submit"]:active,
-.nav-btn.next-btn:active,
-#btn-registrarse-final:active {
+button[type="submit"]:not(.nav-btn):active,
+.nav-btn.next-btn:active {
     transform: translateY(0);
 }
 
@@ -555,6 +555,16 @@ legend {
     background: var(--color-ink);
     color: var(--color-white);
     flex: 1;
+}
+
+.step-navigation .nav-btn {
+    box-sizing: border-box !important;
+    width: auto !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    line-height: normal !important;
 }
 
 .nav-btn:disabled {
