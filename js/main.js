@@ -155,6 +155,18 @@ function actualizarPerfilUI() {
     document.querySelectorAll('.perfil-ciudad').forEach(el => {
         el.textContent = ciudad ? ciudad : '';
     });
+
+    // Mostrar indicador de estado en línea solo si el usuario está activo (sesión iniciada)
+    const onlineIndicator = document.getElementById('perfil-online-indicator');
+    if (onlineIndicator) {
+        if (token && artistaActual) {
+            onlineIndicator.classList.remove('offline');
+            onlineIndicator.style.display = 'block';
+        } else {
+            onlineIndicator.classList.add('offline');
+            onlineIndicator.style.display = 'none';
+        }
+    }
 }
 
 // Sube la foto de perfil al servidor (Cloudinary vía backend) y devuelve la URL.

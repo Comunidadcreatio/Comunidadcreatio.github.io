@@ -258,8 +258,8 @@
 }
 
 .cuenta-seccion {
-    background: var(--color-white);
-    border: 1px solid var(--color-gray-200);
+    background: transparent;
+    border: none;
     border-radius: 8px;
     padding: 24px;
     margin-bottom: 1.5rem;
@@ -723,8 +723,9 @@
 
 .perfil-online-indicator {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
     width: 16px;
     height: 16px;
     background-color: #22c55e;
