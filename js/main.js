@@ -961,6 +961,8 @@ async function refrescarTabla() {
                 });
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
+                // Actualizar iconos de accordions y progress indicator
+                updateFormProgress();
             } catch (error) {
                 console.error("Error al cargar datos de la obra:", error);
                 showError("Error al cargar la obra para editar");
@@ -1058,6 +1060,8 @@ async function refrescarTabla() {
                 if (!algunaCargada && imagenesDuplicar.some(Boolean)) {
                     showWarning("No se pudieron cargar automáticamente las imágenes. Vuelve a subirlas antes de guardar la obra duplicada.");
                 }
+                // Actualizar iconos de accordions y progress indicator
+                updateFormProgress();
             } catch (error) {
                 console.error("Error al duplicar:", error);
                 const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
