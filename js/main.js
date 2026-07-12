@@ -2280,14 +2280,23 @@ async function verPerfilUsuario(userId) {
             // Actualizar indicador de estado en línea para perfil externo
             const onlineIndicator = document.getElementById('perfil-online-indicator');
             if (onlineIndicator) {
-                // Verificar si el usuario externo está activo (basado en campo activo/online si existe)
-                const usuarioActivo = usuario.activo === true || usuario.online === true;
-                if (usuarioActivo) {
+                // Verificar si es el propio usuario (comparando IDs)
+                const esPropioUsuario = artistaActual && (artistaActual.id === usuario.id || artistaActual.email === usuario.email || artistaActual.correo === usuario.email);
+                
+                if (esPropioUsuario && token) {
+                    // Es el propio usuario: mostrar indicador porque está activo con su sesión
                     onlineIndicator.classList.remove('offline');
                     onlineIndicator.style.display = 'block';
                 } else {
-                    onlineIndicator.classList.add('offline');
-                    onlineIndicator.style.display = 'none';
+                    // Es perfil externo: verificar si el usuario externo está activo (basado en campo activo/online si existe)
+                    const usuarioActivo = usuario.activo === true || usuario.online === true;
+                    if (usuarioActivo) {
+                        onlineIndicator.classList.remove('offline');
+                        onlineIndicator.style.display = 'block';
+                    } else {
+                        onlineIndicator.classList.add('offline');
+                        onlineIndicator.style.display = 'none';
+                    }
                 }
             }
             
