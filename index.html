@@ -265,142 +265,214 @@
             <!-- Formulario para agregar/editar obra -->
             <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
                 <h3 id="form-obra-title">Agregar / Editar Obra</h3>
+                
+                <!-- Progress Indicator -->
+                <div class="form-progress-container">
+                    <div class="form-progress-bar">
+                        <div class="form-progress-fill" id="form-progress-fill"></div>
+                    </div>
+                    <div class="form-progress-text">
+                        <span id="form-progress-percentage">0%</span> completado
+                    </div>
+                </div>
+
                 <form id="obra-form" aria-label="Formulario de obra" novalidate>
-                    <!-- 1. Título -->
-                    <div class="form-group">
-                        <label for="input-titulo">Título</label>
-                        <input type="text" id="input-titulo" placeholder="Título" required aria-required="true">
-                    </div>
+                    
+                    <!-- SECCIÓN 1: Información Básica -->
+                    <div class="form-accordion-section" data-section="basica">
+                        <button type="button" class="accordion-header" aria-expanded="true">
+                            <span class="accordion-icon">▼</span>
+                            <span class="accordion-title">Información Básica</span>
+                            <span class="accordion-status">✓</span>
+                        </button>
+                        <div class="accordion-content">
+                            <!-- 1. Título -->
+                            <div class="form-group">
+                                <label for="input-titulo">Título</label>
+                                <input type="text" id="input-titulo" placeholder="Título" required aria-required="true" data-required="true">
+                            </div>
 
-                    <!-- 2. ID Personalizado + Año -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="input-id-personalizado">ID Personalizado</label>
-                            <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required aria-required="true">
+                            <!-- 2. ID Personalizado + Año -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-id-personalizado">ID Personalizado</label>
+                                    <input type="text" id="input-id-personalizado" placeholder="ID Personalizado (ej: 1440001)" required aria-required="true" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-ano">Año</label>
+                                    <input type="number" id="input-ano" placeholder="Año" required aria-required="true" data-required="true">
+                                </div>
+                            </div>
+
+                            <!-- 3. Artista + Precio -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-artista">Artista</label>
+                                    <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-precio">Precio</label>
+                                    <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01" data-required="true">
+                                </div>
+                            </div>
+
+                            <!-- 4. Ancho + Alto -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-ancho">Ancho (cm)</label>
+                                    <input type="number" id="input-ancho" placeholder="Ancho (cm)" required data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-alto">Alto (cm)</label>
+                                    <input type="number" id="input-alto" placeholder="Alto (cm)" required data-required="true">
+                                </div>
+                            </div>
+
+                            <!-- 5. Descripción Artística -->
+                            <div class="form-group">
+                                <label for="input-descripcion-artistica">Descripción Artística</label>
+                                <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required data-required="true"></textarea>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="input-ano">Año</label>
-                            <input type="number" id="input-ano" placeholder="Año" required aria-required="true">
+                    </div>
+
+                    <!-- SECCIÓN 2: Estado y Visibilidad -->
+                    <div class="form-accordion-section" data-section="visibilidad">
+                        <button type="button" class="accordion-header" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">Estado y Visibilidad</span>
+                            <span class="accordion-status">○</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <!-- 6. Status -->
+                            <div class="form-group">
+                                <label for="input-status">Status</label>
+                                <select id="input-status" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Status</option>
+                                    <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
+                                    <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
+                                </select>
+                            </div>
+
+                            <!-- Estado de la Obra -->
+                            <div class="form-group">
+                                <label for="input-estado-obra">Estado</label>
+                                <select id="input-estado-obra" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Estado</option>
+                                    <option value="Disponible (en venta)">Disponible (en venta)</option>
+                                    <option value="Reservado">Reservado</option>
+                                    <option value="Vendido">Vendido</option>
+                                    <option value="No disponible temporalmente">No disponible temporalmente</option>
+                                    <option value="En préstamo (fuera de galería)">En préstamo (fuera de galería)</option>
+                                    <option value="Solo para exhibición (no venta)">Solo para exhibición (no venta)</option>
+                                    <option value="Retirado del inventario">Retirado del inventario</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 3. Artista + Precio -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="input-artista">Artista</label>
-                            <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
+                    <!-- SECCIÓN 3: Detalles Técnicos -->
+                    <div class="form-accordion-section" data-section="tecnicos">
+                        <button type="button" class="accordion-header" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">Detalles Técnicos</span>
+                            <span class="accordion-status">○</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <!-- Técnica -->
+                            <div class="form-group">
+                                <label for="input-descripcion-tecnica" class="has-tooltip">
+                                    Técnica
+                                    <span class="tooltip-icon" data-tooltip="Método o material usado para crear la obra">?</span>
+                                </label>
+                                <select id="input-descripcion-tecnica" required aria-required="true" data-required="true">
+                                    <option value="" disabled selected>Selecciona Técnica</option>
+                                <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
+                                <option value="Acrílico sobre lienzo">Acrílico sobre lienzo</option>
+                                <option value="Acuarela">Acuarela</option>
+                                <option value="Técnica mixta sobre lienzo">Técnica mixta sobre lienzo</option>
+                                <option value="Pintura al pastel">Pintura al pastel</option>
+                                <option value="Gouache">Gouache</option>
+                                <option value="Bronce fundido">Bronce fundido</option>
+                                <option value="Madera tallada">Madera tallada</option>
+                                <option value="Cerámica/terracota">Cerámica/terracota</option>
+                                <option value="Resina moldeada">Resina moldeada</option>
+                                <option value="Escultura en metal (ensamblaje/soldadura)">Escultura en metal (ensamblaje/soldadura)</option>
+                                <option value="Mármol/piedra tallada">Mármol/piedra tallada</option>
+                                <option value="Dibujo a lápiz/grafito">Dibujo a lápiz/grafito</option>
+                                <option value="Dibujo a tinta">Dibujo a tinta</option>
+                                <option value="Carboncillo">Carboncillo</option>
+                                <option value="Lápices de colores">Lápices de colores</option>
+                                <option value="Collage en papel">Collage en papel</option>
+                                <option value="Serigrafía/grabado">Serigrafía/grabado</option>
+                                <option value="Fotografía digital">Fotografía digital</option>
+                                <option value="Fotografía analógica (B/N o color)">Fotografía analógica (B/N o color)</option>
+                                <option value="Videoarte">Videoarte</option>
+                                <option value="Arte digital/ilustración digital">Arte digital/ilustración digital</option>
+                                <option value="Impresión giclée">Impresión giclée</option>
+                                <option value="NFT (arte digital tokenizado)">NFT (arte digital tokenizado)</option>
+                                <option value="Instalación (site-specific)">Instalación (site-specific)</option>
+                                <option value="Arte textil (tapiz, bordado)">Arte textil (tapiz, bordado)</option>
+                                <option value="Performance documentada">Performance documentada</option>
+                                <option value="Arte objeto/ready-made">Arte objeto/ready-made</option>
+                                <option value="Técnica mixta (multidisciplinar)">Técnica mixta (multidisciplinar)</option>
+                                </select>
+                            </div>
+
+                            <!-- Soporte -->
+                            <div class="form-group">
+                                <label for="input-soporte" class="has-tooltip">
+                                    Soporte
+                                    <span class="tooltip-icon" data-tooltip="Superficie o material donde está creada la obra">?</span>
+                                </label>
+                                <select id="input-soporte" required aria-required="true" data-required="true">
+                                    <option value="" disabled selected>Selecciona Soporte</option>
+                                <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
+                                <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
+                                <option value="Papel (acuarela, dibujo, grabado)">Papel (acuarela, dibujo, grabado)</option>
+                                <option value="Cartón (cartulina, cartón pluma)">Cartón (cartulina, cartón pluma)</option>
+                                <option value="Madera (tabla, panel, contrachapado)">Madera (tabla, panel, contrachapado)</option>
+                                <option value="Metal (lámina de aluminio, cobre)">Metal (lámina de aluminio, cobre)</option>
+                                <option value="Vidrio (pintura sobre vidrio)">Vidrio (pintura sobre vidrio)</option>
+                                <option value="Cerámica (azulejo, loza)">Cerámica (azulejo, loza)</option>
+                                <option value="Tela (seda, algodón, yute)">Tela (seda, algodón, yute)</option>
+                                <option value="Piel/cuero">Piel/cuero</option>
+                                <option value="Muro (fresco, mural - no transportable)">Muro (fresco, mural - no transportable)</option>
+                                <option value="Digital (archivo, sin soporte físico)">Digital (archivo, sin soporte físico)</option>
+                                <option value="Mixto (varios materiales)">Mixto (varios materiales)</option>
+                                </select>
+                            </div>
+
+                            <!-- Marcos -->
+                            <div class="form-group">
+                                <label for="input-marcos">Marcos</label>
+                                <select id="input-marcos" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Marcos</option>
+                                    <option value="Ya enmarcada (listo para colgar)">Ya enmarcada (listo para colgar)</option>
+                                    <option value="Sin enmarcar (solo lienzo/bastidor)">Sin enmarcar (solo lienzo/bastidor)</option>
+                                    <option value="Enmarcado opcional (el cliente elige después)">Enmarcado opcional (el cliente elige después)</option>
+                                    <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
+                                    <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="input-precio">Precio</label>
-                            <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01">
-                        </div>
                     </div>
 
-                    <!-- 4. Ancho + Alto -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="input-ancho">Ancho (cm)</label>
-                            <input type="number" id="input-ancho" placeholder="Ancho (cm)" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-alto">Alto (cm)</label>
-                            <input type="number" id="input-alto" placeholder="Alto (cm)" required>
-                        </div>
-                    </div>
-
-                    <!-- 5. Descripción Artística -->
-                    <div class="form-group">
-                        <label for="input-descripcion-artistica">Descripción Artística</label>
-                        <textarea id="input-descripcion-artistica" placeholder="Descripción Artística" required></textarea>
-                    </div>
-
-                    <!-- 6. Status -->
-                    <div class="form-group">
-                        <label for="input-status">Status</label>
-                        <select id="input-status" required>
-                            <option value="" disabled selected>Selecciona Status</option>
-                            <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
-                            <option value="Inactivo (Oculto)">Inactivo (Oculto)</option>
-                        </select>
-                    </div>
-
-                    <!-- Técnica -->
-                    <div class="form-group">
-                        <label for="input-descripcion-tecnica">Técnica</label>
-                        <select id="input-descripcion-tecnica" required aria-required="true">
-                            <option value="" disabled selected>Selecciona Técnica</option>
-                        <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
-                        <option value="Acrílico sobre lienzo">Acrílico sobre lienzo</option>
-                        <option value="Acuarela">Acuarela</option>
-                        <option value="Técnica mixta sobre lienzo">Técnica mixta sobre lienzo</option>
-                        <option value="Pintura al pastel">Pintura al pastel</option>
-                        <option value="Gouache">Gouache</option>
-                        <option value="Bronce fundido">Bronce fundido</option>
-                        <option value="Madera tallada">Madera tallada</option>
-                        <option value="Cerámica/terracota">Cerámica/terracota</option>
-                        <option value="Resina moldeada">Resina moldeada</option>
-                        <option value="Escultura en metal (ensamblaje/soldadura)">Escultura en metal (ensamblaje/soldadura)</option>
-                        <option value="Mármol/piedra tallada">Mármol/piedra tallada</option>
-                        <option value="Dibujo a lápiz/grafito">Dibujo a lápiz/grafito</option>
-                        <option value="Dibujo a tinta">Dibujo a tinta</option>
-                        <option value="Carboncillo">Carboncillo</option>
-                        <option value="Lápices de colores">Lápices de colores</option>
-                        <option value="Collage en papel">Collage en papel</option>
-                        <option value="Serigrafía/grabado">Serigrafía/grabado</option>
-                        <option value="Fotografía digital">Fotografía digital</option>
-                        <option value="Fotografía analógica (B/N o color)">Fotografía analógica (B/N o color)</option>
-                        <option value="Videoarte">Videoarte</option>
-                        <option value="Arte digital/ilustración digital">Arte digital/ilustración digital</option>
-                        <option value="Impresión giclée">Impresión giclée</option>
-                        <option value="NFT (arte digital tokenizado)">NFT (arte digital tokenizado)</option>
-                        <option value="Instalación (site-specific)">Instalación (site-specific)</option>
-                        <option value="Arte textil (tapiz, bordado)">Arte textil (tapiz, bordado)</option>
-                        <option value="Performance documentada">Performance documentada</option>
-                        <option value="Arte objeto/ready-made">Arte objeto/ready-made</option>
-                        <option value="Técnica mixta (multidisciplinar)">Técnica mixta (multidisciplinar)</option>
-                        </select>
-                    </div>
-
-                    <!-- Soporte -->
-                    <div class="form-group">
-                        <label for="input-soporte">Soporte</label>
-                        <select id="input-soporte" required aria-required="true">
-                            <option value="" disabled selected>Selecciona Soporte</option>
-                        <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
-                        <option value="Lienzo sobre tabla/MDF">Lienzo sobre tabla/MDF</option>
-                        <option value="Papel (acuarela, dibujo, grabado)">Papel (acuarela, dibujo, grabado)</option>
-                        <option value="Cartón (cartulina, cartón pluma)">Cartón (cartulina, cartón pluma)</option>
-                        <option value="Madera (tabla, panel, contrachapado)">Madera (tabla, panel, contrachapado)</option>
-                        <option value="Metal (lámina de aluminio, cobre)">Metal (lámina de aluminio, cobre)</option>
-                        <option value="Vidrio (pintura sobre vidrio)">Vidrio (pintura sobre vidrio)</option>
-                        <option value="Cerámica (azulejo, loza)">Cerámica (azulejo, loza)</option>
-                        <option value="Tela (seda, algodón, yute)">Tela (seda, algodón, yute)</option>
-                        <option value="Piel/cuero">Piel/cuero</option>
-                        <option value="Muro (fresco, mural - no transportable)">Muro (fresco, mural - no transportable)</option>
-                        <option value="Digital (archivo, sin soporte físico)">Digital (archivo, sin soporte físico)</option>
-                        <option value="Mixto (varios materiales)">Mixto (varios materiales)</option>
-                        </select>
-                    </div>
-
-                    <!-- Estado de la Obra -->
-                    <div class="form-group">
-                        <label for="input-estado-obra">Estado</label>
-                        <select id="input-estado-obra" required>
-                            <option value="" disabled selected>Selecciona Estado</option>
-                        <option value="Disponible (en venta)">Disponible (en venta)</option>
-                        <option value="Reservado">Reservado</option>
-                        <option value="Vendido">Vendido</option>
-                        <option value="No disponible temporalmente">No disponible temporalmente</option>
-                        <option value="En préstamo (fuera de galería)">En préstamo (fuera de galería)</option>
-                        <option value="Solo para exhibición (no venta)">Solo para exhibición (no venta)</option>
-                        <option value="Retirado del inventario">Retirado del inventario</option>
-                        </select>
-                    </div>
-
-                    <!-- Procedencia -->
-                    <div class="form-group">
-                        <label for="input-procedencia">Procedencia</label>
-                        <select id="input-procedencia" required>
+                    <!-- SECCIÓN 4: Proveniencia y Autenticidad -->
+                    <div class="form-accordion-section" data-section="proveniencia">
+                        <button type="button" class="accordion-header" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">Proveniencia y Autenticidad</span>
+                            <span class="accordion-status">○</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <!-- Procedencia -->
+                            <div class="form-group">
+                                <label for="input-procedencia" class="has-tooltip">
+                                    Procedencia
+                                    <span class="tooltip-icon" data-tooltip="Historial de propiedad de la obra">?</span>
+                                </label>
+                                <select id="input-procedencia" required data-required="true">
                             <option value="" disabled selected>Selecciona Procedencia</option>
                         <option value="Colección privada">Colección privada</option>
                         <option value="Taller del artista">Taller del artista</option>
@@ -411,73 +483,73 @@
                         <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
                         <option value="Desconocida">Desconocida</option>
                         </select>
+                            </div>
+
+                            <!-- Certificado -->
+                            <div class="form-group">
+                                <label for="input-certificado">Certificado</label>
+                                <select id="input-certificado" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Certificado</option>
+                                    <option value="Sí (autenticado)">Sí (autenticado)</option>
+                                    <option value="No">No</option>
+                                    <option value="En trámite">En trámite</option>
+                                    <option value="Certificado digital disponible">Certificado digital disponible</option>
+                                    <option value="Certificado físico disponible">Certificado físico disponible</option>
+                                </select>
+                            </div>
+
+                            <!-- Firma -->
+                            <div class="form-group">
+                                <label for="input-firma">Firma</label>
+                                <select id="input-firma" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Firma</option>
+                                    <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
+                                    <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
+                                    <option value="Firmada en el bastidor">Firmada en el bastidor</option>
+                                    <option value="Iniciales solamente">Iniciales solamente</option>
+                                    <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
+                                    <option value="No firmada">No firmada</option>
+                                    <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
+                                    <option value="Firma ilegible">Firma ilegible</option>
+                                    <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
+                                    <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
+                                </select>
+                            </div>
+
+                            <!-- Conservación -->
+                            <div class="form-group">
+                                <label for="input-conservacion" class="has-tooltip">
+                                    Conservación
+                                    <span class="tooltip-icon" data-tooltip="Estado actual de conservación de la obra">?</span>
+                                </label>
+                                <select id="input-conservacion" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Conservación</option>
+                                    <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
+                                    <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
+                                    <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
+                                    <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
+                                    <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
+                                    <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Marcos -->
-                    <div class="form-group">
-                        <label for="input-marcos">Marcos</label>
-                        <select id="input-marcos" required>
-                            <option value="" disabled selected>Selecciona Marcos</option>
-                        <option value="Ya enmarcada (listo para colgar)">Ya enmarcada (listo para colgar)</option>
-                        <option value="Sin enmarcar (solo lienzo/bastidor)">Sin enmarcar (solo lienzo/bastidor)</option>
-                        <option value="Enmarcado opcional (el cliente elige después)">Enmarcado opcional (el cliente elige después)</option>
-                        <option value="Viene con marco pero sin vidrio">Viene con marco pero sin vidrio</option>
-                        <option value="Con marco y vidrio/plexiglás">Con marco y vidrio/plexiglás</option>
-                        </select>
-                    </div>
+                    <!-- SECCIÓN 5: Imágenes -->
+                    <div class="form-accordion-section" data-section="imagenes">
+                        <button type="button" class="accordion-header" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">Imágenes</span>
+                            <span class="accordion-status">○</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <!-- Etiquetas -->
+                            <div class="form-group">
+                                <label for="input-etiquetas">Etiquetas</label>
+                                <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required data-required="true">
+                            </div>
 
-                    <!-- Certificado -->
-                    <div class="form-group">
-                        <label for="input-certificado">Certificado</label>
-                        <select id="input-certificado" required>
-                            <option value="" disabled selected>Selecciona Certificado</option>
-                        <option value="Sí (autenticado)">Sí (autenticado)</option>
-                        <option value="No">No</option>
-                        <option value="En trámite">En trámite</option>
-                        <option value="Certificado digital disponible">Certificado digital disponible</option>
-                        <option value="Certificado físico disponible">Certificado físico disponible</option>
-                        </select>
-                    </div>
-
-                    <!-- Firma -->
-                    <div class="form-group">
-                        <label for="input-firma">Firma</label>
-                        <select id="input-firma" required>
-                            <option value="" disabled selected>Selecciona Firma</option>
-                        <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
-                        <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
-                        <option value="Firmada en el bastidor">Firmada en el bastidor</option>
-                        <option value="Iniciales solamente">Iniciales solamente</option>
-                        <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
-                        <option value="No firmada">No firmada</option>
-                        <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
-                        <option value="Firma ilegible">Firma ilegible</option>
-                        <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
-                        <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
-                        </select>
-                    </div>
-
-                    <!-- Conservación -->
-                    <div class="form-group">
-                        <label for="input-conservacion">Conservación</label>
-                        <select id="input-conservacion" required>
-                            <option value="" disabled selected>Selecciona Conservación</option>
-                        <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
-                        <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
-                        <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
-                        <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
-                        <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
-                        <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
-                        </select>
-                    </div>
-
-                    <!-- Etiquetas -->
-                    <div class="form-group">
-                        <label for="input-etiquetas">Etiquetas</label>
-                        <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required>
-                    </div>
-
-                    <!-- Contenedor para los 5 recuadros de imágenes -->
+                            <!-- Contenedor para los 5 recuadros de imágenes -->
                     <div class="imagenes-contenedor" role="group" aria-label="Imágenes de la obra">
                         <div class="form-group">
                             <label>Imágenes de la obra (máximo 5)</label>
@@ -530,6 +602,8 @@
                     </div>
 
                     <div id="vista-previa-imagenes" class="vista-previa"></div>
+                        </div>
+                    </div>
 
                     <input type="hidden" id="input-id-edicion">
                     <div class="form-actions">

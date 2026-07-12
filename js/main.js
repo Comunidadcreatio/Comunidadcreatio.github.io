@@ -2319,6 +2319,113 @@ async function init() {
     setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
+    
+    // Inicializar accordions del formulario
+    setupFormAccordions();
+}
+
+// ============================================
+// ACCORDIONS Y PROGRESS INDICATOR DEL FORMULARIO
+// ============================================
+function setupFormAccordions() {
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    const obraForm = document.getElementById('obra-form');
+    
+    // Configurar click en headers de accordion
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const section = header.closest('.form-accordion-section');
+            const content = section.querySelector('.accordion-content');
+            const isExpanded = header.getAttribute('aria-expanded') === 'true';
+            
+            // Toggle estado
+            header.setAttribute('aria-expanded', !isExpanded);
+            content.classList.toggle('hidden');
+            
+            // Actualizar icono
+            const icon = header.querySelector('.accordion-icon');
+            icon.textContent = isExpanded ? '▶' : '▼';
+        });
+    });
+    
+    // Configurar actualización de progress indicator
+    if (obraForm) {
+        const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
+        requiredFields.forEach(field => {
+            field.addEventListener('input', updateFormProgress);
+            field.addEventListener('change', updateFormProgress);
+        });
+        
+        // Actualizar inicial
+        updateFormProgress();
+    }
+}
+
+function updateFormProgress() {
+    const obraForm = document.getElementById('obra-form');
+    if (!obraForm) return;
+    
+    const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
+    const totalFields = requiredFields.length;
+    let completedFields = 0;
+    
+    requiredFields.forEach(field => {
+        if (field.value && field.value.trim() !== '') {
+            completedFields++;
+        }
+    });
+    
+    const percentage = Math.round((completedFields / totalFields) * 100);
+    
+    // Actualizar progress bar
+    const progressFill = document.getElementById('form-progress-fill');
+    const progressText = document.getElementById('form-progress-percentage');
+    
+    if (progressFill) {
+        progressFill.style.width = percentage + '%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = percentage + '%';
+    }
+    
+    // Actualizar estado de cada sección
+    updateSectionStatus();
+}
+
+function updateSectionStatus() {
+    const sections = document.querySelectorAll('.form-accordion-section');
+    
+    sections.forEach(section => {
+        const content = section.querySelector('.accordion-content');
+        const requiredFields = content.querySelectorAll('[data-required="true"]');
+        const statusIcon = section.querySelector('.accordion-status');
+        
+        if (requiredFields.length === 0) return;
+        
+        let completedCount = 0;
+        requiredFields.forEach(field => {
+            if (field.value && field.value.trim() !== '') {
+                completedCount++;
+            }
+        });
+        
+        const isComplete = completedCount === requiredFields.length;
+        const isInProgress = completedCount > 0 && !isComplete;
+        
+        if (isComplete) {
+            statusIcon.textContent = '✓';
+            statusIcon.classList.add('completed');
+            statusIcon.classList.remove('in-progress');
+        } else if (isInProgress) {
+            statusIcon.textContent = '◐';
+            statusIcon.classList.add('in-progress');
+            statusIcon.classList.remove('completed');
+        } else {
+            statusIcon.textContent = '○';
+            statusIcon.classList.remove('completed', 'in-progress');
+        }
+    });
 }
 
 init();
