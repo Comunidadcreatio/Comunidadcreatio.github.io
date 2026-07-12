@@ -1,7 +1,7 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
 import { login, register } from './auth.js';
-import { API_BASE_URL, TOKEN_KEY } from './config.js';
+import { API_BASE_URL, TOKEN_KEY, ARTISTA_KEY } from './config.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
 
 // ============================================

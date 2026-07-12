@@ -692,8 +692,8 @@ form,
     #modal-login input {
         width: 85% !important;
         box-sizing: border-box !important;
-        padding: 4px 8px;
-        font-size: 9px; 
+        padding: 10px 12px;
+        font-size: 14px; 
         border-radius: 6px;
         margin: 0 auto 6px auto !important;
         display: block;
@@ -703,8 +703,8 @@ form,
     #modal-login button {
         width: 85% !important;
         box-sizing: border-box !important;
-        padding: 8px 8px;
-        font-size: 11px; 
+        padding: 10px 12px;
+        font-size: 14px; 
         border-radius: 6px;
         margin: 0 auto 6px auto !important;
         display: block;
@@ -717,7 +717,7 @@ form,
         box-sizing: border-box !important;
         margin-bottom: 10px;
         text-align: center;
-        font-size: 9px;
+        font-size: 13px;
     }
     
     /* Labels más legibles */

@@ -2297,7 +2297,7 @@ async function init() {
         ocultarPreloader();
         clearTimeout(timeoutId);
     } else {
-        const remaining = MIN_DISPLAY_MS - (performance.now() - performance.timing?.navigationStart || 0) % MIN_DISPLAY_MS;
+        const remaining = MIN_DISPLAY_MS - performance.now();
         setTimeout(() => {
             ocultarPreloader();
             clearTimeout(timeoutId);
