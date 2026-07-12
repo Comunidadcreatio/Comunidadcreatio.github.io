@@ -2292,8 +2292,8 @@ async function init() {
     const MAX_TIMEOUT = 15000;
     let timeoutId = setTimeout(ocultarPreloader, MAX_TIMEOUT);
 
-    // Si el servidor tarda > 2s, se ve el preloader al menos ese tiempo
-    const MIN_DISPLAY_MS = 2000;
+    // Si el servidor tarda > 0.8s, se ve el preloader al menos ese tiempo
+    const MIN_DISPLAY_MS = 800;
     let minDisplayPassed = false;
     setTimeout(() => { minDisplayPassed = true; }, MIN_DISPLAY_MS);
 
