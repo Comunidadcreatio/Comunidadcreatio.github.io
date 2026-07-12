@@ -117,7 +117,7 @@
 
 /* Modo oscuro para el preloader */
 [data-theme="dark"] #preloader {
-    background-color: #121212;
+    background-color: #0a0a0a;
 }
 
 [data-theme="dark"] .preloader-logo-img {
@@ -206,16 +206,16 @@
    ============================================== */
 [data-theme="dark"] {
     /* === PALETA MODO OSCURO === */
-    --color-ink: #e5e5e5;           /* Blanco suave para texto principal */
-    --color-ink-light: #d4d4d4;     /* Blanco suave para hover */
-    --color-white: #121212;         /* Fondo oscuro uniforme */
-    --color-bg: #121212;            /* Fondo principal oscuro uniforme */
+    --color-ink: #f5f5f5;           /* Blanco más puro para mejor legibilidad */
+    --color-ink-light: #e5e5e5;     /* Blanco suave para hover */
+    --color-white: #0a0a0a;         /* Fondo oscuro más profundo */
+    --color-bg: #0a0a0a;            /* Fondo principal oscuro más profundo */
 
     /* Grises neutros invertidos */
-    --color-gray-50:  #262626;
-    --color-gray-100: #262626;
+    --color-gray-50:  #1a1a1a;
+    --color-gray-100: #1f1f1f;
     --color-gray-200: #2a2a2a;
-    --color-gray-300: #737373;
+    --color-gray-300: #525252;
     --color-gray-400: #a3a3a3;
     --color-gray-500: #d4d4d4;
     --color-gray-600: #e5e5e5;
@@ -233,8 +233,8 @@
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
     --color-primary-dark: var(--color-ink-light);
-    --color-black: #e5e5e5;
-    --color-border: #e5e5e5;
+    --color-black: #f5f5f5;
+    --color-border: #404040;        /* Borde más visible en modo oscuro */
     --color-text: var(--color-ink);
     --color-text-muted: var(--color-gray-400);
     --color-gray-light: var(--color-gray-100);
@@ -242,20 +242,20 @@
     --color-gray-dark: var(--color-gray-700);
 
     /* Sombras sutiles para modo oscuro */
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-    --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
-    --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.6);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.7);
 }
 
 /* Ajustes específicos para modo oscuro */
 [data-theme="dark"] #main-header {
-    background-color: #121212;
-    border-bottom-color: #e5e5e5;
+    background-color: #0a0a0a;
+    border-bottom-color: var(--color-border);
 }
 
 [data-theme="dark"] #toggle-panel {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: #0a0a0a;
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .header-icon {
@@ -263,12 +263,12 @@
 }
 
 [data-theme="dark"] .header-icon:hover {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .search-input-wrapper input {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
@@ -277,18 +277,18 @@
 }
 
 [data-theme="dark"] .search-dropdown {
-    background-color: #ffffff;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .search-result-item {
-    border-bottom-color: #e5e5e5;
-    color: #1a1a1a;
+    border-bottom-color: var(--color-border);
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .search-result-item:hover {
-    color: #000000;
-    background-color: transparent;
+    color: var(--color-ink);
+    background-color: var(--color-gray-200);
 }
 
 /* Flecha personalizada para selects (modo claro - negra) */
@@ -306,8 +306,8 @@ select {
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
@@ -330,75 +330,75 @@ select {
 }
 
 [data-theme="dark"] .header-popover-panel {
-    background-color: #ffffff;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .header-popover-panel::after {
-    border-bottom-color: #ffffff;
+    border-bottom-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .logout-option {
-    color: #1a1a1a;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .logout-option.disabled {
-    color: #666666 !important;
+    color: var(--color-gray-400) !important;
 }
 
 [data-theme="dark"] #header-logout-all.logout-option.disabled {
-    color: #666666 !important;
+    color: var(--color-gray-400) !important;
 }
 
 [data-theme="dark"] #desktop-logout-all.logout-option.disabled {
-    color: #666666 !important;
+    color: var(--color-gray-400) !important;
 }
 
 [data-theme="dark"] #mobile-logout-all.logout-option.disabled {
-    color: #666666 !important;
+    color: var(--color-gray-400) !important;
 }
 
 [data-theme="dark"] .logout-option.enabled {
-    color: #1a1a1a;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] #desktop-logout-single.logout-option,
 [data-theme="dark"] #mobile-logout-single.logout-option {
-    color: #1a1a1a;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .logout-option:hover {
-    color: #000000;
-    background-color: transparent;
+    color: var(--color-ink);
+    background-color: var(--color-gray-200);
 }
 
 /* Modo oscuro para bocadillos de escritorio y móvil */
 [data-theme="dark"] .desktop-logout-panel.speech-bubble {
-    background-color: #ffffff;
-    border: 1px solid #e5e5e5;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-border);
 }
 
 [data-theme="dark"] .desktop-logout-panel.speech-bubble::after {
-    border-top-color: #ffffff;
+    border-top-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .mobile-logout-panel.speech-bubble {
-    background-color: #ffffff;
-    border: 1px solid #e5e5e5;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-border);
 }
 
 [data-theme="dark"] .mobile-logout-panel.speech-bubble::after {
-    border-top-color: #ffffff;
+    border-top-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .desktop-logout-panel .logout-option.enabled,
 [data-theme="dark"] .mobile-logout-panel .logout-option.enabled {
-    color: #1a1a1a;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .desktop-logout-panel .logout-option.disabled,
 [data-theme="dark"] .mobile-logout-panel .logout-option.disabled {
-    color: #666666 !important;
+    color: var(--color-gray-400) !important;
 }
 
 /* ==============================================

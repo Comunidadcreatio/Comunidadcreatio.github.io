@@ -169,8 +169,8 @@
    MODO OSCURO
    ============================================== */
 [data-theme="dark"] .search-results-content {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: #0a0a0a;
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .search-results-header {
@@ -186,22 +186,22 @@
 }
 
 [data-theme="dark"] .close-results:hover {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-200);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .search-result-item:hover {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .user-avatar {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: #0a0a0a;
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .avatar-placeholder {
     color: var(--color-ink);
-    background-color: #121212;
+    background-color: #0a0a0a;
 }
 
 [data-theme="dark"] .user-name {

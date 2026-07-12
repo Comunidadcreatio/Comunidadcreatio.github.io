@@ -922,8 +922,8 @@
 
 [data-theme="dark"] .filter-controls input[type="text"],
 [data-theme="dark"] .filter-controls select {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
@@ -942,13 +942,13 @@
 }
 
 [data-theme="dark"] #panel-artista .pagination-btn {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .pagination-btn:hover:not(:disabled) {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-200);
 }
 
 [data-theme="dark"] #page-info {
@@ -978,18 +978,18 @@
 }
 
 [data-theme="dark"] .btn-accion {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .btn-accion:hover {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .cuenta-item {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .cuenta-item-label {
@@ -1001,24 +1001,24 @@
 }
 
 [data-theme="dark"] .btn-cuenta-secundario {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .btn-cuenta-secundario:hover {
-    background-color: #1a1a1a;
+    background-color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .cuenta-form {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .cuenta-form input,
 [data-theme="dark"] .cuenta-form select {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
@@ -1032,14 +1032,14 @@
 }
 
 [data-theme="dark"] .btn-cuenta-cancelar {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] #perfil-usuario {
-    background-color: #121212;
-    border-color: #e5e5e5;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .perfil-seccion-info h3 {
