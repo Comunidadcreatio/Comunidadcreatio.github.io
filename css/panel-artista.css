@@ -613,6 +613,7 @@
     justify-content: center;
     padding: 20px 0;
     min-height: 50px;
+    background: transparent;
 }
 
 #perfil-usuario.hidden {
@@ -723,11 +724,11 @@
 
 .perfil-online-indicator {
     position: absolute;
-    left: -12px;
-    top: 50%;
+    left: -20px;
+    top: 35%;
     transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     background-color: #22c55e;
     border: 2px solid var(--color-white);
     border-radius: 50%;
