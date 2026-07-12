@@ -724,11 +724,11 @@
 
 .perfil-online-indicator {
     position: absolute;
-    left: -20px;
+    left: -23px;
     top: 35%;
     transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     background-color: #22c55e;
     border: 2px solid var(--color-white);
     border-radius: 50%;
@@ -1081,8 +1081,8 @@
 }
 
 [data-theme="dark"] #perfil-usuario {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
+    background-color: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .perfil-seccion-info h3 {
