@@ -1812,6 +1812,8 @@ function setupEvents() {
         if (restaurarArtista && artistaActual) {
             document.getElementById('input-artista').value = artistaActual.nombre_artista;
         }
+        // Reset accordion status and progress indicator
+        resetAccordionStatus();
     }
 
     // ✅ Limpiar campos (solo si existe)
@@ -2426,6 +2428,28 @@ function updateSectionStatus() {
             statusIcon.classList.remove('completed', 'in-progress');
         }
     });
+}
+
+function resetAccordionStatus() {
+    const sections = document.querySelectorAll('.form-accordion-section');
+    
+    sections.forEach(section => {
+        const statusIcon = section.querySelector('.accordion-status');
+        statusIcon.textContent = '○';
+        statusIcon.classList.remove('completed', 'in-progress');
+    });
+    
+    // Reset progress indicator
+    const progressFill = document.getElementById('form-progress-fill');
+    const progressText = document.getElementById('form-progress-percentage');
+    
+    if (progressFill) {
+        progressFill.style.width = '0%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = '0%';
+    }
 }
 
 init();
