@@ -41,16 +41,30 @@ let activeSessionsCount = 0;
 // Seguimiento de actividad del usuario para indicador de estado
 let ultimaActividadUsuario = Date.now();
 let usuarioLocalActivo = true;
+let ultimoHeartbeatEnviado = 0;
 const TIEMPO_INACTIVIDAD_MS = 5 * 60 * 1000; // 5 minutos
+const HEARTBEAT_INTERVAL_MS = 30 * 1000; // 30 segundos
 
 function registrarActividadLocal() {
     ultimaActividadUsuario = Date.now();
     usuarioLocalActivo = true;
+    enviarHeartbeatSiEsNecesario();
 }
 
 function verificarActividadLocal() {
     usuarioLocalActivo = (Date.now() - ultimaActividadUsuario) < TIEMPO_INACTIVIDAD_MS;
     return usuarioLocalActivo;
+}
+
+async function enviarHeartbeatSiEsNecesario() {
+    const ahora = Date.now();
+    if (!token || (ahora - ultimoHeartbeatEnviado) < HEARTBEAT_INTERVAL_MS) return;
+    ultimoHeartbeatEnviado = ahora;
+    try {
+        await apiRequest('/api/artistas/heartbeat', { method: 'POST' });
+    } catch (error) {
+        console.error('Error enviando heartbeat:', error);
+    }
 }
 
 function iniciarSeguimientoActividad() {
@@ -59,14 +73,17 @@ function iniciarSeguimientoActividad() {
         window.addEventListener(evento, registrarActividadLocal, { passive: true, capture: true });
     });
     
-    // Verificar inactividad cada 10 segundos
+    // Verificar inactividad y enviar heartbeat cada 30 segundos
     setInterval(() => {
         verificarActividadLocal();
+        if (usuarioLocalActivo) {
+            enviarHeartbeatSiEsNecesario();
+        }
         // Refrescar indicador si el perfil del usuario está visible
         if (!document.getElementById('perfil-usuario')?.classList.contains('hidden')) {
             actualizarPerfilUI();
         }
-    }, 10000);
+    }, 30000);
 }
 
 // ============================================
