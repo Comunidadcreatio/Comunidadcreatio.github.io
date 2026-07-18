@@ -2400,12 +2400,11 @@ async function verPerfilUsuario(userId) {
                     if (usuarioActivo) {
                         onlineIndicator.classList.add('online');
                         onlineIndicator.classList.remove('offline');
-                        onlineIndicator.style.display = 'block';
                     } else {
                         onlineIndicator.classList.remove('online');
                         onlineIndicator.classList.add('offline');
-                        onlineIndicator.style.display = 'none';
                     }
+                    onlineIndicator.style.display = 'block';
                     console.log('usuarioActivo:', usuarioActivo, 'onlineIndicator classes:', onlineIndicator.className, 'display:', onlineIndicator.style.display);
                 }
             }
