@@ -2299,6 +2299,7 @@ function mostrarResultadosBusqueda(usuarios) {
 async function verPerfilUsuario(userId) {
     try {
         const response = await apiRequest(`/api/artistas/perfil/${userId}`);
+        console.log('Respuesta perfil/:id:', response);
         if (response && response.success) {
             const usuario = response.usuario;
             
@@ -2404,6 +2405,7 @@ async function verPerfilUsuario(userId) {
                         onlineIndicator.classList.add('offline');
                         onlineIndicator.style.display = 'none';
                     }
+                    console.log('usuarioActivo:', usuarioActivo, 'onlineIndicator classes:', onlineIndicator.className, 'display:', onlineIndicator.style.display);
                 }
             }
             
