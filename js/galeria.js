@@ -207,6 +207,15 @@ function crearObraCard(obra) {
             <!-- Carrusel de imágenes -->
             ${carruselHTML}
 
+            <!-- Overlay para modo grid (estado amarillo): título, precio y vistas -->
+            <div class="obra-grid-overlay" aria-hidden="true">
+                <span class="obra-grid-titulo" title="${titulo}">${titulo}</span>
+                <div class="obra-grid-bottom">
+                    <span class="obra-grid-vistas">${ICON_OJO} <span>0</span></span>
+                    <span class="obra-grid-precio">$${precio}</span>
+                </div>
+            </div>
+
             <!-- Barra inferior sólida: métricas + botón ver detalles -->
             <div class="obra-metricas-bar">
                 <div class="metrica-left">

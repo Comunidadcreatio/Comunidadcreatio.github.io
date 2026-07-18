@@ -605,93 +605,79 @@ html, body {
     height: auto;
 }
 
-/* ---- Artista row en columna: avatar centrado, título debajo, precio abajo ---- */
+/* ---- En grid ocultamos la fila de artista; usamos el overlay sobre la imagen ---- */
 #galeria-container.modo-grid .obra-artista-row {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 6px;
-    margin-bottom: 0;
-    gap: 2px;
-    background: var(--color-bg);
-}
-
-#galeria-container.modo-grid .obra-artista-nombre {
     display: none;
 }
 
-#galeria-container.modo-grid .obra-artista-left {
-    max-width: none;
-    flex-shrink: 0;
-    order: 0;                          /* Avatar primero */
+/* ---- En grid ocultamos la barra de métricas (avatar, likes, comentarios y botón) ---- */
+#galeria-container.modo-grid .obra-metricas-bar {
+    display: none;
 }
 
-#galeria-container.modo-grid .obra-avatar-round,
-#galeria-container.modo-grid .obra-avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+/* ==============================================
+   OVERLAY PARA MODO GRID (estado amarillo)
+   ============================================== */
+.obra-grid-overlay {
+    display: none;
 }
 
-#galeria-container.modo-grid .obra-titulo-marquee {
-    flex: none;
-    min-width: 0;
-    max-width: 100%;
-    order: 1;                          /* Título en medio */
+#galeria-container.modo-grid .obra-grid-overlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 10;
 }
 
-#galeria-container.modo-grid .marquee-text {
-    font-size: 0.75rem;
-    animation: none;
-    padding-left: 0;
+#galeria-container.modo-grid .obra-grid-titulo {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
+    text-align: left;
 }
 
-#galeria-container.modo-grid .obra-precio-top {
-    font-size: 0.78rem;
-    flex-shrink: 0;
-    order: 2;                          /* Precio abajo */
-}
-
-/* ---- Métricas y botón en columna, centrados, con aire a los lados ---- */
-#galeria-container.modo-grid .obra-metricas-bar {
-    flex-direction: column;            /* Métricas arriba, botón abajo */
+#galeria-container.modo-grid .obra-grid-bottom {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 8px 10px;
-    gap: 6px;
-    background: var(--color-bg);
+    justify-content: space-between;
+    gap: 8px;
 }
 
-#galeria-container.modo-grid .metrica-left {
-    gap: 16px;
-    justify-content: center;
+#galeria-container.modo-grid .obra-grid-vistas,
+#galeria-container.modo-grid .obra-grid-precio {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
 }
 
-#galeria-container.modo-grid .metrica-item {
-    font-size: 0.85rem;
-    color: var(--color-ink);
-    text-shadow: none;
-    gap: 6px;                          /* Espacio entre icono y número */
+#galeria-container.modo-grid .obra-grid-vistas {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-#galeria-container.modo-grid .metrica-item svg {
-    width: 18px;
-    height: 18px;
-    color: var(--color-ink);
-    filter: none;
+#galeria-container.modo-grid .obra-grid-vistas svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
-#galeria-container.modo-grid .btn-ver-detalles {
-    font-size: 0.7rem;
-    padding: 4px 12px;
-    border-width: 1px;
-    border-radius: 3px;
-    color: var(--color-ink);
-    border-color: var(--color-ink);
+#galeria-container.modo-grid .obra-grid-precio {
+    text-align: right;
 }
 
 /* ---- Ocultar dots del carrusel en grid (ahorran espacio) ---- */

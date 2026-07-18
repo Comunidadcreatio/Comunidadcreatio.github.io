@@ -2,7 +2,7 @@
 import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL } from './config.js';
 import { apiRequest } from './config.js';
 import { token, artistaActual, login, register, logout } from './auth.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=20260718';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 import { showSuccess, showError, showWarning, showInfo, showLoadingOverlay, hideLoadingOverlay, setButtonLoading } from './notificaciones.js';
 
