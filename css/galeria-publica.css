@@ -523,9 +523,10 @@ html, body {
 #galeria-container.modo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: max-content;
     gap: 0;
     padding: 0;
-    align-items: stretch;              /* Cada fila ocupa su altura completa, sin solaparse */
+    align-items: start;                  /* Las tarjetas usan solo su altura de contenido */
     overflow-y: auto;
     scroll-snap-type: none;
     animation: gridContainerEnter 0.4s ease-out;
@@ -592,7 +593,7 @@ html, body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 0 0 auto;                  /* No crece: la tarjeta mide solo el contenido de la imagen */
 }
 
 /* En grid: carrusel mantiene proporción 9/16 vertical (igual q modo azul) */
