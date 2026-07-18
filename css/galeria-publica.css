@@ -631,7 +631,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 10px 12px;
+    padding: 6px 8px;
     box-sizing: border-box;
     pointer-events: none;
     z-index: 10;
@@ -639,7 +639,7 @@ html, body {
 
 #galeria-container.modo-grid .obra-grid-titulo {
     display: block;
-    font-size: 0.85rem;
+    font-size: 10px;
     font-weight: 700;
     color: #ffffff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
@@ -653,12 +653,12 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px;
 }
 
 #galeria-container.modo-grid .obra-grid-vistas,
 #galeria-container.modo-grid .obra-grid-precio {
-    font-size: 0.9rem;
+    font-size: 10px;
     font-weight: 700;
     color: #ffffff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
@@ -667,12 +667,12 @@ html, body {
 #galeria-container.modo-grid .obra-grid-vistas {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
 }
 
 #galeria-container.modo-grid .obra-grid-vistas svg {
-    width: 16px;
-    height: 16px;
+    width: 10px;
+    height: 10px;
     flex-shrink: 0;
 }
 

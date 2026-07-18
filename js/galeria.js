@@ -33,7 +33,7 @@ const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" heig
  * Soporta hasta 5 imágenes (imagen_url, imagen_url_1..4).
  * Acepta avatarHTML para insertarlo dentro del carrusel (posición esquina).
  */
-function crearCarruselHTML(obra) {
+function crearCarruselHTML(obra, overlayHTML = '') {
     const urls = [
         obra.imagen_url || obra.imagen_thumbnail_url || '',
         obra.imagen_url_1 || '',
@@ -64,6 +64,7 @@ function crearCarruselHTML(obra) {
             <div class="obra-carousel-dots">
                 ${dots}
             </div>
+            ${overlayHTML}
         </div>
     `;
 }
@@ -188,7 +189,16 @@ function crearObraCard(obra) {
         ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
         : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
-    const carruselHTML = crearCarruselHTML(obra);
+    const gridOverlayHTML = `
+        <div class="obra-grid-overlay" aria-hidden="true">
+            <span class="obra-grid-titulo" title="${titulo}">${titulo}</span>
+            <div class="obra-grid-bottom">
+                <span class="obra-grid-vistas">${ICON_OJO} <span>0</span></span>
+                <span class="obra-grid-precio">$${precio}</span>
+            </div>
+        </div>
+    `;
+    const carruselHTML = crearCarruselHTML(obra, gridOverlayHTML);
 
     card.innerHTML = `
         <div class="obra-card-inner">
@@ -204,17 +214,8 @@ function crearObraCard(obra) {
                 <span class="obra-precio-top">$${precio}</span>
             </div>
 
-            <!-- Carrusel de imágenes -->
+            <!-- Carrusel de imágenes (incluye overlay para modo grid) -->
             ${carruselHTML}
-
-            <!-- Overlay para modo grid (estado amarillo): título, precio y vistas -->
-            <div class="obra-grid-overlay" aria-hidden="true">
-                <span class="obra-grid-titulo" title="${titulo}">${titulo}</span>
-                <div class="obra-grid-bottom">
-                    <span class="obra-grid-vistas">${ICON_OJO} <span>0</span></span>
-                    <span class="obra-grid-precio">$${precio}</span>
-                </div>
-            </div>
 
             <!-- Barra inferior sólida: métricas + botón ver detalles -->
             <div class="obra-metricas-bar">
