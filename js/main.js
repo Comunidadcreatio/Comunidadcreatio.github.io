@@ -1954,47 +1954,49 @@ function setupEvents() {
         });
     }
 
-    // ✅ Eliminar cuenta (solo si existe el botón)
+    // ✅ Eliminar cuenta (desplegable dentro del acordeón)
     const btnEliminarCuenta = document.getElementById('btn-eliminar-cuenta');
-    if (btnEliminarCuenta) {
+    const formEliminarCuenta = document.getElementById('form-eliminar-cuenta');
+    if (btnEliminarCuenta && formEliminarCuenta) {
         btnEliminarCuenta.addEventListener('click', () => {
-            document.getElementById('modal-confirmar-eliminacion').classList.remove('hidden');
+            formEliminarCuenta.classList.toggle('hidden');
         });
-    }
 
-    // ✅ Confirmar eliminación (solo si existe el formulario)
-    const confirmarEliminacionForm = document.getElementById('confirmar-eliminacion-form');
-    if (confirmarEliminacionForm) {
-        confirmarEliminacionForm.addEventListener('submit', async (e) => {
+        formEliminarCuenta.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const password = document.getElementById('confirmar-password').value;
-            const mensajeError = document.getElementById('mensaje-error');
-            mensajeError.style.display = 'none';
+            const password = document.getElementById('eliminar-password').value;
+            const errorEl = document.getElementById('error-eliminar-cuenta');
+            errorEl.textContent = '';
+            if (!password) {
+                errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
+                return;
+            }
+            const btnSubmit = formEliminarCuenta.querySelector('button[type="submit"]');
+            setButtonLoading(btnSubmit, true);
             try {
                 const res = await apiRequest('/api/artistas/eliminar-cuenta', {
                     method: 'POST',
                     body: JSON.stringify({ password })
                 });
+                setButtonLoading(btnSubmit, false);
                 if (res && res.success) {
                     showSuccess("Tu cuenta ha sido eliminada correctamente.");
                     logout();
                     location.reload();
                 } else if (res && (res.errors || res.error)) {
                     if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        mensajeError.textContent = '❌ ' + res.errors.join('\n');
+                        errorEl.textContent = '❌ ' + res.errors.join('\n');
                     } else if (res.error) {
-                        mensajeError.textContent = '❌ ' + res.error;
+                        errorEl.textContent = '❌ ' + res.error;
                     } else {
-                        mensajeError.textContent = '❌ Error desconocido.';
+                        errorEl.textContent = '❌ Error desconocido.';
                     }
-                    mensajeError.style.display = 'block';
                 } else {
-                    mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-                    mensajeError.style.display = 'block';
+                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
                 }
             } catch (error) {
-                mensajeError.textContent = '❌ Error de conexión. Intenta más tarde.';
-                mensajeError.style.display = 'block';
+                setButtonLoading(btnSubmit, false);
+                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
             }
         });
     }

@@ -1038,7 +1038,7 @@
 }
 
 [data-theme="dark"] .cuenta-item {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-bg);
     border-color: var(--color-border);
 }
 
@@ -1047,27 +1047,29 @@
 }
 
 [data-theme="dark"] .cuenta-item-valor {
+    background-color: var(--color-bg);
+    border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .btn-cuenta-secundario {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-bg);
     border-color: var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .btn-cuenta-secundario:hover {
-    background-color: var(--color-gray-200);
+    background-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .cuenta-form {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-bg);
     border-color: var(--color-border);
 }
 
 [data-theme="dark"] .cuenta-form input,
 [data-theme="dark"] .cuenta-form select {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-bg);
     border-color: var(--color-border);
     color: var(--color-ink);
 }
@@ -1076,13 +1078,19 @@
     color: var(--color-gray-400);
 }
 
-[data-theme="dark"] .btn-cuenta-primario {
-    background-color: var(--color-ink);
-    color: var(--color-white);
+[data-theme="dark"] .btn-cuenta-enviar {
+    background-color: var(--color-bg);
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .btn-cuenta-enviar:hover {
+    background-color: var(--color-gray-100);
+    border-color: var(--color-ink);
 }
 
 [data-theme="dark"] .btn-cuenta-cancelar {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-bg);
     border-color: var(--color-border);
     color: var(--color-ink);
 }

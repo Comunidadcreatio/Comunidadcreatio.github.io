@@ -721,6 +721,20 @@
                             <button id="btn-eliminar-cuenta" class="btn-cuenta-secundario">Eliminar mi cuenta</button>
                         </div>
                     </div>
+
+                    <form id="form-eliminar-cuenta" class="cuenta-form hidden" aria-label="Eliminar cuenta">
+                        <h5>Confirmar eliminación</h5>
+                        <p class="cuenta-form-info">Para eliminar tu cuenta permanentemente, ingresa tu contraseña actual.</p>
+                        <div class="form-group">
+                            <label for="eliminar-password">Contraseña actual</label>
+                            <input type="password" id="eliminar-password" placeholder="Contraseña actual" required autocomplete="current-password">
+                            <span class="cuenta-error" id="error-eliminar-cuenta"></span>
+                        </div>
+                        <div class="cuenta-form-acciones">
+                            <button type="button" class="btn-cuenta-cancelar" data-cancelar="form-eliminar-cuenta">Cancelar</button>
+                            <button type="submit" class="btn-cuenta-enviar">Eliminar mi cuenta</button>
+                        </div>
+                    </form>
                 </div>
                 </div>
             </div>
@@ -730,20 +744,6 @@
     </main>
  </div>
 
-    <!-- Modal para confirmar eliminación de cuenta -->
-    <div id="modal-confirmar-eliminacion" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="eliminar-cuenta-title">
-        <div class="modal-content">
-            <button class="cerrar-modal" aria-label="Cerrar modal">&times;</button>
-            <h2 id="eliminar-cuenta-title">🗑️ Eliminar Cuenta</h2>
-            <p>Para eliminar tu cuenta, por favor ingresa tu contraseña actual.</p>
-            <form id="confirmar-eliminacion-form" aria-label="Formulario de eliminación de cuenta">
-                <label for="confirmar-password" class="visually-hidden">Contraseña actual</label>
-                <input type="password" id="confirmar-password" placeholder="Contraseña actual" required aria-required="true" autocomplete="current-password">
-                <button type="submit">Eliminar mi cuenta</button>
-            </form>
-            <p id="mensaje-error" class="error-message" role="alert" aria-live="polite"></p>
-        </div>
-    </div>
 
     <div id="modal-detalles" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo">
         <div class="modal-content">
