@@ -724,8 +724,8 @@
 
 .perfil-online-indicator {
     position: absolute;
-    right: -2px;
-    bottom: -2px;
+    right: 1px;
+    bottom: 1px;
     width: 14px;
     height: 14px;
     background-color: #9ca3af;
