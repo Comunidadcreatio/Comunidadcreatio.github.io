@@ -60,26 +60,43 @@ async function actualizarEstadisticas(userId = null, statsData = null) {
 
     try {
         console.log('Actualizando estadísticas' + (userId ? ` para usuario: ${userId}` : ' propias'));
-        // Si se proporciona userId, obtener obras de ese usuario específico
-        const endpoint = userId 
-            ? `/api/artistas/obras/${userId}?limit=100&search=&sortBy=id&order=DESC`
-            : '/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC';
-        const res = await apiRequest(endpoint);
-        console.log('Respuesta de obras:', res);
+        let res;
+        if (userId) {
+            // Para perfiles externos, usar endpoint público de la galería y filtrar por artista_user_id
+            res = await apiRequest('/obras');
+            console.log('Respuesta de obras públicas:', res);
+            if (Array.isArray(res)) {
+                const obrasUsuario = res.filter(obra => 
+                    String(obra.artista_user_id) === String(userId) ||
+                    String(obra.user_id) === String(userId) ||
+                    String(obra.artista_id) === String(userId)
+                );
+                const activas = obrasUsuario.filter(obra => 
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+                console.log(`Obras activas del usuario ${userId}: ${activas}`);
+                statsCavents.textContent = activas || fallbackCavents;
+            } else {
+                statsCavents.textContent = fallbackCavents;
+            }
+        } else {
+            const endpoint = '/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC';
+            res = await apiRequest(endpoint);
+            console.log('Respuesta de obras propias:', res);
 
-        let activas = 0;
-        if (res && res.success && Array.isArray(res.obras)) {
-            activas = res.obras.filter(obra => 
-                obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
-            ).length;
-        } else if (Array.isArray(res)) {
-            activas = res.filter(obra => 
-                obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
-            ).length;
+            let activas = 0;
+            if (res && res.success && Array.isArray(res.obras)) {
+                activas = res.obras.filter(obra => 
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+            } else if (Array.isArray(res)) {
+                activas = res.filter(obra => 
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+            }
+            console.log(`Obras activas propias: ${activas}`);
+            statsCavents.textContent = activas;
         }
-
-        console.log(`Obras activas encontradas: ${activas}`);
-        statsCavents.textContent = activas || fallbackCavents;
         if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
         if (statsComcons) statsComcons.textContent = fallbackComcons;
     } catch (error) {
