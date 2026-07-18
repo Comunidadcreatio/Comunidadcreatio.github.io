@@ -2361,9 +2361,9 @@ async function verPerfilUsuario(userId) {
             // Actualizar indicador de estado en línea para perfil externo
             const onlineIndicator = document.getElementById('perfil-online-indicator');
             if (onlineIndicator) {
-                // Verificar si es el propio usuario (comparando IDs)
-                const esPropioUsuario = artistaActual && (artistaActual.id === usuario.id || artistaActual.email === usuario.email || artistaActual.correo === usuario.email);
-                console.log('verPerfilUsuario - esPropioUsuario:', esPropioUsuario, 'artistaActual:', artistaActual, 'usuario.id:', usuario.id, 'usuario.activo:', usuario.activo);
+                // Verificar si es el propio usuario comparando solo por ID
+                const esPropioUsuario = artistaActual && String(artistaActual.id) === String(usuario.id);
+                console.log('verPerfilUsuario - esPropioUsuario:', esPropioUsuario, 'artistaActual.id:', artistaActual && artistaActual.id, 'usuario.id:', usuario.id, 'usuario.activo:', usuario.activo);
                 
                 if (esPropioUsuario && token) {
                     // Es el propio usuario: mostrar indicador basado en actividad local
