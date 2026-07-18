@@ -219,28 +219,30 @@ function guardarFotoPerfil(dataUrl) {
 }
 
 function actualizarPerfilUI() {
-    const src = getFotoPerfil() || AVATAR_DEFAULT;
-    ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
-        const img = document.getElementById(id);
-        if (img) img.src = src;
-    });
-    const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
-    const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
-    const ciudad = (artistaActual && artistaActual.ciudad) || '';
-    
-    document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
-    document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
-    document.querySelectorAll('.perfil-ciudad').forEach(el => {
-        el.textContent = ciudad ? ciudad : '';
-    });
-
-    // Mostrar indicador de estado en línea
-    // Para perfil propio: mostrar si el usuario tiene sesión iniciada y está activo localmente
-    // Para perfil externo: se maneja en verPerfilUsuario basado en datos del usuario externo
     const onlineIndicator = document.getElementById('perfil-online-indicator');
     const perfilUsuario = document.getElementById('perfil-usuario');
     const viendoPerfilExterno = perfilUsuario && perfilUsuario.dataset.viewing === 'external';
     
+    // Si estamos viendo un perfil externo, no sobrescribir sus datos con los del usuario logueado
+    if (!viendoPerfilExterno) {
+        const src = getFotoPerfil() || AVATAR_DEFAULT;
+        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
+            const img = document.getElementById(id);
+            if (img) img.src = src;
+        });
+        const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
+        const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
+        const ciudad = (artistaActual && artistaActual.ciudad) || '';
+        
+        document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
+        document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
+        document.querySelectorAll('.perfil-ciudad').forEach(el => {
+            el.textContent = ciudad ? ciudad : '';
+        });
+    }
+
+    // Mostrar indicador de estado en línea solo para perfil propio
+    // Para perfil externo: se maneja en verPerfilUsuario basado en datos del usuario externo
     if (onlineIndicator) {
         if (!viendoPerfilExterno && token && artistaActual) {
             // Perfil propio: mostrar si el usuario tiene sesión iniciada y está activo
@@ -254,10 +256,7 @@ function actualizarPerfilUI() {
                 onlineIndicator.classList.add('offline');
                 onlineIndicator.style.display = 'block';
             }
-        } else if (viendoPerfilExterno) {
-            // Perfil externo: no cambiar el estado (ya se maneja en verPerfilUsuario)
-            // Mantener el estado actual del indicador
-        } else {
+        } else if (!viendoPerfilExterno) {
             // No hay sesión o no es perfil propio
             onlineIndicator.classList.remove('online');
             onlineIndicator.classList.add('offline');
