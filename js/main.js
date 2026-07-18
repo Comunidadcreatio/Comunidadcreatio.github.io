@@ -42,7 +42,7 @@ let activeSessionsCount = 0;
 // ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
 // ============================================
 // Definimos la función y la exponemos globalmente para que sea accesible desde cualquier parte
-async function actualizarEstadisticas() {
+async function actualizarEstadisticas(userId = null, statsData = null) {
     const statsCavents = document.getElementById('stats-cavents');
     const statsProblogs = document.getElementById('stats-problogs');
     const statsComcons = document.getElementById('stats-comcons');
@@ -52,9 +52,19 @@ async function actualizarEstadisticas() {
         return;
     }
 
+    // Si se proporcionan statsData (por ejemplo desde la respuesta del perfil), usarlos como fallback
+    const fallbackCavents = statsData && (statsData.cavents || statsData.total_obras_activas) ? 
+        String(statsData.cavents || statsData.total_obras_activas) : '0';
+    const fallbackProblogs = statsData && statsData.problogs ? String(statsData.problogs) : '0';
+    const fallbackComcons = statsData && statsData.comcons ? String(statsData.comcons) : '0';
+
     try {
-        console.log('Actualizando estadísticas...');
-        const res = await apiRequest('/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC');
+        console.log('Actualizando estadísticas' + (userId ? ` para usuario: ${userId}` : ' propias'));
+        // Si se proporciona userId, obtener obras de ese usuario específico
+        const endpoint = userId 
+            ? `/api/artistas/obras/${userId}?limit=100&search=&sortBy=id&order=DESC`
+            : '/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC';
+        const res = await apiRequest(endpoint);
         console.log('Respuesta de obras:', res);
 
         let activas = 0;
@@ -69,12 +79,15 @@ async function actualizarEstadisticas() {
         }
 
         console.log(`Obras activas encontradas: ${activas}`);
-        statsCavents.textContent = activas;
-        if (statsProblogs) statsProblogs.textContent = '0';
-        if (statsComcons) statsComcons.textContent = '0';
+        statsCavents.textContent = activas || fallbackCavents;
+        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons) statsComcons.textContent = fallbackComcons;
     } catch (error) {
         console.error('Error al cargar estadísticas:', error);
-        statsCavents.textContent = '0';
+        // Usar datos del perfil como fallback si el endpoint no está disponible
+        statsCavents.textContent = fallbackCavents;
+        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons) statsComcons.textContent = fallbackComcons;
     }
 }
 // EXPONER AL ÁMBITO GLOBAL (para módulos)
@@ -2268,14 +2281,8 @@ async function verPerfilUsuario(userId) {
                 avatarBtn.style.cursor = 'default';
             }
             
-            // Poblar estadísticas si están disponibles
-            const statsCavents = document.getElementById('stats-cavents');
-            const statsProblogs = document.getElementById('stats-problogs');
-            const statsComcons = document.getElementById('stats-comcons');
-            
-            if (statsCavents) statsCavents.textContent = usuario.cavents || '0';
-            if (statsProblogs) statsProblogs.textContent = usuario.problogs || '0';
-            if (statsComcons) statsComcons.textContent = usuario.comcons || '0';
+            // Poblar estadísticas reales desde las obras del usuario (con datos del perfil como fallback)
+            await actualizarEstadisticas(userId, usuario);
             
             // Actualizar indicador de estado en línea para perfil externo
             const onlineIndicator = document.getElementById('perfil-online-indicator');
