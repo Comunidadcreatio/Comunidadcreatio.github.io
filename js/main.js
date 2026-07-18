@@ -38,6 +38,37 @@ let mobileOutsideClickListener = null;
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
 
+// Seguimiento de actividad del usuario para indicador de estado
+let ultimaActividadUsuario = Date.now();
+let usuarioLocalActivo = true;
+const TIEMPO_INACTIVIDAD_MS = 5 * 60 * 1000; // 5 minutos
+
+function registrarActividadLocal() {
+    ultimaActividadUsuario = Date.now();
+    usuarioLocalActivo = true;
+}
+
+function verificarActividadLocal() {
+    usuarioLocalActivo = (Date.now() - ultimaActividadUsuario) < TIEMPO_INACTIVIDAD_MS;
+    return usuarioLocalActivo;
+}
+
+function iniciarSeguimientoActividad() {
+    const eventos = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+    eventos.forEach(evento => {
+        window.addEventListener(evento, registrarActividadLocal, { passive: true, capture: true });
+    });
+    
+    // Verificar inactividad cada 10 segundos
+    setInterval(() => {
+        verificarActividadLocal();
+        // Refrescar indicador si el perfil del usuario está visible
+        if (!document.getElementById('perfil-usuario')?.classList.contains('hidden')) {
+            actualizarPerfilUI();
+        }
+    }, 10000);
+}
+
 // ============================================
 // ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
 // ============================================
@@ -187,7 +218,7 @@ function actualizarPerfilUI() {
     });
 
     // Mostrar indicador de estado en línea
-    // Para perfil propio: mostrar si el usuario tiene sesión iniciada
+    // Para perfil propio: mostrar si el usuario tiene sesión iniciada y está activo localmente
     // Para perfil externo: se maneja en verPerfilUsuario basado en datos del usuario externo
     const onlineIndicator = document.getElementById('perfil-online-indicator');
     const perfilUsuario = document.getElementById('perfil-usuario');
@@ -195,9 +226,15 @@ function actualizarPerfilUI() {
     
     if (onlineIndicator) {
         if (!viendoPerfilExterno && token && artistaActual) {
-            // Perfil propio: mostrar si el usuario tiene sesión iniciada
-            onlineIndicator.classList.remove('offline');
-            onlineIndicator.style.display = 'block';
+            // Perfil propio: mostrar si el usuario tiene sesión iniciada y está activo
+            const activo = verificarActividadLocal();
+            if (activo) {
+                onlineIndicator.classList.remove('offline');
+                onlineIndicator.style.display = 'block';
+            } else {
+                onlineIndicator.classList.add('offline');
+                onlineIndicator.style.display = 'block';
+            }
         } else if (viendoPerfilExterno) {
             // Perfil externo: no cambiar el estado (ya se maneja en verPerfilUsuario)
             // Mantener el estado actual del indicador
@@ -2312,8 +2349,25 @@ async function verPerfilUsuario(userId) {
                     onlineIndicator.classList.remove('offline');
                     onlineIndicator.style.display = 'block';
                 } else {
-                    // Es perfil externo: verificar si el usuario externo está activo (basado en campo activo/online si existe)
-                    const usuarioActivo = usuario.activo === true || usuario.online === true;
+                    // Es perfil externo: verificar si el usuario externo está activo
+                    // basado en campo activo/online o en timestamp de ultima actividad
+                    let usuarioActivo = usuario.activo === true || usuario.online === true || usuario.en_linea === true;
+                    
+                    // Si hay timestamp de ultima actividad, considerar activo si fue en los ultimos 5 minutos
+                    const ULTIMA_ACTIVIDAD_MS = 5 * 60 * 1000;
+                    if (!usuarioActivo && usuario.ultima_actividad) {
+                        const ultimaActividad = new Date(usuario.ultima_actividad).getTime();
+                        if (!isNaN(ultimaActividad) && (Date.now() - ultimaActividad) < ULTIMA_ACTIVIDAD_MS) {
+                            usuarioActivo = true;
+                        }
+                    }
+                    if (!usuarioActivo && usuario.last_activity) {
+                        const lastActivity = new Date(usuario.last_activity).getTime();
+                        if (!isNaN(lastActivity) && (Date.now() - lastActivity) < ULTIMA_ACTIVIDAD_MS) {
+                            usuarioActivo = true;
+                        }
+                    }
+                    
                     if (usuarioActivo) {
                         onlineIndicator.classList.remove('offline');
                         onlineIndicator.style.display = 'block';
@@ -2394,6 +2448,9 @@ async function init() {
     setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
+    
+    // Inicializar seguimiento de actividad del usuario para el indicador de estado en línea
+    iniciarSeguimientoActividad();
     
     // Inicializar accordions del formulario
     setupFormAccordions();
