@@ -246,9 +246,11 @@ function actualizarPerfilUI() {
             // Perfil propio: mostrar si el usuario tiene sesión iniciada y está activo
             const activo = verificarActividadLocal();
             if (activo) {
+                onlineIndicator.classList.add('online');
                 onlineIndicator.classList.remove('offline');
                 onlineIndicator.style.display = 'block';
             } else {
+                onlineIndicator.classList.remove('online');
                 onlineIndicator.classList.add('offline');
                 onlineIndicator.style.display = 'block';
             }
@@ -257,6 +259,7 @@ function actualizarPerfilUI() {
             // Mantener el estado actual del indicador
         } else {
             // No hay sesión o no es perfil propio
+            onlineIndicator.classList.remove('online');
             onlineIndicator.classList.add('offline');
             onlineIndicator.style.display = 'none';
         }
@@ -2362,9 +2365,17 @@ async function verPerfilUsuario(userId) {
                 const esPropioUsuario = artistaActual && (artistaActual.id === usuario.id || artistaActual.email === usuario.email || artistaActual.correo === usuario.email);
                 
                 if (esPropioUsuario && token) {
-                    // Es el propio usuario: mostrar indicador porque está activo con su sesión
-                    onlineIndicator.classList.remove('offline');
-                    onlineIndicator.style.display = 'block';
+                    // Es el propio usuario: mostrar indicador basado en actividad local
+                    const activo = verificarActividadLocal();
+                    if (activo) {
+                        onlineIndicator.classList.add('online');
+                        onlineIndicator.classList.remove('offline');
+                        onlineIndicator.style.display = 'block';
+                    } else {
+                        onlineIndicator.classList.remove('online');
+                        onlineIndicator.classList.add('offline');
+                        onlineIndicator.style.display = 'none';
+                    }
                 } else {
                     // Es perfil externo: verificar si el usuario externo está activo
                     // basado en campo activo/online o en timestamp de ultima actividad
@@ -2386,9 +2397,11 @@ async function verPerfilUsuario(userId) {
                     }
                     
                     if (usuarioActivo) {
+                        onlineIndicator.classList.add('online');
                         onlineIndicator.classList.remove('offline');
                         onlineIndicator.style.display = 'block';
                     } else {
+                        onlineIndicator.classList.remove('online');
                         onlineIndicator.classList.add('offline');
                         onlineIndicator.style.display = 'none';
                     }

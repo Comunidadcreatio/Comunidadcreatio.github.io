@@ -729,11 +729,15 @@
     transform: translateY(-50%);
     width: 10px;
     height: 10px;
-    background-color: #22c55e;
+    background-color: #9ca3af;
     border: 2px solid var(--color-white);
     border-radius: 50%;
     z-index: 3;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.perfil-online-indicator.online {
+    background-color: #22c55e;
     animation: pulseOnline 2s ease-in-out infinite;
 }
 
