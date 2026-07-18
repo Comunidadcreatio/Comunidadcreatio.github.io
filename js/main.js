@@ -2363,6 +2363,7 @@ async function verPerfilUsuario(userId) {
             if (onlineIndicator) {
                 // Verificar si es el propio usuario (comparando IDs)
                 const esPropioUsuario = artistaActual && (artistaActual.id === usuario.id || artistaActual.email === usuario.email || artistaActual.correo === usuario.email);
+                console.log('verPerfilUsuario - esPropioUsuario:', esPropioUsuario, 'artistaActual:', artistaActual, 'usuario.id:', usuario.id, 'usuario.activo:', usuario.activo);
                 
                 if (esPropioUsuario && token) {
                     // Es el propio usuario: mostrar indicador basado en actividad local
