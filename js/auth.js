@@ -1,21 +1,23 @@
 // js/auth.js
-import { API_BASE_URL, TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
+import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
 
-export let token = localStorage.getItem(TOKEN_KEY);
+// El token JWT ahora es una cookie HttpOnly (el frontend NO puede leerlo).
+// Usamos la presencia de artistaActual en localStorage como indicador de sesión.
+export let token = !!localStorage.getItem(ARTISTA_KEY);
 export let artistaActual = JSON.parse(localStorage.getItem(ARTISTA_KEY));
 
 export async function login(email, password) {
     try {
         const res = await fetch(`${API_BASE_URL}/api/artistas/login`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
         if (data.success) {
-            token = data.token;
+            token = true;
             artistaActual = data.artista;
-            localStorage.setItem(TOKEN_KEY, token);
             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
             return { success: true, artista: data.artista };
         } else {
@@ -43,7 +45,6 @@ export async function register(nombre_artista, nombre_real, email, password, tel
                 genero
             })
         });
-        // apiRequest ya devuelve los datos parseados (data)
         return data;
     } catch (error) {
         console.error("Error en registro:", error);
@@ -52,7 +53,6 @@ export async function register(nombre_artista, nombre_real, email, password, tel
 }
 
 export function logout() {
-    localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ARTISTA_KEY);
     token = null;
     artistaActual = null;

@@ -2,7 +2,7 @@
 // Gestión del perfil de usuario, estadísticas, foto de perfil,
 // visualización de perfiles externos y resultados de búsqueda.
 
-import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
 import { escapeHtml } from './utils.js';
@@ -99,10 +99,9 @@ export function actualizarPerfilUI(verificarActividadFn) {
 export async function subirFotoPerfilServidor(file) {
     const formData = new FormData();
     formData.append('foto', file);
-    const authToken = localStorage.getItem(TOKEN_KEY);
     const res = await fetch(`${API_BASE_URL}/api/artistas/foto-perfil`, {
         method: 'POST',
-        headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
+        credentials: 'include',
         body: formData
     });
     return await res.json();

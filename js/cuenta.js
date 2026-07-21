@@ -2,7 +2,7 @@
 // Gestión de la sección "Mi Cuenta": cambiar email, cambiar contraseña,
 // eliminar cuenta y accordion de seguridad.
 
-import { TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
+import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
 

@@ -2,7 +2,7 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
+import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
@@ -64,7 +64,6 @@ export async function refrescarTabla(tablaBody) {
         console.error("Error al cargar obras:", result.error);
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
             showWarning("Tu sesión ha expirado. Serás redirigido a la página principal.");
-            localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
             window.location.href = '/';
             return;

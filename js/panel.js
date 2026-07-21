@@ -65,7 +65,7 @@ export async function guardarObra(token, formData, idEdicion = null) {
     try {
         const res = await fetch(`${API_BASE_URL}${url}`, {
             method: method,
-            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'include',
             body: formData
         });
         return await res.json();
@@ -79,7 +79,7 @@ export async function eliminarObra(token, id) {
     try {
         const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         return res.ok;
     } catch (error) {

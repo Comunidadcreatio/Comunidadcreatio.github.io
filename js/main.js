@@ -3,7 +3,7 @@
 // Coordina todos los módulos: autenticación, galería, panel, perfil,
 // búsqueda, cuenta, tema, y gestiona eventos globales.
 
-import { TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
+import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import {
     showSuccess, showError, showWarning, showInfo
@@ -155,7 +155,6 @@ async function closeAllSessions() {
             console.error("Error al cerrar todas las sesiones:", error);
             showError("Error de conexión. Cerrando sesión local por seguridad.");
         } finally {
-            localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(ARTISTA_KEY);
             window.location.href = '/';
         }
@@ -673,7 +672,6 @@ async function init() {
     }
 
     if (!sesionValida) {
-        localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(ARTISTA_KEY);
         window.location.href = 'auth.html';
         return;

@@ -1,7 +1,7 @@
 // js/busqueda.js
 // Búsqueda de usuarios en tiempo real con dropdown y debounce.
 
-import { TOKEN_KEY, API_BASE_URL, apiRequest } from './config.js';
+import { API_BASE_URL, apiRequest } from './config.js';
 import { debounce } from './utils.js';
 
 /**
@@ -102,11 +102,8 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
         }
 
         try {
-            const token = localStorage.getItem(TOKEN_KEY);
             const response = await fetch(`${API_BASE_URL}/api/artistas/buscar?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
+                credentials: 'include'
             });
             const data = await response.json();
 
