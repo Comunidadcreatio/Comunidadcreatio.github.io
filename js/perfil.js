@@ -1,0 +1,377 @@
+// js/perfil.js
+// Gestión del perfil de usuario, estadísticas, foto de perfil,
+// visualización de perfiles externos y resultados de búsqueda.
+
+import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
+import { token, artistaActual } from './auth.js';
+import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
+import { escapeHtml } from './utils.js';
+
+export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
+
+// Referencia a funciones del módulo de navegación (se inyecta para evitar dependencia circular)
+let _navegacion = null;
+export function setNavegacionRef(ref) { _navegacion = ref; }
+
+// ============================================
+// FOTO DE PERFIL
+// ============================================
+function getFotoPerfilKey() {
+    const id = (artistaActual && (artistaActual.email || artistaActual.correo || artistaActual.id)) || 'anon';
+    return `fotoPerfil_${id}`;
+}
+
+export function getFotoPerfil() {
+    if (artistaActual && artistaActual.foto_perfil) return artistaActual.foto_perfil;
+    try {
+        return localStorage.getItem(getFotoPerfilKey()) || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+export function guardarFotoPerfil(dataUrl) {
+    try {
+        localStorage.setItem(getFotoPerfilKey(), dataUrl);
+    } catch (e) {
+        console.error('No se pudo guardar la foto de perfil:', e);
+    }
+    if (artistaActual) {
+        artistaActual.foto_perfil = dataUrl;
+        try {
+            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+        } catch (e) {
+            console.error('No se pudo actualizar el artista en localStorage:', e);
+        }
+    }
+}
+
+// ============================================
+// ACTUALIZAR UI DEL PERFIL
+// ============================================
+export function actualizarPerfilUI(verificarActividadFn) {
+    const onlineIndicator = document.getElementById('perfil-online-indicator');
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    const viendoPerfilExterno = perfilUsuario && perfilUsuario.dataset.viewing === 'external';
+
+    // Si estamos viendo un perfil externo, no sobrescribir sus datos con los del usuario logueado
+    if (!viendoPerfilExterno) {
+        const src = getFotoPerfil() || AVATAR_DEFAULT;
+        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
+            const img = document.getElementById(id);
+            if (img) img.src = src;
+        });
+        const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
+        const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
+        const ciudad = (artistaActual && artistaActual.ciudad) || '';
+
+        document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
+        document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
+        document.querySelectorAll('.perfil-ciudad').forEach(el => {
+            el.textContent = ciudad ? escapeHtml(ciudad) : '';
+        });
+    }
+
+    // Mostrar indicador de estado en línea solo para perfil propio
+    if (onlineIndicator) {
+        if (!viendoPerfilExterno && token && artistaActual) {
+            const activo = verificarActividadFn ? verificarActividadFn() : true;
+            if (activo) {
+                onlineIndicator.classList.add('online');
+                onlineIndicator.classList.remove('offline');
+                onlineIndicator.style.display = 'block';
+            } else {
+                onlineIndicator.classList.remove('online');
+                onlineIndicator.classList.add('offline');
+                onlineIndicator.style.display = 'block';
+            }
+        } else if (!viendoPerfilExterno) {
+            onlineIndicator.classList.remove('online');
+            onlineIndicator.classList.add('offline');
+            onlineIndicator.style.display = 'none';
+        }
+    }
+}
+
+// ============================================
+// SUBIR FOTO DE PERFIL (CLOUDINARY)
+// ============================================
+export async function subirFotoPerfilServidor(file) {
+    const formData = new FormData();
+    formData.append('foto', file);
+    const authToken = localStorage.getItem(TOKEN_KEY);
+    const res = await fetch(`${API_BASE_URL}/api/artistas/foto-perfil`, {
+        method: 'POST',
+        headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
+        body: formData
+    });
+    return await res.json();
+}
+
+// ============================================
+// REFRESCAR PERFIL DESDE EL SERVIDOR
+// ============================================
+export async function refrescarPerfilDesdeServidor() {
+    try {
+        const res = await apiRequest('/api/artistas/perfil');
+        if (res && res.success && res.artista) {
+            if (artistaActual) {
+                artistaActual.foto_perfil = res.artista.foto_perfil || artistaActual.foto_perfil || '';
+                if (res.artista.nombre_real) artistaActual.nombre_real = res.artista.nombre_real;
+                try {
+                    localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+                } catch (e) { /* noop */ }
+            }
+            actualizarPerfilUI();
+        }
+    } catch (e) {
+        // Si falla, se mantiene la foto local/por defecto.
+    }
+}
+
+// ============================================
+// ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
+// ============================================
+export async function actualizarEstadisticas(userId = null, statsData = null) {
+    const statsCavents = document.getElementById('stats-cavents');
+    const statsProblogs = document.getElementById('stats-problogs');
+    const statsComcons = document.getElementById('stats-comcons');
+
+    if (!statsCavents) {
+        console.warn('Elemento #stats-cavents no encontrado (el perfil no está visible)');
+        return;
+    }
+
+    const fallbackCavents = statsData && (statsData.cavents || statsData.total_obras_activas) ?
+        String(statsData.cavents || statsData.total_obras_activas) : '0';
+    const fallbackProblogs = statsData && statsData.problogs ? String(statsData.problogs) : '0';
+    const fallbackComcons = statsData && statsData.comcons ? String(statsData.comcons) : '0';
+
+    try {
+        let res;
+        if (userId) {
+            res = await apiRequest('/obras');
+            if (Array.isArray(res)) {
+                const obrasUsuario = res.filter(obra =>
+                    String(obra.artista_user_id) === String(userId) ||
+                    String(obra.user_id) === String(userId) ||
+                    String(obra.artista_id) === String(userId)
+                );
+                const activas = obrasUsuario.filter(obra =>
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+                statsCavents.textContent = activas || fallbackCavents;
+            } else {
+                statsCavents.textContent = fallbackCavents;
+            }
+        } else {
+            const endpoint = '/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC';
+            res = await apiRequest(endpoint);
+
+            let activas = 0;
+            if (res && res.success && Array.isArray(res.obras)) {
+                activas = res.obras.filter(obra =>
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+            } else if (Array.isArray(res)) {
+                activas = res.filter(obra =>
+                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
+                ).length;
+            }
+            statsCavents.textContent = activas;
+        }
+        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons) statsComcons.textContent = fallbackComcons;
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+        statsCavents.textContent = fallbackCavents;
+        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons) statsComcons.textContent = fallbackComcons;
+    }
+}
+
+// EXPONER AL ÁMBITO GLOBAL (para módulos que lo necesiten)
+window.actualizarEstadisticas = actualizarEstadisticas;
+
+// ============================================
+// MOSTRAR RESULTADOS DE BÚSQUEDA
+// ============================================
+export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
+    const galeria = document.getElementById('galeria-publica');
+    const panel = document.getElementById('panel-artista');
+    const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = document.getElementById('mi-cuenta');
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    const resultadosBusqueda = document.getElementById('resultados-busqueda');
+
+    if (galeria) galeria.classList.add('hidden');
+    if (panel) panel.classList.add('hidden');
+    if (paginaBlanca) paginaBlanca.classList.add('hidden');
+    if (miCuenta) miCuenta.classList.add('hidden');
+    if (perfilUsuario) perfilUsuario.classList.add('hidden');
+
+    if (resultadosBusqueda) resultadosBusqueda.classList.remove('hidden');
+
+    const resultadosLista = document.getElementById('resultados-busqueda-lista');
+    if (resultadosLista) {
+        resultadosLista.innerHTML = usuarios.map(usuario => `
+            <div class="resultado-item" data-user-id="${escapeHtml(String(usuario.id))}">
+                <div class="resultado-avatar">
+                    ${usuario.foto_perfil
+                        ? `<img src="${escapeHtml(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}">`
+                        : `<div class="avatar-placeholder">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
+                    }
+                </div>
+                <div class="resultado-info">
+                    <div class="resultado-nombre">${escapeHtml(usuario.nombre_artista)}</div>
+                    <div class="resultado-nombre-real">${escapeHtml(usuario.nombre_real || '')}</div>
+                    ${usuario.ciudad ? `<div class="resultado-ciudad">${escapeHtml(usuario.ciudad)}</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        const resultadoItems = resultadosLista.querySelectorAll('.resultado-item');
+        resultadoItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const userId = item.getAttribute('data-user-id');
+                if (verPerfilUsuarioFn) verPerfilUsuarioFn(userId);
+            });
+        });
+    }
+}
+
+// ============================================
+// VER PERFIL DE USUARIO (EXTERNO)
+// ============================================
+export async function verPerfilUsuario(userId, verificarActividadFn, actualizarEstadoNavFn) {
+    try {
+        const response = await apiRequest(`/api/artistas/perfil/${userId}`);
+        if (response && response.success) {
+            const usuario = response.usuario;
+
+            // Ocultar todas las secciones
+            const galeria = document.getElementById('galeria-publica');
+            const panel = document.getElementById('panel-artista');
+            const paginaBlanca = document.getElementById('pagina-blanca');
+            const miCuenta = document.getElementById('mi-cuenta');
+            const perfilUsuario = document.getElementById('perfil-usuario');
+            const resultadosBusqueda = document.getElementById('resultados-busqueda');
+
+            if (galeria) galeria.classList.add('hidden');
+            if (panel) panel.classList.add('hidden');
+            if (paginaBlanca) paginaBlanca.classList.add('hidden');
+            if (miCuenta) miCuenta.classList.add('hidden');
+            if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
+
+            if (perfilUsuario) {
+                perfilUsuario.classList.remove('hidden');
+                perfilUsuario.dataset.viewing = 'external';
+            }
+            if (actualizarEstadoNavFn) actualizarEstadoNavFn();
+
+            // Poblar datos del perfil
+            const avatarImg = document.getElementById('perfil-avatar-seccion');
+            const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
+            const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
+            const ciudad = document.querySelector('.perfil-ciudad');
+            const avatarBtn = document.getElementById('perfil-avatar-btn');
+
+            if (avatarImg) {
+                avatarImg.src = usuario.foto_perfil || 'iconos/avatar-default.svg';
+            }
+            if (nombreReal) {
+                nombreReal.textContent = usuario.nombre_real || '';
+            }
+            if (nombreArtista) {
+                nombreArtista.textContent = usuario.nombre_artista || '';
+            }
+            if (ciudad) {
+                ciudad.textContent = usuario.ciudad || '';
+            }
+
+            const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
+            if (avatarOverlay) {
+                avatarOverlay.style.display = 'none';
+            }
+            if (avatarBtn) {
+                avatarBtn.style.pointerEvents = 'none';
+                avatarBtn.style.cursor = 'default';
+            }
+
+            await actualizarEstadisticas(userId, usuario);
+
+            // Actualizar indicador de estado en línea para perfil externo
+            const onlineIndicator = document.getElementById('perfil-online-indicator');
+            if (onlineIndicator) {
+                const esPropioUsuario = artistaActual && String(artistaActual.id) === String(usuario.id);
+
+                if (esPropioUsuario && token) {
+                    const activo = verificarActividadFn ? verificarActividadFn() : false;
+                    if (activo) {
+                        onlineIndicator.classList.add('online');
+                        onlineIndicator.classList.remove('offline');
+                        onlineIndicator.style.display = 'block';
+                    } else {
+                        onlineIndicator.classList.remove('online');
+                        onlineIndicator.classList.add('offline');
+                        onlineIndicator.style.display = 'none';
+                    }
+                } else {
+                    let usuarioActivo = usuario.activo === true || usuario.online === true || usuario.en_linea === true;
+                    const ULTIMA_ACTIVIDAD_MS = 5 * 60 * 1000;
+                    if (!usuarioActivo && usuario.ultima_actividad) {
+                        const ultimaActividad = new Date(usuario.ultima_actividad).getTime();
+                        if (!isNaN(ultimaActividad) && (Date.now() - ultimaActividad) < ULTIMA_ACTIVIDAD_MS) {
+                            usuarioActivo = true;
+                        }
+                    }
+                    if (!usuarioActivo && usuario.last_activity) {
+                        const lastActivity = new Date(usuario.last_activity).getTime();
+                        if (!isNaN(lastActivity) && (Date.now() - lastActivity) < ULTIMA_ACTIVIDAD_MS) {
+                            usuarioActivo = true;
+                        }
+                    }
+
+                    if (usuarioActivo) {
+                        onlineIndicator.classList.add('online');
+                        onlineIndicator.classList.remove('offline');
+                    } else {
+                        onlineIndicator.classList.remove('online');
+                        onlineIndicator.classList.add('offline');
+                    }
+                    onlineIndicator.style.display = 'block';
+                }
+            }
+        } else {
+            alert('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
+        }
+    } catch (error) {
+        console.error('Error al cargar perfil:', error);
+        if (error.response && error.response.status === 500) {
+            alert('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
+        } else {
+            alert('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
+        }
+    }
+}
+
+// ============================================
+// INTERACCIONES DEL PERFIL (sidebar)
+// ============================================
+export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn) {
+    const btn = document.getElementById('btn-perfil-sidebar');
+    if (!btn) return;
+
+    const abrirPerfil = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (cerrarTodosLosPanelesFn) cerrarTodosLosPanelesFn();
+        if (togglePerfilFn) togglePerfilFn();
+    };
+    btn.addEventListener('click', abrirPerfil);
+
+    // Clic en el avatar abre el selector de archivos
+    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
+        document.getElementById('input-foto-perfil')?.click();
+    });
+}

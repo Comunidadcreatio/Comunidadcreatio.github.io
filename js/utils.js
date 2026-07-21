@@ -1,0 +1,59 @@
+// js/utils.js
+// Funciones auxiliares compartidas por todos los módulos
+
+import { showError } from './notificaciones.js';
+
+/**
+ * Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").
+ * El backend usa express-validator .escape() que codifica caracteres
+ * especiales al guardar; esto los revierte para que el valor coincida
+ * con las opciones de los <select> al editar o duplicar una obra.
+ */
+export function decodeHTMLEntities(str) {
+    if (str === null || str === undefined) return '';
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = String(str);
+    return textarea.value;
+}
+
+/**
+ * Muestra errores de validación del backend en formato amigable.
+ */
+export function mostrarErrores(result) {
+    if (Array.isArray(result.errors) && result.errors.length > 0) {
+        const mensaje = result.errors.join('\n• ');
+        showError('Se encontraron los siguientes errores:\n\n• ' + mensaje);
+    } else if (result.error) {
+        showError('Error: ' + result.error);
+    } else {
+        showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+    }
+}
+
+/**
+ * Debounce genérico para limitar frecuencia de llamadas.
+ */
+export function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Escapa HTML para prevenir XSS al insertar datos de usuario en el DOM.
+ */
+export function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}

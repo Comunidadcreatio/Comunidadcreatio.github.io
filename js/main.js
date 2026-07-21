@@ -1,30 +1,43 @@
 // js/main.js
-import { TOKEN_KEY, ARTISTA_KEY, API_BASE_URL } from './config.js';
-import { apiRequest } from './config.js';
-import { token, artistaActual, login, register, logout } from './auth.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=2026071810';
-import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
-import { showSuccess, showError, showWarning, showInfo, showLoadingOverlay, hideLoadingOverlay, setButtonLoading } from './notificaciones.js';
+// Orquestador principal de la aplicación Creatio.
+// Coordina todos los módulos: autenticación, galería, panel, perfil,
+// búsqueda, cuenta, tema, y gestiona eventos globales.
+
+import { TOKEN_KEY, ARTISTA_KEY, apiRequest } from './config.js';
+import { token, artistaActual, logout } from './auth.js';
+import {
+    showSuccess, showError, showWarning, showInfo
+} from './notificaciones.js';
+
+// --- Nuevos módulos extraídos ---
+import { setupDarkModeToggle } from './theme.js';
+import {
+    actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
+    refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
+    verPerfilUsuario, setupPerfilInteracciones
+} from './perfil.js';
+import { setupBuscador } from './busqueda.js';
+import {
+    mostrarPaginaBlanca, actualizarEstadoNavButtons,
+    toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil
+} from './galeria-ui.js';
+import {
+    currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
+    setupFormChangeTracking,
+    refrescarTabla,
+    setupImagePreviews, limpiarFormularioCompleto,
+    setupObraFormSubmit, setupFormAccordions
+} from './panel-ui.js';
+import { setRefrescarTablaFn } from './galeria-ui.js';
+import { setupMiCuenta } from './cuenta.js';
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
 // ============================================
-const galeriaContainer = document.getElementById('galeria-container');
-const panelArtista = document.getElementById('panel-artista');
+export const galeriaContainer = document.getElementById('galeria-container');
 const tablaBody = document.getElementById('tabla-obras-body');
-const obraForm = document.getElementById('obra-form');
-const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
-const imagenesAEliminar = new Set();
 
-// Variables para paginación y filtros
-let currentPage = 1;
-let currentLimit = 10;
-let currentSearch = '';
-let currentSortBy = 'id';
-let currentOrder = 'DESC';
-let totalObras = 0;
-
-// Variables para los paneles flotantes
+// Variables para paneles flotantes
 let desktopLogoutModal = null;
 let desktopLogoutAllBtn = null;
 let desktopLogoutSingleBtn = null;
@@ -32,18 +45,17 @@ let clickOutsideHandlerLogout = null;
 let headerConfigOutsideHandler = null;
 let headerLogoutOutsideHandler = null;
 
-// Control de estado del menú móvil
-let mobileOutsideClickListener = null;
-
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
 
-// Seguimiento de actividad del usuario para indicador de estado
+// ============================================
+// HEARTBEAT / ACTIVIDAD DEL USUARIO
+// ============================================
 let ultimaActividadUsuario = Date.now();
 let usuarioLocalActivo = true;
 let ultimoHeartbeatEnviado = 0;
-const TIEMPO_INACTIVIDAD_MS = 5 * 60 * 1000; // 5 minutos
-const HEARTBEAT_INTERVAL_MS = 30 * 1000; // 30 segundos
+const TIEMPO_INACTIVIDAD_MS = 5 * 60 * 1000;
+const HEARTBEAT_INTERVAL_MS = 30 * 1000;
 
 function registrarActividadLocal() {
     ultimaActividadUsuario = Date.now();
@@ -51,7 +63,7 @@ function registrarActividadLocal() {
     enviarHeartbeatSiEsNecesario();
 }
 
-function verificarActividadLocal() {
+export function verificarActividadLocal() {
     usuarioLocalActivo = (Date.now() - ultimaActividadUsuario) < TIEMPO_INACTIVIDAD_MS;
     return usuarioLocalActivo;
 }
@@ -72,230 +84,16 @@ function iniciarSeguimientoActividad() {
     eventos.forEach(evento => {
         window.addEventListener(evento, registrarActividadLocal, { passive: true, capture: true });
     });
-    
-    // Verificar inactividad y enviar heartbeat cada 30 segundos
+
     setInterval(() => {
         verificarActividadLocal();
         if (usuarioLocalActivo) {
             enviarHeartbeatSiEsNecesario();
         }
-        // Refrescar indicador si el perfil del usuario está visible
         if (!document.getElementById('perfil-usuario')?.classList.contains('hidden')) {
-            actualizarPerfilUI();
+            actualizarPerfilUI(verificarActividadLocal);
         }
     }, 30000);
-}
-
-// ============================================
-// ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
-// ============================================
-// Definimos la función y la exponemos globalmente para que sea accesible desde cualquier parte
-async function actualizarEstadisticas(userId = null, statsData = null) {
-    const statsCavents = document.getElementById('stats-cavents');
-    const statsProblogs = document.getElementById('stats-problogs');
-    const statsComcons = document.getElementById('stats-comcons');
-
-    if (!statsCavents) {
-        console.warn('Elemento #stats-cavents no encontrado (el perfil no está visible)');
-        return;
-    }
-
-    // Si se proporcionan statsData (por ejemplo desde la respuesta del perfil), usarlos como fallback
-    const fallbackCavents = statsData && (statsData.cavents || statsData.total_obras_activas) ? 
-        String(statsData.cavents || statsData.total_obras_activas) : '0';
-    const fallbackProblogs = statsData && statsData.problogs ? String(statsData.problogs) : '0';
-    const fallbackComcons = statsData && statsData.comcons ? String(statsData.comcons) : '0';
-
-    try {
-        console.log('Actualizando estadísticas' + (userId ? ` para usuario: ${userId}` : ' propias'));
-        let res;
-        if (userId) {
-            // Para perfiles externos, usar endpoint público de la galería y filtrar por artista_user_id
-            res = await apiRequest('/obras');
-            console.log('Respuesta de obras públicas:', res);
-            if (Array.isArray(res)) {
-                const obrasUsuario = res.filter(obra => 
-                    String(obra.artista_user_id) === String(userId) ||
-                    String(obra.user_id) === String(userId) ||
-                    String(obra.artista_id) === String(userId)
-                );
-                const activas = obrasUsuario.filter(obra => 
-                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
-                ).length;
-                console.log(`Obras activas del usuario ${userId}: ${activas}`);
-                statsCavents.textContent = activas || fallbackCavents;
-            } else {
-                statsCavents.textContent = fallbackCavents;
-            }
-        } else {
-            const endpoint = '/api/artistas/mis-obras?limit=100&search=&sortBy=id&order=DESC';
-            res = await apiRequest(endpoint);
-            console.log('Respuesta de obras propias:', res);
-
-            let activas = 0;
-            if (res && res.success && Array.isArray(res.obras)) {
-                activas = res.obras.filter(obra => 
-                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
-                ).length;
-            } else if (Array.isArray(res)) {
-                activas = res.filter(obra => 
-                    obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
-                ).length;
-            }
-            console.log(`Obras activas propias: ${activas}`);
-            statsCavents.textContent = activas;
-        }
-        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
-        if (statsComcons) statsComcons.textContent = fallbackComcons;
-    } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
-        // Usar datos del perfil como fallback si el endpoint no está disponible
-        statsCavents.textContent = fallbackCavents;
-        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
-        if (statsComcons) statsComcons.textContent = fallbackComcons;
-    }
-}
-// EXPONER AL ÁMBITO GLOBAL (para módulos)
-window.actualizarEstadisticas = actualizarEstadisticas;
-
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
-// Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").
-// El backend usa express-validator .escape() que codifica caracteres
-// especiales al guardar; esto los revierte para que el valor coincida
-// con las opciones de los <select> al editar o duplicar una obra.
-function decodeHTMLEntities(str) {
-    if (str === null || str === undefined) return '';
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = String(str);
-    return textarea.value;
-}
-
-function mostrarErrores(result) {
-    if (Array.isArray(result.errors) && result.errors.length > 0) {
-        const mensaje = result.errors.join('\n• ');
-        showError('Se encontraron los siguientes errores:\n\n• ' + mensaje);
-    } else if (result.error) {
-        showError('Error: ' + result.error);
-    } else {
-        showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
-    }
-}
-
-// ============================================
-// PERFIL DE USUARIO (avatar + datos)
-// ============================================
-const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
-
-function getFotoPerfilKey() {
-    const id = (artistaActual && (artistaActual.email || artistaActual.correo || artistaActual.id)) || 'anon';
-    return `fotoPerfil_${id}`;
-}
-
-function getFotoPerfil() {
-    if (artistaActual && artistaActual.foto_perfil) return artistaActual.foto_perfil;
-    try {
-        return localStorage.getItem(getFotoPerfilKey()) || '';
-    } catch (e) {
-        return '';
-    }
-}
-
-function guardarFotoPerfil(dataUrl) {
-    try {
-        localStorage.setItem(getFotoPerfilKey(), dataUrl);
-    } catch (e) {
-        console.error('No se pudo guardar la foto de perfil:', e);
-    }
-    if (artistaActual) {
-        artistaActual.foto_perfil = dataUrl;
-        try {
-            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
-        } catch (e) {
-            console.error('No se pudo actualizar el artista en localStorage:', e);
-        }
-    }
-}
-
-function actualizarPerfilUI() {
-    const onlineIndicator = document.getElementById('perfil-online-indicator');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    const viendoPerfilExterno = perfilUsuario && perfilUsuario.dataset.viewing === 'external';
-    
-    // Si estamos viendo un perfil externo, no sobrescribir sus datos con los del usuario logueado
-    if (!viendoPerfilExterno) {
-        const src = getFotoPerfil() || AVATAR_DEFAULT;
-        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
-            const img = document.getElementById(id);
-            if (img) img.src = src;
-        });
-        const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
-        const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
-        const ciudad = (artistaActual && artistaActual.ciudad) || '';
-        
-        document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
-        document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
-        document.querySelectorAll('.perfil-ciudad').forEach(el => {
-            el.textContent = ciudad ? ciudad : '';
-        });
-    }
-
-    // Mostrar indicador de estado en línea solo para perfil propio
-    // Para perfil externo: se maneja en verPerfilUsuario basado en datos del usuario externo
-    if (onlineIndicator) {
-        if (!viendoPerfilExterno && token && artistaActual) {
-            // Perfil propio: mostrar si el usuario tiene sesión iniciada y está activo
-            const activo = verificarActividadLocal();
-            if (activo) {
-                onlineIndicator.classList.add('online');
-                onlineIndicator.classList.remove('offline');
-                onlineIndicator.style.display = 'block';
-            } else {
-                onlineIndicator.classList.remove('online');
-                onlineIndicator.classList.add('offline');
-                onlineIndicator.style.display = 'block';
-            }
-        } else if (!viendoPerfilExterno) {
-            // No hay sesión o no es perfil propio
-            onlineIndicator.classList.remove('online');
-            onlineIndicator.classList.add('offline');
-            onlineIndicator.style.display = 'none';
-        }
-    }
-}
-
-// Sube la foto de perfil al servidor (Cloudinary vía backend) y devuelve la URL.
-async function subirFotoPerfilServidor(file) {
-    const formData = new FormData();
-    formData.append('foto', file);
-    const authToken = localStorage.getItem(TOKEN_KEY);
-    const res = await fetch(`${API_BASE_URL}/api/artistas/foto-perfil`, {
-        method: 'POST',
-        headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
-        body: formData
-    });
-    return await res.json();
-}
-
-// Refresca la foto de perfil desde el servidor (para sesiones ya iniciadas
-// que aún no tienen la URL guardada en localStorage).
-async function refrescarPerfilDesdeServidor() {
-    try {
-        const res = await apiRequest('/api/artistas/perfil');
-        if (res && res.success && res.artista) {
-            if (artistaActual) {
-                artistaActual.foto_perfil = res.artista.foto_perfil || artistaActual.foto_perfil || '';
-                if (res.artista.nombre_real) artistaActual.nombre_real = res.artista.nombre_real;
-                try {
-                    localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
-                } catch (e) { /* noop */ }
-            }
-            actualizarPerfilUI();
-        }
-    } catch (e) {
-        // Si falla, se mantiene la foto local/por defecto.
-    }
 }
 
 // ============================================
@@ -336,16 +134,6 @@ function updateCerrarTodasSesionesButtonState() {
         } else {
             desktopLogoutAllBtn.classList.add('disabled');
             desktopLogoutAllBtn.classList.remove('enabled');
-        }
-    }
-    const headerAllBtn = document.getElementById('header-logout-all');
-    if (headerAllBtn) {
-        if (isEnabled) {
-            headerAllBtn.classList.remove('disabled');
-            headerAllBtn.classList.add('enabled');
-        } else {
-            headerAllBtn.classList.add('disabled');
-            headerAllBtn.classList.remove('enabled');
         }
     }
 }
@@ -416,12 +204,9 @@ function cerrarHeaderPopover(panelElement) {
 }
 
 function cerrarTodosLosPaneles() {
-    // Cerrar paneles de escritorio usando la variable global
     if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
         cerrarDesktopLogoutModal();
     }
-
-    // Cerrar paneles móviles
     const mobileLogoutModal = document.getElementById('mobile-logout-options');
     if (mobileLogoutModal && !mobileLogoutModal.classList.contains('hidden')) {
         cerrarMobileLogoutModal();
@@ -438,10 +223,8 @@ function positionHeaderPopover(triggerElement, panelElement) {
     const margin = 8;
     const iconCenterX = rect.left + rect.width / 2;
 
-    // Posicionar el panel DEBAJO del icono del header
     const top = rect.bottom + 12;
 
-    // Centrar horizontalmente sobre el icono, manteniendo aire con los bordes
     let left = iconCenterX - panelRect.width / 2;
     const maxLeft = window.innerWidth - panelRect.width - margin;
     if (left > maxLeft) left = maxLeft;
@@ -450,7 +233,6 @@ function positionHeaderPopover(triggerElement, panelElement) {
     panelElement.style.top = `${top}px`;
     panelElement.style.left = `${left}px`;
 
-    // Apuntar la cola exactamente bajo el icono
     const tailX = iconCenterX - left;
     panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
@@ -462,14 +244,11 @@ function positionDesktopPanel(triggerElement, panelElement) {
     if (!panelDiv) return;
 
     const panelRect = panelDiv.getBoundingClientRect();
-    const margin = 16; // Aumentado para más aire con el borde
-
-    // Posicionar el panel arriba del botón (barra inferior)
+    const margin = 16;
     const iconCenterX = rect.left + rect.width / 2;
     let top = rect.top - panelRect.height - 12;
     if (top < margin) top = margin;
 
-    // Centrar horizontalmente sobre el botón, pero mantener aire con el borde
     let left = iconCenterX - panelRect.width / 2;
     const maxLeft = window.innerWidth - panelRect.width - margin;
     if (left > maxLeft) left = maxLeft;
@@ -478,7 +257,6 @@ function positionDesktopPanel(triggerElement, panelElement) {
     panelElement.style.top = `${top}px`;
     panelElement.style.left = `${left}px`;
 
-    // Point the tail exactly under the icon, regardless of the bubble offset
     const tailX = iconCenterX - left;
     panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
@@ -493,7 +271,6 @@ function positionMobilePanel(triggerElement, panelElement) {
     const iconCenterX = iconRect.left + iconRect.width / 2;
     const margin = 8;
 
-    // Position the panel directly with fixed positioning
     let top = iconRect.top - panelRect.height - 12;
     if (top < margin) top = margin;
 
@@ -505,775 +282,8 @@ function positionMobilePanel(triggerElement, panelElement) {
     panelDiv.style.top = `${top}px`;
     panelDiv.style.left = `${left}px`;
 
-    // Point the tail exactly under the icon
     const tailX = iconCenterX - left;
     panelDiv.style.setProperty('--tail-x', `${tailX}px`);
-}
-
-// ============================================
-// VARIABLE PARA RASTREAR CAMBIOS NO GUARDADOS
-// ============================================
-let hayCambiosNoGuardados = false;
-
-// Marcar cuando hay cambios en el formulario de obra
-function setupFormChangeTracking() {
-    const form = document.getElementById('obra-form');
-    if (!form) return;
-    
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        const evento = input.tagName === 'SELECT' ? 'change' : 'input';
-        input.addEventListener(evento, () => {
-            hayCambiosNoGuardados = true;
-        });
-    });
-}
-
-// Preguntar antes de descartar cambios
-function confirmarDescartarCambios() {
-    if (hayCambiosNoGuardados) {
-        return confirm('⚠️ Tienes cambios sin guardar en el formulario. ¿Estás seguro de que quieres descartarlos?');
-    }
-    return true;
-}
-
-// Variable de control para el modo de galería: 0=oculta, 1=vista normal (azul), 2=vista grid (amarillo)
-let galeriaModo = 0;
-let gridExiting = false;   // Bloquea doble clic durante animación de salida del grid
-let gridEntering = false;  // Bloquea doble clic durante animación de entrada al grid
-
-// Referencia al contenedor de galería para el modo grid
-function obtenerGaleriaContainer() {
-    return document.getElementById('galeria-container');
-}
-
-// Actualiza el estado visual de los botones de navegación inferior
-function actualizarEstadoNavButtons() {
-    const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
-    const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const galeriaContainer = obtenerGaleriaContainer();
-
-    if (galeria && btnGaleriaSidebar) {
-        const galeriaVisible = !galeria.classList.contains('hidden');
-        btnGaleriaSidebar.classList.remove('nav-btn-active', 'nav-btn-grid');
-
-        if (galeriaVisible) {
-            if (galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
-                btnGaleriaSidebar.classList.add('nav-btn-grid');
-            } else {
-                btnGaleriaSidebar.classList.add('nav-btn-active');
-            }
-        }
-    }
-    if (panel && btnRegistroSidebar) {
-        btnRegistroSidebar.classList.toggle('nav-btn-active', !panel.classList.contains('hidden'));
-    }
-}
-
-// ============================================
-// MANEJO DE VISTAS (Galería, Panel, Página Blanca)
-// ============================================
-// ============================================
-// SISTEMA DE TRANSICIONES ENTRE SECCIONES
-// ============================================
-let isTransitioning = false;
-const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
-
-function encontrarSeccionActual() {
-    for (const id of SECCIONES) {
-        const el = document.getElementById(id);
-        if (el && !el.classList.contains('hidden')) return el;
-    }
-    return document.getElementById('pagina-blanca');
-}
-
-// Oculta una sección con animación de salida, luego muestra la entrante
-function switchSection(sectionSaliente, sectionEntrante, callback) {
-    if (isTransitioning) return; // Bloquear clics durante transición
-    if (!sectionEntrante) return;
-    if (sectionSaliente === sectionEntrante) return;
-
-    isTransitioning = true;
-
-    // Timeout de seguridad: si animationend no se dispara, forzar después de 800ms
-    const safetyTimeout = setTimeout(() => {
-        isTransitioning = false;
-        for (const id of SECCIONES) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.remove('section-entering', 'section-exiting');
-                el.classList.add('hidden');
-            }
-        }
-        if (sectionEntrante) {
-            sectionEntrante.classList.remove('hidden');
-            if (callback) callback();
-        }
-    }, 800);
-
-    function finish() {
-        clearTimeout(safetyTimeout);
-        isTransitioning = false;
-    }
-
-    if (sectionSaliente) {
-        sectionSaliente.classList.remove('section-entering');
-        sectionSaliente.classList.add('section-exiting');
-        sectionSaliente.addEventListener('animationend', function onExit() {
-            sectionSaliente.removeEventListener('animationend', onExit);
-            sectionSaliente.classList.remove('section-exiting');
-            sectionSaliente.classList.add('hidden');
-            finish();
-            mostrarSeccion(sectionEntrante, callback);
-        }, { once: true });
-    } else {
-        finish();
-        mostrarSeccion(sectionEntrante, callback);
-    }
-}
-
-function mostrarSeccion(section, callback) {
-    if (!section) return;
-    // Usar requestAnimationFrame para que el display se aplique antes de la animación
-    section.classList.remove('hidden', 'section-exiting');
-    actualizarEstadoNavButtons();    // Sincroniza indicador visual de botones de navegación
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            section.classList.add('section-entering');
-            section.addEventListener('animationend', function onEnter() {
-                section.removeEventListener('animationend', onEnter);
-                section.classList.remove('section-entering');
-                if (callback) callback();
-            }, { once: true });
-        });
-    });
-}
-
-function ocultarTodasLasSecciones() {
-    SECCIONES.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.classList.remove('section-entering', 'section-exiting');
-            el.classList.add('hidden');
-        }
-    });
-}
-
-function mostrarPaginaBlanca() {
-    ocultarTodasLasSecciones();
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (paginaBlanca) paginaBlanca.classList.remove('hidden');
-    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-}
-
-// Ejecuta la animación de salida del modo grid (amarillo) sobre las tarjetas
-// actuales y, al terminar, invoca onComplete. No cambia galeriaModo ni realiza
-// ningún cambio de sección: eso lo decide quien llama a esta función.
-function salirDeModoGrid(onComplete) {
-    const galeriaContainerLocal = obtenerGaleriaContainer();
-    gridExiting = true;
-
-    if (!galeriaContainerLocal) {
-        gridExiting = false;
-        if (onComplete) onComplete();
-        return;
-    }
-
-    const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-    cards.forEach(c => c.classList.add('modo-grid-exit'));
-
-    let animEndHandled = false;
-    const lastCard = cards[cards.length - 1];
-    const onAnimEnd = () => {
-        if (animEndHandled) return;   // Evita ejecutar dos veces (animationend + timeout)
-        animEndHandled = true;
-        gridExiting = false;
-        galeriaContainerLocal.classList.remove('modo-grid');
-        cards.forEach(c => c.classList.remove('modo-grid-exit'));
-        if (onComplete) onComplete();
-    };
-
-    if (lastCard) {
-        lastCard.addEventListener('animationend', onAnimEnd, { once: true });
-        // Timeout de seguridad por si animationend no se dispara
-        setTimeout(onAnimEnd, 600);
-    } else {
-        gridExiting = false;
-        onAnimEnd();
-    }
-}
-
-// Se invoca al hacer clic en el avatar de un artista dentro de una tarjeta de
-// la galería (funciona tanto en modo azul como en modo grid/amarillo): abre
-// el perfil de ese artista y deja la galería en un estado limpio para cuando
-// el usuario vuelva a ella.
-function verPerfilArtistaDesdeGaleria(artistaId) {
-    galeriaModo = 0;
-    gridEntering = false;
-    gridExiting = false;
-    const galeriaContainerLocal = obtenerGaleriaContainer();
-    if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
-
-    // Ocultar la galería de inmediato (sin pasar visualmente por el modo azul)
-    // mientras se carga el perfil del artista, así se evita el destello previo
-    // durante el tiempo que tarda la petición al backend.
-    const galeria = document.getElementById('galeria-publica');
-    if (galeria) galeria.classList.add('hidden');
-    mostrarPaginaBlanca();
-
-    verPerfilUsuario(artistaId);
-}
-
-// Se invoca al hacer clic en una obra mientras la galería está en modo grid
-// (amarillo): sale del grid y muestra esa misma obra en modo normal (azul),
-// desplazando la vista hasta ella.
-function seleccionarObraDesdeGrid(obraId) {
-    if (galeriaModo !== 2 || gridExiting || gridEntering) return;
-
-    galeriaModo = 1;
-    actualizarEstadoNavButtons();
-
-    salirDeModoGrid(() => {
-        const galeriaContainerLocal = obtenerGaleriaContainer();
-        if (!galeriaContainerLocal) return;
-
-        // Esperar un frame a que el layout normal (tarjetas a tamaño de viewport)
-        // se aplique tras quitar 'modo-grid', para calcular el offset correcto y
-        // que el "magnetismo" (scroll-snap) quede exactamente ajustado a la tarjeta.
-        requestAnimationFrame(() => {
-            const targetCard = galeriaContainerLocal.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
-            if (targetCard) {
-                galeriaContainerLocal.scrollTop = targetCard.offsetTop;
-            }
-
-            // Animar entrada al modo normal (igual que al abrir la galería normalmente)
-            const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-            cards.forEach(c => c.classList.add('modo-flex-enter'));
-        });
-    });
-}
-
-function toggleGaleria() {
-    if (isTransitioning || gridEntering || gridExiting || !confirmarDescartarCambios()) return;
-    
-    const galeria = document.getElementById('galeria-publica');
-    const galeriaContainerLocal = obtenerGaleriaContainer();
-    if (!galeria) return;
-
-    // Ciclo: oculta(0) → normal/azul(1) → grid/amarillo(2) → oculta(0)
-    if (galeria.classList.contains('hidden')) {
-        // Mostrar en modo normal (azul)
-        galeriaModo = 1;
-        if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        
-        // Vaciar tarjetas residuales del ciclo anterior para evitar que se muestren
-        // brevemente (sin animar) mientras la sección hace fade-in, antes de ser
-        // reemplazadas por las nuevas tarjetas cargadas en el callback.
-        if (galeriaContainerLocal) {
-            galeriaContainerLocal.innerHTML = '';
-        }
-
-        switchSection(encontrarSeccionActual(), galeria, () => {
-            cargarGaleria(galeriaContainer).then(obras => {
-                mostrarGaleria(obras, galeriaContainer, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
-                });
-                // Animar entrada al modo normal
-                if (galeriaContainerLocal) {
-                    galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c, i) => {
-                        c.classList.add('modo-flex-enter');
-                    });
-                }
-            });
-        });
-    } else if (galeriaModo === 1) {
-        // Cambiar a modo grid (amarillo) — animación CSS automática
-        galeriaModo = 2;
-        gridEntering = true;   // Evita doble clic mientras las tarjetas animan su entrada al grid
-        if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
-        actualizarEstadoNavButtons();
-
-        // Duración máxima de la animación de entrada (gridCardEnter 0.35s + mayor delay 0.35s)
-        setTimeout(() => { gridEntering = false; }, 700);
-    } else {
-        // Salir del modo grid con animación de salida
-        galeriaModo = 0;
-        salirDeModoGrid(() => switchSection(galeria, document.getElementById('pagina-blanca')));
-    }
-}
-
-function togglePanel() {
-    if (isTransitioning) return;
-    
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (!panel || !paginaBlanca) return;
-
-    // Resetear modo galería al cambiar de sección
-    galeriaModo = 0;
-    const gc = obtenerGaleriaContainer();
-    if (gc) gc.classList.remove('modo-grid');
-
-    if (panel.classList.contains('hidden')) {
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        if (artistaActual && artistaActual.nombre_artista) {
-            const inputArtista = document.getElementById('input-artista');
-            if (inputArtista && !inputArtista.value) {
-                inputArtista.value = artistaActual.nombre_artista;
-            }
-        }
-        switchSection(encontrarSeccionActual(), panel, () => { refrescarTabla(); });
-    } else {
-        switchSection(panel, paginaBlanca);
-    }
-}
-
-function toggleMiCuenta() {
-    if (isTransitioning) return;
-    
-    const miCuenta = document.getElementById('mi-cuenta');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (!miCuenta || !paginaBlanca) return;
-
-    if (miCuenta.classList.contains('hidden')) {
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        const emailInput = document.getElementById('cuenta-email-actual');
-        if (emailInput && artistaActual) {
-            emailInput.value = artistaActual.email || artistaActual.correo || '';
-        }
-        const avatarBtn = document.getElementById('perfil-avatar-btn');
-        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
-        switchSection(encontrarSeccionActual(), miCuenta);
-    } else {
-        switchSection(miCuenta, paginaBlanca);
-    }
-}
-
-function togglePerfil() {
-    if (isTransitioning) return;
-    
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    if (!perfilUsuario || !paginaBlanca) return;
-
-    const viendoPerfilExterno = perfilUsuario.dataset.viewing === 'external';
-
-    if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
-        actualizarPerfilUI();
-        perfilUsuario.dataset.viewing = 'own';
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
-        const avatarBtn = document.getElementById('perfil-avatar-btn');
-        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
-        window.actualizarEstadisticas();
-        switchSection(encontrarSeccionActual(), perfilUsuario);
-    } else {
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        switchSection(perfilUsuario, paginaBlanca);
-    }
-}
-
-function setupPerfilInteracciones() {
-    const btn = document.getElementById('btn-perfil-sidebar');
-    if (!btn) return;
-
-    const abrirPerfil = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        cerrarTodosLosPaneles();
-        togglePerfil();
-    };
-    btn.addEventListener('click', abrirPerfil);
-
-    // Nuevo: clic en el avatar abre el selector de archivos
-    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
-        document.getElementById('input-foto-perfil')?.click();
-    });
-}
-
-// ============================================
-// HELPERS DE PREVISUALIZACIÓN DE IMÁGENES
-// ============================================
-function aplicarPreviewImagen(index, url) {
-    const preview = document.getElementById(`preview-${index}`);
-    const placeholder = document.getElementById(`placeholder-${index}`);
-    if (!preview || !placeholder) return;
-    preview.src = url;
-    preview.style.display = 'block';
-    placeholder.style.display = 'none';
-    const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
-    if (!recuadro) return;
-    const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-    if (btnExistente) btnExistente.remove();
-    const btnEliminar = document.createElement('button');
-    btnEliminar.type = 'button';
-    btnEliminar.className = 'btn-eliminar-imagen';
-    btnEliminar.dataset.index = index;
-    btnEliminar.textContent = '✕';
-    btnEliminar.style.display = 'block';
-    recuadro.style.position = 'relative';
-    recuadro.appendChild(btnEliminar);
-    btnEliminar.addEventListener('click', function() {
-        const idx = parseInt(this.dataset.index);
-        const previewImg = document.getElementById(`preview-${idx}`);
-        const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-        const inputFile = document.getElementById(`input-imagen-${idx}`);
-        if (previewImg.src && previewImg.src !== '') {
-            imagenesAEliminar.add(idx);
-            previewImg.src = '';
-            previewImg.style.display = 'none';
-            placeholderSpan.style.display = 'block';
-            if (inputFile) inputFile.value = '';
-            this.style.display = 'none';
-        }
-    });
-}
-
-// Descarga una imagen existente (por URL) y la coloca como archivo en el input,
-// para que al duplicar una obra esas imágenes se guarden en la nueva obra.
-async function cargarUrlEnInput(index, url) {
-    try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const blob = await resp.blob();
-        const ext = (blob.type && blob.type.split('/')[1]) || 'jpg';
-        const file = new File([blob], `duplicada-${index}.${ext}`, { type: blob.type || 'image/jpeg' });
-        const input = document.getElementById(`input-imagen-${index}`);
-        if (input) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            input.files = dt.files;
-        }
-        return true;
-    } catch (err) {
-        console.error('No se pudo cargar la imagen para duplicar:', url, err);
-        return false;
-    }
-}
-
-// ============================================
-// RENDERIZADO DE TABLA (Panel del Artista)
-// ============================================
-async function refrescarTabla() {
-    const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
-    if (!result.success) {
-        console.error("Error al cargar obras:", result.error);
-        if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
-            showWarning("Tu sesión ha expirado. Serás redirigido a la página principal.");
-            localStorage.removeItem(TOKEN_KEY);
-            localStorage.removeItem(ARTISTA_KEY);
-            window.location.href = '/';
-            return;
-        }
-        mostrarErrores(result);
-        return;
-    }
-    const obras = result.obras;
-    totalObras = result.total;
-    const totalPages = Math.ceil(totalObras / currentLimit);
-    document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-    document.getElementById('btn-prev').disabled = currentPage <= 1;
-    document.getElementById('btn-next').disabled = currentPage >= totalPages;
-    renderizarTabla(obras, tablaBody,
-        async (id) => {
-            try {
-                const data = await apiRequest(`/obras/${id}`);
-                if (!data) return;
-                if (data.success === false) {
-                    console.error('Error al obtener obra:', data.error);
-                    showError('Error al cargar la obra: ' + data.error);
-                    return;
-                }
-                const obra = data;
-                document.getElementById('input-id-edicion').value = obra.id;
-                document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-                document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = obra.id_personalizado;
-                document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
-                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
-                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
-                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
-                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
-                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
-                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
-                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
-                document.getElementById('input-ancho').value = obra.ancho || '';
-                document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
-                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
-                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
-                document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
-                const imagenes = [
-                    obra.imagen_url,
-                    obra.imagen_url_1,
-                    obra.imagen_url_2,
-                    obra.imagen_url_3,
-                    obra.imagen_url_4
-                ];
-                document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
-                imagenes.forEach((url, index) => {
-                    if (url) {
-                        const preview = document.getElementById(`preview-${index}`);
-                        const placeholder = document.getElementById(`placeholder-${index}`);
-                        if (preview && placeholder) {
-                            preview.src = url;
-                            preview.style.display = 'block';
-                            placeholder.style.display = 'none';
-                            const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
-                            if (recuadro) {
-                                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                                if (btnExistente) btnExistente.remove();
-                                const btnEliminar = document.createElement('button');
-                                btnEliminar.type = 'button';
-                                btnEliminar.className = 'btn-eliminar-imagen';
-                                btnEliminar.dataset.index = index;
-                                btnEliminar.textContent = '✕';
-                                btnEliminar.style.cssText = `
-                                    position: absolute; top: 0; right: 0;
-                                    background: #dc3545; color: white;
-                                    border: none; border-radius: 50%;
-                                    width: 24px; height: 24px;
-                                    cursor: pointer; font-size: 14px;
-                                    display: block; z-index: 10;
-                                    line-height: 24px; text-align: center;
-                                `;
-                                recuadro.style.position = 'relative';
-                                recuadro.appendChild(btnEliminar);
-                                btnEliminar.addEventListener('click', function() {
-                                    const idx = parseInt(this.dataset.index);
-                                    const previewImg = document.getElementById(`preview-${idx}`);
-                                    const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-                                    const inputFile = document.getElementById(`input-imagen-${idx}`);
-                                    if (previewImg.src && previewImg.src !== '') {
-                                        imagenesAEliminar.add(idx);
-                                        previewImg.src = '';
-                                        previewImg.style.display = 'none';
-                                        placeholderSpan.style.display = 'block';
-                                        inputFile.value = '';
-                                        this.style.display = 'none';
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
-                document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                // Actualizar iconos de accordions y progress indicator
-                updateFormProgress();
-            } catch (error) {
-                console.error("Error al cargar datos de la obra:", error);
-                showError("Error al cargar la obra para editar");
-            }
-        },
-        async (id) => {
-            if (!confirm('¿Estás seguro de eliminar esta obra?')) return;
-            const btnEliminar = document.querySelector(`.btn-eliminar[data-id="${id}"]`);
-            if (btnEliminar) setButtonLoading(btnEliminar, true);
-            
-            const exito = await eliminarObra(token, id);
-            if (btnEliminar) setButtonLoading(btnEliminar, false);
-            
-            if (exito) {
-                showSuccess("Obra eliminada correctamente.");
-                await refrescarTabla();
-
-                // 🔥 ACTUALIZAR ESTADÍSTICAS SIEMPRE (sin condición)
-                window.actualizarEstadisticas();
-            } else {
-                showError("Error al eliminar la obra.");
-            }
-        },
-        async (id) => {
-            try {
-                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
-                if (btnDuplicar) setButtonLoading(btnDuplicar, true);
-                
-                const res = await apiRequest(`/obras/${id}`);
-                if (!res) return;
-                const obra = res;
-                
-                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
-                
-                document.getElementById('input-id-edicion').value = '';
-                document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-                document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = decodeHTMLEntities(obra.id_personalizado);
-                document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
-                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
-                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
-                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
-                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
-                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
-                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
-                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
-                document.getElementById('input-ancho').value = obra.ancho || '';
-                document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
-                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
-                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
-
-                // Reiniciar imágenes y marcas de eliminación
-                imagenesAEliminar.clear();
-                document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
-                for (let i = 0; i < 5; i++) {
-                    const preview = document.getElementById(`preview-${i}`);
-                    const placeholder = document.getElementById(`placeholder-${i}`);
-                    if (preview && placeholder) {
-                        preview.src = '';
-                        preview.style.display = 'none';
-                        placeholder.style.display = 'block';
-                    }
-                    const inputImg = document.getElementById(`input-imagen-${i}`);
-                    if (inputImg) inputImg.value = '';
-                }
-
-                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
-                document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                document.getElementById('input-id-personalizado').focus();
-
-                // Mostrar las imágenes de la obra original y cargarlas como archivos
-                // para que la obra duplicada se guarde con las mismas imágenes.
-                const imagenesDuplicar = [
-                    obra.imagen_url,
-                    obra.imagen_url_1,
-                    obra.imagen_url_2,
-                    obra.imagen_url_3,
-                    obra.imagen_url_4
-                ];
-                imagenesDuplicar.forEach((url, index) => {
-                    if (url) aplicarPreviewImagen(index, url);
-                });
-                let algunaCargada = false;
-                for (let index = 0; index < imagenesDuplicar.length; index++) {
-                    const url = imagenesDuplicar[index];
-                    if (url) {
-                        const ok = await cargarUrlEnInput(index, url);
-                        if (ok) algunaCargada = true;
-                    }
-                }
-                if (!algunaCargada && imagenesDuplicar.some(Boolean)) {
-                    showWarning("No se pudieron cargar automáticamente las imágenes. Vuelve a subirlas antes de guardar la obra duplicada.");
-                }
-                // Actualizar iconos de accordions y progress indicator
-                updateFormProgress();
-            } catch (error) {
-                console.error("Error al duplicar:", error);
-                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
-                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
-                showError("Error al duplicar la obra.");
-            }
-        }
-    );
-}
-
-async function mostrarPanelArtista() {
-    document.getElementById('galeria-publica').classList.add('hidden');
-    document.getElementById('perfil-usuario')?.classList.add('hidden');
-    panelArtista.classList.remove('hidden');
-    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-    if (artistaActual) {
-        document.getElementById('input-artista').value = artistaActual.nombre_artista;
-    }
-    await refrescarTabla();
-}
-
-function mostrarGaleriaPublica() {
-    document.getElementById('panel-artista').classList.add('hidden');
-    document.getElementById('perfil-usuario')?.classList.add('hidden');
-    document.getElementById('galeria-publica').classList.remove('hidden');
-    if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-    cargarGaleria(galeriaContainer).then(obras => {
-        mostrarGaleria(obras, galeriaContainer, (id) => {
-            console.log("Ver detalles de obra con ID:", id);
-        });
-    });
-}
-
-// ============================================
-// PREVISUALIZACIÓN DE IMÁGENES
-// ============================================
-function setupImagePreviews() {
-    for (let i = 0; i < 5; i++) {
-        const input = document.getElementById(`input-imagen-${i}`);
-        const preview = document.getElementById(`preview-${i}`);
-        const placeholder = document.getElementById(`placeholder-${i}`);
-        if (input) {
-            input.addEventListener('change', function(e) {
-                const file = this.files[0];
-                const recuadro = this.closest('.recuadro-imagen');
-                if (!recuadro) return;
-                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                if (btnExistente) btnExistente.remove();
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        if (preview) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
-                        }
-                        if (placeholder) placeholder.style.display = 'none';
-                        const btnEliminar = document.createElement('button');
-                        btnEliminar.type = 'button';
-                        btnEliminar.className = 'btn-eliminar-imagen';
-                        btnEliminar.dataset.index = i;
-                        btnEliminar.textContent = '✕';
-                        btnEliminar.style.cssText = `
-                            position: absolute; top: 0; right: 0;
-                            background: #dc3545; color: white;
-                            border: none; border-radius: 50%;
-                            width: 24px; height: 24px;
-                            cursor: pointer; font-size: 14px;
-                            display: block; z-index: 10;
-                            line-height: 24px; text-align: center;
-                        `;
-                        recuadro.style.position = 'relative';
-                        recuadro.appendChild(btnEliminar);
-                        btnEliminar.addEventListener('click', function() {
-                            const idx = parseInt(this.dataset.index);
-                            const previewImg = document.getElementById(`preview-${idx}`);
-                            const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-                            const inputFile = document.getElementById(`input-imagen-${idx}`);
-                            if (previewImg.src && previewImg.src !== '') {
-                                previewImg.src = '';
-                                previewImg.style.display = 'none';
-                                placeholderSpan.style.display = 'block';
-                                inputFile.value = '';
-                                this.remove();
-                                // Leer dinámicamente para detectar si estamos en modo edición
-                                const editId = document.getElementById('input-id-edicion').value;
-                                if (editId) {
-                                    imagenesAEliminar.add(idx);
-                                }
-                            }
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    if (preview) {
-                        preview.src = '';
-                        preview.style.display = 'none';
-                    }
-                    if (placeholder) placeholder.style.display = 'block';
-                    const btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
-                    if (btnEliminar) btnEliminar.remove();
-                }
-            });
-        }
-    }
 }
 
 // ============================================
@@ -1290,10 +300,13 @@ async function verificarSesionBackend() {
 }
 
 // ============================================
-// CONFIGURACIÓN DE EVENTOS (setupEvents)
+// CONFIGURACIÓN DE EVENTOS (ORQUESTADOR)
 // ============================================
 function setupEvents() {
-    // ----- Botón de logout del header (bocadillo con opciones) -----
+    // ----- Resolver dependencia circular: galeria-ui -> panel-ui.refrescarTabla -----
+    setRefrescarTablaFn(() => refrescarTabla(tablaBody));
+
+    // ----- Botón de logout del header -----
     const logoutHeaderBtn = document.getElementById('btn-logout-header');
     if (logoutHeaderBtn) {
         const headerLogoutMenu = document.getElementById('header-logout-menu');
@@ -1341,191 +354,12 @@ function setupEvents() {
     }
 
     // ----- Buscador de usuarios en tiempo real -----
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const searchDropdown = document.getElementById('search-results-dropdown');
+    setupBuscador(
+        (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
+        (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons))
+    );
 
-    console.log("Elementos del buscador:", { searchInput, searchBtn, searchDropdown });
-
-    if (searchInput && searchBtn && searchDropdown) {
-        console.log("Buscador inicializado correctamente");
-
-        // Debounce para no saturar el servidor
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        // Cerrar el dropdown al hacer clic fuera
-        const cerrarDropdown = () => {
-            console.log("Cerrando dropdown");
-            searchDropdown.classList.add('hidden');
-            searchInput.classList.remove('input-available', 'input-unavailable');
-        };
-
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
-                cerrarDropdown();
-            }
-        });
-
-        // Renderizar resultados en el dropdown
-        const renderizarResultadosDropdown = (usuarios) => {
-            console.log("Renderizando dropdown con usuarios:", usuarios);
-            searchDropdown.innerHTML = '';
-            
-            if (!usuarios || usuarios.length === 0) {
-                searchDropdown.innerHTML = `<div class="search-no-results">No se encontraron usuarios</div>`;
-                searchDropdown.classList.remove('hidden');
-                console.log("Dropdown mostrado (sin resultados)");
-                return;
-            }
-
-            usuarios.forEach(usuario => {
-                const item = document.createElement('div');
-                item.className = 'search-result-item';
-
-                let avatarHTML = '';
-                if (usuario.foto_perfil) {
-                    avatarHTML = `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}" class="search-result-avatar">`;
-                } else {
-                    const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
-                    avatarHTML = `<div class="search-result-avatar-placeholder">${inicial}</div>`;
-                }
-
-                const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${usuario.nombre_real}</div>` : '';
-
-                item.innerHTML = `
-                    ${avatarHTML}
-                    <div class="search-result-info">
-                        <div class="search-result-name">${usuario.nombre_artista}</div>
-                        ${nombreReal}
-                    </div>
-                `;
-
-                item.addEventListener('click', () => {
-                    cerrarDropdown();
-                    verPerfilUsuario(usuario.id);
-                });
-
-                searchDropdown.appendChild(item);
-            });
-
-            // Calcular posición dinámica del dropdown
-            posicionarDropdown();
-
-            searchDropdown.classList.remove('hidden');
-            console.log("Dropdown mostrado con resultados. Clases:", searchDropdown.className);
-            console.log("Estilo computed:", window.getComputedStyle(searchDropdown).display);
-        };
-
-        // Reposicionar el dropdown según el wrapper del input (responsive en tiempo real)
-        const posicionarDropdown = () => {
-            const inputWrapper = searchInput.closest('.search-input-wrapper');
-            if (!inputWrapper) return;
-            const wrapperRect = inputWrapper.getBoundingClientRect();
-            searchDropdown.style.top = `${wrapperRect.top}px`;
-            searchDropdown.style.left = `${wrapperRect.left}px`;
-            searchDropdown.style.width = `${wrapperRect.width}px`;
-        };
-
-        // Mantener el dropdown alineado al cambiar tamaño de ventana o al hacer scroll
-        const reposicionarSiVisible = () => {
-            if (!searchDropdown.classList.contains('hidden')) {
-                posicionarDropdown();
-            }
-        };
-        window.addEventListener('resize', reposicionarSiVisible);
-        window.addEventListener('scroll', reposicionarSiVisible, true);
-
-        // Función de búsqueda en tiempo real (CON TOKEN)
-        const buscarUsuariosTiempoReal = async (query) => {
-            console.log("Buscando usuarios con query:", query);
-            if (query.length < 1) {
-                searchDropdown.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const token = localStorage.getItem(TOKEN_KEY);
-                const response = await fetch(`${API_BASE_URL}/api/artistas/buscar?q=${encodeURIComponent(query)}`, {
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    }
-                });
-                const data = await response.json();
-                console.log("Respuesta del backend:", data);
-                
-                if (data && data.success && Array.isArray(data.usuarios)) {
-                    renderizarResultadosDropdown(data.usuarios);
-                } else {
-                    console.warn("El backend no devolvió usuarios en el formato esperado:", data);
-                    renderizarResultadosDropdown([]);
-                }
-            } catch (error) {
-                console.error('Error en búsqueda en tiempo real:', error);
-                searchDropdown.classList.add('hidden');
-            }
-        };
-
-        // Versión con debounce de 500ms
-        const buscarConDebounce = debounce((query) => {
-            buscarUsuariosTiempoReal(query);
-        }, 500);
-
-        // Evento input
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            console.log(`Input: "${query}"`); // Para depuración
-            if (query.length >= 1) {
-                buscarConDebounce(query);
-                searchInput.classList.add('input-available');
-            } else {
-                searchDropdown.classList.add('hidden');
-                searchInput.classList.remove('input-available', 'input-unavailable');
-            }
-        });
-
-        // Botón de búsqueda tradicional
-        const buscarUsuarioConBoton = async () => {
-            const query = searchInput.value.trim();
-            if (query.length < 2) {
-                alert('El término de búsqueda debe tener al menos 2 caracteres');
-                return;
-            }
-            
-            try {
-                const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
-                if (response && response.success && response.usuarios.length > 0) {
-                    mostrarResultadosBusqueda(response.usuarios);
-                } else {
-                    alert('No se encontraron usuarios con ese nombre');
-                }
-            } catch (error) {
-                console.error('Error al buscar usuarios:', error);
-                alert('Error al buscar usuarios. Por favor intenta nuevamente.');
-            }
-        };
-
-        searchBtn.addEventListener('click', buscarUsuarioConBoton);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                buscarUsuarioConBoton();
-                cerrarDropdown();
-            }
-        });
-    } else {
-        console.error("No se encontraron los elementos del buscador");
-    }
-
-    // ----- Botón de configuración (bocadillo con "Mi cuenta") -----
+    // ----- Botón de configuración (Mi Cuenta) -----
     const configBtn = document.getElementById('btn-configuracion');
     if (configBtn) {
         const configMenu = document.getElementById('header-config-menu');
@@ -1561,61 +395,8 @@ function setupEvents() {
         });
     }
 
-    // ----- Botón de modo oscuro -----
-    const darkModeBtn = document.getElementById('btn-dark-mode');
-    const darkModeIcon = document.getElementById('dark-mode-icon');
-
-    // Función para determinar el tema basado en la hora
-    function getThemeByTime() {
-        const hour = new Date().getHours();
-        // 6 AM (6) a 6 PM (18): modo claro
-        // 6 PM (18) a 6 AM (6): modo oscuro
-        if (hour >= 6 && hour < 18) {
-            return 'light';
-        } else {
-            return 'dark';
-        }
-    }
-
-    // Función para actualizar el icono
-    function updateDarkModeIcon(theme) {
-        if (darkModeIcon) {
-            if (theme === 'dark') {
-                darkModeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-            } else {
-                darkModeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-            }
-        }
-    }
-
-    // Función para aplicar el tema
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        updateDarkModeIcon(theme);
-    }
-
-    // Inicializar tema: primero verificar preferencia guardada, si no hay, usar hora
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            applyTheme(savedTheme);
-        } else {
-            const timeBasedTheme = getThemeByTime();
-            applyTheme(timeBasedTheme);
-        }
-    }
-
-    // Inicializar tema al cargar
-    initializeTheme();
-
-    if (darkModeBtn) {
-        darkModeBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
-    }
+    // ----- Modo oscuro -----
+    setupDarkModeToggle();
 
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
@@ -1632,12 +413,10 @@ function setupEvents() {
                         positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
                             document.addEventListener('click', function onClickOutsideMobile(e) {
-                                // No cerrar si el clic es en otros botones de la barra de navegación
                                 const target = e.target;
                                 const isNavButton = target.closest('#btn-galeria-sidebar') ||
-                                                  target.closest('#btn-registro-sidebar') ||
-                                                  target.closest('#btn-perfil-sidebar');
-
+                                    target.closest('#btn-registro-sidebar') ||
+                                    target.closest('#btn-perfil-sidebar');
                                 if (!mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
                                     mobileModal.classList.add('hidden');
                                     document.removeEventListener('click', onClickOutsideMobile);
@@ -1689,16 +468,15 @@ function setupEvents() {
         });
     }
 
-    // ----- Botones de navegación de la barra inferior (Galería y Registro) -----
+    // ----- Botones de navegación de la barra inferior -----
     const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
     const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
 
     if (btnGaleriaSidebar) {
         btnGaleriaSidebar.addEventListener('click', () => {
-            toggleGaleria();
+            toggleGaleria(galeriaContainer);
         });
     }
-
     if (btnRegistroSidebar) {
         btnRegistroSidebar.addEventListener('click', () => {
             togglePanel();
@@ -1731,9 +509,7 @@ function setupEvents() {
         });
     }
 
-    // ========== LISTENERS CON VERIFICACIÓN DE EXISTENCIA ==========
-
-    // ✅ Filtros (solo si el usuario está logueado y los elementos existen)
+    // ----- Filtros -----
     const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
     if (btnAplicarFiltros) {
         btnAplicarFiltros.addEventListener('click', () => {
@@ -1742,17 +518,17 @@ function setupEvents() {
             currentOrder = document.getElementById('order-select').value;
             currentLimit = parseInt(document.getElementById('limit-select').value);
             currentPage = 1;
-            refrescarTabla();
+            refrescarTabla(tablaBody);
         });
     }
 
-    // ✅ Paginación (solo si existen)
+    // ----- Paginación -----
     const btnPrev = document.getElementById('btn-prev');
     if (btnPrev) {
         btnPrev.addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
-                refrescarTabla();
+                refrescarTabla(tablaBody);
             }
         });
     }
@@ -1762,13 +538,13 @@ function setupEvents() {
             const totalPages = Math.ceil(totalObras / currentLimit);
             if (currentPage < totalPages) {
                 currentPage++;
-                refrescarTabla();
+                refrescarTabla(tablaBody);
             }
         });
     }
 
-    // ----- Sección de perfil (avatar circular en la barra) -----
-    setupPerfilInteracciones();
+    // ----- Sección de perfil -----
+    setupPerfilInteracciones(togglePerfil, cerrarTodosLosPaneles);
 
     // ----- Cambiar foto de perfil -----
     const inputFotoPerfil = document.getElementById('input-foto-perfil');
@@ -1778,7 +554,6 @@ function setupEvents() {
             this.value = '';
             if (!file) return;
 
-            // 1) Vista previa local inmediata
             const reader = new FileReader();
             reader.onload = (e) => {
                 ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
@@ -1788,153 +563,34 @@ function setupEvents() {
             };
             reader.readAsDataURL(file);
 
-            // 2) Subida al servidor (Cloudinary)
             showInfo('Subiendo foto de perfil...');
             subirFotoPerfilServidor(file).then((res) => {
                 if (res && res.success && res.foto_perfil) {
                     guardarFotoPerfil(res.foto_perfil);
-                    actualizarPerfilUI();
+                    actualizarPerfilUI(verificarActividadLocal);
                     showSuccess('Foto de perfil actualizada.');
                 } else {
                     const msg = (res && res.error) ? res.error : 'No se pudo guardar la foto en el servidor.';
                     showError(msg);
-                    actualizarPerfilUI();
+                    actualizarPerfilUI(verificarActividadLocal);
                 }
             }).catch(() => {
                 showError('Error de conexión al subir la foto de perfil.');
-                actualizarPerfilUI();
+                actualizarPerfilUI(verificarActividadLocal);
             });
         });
     }
 
-    // ✅ Guardar obra (solo si existe el formulario)
-    if (obraForm) {
-        obraForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const titulo = document.getElementById('input-titulo').value;
-            const artista = document.getElementById('input-artista').value;
-            const precio = document.getElementById('input-precio').value;
-            const idPersonalizado = document.getElementById('input-id-personalizado').value;
-            const idEdicion = document.getElementById('input-id-edicion').value;
-            const ano = document.getElementById('input-ano').value;
-            const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-            const soporte = document.getElementById('input-soporte').value;
-            const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-            const estado_obra = document.getElementById('input-estado-obra').value;
-            const procedencia = document.getElementById('input-procedencia').value;
-            const marcos = document.getElementById('input-marcos').value;
-            const certificado = document.getElementById('input-certificado').value;
-            const status = document.getElementById('input-status').value;
-            const ancho = document.getElementById('input-ancho').value;
-            const alto = document.getElementById('input-alto').value;
-            const firma = document.getElementById('input-firma').value;
-            const conservacion = document.getElementById('input-conservacion').value;
-            const etiquetas = document.getElementById('input-etiquetas').value
-                .split(',')
-                .map(t => t.trim())
-                .filter(Boolean)
-                .join(', ');
-            const archivos = [
-                document.getElementById('input-imagen-0'),
-                document.getElementById('input-imagen-1'),
-                document.getElementById('input-imagen-2'),
-                document.getElementById('input-imagen-3'),
-                document.getElementById('input-imagen-4')
-            ];
-            let imagenFinalVisible = false;
-            const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
-            for (let i = 0; i < 5; i++) {
-                const preview = document.getElementById(`preview-${i}`);
-                if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
-                    imagenFinalVisible = true;
-                    break;
-                }
-            }
-            if (!hayArchivosNuevos && !imagenFinalVisible) {
-                showWarning("La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
-                return;
-            }
-            
-            const btnGuardar = document.getElementById('btn-guardar');
-            setButtonLoading(btnGuardar, true);
-            
-            const formData = new FormData();
-            formData.append('titulo', titulo);
-            formData.append('artista', artista);
-            formData.append('precio', precio);
-            formData.append('id_obra', idPersonalizado);
-            formData.append('ano', ano);
-            formData.append('descripcion_tecnica', descripcion_tecnica);
-            formData.append('soporte', soporte);
-            formData.append('descripcion_artistica', descripcion_artistica);
-            formData.append('estado_obra', estado_obra);
-            formData.append('procedencia', procedencia);
-            formData.append('marcos', marcos);
-            formData.append('certificado', certificado);
-            formData.append('status', status);
-            formData.append('ancho', ancho);
-            formData.append('alto', alto);
-            formData.append('firma', firma);
-            formData.append('conservacion', conservacion);
-            formData.append('etiquetas', etiquetas);
-            if (imagenesAEliminar.size > 0) {
-                formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
-            }
-            archivos.forEach((input, index) => {
-                if (input && input.files && input.files.length > 0) {
-                    formData.append(`imagen_${index}`, input.files[0]);
-                }
-            });
-            const result = await guardarObra(token, formData, idEdicion || null);
-            setButtonLoading(btnGuardar, false);
-            if (result.success) {
-                showSuccess("Obra guardada correctamente.");
-                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-                imagenesAEliminar.clear();
-                limpiarFormularioCompleto(true);
-                await refrescarTabla();
+    // ----- Formulario de obra (submit) -----
+    setupObraFormSubmit();
 
-                // 🔥 ACTUALIZAR ESTADÍSTICAS SIEMPRE (sin condición)
-                window.actualizarEstadisticas();
-            } else {
-                mostrarErrores(result);
-            }
-        });
-    }
-
-    function limpiarFormularioCompleto(restaurarArtista = true) {
-        obraForm.reset();
-        document.getElementById('input-id-edicion').value = '';
-        document.getElementById('btn-limpiar-campos').classList.add('hidden');
-        document.getElementById('btn-guardar').textContent = 'Guardar Obra';
-        imagenesAEliminar.clear();
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            const placeholder = document.getElementById(`placeholder-${i}`);
-            const inputFile = document.getElementById(`input-imagen-${i}`);
-            if (preview && placeholder) {
-                preview.src = '';
-                preview.style.display = 'none';
-                placeholder.style.display = 'block';
-            }
-            if (inputFile) inputFile.value = '';
-            const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
-            if (btnEliminar) btnEliminar.style.display = 'none';
-        }
-        if (restaurarArtista && artistaActual) {
-            document.getElementById('input-artista').value = artistaActual.nombre_artista;
-        }
-        // Reset accordion status and progress indicator
-        resetAccordionStatus();
-    }
-
-    // ✅ Limpiar campos (solo si existe)
+    // ----- Limpiar campos -----
     const btnLimpiar = document.getElementById('btn-limpiar-campos');
     if (btnLimpiar) {
         btnLimpiar.addEventListener('click', () => limpiarFormularioCompleto(true));
     }
 
-    // ✅ Navegación entre modales (siempre existen)
+    // ----- Navegación entre modales (login/registro) -----
     const btnIrRegistro = document.getElementById('btn-ir-registro');
     if (btnIrRegistro) {
         btnIrRegistro.addEventListener('click', () => {
@@ -1954,270 +610,10 @@ function setupEvents() {
         });
     }
 
-    // ✅ Eliminar cuenta (desplegable dentro del acordeón)
-    const btnEliminarCuenta = document.getElementById('btn-eliminar-cuenta');
-    const formEliminarCuenta = document.getElementById('form-eliminar-cuenta');
-    if (btnEliminarCuenta && formEliminarCuenta) {
-        btnEliminarCuenta.addEventListener('click', () => {
-            formEliminarCuenta.classList.toggle('hidden');
-        });
+    // ----- Mi Cuenta (email, password, eliminar cuenta) -----
+    setupMiCuenta();
 
-        formEliminarCuenta.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = document.getElementById('eliminar-password').value;
-            const errorEl = document.getElementById('error-eliminar-cuenta');
-            errorEl.textContent = '';
-            if (!password) {
-                errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
-                return;
-            }
-            const btnSubmit = formEliminarCuenta.querySelector('button[type="submit"]');
-            setButtonLoading(btnSubmit, true);
-            try {
-                const res = await apiRequest('/api/artistas/eliminar-cuenta', {
-                    method: 'POST',
-                    body: JSON.stringify({ password })
-                });
-                setButtonLoading(btnSubmit, false);
-                if (res && res.success) {
-                    showSuccess("Tu cuenta ha sido eliminada correctamente.");
-                    logout();
-                    location.reload();
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
-                } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-                }
-            } catch (error) {
-                setButtonLoading(btnSubmit, false);
-                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-            }
-        });
-    }
-
-    // ============================================
-    // MI CUENTA > SEGURIDAD (UI - pendiente de backend)
-    // ============================================
-    // Accordion para sección Seguridad
-    const accordionSeguridad = document.getElementById('accordion-seguridad');
-    const seguridadContent = document.getElementById('seguridad-content');
-    if (accordionSeguridad && seguridadContent) {
-        accordionSeguridad.addEventListener('click', () => {
-            const isExpanded = accordionSeguridad.getAttribute('aria-expanded') === 'true';
-            accordionSeguridad.setAttribute('aria-expanded', !isExpanded);
-            if (isExpanded) {
-                seguridadContent.hidden = true;
-                seguridadContent.style.maxHeight = '0';
-                seguridadContent.style.padding = '0 0';
-            } else {
-                seguridadContent.hidden = false;
-                // Pequeño delay para permitir que la transición funcione
-                setTimeout(() => {
-                    seguridadContent.style.maxHeight = '2000px';
-                    seguridadContent.style.padding = '20px 0';
-                }, 10);
-            }
-        });
-    }
-
-    const ocultarFormularioCuenta = (id) => {
-        const form = document.getElementById(id);
-        if (!form) return;
-        form.reset && form.reset();
-        form.classList.add('hidden');
-        form.querySelectorAll('.cuenta-error').forEach(e => (e.textContent = ''));
-        const strength = form.querySelector('#cuenta-password-strength');
-        if (strength) strength.removeAttribute('data-level');
-        const strengthText = form.querySelector('.strength-text');
-        if (strengthText) strengthText.textContent = '';
-    };
-
-    // Botones "Cancelar" de cualquier formulario de cuenta
-    document.querySelectorAll('.btn-cuenta-cancelar[data-cancelar]').forEach(btn => {
-        btn.addEventListener('click', () => ocultarFormularioCuenta(btn.dataset.cancelar));
-    });
-
-    // --- Cambiar correo electrónico ---
-    const btnCambiarEmail = document.getElementById('btn-cambiar-email');
-    const formCambiarEmail = document.getElementById('form-cambiar-email');
-    const formConfirmarEmail = document.getElementById('form-confirmar-email');
-    if (btnCambiarEmail && formCambiarEmail) {
-        btnCambiarEmail.addEventListener('click', () => {
-            ocultarFormularioCuenta('form-confirmar-email');
-            formCambiarEmail.classList.toggle('hidden');
-        });
-
-        // Paso 1 -> Paso 2 (confirmar contraseña)
-        formCambiarEmail.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
-            const errorEl = document.getElementById('error-nuevo-email');
-            errorEl.textContent = '';
-            const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail);
-            if (!emailValido) {
-                errorEl.textContent = 'Ingresa un correo electrónico válido.';
-                return;
-            }
-            const emailActual = (document.getElementById('cuenta-email-actual').value || '').trim().toLowerCase();
-            if (nuevoEmail.toLowerCase() === emailActual) {
-                errorEl.textContent = 'El nuevo correo debe ser diferente al actual.';
-                return;
-            }
-            formCambiarEmail.classList.add('hidden');
-            formConfirmarEmail.classList.remove('hidden');
-        });
-    }
-
-    if (formConfirmarEmail) {
-        // Paso 2: confirmar con contraseña (conectado al backend)
-        formConfirmarEmail.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = document.getElementById('email-password').value;
-            const errorEl = document.getElementById('error-email-password');
-            errorEl.textContent = '';
-            if (!password) {
-                errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
-                return;
-            }
-            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
-            const btnSubmit = formConfirmarEmail.querySelector('button[type="submit"]');
-            setButtonLoading(btnSubmit, true);
-            
-            try {
-                const res = await apiRequest('/api/artistas/cambiar-email', {
-                    method: 'POST',
-                    body: JSON.stringify({ nuevo_email: nuevoEmail, password })
-                });
-                
-                setButtonLoading(btnSubmit, false);
-                
-                if (res && res.success) {
-                    showSuccess(res.message);
-                    // Reflejar el nuevo correo en el input no editable y persistirlo.
-                    const emailInput = document.getElementById('cuenta-email-actual');
-                    if (emailInput) emailInput.value = nuevoEmail;
-                    if (artistaActual) {
-                        artistaActual.email = nuevoEmail;
-                        try {
-                            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
-                        } catch (e) {
-                            console.error('No se pudo actualizar el correo en localStorage:', e);
-                        }
-                    }
-                    ocultarFormularioCuenta('form-confirmar-email');
-                    ocultarFormularioCuenta('form-cambiar-email');
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
-                } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-                }
-            } catch (error) {
-                setButtonLoading(btnSubmit, false);
-                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-            }
-        });
-    }
-
-    // --- Cambiar contraseña ---
-    const btnCambiarPassword = document.getElementById('btn-cambiar-password');
-    const formCambiarPassword = document.getElementById('form-cambiar-password');
-    if (btnCambiarPassword && formCambiarPassword) {
-        btnCambiarPassword.addEventListener('click', () => {
-            formCambiarPassword.classList.toggle('hidden');
-        });
-
-        // Medidor de fuerza de la nueva contraseña
-        const passNueva = document.getElementById('pass-nueva');
-        const strengthWidget = document.getElementById('cuenta-password-strength');
-        const strengthText = strengthWidget ? strengthWidget.querySelector('.strength-text') : null;
-        if (passNueva && strengthWidget) {
-            passNueva.addEventListener('input', () => {
-                const val = passNueva.value;
-                if (!val) {
-                    strengthWidget.removeAttribute('data-level');
-                    if (strengthText) strengthText.textContent = '';
-                    return;
-                }
-                let score = 0;
-                if (val.length >= 8) score++;
-                if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
-                if (/\d/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
-                const nivel = Math.max(1, score);
-                strengthWidget.setAttribute('data-level', String(nivel));
-                if (strengthText) {
-                    strengthText.textContent = nivel === 1 ? 'Débil' : nivel === 2 ? 'Media' : 'Fuerte';
-                }
-            });
-        }
-
-        formCambiarPassword.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const actual = document.getElementById('pass-actual').value;
-            const nueva = document.getElementById('pass-nueva').value;
-            const confirmar = document.getElementById('pass-confirmar').value;
-            const errorEl = document.getElementById('error-pass-confirmar');
-            errorEl.textContent = '';
-            if (!actual || !nueva || !confirmar) {
-                errorEl.textContent = 'Completa todos los campos.';
-                return;
-            }
-            if (nueva.length < 8) {
-                errorEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.';
-                return;
-            }
-            if (nueva === actual) {
-                errorEl.textContent = 'La nueva contraseña debe ser diferente a la actual.';
-                return;
-            }
-            if (nueva !== confirmar) {
-                errorEl.textContent = 'Las contraseñas no coinciden.';
-                return;
-            }
-            const btnSubmit = formCambiarPassword.querySelector('button[type="submit"]');
-            setButtonLoading(btnSubmit, true);
-            
-            try {
-                const res = await apiRequest('/api/artistas/cambiar-password', {
-                    method: 'POST',
-                    body: JSON.stringify({ password_actual: actual, password_nueva: nueva })
-                });
-                
-                setButtonLoading(btnSubmit, false);
-                
-                if (res && res.success) {
-                    showSuccess(res.message);
-                    ocultarFormularioCuenta('form-cambiar-password');
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
-                } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-                }
-            } catch (error) {
-                setButtonLoading(btnSubmit, false);
-                errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
-            }
-        });
-    }
-
-    // ✅ Cerrar modales (siempre existen)
+    // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -2225,212 +621,25 @@ function setupEvents() {
         });
     });
 
-    // ✅ Tecla Escape para cerrar modales y paneles
+    // ----- Tecla Escape -----
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            // Cerrar modales
             document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
                 modal.classList.add('hidden');
             });
-            // Cerrar paneles flotantes
             cerrarTodosLosPaneles();
             cerrarHeaderPopover(document.getElementById('header-config-menu'));
             cerrarHeaderPopover(document.getElementById('header-logout-menu'));
-            // Cerrar dropdown de búsqueda
             const searchDropdown = document.getElementById('search-results-dropdown');
             if (searchDropdown) searchDropdown.classList.add('hidden');
         }
     });
-
-}
-
-// ============================================
-// MOSTRAR RESULTADOS DE BÚSQUEDA
-// ============================================
-function mostrarResultadosBusqueda(usuarios) {
-    // Ocultar todas las secciones
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
-    const miCuenta = document.getElementById('mi-cuenta');
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    const resultadosBusqueda = document.getElementById('resultados-busqueda');
-
-    if (galeria) galeria.classList.add('hidden');
-    if (panel) panel.classList.add('hidden');
-    if (paginaBlanca) paginaBlanca.classList.add('hidden');
-    if (miCuenta) miCuenta.classList.add('hidden');
-    if (perfilUsuario) perfilUsuario.classList.add('hidden');
-
-    // Mostrar sección de resultados de búsqueda
-    if (resultadosBusqueda) resultadosBusqueda.classList.remove('hidden');
-
-    // Llenar la lista de resultados
-    const resultadosLista = document.getElementById('resultados-busqueda-lista');
-    if (resultadosLista) {
-        resultadosLista.innerHTML = usuarios.map(usuario => `
-            <div class="resultado-item" data-user-id="${usuario.id}">
-                <div class="resultado-avatar">
-                    ${usuario.foto_perfil
-                        ? `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}">`
-                        : `<div class="avatar-placeholder">${usuario.nombre_artista.charAt(0).toUpperCase()}</div>`
-                    }
-                </div>
-                <div class="resultado-info">
-                    <div class="resultado-nombre">${usuario.nombre_artista}</div>
-                    <div class="resultado-nombre-real">${usuario.nombre_real || ''}</div>
-                    ${usuario.ciudad ? `<div class="resultado-ciudad">${usuario.ciudad}</div>` : ''}
-                </div>
-            </div>
-        `).join('');
-
-        // Event listener para ver perfil de usuario
-        const resultadoItems = resultadosLista.querySelectorAll('.resultado-item');
-        resultadoItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const userId = item.getAttribute('data-user-id');
-                verPerfilUsuario(userId);
-            });
-        });
-    }
-}
-
-// ============================================
-// VER PERFIL DE USUARIO
-// ============================================
-async function verPerfilUsuario(userId) {
-    try {
-        const response = await apiRequest(`/api/artistas/perfil/${userId}`);
-        console.log('Respuesta perfil/:id:', response);
-        if (response && response.success) {
-            const usuario = response.usuario;
-            
-            // Ocultar todas las secciones
-            const galeria = document.getElementById('galeria-publica');
-            const panel = document.getElementById('panel-artista');
-            const paginaBlanca = document.getElementById('pagina-blanca');
-            const miCuenta = document.getElementById('mi-cuenta');
-            const perfilUsuario = document.getElementById('perfil-usuario');
-            const resultadosBusqueda = document.getElementById('resultados-busqueda');
-
-            if (galeria) galeria.classList.add('hidden');
-            if (panel) panel.classList.add('hidden');
-            if (paginaBlanca) paginaBlanca.classList.add('hidden');
-            if (miCuenta) miCuenta.classList.add('hidden');
-            if (resultadosBusqueda) resultadosBusqueda.classList.add('hidden');
-
-            // Mostrar sección de perfil y marcarla como perfil externo
-            if (perfilUsuario) {
-                perfilUsuario.classList.remove('hidden');
-                perfilUsuario.dataset.viewing = 'external';
-            }
-            actualizarEstadoNavButtons();
-            
-            // Poblar datos del perfil
-            const avatarImg = document.getElementById('perfil-avatar-seccion');
-            const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
-            const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
-            const ciudad = document.querySelector('.perfil-ciudad');
-            const avatarBtn = document.getElementById('perfil-avatar-btn');
-            
-            if (avatarImg) {
-                avatarImg.src = usuario.foto_perfil || 'iconos/avatar-default.svg';
-            }
-            if (nombreReal) {
-                nombreReal.textContent = usuario.nombre_real || '';
-            }
-            if (nombreArtista) {
-                nombreArtista.textContent = usuario.nombre_artista || '';
-            }
-            if (ciudad) {
-                ciudad.textContent = usuario.ciudad || '';
-            }
-            
-            // Ocultar overlay de cambio de avatar (modo no editable)
-            const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-            if (avatarOverlay) {
-                avatarOverlay.style.display = 'none';
-            }
-            // Deshabilitar click en el botón de avatar
-            if (avatarBtn) {
-                avatarBtn.style.pointerEvents = 'none';
-                avatarBtn.style.cursor = 'default';
-            }
-            
-            // Poblar estadísticas reales desde las obras del usuario (con datos del perfil como fallback)
-            await actualizarEstadisticas(userId, usuario);
-            
-            // Actualizar indicador de estado en línea para perfil externo
-            const onlineIndicator = document.getElementById('perfil-online-indicator');
-            if (onlineIndicator) {
-                // Verificar si es el propio usuario comparando solo por ID
-                const esPropioUsuario = artistaActual && String(artistaActual.id) === String(usuario.id);
-                console.log('verPerfilUsuario - esPropioUsuario:', esPropioUsuario, 'artistaActual.id:', artistaActual && artistaActual.id, 'usuario.id:', usuario.id, 'usuario.activo:', usuario.activo);
-                
-                if (esPropioUsuario && token) {
-                    // Es el propio usuario: mostrar indicador basado en actividad local
-                    const activo = verificarActividadLocal();
-                    if (activo) {
-                        onlineIndicator.classList.add('online');
-                        onlineIndicator.classList.remove('offline');
-                        onlineIndicator.style.display = 'block';
-                    } else {
-                        onlineIndicator.classList.remove('online');
-                        onlineIndicator.classList.add('offline');
-                        onlineIndicator.style.display = 'none';
-                    }
-                } else {
-                    // Es perfil externo: verificar si el usuario externo está activo
-                    // basado en campo activo/online o en timestamp de ultima actividad
-                    let usuarioActivo = usuario.activo === true || usuario.online === true || usuario.en_linea === true;
-                    
-                    // Si hay timestamp de ultima actividad, considerar activo si fue en los ultimos 5 minutos
-                    const ULTIMA_ACTIVIDAD_MS = 5 * 60 * 1000;
-                    if (!usuarioActivo && usuario.ultima_actividad) {
-                        const ultimaActividad = new Date(usuario.ultima_actividad).getTime();
-                        if (!isNaN(ultimaActividad) && (Date.now() - ultimaActividad) < ULTIMA_ACTIVIDAD_MS) {
-                            usuarioActivo = true;
-                        }
-                    }
-                    if (!usuarioActivo && usuario.last_activity) {
-                        const lastActivity = new Date(usuario.last_activity).getTime();
-                        if (!isNaN(lastActivity) && (Date.now() - lastActivity) < ULTIMA_ACTIVIDAD_MS) {
-                            usuarioActivo = true;
-                        }
-                    }
-                    
-                    if (usuarioActivo) {
-                        onlineIndicator.classList.add('online');
-                        onlineIndicator.classList.remove('offline');
-                    } else {
-                        onlineIndicator.classList.remove('online');
-                        onlineIndicator.classList.add('offline');
-                    }
-                    onlineIndicator.style.display = 'block';
-                    console.log('usuarioActivo:', usuarioActivo, 'onlineIndicator classes:', onlineIndicator.className, 'display:', onlineIndicator.style.display);
-                }
-            }
-            
-        } else {
-            alert('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
-        }
-    } catch (error) {
-        console.error('Error al cargar perfil:', error);
-        if (error.response && error.response.status === 500) {
-            alert('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
-        } else {
-            alert('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
-        }
-    }
 }
 
 // ============================================
 // INICIALIZACIÓN
 // ============================================
 async function init() {
-    // El preloader actúa como indicador de que el backend está
-    // despertando. Se muestra hasta que la primera API responde
-    // correctamente (servidor despierto) o hasta un timeout máximo.
     const preloader = document.getElementById('preloader');
     let preloaderOcultado = false;
     const ocultarPreloader = () => {
@@ -2444,17 +653,14 @@ async function init() {
         }
     };
 
-    // Timeout máximo de seguridad: 15 segundos
     const MAX_TIMEOUT = 15000;
     let timeoutId = setTimeout(ocultarPreloader, MAX_TIMEOUT);
 
-    // Si el servidor tarda > 0.8s, se ve el preloader al menos ese tiempo
     const MIN_DISPLAY_MS = 800;
     let minDisplayPassed = false;
     setTimeout(() => { minDisplayPassed = true; }, MIN_DISPLAY_MS);
 
     const sesionValida = await verificarSesionBackend();
-    // Servidor YA respondió (despertó). Ocultar preloader cuando pasó el mínimo.
     if (minDisplayPassed) {
         ocultarPreloader();
         clearTimeout(timeoutId);
@@ -2472,147 +678,18 @@ async function init() {
         window.location.href = 'auth.html';
         return;
     }
-    
+
     document.getElementById('toggle-panel').classList.remove('hidden');
-    actualizarPerfilUI();
+    actualizarPerfilUI(verificarActividadLocal);
     mostrarPaginaBlanca();
     setupEvents();
     setupImagePreviews();
     setupFormChangeTracking();
     await fetchActiveSessionsCount();
     refrescarPerfilDesdeServidor();
-    
-    // Inicializar seguimiento de actividad del usuario para el indicador de estado en línea
+
     iniciarSeguimientoActividad();
-    
-    // Inicializar accordions del formulario
     setupFormAccordions();
-}
-
-// ============================================
-// ACCORDIONS Y PROGRESS INDICATOR DEL FORMULARIO
-// ============================================
-function setupFormAccordions() {
-    const accordionHeaders = document.querySelectorAll('.accordion-header');
-    const obraForm = document.getElementById('obra-form');
-    
-    // Configurar click en headers de accordion
-    accordionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const section = header.closest('.form-accordion-section');
-            const content = section.querySelector('.accordion-content');
-            const isExpanded = header.getAttribute('aria-expanded') === 'true';
-            
-            // Toggle estado
-            header.setAttribute('aria-expanded', !isExpanded);
-            content.classList.toggle('hidden');
-            
-            // Actualizar icono
-            const icon = header.querySelector('.accordion-icon');
-            icon.textContent = isExpanded ? '▶' : '▼';
-        });
-    });
-    
-    // Configurar actualización de progress indicator
-    if (obraForm) {
-        const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
-        requiredFields.forEach(field => {
-            field.addEventListener('input', updateFormProgress);
-            field.addEventListener('change', updateFormProgress);
-        });
-        
-        // Actualizar inicial
-        updateFormProgress();
-    }
-}
-
-function updateFormProgress() {
-    const obraForm = document.getElementById('obra-form');
-    if (!obraForm) return;
-    
-    const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
-    const totalFields = requiredFields.length;
-    let completedFields = 0;
-    
-    requiredFields.forEach(field => {
-        if (field.value && field.value.trim() !== '') {
-            completedFields++;
-        }
-    });
-    
-    const percentage = Math.round((completedFields / totalFields) * 100);
-    
-    // Actualizar progress bar
-    const progressFill = document.getElementById('form-progress-fill');
-    const progressText = document.getElementById('form-progress-percentage');
-    
-    if (progressFill) {
-        progressFill.style.width = percentage + '%';
-    }
-    
-    if (progressText) {
-        progressText.textContent = percentage + '%';
-    }
-    
-    // Actualizar estado de cada sección
-    updateSectionStatus();
-}
-
-function updateSectionStatus() {
-    const sections = document.querySelectorAll('.form-accordion-section');
-    
-    sections.forEach(section => {
-        const content = section.querySelector('.accordion-content');
-        const requiredFields = content.querySelectorAll('[data-required="true"]');
-        const statusIcon = section.querySelector('.accordion-status');
-        
-        if (requiredFields.length === 0) return;
-        
-        let completedCount = 0;
-        requiredFields.forEach(field => {
-            if (field.value && field.value.trim() !== '') {
-                completedCount++;
-            }
-        });
-        
-        const isComplete = completedCount === requiredFields.length;
-        const isInProgress = completedCount > 0 && !isComplete;
-        
-        if (isComplete) {
-            statusIcon.textContent = '✓';
-            statusIcon.classList.add('completed');
-            statusIcon.classList.remove('in-progress');
-        } else if (isInProgress) {
-            statusIcon.textContent = '◐';
-            statusIcon.classList.add('in-progress');
-            statusIcon.classList.remove('completed');
-        } else {
-            statusIcon.textContent = '○';
-            statusIcon.classList.remove('completed', 'in-progress');
-        }
-    });
-}
-
-function resetAccordionStatus() {
-    const sections = document.querySelectorAll('.form-accordion-section');
-    
-    sections.forEach(section => {
-        const statusIcon = section.querySelector('.accordion-status');
-        statusIcon.textContent = '○';
-        statusIcon.classList.remove('completed', 'in-progress');
-    });
-    
-    // Reset progress indicator
-    const progressFill = document.getElementById('form-progress-fill');
-    const progressText = document.getElementById('form-progress-percentage');
-    
-    if (progressFill) {
-        progressFill.style.width = '0%';
-    }
-    
-    if (progressText) {
-        progressText.textContent = '0%';
-    }
 }
 
 init();
