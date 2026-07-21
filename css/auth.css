@@ -347,6 +347,15 @@ form {
     margin-bottom: 6px;
 }
 
+#registro-form .form-row .form-group {
+    margin-bottom: 0;
+}
+
+#registro-form .form-row {
+    gap: 6px;
+    margin-bottom: 0;
+}
+
 #registro-form .date-group {
     gap: 6px;
     margin-bottom: 6px;
