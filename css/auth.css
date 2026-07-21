@@ -61,11 +61,7 @@ body {
 }
 
 /* Layout centrado cuando el branding está oculto */
-.auth-layout-centered {
-    gap: 0;
-    justify-content: center;
-    padding-top: 0;
-}
+/* (auth-layout-centered y auth-right-centered están en @media 768px) */
 
 /* Panel izquierdo: branding */
 .auth-left {
@@ -100,12 +96,7 @@ body {
     transition: flex 0.5s ease;
 }
 
-/* Expandir formulario al centro cuando no hay branding */
-.auth-right-centered {
-    flex: 0 0 440px;
-    margin: auto;
-    margin-top: 0;
-}
+/* (auth-right-centered en @media 768px) */
 
 /* ==============================================
    CONTENEDOR DEL FORMULARIO
@@ -976,6 +967,20 @@ legend {
     .back-btn {
         top: 12px;
         left: 12px;
+    }
+
+    /* Formulario centrado cuando branding oculto */
+    .auth-layout-centered {
+        gap: 0;
+        justify-content: center;
+        padding-top: 0;
+    }
+
+    .auth-right-centered {
+        flex: 0 0 100%;
+        max-width: 400px;
+        margin: auto;
+        margin-top: 0;
     }
 }
 
