@@ -145,7 +145,7 @@ body {
 }
 
 .auth-subtitle {
-    font-size: 16px;
+    font-size: 25px;
     color: var(--color-gray-500);
     line-height: 1.6;
     min-height: auto;
@@ -876,7 +876,7 @@ legend {
     }
 
     .auth-subtitle {
-        font-size: 13px;
+        font-size: 19px;
         min-height: auto;
     }
 
@@ -966,7 +966,7 @@ legend {
     }
 
     .auth-subtitle {
-        font-size: 12px;
+        font-size: 19px;
     }
 
     .auth-section {
