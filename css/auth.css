@@ -66,6 +66,14 @@ body {
     align-items: center;
     justify-content: center;
     padding: 40px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Ocultar branding con fade-out + slide */
+.auth-left-hidden {
+    opacity: 0;
+    transform: translateX(-40px);
+    pointer-events: none;
 }
 
 .auth-branding {
@@ -78,6 +86,13 @@ body {
     flex: 0 0 380px;
     display: flex;
     align-items: center;
+    transition: flex 0.5s ease;
+}
+
+/* Expandir formulario al centro cuando no hay branding */
+.auth-right-centered {
+    flex: 0 0 420px;
+    margin: 0 auto;
 }
 
 /* ==============================================

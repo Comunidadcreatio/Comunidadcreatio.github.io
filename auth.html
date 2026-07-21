@@ -360,25 +360,63 @@
             }
         })();
     </script>
-    <!-- Toggle landing → formulario login -->
+    <!-- Toggle landing → formularios -->
     <script>
         (function() {
-            var btnMostrar = document.getElementById('btn-mostrar-login');
-            var btnVolver = document.getElementById('btn-volver-landing');
+            var authLeft = document.querySelector('.auth-left');
+            var authRight = document.querySelector('.auth-right');
+            var btnLogin = document.getElementById('btn-mostrar-login');
+            var btnRegistro = document.getElementById('btn-ir-registro');
             var landing = document.getElementById('login-landing');
             var formWrapper = document.getElementById('login-form-wrapper');
+            var btnVolverLogin = document.getElementById('btn-volver-landing');
 
-            if (btnMostrar && formWrapper) {
-                btnMostrar.addEventListener('click', function() {
-                    landing.classList.add('hidden');
-                    formWrapper.classList.remove('hidden');
+            function mostrarFormulario(tipo) {
+                // Ocultar branding
+                if (authLeft) authLeft.classList.add('auth-left-hidden');
+                // Expandir formulario al centro
+                if (authRight) authRight.classList.add('auth-right-centered');
+                
+                if (tipo === 'login') {
+                    if (landing) landing.classList.add('hidden');
+                    if (formWrapper) formWrapper.classList.remove('hidden');
+                } else if (tipo === 'registro') {
+                    // El registro se maneja desde auth-logic.js (btn-ir-registro)
+                    // Solo ocultamos el branding, el registro ya tiene su propia lógica
+                }
+            }
+
+            function volverLanding() {
+                if (authLeft) authLeft.classList.remove('auth-left-hidden');
+                if (authRight) authRight.classList.remove('auth-right-centered');
+                if (formWrapper) formWrapper.classList.add('hidden');
+                if (landing) landing.classList.remove('hidden');
+                // También ocultar registro si está visible
+                var registro = document.getElementById('registro-section');
+                if (registro) registro.classList.add('hidden');
+                var login = document.getElementById('login-section');
+                if (login) login.classList.remove('hidden');
+            }
+
+            if (btnLogin) {
+                btnLogin.addEventListener('click', function() {
+                    mostrarFormulario('login');
                 });
             }
-            if (btnVolver && landing) {
-                btnVolver.addEventListener('click', function() {
-                    formWrapper.classList.add('hidden');
-                    landing.classList.remove('hidden');
+            if (btnRegistro) {
+                btnRegistro.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mostrarFormulario('registro');
+                    // Mostrar sección de registro
+                    var loginSec = document.getElementById('login-section');
+                    var registroSec = document.getElementById('registro-section');
+                    if (loginSec) loginSec.classList.add('hidden');
+                    if (registroSec) registroSec.classList.remove('hidden');
                 });
+            }
+            if (btnVolverLogin) {
+                btnVolverLogin.addEventListener('click', volverLanding);
             }
         })();
     </script>
