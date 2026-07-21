@@ -140,7 +140,7 @@ body {
     font-weight: 600;
     color: var(--color-ink);
     margin-bottom: 24px;
-    line-height: 0.95;
+    line-height: 1.05;
     letter-spacing: -0.03em;
 }
 
@@ -872,7 +872,7 @@ legend {
 
     .auth-tagline {
         font-size: 100px;
-        line-height: 0.9;
+        line-height: 1.05;
     }
 
     .auth-subtitle {
@@ -962,7 +962,7 @@ legend {
 
     .auth-tagline {
         font-size: 60px;
-        line-height: 0.9;
+        line-height: 1.05;
     }
 
     .auth-subtitle {
