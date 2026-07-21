@@ -157,6 +157,7 @@ body {
     min-height: auto;
     margin: 0;
     max-width: 500px;
+    visibility: hidden;
 }
 
 /* Cursor parpadeante del typewriter (via JS .typing-cursor) */
