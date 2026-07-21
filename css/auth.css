@@ -144,6 +144,10 @@ body {
     letter-spacing: -0.03em;
 }
 
+.tagline-bold {
+    font-weight: 800;
+}
+
 .auth-subtitle {
     font-size: 25px;
     color: var(--color-gray-500);
