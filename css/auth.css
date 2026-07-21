@@ -1105,13 +1105,15 @@ legend {
     background-color: var(--color-ink-light) !important;
 }
 
-[data-theme="dark"] .secondary-btn {
+[data-theme="dark"] .secondary-btn,
+[data-theme="dark"] .nav-btn.prev-btn {
     background-color: #121212 !important;
     border-color: #e5e5e5 !important;
     color: var(--color-ink) !important;
 }
 
-[data-theme="dark"] .secondary-btn:hover {
+[data-theme="dark"] .secondary-btn:hover,
+[data-theme="dark"] .nav-btn.prev-btn:hover {
     background-color: #1a1a1a !important;
 }
 
