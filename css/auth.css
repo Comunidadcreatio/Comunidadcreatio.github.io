@@ -134,14 +134,14 @@ body {
     white-space: nowrap;
     border-right: 2px solid var(--color-ink);
     max-width: 0;
-    animation: typing 5s steps(90, end) 0.5s forwards,
+    animation: typing 5s steps(100, end) 0.5s forwards,
                blink 0.8s step-end infinite;
     margin: 0 auto;
 }
 
 @keyframes typing {
     from { max-width: 0; }
-    to { max-width: 640px; }
+    to { max-width: 900px; }
 }
 
 @keyframes blink {
@@ -815,7 +815,8 @@ legend {
         white-space: normal;
         border-right: none;
         animation: none;
-        width: auto;
+        max-width: 100%;
+        overflow: visible;
     }
 
     .auth-right {
