@@ -136,7 +136,7 @@ body {
 }
 
 .auth-tagline {
-    font-size: 140px;
+    font-size: 100px;
     font-weight: 600;
     color: var(--color-ink);
     margin-bottom: 24px;
