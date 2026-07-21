@@ -285,23 +285,22 @@
     <!-- Efecto typewriter en tagline y subtítulo -->
     <script>
         (function() {
+            // Cursor ÚNICO compartido
+            var cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            cursor.textContent = '|';
+            
             // --- Tagline (con saltos de línea) ---
             var tagline = document.querySelector('.auth-tagline');
             if (tagline) {
                 var lines = ['Conecta', 'con el Arte', 'en el Táchira'];
                 tagline.textContent = '';
                 tagline.classList.add('typing');
-                
-                // Crear cursor visible
-                var cursor = document.createElement('span');
-                cursor.className = 'typing-cursor';
-                cursor.textContent = '|';
                 tagline.appendChild(cursor);
                 
                 var lineIndex = 0;
                 var charIndex = 0;
                 var speed = 220;
-                // Guardar texto acumulado
                 var builtLines = ['', '', ''];
                 
                 function typeTagline() {
@@ -310,13 +309,11 @@
                         if (charIndex < line.length) {
                             builtLines[lineIndex] += line.charAt(charIndex);
                             charIndex++;
-                            // Reconstruir HTML: líneas completadas + línea actual + cursor
                             var html = '';
                             for (var l = 0; l <= lineIndex; l++) {
                                 if (l > 0) html += '<br>';
                                 html += builtLines[l];
                             }
-                            // Insertar antes del cursor
                             tagline.innerHTML = html;
                             tagline.appendChild(cursor);
                             setTimeout(typeTagline, speed);
@@ -325,27 +322,29 @@
                             charIndex = 0;
                             setTimeout(typeTagline, speed * 2);
                         }
+                    } else {
+                        // Tagline terminó — mover cursor al subtitle
+                        tagline.classList.remove('typing');
+                        startSubtitle();
                     }
                 }
                 
                 setTimeout(typeTagline, 800);
+            } else {
+                startSubtitle();
             }
 
-            // --- Subtitle ---
-            var subtitle = document.querySelector('.auth-subtitle');
-            if (subtitle) {
+            function startSubtitle() {
+                var subtitle = document.querySelector('.auth-subtitle');
+                if (!subtitle) return;
+                
                 var text = subtitle.textContent.trim();
                 subtitle.textContent = '';
                 subtitle.classList.add('typing');
                 
-                // Crear nodo de texto para ir llenando
                 var textNode = document.createTextNode('');
                 subtitle.appendChild(textNode);
-                
-                var cursor2 = document.createElement('span');
-                cursor2.className = 'typing-cursor';
-                cursor2.textContent = '|';
-                subtitle.appendChild(cursor2);
+                subtitle.appendChild(cursor);
                 
                 var i = 0;
                 var subSpeed = 33;
@@ -356,7 +355,7 @@
                         setTimeout(typeSub, subSpeed);
                     }
                 }
-                setTimeout(typeSub, 8200);
+                typeSub();
             }
         })();
     </script>
