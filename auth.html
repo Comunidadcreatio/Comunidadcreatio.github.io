@@ -28,28 +28,42 @@
     <!-- Contenedor de notificaciones -->
     <div id="notification-container" class="notification-container"></div>
 
-    <div class="auth-container">
-        <!-- LOGIN SECTION -->
-        <div id="login-section" class="auth-section">
-            <img src="iconos/Logo-temporal.svg" alt="Creatio" class="auth-logo">
-            <h1>Iniciar Sesión</h1>
-            <form id="login-form">
-                <label for="login-email" class="visually-hidden">Email</label>
-                <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
-                <label for="login-pass" class="visually-hidden">Contraseña</label>
-                <div class="password-wrapper">
-                    <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password">
-                    <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
-                </div>
-                <p class="forgot-password">
-                    <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
-                </p>
-                <button type="submit">Entrar</button>
-            </form>
-            <button id="btn-ir-registro" class="secondary-btn">Registrarse</button>
+    <div class="auth-layout">
+        <!-- PANEL IZQUIERDO: Logo y branding -->
+        <div class="auth-left">
+            <div class="auth-branding">
+                <img src="iconos/Logo-temporal.svg" alt="Creatio" class="auth-logo">
+                <p class="auth-tagline">Conecta con el arte en el Táchira</p>
+                <p class="auth-subtitle">Descubre artistas locales, sus obras y participa en concursos. ¡Fortalezcamos juntos el talento tachirense!</p>
+            </div>
         </div>
 
-        <!-- Botón de modo oscuro (fuera del auth-container) -->
+        <!-- PANEL DERECHO: Formularios -->
+        <div class="auth-right">
+            <div class="auth-container">
+                <!-- LOGIN SECTION -->
+                <div id="login-section" class="auth-section">
+                    <h1>Iniciar Sesión</h1>
+                    <form id="login-form">
+                        <label for="login-email" class="visually-hidden">Email</label>
+                        <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
+                        <label for="login-pass" class="visually-hidden">Contraseña</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
+                        </div>
+                        <p class="forgot-password">
+                            <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
+                        </p>
+                        <button type="submit">Entrar</button>
+                    </form>
+                    <div class="auth-divider">
+                        <span>o</span>
+                    </div>
+                    <button id="btn-ir-registro" class="secondary-btn">Crear cuenta nueva</button>
+                </div>
+
+        <!-- Botón de modo oscuro -->
         <button id="auth-dark-mode-btn" class="auth-dark-mode-btn" aria-label="Cambiar a modo oscuro">
             <svg id="auth-dark-mode-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -203,7 +217,20 @@
 
             </form>
         </div>
-    </div>
+            </div>  <!-- /auth-container -->
+        </div>      <!-- /auth-right -->
+    </div>          <!-- /auth-layout -->
+
+    <!-- FOOTER -->
+    <footer class="auth-footer">
+        <div class="auth-footer-links">
+            <a href="index.html">Galería</a>
+            <span>·</span>
+            <a href="#" onclick="alert('Contacto: extramurosfundation@gmail.com')">Contacto</a>
+            <span>·</span>
+            <span>© 2025 Creatio</span>
+        </div>
+    </footer>
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
     <script type="module" src="js/auth-logic.js?v=20260721"></script>
