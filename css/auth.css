@@ -159,7 +159,7 @@ body {
 
 /* Cursor parpadeante del typewriter (via JS .typing-cursor) */
 .typing-cursor {
-    animation: blink 1.2s step-end infinite;
+    animation: blink 1.2s step-end infinite !important;
     color: var(--color-ink);
     font-weight: 400;
 }
