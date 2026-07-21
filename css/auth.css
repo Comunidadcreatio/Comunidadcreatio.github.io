@@ -129,6 +129,24 @@ body {
     font-size: 14px;
     color: var(--color-gray-500);
     line-height: 1.6;
+    /* Efecto máquina de escribir */
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--color-ink);
+    width: 0;
+    animation: typing 4s steps(80, end) 0.5s forwards,
+               blink 0.8s step-end infinite;
+    margin: 0 auto;
+    max-width: fit-content;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
 }
 
 /* Divider "o" entre login y registro */
@@ -734,30 +752,54 @@ legend {
    FOOTER
    ============================================== */
 .auth-footer {
-    text-align: center;
-    padding: 20px;
+    padding: 40px 24px 24px;
     border-top: 1px solid var(--color-gray-200);
-    background: var(--color-white);
+    background: var(--color-gray-50);
 }
 
-.auth-footer-links {
+.auth-footer-grid {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--color-gray-500);
+    gap: 80px;
+    max-width: 800px;
+    margin: 0 auto 24px;
     flex-wrap: wrap;
 }
 
-.auth-footer-links a {
+.auth-footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 120px;
+}
+
+.auth-footer-col h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.auth-footer-col a {
+    font-size: 12px;
     color: var(--color-gray-500);
     text-decoration: none;
     transition: color 0.2s;
 }
 
-.auth-footer-links a:hover {
+.auth-footer-col a:hover {
     color: var(--color-ink);
+}
+
+.auth-footer-bottom {
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-gray-400);
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
 /* ==============================================
@@ -772,11 +814,11 @@ legend {
 
     .auth-left {
         flex: 0 0 auto;
-        padding: 20px 16px;
+        padding: 24px 16px 8px;
     }
 
     .auth-logo {
-        max-width: 120px;
+        max-width: 160px;
         margin-bottom: 16px;
     }
 
@@ -786,6 +828,10 @@ legend {
 
     .auth-subtitle {
         font-size: 13px;
+        white-space: normal;
+        border-right: none;
+        animation: none;
+        width: auto;
     }
 
     .auth-right {
@@ -838,6 +884,10 @@ legend {
         top: 12px;
         left: 12px;
     }
+
+    .auth-footer-grid {
+        gap: 30px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -846,11 +896,11 @@ legend {
     }
 
     .auth-left {
-        padding: 16px 12px;
+        padding: 16px 12px 4px;
     }
 
     .auth-logo {
-        max-width: 100px;
+        max-width: 130px;
         margin-bottom: 12px;
     }
 
@@ -859,7 +909,7 @@ legend {
     }
 
     .auth-subtitle {
-        display: none;
+        font-size: 12px;
     }
 
     .auth-section {
@@ -881,6 +931,16 @@ legend {
     .nav-btn,
     .secondary-btn {
         padding: 10px 16px;
+    }
+
+    .auth-footer-grid {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .auth-footer-col {
+        align-items: center;
     }
 }
 
@@ -906,12 +966,16 @@ legend {
 }
 
 [data-theme="dark"] .auth-footer {
-    background-color: #121212;
+    background-color: #0a0a0a;
     border-top-color: var(--color-border);
 }
 
-[data-theme="dark"] .auth-footer-links,
-[data-theme="dark"] .auth-footer-links a {
+[data-theme="dark"] .auth-footer-col h4 {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .auth-footer-col a,
+[data-theme="dark"] .auth-footer-bottom {
     color: var(--color-gray-400);
 }
 
