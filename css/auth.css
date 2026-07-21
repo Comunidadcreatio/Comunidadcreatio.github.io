@@ -871,9 +871,8 @@ legend {
     }
 
     .auth-tagline {
-        font-size: 380px;
-        line-height: 0.85;
-        letter-spacing: -0.04em;
+        font-size: 100px;
+        line-height: 0.9;
     }
 
     .auth-subtitle {
@@ -962,9 +961,8 @@ legend {
     }
 
     .auth-tagline {
-        font-size: 200px;
-        line-height: 0.85;
-        letter-spacing: -0.04em;
+        font-size: 60px;
+        line-height: 0.9;
     }
 
     .auth-subtitle {
