@@ -320,10 +320,9 @@ form {
     cursor: not-allowed;
 }
 
-/* Reset margins heredados de formularios.css */
+/* Reset margins heredados de formularios.css (solo registro) */
 #registro-form input,
-#registro-form select,
-#login-form input {
+#registro-form select {
     margin-bottom: 0 !important;
 }
 
