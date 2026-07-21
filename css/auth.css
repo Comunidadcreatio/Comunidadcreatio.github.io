@@ -344,12 +344,12 @@ form {
 }
 
 #registro-form .form-group {
-    margin-bottom: 0;
+    margin-bottom: 6px;
 }
 
 #registro-form .date-group {
     gap: 6px;
-    margin-bottom: 0;
+    margin-bottom: 6px;
 }
 
 .form-group select,
@@ -641,9 +641,6 @@ button[type="submit"]:not(.nav-btn):active,
 .step {
     width: 100%;
     animation: slideIn 0.3s ease-out;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
 }
 
 @keyframes slideIn {
