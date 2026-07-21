@@ -172,7 +172,7 @@ function initCarrusel(card) {
 }
 
 function crearObraCard(obra) {
-    const card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'obra-card';
     if (obra.id !== undefined && obra.id !== null) {
         card.dataset.obraId = obra.id;
