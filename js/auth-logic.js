@@ -3,7 +3,7 @@
 import { login, register } from './auth.js';
 import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
-import { mostrarErrores, debounce } from './utils.js';
+import { mostrarErrores, debounce, debugLog } from './utils.js';
 import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupDarkModeToggle } from './theme.js';
 
 // ============================================
@@ -99,7 +99,7 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
             disponibilidad[clave] = false;
         }
     } catch (error) {
-        console.error('Error al verificar disponibilidad:', error);
+        debugLog.error('Error al verificar disponibilidad:', error);
         disponibilidad[clave] = null;
     }
 }
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const redirectFlag = sessionStorage.getItem('auth_redirect_flag');
         const now = Date.now();
         if (redirectFlag && (now - parseInt(redirectFlag)) < 5000) {
-            console.warn('Bucle de redirección detectado. Limpiando sesión.');
+            debugLog.warn('Bucle de redirección detectado. Limpiando sesión.');
             localStorage.removeItem(ARTISTA_KEY);
             sessionStorage.removeItem('auth_redirect_flag');
             return;

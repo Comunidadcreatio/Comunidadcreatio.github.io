@@ -5,7 +5,7 @@
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, debugLog } from './utils.js';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -34,14 +34,14 @@ export function guardarFotoPerfil(dataUrl) {
     try {
         localStorage.setItem(getFotoPerfilKey(), dataUrl);
     } catch (e) {
-        console.error('No se pudo guardar la foto de perfil:', e);
+        debugLog.error('No se pudo guardar la foto de perfil:', e);
     }
     if (artistaActual) {
         artistaActual.foto_perfil = dataUrl;
         try {
             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
         } catch (e) {
-            console.error('No se pudo actualizar el artista en localStorage:', e);
+            debugLog.error('No se pudo actualizar el artista en localStorage:', e);
         }
     }
 }
@@ -137,7 +137,7 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
     const statsComcons = document.getElementById('stats-comcons');
 
     if (!statsCavents) {
-        console.warn('Elemento #stats-cavents no encontrado (el perfil no está visible)');
+        debugLog.warn('Elemento #stats-cavents no encontrado (el perfil no está visible)');
         return;
     }
 
@@ -182,7 +182,7 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
         if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
         if (statsComcons) statsComcons.textContent = fallbackComcons;
     } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
+        debugLog.error('Error al cargar estadísticas:', error);
         statsCavents.textContent = fallbackCavents;
         if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
         if (statsComcons) statsComcons.textContent = fallbackComcons;
@@ -345,7 +345,7 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             showError('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
         }
     } catch (error) {
-        console.error('Error al cargar perfil:', error);
+        debugLog.error('Error al cargar perfil:', error);
         if (error.response && error.response.status === 500) {
             showError('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
         } else {

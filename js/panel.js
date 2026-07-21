@@ -1,7 +1,7 @@
 // js/panel.js
 // js/panel.js
 import { API_BASE_URL, apiRequest } from './config.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, debugLog } from './utils.js';
 
 export async function cargarMisObras(token, page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     try {
@@ -9,7 +9,7 @@ export async function cargarMisObras(token, page = 1, limit = 10, search = '', s
         const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
         return data;
     } catch (error) {
-        console.error("Error al cargar mis obras:", error);
+        debugLog.error("Error al cargar mis obras:", error);
         return { success: false, obras: [], total: 0 };
     }
 }
@@ -72,7 +72,7 @@ export async function guardarObra(token, formData, idEdicion = null) {
         });
         return await res.json();
     } catch (error) {
-        console.error("Error al guardar obra:", error);
+        debugLog.error("Error al guardar obra:", error);
         return { success: false, error: "Error de conexión" };
     }
 }
@@ -85,7 +85,7 @@ export async function eliminarObra(token, id) {
         });
         return res.ok;
     } catch (error) {
-        console.error("Error al eliminar obra:", error);
+        debugLog.error("Error al eliminar obra:", error);
         return false;
     }
 }

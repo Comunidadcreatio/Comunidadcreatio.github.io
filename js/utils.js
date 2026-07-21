@@ -57,3 +57,17 @@ export function escapeHtml(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+// ============================================
+// LOGGING CONDICIONAL (solo en desarrollo)
+// ============================================
+const isDebug = () => {
+    try { return localStorage.getItem('DEBUG') === 'true'; } catch (e) { return false; }
+};
+
+/** Reemplaza console.* — solo imprime si DEBUG=true en localStorage. */
+export const debugLog = {
+    log:   (...args) => { if (isDebug()) console.log(...args); },
+    warn:  (...args) => { if (isDebug()) console.warn(...args); },
+    error: (...args) => { if (isDebug()) console.error(...args); }
+};

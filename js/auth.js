@@ -24,7 +24,7 @@ export async function login(email, password) {
             return { success: false, error: data.error };
         }
     } catch (error) {
-        console.error("Error en login:", error);
+        debugLog.error("Error en login:", error);
         return { success: false, error: "Error de conexión" };
     }
 }
@@ -47,7 +47,7 @@ export async function register(nombre_artista, nombre_real, email, password, tel
         });
         return data;
     } catch (error) {
-        console.error("Error en registro:", error);
+        debugLog.error("Error en registro:", error);
         return { success: false, error: "Error de conexión" };
     }
 }

@@ -6,7 +6,7 @@ import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
-import { decodeHTMLEntities, mostrarErrores } from './utils.js';
+import { decodeHTMLEntities, mostrarErrores, debugLog } from './utils.js';
 
 // ============================================
 // VARIABLES DE ESTADO (PANEL)
@@ -61,7 +61,7 @@ function resetCambiosNoGuardados() {
 export async function refrescarTabla(tablaBody) {
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     if (!result.success) {
-        console.error("Error al cargar obras:", result.error);
+        debugLog.error("Error al cargar obras:", result.error);
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
             showWarning("Tu sesión ha expirado. Serás redirigido a la página principal.");
             localStorage.removeItem(ARTISTA_KEY);
@@ -85,7 +85,7 @@ export async function refrescarTabla(tablaBody) {
                 const data = await apiRequest(`/obras/${id}`);
                 if (!data) return;
                 if (data.success === false) {
-                    console.error('Error al obtener obra:', data.error);
+                    debugLog.error('Error al obtener obra:', data.error);
                     showError('Error al cargar la obra: ' + data.error);
                     return;
                 }
@@ -165,7 +165,7 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 updateFormProgress();
             } catch (error) {
-                console.error("Error al cargar datos de la obra:", error);
+                debugLog.error("Error al cargar datos de la obra:", error);
                 showError("Error al cargar la obra para editar");
             }
         },
@@ -257,7 +257,7 @@ export async function refrescarTabla(tablaBody) {
                 }
                 updateFormProgress();
             } catch (error) {
-                console.error("Error al duplicar:", error);
+                debugLog.error("Error al duplicar:", error);
                 const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
                 if (btnDuplicar) setButtonLoading(btnDuplicar, false);
                 showError("Error al duplicar la obra.");
@@ -319,7 +319,7 @@ export async function cargarUrlEnInput(index, url) {
         }
         return true;
     } catch (err) {
-        console.error('No se pudo cargar la imagen para duplicar:', url, err);
+        debugLog.error('No se pudo cargar la imagen para duplicar:', url, err);
         return false;
     }
 }

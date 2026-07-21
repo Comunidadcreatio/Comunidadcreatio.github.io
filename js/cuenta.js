@@ -119,7 +119,7 @@ export function setupMiCuenta() {
                         try {
                             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
                         } catch (e) {
-                            console.error('No se pudo actualizar el correo en localStorage:', e);
+                            debugLog.error('No se pudo actualizar el correo en localStorage:', e);
                         }
                     }
                     ocultarFormularioCuenta('form-confirmar-email');

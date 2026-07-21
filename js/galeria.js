@@ -1,7 +1,7 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, debugLog } from './utils.js';
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
@@ -9,7 +9,7 @@ export async function cargarGaleria(container) {
     try {
         const data = await apiRequest('/obras');
         if (data && data.success === false) {
-            console.error('Error al cargar galería:', data.error);
+            debugLog.error('Error al cargar galería:', data.error);
             container.innerHTML = '<p>Error al cargar las obras.</p>';
             container.setAttribute('aria-busy', 'false');
             return [];
@@ -17,7 +17,7 @@ export async function cargarGaleria(container) {
         container.setAttribute('aria-busy', 'false');
         return Array.isArray(data) ? data : [];
     } catch (error) {
-        console.error("Error al cargar la galería:", error);
+        debugLog.error("Error al cargar la galería:", error);
         container.innerHTML = '<p>Error al cargar las obras.</p>';
         container.setAttribute('aria-busy', 'false');
         return [];

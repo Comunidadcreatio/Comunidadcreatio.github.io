@@ -18,7 +18,7 @@ export async function apiRequest(endpoint, options = {}) {
         });
 
         if (res.status === 401 && !endpoint.includes('/eliminar-cuenta')) {
-            console.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
+            debugLog.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
             localStorage.removeItem(ARTISTA_KEY);
             // Disparamos evento para que la app reaccione
             document.dispatchEvent(new Event('userLogout'));
@@ -28,7 +28,7 @@ export async function apiRequest(endpoint, options = {}) {
         const data = await res.json();
         return data;
     } catch (error) {
-        console.error("Error en apiRequest:", error);
+        debugLog.error("Error en apiRequest:", error);
         return { success: false, error: "Error de conexión. Intenta más tarde." };
     }
 }

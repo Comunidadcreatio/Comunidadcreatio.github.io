@@ -75,7 +75,7 @@ async function enviarHeartbeatSiEsNecesario() {
     try {
         await apiRequest('/api/artistas/heartbeat', { method: 'POST' });
     } catch (error) {
-        console.error('Error enviando heartbeat:', error);
+        debugLog.error('Error enviando heartbeat:', error);
     }
 }
 
@@ -107,10 +107,10 @@ async function fetchActiveSessionsCount() {
             activeSessionsCount = res.count;
             updateCerrarTodasSesionesButtonState();
         } else if (res && res.error) {
-            console.warn("No se pudo obtener conteo de sesiones:", res.error);
+            debugLog.warn("No se pudo obtener conteo de sesiones:", res.error);
         }
     } catch (error) {
-        console.error("Error al obtener número de sesiones:", error);
+        debugLog.error("Error al obtener número de sesiones:", error);
     }
 }
 
@@ -152,7 +152,7 @@ async function closeAllSessions() {
                 showError((res.error || "Error inesperado."));
             }
         } catch (error) {
-            console.error("Error al cerrar todas las sesiones:", error);
+            debugLog.error("Error al cerrar todas las sesiones:", error);
             showError("Error de conexión. Cerrando sesión local por seguridad.");
         } finally {
             localStorage.removeItem(ARTISTA_KEY);
@@ -167,9 +167,9 @@ async function closeAllSessions() {
 async function ejecutarLogout() {
     try {
         const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
-        if (res && !res.success) console.warn(res.error);
+        if (res && !res.success) debugLog.warn(res.error);
     } catch (error) {
-        console.error("Error en logout backend:", error);
+        debugLog.error("Error en logout backend:", error);
     } finally {
         logout();
         window.location.href = 'auth.html';

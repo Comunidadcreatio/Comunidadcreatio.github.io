@@ -2,7 +2,7 @@
 // Búsqueda de usuarios en tiempo real con dropdown y debounce.
 
 import { API_BASE_URL, apiRequest } from './config.js';
-import { debounce, escapeHtml } from './utils.js';
+import { debounce, escapeHtml, debugLog } from './utils.js';
 import { showWarning, showError } from './notificaciones.js';
 
 /**
@@ -16,7 +16,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
     const searchDropdown = document.getElementById('search-results-dropdown');
 
     if (!searchInput || !searchBtn || !searchDropdown) {
-        console.warn('Buscador: elementos no encontrados');
+        debugLog.warn('Buscador: elementos no encontrados');
         return;
     }
 
@@ -114,7 +114,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
                 renderizarResultadosDropdown([]);
             }
         } catch (error) {
-            console.error('Error en búsqueda en tiempo real:', error);
+            debugLog.error('Error en búsqueda en tiempo real:', error);
             searchDropdown.classList.add('hidden');
         }
     };
@@ -152,7 +152,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
                 showWarning('No se encontraron usuarios con ese nombre');
             }
         } catch (error) {
-            console.error('Error al buscar usuarios:', error);
+            debugLog.error('Error al buscar usuarios:', error);
             showError('Error al buscar usuarios. Por favor intenta nuevamente.');
         }
     };
