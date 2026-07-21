@@ -61,7 +61,7 @@ body {
 
 /* Panel izquierdo: branding */
 .auth-left {
-    flex: 0 0 420px;
+    flex: 0 0 520px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -70,7 +70,7 @@ body {
 
 .auth-branding {
     text-align: left;
-    max-width: 380px;
+    max-width: 480px;
 }
 
 /* Panel derecho: formulario */
@@ -136,12 +136,12 @@ body {
 }
 
 .auth-tagline {
-    font-size: 40px;
+    font-size: 72px;
     font-weight: 800;
     color: var(--color-ink);
-    margin-bottom: 16px;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
 }
 
 .auth-subtitle {
@@ -871,7 +871,7 @@ legend {
     }
 
     .auth-tagline {
-        font-size: 28px;
+        font-size: 36px;
     }
 
     .auth-subtitle {
