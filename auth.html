@@ -282,25 +282,69 @@
             setTimeout(ocultarPreloader, MIN_DISPLAY_MS);
         })();
     </script>
-    <!-- Efecto typewriter en el subtítulo -->
+    <!-- Efecto typewriter en tagline y subtítulo -->
     <script>
         (function() {
-            var el = document.querySelector('.auth-subtitle');
-            if (!el) return;
-            var text = el.textContent.trim();
-            el.textContent = '';
-            el.classList.add('typing');
-            var i = 0;
-            var speed = 35; // ms por carácter
-            function type() {
-                if (i < text.length) {
-                    el.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
+            // --- Tagline (con saltos de línea) ---
+            var tagline = document.querySelector('.auth-tagline');
+            if (tagline) {
+                var lines = ['Conecta', 'con el Arte', 'en el Táchira'];
+                var spans = tagline.querySelectorAll('.tagline-bold');
+                // Guardar referencias a los spans antes de vaciar
+                var boldWords = [];
+                spans.forEach(function(s) { boldWords.push(s.textContent); });
+                
+                tagline.innerHTML = '';
+                tagline.classList.add('typing');
+                
+                var lineIndex = 0;
+                var charIndex = 0;
+                var speed = 120; // ms por carácter (lento)
+                
+                function typeTagline() {
+                    if (lineIndex < lines.length) {
+                        var line = lines[lineIndex];
+                        if (charIndex < line.length) {
+                            tagline.innerHTML += line.charAt(charIndex);
+                            charIndex++;
+                            setTimeout(typeTagline, speed);
+                        } else {
+                            // Línea completa, añadir <br> si no es la última
+                            if (lineIndex < lines.length - 1) {
+                                tagline.innerHTML += '<br>';
+                            }
+                            lineIndex++;
+                            charIndex = 0;
+                            setTimeout(typeTagline, speed * 2); // pausa entre líneas
+                        }
+                    } else {
+                        // Terminó — restaurar los spans bold
+                        // (simplemente dejamos el texto plano, el efecto bold se pierde
+                        //  pero el typewriter es el foco)
+                    }
                 }
+                
+                setTimeout(typeTagline, 800);
             }
-            // Iniciar después del preloader
-            setTimeout(type, 1000);
+
+            // --- Subtitle ---
+            var subtitle = document.querySelector('.auth-subtitle');
+            if (subtitle) {
+                var text = subtitle.textContent.trim();
+                subtitle.textContent = '';
+                subtitle.classList.add('typing');
+                var i = 0;
+                var subSpeed = 35;
+                function typeSub() {
+                    if (i < text.length) {
+                        subtitle.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeSub, subSpeed);
+                    }
+                }
+                // Iniciar después de que el tagline termine (~3 líneas * ~15 chars * 120ms = ~5.4s)
+                setTimeout(typeSub, 6000);
+            }
         })();
     </script>
     <!-- Toggle landing → formulario login -->

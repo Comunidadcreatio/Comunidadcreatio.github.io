@@ -169,6 +169,14 @@ body {
     50% { opacity: 0; }
 }
 
+/* Cursor lento para el tagline */
+.auth-tagline.typing::after {
+    content: '|';
+    animation: blink 1.2s step-end infinite;
+    color: var(--color-ink);
+    font-weight: 400;
+}
+
 /* Divider "o" entre login y registro */
 .auth-divider {
     display: flex;
