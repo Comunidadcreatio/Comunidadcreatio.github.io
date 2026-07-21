@@ -104,7 +104,7 @@ body {
 .auth-right-centered {
     flex: 0 0 440px;
     margin: auto;
-    margin-top: 10%;
+    margin-top: 0;
 }
 
 /* ==============================================
