@@ -300,7 +300,7 @@
                 
                 var lineIndex = 0;
                 var charIndex = 0;
-                var speed = 120;
+                var speed = 220;
                 // Guardar texto acumulado
                 var builtLines = ['', '', ''];
                 
@@ -348,7 +348,7 @@
                 subtitle.appendChild(cursor2);
                 
                 var i = 0;
-                var subSpeed = 35;
+                var subSpeed = 33;
                 function typeSub() {
                     if (i < text.length) {
                         textNode.textContent += text.charAt(i);
@@ -356,7 +356,7 @@
                         setTimeout(typeSub, subSpeed);
                     }
                 }
-                setTimeout(typeSub, 800);
+                setTimeout(typeSub, 7000);
             }
         })();
     </script>
