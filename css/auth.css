@@ -322,8 +322,9 @@ form {
 
 /* Reset margins heredados de formularios.css */
 #registro-form input,
-#registro-form select {
-    margin-bottom: 0;
+#registro-form select,
+#login-form input {
+    margin-bottom: 0 !important;
 }
 
 .form-group select,
