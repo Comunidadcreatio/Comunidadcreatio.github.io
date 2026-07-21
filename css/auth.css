@@ -57,6 +57,13 @@ body {
     max-width: 1300px;
     margin: 0 auto;
     width: 100%;
+    transition: gap 0.5s ease;
+}
+
+/* Layout centrado cuando el branding está oculto */
+.auth-layout-centered {
+    gap: 0;
+    justify-content: center;
 }
 
 /* Panel izquierdo: branding */
@@ -69,11 +76,14 @@ body {
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Ocultar branding con fade-out + slide */
+/* Ocultar branding con fade-out + colapso */
 .auth-left-hidden {
     opacity: 0;
     transform: translateX(-40px);
     pointer-events: none;
+    flex: 0 0 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .auth-branding {
@@ -91,7 +101,7 @@ body {
 
 /* Expandir formulario al centro cuando no hay branding */
 .auth-right-centered {
-    flex: 0 0 420px;
+    flex: 0 0 440px;
     margin: auto;
 }
 
