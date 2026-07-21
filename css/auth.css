@@ -663,8 +663,9 @@ legend {
 .step-navigation {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
     margin-top: 20px;
+    flex-direction: column;
 }
 
 .nav-btn {
@@ -686,7 +687,7 @@ legend {
     background: var(--color-white);
     color: var(--color-ink);
     border: 1.5px solid var(--color-gray-300);
-    flex: 1;
+    order: 2;
 }
 
 .nav-btn.prev-btn:hover {
@@ -698,12 +699,12 @@ legend {
 .nav-btn.next-btn {
     background: var(--color-ink);
     color: var(--color-white);
-    flex: 1;
+    order: 1;
 }
 
 .step-navigation .nav-btn {
     box-sizing: border-box !important;
-    flex: 1;
+    width: 100%;
     padding: 12px 20px;
     font-size: 14px;
 }
