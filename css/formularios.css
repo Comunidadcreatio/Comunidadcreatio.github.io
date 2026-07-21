@@ -748,7 +748,7 @@ form *,
 form,
 .step,
 #panel-artista {
-    overflow-x: hidden !important;
+    overflow-x: hidden;
 }
 
 /* 2. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
@@ -810,18 +810,18 @@ form,
        ESPACIADO GLOBAL DE PANTALLAS Y MODALES 
        ---------------------------------------------- */
     /* Forzamos al fondo del modal y al panel general a tener padding lateral exacto */
-    .modal, 
+    .modal,
     .modal-fullscreen,
     #panel-artista {
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-        box-sizing: border-box !important;
-        width: 100% !important;
+        padding-left: 20px;
+        padding-right: 20px;
+        box-sizing: border-box;
+        width: 100%;
     }
-    
-    .modal, 
+
+    .modal,
     .modal-fullscreen {
-        display: flex !important;
+        display: flex;
         flex-direction: column;
         align-items: center;
         padding-top: 20px;
@@ -833,12 +833,12 @@ form,
        
     /* LOGIN: Centrado y angosto para respetar el diseño de la Mesa de Trabajo */
     #modal-login .modal-content {
-        width: 100% !important;
-        max-width: 200px !important; 
-        margin: 0 auto !important; 
-        padding: 8px 12px !important; 
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        padding: 8px 12px;
         border-radius: 12px;
-        box-sizing: border-box !important;
+        box-sizing: border-box;
         box-shadow: none;
     }
 
@@ -846,65 +846,65 @@ form,
     #modal-registro .modal-content,
     #formulario-obra,
     #panel-artista form {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 auto !important; 
-        padding: 24px 20px !important; 
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 24px 20px;
         border-radius: 16px;
-        box-sizing: border-box !important;
+        box-sizing: border-box;
         box-shadow: none;
     }
-    
+
     /* Para el panel específicamente: que las tablas tampoco se desborden ni choquen */
     #panel-artista table,
     #panel-artista .table-responsive {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
     }
 
     /* Aseguramos que inputs y botones respeten esta nueva regla estricta */
-    #modal-login form, 
+    #modal-login form,
     #modal-registro form,
     #panel-artista form {
-        width: 100% !important;
-        margin: 0 !important;
-        box-sizing: border-box !important;
+        width: 100%;
+        margin: 0;
+        box-sizing: border-box;
     }
 
-    #modal-registro input, 
+    #modal-registro input,
     #modal-registro select,
     #modal-registro button,
     #panel-artista input,
     #panel-artista select,
     #panel-artista button {
-        width: 100% !important;
-        box-sizing: border-box !important;
+        width: 100%;
+        box-sizing: border-box;
         padding: 14px 12px; /* Mejor área táctil */
-        font-size: 16px; 
+        font-size: 16px;
         border-radius: 10px;
     }
 
     /* Inputs específicos del login - más bajos y con texto más pequeño */
     #modal-login input {
-        width: 85% !important;
-        box-sizing: border-box !important;
+        width: 85%;
+        box-sizing: border-box;
         padding: 10px 12px;
-        font-size: 14px; 
+        font-size: 14px;
         border-radius: 6px;
-        margin: 0 auto 6px auto !important;
+        margin: 0 auto 6px auto;
         display: block;
     }
 
     /* Botones del login - mantener tamaño normal */
     #modal-login button {
-        width: 85% !important;
-        box-sizing: border-box !important;
+        width: 85%;
+        box-sizing: border-box;
         padding: 10px 12px;
-        font-size: 14px; 
+        font-size: 14px;
         border-radius: 6px;
-        margin: 0 auto 6px auto !important;
+        margin: 0 auto 6px auto;
         display: block;
     }
     
@@ -912,7 +912,7 @@ form,
     .modal-content a {
         display: block;
         width: 100%;
-        box-sizing: border-box !important;
+        box-sizing: border-box;
         margin-bottom: 10px;
         text-align: center;
         font-size: 13px;
@@ -983,7 +983,7 @@ form,
         flex-direction: column;
     }
     .form-actions button {
-        width: 100% !important;
+        width: 100%;
     }
     
     /* Modal scroll */
@@ -1000,7 +1000,7 @@ form,
     /* Selects con padding extra para el icono nativo */
     #obra-form select,
     #panel-artista select {
-        padding-right: 40px !important;
+        padding-right: 40px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 14px center;
@@ -1009,8 +1009,8 @@ form,
     
     #obra-form textarea {
         min-height: 120px;
-        width: 100% !important;
-        box-sizing: border-box !important;
+        width: 100%;
+        box-sizing: border-box;
         padding: 14px 12px;
         border-radius: 10px;
     }
@@ -1050,13 +1050,13 @@ form,
     
     #obra-form select,
     #panel-artista select {
-        padding-right: 35px !important;
+        padding-right: 35px;
     }
     
     /* Aire sutil para pantallas muy pequeñas */
     #formulario-obra,
     #panel-artista form {
-        padding: 20px 15px !important;
+        padding: 20px 15px;
     }
     
     .recuadro-imagen {

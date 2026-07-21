@@ -9,11 +9,11 @@
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 @import url('panel-artista.css?v=20250718');
 
-/* 4. Formularios (registro y obra) */
-@import url('formularios.css?v=20250718');
-
-/* 5. Modales (login, registro, restablecimiento, etc.) */
+/* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=20250718');
+
+/* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
+@import url('formularios.css?v=20250718');
 
 .hidden {
     display: none !important;
