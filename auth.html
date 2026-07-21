@@ -337,6 +337,11 @@
                 var text = subtitle.textContent.trim();
                 subtitle.textContent = '';
                 subtitle.classList.add('typing');
+                
+                // Crear nodo de texto para ir llenando
+                var textNode = document.createTextNode('');
+                subtitle.appendChild(textNode);
+                
                 var cursor2 = document.createElement('span');
                 cursor2.className = 'typing-cursor';
                 cursor2.textContent = '|';
@@ -346,8 +351,7 @@
                 var subSpeed = 35;
                 function typeSub() {
                     if (i < text.length) {
-                        subtitle.textContent += text.charAt(i);
-                        subtitle.appendChild(cursor2);
+                        textNode.textContent += text.charAt(i);
                         i++;
                         setTimeout(typeSub, subSpeed);
                     }
