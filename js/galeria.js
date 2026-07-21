@@ -1,6 +1,7 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
+import { escapeHtml } from './utils.js';
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
@@ -177,12 +178,12 @@ function crearObraCard(obra) {
         card.dataset.obraId = obra.id;
     }
 
-    const nombreArtista = obra.artista || 'Artista';
+    const nombreArtista = escapeHtml(obra.artista || 'Artista');
     const inicial = nombreArtista.charAt(0).toUpperCase();
     const fotoArtista = obra.foto_artista || '';
     const tieneAvatar = !!fotoArtista;
-    const titulo = obra.titulo || 'Sin título';
-    const precio = obra.precio || 'N/A';
+    const titulo = escapeHtml(obra.titulo || 'Sin título');
+    const precio = escapeHtml(obra.precio || 'N/A');
 
     const artistaUserId = obra.artista_user_id !== undefined && obra.artista_user_id !== null ? obra.artista_user_id : '';
     const avatarHTML = tieneAvatar 

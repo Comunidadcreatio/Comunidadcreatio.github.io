@@ -1,5 +1,7 @@
 // js/panel.js
+// js/panel.js
 import { API_BASE_URL, apiRequest } from './config.js';
+import { escapeHtml } from './utils.js';
 
 export async function cargarMisObras(token, page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     try {
@@ -37,11 +39,11 @@ export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplic
         // ✅ Usar miniatura para la tabla
         const imgSrc = obra.imagen_thumbnail_url || obra.imagen_url || '';
         tr.innerHTML = `
-            <td>${obra.id_personalizado || obra.id}</td>
-            <td>${obra.titulo}</td>
-            <td>${obra.precio}</td>
-            <td><img src="${imgSrc}" width="50"></td>
-            <td><span class="status-text ${statusClass}">${statusLabel}</span></td>
+            <td>${escapeHtml(obra.id_personalizado || String(obra.id))}</td>
+            <td>${escapeHtml(obra.titulo)}</td>
+            <td>${escapeHtml(obra.precio)}</td>
+            <td><img src="${escapeHtml(imgSrc)}" width="50"></td>
+            <td><span class="status-text ${statusClass}">${escapeHtml(statusLabel)}</span></td>
             <td>
                 <div class="acciones-obra">
                     <button class="btn-accion btn-editar" data-id="${obra.id}" title="Editar" aria-label="Editar obra">${ICONS.editar}</button>

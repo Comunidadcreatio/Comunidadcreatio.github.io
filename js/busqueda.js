@@ -2,7 +2,7 @@
 // Búsqueda de usuarios en tiempo real con dropdown y debounce.
 
 import { API_BASE_URL, apiRequest } from './config.js';
-import { debounce } from './utils.js';
+import { debounce, escapeHtml } from './utils.js';
 
 /**
  * Configura el buscador de usuarios en tiempo real.
@@ -66,18 +66,18 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
 
             let avatarHTML = '';
             if (usuario.foto_perfil) {
-                avatarHTML = `<img src="${usuario.foto_perfil}" alt="${usuario.nombre_artista}" class="search-result-avatar">`;
+                avatarHTML = `<img src="${escapeHtml(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
             } else {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
-                avatarHTML = `<div class="search-result-avatar-placeholder">${inicial}</div>`;
+                avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;
             }
 
-            const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${usuario.nombre_real}</div>` : '';
+            const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${escapeHtml(usuario.nombre_real)}</div>` : '';
 
             item.innerHTML = `
                 ${avatarHTML}
                 <div class="search-result-info">
-                    <div class="search-result-name">${usuario.nombre_artista}</div>
+                    <div class="search-result-name">${escapeHtml(usuario.nombre_artista)}</div>
                     ${nombreReal}
                 </div>
             `;
