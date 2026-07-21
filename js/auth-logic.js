@@ -471,6 +471,8 @@ function showLoginSection() {
     document.getElementById('registro-section').classList.add('hidden');
     const forgotSection = document.getElementById('forgot-section');
     if (forgotSection) forgotSection.classList.add('hidden');
+    // Restaurar branding si estaba oculto
+    if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {

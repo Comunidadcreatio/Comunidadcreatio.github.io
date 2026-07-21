@@ -398,12 +398,14 @@
                 if (authLayout) authLayout.classList.remove('auth-layout-centered');
                 if (formWrapper) formWrapper.classList.add('hidden');
                 if (landing) landing.classList.remove('hidden');
-                // También ocultar registro si está visible
                 var registro = document.getElementById('registro-section');
                 if (registro) registro.classList.add('hidden');
                 var login = document.getElementById('login-section');
                 if (login) login.classList.remove('hidden');
             }
+
+            // Exponer para que auth-logic.js pueda llamarlo
+            window.volverAlBranding = volverLanding;
 
             if (btnLogin) {
                 btnLogin.addEventListener('click', function() {
