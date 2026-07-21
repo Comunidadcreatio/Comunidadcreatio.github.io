@@ -882,16 +882,21 @@ legend {
         flex: 0 0 auto;
         width: 100%;
         max-width: 400px;
+        margin-top: 40px;
     }
 
     .auth-container {
         border-radius: var(--radius-lg);
         border: none;
-        box-shadow: var(--shadow-md);
+        box-shadow: none;
     }
 
     .auth-section {
-        padding: 28px 20px;
+        padding: 20px;
+    }
+
+    .auth-divider {
+        margin: 4px 0;
     }
 
     .auth-section h1 {
