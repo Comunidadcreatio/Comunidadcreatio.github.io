@@ -89,10 +89,10 @@
             <p style="font-size:13px; color:var(--color-gray-500); margin-bottom:20px; text-align:left;">
                 Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
             </p>
-            <form id="solicitar-restablecimiento-form">
+            <form id="solicitar-restablecimiento-form" novalidate>
                 <div class="form-group" style="margin-bottom:6px;">
                     <label for="forgot-email">Correo electrónico</label>
-                    <input type="email" id="forgot-email" placeholder="Ej: ejemplo@gmail.com" required autocomplete="email">
+                    <input type="email" id="forgot-email" placeholder="Ej: ejemplo@gmail.com" required autocomplete="email" data-required="true">
                 </div>
                 <button type="submit" id="btn-enviar-reset" style="margin-bottom:6px;">Enviar enlace</button>
             </form>
