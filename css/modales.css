@@ -46,7 +46,7 @@
 
 /* Las imágenes dentro de modales nunca deben desbordar su contenedor
    (se excluye el logo del login, que tiene su propio tamaño) */
-.modal-content img:not(.login-logo) {
+.modal-content img:not(.modal__logo) {
     display: block;
     width: 100%;
     max-width: 100%;
@@ -214,7 +214,7 @@
 /* ==============================================
    ESTILO DEL LOGO EN EL LOGIN
    ============================================== */
-.login-logo {
+.modal__logo {
     display: block;
     margin: 0 auto 20px auto; /* Centrado y con margen inferior */
     max-width: 250px;         /* Tamaño máximo en escritorio */
@@ -224,7 +224,7 @@
 
 /* Logo más pequeño en móvil */
 @media (max-width: 768px) {
-    #modal-login .login-logo {
+    #modal-login .modal__logo {
         max-width: 100px;
         margin-bottom: 8px;
     }
@@ -299,7 +299,7 @@
     }
 
     /* Ajuste para el logo (si está en el modal de registro) */
-    #modal-registro .login-logo {
+    #modal-registro .modal__logo {
         max-width: 150px;
         margin-bottom: 20px;
     }

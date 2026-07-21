@@ -274,7 +274,7 @@
 }
 
 /* --- Accordion para sección Seguridad --- */
-.accordion-header {
+.cuenta-seccion .accordion-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -288,11 +288,11 @@
     transition: background 0.2s ease;
 }
 
-.accordion-header:hover {
+.cuenta-seccion .accordion-header:hover {
     background: var(--color-gray-50, #fafafa);
 }
 
-.accordion-header h3 {
+.cuenta-seccion .accordion-header h3 {
     margin: 0;
     padding: 0;
     border: none;
@@ -301,29 +301,29 @@
     color: var(--color-text);
 }
 
-.accordion-icon {
+.cuenta-seccion .accordion-icon {
     font-size: 14px;
     transition: transform 0.3s ease;
     color: var(--color-text-muted);
     padding: 8px;
 }
 
-.accordion-header[aria-expanded="true"] .accordion-icon {
+.cuenta-seccion .accordion-header[aria-expanded="true"] .accordion-icon {
     transform: rotate(180deg);
 }
 
-.accordion-content {
+.cuenta-seccion .accordion-content {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease-out, padding 0.4s ease-out;
     padding: 0 0;
 }
 
-.accordion-content[hidden] {
+.cuenta-seccion .accordion-content[hidden] {
     display: none;
 }
 
-.accordion-content:not([hidden]) {
+.cuenta-seccion .accordion-content:not([hidden]) {
     max-height: 2000px;
     padding: 20px 0;
 }
