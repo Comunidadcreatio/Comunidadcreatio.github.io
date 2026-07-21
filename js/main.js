@@ -16,7 +16,6 @@ import {
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
 } from './perfil.js';
-import { setupBuscador } from './busqueda.js';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil
@@ -29,7 +28,8 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { setRefrescarTablaFn } from './galeria-ui.js';
-import { setupMiCuenta } from './cuenta.js';
+// cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
+// busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
@@ -352,11 +352,13 @@ function setupEvents() {
         });
     }
 
-    // ----- Buscador de usuarios en tiempo real -----
-    setupBuscador(
-        (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
-        (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons))
-    );
+    // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
+    import('./busqueda.js').then(m => {
+        m.setupBuscador(
+            (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
+            (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons))
+        );
+    });
 
     // ----- Botón de configuración (Mi Cuenta) -----
     const configBtn = document.getElementById('btn-configuracion');
@@ -609,8 +611,8 @@ function setupEvents() {
         });
     }
 
-    // ----- Mi Cuenta (email, password, eliminar cuenta) -----
-    setupMiCuenta();
+    // ----- Mi Cuenta (lazy: 13 KB) -----
+    import('./cuenta.js').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
