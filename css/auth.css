@@ -142,6 +142,7 @@ body {
     margin-bottom: 24px;
     line-height: 1.05;
     letter-spacing: -0.03em;
+    text-align: left;
 }
 
 .tagline-bold {
