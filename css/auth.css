@@ -316,26 +316,6 @@ button[type="submit"]:not(.nav-btn):active,
     margin-top: 0;
 }
 
-/* Botón principal (Iniciar Sesión en landing) */
-.primary-btn {
-    width: 100%;
-    padding: 12px 20px;
-    background: var(--color-ink);
-    color: var(--color-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-}
-
-.primary-btn:hover {
-    background: var(--color-ink-light);
-    transform: translateY(-1px);
-}
-
 .secondary-btn:hover {
     background: var(--color-gray-100);
     border-color: var(--color-ink);
@@ -1107,9 +1087,9 @@ legend {
    BOTÓN DE MODO OSCURO (AUTH)
    ============================================== */
 .auth-dark-mode-btn {
-    position: absolute;
+    position: fixed;
     top: 16px;
-    right: 16px;
+    left: 16px;
     background: transparent;
     border: none;
     cursor: pointer;
