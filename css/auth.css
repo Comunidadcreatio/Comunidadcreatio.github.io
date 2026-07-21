@@ -319,7 +319,7 @@ form {
     cursor: not-allowed;
 }
 
-/* Validación visual para registro (igual que login y obra) */
+/* Validación visual para registro (idéntico al login) */
 #registro-form input.input-error,
 #registro-form select.input-error {
     border-color: var(--color-danger) !important;
@@ -335,7 +335,7 @@ form {
 #registro-form input[data-required="true"]:valid,
 #registro-form select[data-required="true"]:valid {
     border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.4) !important;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3) !important;
 }
 #registro-form input,
 #registro-form select {
