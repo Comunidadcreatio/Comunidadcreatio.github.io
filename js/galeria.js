@@ -274,5 +274,5 @@ function cloudinaryUrl(originalUrl, width, height) {
     if (!originalUrl) return '';
     const parts = originalUrl.split('/upload/');
     if (parts.length !== 2) return originalUrl;
-    return `${parts[0]}/upload/w_${width},h_${height},c_limit,q_auto:good/${parts[1]}`;
+    return `${parts[0]}/upload/w_${width},h_${height},c_limit,f_auto,q_auto:good/${parts[1]}`;
 }

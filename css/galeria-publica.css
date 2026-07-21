@@ -487,11 +487,6 @@ html, body {
     border-color: #ffffff;
 }
 
-/* Ocultar elementos legacy (ya no se usan) */
-.obra-imagen-container,
-.obra-footer {
-    display: none;
-}
 
 /* ==============================================
    MODO GRID — misma proporción que vista normal, 3 columnas
