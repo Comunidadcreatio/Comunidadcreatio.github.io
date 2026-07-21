@@ -92,7 +92,7 @@ body {
 /* Expandir formulario al centro cuando no hay branding */
 .auth-right-centered {
     flex: 0 0 420px;
-    margin: 0 auto;
+    margin: auto;
 }
 
 /* ==============================================
@@ -100,11 +100,13 @@ body {
    ============================================== */
 .auth-container {
     width: 100%;
+    max-width: 400px;
     background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     overflow: visible;
     position: relative;
+    margin: 0 auto;
 }
 
 .auth-section {
