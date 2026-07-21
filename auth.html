@@ -372,12 +372,16 @@
             var btnVolverLogin = document.getElementById('btn-volver-landing');
 
             function mostrarFormulario(tipo) {
-                // Ocultar branding y colapsarlo
+                // Animación de salida del branding
                 if (authLeft) authLeft.classList.add('auth-left-hidden');
-                // Centrar formulario
                 if (authRight) authRight.classList.add('auth-right-centered');
                 var authLayout = document.querySelector('.auth-layout');
                 if (authLayout) authLayout.classList.add('auth-layout-centered');
+                
+                // Después de la animación, remover del flujo
+                setTimeout(function() {
+                    if (authLeft) authLeft.style.display = 'none';
+                }, 500);
                 
                 if (tipo === 'login') {
                     if (landing) landing.classList.add('hidden');
@@ -389,7 +393,10 @@
             }
 
             function volverLanding() {
-                if (authLeft) authLeft.classList.remove('auth-left-hidden');
+                if (authLeft) {
+                    authLeft.style.display = '';
+                    authLeft.classList.remove('auth-left-hidden');
+                }
                 if (authRight) authRight.classList.remove('auth-right-centered');
                 var authLayout = document.querySelector('.auth-layout');
                 if (authLayout) authLayout.classList.remove('auth-layout-centered');
