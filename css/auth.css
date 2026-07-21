@@ -319,32 +319,6 @@ form {
     cursor: not-allowed;
 }
 
-/* Validación visual para registro (idéntico al login) */
-#registro-form input.input-error,
-#registro-form select.input-error {
-    border-color: var(--color-danger) !important;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.4) !important;
-    background-color: var(--color-white) !important;
-    color: var(--color-text) !important;
-}
-
-#registro-form input[data-required="true"]:focus,
-#registro-form select[data-required="true"]:focus {
-    border-color: var(--color-ink) !important;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.3) !important;
-    background-color: var(--color-white) !important;
-    color: var(--color-text) !important;
-}
-
-#registro-form input[data-required="true"]:valid,
-#registro-form select[data-required="true"]:valid {
-    border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3) !important;
-    background-color: var(--color-white) !important;
-    color: var(--color-text) !important;
-}
-#registro-form input,
-#registro-form select {
     margin-bottom: 0 !important;
 }
 
@@ -1252,6 +1226,33 @@ legend {
 [data-theme="dark"] #registro-form select,
 [data-theme="dark"] .form-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='%23e5e5e5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ==============================================
+   VALIDACIÓN VISUAL REGISTRO (al final para prioridad)
+   ============================================== */
+#registro-form input.input-error,
+#registro-form select.input-error {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.4) !important;
+    background-color: var(--color-white) !important;
+    color: var(--color-text) !important;
+}
+
+#registro-form input[data-required="true"]:focus,
+#registro-form select[data-required="true"]:focus {
+    border-color: var(--color-ink) !important;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.3) !important;
+    background-color: var(--color-white) !important;
+    color: var(--color-text) !important;
+}
+
+#registro-form input[data-required="true"]:valid,
+#registro-form select[data-required="true"]:valid {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3) !important;
+    background-color: var(--color-white) !important;
+    color: var(--color-text) !important;
 }
 
 /* ==============================================
