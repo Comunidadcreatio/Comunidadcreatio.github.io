@@ -68,7 +68,7 @@
                     <div id="login-form-wrapper" class="hidden">
                         <form id="login-form" novalidate>
                             <label for="login-email" class="visually-hidden">Email</label>
-                            <input type="email" id="login-email" placeholder="Email" required autocomplete="email" data-required="true" style="margin-bottom:6px;">
+                            <input type="email" id="login-email" placeholder="Email" required autocomplete="email" data-required="true" style="margin-bottom:6px !important;">
                             <label for="login-pass" class="visually-hidden">Contraseña</label>
                             <div class="password-wrapper" style="margin-top:0;margin-bottom:12px;">
                                 <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password" data-required="true">
@@ -77,7 +77,7 @@
                             <p class="forgot-password" style="margin:0 0 12px 0;">
                                 <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
                             </p>
-                            <button type="submit" style="margin-bottom:6px;">Entrar</button>
+                            <button type="submit" style="margin-bottom:6px !important;">Entrar</button>
                         </form>
                         <button id="btn-volver-landing" class="secondary-btn" style="margin-top:0;">← Volver</button>
                     </div>
@@ -90,11 +90,11 @@
                 Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
             </p>
             <form id="solicitar-restablecimiento-form" novalidate>
-                <div class="form-group" style="margin-bottom:6px;">
+                <div class="form-group" style="margin-bottom:6px !important;">
                     <label for="forgot-email">Correo electrónico</label>
                     <input type="email" id="forgot-email" placeholder="Ej: ejemplo@gmail.com" required autocomplete="email" data-required="true">
                 </div>
-                <button type="submit" id="btn-enviar-reset" style="margin-bottom:6px;">Enviar enlace</button>
+                <button type="submit" id="btn-enviar-reset" style="margin-bottom:6px !important;">Enviar enlace</button>
             </form>
             <button id="btn-volver-login-from-forgot" class="secondary-btn" style="margin-top:0;">← Volver</button>
             <div id="forgot-msg" class="error-message-field" style="text-align:center; margin-top:12px;"></div>
@@ -106,10 +106,10 @@
 
                 <div class="step" data-step="1">
                     <div class="form-row" style="margin-bottom:0;">
-                        <div class="form-group" style="margin-bottom:6px;">
+                        <div class="form-group" style="margin-bottom:6px !important;">
                             <input type="text" id="reg-nombres" placeholder="Nombres" required autocomplete="given-name" data-required="true">
                         </div>
-                        <div class="form-group" style="margin-bottom:6px;">
+                        <div class="form-group" style="margin-bottom:6px !important;">
                             <input type="text" id="reg-apellidos" placeholder="Apellidos" required autocomplete="family-name" data-required="true">
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                             <option value="" disabled selected>Año</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <select id="reg-genero" required data-required="true">
                             <option value="" disabled selected>Selecciona Género</option>
                             <option value="masculino">Masculino</option>
@@ -146,13 +146,13 @@
                 </div>
 
                 <div class="step" data-step="3" style="display:none;">
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <select id="reg-pais" required data-required="true">
                             <option value="" disabled selected>Selecciona tu país</option>
                             <option value="Venezuela">Venezuela</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <select id="reg-ciudad" required data-required="true">
                             <option value="" disabled selected>Selecciona tu ciudad</option>
                         </select>
@@ -164,10 +164,10 @@
                 </div>
 
                 <div class="step" data-step="4" style="display:none;">
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <input type="email" id="reg-email" placeholder="Correo Electrónico" required data-required="true">
                     </div>
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <input type="text" id="reg-telefono" placeholder="Número de celular" required data-required="true">
                     </div>
                     <div class="step-navigation">
@@ -177,10 +177,10 @@
                 </div>
 
                 <div class="step" data-step="5" style="display:none;">
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required data-required="true">
                     </div>
-                    <div class="form-group" style="margin-bottom:6px;">
+                    <div class="form-group" style="margin-bottom:6px !important;">
                         <div class="password-wrapper">
                             <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" data-required="true">
                             <button type="button" class="toggle-password" data-target="reg-pass" aria-label="Mostrar contraseña"></button>
