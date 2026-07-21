@@ -948,12 +948,8 @@ legend {
     }
 
     .step-navigation {
-        flex-direction: row;
-        gap: 8px;
-    }
-
-    .nav-btn.next-btn {
-        width: auto;
+        flex-direction: column;
+        gap: 6px;
     }
 
     .form-group input,
