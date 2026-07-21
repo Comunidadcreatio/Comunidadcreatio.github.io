@@ -342,14 +342,14 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
                 }
             }
         } else {
-            alert('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
+            showError('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
         }
     } catch (error) {
         console.error('Error al cargar perfil:', error);
         if (error.response && error.response.status === 500) {
-            alert('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
+            showError('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
         } else {
-            alert('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
+            showError('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
         }
     }
 }

@@ -6,7 +6,7 @@
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import {
-    showSuccess, showError, showWarning, showInfo
+    showSuccess, showError, showWarning, showInfo, showConfirm
 } from './notificaciones.js';
 
 // --- Nuevos módulos extraídos ---
@@ -143,7 +143,7 @@ async function closeAllSessions() {
         showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
         return;
     }
-    if (confirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos? Esta acción cerrará tu sesión actual.")) {
+    if (await showConfirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos?\n\nEsta acción cerrará tu sesión actual.")) {
         try {
             const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
             if (res && res.success) {

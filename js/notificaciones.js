@@ -131,3 +131,54 @@ export function setButtonLoading(button, isLoading) {
         }
     }
 }
+
+// ============================================
+// DIÁLOGO DE CONFIRMACIÓN (reemplaza confirm())
+// ============================================
+
+/**
+ * Muestra un modal de confirmación con OK / Cancelar.
+ * Devuelve una Promise que resuelve a true (OK) o false (Cancelar).
+ */
+export function showConfirm(message) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'confirm-overlay';
+        overlay.innerHTML = `
+            <div class="confirm-dialog">
+                <p class="confirm-message"></p>
+                <div class="confirm-actions">
+                    <button class="confirm-btn confirm-btn-cancel">Cancelar</button>
+                    <button class="confirm-btn confirm-btn-ok">Aceptar</button>
+                </div>
+            </div>
+        `;
+        overlay.querySelector('.confirm-message').textContent = message;
+
+        const cleanup = () => {
+            overlay.classList.add('confirm-closing');
+            setTimeout(() => overlay.remove(), 200);
+        };
+
+        overlay.querySelector('.confirm-btn-ok').addEventListener('click', () => {
+            cleanup();
+            resolve(true);
+        });
+        overlay.querySelector('.confirm-btn-cancel').addEventListener('click', () => {
+            cleanup();
+            resolve(false);
+        });
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) { cleanup(); resolve(false); }
+        });
+        document.addEventListener('keydown', function onEsc(e) {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', onEsc);
+                cleanup();
+                resolve(false);
+            }
+        });
+
+        document.body.appendChild(overlay);
+    });
+}

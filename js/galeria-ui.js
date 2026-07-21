@@ -226,8 +226,8 @@ export function isTransitioningNow() {
     return isTransitioning || gridEntering || gridExiting;
 }
 
-export function toggleGaleria(galeriaContainer) {
-    if (isTransitioning || gridEntering || gridExiting || !confirmarDescartarCambios()) return;
+export async function toggleGaleria(galeriaContainer) {
+    if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
 
     const galeria = document.getElementById('galeria-publica');
     const galeriaContainerLocal = obtenerGaleriaContainer();

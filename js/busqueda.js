@@ -3,6 +3,7 @@
 
 import { API_BASE_URL, apiRequest } from './config.js';
 import { debounce, escapeHtml } from './utils.js';
+import { showWarning, showError } from './notificaciones.js';
 
 /**
  * Configura el buscador de usuarios en tiempo real.
@@ -139,7 +140,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
     const buscarUsuarioConBoton = async () => {
         const query = searchInput.value.trim();
         if (query.length < 2) {
-            alert('El término de búsqueda debe tener al menos 2 caracteres');
+            showWarning('El término de búsqueda debe tener al menos 2 caracteres');
             return;
         }
 
@@ -148,11 +149,11 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
             if (response && response.success && response.usuarios.length > 0) {
                 if (mostrarResultadosBusquedaFn) mostrarResultadosBusquedaFn(response.usuarios);
             } else {
-                alert('No se encontraron usuarios con ese nombre');
+                showWarning('No se encontraron usuarios con ese nombre');
             }
         } catch (error) {
             console.error('Error al buscar usuarios:', error);
-            alert('Error al buscar usuarios. Por favor intenta nuevamente.');
+            showError('Error al buscar usuarios. Por favor intenta nuevamente.');
         }
     };
 

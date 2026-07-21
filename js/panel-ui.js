@@ -5,7 +5,7 @@
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
-import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
+import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
 import { decodeHTMLEntities, mostrarErrores } from './utils.js';
 
 // ============================================
@@ -44,9 +44,9 @@ export function setupFormChangeTracking() {
     });
 }
 
-export function confirmarDescartarCambios() {
+export async function confirmarDescartarCambios() {
     if (hayCambiosNoGuardados) {
-        return confirm('⚠️ Tienes cambios sin guardar en el formulario. ¿Estás seguro de que quieres descartarlos?');
+        return await showConfirm('⚠️ Tienes cambios sin guardar en el formulario.\n\n¿Estás seguro de que quieres descartarlos?');
     }
     return true;
 }
@@ -171,7 +171,7 @@ export async function refrescarTabla(tablaBody) {
         },
         // Eliminar obra
         async (id) => {
-            if (!confirm('¿Estás seguro de eliminar esta obra?')) return;
+            if (!(await showConfirm('¿Estás seguro de eliminar esta obra?'))) return;
             const btnEliminar = document.querySelector(`.btn-eliminar[data-id="${id}"]`);
             if (btnEliminar) setButtonLoading(btnEliminar, true);
 
