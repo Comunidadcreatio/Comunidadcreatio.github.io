@@ -289,38 +289,42 @@
             var tagline = document.querySelector('.auth-tagline');
             if (tagline) {
                 var lines = ['Conecta', 'con el Arte', 'en el Táchira'];
-                var spans = tagline.querySelectorAll('.tagline-bold');
-                // Guardar referencias a los spans antes de vaciar
-                var boldWords = [];
-                spans.forEach(function(s) { boldWords.push(s.textContent); });
-                
-                tagline.innerHTML = '';
+                tagline.textContent = '';
                 tagline.classList.add('typing');
+                
+                // Crear cursor visible
+                var cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                cursor.textContent = '|';
+                tagline.appendChild(cursor);
                 
                 var lineIndex = 0;
                 var charIndex = 0;
-                var speed = 120; // ms por carácter (lento)
+                var speed = 120;
+                // Guardar texto acumulado
+                var builtLines = ['', '', ''];
                 
                 function typeTagline() {
                     if (lineIndex < lines.length) {
                         var line = lines[lineIndex];
                         if (charIndex < line.length) {
-                            tagline.innerHTML += line.charAt(charIndex);
+                            builtLines[lineIndex] += line.charAt(charIndex);
                             charIndex++;
+                            // Reconstruir HTML: líneas completadas + línea actual + cursor
+                            var html = '';
+                            for (var l = 0; l <= lineIndex; l++) {
+                                if (l > 0) html += '<br>';
+                                html += builtLines[l];
+                            }
+                            // Insertar antes del cursor
+                            tagline.innerHTML = html;
+                            tagline.appendChild(cursor);
                             setTimeout(typeTagline, speed);
                         } else {
-                            // Línea completa, añadir <br> si no es la última
-                            if (lineIndex < lines.length - 1) {
-                                tagline.innerHTML += '<br>';
-                            }
                             lineIndex++;
                             charIndex = 0;
-                            setTimeout(typeTagline, speed * 2); // pausa entre líneas
+                            setTimeout(typeTagline, speed * 2);
                         }
-                    } else {
-                        // Terminó — restaurar los spans bold
-                        // (simplemente dejamos el texto plano, el efecto bold se pierde
-                        //  pero el typewriter es el foco)
                     }
                 }
                 
@@ -333,17 +337,22 @@
                 var text = subtitle.textContent.trim();
                 subtitle.textContent = '';
                 subtitle.classList.add('typing');
+                var cursor2 = document.createElement('span');
+                cursor2.className = 'typing-cursor';
+                cursor2.textContent = '|';
+                subtitle.appendChild(cursor2);
+                
                 var i = 0;
                 var subSpeed = 35;
                 function typeSub() {
                     if (i < text.length) {
                         subtitle.textContent += text.charAt(i);
+                        subtitle.appendChild(cursor2);
                         i++;
                         setTimeout(typeSub, subSpeed);
                     }
                 }
-                // Iniciar después de que el tagline termine (~3 líneas * ~15 chars * 120ms = ~5.4s)
-                setTimeout(typeSub, 6000);
+                setTimeout(typeSub, 7000);
             }
         })();
     </script>

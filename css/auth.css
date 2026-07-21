@@ -157,24 +157,21 @@ body {
     max-width: 500px;
 }
 
-/* Cursor parpadeante del typewriter */
-.auth-subtitle.typing::after {
-    content: '|';
-    animation: blink 0.8s step-end infinite;
+/* Cursor parpadeante del typewriter (via JS .typing-cursor) */
+.typing-cursor {
+    animation: blink 1.2s step-end infinite;
     color: var(--color-ink);
-    font-weight: 700;
+    font-weight: 400;
 }
 
 @keyframes blink {
     50% { opacity: 0; }
 }
 
-/* Cursor lento para el tagline */
+/* Quitar cursores ::after viejos */
+.auth-subtitle.typing::after,
 .auth-tagline.typing::after {
-    content: '|';
-    animation: blink 1.2s step-end infinite;
-    color: var(--color-ink);
-    font-weight: 400;
+    content: none;
 }
 
 /* Divider "o" entre login y registro */
