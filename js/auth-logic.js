@@ -1,8 +1,10 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
 import { login, register } from './auth.js';
-import { API_BASE_URL, ARTISTA_KEY } from './config.js';
+import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
+import { mostrarErrores, debounce } from './utils.js';
+import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupDarkModeToggle } from './theme.js';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -52,31 +54,7 @@ function poblarCiudades(paisSeleccionado) {
     }
 }
 
-function mostrarErrores(result) {
-    if (Array.isArray(result.errors) && result.errors.length > 0) {
-        const mensaje = result.errors.join('\n• ');
-        showError('Se encontraron los siguientes errores:\n\n• ' + mensaje);
-    } else if (result.error) {
-        showError('Error: ' + result.error);
-    } else {
-        showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
-    }
-}
-
-// ============================================
-// VERIFICACIÓN EN TIEMPO REAL
-// ============================================
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+// mostrarErrores y debounce importados de utils.js
 
 async function verificarDisponibilidad(tipo, valor, inputElement) {
     const clave = tipo === 'email' ? 'email' : 'nombre';
@@ -94,8 +72,7 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
             ? `/api/artistas/verificar-email/${encodeURIComponent(valor)}`
             : `/api/artistas/verificar-nombre/${encodeURIComponent(valor)}`;
 
-        const res = await fetch(`${API_BASE_URL}${endpoint}`);
-        const data = await res.json();
+        const data = await apiRequest(endpoint);
 
         let msg = inputElement.parentElement.querySelector('.validation-message');
         if (!msg) {
@@ -588,12 +565,10 @@ document.addEventListener('DOMContentLoaded', function() {
             msgEl.style.display = 'none';
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/artistas/solicitar-restablecimiento`, {
+                const data = await apiRequest('/api/artistas/solicitar-restablecimiento', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
-                const data = await res.json();
                 setButtonLoading(btn, false);
                 if (data.success || res.ok) {
                     emailInput.value = '';
@@ -815,61 +790,6 @@ document.addEventListener('DOMContentLoaded', function() {
     showStep(1);
 
     // ============================================
-    // MODO OSCURO - DETECCIÓN AUTOMÁTICA POR HORA
-    // ============================================
-    const authDarkModeBtn = document.getElementById('auth-dark-mode-btn');
-    const authDarkModeIcon = document.getElementById('auth-dark-mode-icon');
-
-    // Función para determinar el tema basado en la hora
-    function getThemeByTime() {
-        const hour = new Date().getHours();
-        // 6 AM (6) a 6 PM (18): modo claro
-        // 6 PM (18) a 6 AM (6): modo oscuro
-        if (hour >= 6 && hour < 18) {
-            return 'light';
-        } else {
-            return 'dark';
-        }
-    }
-
-    // Función para actualizar el icono
-    function updateDarkModeIcon(theme) {
-        if (authDarkModeIcon) {
-            if (theme === 'dark') {
-                authDarkModeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-            } else {
-                authDarkModeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-            }
-        }
-    }
-
-    // Función para aplicar el tema
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        updateDarkModeIcon(theme);
-    }
-
-    // Inicializar tema: primero verificar preferencia guardada, si no hay, usar hora
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            applyTheme(savedTheme);
-        } else {
-            const timeBasedTheme = getThemeByTime();
-            applyTheme(timeBasedTheme);
-        }
-    }
-
-    // Inicializar tema al cargar
-    initializeTheme();
-
-    // Event listener para el botón de modo oscuro
-    if (authDarkModeBtn) {
-        authDarkModeBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
-    }
+    // MODO OSCURO — delegado a theme.js (compatible con index.html y auth.html)
+    setupDarkModeToggle();
 });
