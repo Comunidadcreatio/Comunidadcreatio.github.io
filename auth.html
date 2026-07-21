@@ -269,6 +269,27 @@
             setTimeout(ocultarPreloader, MIN_DISPLAY_MS);
         })();
     </script>
+    <!-- Efecto typewriter en el subtítulo -->
+    <script>
+        (function() {
+            var el = document.querySelector('.auth-subtitle');
+            if (!el) return;
+            var text = el.textContent.trim();
+            el.textContent = '';
+            el.classList.add('typing');
+            var i = 0;
+            var speed = 35; // ms por carácter
+            function type() {
+                if (i < text.length) {
+                    el.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            // Iniciar después del preloader
+            setTimeout(type, 1000);
+        })();
+    </script>
     </main>
 </body>
 </html>
