@@ -186,13 +186,25 @@ body {
 /* ==============================================
    TÍTULOS
    ============================================== */
-.auth-section h1 {
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 24px;
-    letter-spacing: -0.025em;
+/* ==============================================
+   HEADER SUPERIOR
+   ============================================== */
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-white);
+}
+
+.auth-header-left {
+    width: 40px; /* mismo ancho que el botón para balance */
+}
+
+.auth-header-logo {
+    height: 28px;
+    width: auto;
 }
 
 .auth-section h2 {
@@ -768,7 +780,7 @@ legend {
 .auth-footer {
     padding: 24px;
     border-top: 1px solid var(--color-gray-200);
-    background: var(--color-gray-50);
+    background: var(--color-white);
 }
 
 .auth-footer-links {
@@ -963,8 +975,17 @@ legend {
     color: var(--color-ink);
 }
 
+[data-theme="dark"] .auth-header {
+    background-color: #121212;
+    border-bottom-color: var(--color-border);
+}
+
+[data-theme="dark"] .auth-header-logo {
+    filter: brightness(0) invert(1);
+}
+
 [data-theme="dark"] .auth-footer {
-    background-color: #0a0a0a;
+    background-color: #121212;
     border-top-color: var(--color-border);
 }
 
@@ -1094,9 +1115,6 @@ legend {
    BOTÓN DE MODO OSCURO (AUTH)
    ============================================== */
 .auth-dark-mode-btn {
-    position: fixed;
-    top: 16px;
-    left: 16px;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -1107,7 +1125,6 @@ legend {
     align-items: center;
     justify-content: center;
     color: var(--color-gray-600);
-    z-index: 1000;
 }
 
 .auth-dark-mode-btn:hover {
