@@ -45,23 +45,33 @@
                 <!-- LOGIN SECTION -->
                 <div id="login-section" class="auth-section">
                     <h1>Iniciar Sesión</h1>
-                    <form id="login-form">
-                        <label for="login-email" class="visually-hidden">Email</label>
-                        <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
-                        <label for="login-pass" class="visually-hidden">Contraseña</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password">
-                            <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
+
+                    <!-- Vista inicial: solo botones -->
+                    <div id="login-landing">
+                        <button id="btn-mostrar-login" class="primary-btn">Iniciar Sesión</button>
+                        <div class="auth-divider">
+                            <span>o</span>
                         </div>
-                        <p class="forgot-password">
-                            <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
-                        </p>
-                        <button type="submit">Entrar</button>
-                    </form>
-                    <div class="auth-divider">
-                        <span>o</span>
+                        <button id="btn-ir-registro" class="secondary-btn">Crear cuenta nueva</button>
                     </div>
-                    <button id="btn-ir-registro" class="secondary-btn">Crear cuenta nueva</button>
+
+                    <!-- Formulario de login (oculto hasta que se pulse el botón) -->
+                    <div id="login-form-wrapper" class="hidden">
+                        <form id="login-form">
+                            <label for="login-email" class="visually-hidden">Email</label>
+                            <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
+                            <label for="login-pass" class="visually-hidden">Contraseña</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password">
+                                <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
+                            </div>
+                            <p class="forgot-password">
+                                <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
+                            </p>
+                            <button type="submit">Entrar</button>
+                        </form>
+                        <button id="btn-volver-landing" class="secondary-btn">← Volver</button>
+                    </div>
                 </div>
 
         <!-- Botón de modo oscuro -->
@@ -289,6 +299,28 @@
             }
             // Iniciar después del preloader
             setTimeout(type, 1000);
+        })();
+    </script>
+    <!-- Toggle landing → formulario login -->
+    <script>
+        (function() {
+            var btnMostrar = document.getElementById('btn-mostrar-login');
+            var btnVolver = document.getElementById('btn-volver-landing');
+            var landing = document.getElementById('login-landing');
+            var formWrapper = document.getElementById('login-form-wrapper');
+
+            if (btnMostrar && formWrapper) {
+                btnMostrar.addEventListener('click', function() {
+                    landing.classList.add('hidden');
+                    formWrapper.classList.remove('hidden');
+                });
+            }
+            if (btnVolver && landing) {
+                btnVolver.addEventListener('click', function() {
+                    formWrapper.classList.add('hidden');
+                    landing.classList.remove('hidden');
+                });
+            }
         })();
     </script>
     </main>

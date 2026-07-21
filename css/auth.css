@@ -313,7 +313,27 @@ button[type="submit"]:not(.nav-btn):active,
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
-    margin-top: 12px;
+    margin-top: 0;
+}
+
+/* Botón principal (Iniciar Sesión en landing) */
+.primary-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--color-ink);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.primary-btn:hover {
+    background: var(--color-ink-light);
+    transform: translateY(-1px);
 }
 
 .secondary-btn:hover {
