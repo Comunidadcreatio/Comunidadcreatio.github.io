@@ -32,6 +32,13 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+}
+
+#main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 /* .visually-hidden y .hidden ya están en style.css (cargado antes en auth.html) */
