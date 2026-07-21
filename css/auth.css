@@ -266,7 +266,6 @@ form {
 }
 
 .form-group {
-    margin-bottom: 6px;
     width: 100%;
 }
 
@@ -615,6 +614,9 @@ button[type="submit"]:not(.nav-btn):active,
 .step {
     width: 100%;
     animation: slideIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 @keyframes slideIn {
@@ -1091,7 +1093,7 @@ legend {
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select {
     background-color: #121212 !important;
-    border-color: #e5e5e5 !important;
+    border-color: var(--color-border) !important;
     color: var(--color-ink) !important;
 }
 
