@@ -703,12 +703,9 @@ legend {
 
 .step-navigation .nav-btn {
     box-sizing: border-box !important;
-    width: auto !important;
-    height: 44px !important;
-    padding: 0 16px !important;
-    margin: 0 !important;
-    font-size: 14px !important;
-    line-height: normal !important;
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 14px;
 }
 
 .nav-btn:disabled {
