@@ -119,22 +119,27 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
-    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .auth-section.fade-out {
-    opacity: 0;
+    opacity: 0 !important;
     transform: translateY(-8px);
     pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .auth-section.fade-in {
-    animation: authFadeIn 0.3s ease-out forwards;
+    opacity: 1 !important;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-@keyframes authFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* Animar entrada cuando NO está en fade-out */
+#login-section:not(.hidden):not(.fade-out),
+#registro-section:not(.hidden):not(.fade-out),
+#forgot-section:not(.hidden):not(.fade-out) {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Login section */
