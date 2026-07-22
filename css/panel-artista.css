@@ -1267,6 +1267,8 @@
 @media (min-width: 1024px) {
     .perfil-grid-obras {
         width: 110%;
-        margin-left: -5%;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
