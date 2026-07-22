@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Navegación de pasos del registro
+    // Navegación de pasos del registro (sin transición cinematográfica)
     document.addEventListener('click', function(e) {
         if (e.target.closest('.nav-btn')) {
             const btn = e.target.closest('.nav-btn');
@@ -611,17 +611,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isPrev) {
                 if (step === 1) {
-                    showLoginSection();
+                    // Usar transición cinematográfica para volver al login
+                    fadeTransition(() => {
+                        document.getElementById('login-section').classList.remove('hidden');
+                        document.getElementById('registro-section').classList.add('hidden');
+                        if (window.volverAlBranding) window.volverAlBranding();
+                    });
                     return;
                 }
-                const newStep = step - 1;
-                showStep(newStep);
+                showStep(step - 1);
             } else {
                 if (!validateStep(step)) return;
-                const newStep = step + 1;
-                if (newStep <= totalSteps) {
-                    showStep(newStep);
-                }
+                if (step + 1 <= totalSteps) showStep(step + 1);
             }
         }
     });
