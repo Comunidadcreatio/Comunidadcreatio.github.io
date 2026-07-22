@@ -469,3 +469,20 @@ picture {
         font-size: 10px;
     }
 }
+
+/* ==============================================
+   DESKTOP: Logo más grande
+   ============================================== */
+@media (min-width: 1024px) {
+    picture {
+        height: 48px;
+        max-height: 48px;
+    }
+
+    .header__logo {
+        height: 42px;
+        max-width: none;
+        max-height: 42px;
+        transform: translateY(0);
+    }
+}
