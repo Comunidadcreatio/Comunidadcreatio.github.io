@@ -25,7 +25,7 @@
    ============================================== */
 .filter-controls {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     gap: 8px;
     margin-bottom: 1.5rem;
     align-items: center;
@@ -1004,7 +1004,7 @@
         width: 100%;
         padding: 0;
         gap: 6px;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: 1fr;
     }
     .filter-controls input[type="text"],
     .filter-controls select {
