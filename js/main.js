@@ -495,7 +495,7 @@ function setupEvents() {
         const triggerRect = trigger.getBoundingClientRect();
         const panelRect = panelDiv.getBoundingClientRect();
         const margin = 8;
-        const gap = 3;
+        const gap = 8;
         const iconCenterX = triggerRect.left + triggerRect.width / 2;
         // Posicionar arriba del botón
         let top = triggerRect.top - panelRect.height - gap;
