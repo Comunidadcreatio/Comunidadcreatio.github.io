@@ -385,6 +385,7 @@ export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn
 // TABS DEL PERFIL (cavents, problogs, comcons)
 // ============================================
 let perfilTabActual = 'cavents';
+let perfilExternoId = null; // ID del usuario externo que se está viendo
 
 function setupPerfilTabs() {
     const tabs = document.querySelectorAll('.perfil-tab-btn');
@@ -404,6 +405,7 @@ function setupPerfilTabs() {
 
 export function activarTabCavents() {
     perfilTabActual = 'cavents';
+    perfilExternoId = null;
     const tabs = document.querySelectorAll('.perfil-tab-btn');
     tabs.forEach(t => t.classList.remove('active'));
     const caventsTab = document.querySelector('.perfil-tab-btn[data-tab="cavents"]');
@@ -415,16 +417,27 @@ async function cargarContenidoTab(tab) {
     const content = document.getElementById('perfil-tab-content');
     if (!content) return;
 
+    const viendoExterno = !!perfilExternoId;
+
     if (tab === 'cavents') {
-        content.innerHTML = '<div class="perfil-grid-loading" style="text-align:center;padding:20px;color:var(--color-text-muted);">Cargando obras...</div>';
+        content.innerHTML = '<div class="perfil-grid-loading">Cargando obras...</div>';
         try {
-            const res = await apiRequest('/api/artistas/mis-obras?limit=50');
-            if (res && res.success && res.obras) {
-                // Filtrar solo obras activas
-                const obrasActivas = res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)');
-                renderizarGridObras(obrasActivas, content);
+            if (viendoExterno) {
+                const res = await apiRequest('/obras');
+                if (res && Array.isArray(res)) {
+                    const obrasUsuario = res.filter(obra => String(obra.artista_user_id) === String(perfilExternoId));
+                    renderizarGridObras(obrasUsuario, content);
+                } else {
+                    content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
+                }
             } else {
-                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
+                const res = await apiRequest('/api/artistas/mis-obras?limit=50');
+                if (res && res.success && res.obras) {
+                    const obrasActivas = res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)');
+                    renderizarGridObras(obrasActivas, content);
+                } else {
+                    content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
+                }
             }
         } catch (e) {
             content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
@@ -437,32 +450,13 @@ async function cargarContenidoTab(tab) {
 }
 
 async function cargarObrasExternas(userId) {
-    const content = document.getElementById('perfil-tab-content');
-    if (!content) return;
-
-    // Activar tab cavents visualmente
+    perfilExternoId = userId;
     perfilTabActual = 'cavents';
     const tabs = document.querySelectorAll('.perfil-tab-btn');
     tabs.forEach(t => t.classList.remove('active'));
     const caventsTab = document.querySelector('.perfil-tab-btn[data-tab="cavents"]');
     if (caventsTab) caventsTab.classList.add('active');
-
-    content.innerHTML = '<div class="perfil-grid-loading">Cargando obras...</div>';
-    try {
-        const res = await apiRequest('/obras');
-        if (res && Array.isArray(res)) {
-            const obrasUsuario = res.filter(obra => String(obra.artista_user_id) === String(userId));
-            if (obrasUsuario.length > 0) {
-                renderizarGridObras(obrasUsuario, content);
-            } else {
-                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Este usuario no tiene obras registradas.</p>';
-            }
-        } else {
-            content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
-        }
-    } catch (e) {
-        content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
-    }
+    cargarContenidoTab('cavents');
 }
 
 function renderizarGridObras(obras, container) {
