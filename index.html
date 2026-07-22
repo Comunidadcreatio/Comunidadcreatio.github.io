@@ -255,62 +255,6 @@
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
         <section id="panel-artista" class="hidden" aria-label="Panel del artista" role="region">
 
-            <!-- Controles de búsqueda y filtros -->
-            <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
-                <!-- Fila 1: Buscar + Ordenar por -->
-                <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
-                <label for="sort-select" class="visually-hidden">Ordenar por</label>
-                <select id="sort-select" aria-label="Criterio de ordenamiento">
-                    <option value="id">Ordenar por ID</option>
-                    <option value="titulo">Ordenar por Título</option>
-                    <option value="precio">Ordenar por Precio</option>
-                    <option value="status">Ordenar por Status</option>
-                </select>
-                <!-- Fila 2: Orden + Resultados por página -->
-                <label for="order-select" class="visually-hidden">Orden</label>
-                <select id="order-select" aria-label="Orden de clasificación">
-                    <option value="DESC">Descendente</option>
-                    <option value="ASC">Ascendente</option>
-                </select>
-                <label for="limit-select" class="visually-hidden">Resultados por página</label>
-                <select id="limit-select" aria-label="Cantidad de resultados por página">
-                    <option value="5">5 por página</option>
-                    <option value="10" selected>10 por página</option>
-                    <option value="20">20 por página</option>
-                    <option value="50">50 por página</option>
-                </select>
-                <!-- Fila 3: Botón Aplicar -->
-                <button id="btn-aplicar-filtros" type="button">Aplicar</button>
-            </div>
-
-            <!-- Controles de paginación -->
-            <div class="pagination-controls" role="navigation" aria-label="Paginación de resultados">
-                <span id="page-info" aria-live="polite">Página 1</span>
-                <div class="pagination-buttons">
-                    <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
-                    <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
-                </div>
-            </div>
-
-            <!-- Tabla de obras -->
-            <div id="tabla-obras-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Título</th>
-                            <th>Precio</th>
-                            <th>Imagen</th>
-                            <th>Status</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-obras-body">
-                        <!-- Filas de obras -->
-                    </tbody>
-                </table>
-            </div>
-
             <!-- Formulario para agregar/editar obra -->
             <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
                 <h3 id="form-obra-title">Crear Cavent</h3>
@@ -664,6 +608,61 @@
 
                 </form>
 
+            </div>
+            <!-- Controles de búsqueda y filtros -->
+            <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
+                <!-- Fila 1: Buscar + Ordenar por -->
+                <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
+                <label for="sort-select" class="visually-hidden">Ordenar por</label>
+                <select id="sort-select" aria-label="Criterio de ordenamiento">
+                    <option value="id">Ordenar por ID</option>
+                    <option value="titulo">Ordenar por Título</option>
+                    <option value="precio">Ordenar por Precio</option>
+                    <option value="status">Ordenar por Status</option>
+                </select>
+                <!-- Fila 2: Orden + Resultados por página -->
+                <label for="order-select" class="visually-hidden">Orden</label>
+                <select id="order-select" aria-label="Orden de clasificación">
+                    <option value="DESC">Descendente</option>
+                    <option value="ASC">Ascendente</option>
+                </select>
+                <label for="limit-select" class="visually-hidden">Resultados por página</label>
+                <select id="limit-select" aria-label="Cantidad de resultados por página">
+                    <option value="5">5 por página</option>
+                    <option value="10" selected>10 por página</option>
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                </select>
+                <!-- Fila 3: Botón Aplicar -->
+                <button id="btn-aplicar-filtros" type="button">Aplicar</button>
+            </div>
+
+            <!-- Controles de paginación -->
+            <div class="pagination-controls" role="navigation" aria-label="Paginación de resultados">
+                <span id="page-info" aria-live="polite">Página 1</span>
+                <div class="pagination-buttons">
+                    <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
+                    <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
+                </div>
+            </div>
+
+            <!-- Tabla de obras -->
+            <div id="tabla-obras-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Precio</th>
+                            <th>Imagen</th>
+                            <th>Status</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-obras-body">
+                        <!-- Filas de obras -->
+                    </tbody>
+                </table>
             </div>
         </section>
 
