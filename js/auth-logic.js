@@ -493,16 +493,16 @@ function switchSection(fromId, toId) {
             fromEl.classList.add('hidden');
             fromEl.classList.remove('fade-out');
             showTarget();
-        }, 320);
+        }, 480);
     } else {
         showTarget();
     }
 
     function showTarget() {
         // Preparar entrada: opacity 0 primero
-        toEl.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+        toEl.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         toEl.style.opacity = '0';
-        toEl.style.transform = 'translateY(12px)';
+        toEl.style.transform = 'translateY(16px)';
         toEl.classList.remove('hidden');
         toEl.offsetHeight;
         toEl.style.opacity = '1';
@@ -511,7 +511,7 @@ function switchSection(fromId, toId) {
             toEl.style.opacity = '';
             toEl.style.transform = '';
             toEl.style.transition = '';
-        }, 350);
+        }, 500);
     }
 }
 
