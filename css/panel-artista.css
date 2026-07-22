@@ -1134,7 +1134,7 @@
 }
 
 [data-theme="dark"] #tabla-obras-container table {
-    background-color: #121212;
+    background-color: #0a0a0a;
 }
 
 [data-theme="dark"] #tabla-obras-container th,
@@ -1144,7 +1144,7 @@
 }
 
 [data-theme="dark"] #tabla-obras-container th {
-    background-color: #121212;
+    background-color: #0a0a0a;
 }
 
 [data-theme="dark"] #tabla-obras-container td img {
