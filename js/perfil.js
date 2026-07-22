@@ -420,7 +420,9 @@ async function cargarContenidoTab(tab) {
         try {
             const res = await apiRequest('/api/artistas/mis-obras?limit=50');
             if (res && res.success && res.obras) {
-                renderizarGridObras(res.obras, content);
+                // Filtrar solo obras activas
+                const obrasActivas = res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)');
+                renderizarGridObras(obrasActivas, content);
             } else {
                 content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
             }
