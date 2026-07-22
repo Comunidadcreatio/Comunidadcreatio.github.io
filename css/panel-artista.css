@@ -126,8 +126,8 @@
    TABLA DE OBRAS
    ============================================== */
 #tabla-obras-container {
-    border: 1px solid #000;
-    border-radius: 4px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
     overflow: hidden;
     margin-bottom: 2rem;
 }
@@ -135,51 +135,92 @@
 #tabla-obras-container table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--color-white);
 }
 
 #tabla-obras-container th,
 #tabla-obras-container td {
-    padding: 12px;
+    padding: 10px 8px;
     text-align: left;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid var(--color-gray-200);
+    vertical-align: middle;
 }
 
 #tabla-obras-container th {
     background-color: #f8f9fa;
     font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted, #888);
+    border-bottom: 2px solid var(--color-gray-300);
+}
+
+#tabla-obras-container tbody tr:hover {
+    background: var(--color-gray-50, #f5f5f5);
 }
 
 #tabla-obras-container td img {
-    width: 50px;
-    height: 50px;
+    width: 36px;
+    height: 36px;
     object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #000;
+    border-radius: 8px;
 }
 
 #tabla-obras-container tr:last-child td {
     border-bottom: none;
 }
 
+/* Columnas compactas */
+.col-id {
+    width: 80px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.col-precio {
+    width: 70px;
+    text-align: right;
+    font-weight: 500;
+}
+
+.col-imagen {
+    width: 52px;
+    text-align: center;
+}
+
+.col-acciones {
+    width: 100px;
+}
+
 /* ==============================================
    COLUMNA STATUS (texto simple de color)
    ============================================== */
-.status-text {
-    font-weight: 700;
-    font-size: 13px;
+/* Status badges tipo píldora */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
-.status-text.status-activo {
-    color: var(--color-success, #28a745);
+.status-badge.status-activo {
+    background: #d4edda;
+    color: #155724;
 }
 
-.status-text.status-inactivo {
-    color: var(--color-danger, #dc3545);
+.status-badge.status-inactivo {
+    background: #e2e3e5;
+    color: #383d41;
 }
 
-.status-text.status-desconocido {
-    color: var(--color-text-muted, #6c757d);
+.status-badge.status-desconocido {
+    background: #fff3cd;
+    color: #856404;
 }
 
 /* ==============================================
@@ -195,16 +236,26 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     margin: 0;
-    border: 1px solid var(--color-gray-300);
+    border: none;
     border-radius: 8px;
-    background: var(--color-white);
-    color: var(--color-ink);
+    background: transparent;
+    color: var(--color-text-muted, #888);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    transition: all 0.15s ease;
+}
+
+#tabla-obras-container td .btn-accion:hover {
+    background: var(--color-gray-100);
+    color: var(--color-ink);
+}
+
+.btn-eliminar:hover {
+    color: #e74c3c !important;
+    background: #fde8e8 !important;
 }
 
 .btn-accion svg {
@@ -1138,7 +1189,7 @@
 }
 
 [data-theme="dark"] #tabla-obras-container {
-    border-color: #e5e5e5;
+    border-color: #333;
 }
 
 [data-theme="dark"] #tabla-obras-container table {
@@ -1147,26 +1198,50 @@
 
 [data-theme="dark"] #tabla-obras-container th,
 [data-theme="dark"] #tabla-obras-container td {
-    border-bottom-color: #e5e5e5;
+    border-bottom-color: #333;
     color: var(--color-ink);
 }
 
 [data-theme="dark"] #tabla-obras-container th {
-    background-color: #0a0a0a;
+    background-color: #111;
+    border-bottom-color: #444;
+}
+
+[data-theme="dark"] #tabla-obras-container tbody tr:hover {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] #tabla-obras-container td .btn-accion {
+    color: #888;
+}
+
+[data-theme="dark"] #tabla-obras-container td .btn-accion:hover {
+    background: #222;
+    color: #fff;
+}
+
+[data-theme="dark"] .btn-eliminar:hover {
+    color: #e74c3c !important;
+    background: #2a1010 !important;
+}
+
+[data-theme="dark"] .status-badge.status-activo {
+    background: #0d2818;
+    color: #4caf50;
+}
+
+[data-theme="dark"] .status-badge.status-inactivo {
+    background: #1a1a1a;
+    color: #888;
+}
+
+[data-theme="dark"] .status-badge.status-desconocido {
+    background: #2a2000;
+    color: #ffc107;
 }
 
 [data-theme="dark"] #tabla-obras-container td img {
-    border-color: #e5e5e5;
-}
-
-[data-theme="dark"] .btn-accion {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .btn-accion:hover {
-    background-color: var(--color-gray-200);
+    border-color: #333;
 }
 
 [data-theme="dark"] .cuenta-item {

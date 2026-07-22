@@ -39,12 +39,12 @@ export function renderizarTabla(obras, container, onEditar, onEliminar, onDuplic
         // ✅ Usar miniatura para la tabla
         const imgSrc = obra.imagen_thumbnail_url || obra.imagen_url || '';
         tr.innerHTML = `
-            <td>${escapeHtml(obra.id_personalizado || String(obra.id))}</td>
+            <td class="col-id">${escapeHtml(obra.id_personalizado || String(obra.id))}</td>
             <td>${escapeHtml(obra.titulo)}</td>
-            <td>${escapeHtml(obra.precio)}</td>
-            <td><img src="${escapeHtml(imgSrc)}" width="50"></td>
-            <td><span class="status-text ${statusClass}">${escapeHtml(statusLabel)}</span></td>
-            <td>
+            <td class="col-precio">${escapeHtml(obra.precio)}</td>
+            <td class="col-imagen"><img src="${escapeHtml(imgSrc)}" width="36" height="36"></td>
+            <td><span class="status-badge ${statusClass}">${escapeHtml(statusLabel)}</span></td>
+            <td class="col-acciones">
                 <div class="acciones-obra">
                     <button class="btn-accion btn-editar" data-id="${obra.id}" title="Editar" aria-label="Editar obra">${ICONS.editar}</button>
                     <button class="btn-accion btn-duplicar" data-id="${obra.id}" title="Duplicar" aria-label="Duplicar obra">${ICONS.duplicar}</button>
