@@ -116,7 +116,7 @@ async function fetchActiveSessionsCount() {
 
 function updateCerrarTodasSesionesButtonState() {
     const mobileAllBtn = document.getElementById('mobile-logout-all');
-    const isEnabled = activeSessionsCount >= 2;
+    const isEnabled = activeSessionsCount >= 3;
 
     if (mobileAllBtn) {
         if (isEnabled) {
@@ -139,7 +139,7 @@ function updateCerrarTodasSesionesButtonState() {
 }
 
 async function closeAllSessions() {
-    if (activeSessionsCount < 2) {
+    if (activeSessionsCount < 3) {
         showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
         return;
     }
@@ -549,7 +549,7 @@ function setupEvents() {
     if (mobileAll) {
         mobileAll.addEventListener('click', async () => {
             cerrarMobileLogoutModal();
-            if (activeSessionsCount >= 2) {
+            if (activeSessionsCount >= 3) {
                 await closeAllSessions();
             } else {
                 showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
