@@ -792,7 +792,6 @@ legend {
    ============================================== */
 .input-error {
     border-color: var(--color-danger) !important;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.4) !important;
 }
 
 .input-available {
@@ -1274,19 +1273,16 @@ legend {
 #registro-form input.input-error,
 #registro-form select.input-error {
     border-color: var(--color-danger) !important;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.4) !important;
 }
 
 #registro-form input[data-required="true"]:focus,
 #registro-form select[data-required="true"]:focus {
     border-color: var(--color-ink) !important;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.3) !important;
 }
 
 #registro-form input[data-required="true"]:valid,
 #registro-form select[data-required="true"]:valid {
     border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3) !important;
 }
 
 /* ==============================================
