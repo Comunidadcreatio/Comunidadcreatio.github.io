@@ -335,8 +335,10 @@ form {
     height: 100%;
     background: var(--color-ink);
     border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
 .reg-step-label {
-    font-size: 11px;
     font-size: 11px;
     font-weight: 600;
     color: var(--color-gray-400);
