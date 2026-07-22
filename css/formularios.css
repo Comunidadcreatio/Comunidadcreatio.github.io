@@ -452,6 +452,15 @@ form *,
     margin-top: 0;
 }
 
+.form-obra-subtitle {
+    font-size: 13px;
+    color: var(--color-text-muted, #888);
+    text-align: center;
+    margin: -10px 0 16px 0;
+    font-style: italic;
+    line-height: 1.4;
+}
+
 .dimensiones-group input,
 .name-group input,
 .date-group select {
@@ -1065,6 +1074,10 @@ form,
 [data-theme="dark"] #formulario-obra h2,
 [data-theme="dark"] #formulario-obra h3 {
     color: var(--color-ink);
+}
+
+[data-theme="dark"] .form-obra-subtitle {
+    color: #aaa;
 }
 
 [data-theme="dark"] #formulario-obra label {
