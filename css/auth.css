@@ -119,12 +119,12 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
 .auth-section.fade-out {
     opacity: 0 !important;
-    transform: translateY(-8px);
+    transform: translateY(-12px);
     pointer-events: none;
 }
 

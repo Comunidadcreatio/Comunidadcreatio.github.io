@@ -493,24 +493,25 @@ function switchSection(fromId, toId) {
             fromEl.classList.add('hidden');
             fromEl.classList.remove('fade-out');
             showTarget();
-        }, 280);
+        }, 320);
     } else {
         showTarget();
     }
 
     function showTarget() {
         // Preparar entrada: opacity 0 primero
+        toEl.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
         toEl.style.opacity = '0';
-        toEl.style.transform = 'translateY(8px)';
+        toEl.style.transform = 'translateY(12px)';
         toEl.classList.remove('hidden');
-        // Forzar reflow y luego animar entrada
         toEl.offsetHeight;
         toEl.style.opacity = '1';
         toEl.style.transform = 'translateY(0)';
         setTimeout(() => {
             toEl.style.opacity = '';
             toEl.style.transform = '';
-        }, 300);
+            toEl.style.transition = '';
+        }, 350);
     }
 }
 
