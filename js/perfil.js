@@ -474,38 +474,69 @@ function renderizarGridObras(obras, container) {
         const card = document.createElement('div');
         card.className = 'perfil-obra-card';
         card.dataset.obraId = obra.id;
-        const imgUrl = obra.imagen_url || obra.imagen_thumbnail_url || '';
 
-        // Contar imágenes disponibles
+        // Construir array de imágenes
         const imagenes = [];
         if (obra.imagen_url) imagenes.push(obra.imagen_url);
         if (obra.imagen_url_1) imagenes.push(obra.imagen_url_1);
         if (obra.imagen_url_2) imagenes.push(obra.imagen_url_2);
         if (obra.imagen_url_3) imagenes.push(obra.imagen_url_3);
         if (obra.imagen_url_4) imagenes.push(obra.imagen_url_4);
-        const totalImagenes = imagenes.length || 1;
 
-        // Dots para múltiples imágenes
-        let dotsHTML = '';
-        if (totalImagenes > 1) {
-            dotsHTML = '<div class="perfil-card-dots">';
-            for (let i = 0; i < totalImagenes; i++) {
-                dotsHTML += `<span class="perfil-card-dot${i === 0 ? ' active' : ''}"></span>`;
-            }
-            dotsHTML += '</div>';
-        }
+        const totalImagenes = imagenes.length || 0;
+        const primeraImg = imagenes[0] || '';
 
         card.innerHTML = `
             <div class="perfil-obra-card-img">
-                ${imgUrl ? `<img src="${imgUrl}" alt="" loading="lazy">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
-                ${dotsHTML}
+                ${primeraImg ? `<img src="${primeraImg}" alt="" loading="lazy" class="perfil-card-main-img">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
+                ${totalImagenes > 1 ? `<div class="perfil-card-dots">${imagenes.map((_, i) => `<span class="perfil-card-dot${i === 0 ? ' active' : ''}" data-index="${i}"></span>`).join('')}</div>` : ''}
                 <div class="perfil-card-bottom">
                     <span class="perfil-card-vistas">${ICON_OJO} 0</span>
                 </div>
             </div>
         `;
 
-        card.addEventListener('click', () => {
+        // Swipe para múltiples imágenes
+        if (totalImagenes > 1) {
+            let currentImgIndex = 0;
+            let touchStartX = 0;
+            const img = card.querySelector('.perfil-card-main-img');
+            const dots = card.querySelectorAll('.perfil-card-dot');
+
+            function updateImage(index) {
+                currentImgIndex = index;
+                if (img) img.src = imagenes[index];
+                dots.forEach((d, i) => d.classList.toggle('active', i === index));
+            }
+
+            card.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            card.addEventListener('touchend', (e) => {
+                const diff = touchStartX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 40) {
+                    e.preventDefault();
+                    if (diff > 0 && currentImgIndex < totalImagenes - 1) {
+                        updateImage(currentImgIndex + 1);
+                    } else if (diff < 0 && currentImgIndex > 0) {
+                        updateImage(currentImgIndex - 1);
+                    }
+                }
+            });
+
+            // También permitir clic en dots
+            dots.forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateImage(parseInt(dot.dataset.index));
+                });
+            });
+        }
+
+        card.addEventListener('click', (e) => {
+            // No abrir si se hizo clic en un dot
+            if (e.target.classList.contains('perfil-card-dot')) return;
             if (typeof window.abrirObraDesdePerfil === 'function') {
                 window.abrirObraDesdePerfil(obra.id);
             }
