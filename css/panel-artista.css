@@ -829,6 +829,22 @@
     margin: 0 2px;
 }
 
+/* --- ICONOS DECORATIVOS DEBAJO DE LOS CONTADORES --- */
+.perfil-iconos-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 6px;
+    color: var(--color-text-muted, #888);
+    opacity: 0.7;
+}
+
+.perfil-iconos-stats svg {
+    flex-shrink: 0;
+}
+
 /* ========== RESPONSIVE MÓVIL ========== */
 @media (max-width: 768px) {
     #perfil-usuario {
