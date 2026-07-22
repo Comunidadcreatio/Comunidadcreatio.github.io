@@ -1,0 +1,2 @@
+[permissions]
+allow = ["Bash(git add -A && git commit -m \"fix: transition en clase BASE .auth-section (no en .fade-out)\" && git push origin main)"]
