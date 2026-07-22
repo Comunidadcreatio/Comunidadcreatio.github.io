@@ -781,3 +781,14 @@ html, body {
         border-color: var(--color-ink);
     }
 }
+
+/* ==============================================
+   DESKTOP: Modo Grid con aire a los lados
+   ============================================== */
+@media (min-width: 1024px) {
+    #galeria-container.modo-grid {
+        padding-left: 5vw;
+        padding-right: 5vw;
+        gap: 12px;
+    }
+}
