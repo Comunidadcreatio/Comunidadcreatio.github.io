@@ -570,17 +570,22 @@ function setupEvents() {
 
     function aplicarFiltros() {
         if (!tablaBody) return;
-        currentSearch = searchInputPanel?.value || '';
-        currentSortBy = sortSelect?.value || 'id';
-        currentOrder = orderSelect?.value || 'DESC';
-        currentLimit = parseInt(limitSelect?.value || '10');
-        currentPage = 1;
-        refrescarTabla(tablaBody);
+        try {
+            currentSearch = searchInputPanel?.value || '';
+            currentSortBy = sortSelect?.value || 'id';
+            currentOrder = orderSelect?.value || 'DESC';
+            currentLimit = parseInt(limitSelect?.value || '10');
+            currentPage = 1;
+            refrescarTabla(tablaBody);
+        } catch(e) {
+            console.error('Error en aplicarFiltros:', e);
+        }
     }
 
     let filterDebounce;
     if (searchInputPanel) {
         searchInputPanel.addEventListener('input', () => {
+            console.log('search input changed:', searchInputPanel.value);
             clearTimeout(filterDebounce);
             filterDebounce = setTimeout(aplicarFiltros, 300);
         });
