@@ -390,25 +390,14 @@
                     e.preventDefault();
                     e.stopPropagation();
                     mostrarFormulario('registro');
-                    // Mostrar sección de registro
-                    var loginSec = document.getElementById('login-section');
-                    var registroSec = document.getElementById('registro-section');
-                    if (loginSec) loginSec.classList.add('hidden');
-                    if (registroSec) registroSec.classList.remove('hidden');
                 });
             }
             if (btnVolverLogin) {
                 btnVolverLogin.addEventListener('click', volverLanding);
             }
 
-            // Volver desde forgot al login
-            var btnVolverForgot = document.getElementById('btn-volver-login-from-forgot');
-            if (btnVolverForgot) {
-                btnVolverForgot.addEventListener('click', function() {
-                    document.getElementById('forgot-section').classList.add('hidden');
-                    document.getElementById('login-section').classList.remove('hidden');
-                });
-            }
+            // Volver desde forgot al login (manejado por auth-logic.js)
+
         })();
     </script>
     </main>
