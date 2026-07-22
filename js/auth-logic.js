@@ -611,12 +611,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isPrev) {
                 if (step === 1) {
-                    // Usar transición cinematográfica para volver al login
-                    fadeTransition(() => {
-                        document.getElementById('login-section').classList.remove('hidden');
-                        document.getElementById('registro-section').classList.add('hidden');
-                        if (window.volverAlBranding) window.volverAlBranding();
-                    });
+                    document.getElementById('login-section').classList.remove('hidden');
+                    document.getElementById('registro-section').classList.add('hidden');
+                    if (window.volverAlBranding) window.volverAlBranding();
                     return;
                 }
                 showStep(step - 1);
