@@ -480,13 +480,35 @@ function setupEvents() {
             // Cerrar otros popovers
             document.querySelectorAll('.header-popover').forEach(p => p.classList.add('hidden'));
             if (isHidden) {
-                // Posicionar el popover sobre el botón
-                const rect = btnCaventsHub.getBoundingClientRect();
-                caventsPopover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-                caventsPopover.style.left = rect.left + 'px';
+                posicionarCaventsPopover(btnCaventsHub, caventsPopover);
                 caventsPopover.classList.remove('hidden');
             }
         });
+    }
+
+    function posicionarCaventsPopover(trigger, popover) {
+        const panelDiv = popover.querySelector('.header-popover-panel');
+        if (!panelDiv) return;
+        // Mostrar temporalmente para medir
+        popover.style.display = 'block';
+        const triggerRect = trigger.getBoundingClientRect();
+        const panelRect = panelDiv.getBoundingClientRect();
+        popover.style.display = '';
+        const margin = 8;
+        const gap = 3;
+        const iconCenterX = triggerRect.left + triggerRect.width / 2;
+        // Posicionar arriba del botón
+        let top = triggerRect.top - panelRect.height - gap;
+        if (top < margin) top = margin;
+        let left = iconCenterX - panelRect.width / 2;
+        const maxLeft = window.innerWidth - panelRect.width - margin;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+        popover.style.top = `${top}px`;
+        popover.style.left = `${left}px`;
+        // Cola apuntando al centro del botón
+        const tailX = iconCenterX - left;
+        panelDiv.style.setProperty('--tail-x', `${tailX}px`);
     }
 
     if (caventsPopover) {
