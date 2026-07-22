@@ -481,30 +481,29 @@ function fadeTransition(callback) {
     if (isTransitioning) return;
     isTransitioning = true;
 
-    // Crear overlay negro si no existe
     let overlay = document.getElementById('transition-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'transition-overlay';
-        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;pointer-events:all;transition:opacity 0.5s ease;';
+        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;pointer-events:all;transition:opacity 0.35s ease;';
         document.body.appendChild(overlay);
     }
 
-    // Fase 1: fundir a negro
+    // Fase 1: fundir a negro (0.35s)
     overlay.style.opacity = '1';
 
-    // Fase 2: esperar y cambiar contenido
+    // Fase 2: cambiar contenido durante el negro (0.6s)
     setTimeout(() => {
         callback();
         
-        // Fase 3: revelar nuevo contenido
+        // Fase 3: revelar (0.35s)
         setTimeout(() => {
             overlay.style.opacity = '0';
             setTimeout(() => {
                 isTransitioning = false;
-            }, 500);
-        }, 1200);
-    }, 500);
+            }, 350);
+        }, 600);
+    }, 350);
 }
 
 // ============================================
