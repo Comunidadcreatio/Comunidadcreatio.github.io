@@ -105,6 +105,9 @@
             <form id="registro-form" class="compact-form" style="padding-top:0;" novalidate>
 
                 <div class="step" data-step="1">
+                    <p class="reg-step-label">Paso 1 de 4</p>
+                    <h2 class="reg-step-title">¿Cómo te llamas?</h2>
+                    <p class="reg-step-subtitle">Queremos saber quién está detrás de cada obra, perfil y pieza artística.</p>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group">
                             <input type="text" id="reg-nombres" placeholder="Nombres" required autocomplete="given-name" data-required="true">
@@ -120,6 +123,9 @@
                 </div>
 
                 <div class="step" data-step="2" style="display:none;">
+                    <p class="reg-step-label">Paso 2 de 4</p>
+                    <h2 class="reg-step-title">Información personal</h2>
+                    <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
                     <div class="date-group" style="margin-bottom:6px; gap:6px;">
                         <select name="dia" id="reg-dia" required data-required="true">
                             <option value="" disabled selected>Día</option>
@@ -146,16 +152,14 @@
                 </div>
 
                 <div class="step" data-step="3" style="display:none;">
+                    <p class="reg-step-label">Paso 3 de 4</p>
+                    <h2 class="reg-step-title">Datos de contacto</h2>
+                    <p class="reg-step-subtitle">Te enviaremos novedades sobre concursos y novedades de la comunidad.</p>
                     <div class="form-group">
-                        <select id="reg-pais" required data-required="true">
-                            <option value="" disabled selected>Selecciona tu país</option>
-                            <option value="Venezuela">Venezuela</option>
-                        </select>
+                        <input type="email" id="reg-email" placeholder="Correo Electrónico" required data-required="true">
                     </div>
                     <div class="form-group">
-                        <select id="reg-ciudad" required data-required="true">
-                            <option value="" disabled selected>Selecciona tu ciudad</option>
-                        </select>
+                        <input type="text" id="reg-telefono" placeholder="Número de celular" required data-required="true">
                     </div>
                     <div class="step-navigation">
                         <button type="button" class="nav-btn prev-btn" data-step="3">← Volver</button>
@@ -164,19 +168,9 @@
                 </div>
 
                 <div class="step" data-step="4" style="display:none;">
-                    <div class="form-group">
-                        <input type="email" id="reg-email" placeholder="Correo Electrónico" required data-required="true">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="reg-telefono" placeholder="Número de celular" required data-required="true">
-                    </div>
-                    <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="4">← Volver</button>
-                        <button type="button" class="nav-btn next-btn" data-step="4">Siguiente</button>
-                    </div>
-                </div>
-
-                <div class="step" data-step="5" style="display:none;">
+                    <p class="reg-step-label">Paso 4 de 4</p>
+                    <h2 class="reg-step-title">Protege tu cuenta</h2>
+                    <p class="reg-step-subtitle">Elige un nombre de usuario único y una contraseña segura.</p>
                     <div class="form-group">
                         <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required data-required="true">
                     </div>
@@ -200,7 +194,7 @@
                         </ul>
                     </div>
                     <div class="step-navigation">
-                        <button type="button" class="nav-btn prev-btn" data-step="5">← Volver</button>
+                        <button type="button" class="nav-btn prev-btn" data-step="4">← Volver</button>
                         <button type="submit" class="nav-btn next-btn" id="btn-registrarse-final">Enviar</button>
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupD
 // VARIABLES GLOBALES
 // ============================================
 let currentStep = 1;
-const totalSteps = 5;
+const totalSteps = 4;
 
 // Estado de disponibilidad de email y nombre de usuario
 const disponibilidad = {
@@ -359,30 +359,6 @@ function showStep(step) {
     if (step === 2) {
         cargarSelectoresFecha();
     }
-
-    // Poblar ciudades al llegar al paso 3
-    if (step === 3) {
-        const paisSelect = document.getElementById('reg-pais');
-        const ciudadSelect = document.getElementById('reg-ciudad');
-
-        if (paisSelect) {
-            paisSelect.removeEventListener('change', paisChangeHandler);
-            paisSelect.addEventListener('change', paisChangeHandler);
-            if (paisSelect.value) {
-                poblarCiudades(paisSelect.value);
-            } else {
-                if (ciudadSelect) {
-                    ciudadSelect.innerHTML = '';
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.textContent = 'Selecciona tu ciudad';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    ciudadSelect.appendChild(defaultOption);
-                }
-            }
-        }
-    }
 }
 
 function validateStep(step) {
@@ -407,7 +383,7 @@ function validateStep(step) {
     if (!isValid) return false;
 
     // 2. Validaciones específicas por paso
-    if (step === 4) {
+    if (step === 3) {
         const emailInput = document.getElementById('reg-email');
         const telefonoInput = document.getElementById('reg-telefono');
 
@@ -436,7 +412,7 @@ function validateStep(step) {
         }
     }
 
-    if (step === 5) {
+    if (step === 4) {
         const nombreInput = document.getElementById('reg-nombre-artista');
         const passInput = document.getElementById('reg-pass');
 
@@ -735,8 +711,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-pass').value;
             const telefono = document.getElementById('reg-telefono').value;
-            const pais = document.getElementById('reg-pais').value;
-            const ciudad = document.getElementById('reg-ciudad').value;
             const genero = document.getElementById('reg-genero').value;
             const dia = document.getElementById('reg-dia').value;
             const mes = document.getElementById('reg-mes').value;
@@ -765,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setButtonLoading(submitBtn, true);
             try {
                 const result = await register(
-                    nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
+                    nombre_artista, nombre_real, email, password, telefono, 'Venezuela', 'San Cristóbal', fecha_nacimiento, genero
                 );
 
                 if (result.success) {
