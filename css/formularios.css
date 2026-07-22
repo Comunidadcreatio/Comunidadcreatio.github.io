@@ -439,7 +439,7 @@ form *,
 
 /* Títulos de secciones del formulario */
 #formulario-obra h3 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--color-text);
     margin: 24px 0 16px 0;
