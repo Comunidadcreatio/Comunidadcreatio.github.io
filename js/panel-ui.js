@@ -306,11 +306,26 @@ export function aplicarPreviewImagen(index, url) {
 
 export async function cargarUrlEnInput(index, url) {
     try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const blob = await resp.blob();
-        const ext = (blob.type && blob.type.split('/')[1]) || 'jpg';
-        const file = new File([blob], `duplicada-${index}.${ext}`, { type: blob.type || 'image/jpeg' });
+        // Usar Image + canvas para evitar problemas CORS con Cloudinary
+        const blob = await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(blob => {
+                    if (blob) resolve(blob);
+                    else reject(new Error('Canvas toBlob failed'));
+                }, 'image/jpeg', 0.95);
+            };
+            img.onerror = () => reject(new Error('Failed to load image'));
+            img.src = url;
+        });
+
+        const file = new File([blob], `duplicada-${index}.jpg`, { type: 'image/jpeg' });
         const input = document.getElementById(`input-imagen-${index}`);
         if (input) {
             const dt = new DataTransfer();
