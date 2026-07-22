@@ -93,6 +93,7 @@ function iniciarSeguimientoActividad() {
         if (!document.getElementById('perfil-usuario')?.classList.contains('hidden')) {
             actualizarPerfilUI(verificarActividadLocal);
         }
+        fetchActiveSessionsCount();
     }, 30000);
 }
 
@@ -116,7 +117,7 @@ async function fetchActiveSessionsCount() {
 
 function updateCerrarTodasSesionesButtonState() {
     const mobileAllBtn = document.getElementById('mobile-logout-all');
-    const isEnabled = activeSessionsCount >= 3;
+    const isEnabled = activeSessionsCount >= 2;
 
     if (mobileAllBtn) {
         if (isEnabled) {
@@ -139,7 +140,7 @@ function updateCerrarTodasSesionesButtonState() {
 }
 
 async function closeAllSessions() {
-    if (activeSessionsCount < 3) {
+    if (activeSessionsCount < 2) {
         showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
         return;
     }
@@ -549,7 +550,7 @@ function setupEvents() {
     if (mobileAll) {
         mobileAll.addEventListener('click', async () => {
             cerrarMobileLogoutModal();
-            if (activeSessionsCount >= 3) {
+            if (activeSessionsCount >= 2) {
                 await closeAllSessions();
             } else {
                 showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
