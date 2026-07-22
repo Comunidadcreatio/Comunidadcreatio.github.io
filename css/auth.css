@@ -1005,8 +1005,8 @@ legend {
     }
 
     .date-group {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        gap: 6px;
     }
 
     .step-navigation {
