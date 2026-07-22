@@ -443,72 +443,68 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    switchSection('login-section', 'left');
-    if (window.volverAlBranding) window.volverAlBranding();
+    fadeTransition(() => {
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('registro-section').classList.add('hidden');
+        document.getElementById('forgot-section').classList.add('hidden');
+        if (window.volverAlBranding) window.volverAlBranding();
+    });
 }
 
 function showRegistroSection() {
-    switchSection('registro-section', 'right');
-    showStep(1);
+    fadeTransition(() => {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('registro-section').classList.remove('hidden');
+        document.getElementById('forgot-section').classList.add('hidden');
+        showStep(1);
+    });
 }
 
 function showForgotSection() {
-    switchSection('forgot-section', 'up');
-    const msgEl = document.getElementById('forgot-msg');
-    if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
-    const emailInput = document.getElementById('forgot-email');
-    if (emailInput) emailInput.value = '';
+    fadeTransition(() => {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('registro-section').classList.add('hidden');
+        document.getElementById('forgot-section').classList.remove('hidden');
+        const msgEl = document.getElementById('forgot-msg');
+        if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
+        const emailInput = document.getElementById('forgot-email');
+        if (emailInput) emailInput.value = '';
+    });
 }
 
 // ============================================
-// TRANSICIÓN ENTRE SECCIONES
+// TRANSICIÓN CINEMATOGRÁFICA (fade to black → fade in)
 // ============================================
 let isTransitioning = false;
 
-function switchSection(toId, direction) {
+function fadeTransition(callback) {
     if (isTransitioning) return;
     isTransitioning = true;
 
-    const current = document.querySelector('.auth-section:not(.hidden)');
-    const target = document.getElementById(toId);
-    if (!target || target === current) { isTransitioning = false; return; }
-
-    // Ocultar otras secciones
-    document.querySelectorAll('.auth-section').forEach(el => {
-        if (el !== current && el !== target) el.classList.add('hidden');
-    });
-
-    // Clases de salida según dirección
-    const outClass = direction === 'right' ? 'slide-out-left' : 
-                     direction === 'left' ? 'slide-out-right' : 'slide-out-left';
-    
-    // Clase de entrada (opuesta)
-    const inClass = direction === 'right' ? 'slide-in-right' : 
-                    direction === 'left' ? 'slide-in-left' : 'slide-in-left';
-
-    if (current) {
-        current.classList.add(outClass);
+    // Crear overlay negro si no existe
+    let overlay = document.getElementById('transition-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'transition-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;pointer-events:all;transition:opacity 0.5s ease;';
+        document.body.appendChild(overlay);
     }
 
-    // Mostrar target invisible y animar entrada
-    target.classList.remove('hidden');
-    target.classList.add(inClass);
-    target.offsetHeight; // reflow
-    target.style.opacity = '1';
-    target.style.transform = 'translateX(0)';
+    // Fase 1: fundir a negro
+    overlay.style.opacity = '1';
 
+    // Fase 2: esperar y cambiar contenido
     setTimeout(() => {
-        if (current) {
-            current.classList.add('hidden');
-            current.classList.remove(outClass);
-            current.style.opacity = '';
-            current.style.transform = '';
-        }
-        target.classList.remove(inClass);
-        target.style.opacity = '';
-        target.style.transform = '';
-        isTransitioning = false;
-    }, 350);
+        callback();
+        
+        // Fase 3: revelar nuevo contenido
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }, 1200);
+    }, 500);
 }
 
 // ============================================

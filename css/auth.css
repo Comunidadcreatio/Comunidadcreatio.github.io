@@ -119,29 +119,6 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-}
-
-.auth-section.slide-out-left {
-    opacity: 0;
-    transform: translateX(-30px);
-    pointer-events: none;
-}
-
-.auth-section.slide-out-right {
-    opacity: 0;
-    transform: translateX(30px);
-    pointer-events: none;
-}
-
-.auth-section.slide-in-left {
-    opacity: 0;
-    transform: translateX(30px);
-}
-
-.auth-section.slide-in-right {
-    opacity: 0;
-    transform: translateX(-30px);
 }
 
 /* Login section */
