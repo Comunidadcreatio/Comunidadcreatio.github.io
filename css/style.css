@@ -483,15 +483,12 @@ input, select, textarea {
     box-sizing: border-box;
 }
 
-/* Botón hub "cavents" — a la derecha, junto al perfil */
+/* Contenedor cavents + perfil — centrados */
 .bottom-bar-left {
-    position: absolute;
-    right: 56px;
-    bottom: 0;
-    height: 100%;
     display: flex;
+    gap: 8px;
     align-items: center;
-    z-index: 1;
+    height: 100%;
 }
 
 .toggle-nav-btn {
