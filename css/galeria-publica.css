@@ -787,8 +787,8 @@ html, body {
    ============================================== */
 @media (min-width: 1024px) {
     #galeria-container.modo-grid {
-        padding-left: 5vw;
-        padding-right: 5vw;
+        padding-left: 10vw;
+        padding-right: 10vw;
         gap: 12px;
     }
 }
