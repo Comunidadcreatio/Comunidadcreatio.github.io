@@ -375,8 +375,8 @@ export function togglePerfil() {
     const viendoPerfilExterno = perfilUsuario.dataset.viewing === 'external';
 
     if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
-        actualizarPerfilUI();
         perfilUsuario.dataset.viewing = 'own';
+        actualizarPerfilUI();
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
         const avatarBtn = document.getElementById('perfil-avatar-btn');
