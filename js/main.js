@@ -582,7 +582,13 @@ function setupEvents() {
     if (searchInputPanel) {
         searchInputPanel.addEventListener('input', () => {
             clearTimeout(filterDebounce);
-            filterDebounce = setTimeout(aplicarFiltros, 400);
+            filterDebounce = setTimeout(aplicarFiltros, 300);
+        });
+        searchInputPanel.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                clearTimeout(filterDebounce);
+                aplicarFiltros();
+            }
         });
     }
     if (sortSelect) sortSelect.addEventListener('change', aplicarFiltros);
