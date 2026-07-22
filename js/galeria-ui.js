@@ -4,7 +4,7 @@
 
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=2026071810';
 import { artistaActual, token } from './auth.js';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas } from './perfil.js';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js';
 import { confirmarDescartarCambios } from './panel-ui.js';
 
 // Referencia para refrescarTabla (evita dependencia circular)
@@ -384,6 +384,7 @@ export function togglePerfil() {
         if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
         if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
         window.actualizarEstadisticas();
+        activarTabCavents();
         switchSection(encontrarSeccionActual(), perfilUsuario);
     } else {
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');

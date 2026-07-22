@@ -373,4 +373,92 @@ export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn
     document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
         document.getElementById('input-foto-perfil')?.click();
     });
+
+    // Inicializar tabs del perfil
+    setupPerfilTabs();
+}
+
+// ============================================
+// TABS DEL PERFIL (cavents, problogs, comcons)
+// ============================================
+let perfilTabActual = 'cavents';
+
+function setupPerfilTabs() {
+    const tabs = document.querySelectorAll('.perfil-tab-btn');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (perfilTabActual === tab.dataset.tab) return;
+            perfilTabActual = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            cargarContenidoTab(perfilTabActual);
+        });
+    });
+
+    // Activar cavents por defecto al abrir perfil
+    activarTabCavents();
+}
+
+export function activarTabCavents() {
+    perfilTabActual = 'cavents';
+    const tabs = document.querySelectorAll('.perfil-tab-btn');
+    tabs.forEach(t => t.classList.remove('active'));
+    const caventsTab = document.querySelector('.perfil-tab-btn[data-tab="cavents"]');
+    if (caventsTab) caventsTab.classList.add('active');
+    cargarContenidoTab('cavents');
+}
+
+async function cargarContenidoTab(tab) {
+    const content = document.getElementById('perfil-tab-content');
+    if (!content) return;
+
+    if (tab === 'cavents') {
+        content.innerHTML = '<div class="perfil-grid-loading" style="text-align:center;padding:20px;color:var(--color-text-muted);">Cargando obras...</div>';
+        try {
+            const res = await apiRequest('/api/artistas/mis-obras?limit=50');
+            if (res && res.success && res.obras) {
+                renderizarGridObras(res.obras, content);
+            } else {
+                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
+            }
+        } catch (e) {
+            content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
+        }
+    } else if (tab === 'problogs') {
+        content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Problogs — próximamente</p>';
+    } else if (tab === 'comcons') {
+        content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Comcons — próximamente</p>';
+    }
+}
+
+function renderizarGridObras(obras, container) {
+    if (!obras || obras.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No tienes obras registradas aún.</p>';
+        return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'perfil-grid-obras';
+
+    obras.forEach(obra => {
+        const card = document.createElement('div');
+        card.className = 'perfil-obra-card';
+        const imgUrl = obra.imagen_url || obra.imagen_thumbnail_url || '';
+        const titulo = escapeHtml(obra.titulo || 'Sin título');
+        const precio = obra.precio ? `$${Number(obra.precio).toLocaleString()}` : '';
+
+        card.innerHTML = `
+            <div class="perfil-obra-card-img">
+                ${imgUrl ? `<img src="${imgUrl}" alt="${titulo}" loading="lazy">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
+                <div class="perfil-obra-card-overlay">
+                    <span class="perfil-obra-card-titulo">${titulo}</span>
+                    ${precio ? `<span class="perfil-obra-card-precio">${precio}</span>` : ''}
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(grid);
 }
