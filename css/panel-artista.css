@@ -1253,9 +1253,8 @@
 /* Móvil: sin padding, edge-to-edge */
 @media (max-width: 768px) {
     .perfil-tab-content {
-        margin-left: -24px;
-        margin-right: -24px;
-        width: calc(100% + 48px);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
     }
 }
 
