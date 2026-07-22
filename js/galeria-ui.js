@@ -316,7 +316,10 @@ export async function toggleExplorar() {
 }
 
 export function togglePanel() {
-    if (isTransitioning) return;
+    if (isTransitioning) {
+        // Forzar reset por si hay una transición atascada
+        isTransitioning = false;
+    }
 
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');

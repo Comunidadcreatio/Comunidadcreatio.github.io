@@ -523,7 +523,10 @@ function setupEvents() {
         });
         document.getElementById('cavents-registro')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            setTimeout(() => togglePanel(), 50);
+            setTimeout(() => {
+                console.log('togglePanel llamado desde cavents-registro');
+                togglePanel();
+            }, 50);
         });
     }
 
