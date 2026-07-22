@@ -497,8 +497,8 @@ function setupEvents() {
         const margin = 8;
         const gap = 3;
         const iconCenterX = triggerRect.left + triggerRect.width / 2;
-        // Posicionar arriba del botón (50% más arriba)
-        let top = triggerRect.top - (panelRect.height * 1.5) - gap;
+        // Posicionar arriba del botón
+        let top = triggerRect.top - panelRect.height - gap;
         if (top < margin) top = margin;
         let left = iconCenterX - panelRect.width / 2;
         const maxLeft = window.innerWidth - panelRect.width - margin;
