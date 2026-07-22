@@ -1266,7 +1266,7 @@
 /* Escritorio: grid más grande, centrado */
 @media (min-width: 1024px) {
     .perfil-tab-content {
-        width: 130%;
+        width: 180%;
         position: relative;
         left: 50%;
         transform: translateX(-50%);
