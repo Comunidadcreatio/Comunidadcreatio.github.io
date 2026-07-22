@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Botón volver en la sección de olvidé contraseña
-    const btnVolverForgot = document.getElementById('btn-volver-login-forgot');
+    const btnVolverForgot = document.getElementById('btn-volver-login-from-forgot');
     if (btnVolverForgot) {
         btnVolverForgot.addEventListener('click', showLoginSection);
     }
