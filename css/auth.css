@@ -128,19 +128,6 @@ body {
     pointer-events: none;
 }
 
-.auth-section.fade-in {
-    opacity: 1 !important;
-    transform: translateY(0);
-}
-
-/* Animar entrada cuando NO está en fade-out */
-#login-section:not(.hidden):not(.fade-out),
-#registro-section:not(.hidden):not(.fade-out),
-#forgot-section:not(.hidden):not(.fade-out) {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 /* Login section */
 #login-section {
     margin-bottom: 0;

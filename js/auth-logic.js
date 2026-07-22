@@ -443,9 +443,16 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    switchSection('registro-section', 'login-section');
-    const forgotSection = document.getElementById('forgot-section');
-    if (forgotSection) { forgotSection.classList.add('hidden'); forgotSection.classList.remove('fade-out', 'fade-in'); }
+    // Detectar qué sección está visible actualmente
+    const forgot = document.getElementById('forgot-section');
+    const registro = document.getElementById('registro-section');
+    if (forgot && !forgot.classList.contains('hidden')) {
+        switchSection('forgot-section', 'login-section');
+    } else if (registro && !registro.classList.contains('hidden')) {
+        switchSection('registro-section', 'login-section');
+    } else {
+        switchSection(null, 'login-section');
+    }
     // Restaurar branding si estaba oculto
     if (window.volverAlBranding) window.volverAlBranding();
 }
@@ -471,21 +478,39 @@ function switchSection(fromId, toId) {
     const toEl = document.getElementById(toId);
     if (!toEl) return;
 
+    // Ocultar otras secciones que no sean la actual ni la nueva
+    ['login-section', 'registro-section', 'forgot-section'].forEach(id => {
+        if (id !== fromId && id !== toId) {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.classList.remove('fade-out', 'fade-in'); }
+        }
+    });
+
     if (fromEl && !fromEl.classList.contains('hidden')) {
+        // Fade-out de la sección actual
         fromEl.classList.add('fade-out');
         setTimeout(() => {
             fromEl.classList.add('hidden');
             fromEl.classList.remove('fade-out');
             showTarget();
-        }, 250);
+        }, 280);
     } else {
         showTarget();
     }
 
     function showTarget() {
+        // Preparar entrada: opacity 0 primero
+        toEl.style.opacity = '0';
+        toEl.style.transform = 'translateY(8px)';
         toEl.classList.remove('hidden');
-        toEl.classList.add('fade-in');
-        setTimeout(() => toEl.classList.remove('fade-in'), 300);
+        // Forzar reflow y luego animar entrada
+        toEl.offsetHeight;
+        toEl.style.opacity = '1';
+        toEl.style.transform = 'translateY(0)';
+        setTimeout(() => {
+            toEl.style.opacity = '';
+            toEl.style.transform = '';
+        }, 300);
     }
 }
 

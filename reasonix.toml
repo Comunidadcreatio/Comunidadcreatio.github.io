@@ -1,2 +1,2 @@
 [permissions]
-allow = ["Bash(git add -A && git commit -m \"fix: transition en clase BASE .auth-section (no en .fade-out)\" && git push origin main)", "Bash(git add -A && git commit -m \"fix: eliminar hidden manuales que bloquean transiciones\" && git push origin main)"]
+allow = ["Bash(git add -A && git commit -m \"fix: transition en clase BASE .auth-section (no en .fade-out)\" && git push origin main)", "Bash(git add -A && git commit -m \"fix: eliminar hidden manuales que bloquean transiciones\" && git push origin main)", "Bash(git add -A && git commit -m \"fix: fade-in con inline styles + reflow, detectar sección visible, limpiar conflicto handlers\" && git push origin main)"]
