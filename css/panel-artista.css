@@ -1258,10 +1258,15 @@
     }
 }
 
-/* Escritorio: aire a los lados */
+/* Ocultar overlay de título y precio en el grid del perfil */
+.perfil-obra-card-overlay {
+    display: none;
+}
+
+/* Escritorio: grid 10% más grande, centrado */
 @media (min-width: 1024px) {
-    .perfil-tab-content {
-        padding-left: 2vw;
-        padding-right: 2vw;
+    .perfil-grid-obras {
+        width: 110%;
+        margin-left: -5%;
     }
 }
