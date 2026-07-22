@@ -483,12 +483,17 @@ input, select, textarea {
     box-sizing: border-box;
 }
 
-/* Contenedor cavents + perfil — centrados */
+/* Botón cavents — absoluto, justo a la izquierda del perfil centrado */
 .bottom-bar-left {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
     height: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: calc(-18px - 8px);
+    transform: translateX(-100%);
+    z-index: 1;
 }
 
 .toggle-nav-btn {
