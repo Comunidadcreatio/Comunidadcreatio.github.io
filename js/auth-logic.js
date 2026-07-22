@@ -354,6 +354,13 @@ function showStep(step) {
     }
     currentStep = step;
 
+    // Actualizar barra de progreso
+    const progressBar = document.getElementById('reg-progress');
+    if (progressBar) {
+        const fill = progressBar.querySelector('.reg-progress-fill');
+        if (fill) fill.style.width = (step / totalSteps * 100) + '%';
+    }
+
     // Limpiar errores al cambiar de paso
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
