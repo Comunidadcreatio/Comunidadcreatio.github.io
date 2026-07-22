@@ -468,22 +468,49 @@ function renderizarGridObras(obras, container) {
     const grid = document.createElement('div');
     grid.className = 'perfil-grid-obras';
 
+    const ICON_OJO = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+
     obras.forEach(obra => {
         const card = document.createElement('div');
         card.className = 'perfil-obra-card';
+        card.dataset.obraId = obra.id;
         const imgUrl = obra.imagen_url || obra.imagen_thumbnail_url || '';
-        const titulo = escapeHtml(obra.titulo || 'Sin título');
-        const precio = obra.precio ? `$${Number(obra.precio).toLocaleString()}` : '';
+
+        // Contar imágenes disponibles
+        const imagenes = [];
+        if (obra.imagen_url) imagenes.push(obra.imagen_url);
+        if (obra.imagen_url_1) imagenes.push(obra.imagen_url_1);
+        if (obra.imagen_url_2) imagenes.push(obra.imagen_url_2);
+        if (obra.imagen_url_3) imagenes.push(obra.imagen_url_3);
+        if (obra.imagen_url_4) imagenes.push(obra.imagen_url_4);
+        const totalImagenes = imagenes.length || 1;
+
+        // Dots para múltiples imágenes
+        let dotsHTML = '';
+        if (totalImagenes > 1) {
+            dotsHTML = '<div class="perfil-card-dots">';
+            for (let i = 0; i < totalImagenes; i++) {
+                dotsHTML += `<span class="perfil-card-dot${i === 0 ? ' active' : ''}"></span>`;
+            }
+            dotsHTML += '</div>';
+        }
 
         card.innerHTML = `
             <div class="perfil-obra-card-img">
-                ${imgUrl ? `<img src="${imgUrl}" alt="${titulo}" loading="lazy">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
-                <div class="perfil-obra-card-overlay">
-                    <span class="perfil-obra-card-titulo">${titulo}</span>
-                    ${precio ? `<span class="perfil-obra-card-precio">${precio}</span>` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="" loading="lazy">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
+                ${dotsHTML}
+                <div class="perfil-card-bottom">
+                    <span class="perfil-card-vistas">${ICON_OJO} 0</span>
                 </div>
             </div>
         `;
+
+        card.addEventListener('click', () => {
+            if (typeof window.abrirObraDesdePerfil === 'function') {
+                window.abrirObraDesdePerfil(obra.id);
+            }
+        });
+
         grid.appendChild(card);
     });
 

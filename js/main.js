@@ -29,6 +29,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { setRefrescarTablaFn } from './galeria-ui.js';
+import { cargarGaleria, mostrarGaleria } from './galeria.js';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
@@ -562,6 +563,35 @@ function setupEvents() {
             if (e.target === mobileModalLogout) cerrarMobileLogoutModal();
         });
     }
+
+    // ----- Abrir obra desde perfil (global) -----
+    window.abrirObraDesdePerfil = (obraId) => {
+        // Cerrar perfil y abrir galería en modo normal con la obra específica
+        const perfilUsuario = document.getElementById('perfil-usuario');
+        if (perfilUsuario && !perfilUsuario.classList.contains('hidden')) {
+            perfilUsuario.classList.add('hidden');
+        }
+        mostrarPaginaBlanca();
+        // Cargar galería y hacer scroll a la obra
+        const galeria = document.getElementById('galeria-publica');
+        if (galeria) galeria.classList.remove('hidden');
+        const gc = document.getElementById('galeria-container');
+        if (gc) {
+            gc.innerHTML = '';
+            gc.classList.remove('modo-grid');
+            cargarGaleria(gc).then(obras => {
+                mostrarGaleria(obras, gc);
+                // Hacer scroll a la obra específica
+                setTimeout(() => {
+                    const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
+                    if (target) {
+                        gc.scrollTop = target.offsetTop;
+                    }
+                }, 300);
+            });
+        }
+        actualizarEstadoNavButtons();
+    };
 
     // ----- Filtros (auto-aplicar al cambiar) -----
     const searchInputPanel = document.getElementById('search-input-panel');
