@@ -611,30 +611,29 @@
             </div>
             <!-- Controles de búsqueda y filtros -->
             <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
-                <!-- Fila 1: Buscar + Ordenar por -->
-                <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
-                <label for="sort-select" class="visually-hidden">Ordenar por</label>
+                <div class="filter-search-wrapper">
+                    <svg class="filter-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input-panel" placeholder="Buscar por título, artista o ID..." aria-label="Buscar obras">
+                </div>
                 <select id="sort-select" aria-label="Criterio de ordenamiento">
                     <option value="id">Ordenar por ID</option>
                     <option value="titulo">Ordenar por Título</option>
                     <option value="precio">Ordenar por Precio</option>
                     <option value="status">Ordenar por Status</option>
                 </select>
-                <!-- Fila 2: Orden + Resultados por página -->
-                <label for="order-select" class="visually-hidden">Orden</label>
                 <select id="order-select" aria-label="Orden de clasificación">
                     <option value="DESC">Descendente</option>
                     <option value="ASC">Ascendente</option>
                 </select>
-                <label for="limit-select" class="visually-hidden">Resultados por página</label>
                 <select id="limit-select" aria-label="Cantidad de resultados por página">
-                    <option value="5">5 por página</option>
-                    <option value="10" selected>10 por página</option>
-                    <option value="20">20 por página</option>
-                    <option value="50">50 por página</option>
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
                 </select>
-                <!-- Fila 3: Botón Aplicar -->
-                <button id="btn-aplicar-filtros" type="button">Aplicar</button>
             </div>
 
             <!-- Controles de paginación -->

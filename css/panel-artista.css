@@ -24,67 +24,75 @@
    CONTROLES DE BÚSQUEDA Y FILTROS
    ============================================== */
 .filter-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
     margin-bottom: 1.5rem;
     align-items: center;
     padding: 0;
     border: none;
+    flex-wrap: wrap;
+}
+
+.filter-search-wrapper {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-text-muted, #888);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .filter-controls #search-input-panel {
-    grid-column: auto;
+    width: 100%;
+    padding-left: 36px;
+}
+
+.filter-controls select {
+    width: auto;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.filter-controls input[type="text"],
+.filter-controls select {
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
+    font-size: 13px;
+    background: var(--color-white);
+    height: 40px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    padding: 8px 32px 8px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-controls input[type="text"]:focus,
+.filter-controls select:focus {
+    outline: none;
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+
+.filter-controls input[type="text"] {
+    padding: 8px 12px;
 }
 
 /* Asegurar que las flechas de los selects se posicionen correctamente */
 #panel-artista .filter-controls select {
     background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
+    background-position: right 10px center !important;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    padding-right: 42px !important;
-}
-
-.filter-controls #btn-aplicar-filtros {
-    grid-column: 1 / -1;
-}
-
-.filter-controls input[type="text"],
-.filter-controls select,
-.filter-controls button {
-    border: 1px solid #000;
-    border-radius: 4px;
-    font-size: 14px;
-    background: var(--color-white);
-    width: 100%;
-    height: 48px;
-    line-height: 1.2;
-    box-sizing: border-box;
-    min-width: 0;
-    padding: 10px 36px 10px 12px;
-}
-
-.filter-controls input[type="text"] {
-    padding: 10px 12px;
-}
-
-.filter-controls button {
-    padding: 10px 12px;
-}
-
-.filter-controls #btn-aplicar-filtros {
-    grid-column: 1 / -1;
-    background-color: var(--color-ink);
-    color: var(--color-white);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.filter-controls button:hover {
-    background-color: var(--color-ink-light);
+    padding-right: 30px !important;
 }
 
 
@@ -1015,16 +1023,18 @@
    DISEÑO RESPONSIVO - PANEL DE ARTISTA (general)
    ============================================== */
 @media (max-width: 768px) {
-    /* Controles de filtro en grid de 2 columnas */
+    /* Controles de filtro en una fila */
     .filter-controls {
         width: 100%;
         padding: 0;
-        gap: 8px;
+        gap: 6px;
     }
-    .filter-controls input[type="text"],
-    .filter-controls select,
-    .filter-controls button {
-        width: 100%;
+    .filter-search-wrapper {
+        min-width: 140px;
+    }
+    .filter-controls select {
+        min-width: 80px;
+        font-size: 12px;
     }
     .pagination-controls {
         flex-wrap: wrap;
@@ -1120,9 +1130,8 @@
     color: var(--color-gray-400);
 }
 
-[data-theme="dark"] .filter-controls #btn-aplicar-filtros {
-    background-color: var(--color-ink);
-    color: var(--color-white);
+[data-theme="dark"] .filter-search-icon {
+    color: #888;
 }
 
 [data-theme="dark"] #panel-artista .pagination-btn {

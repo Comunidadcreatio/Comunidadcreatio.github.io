@@ -562,18 +562,31 @@ function setupEvents() {
         });
     }
 
-    // ----- Filtros -----
-    const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
-    if (btnAplicarFiltros) {
-        btnAplicarFiltros.addEventListener('click', () => {
-            currentSearch = document.getElementById('search-input-panel').value;
-            currentSortBy = document.getElementById('sort-select').value;
-            currentOrder = document.getElementById('order-select').value;
-            currentLimit = parseInt(document.getElementById('limit-select').value);
-            currentPage = 1;
-            refrescarTabla(tablaBody);
+    // ----- Filtros (auto-aplicar al cambiar) -----
+    const searchInputPanel = document.getElementById('search-input-panel');
+    const sortSelect = document.getElementById('sort-select');
+    const orderSelect = document.getElementById('order-select');
+    const limitSelect = document.getElementById('limit-select');
+
+    function aplicarFiltros() {
+        currentSearch = searchInputPanel?.value || '';
+        currentSortBy = sortSelect?.value || 'id';
+        currentOrder = orderSelect?.value || 'DESC';
+        currentLimit = parseInt(limitSelect?.value || '10');
+        currentPage = 1;
+        refrescarTabla(tablaBody);
+    }
+
+    let filterDebounce;
+    if (searchInputPanel) {
+        searchInputPanel.addEventListener('input', () => {
+            clearTimeout(filterDebounce);
+            filterDebounce = setTimeout(aplicarFiltros, 400);
         });
     }
+    if (sortSelect) sortSelect.addEventListener('change', aplicarFiltros);
+    if (orderSelect) orderSelect.addEventListener('change', aplicarFiltros);
+    if (limitSelect) limitSelect.addEventListener('change', aplicarFiltros);
 
     // ----- Paginación -----
     const btnPrev = document.getElementById('btn-prev');
