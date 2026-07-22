@@ -443,71 +443,27 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    // Detectar qué sección está visible actualmente
-    const forgot = document.getElementById('forgot-section');
-    const registro = document.getElementById('registro-section');
-    if (forgot && !forgot.classList.contains('hidden')) {
-        switchSection('forgot-section', 'login-section');
-    } else if (registro && !registro.classList.contains('hidden')) {
-        switchSection('registro-section', 'login-section');
-    } else {
-        switchSection(null, 'login-section');
-    }
-    // Restaurar branding si estaba oculto
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('registro-section').classList.add('hidden');
+    document.getElementById('forgot-section').classList.add('hidden');
     if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {
-    switchSection('login-section', 'registro-section');
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('registro-section').classList.remove('hidden');
+    document.getElementById('forgot-section').classList.add('hidden');
     showStep(1);
 }
 
 function showForgotSection() {
-    switchSection('login-section', 'forgot-section');
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('registro-section').classList.add('hidden');
+    document.getElementById('forgot-section').classList.remove('hidden');
     const msgEl = document.getElementById('forgot-msg');
     if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
     const emailInput = document.getElementById('forgot-email');
     if (emailInput) emailInput.value = '';
-}
-
-// ============================================
-// TRANSICIÓN SUAVE ENTRE SECCIONES
-// ============================================
-function switchSection(fromId, toId) {
-    const fromEl = fromId ? document.getElementById(fromId) : null;
-    const toEl = document.getElementById(toId);
-    if (!toEl) return;
-
-    // Ocultar otras secciones que no sean la actual ni la nueva
-    ['login-section', 'registro-section', 'forgot-section'].forEach(id => {
-        if (id !== fromId && id !== toId) {
-            const el = document.getElementById(id);
-            if (el) { el.classList.add('hidden'); el.classList.remove('fade-out', 'fade-in'); }
-        }
-    });
-
-    if (fromEl && !fromEl.classList.contains('hidden')) {
-        fromEl.classList.add('fade-out');
-        setTimeout(() => {
-            fromEl.classList.add('hidden');
-            fromEl.classList.remove('fade-out');
-            showTarget();
-        }, 380);
-    } else {
-        showTarget();
-    }
-
-    function showTarget() {
-        toEl.style.transition = 'opacity 0.4s ease';
-        toEl.style.opacity = '0';
-        toEl.classList.remove('hidden');
-        toEl.offsetHeight;
-        toEl.style.opacity = '1';
-        setTimeout(() => {
-            toEl.style.opacity = '';
-            toEl.style.transition = '';
-        }, 400);
-    }
 }
 
 // ============================================
