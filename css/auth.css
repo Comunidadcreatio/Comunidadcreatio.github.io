@@ -332,7 +332,7 @@ form {
     text-align: left;
 }
 
-.reg-step-title {
+.auth-section .reg-step-title {
     font-size: 35px;
     font-weight: 700;
     color: var(--color-ink);
