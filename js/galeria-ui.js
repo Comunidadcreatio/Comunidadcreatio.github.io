@@ -316,16 +316,20 @@ export async function toggleExplorar() {
 }
 
 export function togglePanel() {
+    console.log('togglePanel llamado, isTransitioning:', isTransitioning);
     if (isTransitioning) {
         // Forzar reset por si hay una transición atascada
+        console.log('isTransitioning estaba true, reseteando');
         isTransitioning = false;
     }
 
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
+    console.log('panel:', !!panel, 'paginaBlanca:', !!paginaBlanca);
     if (!panel || !paginaBlanca) return;
 
     resetGaleriaModo();
+    console.log('panel.classList.contains(hidden):', panel.classList.contains('hidden'));
 
     if (panel.classList.contains('hidden')) {
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
