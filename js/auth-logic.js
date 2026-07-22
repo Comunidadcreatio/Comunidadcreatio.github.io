@@ -450,32 +450,49 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
+    switchSection('registro-section', 'login-section');
     const forgotSection = document.getElementById('forgot-section');
-    if (forgotSection) forgotSection.classList.add('hidden');
+    if (forgotSection) { forgotSection.classList.add('hidden'); forgotSection.classList.remove('fade-out', 'fade-in'); }
     // Restaurar branding si estaba oculto
     if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.remove('hidden');
-    const forgotSection = document.getElementById('forgot-section');
-    if (forgotSection) forgotSection.classList.add('hidden');
+    switchSection('login-section', 'registro-section');
     showStep(1);
 }
 
 function showForgotSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
-    const forgotSection = document.getElementById('forgot-section');
-    if (forgotSection) {
-        forgotSection.classList.remove('hidden');
-        const msgEl = document.getElementById('forgot-msg');
-        if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
-        const emailInput = document.getElementById('forgot-email');
-        if (emailInput) emailInput.value = '';
+    switchSection('login-section', 'forgot-section');
+    const msgEl = document.getElementById('forgot-msg');
+    if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
+    const emailInput = document.getElementById('forgot-email');
+    if (emailInput) emailInput.value = '';
+}
+
+// ============================================
+// TRANSICIÓN SUAVE ENTRE SECCIONES
+// ============================================
+function switchSection(fromId, toId) {
+    const fromEl = fromId ? document.getElementById(fromId) : null;
+    const toEl = document.getElementById(toId);
+    if (!toEl) return;
+
+    if (fromEl && !fromEl.classList.contains('hidden')) {
+        fromEl.classList.add('fade-out');
+        setTimeout(() => {
+            fromEl.classList.add('hidden');
+            fromEl.classList.remove('fade-out');
+            showTarget();
+        }, 250);
+    } else {
+        showTarget();
+    }
+
+    function showTarget() {
+        toEl.classList.remove('hidden');
+        toEl.classList.add('fade-in');
+        setTimeout(() => toEl.classList.remove('fade-in'), 300);
     }
 }
 
