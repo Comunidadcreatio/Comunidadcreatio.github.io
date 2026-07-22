@@ -470,25 +470,49 @@ function setupEvents() {
     }
 
     // ----- Botones de navegación de la barra inferior -----
-    const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
-    const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
+    const btnCaventsHub = document.getElementById('btn-cavents-hub');
+    const caventsPopover = document.getElementById('cavents-popover');
 
-    if (btnGaleriaSidebar) {
-        btnGaleriaSidebar.addEventListener('click', () => {
-            toggleGaleria(galeriaContainer);
+    if (btnCaventsHub && caventsPopover) {
+        btnCaventsHub.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isHidden = caventsPopover.classList.contains('hidden');
+            // Cerrar otros popovers
+            document.querySelectorAll('.header-popover').forEach(p => p.classList.add('hidden'));
+            if (isHidden) {
+                // Posicionar el popover sobre el botón
+                const rect = btnCaventsHub.getBoundingClientRect();
+                caventsPopover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+                caventsPopover.style.left = rect.left + 'px';
+                caventsPopover.classList.remove('hidden');
+            }
         });
     }
-    const btnExplorarSidebar = document.getElementById('btn-explorar-sidebar');
-    if (btnExplorarSidebar) {
-        btnExplorarSidebar.addEventListener('click', () => {
+
+    if (caventsPopover) {
+        // Opciones del menú cavents
+        document.getElementById('cavents-explorar')?.addEventListener('click', () => {
+            caventsPopover.classList.add('hidden');
             toggleExplorar();
         });
-    }
-    if (btnRegistroSidebar) {
-        btnRegistroSidebar.addEventListener('click', () => {
+        document.getElementById('cavents-galeria')?.addEventListener('click', () => {
+            caventsPopover.classList.add('hidden');
+            toggleGaleria(galeriaContainer);
+        });
+        document.getElementById('cavents-registro')?.addEventListener('click', () => {
+            caventsPopover.classList.add('hidden');
             togglePanel();
         });
     }
+
+    // Cerrar popovers al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (caventsPopover && !caventsPopover.classList.contains('hidden')) {
+            if (!caventsPopover.contains(e.target) && e.target !== btnCaventsHub) {
+                caventsPopover.classList.add('hidden');
+            }
+        }
+    });
 
     // ----- Botones del panel móvil de logout -----
     const mobileSingle = document.getElementById('mobile-logout-single');

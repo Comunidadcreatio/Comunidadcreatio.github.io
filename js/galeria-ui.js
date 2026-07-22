@@ -123,33 +123,22 @@ export function mostrarPaginaBlanca() {
 // ACTUALIZAR ESTADO DE BOTONES DE NAVEGACIÓN
 // ============================================
 export function actualizarEstadoNavButtons() {
-    const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
-    const btnExplorarSidebar = document.getElementById('btn-explorar-sidebar');
-    const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
+    const btnCaventsHub = document.getElementById('btn-cavents-hub');
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const galeriaContainer = obtenerGaleriaContainer();
 
-    if (galeria && btnGaleriaSidebar) {
+    if (galeria && btnCaventsHub) {
         const galeriaVisible = !galeria.classList.contains('hidden');
-        btnGaleriaSidebar.classList.remove('nav-btn-active');
+        btnCaventsHub.classList.remove('nav-btn-active', 'nav-btn-grid');
 
-        if (galeriaVisible && galeriaModo === 1) {
-            btnGaleriaSidebar.classList.add('nav-btn-active');
+        if (galeriaVisible) {
+            if (galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
+                btnCaventsHub.classList.add('nav-btn-grid');
+            } else {
+                btnCaventsHub.classList.add('nav-btn-active');
+            }
         }
-    }
-
-    if (galeria && btnExplorarSidebar) {
-        const galeriaVisible = !galeria.classList.contains('hidden');
-        btnExplorarSidebar.classList.remove('nav-btn-grid');
-
-        if (galeriaVisible && galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
-            btnExplorarSidebar.classList.add('nav-btn-grid');
-        }
-    }
-
-    if (panel && btnRegistroSidebar) {
-        btnRegistroSidebar.classList.toggle('nav-btn-active', !panel.classList.contains('hidden'));
     }
 }
 
