@@ -795,11 +795,11 @@ html, body {
     #galeria-container.modo-grid .obra-grid-titulo,
     #galeria-container.modo-grid .obra-grid-precio,
     #galeria-container.modo-grid .obra-grid-vistas {
-        font-size: 13px;
+        font-size: 18px;
     }
 
     #galeria-container.modo-grid .obra-grid-vistas svg {
-        width: 13px;
-        height: 13px;
+        width: 18px;
+        height: 18px;
     }
 }
