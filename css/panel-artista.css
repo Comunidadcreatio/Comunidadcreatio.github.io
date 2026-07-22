@@ -1263,12 +1263,16 @@
     display: none;
 }
 
-/* Escritorio: grid 10% más grande, centrado */
+/* Escritorio: grid más grande, centrado */
 @media (min-width: 1024px) {
-    .perfil-grid-obras {
-        width: 110%;
+    .perfil-tab-content {
+        width: 130%;
         position: relative;
         left: 50%;
         transform: translateX(-50%);
+    }
+
+    .perfil-grid-obras {
+        width: 100%;
     }
 }
