@@ -24,59 +24,34 @@
    CONTROLES DE BÚSQUEDA Y FILTROS
    ============================================== */
 .filter-controls {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     margin-bottom: 1.5rem;
     align-items: center;
     padding: 0;
     border: none;
-    flex-wrap: wrap;
-}
-
-.filter-search-wrapper {
-    flex: 1;
-    min-width: 180px;
-    max-width: 400px;
-    position: relative;
-    height: 40px;
-}
-
-.filter-search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-text-muted, #888);
-    pointer-events: none;
-    z-index: 1;
-}
-
-.filter-controls .filter-search-wrapper input[type="text"] {
-    width: 100%;
-    height: 100%;
-    padding: 8px 12px 8px 42px;
-    box-sizing: border-box;
-    border-radius: 10px;
-}
-
-.filter-controls select {
-    width: auto;
-    min-width: 100px;
-    flex-shrink: 0;
 }
 
 .filter-controls input[type="text"],
 .filter-controls select {
+    width: 100%;
+    height: 40px;
     border: 1px solid var(--color-gray-300);
     border-radius: 10px;
     font-size: 13px;
     background: var(--color-white);
-    height: 40px;
-    line-height: 1.2;
     box-sizing: border-box;
-    padding: 8px 32px 8px 12px;
+    padding: 8px 30px 8px 12px;
+    line-height: 1.2;
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-controls input[type="text"] {
+    padding-left: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 12px center;
 }
 
 .filter-controls input[type="text"]:focus,
@@ -88,12 +63,12 @@
 
 /* Asegurar que las flechas de los selects se posicionen correctamente */
 #panel-artista .filter-controls select {
-    background-repeat: no-repeat !important;
-    background-position: right 10px center !important;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    padding-right: 30px !important;
+    padding-right: 30px;
 }
 
 
@@ -1029,13 +1004,18 @@
         width: 100%;
         padding: 0;
         gap: 6px;
+        grid-template-columns: repeat(4, 1fr);
     }
-    .filter-search-wrapper {
-        min-width: 140px;
-    }
+    .filter-controls input[type="text"],
     .filter-controls select {
-        min-width: 80px;
-        font-size: 12px;
+        font-size: 11px;
+        padding: 6px 24px 6px 8px;
+        height: 36px;
+    }
+    .filter-controls input[type="text"] {
+        padding-left: 30px;
+        background-position: 8px center;
+        background-size: 14px;
     }
     .pagination-controls {
         flex-wrap: wrap;
@@ -1131,8 +1111,8 @@
     color: var(--color-gray-400);
 }
 
-[data-theme="dark"] .filter-search-icon {
-    color: #888;
+[data-theme="dark"] .filter-controls input[type="text"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
 }
 
 [data-theme="dark"] #panel-artista .pagination-btn {
