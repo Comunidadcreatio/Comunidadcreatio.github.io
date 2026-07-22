@@ -884,7 +884,7 @@
 /* Contenedor del contenido de tabs */
 .perfil-tab-content {
     width: 100%;
-    margin-top: 12px;
+    margin-top: 0;
 }
 
 .perfil-tab-content .perfil-grid-obras {
@@ -1244,4 +1244,25 @@
 
 [data-theme="dark"] .perfil-nombre-real-seccion {
     color: var(--color-gray-400);
+}
+
+/* ==============================================
+   PERFIL TABS GRID — Responsive
+   ============================================== */
+
+/* Móvil: sin padding, edge-to-edge */
+@media (max-width: 768px) {
+    .perfil-tab-content {
+        margin-left: -24px;
+        margin-right: -24px;
+        width: calc(100% + 48px);
+    }
+}
+
+/* Escritorio: aire a los lados */
+@media (min-width: 1024px) {
+    .perfil-tab-content {
+        padding-left: 2vw;
+        padding-right: 2vw;
+    }
 }
