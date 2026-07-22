@@ -740,6 +740,10 @@ input, select, textarea {
     border-bottom: none;
 }
 
+[data-theme="dark"] #cavents-popover .header-popover-panel::after {
+    border-top-color: var(--color-gray-100);
+}
+
 /* ==============================================
    TRANSICIONES SUAVES ENTRE SECCIONES
    ============================================== */
