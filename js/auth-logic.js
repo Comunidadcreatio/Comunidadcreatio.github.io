@@ -342,9 +342,16 @@ function paisChangeHandler() {
 }
 
 function showStep(step) {
-    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.step').forEach(el => {
+        el.style.display = 'none';
+        el.classList.remove('step-enter');
+    });
     const target = document.querySelector(`.step[data-step="${step}"]`);
-    if (target) target.style.display = 'block';
+    if (target) {
+        target.style.display = 'block';
+        target.classList.add('step-enter');
+        setTimeout(() => target.classList.remove('step-enter'), 300);
+    }
     currentStep = step;
 
     // Limpiar errores al cambiar de paso

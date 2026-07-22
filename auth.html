@@ -87,14 +87,11 @@
 
         <!-- OLVIDÉ MI CONTRASEÑA SECTION -->
         <div id="forgot-section" class="auth-section hidden">
-            <h1 style="padding-left:0;text-align:left;">Recuperar contraseña</h1>
-            <p style="font-size:13px; color:var(--color-gray-500); margin-bottom:20px; text-align:left;">
-                Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
-            </p>
+            <h2 class="reg-step-title" style="padding-left:0;text-align:left;">Recuperar contraseña</h2>
+            <p class="reg-step-subtitle">Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.</p>
             <form id="solicitar-restablecimiento-form" novalidate>
                 <div class="form-group">
-                    <label for="forgot-email">Correo electrónico</label>
-                    <input type="email" id="forgot-email" placeholder="Ej: ejemplo@gmail.com" required autocomplete="email" data-required="true">
+                    <input type="email" id="forgot-email" placeholder="Correo electrónico" required autocomplete="email" data-required="true">
                 </div>
                 <button type="submit" id="btn-enviar-reset">Enviar enlace</button>
             </form>
@@ -107,6 +104,7 @@
             <form id="registro-form" class="compact-form" style="padding-top:0;" novalidate>
 
                 <div class="step" data-step="1">
+                    <div class="reg-progress-bar"><div class="reg-progress-fill" style="width:25%"></div></div>
                     <p class="reg-step-label">Paso 1 de 4</p>
                     <h2 class="reg-step-title">¿Cómo te llamas?</h2>
                     <p class="reg-step-subtitle">Queremos saber quién está detrás de cada obra, perfil y pieza artística.</p>
@@ -125,6 +123,7 @@
                 </div>
 
                 <div class="step" data-step="2" style="display:none;">
+                    <div class="reg-progress-bar"><div class="reg-progress-fill" style="width:50%"></div></div>
                     <p class="reg-step-label">Paso 2 de 4</p>
                     <h2 class="reg-step-title">Información personal</h2>
                     <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
@@ -154,6 +153,7 @@
                 </div>
 
                 <div class="step" data-step="3" style="display:none;">
+                    <div class="reg-progress-bar"><div class="reg-progress-fill" style="width:75%"></div></div>
                     <p class="reg-step-label">Paso 3 de 4</p>
                     <h2 class="reg-step-title">Datos de contacto</h2>
                     <p class="reg-step-subtitle">Te enviaremos novedades sobre concursos y novedades de la comunidad.</p>
@@ -170,6 +170,7 @@
                 </div>
 
                 <div class="step" data-step="4" style="display:none;">
+                    <div class="reg-progress-bar"><div class="reg-progress-fill" style="width:100%"></div></div>
                     <p class="reg-step-label">Paso 4 de 4</p>
                     <h2 class="reg-step-title">Protege tu cuenta</h2>
                     <p class="reg-step-subtitle">Elige un nombre de usuario único y una contraseña segura.</p>

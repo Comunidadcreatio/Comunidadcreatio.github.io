@@ -322,7 +322,21 @@ form {
     margin-bottom: 0 !important;
 }
 
+.reg-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--color-gray-200);
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.reg-progress-fill {
+    height: 100%;
+    background: var(--color-ink);
+    border-radius: 2px;
 .reg-step-label {
+    font-size: 11px;
     font-size: 11px;
     font-weight: 600;
     color: var(--color-gray-400);
@@ -429,7 +443,7 @@ button[type="submit"]:not(.nav-btn):active,
 .secondary-btn {
     width: 100%;
     padding: 12px 20px;
-    background: var(--color-white);
+    background: var(--color-gray-50);
     color: var(--color-ink);
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
@@ -644,7 +658,7 @@ button[type="submit"]:not(.nav-btn):active,
     padding-left: 18px;
     position: relative;
     line-height: 1.6;
-    transition: color 0.2s ease;
+    transition: color 0.3s ease;
 }
 
 .password-requirements li::before {
@@ -653,6 +667,7 @@ button[type="submit"]:not(.nav-btn):active,
     left: 0;
     color: var(--color-gray-400);
     font-size: 12px;
+    transition: color 0.3s ease, content 0.3s ease;
 }
 
 .password-requirements li.met {
@@ -682,6 +697,16 @@ button[type="submit"]:not(.nav-btn):active,
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+/* Animación de entrada para pasos del registro */
+.step-enter {
+    animation: stepFadeIn 0.3s ease-out;
+}
+
+@keyframes stepFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .form-row {
@@ -1169,14 +1194,14 @@ legend {
 
 [data-theme="dark"] .secondary-btn,
 [data-theme="dark"] .nav-btn.prev-btn {
-    background-color: #121212 !important;
+    background-color: #1a1a1a !important;
     border-color: #e5e5e5 !important;
     color: var(--color-ink) !important;
 }
 
 [data-theme="dark"] .secondary-btn:hover,
 [data-theme="dark"] .nav-btn.prev-btn:hover {
-    background-color: #1a1a1a !important;
+    background-color: #242424 !important;
 }
 
 [data-theme="dark"] .auth-logo {
