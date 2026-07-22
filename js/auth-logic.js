@@ -443,27 +443,72 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
-    document.getElementById('forgot-section').classList.add('hidden');
+    switchSection('login-section', 'left');
     if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.remove('hidden');
-    document.getElementById('forgot-section').classList.add('hidden');
+    switchSection('registro-section', 'right');
     showStep(1);
 }
 
 function showForgotSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
-    document.getElementById('forgot-section').classList.remove('hidden');
+    switchSection('forgot-section', 'up');
     const msgEl = document.getElementById('forgot-msg');
     if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
     const emailInput = document.getElementById('forgot-email');
     if (emailInput) emailInput.value = '';
+}
+
+// ============================================
+// TRANSICIÓN ENTRE SECCIONES
+// ============================================
+let isTransitioning = false;
+
+function switchSection(toId, direction) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    const current = document.querySelector('.auth-section:not(.hidden)');
+    const target = document.getElementById(toId);
+    if (!target || target === current) { isTransitioning = false; return; }
+
+    // Ocultar otras secciones
+    document.querySelectorAll('.auth-section').forEach(el => {
+        if (el !== current && el !== target) el.classList.add('hidden');
+    });
+
+    // Clases de salida según dirección
+    const outClass = direction === 'right' ? 'slide-out-left' : 
+                     direction === 'left' ? 'slide-out-right' : 'slide-out-left';
+    
+    // Clase de entrada (opuesta)
+    const inClass = direction === 'right' ? 'slide-in-right' : 
+                    direction === 'left' ? 'slide-in-left' : 'slide-in-left';
+
+    if (current) {
+        current.classList.add(outClass);
+    }
+
+    // Mostrar target invisible y animar entrada
+    target.classList.remove('hidden');
+    target.classList.add(inClass);
+    target.offsetHeight; // reflow
+    target.style.opacity = '1';
+    target.style.transform = 'translateX(0)';
+
+    setTimeout(() => {
+        if (current) {
+            current.classList.add('hidden');
+            current.classList.remove(outClass);
+            current.style.opacity = '';
+            current.style.transform = '';
+        }
+        target.classList.remove(inClass);
+        target.style.opacity = '';
+        target.style.transform = '';
+        isTransitioning = false;
+    }, 350);
 }
 
 // ============================================
