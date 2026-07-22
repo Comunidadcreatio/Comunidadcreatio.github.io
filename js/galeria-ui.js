@@ -124,6 +124,7 @@ export function mostrarPaginaBlanca() {
 // ============================================
 export function actualizarEstadoNavButtons() {
     const btnGaleriaSidebar = document.getElementById('btn-galeria-sidebar');
+    const btnExplorarSidebar = document.getElementById('btn-explorar-sidebar');
     const btnRegistroSidebar = document.getElementById('btn-registro-sidebar');
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
@@ -131,16 +132,22 @@ export function actualizarEstadoNavButtons() {
 
     if (galeria && btnGaleriaSidebar) {
         const galeriaVisible = !galeria.classList.contains('hidden');
-        btnGaleriaSidebar.classList.remove('nav-btn-active', 'nav-btn-grid');
+        btnGaleriaSidebar.classList.remove('nav-btn-active');
 
-        if (galeriaVisible) {
-            if (galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
-                btnGaleriaSidebar.classList.add('nav-btn-grid');
-            } else {
-                btnGaleriaSidebar.classList.add('nav-btn-active');
-            }
+        if (galeriaVisible && galeriaModo === 1) {
+            btnGaleriaSidebar.classList.add('nav-btn-active');
         }
     }
+
+    if (galeria && btnExplorarSidebar) {
+        const galeriaVisible = !galeria.classList.contains('hidden');
+        btnExplorarSidebar.classList.remove('nav-btn-grid');
+
+        if (galeriaVisible && galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
+            btnExplorarSidebar.classList.add('nav-btn-grid');
+        }
+    }
+
     if (panel && btnRegistroSidebar) {
         btnRegistroSidebar.classList.toggle('nav-btn-active', !panel.classList.contains('hidden'));
     }
@@ -234,6 +241,7 @@ export async function toggleGaleria(galeriaContainer) {
     if (!galeria) return;
 
     if (galeria.classList.contains('hidden')) {
+        // Mostrar galería en modo normal (carousel)
         galeriaModo = 1;
         if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
@@ -257,13 +265,51 @@ export async function toggleGaleria(galeriaContainer) {
                 }
             });
         });
+    } else {
+        // Ocultar galería
+        galeriaModo = 0;
+        switchSection(galeria, document.getElementById('pagina-blanca'));
+    }
+}
+
+export async function toggleExplorar() {
+    if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
+
+    const galeria = document.getElementById('galeria-publica');
+    const galeriaContainerLocal = obtenerGaleriaContainer();
+    if (!galeria) return;
+
+    if (galeria.classList.contains('hidden')) {
+        // Mostrar galería directamente en modo grid
+        galeriaModo = 2;
+        gridEntering = true;
+        if (galeriaContainerLocal) {
+            galeriaContainerLocal.innerHTML = '';
+            galeriaContainerLocal.classList.add('modo-grid');
+        }
+        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
+
+        switchSection(encontrarSeccionActual(), galeria, () => {
+            cargarGaleria(galeriaContainerLocal).then(obras => {
+                mostrarGaleria(obras, galeriaContainerLocal, (id) => {
+                    seleccionarObraDesdeGrid(id);
+                }, (artistaId) => {
+                    verPerfilArtistaDesdeGaleria(artistaId);
+                });
+                actualizarEstadoNavButtons();
+                setTimeout(() => { gridEntering = false; }, 700);
+            });
+        });
     } else if (galeriaModo === 1) {
+        // Cambiar de modo normal a grid
         galeriaModo = 2;
         gridEntering = true;
         if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
         actualizarEstadoNavButtons();
         setTimeout(() => { gridEntering = false; }, 700);
     } else {
+        // Salir del modo grid (volver a normal o cerrar)
         galeriaModo = 0;
         salirDeModoGrid(() => switchSection(galeria, document.getElementById('pagina-blanca')));
     }

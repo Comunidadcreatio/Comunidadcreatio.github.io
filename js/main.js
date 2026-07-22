@@ -18,7 +18,7 @@ import {
 } from './perfil.js';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
-    toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil
+    toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar
 } from './galeria-ui.js';
 import {
     currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
@@ -476,6 +476,12 @@ function setupEvents() {
     if (btnGaleriaSidebar) {
         btnGaleriaSidebar.addEventListener('click', () => {
             toggleGaleria(galeriaContainer);
+        });
+    }
+    const btnExplorarSidebar = document.getElementById('btn-explorar-sidebar');
+    if (btnExplorarSidebar) {
+        btnExplorarSidebar.addEventListener('click', () => {
+            toggleExplorar();
         });
     }
     if (btnRegistroSidebar) {
