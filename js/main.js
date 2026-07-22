@@ -481,7 +481,6 @@ function setupEvents() {
             document.querySelectorAll('.header-popover').forEach(p => p.classList.add('hidden'));
             if (isHidden) {
                 posicionarCaventsPopover(btnCaventsHub, caventsPopover);
-                caventsPopover.classList.remove('hidden');
             }
         });
     }
@@ -489,11 +488,12 @@ function setupEvents() {
     function posicionarCaventsPopover(trigger, popover) {
         const panelDiv = popover.querySelector('.header-popover-panel');
         if (!panelDiv) return;
-        // Mostrar temporalmente para medir
+        // Forzar display block y reflow para medir correctamente
+        popover.classList.remove('hidden');
         popover.style.display = 'block';
+        void popover.offsetHeight; // forzar reflow
         const triggerRect = trigger.getBoundingClientRect();
         const panelRect = panelDiv.getBoundingClientRect();
-        popover.style.display = '';
         const margin = 8;
         const gap = 3;
         const iconCenterX = triggerRect.left + triggerRect.width / 2;
@@ -506,6 +506,7 @@ function setupEvents() {
         if (left < margin) left = margin;
         popover.style.top = `${top}px`;
         popover.style.left = `${left}px`;
+        popover.style.display = '';
         // Cola apuntando al centro del botón
         const tailX = iconCenterX - left;
         panelDiv.style.setProperty('--tail-x', `${tailX}px`);
