@@ -254,6 +254,17 @@ export async function toggleGaleria(galeriaContainer) {
                 }
             });
         });
+    } else if (galeriaModo === 2) {
+        // Cambiar de grid a carrusel
+        galeriaModo = 1;
+        salirDeModoGrid(() => {
+            if (galeriaContainerLocal) {
+                galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c) => {
+                    c.classList.add('modo-flex-enter');
+                });
+            }
+            actualizarEstadoNavButtons();
+        });
     } else {
         // Ocultar galería
         galeriaModo = 0;
