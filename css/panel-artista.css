@@ -838,9 +838,20 @@
     gap: 80px;
     margin-top: 27px;
     padding-bottom: 4px;
-    border-bottom: 1px solid var(--color-gray-300);
     color: var(--color-text-muted, #888);
     opacity: 0.7;
+    position: relative;
+}
+
+.perfil-iconos-stats::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 1px;
+    background: var(--color-gray-300);
 }
 
 .perfil-iconos-stats svg {
