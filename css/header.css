@@ -475,14 +475,14 @@ picture {
    ============================================== */
 @media (min-width: 1024px) {
     picture {
-        height: 48px;
-        max-height: 48px;
+        height: 36px;
+        max-height: 36px;
     }
 
     .header__logo {
-        height: 42px;
+        height: 30px;
         max-width: none;
-        max-height: 42px;
+        max-height: 30px;
         transform: translateY(0);
     }
 }
