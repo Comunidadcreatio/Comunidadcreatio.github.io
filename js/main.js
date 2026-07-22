@@ -570,7 +570,7 @@ function setupEvents() {
         const gc = document.getElementById('galeria-container');
         if (!galeria || !gc) return;
 
-        // Si la galería ya está visible, solo hacer scroll
+        // Si la galería ya está visible, solo recargar y hacer scroll
         if (!galeria.classList.contains('hidden')) {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
@@ -584,16 +584,21 @@ function setupEvents() {
             return;
         }
 
-        // Mostrar galería con transición suave
+        // Ocultar perfil y mostrar galería con transición
         const perfilUsuario = document.getElementById('perfil-usuario');
         if (perfilUsuario) perfilUsuario.classList.add('hidden');
         mostrarPaginaBlanca();
         toggleGaleria(gc);
-        // Después de que cargue, scrollear a la obra
-        setTimeout(() => {
+        // Esperar a que la galería cargue y hacer scroll a la obra
+        const checkInterval = setInterval(() => {
             const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
-            if (target) gc.scrollTop = target.offsetTop;
-        }, 600);
+            if (target) {
+                clearInterval(checkInterval);
+                gc.scrollTop = target.offsetTop;
+            }
+        }, 100);
+        // Safety: dejar de buscar después de 5 segundos
+        setTimeout(() => clearInterval(checkInterval), 5000);
     };
 
     // ----- Filtros (auto-aplicar al cambiar) -----

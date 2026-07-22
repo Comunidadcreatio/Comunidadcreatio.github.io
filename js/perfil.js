@@ -505,7 +505,13 @@ function renderizarGridObras(obras, container) {
 
             function updateImage(index) {
                 currentImgIndex = index;
-                if (img) img.src = imagenes[index];
+                if (img) {
+                    img.style.opacity = '0';
+                    setTimeout(() => {
+                        img.src = imagenes[index];
+                        img.style.opacity = '1';
+                    }, 150);
+                }
                 dots.forEach((d, i) => d.classList.toggle('active', i === index));
             }
 
