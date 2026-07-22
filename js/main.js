@@ -116,27 +116,25 @@ async function fetchActiveSessionsCount() {
 }
 
 function updateCerrarTodasSesionesButtonState() {
-    const mobileAllBtn = document.getElementById('mobile-logout-all');
     const isEnabled = activeSessionsCount >= 2;
 
-    if (mobileAllBtn) {
+    // Actualizar todos los botones de "cerrar demás sesiones"
+    const allButtons = [
+        document.getElementById('mobile-logout-all'),
+        document.getElementById('desktop-logout-all'),
+        document.getElementById('header-logout-all')
+    ];
+
+    allButtons.forEach(btn => {
+        if (!btn) return;
         if (isEnabled) {
-            mobileAllBtn.classList.remove('disabled');
-            mobileAllBtn.classList.add('enabled');
+            btn.classList.remove('disabled');
+            btn.classList.add('enabled');
         } else {
-            mobileAllBtn.classList.add('disabled');
-            mobileAllBtn.classList.remove('enabled');
+            btn.classList.add('disabled');
+            btn.classList.remove('enabled');
         }
-    }
-    if (desktopLogoutAllBtn) {
-        if (isEnabled) {
-            desktopLogoutAllBtn.classList.remove('disabled');
-            desktopLogoutAllBtn.classList.add('enabled');
-        } else {
-            desktopLogoutAllBtn.classList.add('disabled');
-            desktopLogoutAllBtn.classList.remove('enabled');
-        }
-    }
+    });
 }
 
 async function closeAllSessions() {
