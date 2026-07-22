@@ -301,7 +301,6 @@ form {
 #registro-form input:focus {
     outline: none;
     border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.10);
     background: var(--color-white);
 }
 

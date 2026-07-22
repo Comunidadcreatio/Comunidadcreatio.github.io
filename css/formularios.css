@@ -185,18 +185,15 @@
    ============================================== */
 [data-required="true"]:valid {
     border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.4) !important;
 }
 
 [data-required="true"]:invalid:not(:placeholder-shown) {
     border-color: var(--color-danger) !important;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4) !important;
 }
 
 [data-required="true"]:focus {
     outline: none;
     border-color: var(--color-ink) !important;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.3) !important;
 }
 
 /* ==============================================
@@ -391,7 +388,6 @@ form *,
 #panel-artista select:focus {
     outline: none;
     border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.10);
 }
 
 #obra-form textarea {
@@ -688,7 +684,6 @@ form *,
 /* Estilos para validación visual */
 .input-error {
     border-color: var(--color-danger) !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
 .error-message-field {
