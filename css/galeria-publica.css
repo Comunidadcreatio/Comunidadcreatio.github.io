@@ -791,4 +791,15 @@ html, body {
         padding-right: 25vw;
         gap: 0;
     }
+
+    #galeria-container.modo-grid .obra-grid-titulo,
+    #galeria-container.modo-grid .obra-grid-precio,
+    #galeria-container.modo-grid .obra-grid-vistas {
+        font-size: 13px;
+    }
+
+    #galeria-container.modo-grid .obra-grid-vistas svg {
+        width: 13px;
+        height: 13px;
+    }
 }
