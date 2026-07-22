@@ -487,31 +487,26 @@ function switchSection(fromId, toId) {
     });
 
     if (fromEl && !fromEl.classList.contains('hidden')) {
-        // Fade-out de la sección actual
         fromEl.classList.add('fade-out');
         setTimeout(() => {
             fromEl.classList.add('hidden');
             fromEl.classList.remove('fade-out');
             showTarget();
-        }, 480);
+        }, 380);
     } else {
         showTarget();
     }
 
     function showTarget() {
-        // Preparar entrada: opacity 0 primero
-        toEl.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        toEl.style.transition = 'opacity 0.4s ease';
         toEl.style.opacity = '0';
-        toEl.style.transform = 'translateY(16px)';
         toEl.classList.remove('hidden');
         toEl.offsetHeight;
         toEl.style.opacity = '1';
-        toEl.style.transform = 'translateY(0)';
         setTimeout(() => {
             toEl.style.opacity = '';
-            toEl.style.transform = '';
             toEl.style.transition = '';
-        }, 500);
+        }, 400);
     }
 }
 
