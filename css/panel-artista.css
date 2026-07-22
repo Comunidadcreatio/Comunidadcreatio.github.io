@@ -836,7 +836,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-top: 6px;
+    margin-top: 10px;
     color: var(--color-text-muted, #888);
     opacity: 0.7;
 }
