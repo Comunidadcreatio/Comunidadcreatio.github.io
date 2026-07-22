@@ -77,9 +77,10 @@
    ============================================== */
 .pagination-controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 16px;
     margin: 1rem 0 2rem;
 }
 
@@ -91,27 +92,33 @@
 #panel-artista .pagination-btn {
     width: auto !important;
     flex: 0 0 auto;
-    padding: 7px 16px !important;
-    border: 1px solid #000;
-    border-radius: 6px !important;
-    background: white;
+    padding: 8px 20px !important;
+    border: 1.5px solid var(--color-gray-300);
+    border-radius: 50px !important;
+    background: var(--color-white);
     cursor: pointer;
     font-size: 13px !important;
+    font-weight: 500;
     white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-    background: #f1f1f1;
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
 }
 
 .pagination-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 #page-info {
-    padding: 6px 12px;
-    align-self: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-muted, #666);
 }
 
 
@@ -1122,7 +1129,8 @@
 }
 
 [data-theme="dark"] .pagination-btn:hover:not(:disabled) {
-    background-color: var(--color-gray-200);
+    background-color: var(--color-ink);
+    color: var(--color-white);
 }
 
 [data-theme="dark"] #page-info {
