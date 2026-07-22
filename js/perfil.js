@@ -299,6 +299,9 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
 
             await actualizarEstadisticas(userId, usuario);
 
+            // Cargar obras del usuario externo en el grid
+            cargarObrasExternas(userId);
+
             // Actualizar indicador de estado en línea para perfil externo
             const onlineIndicator = document.getElementById('perfil-online-indicator');
             if (onlineIndicator) {
@@ -428,6 +431,35 @@ async function cargarContenidoTab(tab) {
         content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Problogs — próximamente</p>';
     } else if (tab === 'comcons') {
         content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Comcons — próximamente</p>';
+    }
+}
+
+async function cargarObrasExternas(userId) {
+    const content = document.getElementById('perfil-tab-content');
+    if (!content) return;
+
+    // Activar tab cavents visualmente
+    perfilTabActual = 'cavents';
+    const tabs = document.querySelectorAll('.perfil-tab-btn');
+    tabs.forEach(t => t.classList.remove('active'));
+    const caventsTab = document.querySelector('.perfil-tab-btn[data-tab="cavents"]');
+    if (caventsTab) caventsTab.classList.add('active');
+
+    content.innerHTML = '<div class="perfil-grid-loading">Cargando obras...</div>';
+    try {
+        const res = await apiRequest('/obras');
+        if (res && Array.isArray(res)) {
+            const obrasUsuario = res.filter(obra => String(obra.artista_user_id) === String(userId));
+            if (obrasUsuario.length > 0) {
+                renderizarGridObras(obrasUsuario, content);
+            } else {
+                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Este usuario no tiene obras registradas.</p>';
+            }
+        } else {
+            content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
+        }
+    } catch (e) {
+        content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
     }
 }
 
