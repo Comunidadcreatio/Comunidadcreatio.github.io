@@ -443,67 +443,27 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    fadeTransition(() => {
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('registro-section').classList.add('hidden');
-        document.getElementById('forgot-section').classList.add('hidden');
-        if (window.volverAlBranding) window.volverAlBranding();
-    });
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('registro-section').classList.add('hidden');
+    document.getElementById('forgot-section').classList.add('hidden');
+    if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {
-    fadeTransition(() => {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('registro-section').classList.remove('hidden');
-        document.getElementById('forgot-section').classList.add('hidden');
-        showStep(1);
-    });
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('registro-section').classList.remove('hidden');
+    document.getElementById('forgot-section').classList.add('hidden');
+    showStep(1);
 }
 
 function showForgotSection() {
-    fadeTransition(() => {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('registro-section').classList.add('hidden');
-        document.getElementById('forgot-section').classList.remove('hidden');
-        const msgEl = document.getElementById('forgot-msg');
-        if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
-        const emailInput = document.getElementById('forgot-email');
-        if (emailInput) emailInput.value = '';
-    });
-}
-
-// ============================================
-// TRANSICIÓN CINEMATOGRÁFICA (fade to black → fade in)
-// ============================================
-let isTransitioning = false;
-
-function fadeTransition(callback) {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    let overlay = document.getElementById('transition-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'transition-overlay';
-        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;pointer-events:all;transition:opacity 0.35s ease;';
-        document.body.appendChild(overlay);
-    }
-
-    // Fase 1: fundir a negro (0.35s)
-    overlay.style.opacity = '1';
-
-    // Fase 2: cambiar contenido durante el negro (0.6s)
-    setTimeout(() => {
-        callback();
-        
-        // Fase 3: revelar (0.35s)
-        setTimeout(() => {
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                isTransitioning = false;
-            }, 350);
-        }, 600);
-    }, 350);
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('registro-section').classList.add('hidden');
+    document.getElementById('forgot-section').classList.remove('hidden');
+    const msgEl = document.getElementById('forgot-msg');
+    if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
+    const emailInput = document.getElementById('forgot-email');
+    if (emailInput) emailInput.value = '';
 }
 
 // ============================================
@@ -611,9 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isPrev) {
                 if (step === 1) {
-                    document.getElementById('login-section').classList.remove('hidden');
-                    document.getElementById('registro-section').classList.add('hidden');
-                    if (window.volverAlBranding) window.volverAlBranding();
+                    showLoginSection();
                     return;
                 }
                 showStep(step - 1);
