@@ -569,6 +569,7 @@ function setupEvents() {
     const limitSelect = document.getElementById('limit-select');
 
     function aplicarFiltros() {
+        if (!tablaBody) return;
         currentSearch = searchInputPanel?.value || '';
         currentSortBy = sortSelect?.value || 'id';
         currentOrder = orderSelect?.value || 'DESC';
