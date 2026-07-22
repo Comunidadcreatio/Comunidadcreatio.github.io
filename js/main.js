@@ -515,18 +515,15 @@ function setupEvents() {
         // Opciones del menú cavents
         document.getElementById('cavents-explorar')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            setTimeout(() => toggleExplorar(), 50);
+            toggleExplorar();
         });
         document.getElementById('cavents-galeria')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            setTimeout(() => toggleGaleria(galeriaContainer), 50);
+            toggleGaleria(galeriaContainer);
         });
         document.getElementById('cavents-registro')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            setTimeout(() => {
-                console.log('togglePanel llamado desde cavents-registro');
-                togglePanel();
-            }, 50);
+            togglePanel();
         });
     }
 
