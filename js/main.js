@@ -22,6 +22,7 @@ import {
 } from './galeria-ui.js';
 import {
     currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
+    aplicarFiltrosPanel, paginaAnterior, paginaSiguiente,
     setupFormChangeTracking,
     refrescarTabla,
     setupImagePreviews, limpiarFormularioCompleto,
@@ -571,11 +572,12 @@ function setupEvents() {
     function aplicarFiltros() {
         if (!tablaBody) return;
         try {
-            currentSearch = searchInputPanel?.value || '';
-            currentSortBy = sortSelect?.value || 'id';
-            currentOrder = orderSelect?.value || 'DESC';
-            currentLimit = parseInt(limitSelect?.value || '10');
-            currentPage = 1;
+            aplicarFiltrosPanel(
+                searchInputPanel?.value || '',
+                sortSelect?.value || 'id',
+                orderSelect?.value || 'DESC',
+                parseInt(limitSelect?.value || '10')
+            );
             refrescarTabla(tablaBody);
         } catch(e) {
             console.error('Error en aplicarFiltros:', e);
@@ -585,7 +587,6 @@ function setupEvents() {
     let filterDebounce;
     if (searchInputPanel) {
         searchInputPanel.addEventListener('input', () => {
-            console.log('search input changed:', searchInputPanel.value);
             clearTimeout(filterDebounce);
             filterDebounce = setTimeout(aplicarFiltros, 300);
         });
@@ -604,8 +605,7 @@ function setupEvents() {
     const btnPrev = document.getElementById('btn-prev');
     if (btnPrev) {
         btnPrev.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
+            if (paginaAnterior()) {
                 refrescarTabla(tablaBody);
             }
         });
@@ -613,9 +613,7 @@ function setupEvents() {
     const btnNext = document.getElementById('btn-next');
     if (btnNext) {
         btnNext.addEventListener('click', () => {
-            const totalPages = Math.ceil(totalObras / currentLimit);
-            if (currentPage < totalPages) {
-                currentPage++;
+            if (paginaSiguiente()) {
                 refrescarTabla(tablaBody);
             }
         });

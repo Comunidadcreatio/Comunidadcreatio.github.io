@@ -19,6 +19,31 @@ export let currentSortBy = 'id';
 export let currentOrder = 'DESC';
 export let totalObras = 0;
 
+export function aplicarFiltrosPanel(search, sortBy, order, limit) {
+    currentSearch = search;
+    currentSortBy = sortBy;
+    currentOrder = order;
+    currentLimit = limit;
+    currentPage = 1;
+}
+
+export function paginaAnterior() {
+    if (currentPage > 1) {
+        currentPage--;
+        return true;
+    }
+    return false;
+}
+
+export function paginaSiguiente() {
+    const totalPages = Math.ceil(totalObras / currentLimit);
+    if (currentPage < totalPages) {
+        currentPage++;
+        return true;
+    }
+    return false;
+}
+
 export function resetPagination() {
     currentPage = 1;
     currentSearch = '';
