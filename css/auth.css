@@ -234,7 +234,9 @@ body {
     justify-content: space-between;
     padding: 12px 24px 10px;
     border-bottom: 1px solid var(--color-gray-200);
-    background: var(--color-white);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .auth-header-left {
@@ -872,7 +874,9 @@ legend {
 .auth-footer {
     padding: 24px;
     border-top: 1px solid var(--color-gray-200);
-    background: var(--color-white);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .auth-footer-links {
@@ -1103,8 +1107,10 @@ legend {
 }
 
 [data-theme="dark"] .auth-header {
-    background-color: #121212;
+    background: rgba(10, 10, 10, 0.6);
     border-bottom-color: var(--color-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .auth-header-logo {
@@ -1112,8 +1118,10 @@ legend {
 }
 
 [data-theme="dark"] .auth-footer {
-    background-color: #121212;
+    background: rgba(10, 10, 10, 0.6);
     border-top-color: var(--color-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .auth-footer-links a {
@@ -1172,7 +1180,9 @@ legend {
 }
 
 [data-theme="dark"] .auth-section {
-    background-color: #121212 !important;
+    background: rgba(10, 10, 10, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 [data-theme="dark"] .auth-section h2 {
