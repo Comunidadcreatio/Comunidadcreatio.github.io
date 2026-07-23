@@ -361,6 +361,12 @@ function showStep(step) {
     }
 }
 
+function mostrarPasoActual() {
+    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
+    const target = document.querySelector(`.step[data-step="${currentStep}"]`);
+    if (target) target.style.display = 'block';
+}
+
 function validateStep(step) {
     const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
     if (!stepContainer) return true;
@@ -692,7 +698,23 @@ document.addEventListener('DOMContentLoaded', function() {
         registroForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!validateStep(5)) return;
+            // Re-validar todos los pasos al enviar (sin showStep para no limpiar errores)
+            if (!validateStep(1)) { currentStep = 1; mostrarPasoActual(); return; }
+            if (!validateStep(2)) { currentStep = 2; mostrarPasoActual(); return; }
+            if (!validateStep(3)) { currentStep = 3; mostrarPasoActual(); return; }
+            if (!validateStep(4)) { currentStep = 4; mostrarPasoActual(); return; }
+
+            // Validaciones adicionales que validateStep no cubre
+            const emailInput = document.getElementById('reg-email');
+            if (emailInput && disponibilidad.email === false) {
+                showWarning('El correo electrónico ya está registrado. Usa otro.');
+                currentStep = 3; mostrarPasoActual(); return;
+            }
+            const nombreInput = document.getElementById('reg-nombre-artista');
+            if (nombreInput && disponibilidad.nombre === false) {
+                showWarning('El nombre de artista ya está en uso. Elige otro.');
+                currentStep = 4; mostrarPasoActual(); return;
+            }
             
             const nombre_artista = document.getElementById('reg-nombre-artista').value;
             const nombres = document.getElementById('reg-nombres').value;
