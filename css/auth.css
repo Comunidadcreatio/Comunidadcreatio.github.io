@@ -34,6 +34,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
+    padding-bottom: 80px;
 }
 
 #main-content {
@@ -897,12 +898,14 @@ legend {
 .auth-footer {
     padding: 24px;
     border-top: 1px solid var(--color-gray-200);
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    position: sticky;
+    position: fixed;
     bottom: 0;
-    z-index: 1;
+    left: 0;
+    right: 0;
+    z-index: 10;
 }
 
 .auth-footer-links {
@@ -1144,7 +1147,7 @@ legend {
 }
 
 [data-theme="dark"] .auth-footer {
-    background: rgba(10, 10, 10, 0.6);
+    background: rgba(10, 10, 10, 0.85);
     border-top-color: var(--color-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
