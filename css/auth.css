@@ -122,6 +122,10 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-xl);
 }
 
 /* Login section */
@@ -296,9 +300,8 @@ form {
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
     color: var(--color-text);
     transition: all 0.2s ease;
     font-family: inherit;
@@ -1145,11 +1148,9 @@ legend {
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select {
-    background: rgba(0, 0, 0, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+    background: rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
     color: var(--color-ink) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 [data-theme="dark"] .form-group input::placeholder {
@@ -1186,7 +1187,9 @@ legend {
 }
 
 [data-theme="dark"] .auth-section {
-    background: transparent !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .auth-section h2 {
@@ -1337,9 +1340,9 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.31);
 }
 
 [data-theme="dark"] .auth-bg-overlay {
-    background: rgba(10, 10, 10, 0.25);
+    background: rgba(10, 10, 10, 0.31);
 }
