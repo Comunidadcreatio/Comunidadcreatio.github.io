@@ -329,7 +329,8 @@ form {
 #login-form input.input-error,
 #registro-form input.input-error,
 #registro-form select.input-error {
-    border-color: var(--color-danger) !important;
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px #e74c3c !important;
 }
 
 [data-theme="dark"] .form-group select:invalid,
