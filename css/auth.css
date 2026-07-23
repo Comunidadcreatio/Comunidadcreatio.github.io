@@ -316,9 +316,20 @@ form {
 .date-group input:invalid,
 #login-form input:invalid,
 #registro-form input:invalid {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: none;
-    outline: none;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* .input-error debe ganar sobre :invalid */
+.form-group input.input-error,
+.form-group select.input-error,
+.date-group input.input-error,
+.date-group select.input-error,
+#login-form input.input-error,
+#registro-form input.input-error,
+#registro-form select.input-error {
+    border-color: var(--color-danger) !important;
 }
 
 [data-theme="dark"] .form-group select:invalid,
@@ -328,9 +339,9 @@ form {
 [data-theme="dark"] .date-group input:invalid,
 [data-theme="dark"] #login-form input:invalid,
 [data-theme="dark"] #registro-form input:invalid {
-    border-color: rgba(255, 255, 255, 0.10);
-    box-shadow: none;
-    outline: none;
+    border-color: rgba(255, 255, 255, 0.10) !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 .form-group input:focus,
