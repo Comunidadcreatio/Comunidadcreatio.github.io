@@ -293,19 +293,27 @@ form {
 
 .form-group input,
 .form-group select,
+.date-group select,
 #login-form input,
 #registro-form input {
     width: 100%;
     padding: 12px 14px;
-    border: 1.5px solid var(--color-gray-300);
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
     border-radius: var(--radius-md);
     font-size: 14px;
     background-color: rgba(255, 255, 255, 0.05);
-    border: 1.5px solid rgba(0, 0, 0, 0.12);
     color: var(--color-text);
     transition: all 0.2s ease;
     font-family: inherit;
     line-height: 1.5;
+    box-shadow: none;
+}
+
+.form-group select:invalid,
+.date-group select:invalid,
+#registro-form select:invalid {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: none;
 }
 
 .form-group input:focus,
@@ -1148,6 +1156,7 @@ legend {
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
+[data-theme="dark"] .date-group select,
 [data-theme="dark"] #login-form input {
     background-color: rgba(0, 0, 0, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
