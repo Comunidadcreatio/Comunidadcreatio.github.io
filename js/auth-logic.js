@@ -350,8 +350,8 @@ function showStep(step) {
     if (step === 2) {
         paisChangeHandler();
     }
-    // Cargar selectores de fecha al llegar al paso 4
-    if (step === 4) {
+    // Cargar selectores de fecha al llegar al paso 3
+    if (step === 3) {
         cargarSelectoresFecha();
     }
 }
@@ -389,6 +389,10 @@ function validateStep(step) {
     }
 
     if (step === 3) {
+        // Fecha y género - solo validación de campos requeridos (ya cubierta arriba)
+    }
+
+    if (step === 4) {
         const emailInput = document.getElementById('reg-email');
         const telefonoInput = document.getElementById('reg-telefono');
 
@@ -708,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('reg-email');
             if (emailInput && disponibilidad.email === false) {
                 showWarning('El correo electrónico ya está registrado. Usa otro.');
-                currentStep = 3; mostrarPasoActual(); return;
+                currentStep = 4; mostrarPasoActual(); return;
             }
             const nombreInput = document.getElementById('reg-nombre-artista');
             if (nombreInput && disponibilidad.nombre === false) {
