@@ -348,6 +348,9 @@ function showStep(step) {
 
     // Cargar ciudades al llegar al paso 2
     if (step === 2) {
+        // Resetear país a opción por defecto
+        const paisSelect = document.getElementById('reg-pais');
+        if (paisSelect) paisSelect.value = '';
         paisChangeHandler();
     }
     // Cargar selectores de fecha al llegar al paso 3

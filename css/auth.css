@@ -312,8 +312,17 @@ form {
 .form-group select:invalid,
 .date-group select:invalid,
 #registro-form select:invalid {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: none;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+[data-theme="dark"] .form-group select:invalid,
+[data-theme="dark"] .date-group select:invalid,
+[data-theme="dark"] #registro-form select:invalid {
+    border-color: rgba(255, 255, 255, 0.10) !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 .form-group input:focus,
