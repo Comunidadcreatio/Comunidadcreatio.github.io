@@ -82,10 +82,10 @@
                         <p class="reg-step-subtitle">Accede a tu perfil, tus obras y las novedades del talento local.</p>
                         <form id="login-form" novalidate>
                             <label for="login-email" class="visually-hidden">Email</label>
-                            <input type="email" id="login-email" placeholder="Email" required autocomplete="email" data-required="true" style="margin-bottom:6px;">
+                            <input type="email" id="login-email" placeholder="Email" autocomplete="email" data-required="true" style="margin-bottom:6px;">
                             <label for="login-pass" class="visually-hidden">Contraseña</label>
                             <div class="password-wrapper" style="margin-top:0;margin-bottom:12px;">
-                                <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password" data-required="true">
+                                <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" data-required="true">
                                 <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
                             </div>
                             <p class="forgot-password" style="margin:0 0 12px 0;">
@@ -103,7 +103,7 @@
             <p class="reg-step-subtitle">Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.</p>
             <form id="solicitar-restablecimiento-form" novalidate>
                 <div class="form-group">
-                    <input type="email" id="forgot-email" placeholder="Correo electrónico" required autocomplete="email" data-required="true">
+                    <input type="email" id="forgot-email" placeholder="Correo electrónico" autocomplete="email" data-required="true">
                 </div>
                 <button type="submit" id="btn-enviar-reset" style="margin-bottom:6px;">Enviar enlace</button>
             </form>
@@ -121,10 +121,10 @@
                     <p class="reg-step-subtitle">Queremos saber quién está detrás de cada obra, perfil y pieza artística.</p>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group">
-                            <input type="text" id="reg-nombres" placeholder="Nombres" required autocomplete="given-name" data-required="true">
+                            <input type="text" id="reg-nombres" placeholder="Nombres" autocomplete="given-name" data-required="true">
                         </div>
                         <div class="form-group">
-                            <input type="text" id="reg-apellidos" placeholder="Apellidos" required autocomplete="family-name" data-required="true">
+                            <input type="text" id="reg-apellidos" placeholder="Apellidos" autocomplete="family-name" data-required="true">
                         </div>
                     </div>
                     <div class="step-navigation">
@@ -138,13 +138,13 @@
                     <h2 class="reg-step-title">¿Dónde te encuentras?</h2>
                     <p class="reg-step-subtitle">Selecciona tu país y ciudad para conectar con artistas cercanos.</p>
                     <div class="form-group">
-                        <select id="reg-pais" required data-required="true" autocomplete="off">
+                        <select id="reg-pais" data-required="true" autocomplete="off">
                             <option value="" disabled selected>Selecciona tu país</option>
                             <option value="Venezuela">Venezuela</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="reg-ciudad" required data-required="true">
+                        <select id="reg-ciudad" data-required="true">
                             <option value="" disabled selected>Selecciona tu ciudad</option>
                         </select>
                     </div>
@@ -159,10 +159,10 @@
                     <h2 class="reg-step-title">Datos de contacto</h2>
                     <p class="reg-step-subtitle">Te enviaremos novedades sobre concursos y novedades de la comunidad.</p>
                     <div class="form-group">
-                        <input type="email" id="reg-email" placeholder="Correo Electrónico" required data-required="true">
+                        <input type="email" id="reg-email" placeholder="Correo Electrónico" data-required="true">
                     </div>
                     <div class="form-group">
-                        <input type="text" id="reg-telefono" placeholder="Número de celular" required data-required="true">
+                        <input type="text" id="reg-telefono" placeholder="Número de celular" data-required="true">
                     </div>
                     <div class="step-navigation">
                         <button type="button" class="nav-btn prev-btn" data-step="4">← Volver</button>
@@ -175,18 +175,18 @@
                     <h2 class="reg-step-title">Información personal</h2>
                     <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
                     <div class="date-group" style="margin-bottom:6px; gap:6px;">
-                        <select name="dia" id="reg-dia" required data-required="true">
+                        <select name="dia" id="reg-dia" data-required="true">
                             <option value="" disabled selected>Día</option>
                         </select>
-                        <select name="mes" id="reg-mes" required data-required="true">
+                        <select name="mes" id="reg-mes" data-required="true">
                             <option value="" disabled selected>Mes</option>
                         </select>
-                        <select name="ano" id="reg-ano" required data-required="true">
+                        <select name="ano" id="reg-ano" data-required="true">
                             <option value="" disabled selected>Año</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="reg-genero" required data-required="true">
+                        <select id="reg-genero" data-required="true">
                             <option value="" disabled selected>Selecciona Género</option>
                             <option value="masculino">Masculino</option>
                             <option value="femenino">Femenino</option>
@@ -204,11 +204,11 @@
                     <h2 class="reg-step-title">Protege tu cuenta</h2>
                     <p class="reg-step-subtitle">Elige un nombre de usuario único y una contraseña segura.</p>
                     <div class="form-group">
-                        <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required data-required="true">
+                        <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" data-required="true">
                     </div>
                     <div class="form-group">
                         <div class="password-wrapper">
-                            <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" data-required="true">
+                            <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" data-required="true">
                             <button type="button" class="toggle-password" data-target="reg-pass" aria-label="Mostrar contraseña"></button>
                         </div>
                         <div class="password-strength" id="password-strength" aria-live="polite">

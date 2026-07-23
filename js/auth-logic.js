@@ -372,13 +372,12 @@ function validateStep(step) {
     // Limpiar TODOS los errores previos (global)
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
-    // Validar campos requeridos del paso actual
+    // Validar campos requeridos del paso actual (usar data-required)
     const inputs = stepContainer.querySelectorAll('input, select');
     let isValid = true;
 
-    // 1. Validar campos requeridos vacíos (solo borde rojo)
     for (let input of inputs) {
-        if (input.hasAttribute('required') && !input.value.trim()) {
+        if (input.hasAttribute('data-required') && !input.value.trim()) {
             input.classList.add('input-error');
             isValid = false;
         }
