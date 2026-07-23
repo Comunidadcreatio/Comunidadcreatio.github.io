@@ -295,7 +295,9 @@ form {
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: 14px;
-    background: var(--color-white);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     color: var(--color-text);
     transition: all 0.2s ease;
     font-family: inherit;
@@ -308,7 +310,7 @@ form {
 #registro-form input:focus {
     outline: none;
     border-color: var(--color-ink);
-    background: var(--color-white);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .form-group input:hover,
@@ -1142,9 +1144,11 @@ legend {
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select {
-    background-color: #121212 !important;
-    border-color: var(--color-border) !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
     color: var(--color-ink) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 [data-theme="dark"] .form-group input::placeholder {
