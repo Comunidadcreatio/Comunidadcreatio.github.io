@@ -295,7 +295,7 @@ form {
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     color: var(--color-text);
@@ -310,7 +310,7 @@ form {
 #registro-form input:focus {
     outline: none;
     border-color: var(--color-ink);
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .form-group input:hover,
