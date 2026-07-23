@@ -296,9 +296,9 @@ form {
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--color-text);
     transition: all 0.2s ease;
     font-family: inherit;
@@ -1148,8 +1148,8 @@ legend {
     background: rgba(0, 0, 0, 0.25) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: var(--color-ink) !important;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 [data-theme="dark"] .form-group input::placeholder {
