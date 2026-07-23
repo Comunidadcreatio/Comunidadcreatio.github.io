@@ -311,18 +311,26 @@ form {
 
 .form-group select:invalid,
 .date-group select:invalid,
-#registro-form select:invalid {
-    border-color: rgba(0, 0, 0, 0.12) !important;
-    box-shadow: none !important;
-    outline: none !important;
+#registro-form select:invalid,
+.form-group input:invalid,
+.date-group input:invalid,
+#login-form input:invalid,
+#registro-form input:invalid {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: none;
+    outline: none;
 }
 
 [data-theme="dark"] .form-group select:invalid,
 [data-theme="dark"] .date-group select:invalid,
-[data-theme="dark"] #registro-form select:invalid {
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow: none !important;
-    outline: none !important;
+[data-theme="dark"] #registro-form select:invalid,
+[data-theme="dark"] .form-group input:invalid,
+[data-theme="dark"] .date-group input:invalid,
+[data-theme="dark"] #login-form input:invalid,
+[data-theme="dark"] #registro-form input:invalid {
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: none;
+    outline: none;
 }
 
 .form-group input:focus,
