@@ -333,6 +333,17 @@ form {
     box-shadow: 0 0 0 1px #e74c3c !important;
 }
 
+[data-theme="dark"] .form-group input.input-error,
+[data-theme="dark"] .form-group select.input-error,
+[data-theme="dark"] .date-group input.input-error,
+[data-theme="dark"] .date-group select.input-error,
+[data-theme="dark"] #login-form input.input-error,
+[data-theme="dark"] #registro-form input.input-error,
+[data-theme="dark"] #registro-form select.input-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px #e74c3c !important;
+}
+
 [data-theme="dark"] .form-group select:invalid,
 [data-theme="dark"] .date-group select:invalid,
 [data-theme="dark"] #registro-form select:invalid,
