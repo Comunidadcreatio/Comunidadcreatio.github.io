@@ -315,7 +315,7 @@ form {
 input:valid,
 select:valid {
     border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.12) !important;
+    box-shadow: none !important;
     background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
@@ -361,7 +361,6 @@ select:invalid:not(.input-error) {
 input.input-error,
 select.input-error {
     border-color: #e74c3c !important;
-    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2) !important;
 }
 
 [data-theme="dark"] input:invalid:not(.input-error),
@@ -372,7 +371,7 @@ select.input-error {
 [data-theme="dark"] input:valid,
 [data-theme="dark"] select:valid {
     border-color: #22c55e !important;
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15) !important;
+    box-shadow: none !important;
     background-color: rgba(0, 0, 0, 0.15) !important;
 }
 
@@ -850,7 +849,7 @@ legend {
 
 .input-available {
     border-color: var(--color-success) !important;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15) !important;
+    box-shadow: none !important;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
