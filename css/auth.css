@@ -312,9 +312,14 @@ form {
 /* Eliminar completamente el estilo nativo :invalid */
 input:invalid,
 select:invalid {
-    border-color: inherit !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
     box-shadow: none !important;
     outline: none !important;
+}
+
+[data-theme="dark"] input:invalid,
+[data-theme="dark"] select:invalid {
+    border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 /* .input-error: única fuente de borde rojo */
