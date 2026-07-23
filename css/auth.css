@@ -313,7 +313,9 @@ form {
 /* Por defecto: borde gris */
 /* :valid (campo lleno): borde verde */
 input:valid,
-select:valid {
+select:valid,
+#login-form input:valid,
+#forgot-section input:valid {
     border-color: var(--color-success) !important;
     box-shadow: none !important;
     background-color: rgba(255, 255, 255, 0.05) !important;
@@ -369,7 +371,9 @@ select.input-error {
 }
 
 [data-theme="dark"] input:valid,
-[data-theme="dark"] select:valid {
+[data-theme="dark"] select:valid,
+[data-theme="dark"] #login-form input:valid,
+[data-theme="dark"] #forgot-section input:valid {
     border-color: #22c55e !important;
     box-shadow: none !important;
     background-color: rgba(0, 0, 0, 0.15) !important;
