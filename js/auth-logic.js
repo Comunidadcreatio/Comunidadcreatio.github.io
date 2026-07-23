@@ -377,7 +377,7 @@ function validateStep(step) {
     let isValid = true;
 
     for (let input of inputs) {
-        if (input.hasAttribute('data-required') && !input.value.trim()) {
+        if (input.hasAttribute('required') && !input.value.trim()) {
             input.classList.add('input-error');
             isValid = false;
         }
