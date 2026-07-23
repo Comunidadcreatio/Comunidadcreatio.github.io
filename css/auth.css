@@ -628,19 +628,20 @@ button[type="submit"]:not(.nav-btn):active,
    MEDIDOR DE FORTALEZA DE CONTRASEÑA
    ============================================== */
 .password-strength {
-    margin-top: 8px;
+    margin-top: 0;
     display: flex;
     align-items: center;
     gap: 8px;
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.2s ease, max-height 0.2s ease;
+    transition: opacity 0.2s ease, max-height 0.2s ease, margin-top 0.2s ease;
 }
 
 .password-strength.active {
     opacity: 1;
     max-height: 40px;
+    margin-top: 8px;
 }
 
 .strength-bar {
@@ -703,7 +704,7 @@ button[type="submit"]:not(.nav-btn):active,
 /* Lista de requisitos */
 .password-requirements {
     list-style: none;
-    margin: 8px 0 0;
+    margin: 0;
     padding: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -711,12 +712,13 @@ button[type="submit"]:not(.nav-btn):active,
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.2s ease, max-height 0.2s ease;
+    transition: opacity 0.2s ease, max-height 0.2s ease, margin 0.2s ease;
 }
 
 .password-requirements.active {
     opacity: 1;
     max-height: 120px;
+    margin: 8px 0 0;
 }
 
 .password-requirements li {
