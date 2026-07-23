@@ -1147,7 +1147,8 @@ legend {
 }
 
 [data-theme="dark"] .form-group input,
-[data-theme="dark"] .form-group select {
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] #login-form input {
     background: rgba(0, 0, 0, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
     color: var(--color-ink) !important;
