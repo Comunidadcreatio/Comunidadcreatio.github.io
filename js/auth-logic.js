@@ -10,7 +10,7 @@ import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupD
 // VARIABLES GLOBALES
 // ============================================
 let currentStep = 1;
-const totalSteps = 4;
+const totalSteps = 5;
 
 // Estado de disponibilidad de email y nombre de usuario
 const disponibilidad = {
@@ -19,6 +19,40 @@ const disponibilidad = {
 };
 
 // mostrarErrores y debounce importados de utils.js
+
+// Ciudades para el registro
+const ciudadesPorPais = {
+    'Venezuela': {
+        'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
+    }
+};
+
+function poblarCiudades(paisSeleccionado) {
+    const ciudadSelect = document.getElementById('reg-ciudad');
+    if (!ciudadSelect) return;
+    ciudadSelect.innerHTML = '<option value="" disabled selected>Selecciona tu ciudad</option>';
+    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
+        const data = ciudadesPorPais[paisSeleccionado];
+        Object.keys(data).forEach(departamento => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = departamento;
+            data[departamento].forEach(ciudad => {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                optgroup.appendChild(option);
+            });
+            ciudadSelect.appendChild(optgroup);
+        });
+    }
+}
+
+function paisChangeHandler() {
+    const paisSelect = document.getElementById('reg-pais');
+    if (paisSelect) {
+        poblarCiudades(paisSelect.value);
+    }
+}
 
 async function verificarDisponibilidad(tipo, valor, inputElement) {
     const clave = tipo === 'email' ? 'email' : 'nombre';
@@ -316,6 +350,10 @@ function showStep(step) {
     if (step === 2) {
         cargarSelectoresFecha();
     }
+    // Cargar ciudades al llegar al paso 4
+    if (step === 4) {
+        paisChangeHandler();
+    }
 }
 
 function mostrarPasoActual() {
@@ -376,6 +414,10 @@ function validateStep(step) {
     }
 
     if (step === 4) {
+        // País y ciudad - solo validación de campos requeridos (ya cubierta arriba)
+    }
+
+    if (step === 5) {
         const nombreInput = document.getElementById('reg-nombre-artista');
         const passInput = document.getElementById('reg-pass');
 
@@ -539,6 +581,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Cargar ciudades al cambiar de país
+    const regPais = document.getElementById('reg-pais');
+    if (regPais) {
+        regPais.addEventListener('change', paisChangeHandler);
+    }
+
     // Verificación en tiempo real de email y nombre de usuario
     const regEmail = document.getElementById('reg-email');
     if (regEmail) {
@@ -654,6 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!validateStep(2)) { currentStep = 2; mostrarPasoActual(); return; }
             if (!validateStep(3)) { currentStep = 3; mostrarPasoActual(); return; }
             if (!validateStep(4)) { currentStep = 4; mostrarPasoActual(); return; }
+            if (!validateStep(5)) { currentStep = 5; mostrarPasoActual(); return; }
 
             // Validaciones adicionales que validateStep no cubre
             const emailInput = document.getElementById('reg-email');
@@ -664,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const nombreInput = document.getElementById('reg-nombre-artista');
             if (nombreInput && disponibilidad.nombre === false) {
                 showWarning('El nombre de artista ya está en uso. Elige otro.');
-                currentStep = 4; mostrarPasoActual(); return;
+                currentStep = 5; mostrarPasoActual(); return;
             }
             
             const nombre_artista = document.getElementById('reg-nombre-artista').value;
@@ -698,11 +747,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
+            const pais = document.getElementById('reg-pais').value;
+            const ciudad = document.getElementById('reg-ciudad').value;
+
             const submitBtn = document.getElementById('btn-registrarse-final');
             setButtonLoading(submitBtn, true);
             try {
                 const result = await register(
-                    nombre_artista, nombre_real, email, password, telefono, 'Venezuela', 'San Cristóbal', fecha_nacimiento, genero
+                    nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
                 );
 
                 if (result.success) {
