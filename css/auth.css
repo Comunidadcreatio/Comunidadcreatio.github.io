@@ -900,7 +900,6 @@ legend {
     background: rgba(255, 255, 255, 0.60);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    margin-top: auto;
 }
 
 .auth-footer-links {
