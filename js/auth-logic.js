@@ -369,10 +369,10 @@ function validateStep(step) {
     const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
     if (!stepContainer) return true;
 
-    // Limpiar errores previos del paso
-    stepContainer.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-    stepContainer.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
+    // Limpiar TODOS los errores previos (global)
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
+    // Validar campos requeridos del paso actual
     const inputs = stepContainer.querySelectorAll('input, select');
     let isValid = true;
 
