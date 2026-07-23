@@ -40,6 +40,8 @@ body {
     flex-direction: column;
     flex: 1;
     padding: 0;
+    position: relative;
+    z-index: 1;
 }
 
 /* .visually-hidden y .hidden ya están en style.css (cargado antes en auth.html) */
@@ -1295,7 +1297,7 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 0;
     overflow: hidden;
 }
 
@@ -1321,9 +1323,9 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.75);
 }
 
 [data-theme="dark"] .auth-bg-overlay {
-    background: rgba(10, 10, 10, 0.88);
+    background: rgba(10, 10, 10, 0.82);
 }
