@@ -123,25 +123,17 @@
 
                 <div class="step" data-step="2" style="display:none;">
                     <p class="reg-step-label">Paso 2 de 5</p>
-                    <h2 class="reg-step-title">Información personal</h2>
-                    <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
-                    <div class="date-group" style="margin-bottom:6px; gap:6px;">
-                        <select name="dia" id="reg-dia" required data-required="true">
-                            <option value="" disabled selected>Día</option>
-                        </select>
-                        <select name="mes" id="reg-mes" required data-required="true">
-                            <option value="" disabled selected>Mes</option>
-                        </select>
-                        <select name="ano" id="reg-ano" required data-required="true">
-                            <option value="" disabled selected>Año</option>
+                    <h2 class="reg-step-title">¿Dónde te encuentras?</h2>
+                    <p class="reg-step-subtitle">Selecciona tu país y ciudad para conectar con artistas cercanos.</p>
+                    <div class="form-group">
+                        <select id="reg-pais" required data-required="true">
+                            <option value="" disabled selected>Selecciona tu país</option>
+                            <option value="Venezuela">Venezuela</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="reg-genero" required data-required="true">
-                            <option value="" disabled selected>Selecciona Género</option>
-                            <option value="masculino">Masculino</option>
-                            <option value="femenino">Femenino</option>
-                            <option value="otro">Otro</option>
+                        <select id="reg-ciudad" required data-required="true">
+                            <option value="" disabled selected>Selecciona tu ciudad</option>
                         </select>
                     </div>
                     <div class="step-navigation">
@@ -168,17 +160,25 @@
 
                 <div class="step" data-step="4" style="display:none;">
                     <p class="reg-step-label">Paso 4 de 5</p>
-                    <h2 class="reg-step-title">¿Dónde te encuentras?</h2>
-                    <p class="reg-step-subtitle">Selecciona tu país y ciudad para conectar con artistas cercanos.</p>
-                    <div class="form-group">
-                        <select id="reg-pais" required data-required="true">
-                            <option value="" disabled selected>Selecciona tu país</option>
-                            <option value="Venezuela">Venezuela</option>
+                    <h2 class="reg-step-title">Información personal</h2>
+                    <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
+                    <div class="date-group" style="margin-bottom:6px; gap:6px;">
+                        <select name="dia" id="reg-dia" required data-required="true">
+                            <option value="" disabled selected>Día</option>
+                        </select>
+                        <select name="mes" id="reg-mes" required data-required="true">
+                            <option value="" disabled selected>Mes</option>
+                        </select>
+                        <select name="ano" id="reg-ano" required data-required="true">
+                            <option value="" disabled selected>Año</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="reg-ciudad" required data-required="true">
-                            <option value="" disabled selected>Selecciona tu ciudad</option>
+                        <select id="reg-genero" required data-required="true">
+                            <option value="" disabled selected>Selecciona Género</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
                         </select>
                     </div>
                     <div class="step-navigation">

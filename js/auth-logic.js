@@ -346,13 +346,13 @@ function showStep(step) {
     });
     document.querySelectorAll('.validation-message').forEach(el => el.remove());
 
-    // Cargar selectores de fecha al llegar al paso 2
+    // Cargar ciudades al llegar al paso 2
     if (step === 2) {
-        cargarSelectoresFecha();
-    }
-    // Cargar ciudades al llegar al paso 4
-    if (step === 4) {
         paisChangeHandler();
+    }
+    // Cargar selectores de fecha al llegar al paso 4
+    if (step === 4) {
+        cargarSelectoresFecha();
     }
 }
 
@@ -384,6 +384,10 @@ function validateStep(step) {
     if (!isValid) return false;
 
     // 2. Validaciones específicas por paso
+    if (step === 2) {
+        // País y ciudad - solo validación de campos requeridos (ya cubierta arriba)
+    }
+
     if (step === 3) {
         const emailInput = document.getElementById('reg-email');
         const telefonoInput = document.getElementById('reg-telefono');
@@ -411,10 +415,6 @@ function validateStep(step) {
             showWarning('Ingresa un número de celular válido (solo dígitos).');
             return false;
         }
-    }
-
-    if (step === 4) {
-        // País y ciudad - solo validación de campos requeridos (ya cubierta arriba)
     }
 
     if (step === 5) {
