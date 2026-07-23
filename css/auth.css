@@ -311,15 +311,7 @@ form {
 
 /* Estados de validación de inputs */
 /* Por defecto: borde gris */
-/* :valid (campo lleno): borde verde */
-input:valid,
-select:valid,
-#login-form input:valid,
-#forgot-section input:valid {
-    border: 1.5px solid var(--color-success) !important;
-    box-shadow: none !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
+
 
 /* Eliminar fondo de autocompletado - enfoque nuclear */
 input:-webkit-autofill,
@@ -368,6 +360,15 @@ select.input-error {
 [data-theme="dark"] input:invalid:not(.input-error),
 [data-theme="dark"] select:invalid:not(.input-error) {
     border: 1.5px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+input:valid,
+select:valid,
+#login-form input:valid,
+#forgot-section input:valid {
+    border: 1.5px solid var(--color-success) !important;
+    box-shadow: none !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 [data-theme="dark"] input:valid,
