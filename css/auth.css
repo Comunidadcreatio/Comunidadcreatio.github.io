@@ -300,7 +300,7 @@ form {
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     border: 1.5px solid rgba(0, 0, 0, 0.12);
     color: var(--color-text);
     transition: all 0.2s ease;
@@ -314,7 +314,7 @@ form {
 #registro-form input:focus {
     outline: none;
     border-color: var(--color-ink);
-    background: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.25);
 }
 
 .form-group input:hover,
@@ -327,7 +327,7 @@ form {
 .form-group input:read-only,
 #login-form input:read-only,
 #registro-form input:read-only {
-    background-color: var(--color-gray-100);
+    background-color: rgba(0, 0, 0, 0.04);
     cursor: not-allowed;
 }
 
@@ -1149,7 +1149,7 @@ legend {
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] #login-form input {
-    background: rgba(0, 0, 0, 0.15) !important;
+    background-color: rgba(0, 0, 0, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
     color: var(--color-ink) !important;
 }
