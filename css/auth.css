@@ -309,51 +309,19 @@ form {
     box-shadow: none;
 }
 
-.form-group select:invalid,
-.date-group select:invalid,
-#registro-form select:invalid,
-.form-group input:invalid,
-.date-group input:invalid,
-#login-form input:invalid,
-#registro-form input:invalid {
-    border-color: rgba(0, 0, 0, 0.12) !important;
+/* Eliminar completamente el estilo nativo :invalid */
+input:invalid,
+select:invalid {
+    border-color: inherit !important;
     box-shadow: none !important;
     outline: none !important;
 }
 
-/* .input-error debe ganar sobre :invalid */
-.form-group input.input-error,
-.form-group select.input-error,
-.date-group input.input-error,
-.date-group select.input-error,
-#login-form input.input-error,
+/* .input-error: única fuente de borde rojo */
+.input-error,
 #registro-form input.input-error,
 #registro-form select.input-error {
-    border-color: #e74c3c !important;
-    box-shadow: 0 0 0 1px #e74c3c !important;
-}
-
-[data-theme="dark"] .form-group input.input-error,
-[data-theme="dark"] .form-group select.input-error,
-[data-theme="dark"] .date-group input.input-error,
-[data-theme="dark"] .date-group select.input-error,
-[data-theme="dark"] #login-form input.input-error,
-[data-theme="dark"] #registro-form input.input-error,
-[data-theme="dark"] #registro-form select.input-error {
-    border-color: #e74c3c !important;
-    box-shadow: 0 0 0 1px #e74c3c !important;
-}
-
-[data-theme="dark"] .form-group select:invalid,
-[data-theme="dark"] .date-group select:invalid,
-[data-theme="dark"] #registro-form select:invalid,
-[data-theme="dark"] .form-group input:invalid,
-[data-theme="dark"] .date-group input:invalid,
-[data-theme="dark"] #login-form input:invalid,
-[data-theme="dark"] #registro-form input:invalid {
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow: none !important;
-    outline: none !important;
+    border-color: var(--color-danger) !important;
 }
 
 .form-group input:focus,
