@@ -18,42 +18,6 @@ const disponibilidad = {
     nombre: null
 };
 
-// Ciudades para el registro
-const ciudadesPorPais = {
-    'Venezuela': {
-        'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
-    }
-};
-
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
-function poblarCiudades(paisSeleccionado) {
-    const ciudadSelect = document.getElementById('reg-ciudad');
-    if (!ciudadSelect) return;
-    ciudadSelect.innerHTML = '';
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'Selecciona tu ciudad';
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    ciudadSelect.appendChild(defaultOption);
-    if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
-        const data = ciudadesPorPais[paisSeleccionado];
-        Object.keys(data).forEach(departamento => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = departamento;
-            data[departamento].forEach(ciudad => {
-                const option = document.createElement('option');
-                option.value = ciudad;
-                option.textContent = ciudad;
-                optgroup.appendChild(option);
-            });
-            ciudadSelect.appendChild(optgroup);
-        });
-    }
-}
-
 // mostrarErrores y debounce importados de utils.js
 
 async function verificarDisponibilidad(tipo, valor, inputElement) {
@@ -334,13 +298,6 @@ function cargarSelectoresFecha() {
 // MANEJO DE PASOS DEL REGISTRO
 // ============================================
 
-function paisChangeHandler() {
-    const paisSelect = document.getElementById('reg-pais');
-    if (paisSelect) {
-        poblarCiudades(paisSelect.value);
-    }
-}
-
 function showStep(step) {
     document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
     const target = document.querySelector(`.step[data-step="${step}"]`);
@@ -498,12 +455,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnIrRegistro = document.getElementById('btn-ir-registro');
     if (btnIrRegistro) {
         btnIrRegistro.addEventListener('click', showRegistroSection);
-    }
-
-    // Botón para volver al login
-    const btnVolverLogin = document.getElementById('btn-volver-login');
-    if (btnVolverLogin) {
-        btnVolverLogin.addEventListener('click', showLoginSection);
     }
 
     // Enlace ¿Olvidaste tu contraseña? → mostrar sección de solicitud

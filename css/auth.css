@@ -321,9 +321,6 @@ form {
     cursor: not-allowed;
 }
 
-    margin-bottom: 0 !important;
-}
-
 .reg-step-label {
     font-size: 11px;
     font-weight: 600;
@@ -1170,11 +1167,6 @@ legend {
 
 [data-theme="dark"] .auth-logo {
     filter: brightness(0) invert(1);
-}
-
-[data-theme="dark"] .auth-container {
-    background-color: #121212 !important;
-    border-color: var(--color-border);
 }
 
 [data-theme="dark"] .auth-section {
