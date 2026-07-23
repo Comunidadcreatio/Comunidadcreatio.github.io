@@ -432,7 +432,7 @@ button[type="submit"]:not(.nav-btn):active,
 .secondary-btn {
     width: 100%;
     padding: 12px 20px;
-    background: var(--color-gray-50);
+    background: rgba(0, 0, 0, 0.04);
     color: var(--color-ink);
     border: 1.5px solid var(--color-gray-300);
     border-radius: var(--radius-md);
@@ -445,7 +445,7 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 .secondary-btn:hover {
-    background: var(--color-gray-100);
+    background: rgba(0, 0, 0, 0.08);
     border-color: var(--color-ink);
     color: var(--color-ink);
 }
@@ -750,7 +750,7 @@ legend {
 }
 
 .nav-btn.next-btn {
-    background: var(--color-ink);
+    background: rgba(0, 0, 0, 0.85);
     color: var(--color-white);
     order: 1;
 }
@@ -1153,26 +1153,27 @@ legend {
 
 [data-theme="dark"] button[type="submit"],
 [data-theme="dark"] .nav-btn {
-    background-color: var(--color-ink) !important;
-    color: var(--color-white) !important;
-    border-color: #e5e5e5 !important;
+    background: rgba(255, 255, 255, 0.90) !important;
+    color: #000 !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 [data-theme="dark"] button[type="submit"]:hover,
 [data-theme="dark"] .nav-btn:hover {
-    background-color: var(--color-ink-light) !important;
+    background: rgba(255, 255, 255, 1) !important;
 }
 
 [data-theme="dark"] .secondary-btn,
 [data-theme="dark"] .nav-btn.prev-btn {
-    background-color: #1a1a1a !important;
-    border-color: #e5e5e5 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
     color: var(--color-ink) !important;
 }
 
 [data-theme="dark"] .secondary-btn:hover,
 [data-theme="dark"] .nav-btn.prev-btn:hover {
-    background-color: #242424 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 [data-theme="dark"] .auth-logo {
