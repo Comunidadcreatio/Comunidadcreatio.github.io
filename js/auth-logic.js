@@ -787,4 +787,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     // MODO OSCURO — delegado a theme.js (compatible con index.html y auth.html)
     setupDarkModeToggle();
+
+    // ============================================
+    // SLIDESHOW DE FONDO — cambia cada 15 segundos
+    // ============================================
+    const slides = document.querySelectorAll('.auth-bg-slide');
+    if (slides.length > 1) {
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 15000);
+    }
 });
