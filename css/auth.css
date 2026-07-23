@@ -316,6 +316,7 @@ input:valid,
 select:valid {
     border-color: var(--color-success) !important;
     box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.12) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* :invalid sin interacción: mismo gris que normal */
@@ -343,6 +344,7 @@ select.input-error {
 [data-theme="dark"] select:valid {
     border-color: #22c55e !important;
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15) !important;
+    background-color: rgba(0, 0, 0, 0.15) !important;
 }
 
 .form-group input:focus,
