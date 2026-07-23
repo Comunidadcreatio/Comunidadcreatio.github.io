@@ -319,26 +319,33 @@ select:valid {
     background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* Eliminar fondo blanco del autocompletado del navegador */
+/* Eliminar fondo de autocompletado - enfoque nuclear */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
-    box-shadow: 0 0 0 30px transparent inset !important;
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.05) inset !important;
+    box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.05) inset !important;
     -webkit-text-fill-color: var(--color-text) !important;
-    transition: background-color 5000s ease-in-out 0s;
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    transition: background-color 9999s ease-in-out 0s !important;
 }
 
 [data-theme="dark"] input:-webkit-autofill,
 [data-theme="dark"] input:-webkit-autofill:hover,
 [data-theme="dark"] input:-webkit-autofill:focus,
-[data-theme="dark"] input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
-    box-shadow: 0 0 0 30px transparent inset !important;
+[data-theme="dark"] input:-webkit-autofill:active,
+[data-theme="dark"] select:-webkit-autofill,
+[data-theme="dark"] select:-webkit-autofill:hover,
+[data-theme="dark"] select:-webkit-autofill:focus,
+[data-theme="dark"] select:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.15) inset !important;
+    box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.15) inset !important;
     -webkit-text-fill-color: var(--color-ink) !important;
-    background-color: rgba(0, 0, 0, 0.15) !important;
+    transition: background-color 9999s ease-in-out 0s !important;
 }
 
 /* :invalid sin interacción: mismo gris que normal */
