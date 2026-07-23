@@ -319,6 +319,28 @@ select:valid {
     background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
+/* Eliminar fondo blanco del autocompletado del navegador */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+    box-shadow: 0 0 0 30px transparent inset !important;
+    -webkit-text-fill-color: var(--color-text) !important;
+    transition: background-color 5000s ease-in-out 0s;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus,
+[data-theme="dark"] input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+    box-shadow: 0 0 0 30px transparent inset !important;
+    -webkit-text-fill-color: var(--color-ink) !important;
+    background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
 /* :invalid sin interacción: mismo gris que normal */
 input:invalid:not(.input-error),
 select:invalid:not(.input-error) {
