@@ -3,7 +3,8 @@
   "appName": "Creatio",
   "webDir": "www",
   "server": {
-    "url": "https://Comunidadcreatio.github.io",
+    "url": "https://comunidadcreatio.github.io",
+    "hostname": "comunidadcreatio.github.io",
     "cleartext": true
   },
   "android": {
