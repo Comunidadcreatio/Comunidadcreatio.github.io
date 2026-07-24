@@ -955,9 +955,9 @@ legend {
 .auth-footer {
     padding: 24px;
     border-top: 1px solid var(--color-gray-200);
-    background: rgba(255, 255, 255, 0.60);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     position: sticky;
     bottom: 0;
 }
@@ -1201,10 +1201,10 @@ legend {
 }
 
 [data-theme="dark"] .auth-footer {
-    background: rgba(10, 10, 10, 0.60);
+    background: rgba(10, 10, 10, 0.85);
     border-top-color: var(--color-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 [data-theme="dark"] .auth-footer-links a {
