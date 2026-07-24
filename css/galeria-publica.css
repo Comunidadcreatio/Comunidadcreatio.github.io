@@ -23,7 +23,7 @@ html, body {
     -webkit-overflow-scrolling: touch;
     /* Posición fija entre header y barra inferior (respeta safe-area en móviles) */
     position: fixed;
-    top: calc(64px + env(safe-area-inset-top, 0px));
+    top: calc(64px + 8px + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
     bottom: calc(50px + env(safe-area-inset-bottom, 0px));

@@ -11,8 +11,9 @@
     z-index: 1000;
     background-color: var(--color-white);
     color: var(--color-black);
-    padding: env(safe-area-inset-top, 0px) 1.5rem 0;
-    height: calc(64px + env(safe-area-inset-top, 0px));
+    padding: 0 1.5rem;
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    height: calc(64px + 8px + env(safe-area-inset-top, 0px));
     display: flex;
     align-items: center;
     justify-content: flex-start;
