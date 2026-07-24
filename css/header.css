@@ -37,7 +37,7 @@
     flex-shrink: 0;       /* Evita que el logo se encoja */
     margin: 0;            /* Eliminar cualquier margen */
     padding: 0;           /* Eliminar cualquier padding */
-    transform: translateY(9px);
+    transform: translateY(0);
 }
 
 /* Contenedor picture para el logo */
