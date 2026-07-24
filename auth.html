@@ -22,16 +22,16 @@
 
     <!-- Slideshow de fondo del Táchira -->
     <div class="auth-bg-slideshow" aria-hidden="true">
-        <div class="auth-bg-slide active" style="background-image: url('iconos/fondos/01.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/02.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/03.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/04.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/05.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/06.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/07.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/08.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/9.png');"></div>
-        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/10.png');"></div>
+        <div class="auth-bg-slide active" style="background-image: url('iconos/fondos/01.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/02.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/03.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/04.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/05.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/06.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/07.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/08.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/9.webp');"></div>
+        <div class="auth-bg-slide" style="background-image: url('iconos/fondos/10.webp');"></div>
         <div class="auth-bg-overlay"></div>
     </div>
 
@@ -458,5 +458,30 @@
         })();
     </script>
     </main>
+    <!-- Detector de actualizaciones -->
+    <script>
+        (function() {
+            fetch('/version.json?t=' + Date.now())
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var localVer = localStorage.getItem('app_version');
+                    if (!localVer) {
+                        localStorage.setItem('app_version', data.version);
+                        return;
+                    }
+                    if (data.version !== localVer) {
+                        var bar = document.createElement('div');
+                        bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:\"Nunito\",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+                        bar.innerHTML = '🔄 Nueva versión disponible <button id=\"btn-refresh-auth\" style=\"background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;\">Actualizar</button>';
+                        document.body.appendChild(bar);
+                        document.getElementById('btn-refresh-auth').onclick = function() {
+                            localStorage.setItem('app_version', data.version);
+                            window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
+                        };
+                    }
+                })
+                .catch(function() {});
+        })();
+    </script>
 </body>
 </html>
