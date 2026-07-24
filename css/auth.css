@@ -53,6 +53,7 @@ body {
    ============================================== */
 .auth-layout {
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     padding: 40px 24px;
@@ -957,7 +958,8 @@ legend {
     background: rgba(255, 255, 255, 0.60);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    margin-top: auto;
+    position: sticky;
+    bottom: 0;
 }
 
 .auth-footer-links {
@@ -1391,6 +1393,7 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     z-index: 0;
     overflow: hidden;
 }
@@ -1401,6 +1404,7 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     background-size: cover;
     background-position: center;
     opacity: 0;
@@ -1417,6 +1421,7 @@ legend {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     background: rgba(255, 255, 255, 0.31);
 }
 
