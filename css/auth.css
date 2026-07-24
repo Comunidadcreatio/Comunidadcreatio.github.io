@@ -59,7 +59,7 @@ body {
 .auth-layout {
     display: flex;
     flex: 1;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 40px 24px;
     gap: 60px;
@@ -80,6 +80,7 @@ body {
     justify-content: center;
     padding: 40px;
     transition: opacity 0.5s ease, transform 0.5s ease;
+    align-self: center;
 }
 
 /* Ocultar branding con fade-out + colapso */
@@ -103,6 +104,7 @@ body {
     display: flex;
     align-items: center;
     transition: flex 0.5s ease;
+    align-self: center;
 }
 
 /* (auth-right-centered en @media 768px) */
