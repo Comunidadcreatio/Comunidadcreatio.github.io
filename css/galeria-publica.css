@@ -23,7 +23,7 @@ html, body {
     -webkit-overflow-scrolling: touch;
     /* Posición fija entre header y barra inferior (respeta safe-area en móviles) */
     position: fixed;
-    top: calc(64px + 32px + env(safe-area-inset-top, 0px));
+    top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
     bottom: calc(50px + env(safe-area-inset-bottom, 0px));
@@ -332,7 +332,7 @@ html, body {
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        top: 50px;
+        top: calc(50px + var(--status-bar-height, 24px));
         bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
@@ -391,7 +391,7 @@ html, body {
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        top: 48px;
+        top: calc(48px + var(--status-bar-height, 24px));
         bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
