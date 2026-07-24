@@ -1,0 +1,11 @@
+{
+  "appId": "com.creatividad.creatio",
+  "appName": "Creatio",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

@@ -1,2 +1,5 @@
 *.min.css
 *.min.js
+www/
+android/
+node_modules/
