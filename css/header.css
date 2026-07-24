@@ -12,8 +12,8 @@
     background-color: var(--color-white); /* v2026072501 */
     color: var(--color-black);
     padding: 0 1.5rem;
-    padding-top: calc(32px + env(safe-area-inset-top, 0px));
-    height: calc(64px + 32px + env(safe-area-inset-top, 0px));
+    padding-top: var(--status-bar-height, 24px);
+    height: calc(64px + var(--status-bar-height, 24px));
     display: flex;
     align-items: center;
     justify-content: flex-start;

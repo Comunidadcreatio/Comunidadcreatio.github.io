@@ -4,9 +4,10 @@
  *
  * Qué hace:
  * 1. Calcula un hash MD5 del contenido de cada CSS/JS referenciado en HTML
- * 2. Actualiza los ?v=... en index.html, auth.html, reset-password.html
- * 3. Incrementa la versión en version.json
- * 4. Solo modifica archivos si algo cambió realmente
+ * 2. Escanea @import en CSS y actualiza sus ?v= si el importado cambió
+ * 3. Actualiza los ?v=... en index.html, auth.html, reset-password.html
+ * 4. Incrementa la versión en version.json
+ * 5. Solo modifica archivos si algo cambió realmente
  *
  * Uso: node scripts/bump-version.js
  */
@@ -30,69 +31,118 @@ function hashFile(filePath) {
  * Encuentra todas las referencias a CSS/JS con ?v=... en un HTML.
  * Retorna [{ fullMatch, filePath, oldVer }].
  */
-function findAssets(html, htmlFile) {
-    const regex = /(href|src)="((css\/|js\/)[^"']+)\?v=([^"']+)"/g;
+function findAssets(html) {
+    const regex = /(?:href|src)="((?:css\/|js\/)[^"']+)\?v=([^"']+)"/g;
     const assets = [];
     let match;
     while ((match = regex.exec(html)) !== null) {
         assets.push({
             fullMatch: match[0],
-            filePath: match[2],
-            oldVer: match[4],
-            htmlFile,
+            filePath: match[1],
+            oldVer: match[2],
         });
     }
     return assets;
+}
+
+/**
+ * Encuentra @import de CSS con ?v=...
+ */
+function findCssImports(cssContent) {
+    const regex = /@import\s+url\(['"]?((?:css\/)?([^'"\)]+\.css))\?v=([^'"\)]+)['"]?\)/g;
+    const imports = [];
+    let match;
+    while ((match = regex.exec(cssContent)) !== null) {
+        // Si el path no empieza con css/, se asume que es relativo al mismo dir
+        const rawPath = match[1];
+        const filePath = rawPath.startsWith('css/') ? rawPath : `css/${rawPath}`;
+        imports.push({
+            fullMatch: match[0],
+            filePath: filePath,
+            oldVer: match[3],
+        });
+    }
+    return imports;
+}
+
+function processFile(projectRoot, filePath, findFn, labelFn) {
+    const fullPath = path.join(projectRoot, filePath);
+    if (!fs.existsSync(fullPath)) {
+        console.log(`⚠  ${filePath} no encontrado, se omite.`);
+        return { modified: false, anyChange: false };
+    }
+
+    let content = fs.readFileSync(fullPath, 'utf-8');
+    const assets = findFn(content);
+
+    if (assets.length === 0) {
+        return { modified: false, anyChange: false };
+    }
+
+    let modified = false;
+    let anyChange = false;
+    for (const asset of assets) {
+        const assetPath = path.join(projectRoot, asset.filePath);
+        if (!fs.existsSync(assetPath)) {
+            console.log(`⚠  ${asset.filePath} no existe en disco, se conserva ?v=${asset.oldVer}`);
+            continue;
+        }
+
+        const newHash = hashFile(assetPath);
+        if (newHash !== asset.oldVer) {
+            content = content.replace(asset.fullMatch, asset.fullMatch.replace(`?v=${asset.oldVer}`, `?v=${newHash}`));
+            console.log(`✓ ${labelFn(asset.filePath)}: ${asset.filePath} ?v=${asset.oldVer} → ?v=${newHash}`);
+            modified = true;
+            anyChange = true;
+        } else {
+            console.log(`· ${asset.filePath} sin cambios (?v=${asset.oldVer})`);
+        }
+    }
+
+    if (modified) {
+        fs.writeFileSync(fullPath, content, 'utf-8');
+        console.log(`✎ ${filePath} actualizado.`);
+    }
+
+    return { modified, anyChange };
 }
 
 function main() {
     const projectRoot = path.resolve(__dirname, '..');
     let anyChange = false;
 
-    // 1. Procesar cada HTML
+    // 1. Procesar cada HTML (CSS/JS referenciados)
+    for (const htmlFile of HTML_FILES) {
+        const result = processFile(projectRoot, htmlFile, findAssets,
+            (fp) => `${htmlFile}: ${fp}`);
+        if (result.anyChange) anyChange = true;
+    }
+
+    // 2. Procesar @import en cada CSS referenciado en HTML
     for (const htmlFile of HTML_FILES) {
         const htmlPath = path.join(projectRoot, htmlFile);
-        if (!fs.existsSync(htmlPath)) {
-            console.log(`⚠  ${htmlFile} no encontrado, se omite.`);
-            continue;
-        }
-
-        let html = fs.readFileSync(htmlPath, 'utf-8');
-        const assets = findAssets(html, htmlFile);
-
-        if (assets.length === 0) {
-            console.log(`ℹ  ${htmlFile}: sin assets con ?v=, se omite.`);
-            continue;
-        }
-
-        let modified = false;
-        for (const asset of assets) {
-            const assetPath = path.join(projectRoot, asset.filePath);
-            if (!fs.existsSync(assetPath)) {
-                console.log(`⚠  ${asset.filePath} no existe en disco, se conserva ?v=${asset.oldVer}`);
-                continue;
-            }
-
-            const newHash = hashFile(assetPath);
-            if (newHash !== asset.oldVer) {
-                const oldFull = asset.fullMatch;
-                const newFull = oldFull.replace(`?v=${asset.oldVer}`, `?v=${newHash}`);
-                html = html.replace(oldFull, newFull);
-                console.log(`✓ ${htmlFile}: ${asset.filePath} ?v=${asset.oldVer} → ?v=${newHash}`);
-                modified = true;
-                anyChange = true;
-            } else {
-                console.log(`· ${htmlFile}: ${asset.filePath} sin cambios (?v=${asset.oldVer})`);
-            }
-        }
-
-        if (modified) {
-            fs.writeFileSync(htmlPath, html, 'utf-8');
-            console.log(`✎ ${htmlFile} actualizado.`);
+        if (!fs.existsSync(htmlPath)) continue;
+        const html = fs.readFileSync(htmlPath, 'utf-8');
+        const cssAssets = findAssets(html).filter(a => a.filePath.endsWith('.css'));
+        for (const cssAsset of cssAssets) {
+            const cssPath = path.join(projectRoot, cssAsset.filePath);
+            if (!fs.existsSync(cssPath)) continue;
+            const result = processFile(projectRoot, cssAsset.filePath, findCssImports,
+                (fp) => `${cssAsset.filePath} → ${fp}`);
+            if (result.anyChange) anyChange = true;
         }
     }
 
-    // 2. Actualizar version.json (solo si hubo cambios reales)
+    // 3. Si CSS cambió, reprocesar HTMLs (el hash del CSS padre pudo cambiar)
+    if (anyChange) {
+        for (const htmlFile of HTML_FILES) {
+            const result = processFile(projectRoot, htmlFile, findAssets,
+                (fp) => `${htmlFile} [2ª pasada]: ${fp}`);
+            // No modificamos anyChange — ya es true
+        }
+    }
+
+    // 4. Actualizar version.json (solo si hubo cambios reales)
     if (anyChange) {
         const versionPath = path.join(projectRoot, VERSION_FILE);
         if (fs.existsSync(versionPath)) {

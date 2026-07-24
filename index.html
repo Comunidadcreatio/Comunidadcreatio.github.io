@@ -4,6 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Detección de altura de barra de estado para Android -->
+    <script>
+        (function() {
+            // Calcula altura estimada: 24dp × devicePixelRatio, mínimo 24px
+            var dpr = window.devicePixelRatio || 1;
+            var statusH = Math.max(24, Math.round(24 * dpr));
+            document.documentElement.style.setProperty('--status-bar-height', statusH + 'px');
+        })();
+    </script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -42,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=0b8debc9c9">
+    <link rel="stylesheet" href="css/style.css?v=3b086c8a0b">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
