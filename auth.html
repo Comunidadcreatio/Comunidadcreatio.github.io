@@ -330,8 +330,8 @@
                             setTimeout(typeTagline, speed * 2);
                         }
                     } else {
-                        // Tagline terminó — mover cursor al subtitle
-                        tagline.classList.remove('typing');
+                        // Tagline terminó — ocultar cursor del tagline y empezar subtitle
+                        cursor.style.display = 'none';
                         startSubtitle();
                     }
                 }
@@ -350,9 +350,13 @@
                 subtitle.textContent = '';
                 subtitle.classList.add('typing');
                 
+                var subCursor = document.createElement('span');
+                subCursor.className = 'typing-cursor';
+                subCursor.textContent = '|';
+                
                 var textNode = document.createTextNode('');
                 subtitle.appendChild(textNode);
-                subtitle.appendChild(cursor);
+                subtitle.appendChild(subCursor);
                 
                 var i = 0;
                 var subSpeed = 33;
