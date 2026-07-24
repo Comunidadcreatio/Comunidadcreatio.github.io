@@ -827,6 +827,7 @@ input, select, textarea {
     }
     main {
         padding: 84px 24px 20px;
+        padding-top: calc(64px + var(--status-bar-height, 24px));
         width: 100%;
         box-sizing: border-box;
     }
@@ -869,6 +870,7 @@ input, select, textarea {
 
     main {
         padding: 50px 24px 0;
+        padding-top: calc(50px + var(--status-bar-height, 24px));
     }
 
     .toggle-icon {
