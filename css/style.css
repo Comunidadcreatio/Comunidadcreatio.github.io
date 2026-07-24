@@ -488,12 +488,12 @@ input, select, textarea {
 .bottom-bar-left {
     position: absolute;
     left: 50%;
-    bottom: 0;
+    top: 50%;
+    transform: translate(-100%, -50%);
     height: 100%;
     display: flex;
     align-items: center;
     margin-left: calc(-18px - 8px);
-    transform: translateX(-100%);
     z-index: 1;
 }
 
@@ -852,7 +852,7 @@ input, select, textarea {
 
 /* 3. Responsive - Móviles (≤ 768px) */
 @media (max-width: 768px) {
-    body { padding-bottom: 45px; }
+    body { padding-bottom: calc(50px + env(safe-area-inset-bottom, 16px)); }
 
     main {
         padding: 50px 24px 0;
