@@ -3,7 +3,8 @@
   "appName": "Creatio",
   "webDir": "www",
   "server": {
-    "androidScheme": "https"
+    "url": "https://comunidadcreatio.github.io",
+    "cleartext": true
   },
   "android": {
     "allowMixedContent": true
