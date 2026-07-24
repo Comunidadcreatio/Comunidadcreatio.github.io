@@ -10,9 +10,9 @@
     <meta name="description" content="Inicia sesión o regístrate en Creatio">
     <meta name="robots" content="noindex, nofollow">
     
-    <link rel="stylesheet" href="css/style.css?v=20260721">
-    <link rel="stylesheet" href="css/auth.css?v=20260724">
-    <link rel="stylesheet" href="css/notificaciones.css?v=20260721">
+    <link rel="stylesheet" href="css/style.css?v=2d1378c47f">
+    <link rel="stylesheet" href="css/auth.css?v=c3270f62ae">
+    <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -267,7 +267,7 @@
     </footer>
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=20260722"></script>
+    <script type="module" src="js/auth-logic.js?v=f69d876251"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>
@@ -458,25 +458,44 @@
         })();
     </script>
     </main>
-    <!-- Detector de actualizaciones -->
+    <!-- Detector de actualizaciones (con recarga forzada) -->
     <script>
         (function() {
-            fetch('/version.json?t=' + Date.now())
+            var AUTO_RELOAD_DELAY = 60000; // 60 segundos antes de recargar automáticamente
+
+            fetch('/version.json?t=' + Date.now(), { cache: 'no-cache' })
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     var localVer = localStorage.getItem('app_version');
-                    if (!localVer) {
+                    var currentUrl = window.location.href;
+
+                    // Si es primera visita o viene con ?v= (recarga forzada): actualizar y salir
+                    if (!localVer || currentUrl.indexOf('?v=') !== -1) {
                         localStorage.setItem('app_version', data.version);
                         return;
                     }
+
                     if (data.version !== localVer) {
                         var bar = document.createElement('div');
-                        bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:\"Nunito\",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
-                        bar.innerHTML = '🔄 Nueva versión disponible <button id=\"btn-refresh-auth\" style=\"background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;\">Actualizar</button>';
+                        bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+                        bar.innerHTML = '🔄 Nueva versi\u00f3n disponible <button id="btn-refresh-auth" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
                         document.body.appendChild(bar);
-                        document.getElementById('btn-refresh-auth').onclick = function() {
+
+                        // Auto-recarga después de X segundos si el usuario no hace clic
+                        var autoTimer = setTimeout(function() {
+                            var btn = document.getElementById('btn-refresh-auth');
+                            if (btn) {
+                                btn.textContent = 'Recargando...';
+                                btn.style.opacity = '0.6';
+                            }
                             localStorage.setItem('app_version', data.version);
-                            window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
+                            window.location.reload(true);
+                        }, AUTO_RELOAD_DELAY);
+
+                        document.getElementById('btn-refresh-auth').onclick = function() {
+                            clearTimeout(autoTimer);
+                            localStorage.setItem('app_version', data.version);
+                            window.location.reload(true);
                         };
                     }
                 })

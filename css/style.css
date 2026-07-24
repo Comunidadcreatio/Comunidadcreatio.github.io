@@ -472,10 +472,9 @@ input, select, textarea {
     z-index: 998;
     display: flex;
     align-items: center;
-    justify-content: center;
     width: 100%;
     height: calc(50px + env(safe-area-inset-bottom, 0px));
-    padding: 0 12px;
+    padding: 0 16px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background-color: var(--color-white);
     border: none;
@@ -484,17 +483,28 @@ input, select, textarea {
     box-sizing: border-box;
 }
 
-/* Botón cavents — absoluto, justo a la izquierda del perfil centrado */
+/* Columna izquierda: cavents al final, justo antes del centro */
 .bottom-bar-left {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-100%);
-    height: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
-    margin-left: calc(-18px - 8px);
-    z-index: 1;
+    justify-content: flex-end;
+    padding-right: 16px;
+    min-width: 0;
+}
+
+/* Columna central: el perfil perfectamente centrado */
+.bottom-bar-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Columna derecha: spacer para balancear */
+.bottom-bar-right {
+    flex: 1;
+    min-width: 0;
 }
 
 .toggle-nav-btn {
