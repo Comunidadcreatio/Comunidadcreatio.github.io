@@ -180,6 +180,7 @@ body {
     letter-spacing: -0.03em;
     text-align: left;
     width: 100%;
+    min-height: 315px;
 }
 
 .tagline-bold {
@@ -1148,6 +1149,7 @@ legend {
     .auth-tagline {
         font-size: 60px;
         line-height: 1.05;
+        min-height: 190px;
     }
 
     .auth-subtitle {
