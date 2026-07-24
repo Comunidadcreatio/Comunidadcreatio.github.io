@@ -303,8 +303,9 @@ picture {
    ============================================== */
 @media (max-width: 768px) {
     #main-header {
-        height: 50px;
+        height: calc(50px + var(--status-bar-height, 24px));
         padding: 0 0.5rem;
+        padding-top: var(--status-bar-height, 24px);
         gap: 0.5rem;
     }
 
@@ -393,8 +394,9 @@ picture {
 
 @media (max-width: 480px) {
     #main-header {
-        height: 48px;
+        height: calc(48px + var(--status-bar-height, 24px));
         padding: 0 0.5rem;
+        padding-top: var(--status-bar-height, 24px);
         gap: 0.25rem;
     }
 
