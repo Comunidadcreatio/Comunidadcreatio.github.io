@@ -39,6 +39,7 @@ body {
     min-height: 100vh;
     min-height: 100dvh;
     margin: 0;
+    padding-bottom: 100px;
 }
 
 #main-content {
@@ -962,8 +963,11 @@ legend {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
 }
 
 .auth-footer-links {
