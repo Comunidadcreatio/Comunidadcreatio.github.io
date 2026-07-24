@@ -190,7 +190,7 @@ body {
     font-size: 25px;
     color: var(--color-gray-500);
     line-height: 1.6;
-    min-height: auto;
+    min-height: 165px;
     margin: 0;
     max-width: 500px;
     visibility: hidden;
