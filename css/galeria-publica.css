@@ -623,7 +623,7 @@ html, body {
     width: 100%;
     padding: 0;
     pointer-events: none;
-    background: transparent;
+    background: rgba(255,0,0,0.3);
     grid-column: 1 / -1;
 }
 
