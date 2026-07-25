@@ -339,17 +339,29 @@ function shuffleArray(arr) {
     return a;
 }
 
-function createPTRIndicator() {
-    if (ptrIndicator) return;
+function createPTRIndicator(container) {
+    if (ptrIndicator) {
+        // Re-insertar si fue destruido por innerHTML
+        if (!ptrIndicator.parentNode) {
+            container.insertBefore(ptrIndicator, container.firstChild);
+        }
+        return;
+    }
     ptrIndicator = document.createElement('div');
     ptrIndicator.className = 'pull-refresh-indicator';
     ptrIndicator.innerHTML = '<div class="spinner"></div><span class="ptr-label">Desliza para actualizar</span>';
-    document.body.appendChild(ptrIndicator);
+    container.insertBefore(ptrIndicator, container.firstChild);
+}
+
+function ensurePTRInContainer(container) {
+    if (ptrIndicator && !ptrIndicator.parentNode) {
+        container.insertBefore(ptrIndicator, container.firstChild);
+    }
 }
 
 export function setupPullToRefresh(container) {
     if (!container) return;
-    createPTRIndicator();
+    createPTRIndicator(container);
 
     container.addEventListener('touchstart', (e) => {
         if (ptrRefreshing) return;
@@ -396,6 +408,7 @@ export function setupPullToRefresh(container) {
                 }, (artistaId) => {
                     verPerfilArtistaDesdeGaleria(artistaId);
                 });
+                ensurePTRInContainer(container);
             } catch (err) {
                 console.warn('Pull-to-refresh falló:', err);
             }

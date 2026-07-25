@@ -615,25 +615,18 @@ html, body {
    PULL-TO-REFRESH (MODO EXPLORAR)
    ============================================== */
 .pull-refresh-indicator {
-    position: fixed;
-    top: calc(64px + var(--status-bar-height, 24px));
-    left: 0;
-    width: 100%;
-    height: 56px;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
-    z-index: 99;
+    height: 56px;
+    width: 100%;
+    padding: 0;
     pointer-events: none;
-    opacity: 0;
-    transform: translateY(-100%);
-    transition: transform 0.25s ease, opacity 0.25s ease;
-    background: var(--color-bg);
+    background: transparent;
 }
 
 .pull-refresh-indicator.visible {
-    opacity: 1;
-    transform: translateY(0);
+    display: flex;
 }
 
 .pull-refresh-indicator .spinner {
