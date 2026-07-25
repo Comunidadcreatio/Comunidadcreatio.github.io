@@ -1451,3 +1451,30 @@ legend {
 [data-theme="dark"] .auth-bg-overlay {
     background: rgba(10, 10, 10, 0.50);
 }
+
+/* ==============================================
+   ETIQUETA DEL SLIDESHOW
+   ============================================== */
+.auth-slide-label {
+    position: fixed;
+    top: calc(70px + var(--status-bar-height, 24px));
+    right: 28px;
+    z-index: 5;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-shadow: 0 1px 6px rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+    text-align: right;
+}
+
+.auth-slide-label.visible {
+    opacity: 1;
+}
+
+[data-theme="dark"] .auth-slide-label {
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}

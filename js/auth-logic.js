@@ -794,12 +794,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // SLIDESHOW DE FONDO — cambia cada 15 segundos
     // ============================================
     const slides = document.querySelectorAll('.auth-bg-slide');
+    const label = document.querySelector('.auth-slide-label');
     if (slides.length > 1) {
         let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[index].classList.add('active');
+            // Actualizar etiqueta
+            if (label) {
+                const name = slides[index].dataset.name || '';
+                label.textContent = name;
+                label.classList.add('visible');
+                setTimeout(() => label.classList.remove('visible'), 6000);
+            }
+        }
+
+        // Mostrar nombre de la primera imagen
+        if (label && slides[0].dataset.name) {
+            label.textContent = slides[0].dataset.name;
+            label.classList.add('visible');
+            setTimeout(() => label.classList.remove('visible'), 6000);
+        }
+
         setInterval(() => {
-            slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+            showSlide(currentSlide);
         }, 8000);
     }
 });
