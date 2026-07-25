@@ -20,7 +20,6 @@ html, body {
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior-y: contain;
-    touch-action: pan-y;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     /* Posición fija entre header y barra inferior (respeta safe-area en móviles) */
@@ -643,7 +642,7 @@ html, body {
 }
 
 .pull-refresh-indicator .ptr-circle-bg {
-    stroke: var(--color-gray-300);
+    stroke: var(--color-gray-500);
 }
 
 .pull-refresh-indicator .ptr-circle-fill {
