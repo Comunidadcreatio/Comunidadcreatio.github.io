@@ -130,7 +130,7 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.69);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-xl);
 }
@@ -1281,7 +1281,7 @@ legend {
 }
 
 [data-theme="dark"] .auth-section {
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: rgba(0, 0, 0, 0.69) !important;
 }
 
 [data-theme="dark"] .auth-section h2 {
