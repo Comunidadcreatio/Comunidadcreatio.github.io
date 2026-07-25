@@ -378,6 +378,7 @@ export function setupPullToRefresh(container) {
             ptrStartY = e.touches[0].clientY;
             ptrPulling = true;
             container.style.transition = 'none';
+            container.style.transform = '';
         } else {
             ptrPulling = false;
         }
@@ -391,7 +392,7 @@ export function setupPullToRefresh(container) {
         if (dist > 5 && container.scrollTop <= 0) {
             e.preventDefault();
             const damped = Math.min(dist * 0.45, 90);
-            container.style.paddingTop = damped + 'px';
+            container.style.transform = `translateY(${damped}px)`;
             ptrIndicator.classList.add('visible');
             // Actualizar progreso del círculo (conic-gradient)
             const progress = Math.min(dist / PTR_THRESHOLD, 1);
@@ -407,8 +408,9 @@ export function setupPullToRefresh(container) {
     container.addEventListener('touchend', async () => {
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-        container.style.paddingTop = '0';
+        container.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+        container.style.transform = '';
+        container.style.paddingTop = '';
 
         // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
