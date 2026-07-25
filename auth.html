@@ -17,7 +17,7 @@
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="stylesheet" href="css/style.css?v=321d1cdb10">
-    <link rel="stylesheet" href="css/auth.css?v=3fdfd2afb4">
+    <link rel="stylesheet" href="css/auth.css?v=2093e39f48">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +39,10 @@
         <div class="auth-bg-slide" style="background-image: url('iconos/fondos/9.webp');"></div>
         <div class="auth-bg-slide" style="background-image: url('iconos/fondos/10.webp');"></div>
         <div class="auth-bg-overlay"></div>
+        <!-- Versión móvil: columna infinita -->
+        <div class="auth-bg-scroll">
+            <div class="auth-bg-scroll-inner" id="auth-bg-scroll-inner"></div>
+        </div>
     </div>
 
     <main id="main-content">
@@ -273,7 +277,7 @@
     </footer>
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=f69d876251"></script>
+    <script type="module" src="js/auth-logic.js?v=74637392c8"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>
