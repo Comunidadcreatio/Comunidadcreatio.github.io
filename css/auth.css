@@ -78,7 +78,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 180px 40px 40px 40px;
+    padding: 40px;
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
@@ -96,6 +96,7 @@ body {
     text-align: left;
     max-width: 650px;
     position: relative;
+    transform: translateY(140px);
 }
 
 /* Panel derecho: formulario */
