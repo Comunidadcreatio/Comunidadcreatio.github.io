@@ -621,7 +621,7 @@ html, body {
 #galeria-container.modo-grid .obra-grid-overlay {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
     position: absolute;
     top: 0;
     left: 0;
