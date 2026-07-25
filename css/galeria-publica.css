@@ -634,15 +634,7 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-grid-titulo {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    color: #ffffff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
+    display: none;
 }
 
 #galeria-container.modo-grid .obra-grid-bottom {
