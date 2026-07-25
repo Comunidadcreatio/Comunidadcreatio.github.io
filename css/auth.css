@@ -525,7 +525,7 @@ button[type="submit"]:not(.nav-btn):active,
     padding: 12px 20px;
     background: rgba(0, 0, 0, 0.04);
     color: var(--color-ink);
-    border: 1.5px solid var(--color-gray-300);
+    border: 1.5px solid rgba(0, 0, 0, 0.25);
     border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
@@ -832,7 +832,7 @@ legend {
 .nav-btn.prev-btn {
     background: var(--color-white);
     color: var(--color-ink);
-    border: 1.5px solid var(--color-gray-300);
+    border: 1.5px solid rgba(0, 0, 0, 0.25);
     order: 2;
 }
 
@@ -1272,14 +1272,14 @@ legend {
 [data-theme="dark"] .secondary-btn,
 [data-theme="dark"] .nav-btn.prev-btn {
     background: rgba(255, 255, 255, 0.06) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
     color: var(--color-ink) !important;
 }
 
 [data-theme="dark"] .secondary-btn:hover,
 [data-theme="dark"] .nav-btn.prev-btn:hover {
     background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 [data-theme="dark"] .auth-logo {
@@ -1288,7 +1288,7 @@ legend {
 
 [data-theme="dark"] .auth-section {
     background: rgba(0, 0, 0, 0.47) !important;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 [data-theme="dark"] .auth-section h2 {
