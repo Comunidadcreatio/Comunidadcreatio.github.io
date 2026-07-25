@@ -442,6 +442,33 @@ export function setupPullToRefresh(container) {
         }
         ptrPullDist = 0;
     });
+
+    // Soporte mouse/trackpad (desktop)
+    container.addEventListener('wheel', (e) => {
+        if (ptrRefreshing) return;
+        if (container.scrollTop <= 0 && e.deltaY < 0) {
+            e.preventDefault();
+            ptrRefreshing = true;
+            ptrIndicator.classList.add('visible', 'loading');
+
+            (async () => {
+                try {
+                    const obras = await cargarGaleria(container);
+                    const shuffled = shuffleArray(obras);
+                    mostrarGaleria(shuffled, container, (id) => {
+                        seleccionarObraDesdeGrid(id);
+                    }, (artistaId) => {
+                        verPerfilArtistaDesdeGaleria(artistaId);
+                    });
+                    ensurePTRInContainer(container);
+                } catch (err) {
+                    console.warn('Pull-to-refresh (wheel) falló:', err);
+                }
+                ptrRefreshing = false;
+                ptrIndicator.classList.remove('visible', 'loading');
+            })();
+        }
+    }, { passive: false });
 }
 
 
