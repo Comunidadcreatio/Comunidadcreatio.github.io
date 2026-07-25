@@ -393,12 +393,12 @@ export function setupPullToRefresh(container) {
             const damped = Math.min(dist * 0.45, 90);
             container.style.paddingTop = damped + 'px';
             ptrIndicator.classList.add('visible');
-            // Actualizar progreso del círculo
+            // Actualizar progreso del círculo (conic-gradient)
             const progress = Math.min(dist / PTR_THRESHOLD, 1);
             const circle = ptrIndicator.querySelector('.ptr-circle-fill');
             if (circle) {
-                circle.style.transition = 'none';
-                circle.style.transform = `rotate(${-45 + progress * 360}deg)`;
+                const deg = Math.round(progress * 360);
+                circle.style.background = `conic-gradient(var(--ptr-fill) 0deg, var(--ptr-fill) ${deg}deg, transparent ${deg}deg)`;
             }
         }
     }, { passive: false });
@@ -409,11 +409,10 @@ export function setupPullToRefresh(container) {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
 
-        // Animar círculo de vuelta a inicio
+        // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) {
-            circle.style.transition = 'transform 0.3s ease';
-            circle.style.transform = 'rotate(-45deg)';
+            circle.style.background = '';
         }
 
         if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
