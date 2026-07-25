@@ -232,13 +232,13 @@ export async function toggleGaleria(galeriaContainer) {
     if (galeria.classList.contains('hidden')) {
         // Mostrar galería en modo normal (carousel)
         galeriaModo = 1;
-        if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
+        if (galeriaContainerLocal) {
+            galeriaContainerLocal.classList.remove('modo-grid');
+            galeriaContainerLocal.innerHTML = '';
+            setupPullToRefresh(galeriaContainerLocal);
+        }
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-
-        if (galeriaContainerLocal) {
-            galeriaContainerLocal.innerHTML = '';
-        }
 
         switchSection(encontrarSeccionActual(), galeria, () => {
             cargarGaleria(galeriaContainer).then(obras => {
@@ -247,6 +247,7 @@ export async function toggleGaleria(galeriaContainer) {
                 }, (artistaId) => {
                     verPerfilArtistaDesdeGaleria(artistaId);
                 });
+                ensurePTRInContainer(galeriaContainer);
                 if (galeriaContainerLocal) {
                     galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c) => {
                         c.classList.add('modo-flex-enter');
@@ -328,6 +329,7 @@ let ptrStartY = 0;
 let ptrPulling = false;
 let ptrRefreshing = false;
 let ptrPullDist = 0;
+let ptrSetup = false;
 const PTR_THRESHOLD = 70;
 
 function shuffleArray(arr) {
@@ -360,7 +362,8 @@ function ensurePTRInContainer(container) {
 }
 
 export function setupPullToRefresh(container) {
-    if (!container) return;
+    if (!container || ptrSetup) return;
+    ptrSetup = true;
     createPTRIndicator(container);
 
     container.addEventListener('touchstart', (e) => {
