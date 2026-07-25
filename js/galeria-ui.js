@@ -398,7 +398,8 @@ export function setupPullToRefresh(container) {
             const circle = ptrIndicator.querySelector('.ptr-circle-fill');
             if (circle) {
                 const deg = Math.round(progress * 360);
-                circle.style.background = `conic-gradient(var(--ptr-fill) 0deg, var(--ptr-fill) ${deg}deg, transparent ${deg}deg)`;
+                const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
+                circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
             }
         }
     }, { passive: false });
