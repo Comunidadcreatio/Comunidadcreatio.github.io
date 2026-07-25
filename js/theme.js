@@ -50,16 +50,11 @@ export function applyTheme(theme) {
 
 /**
  * Inicializa el tema al cargar la página:
- * primero verifica preferencia guardada, si no hay, usa la hora.
+ * primero verifica preferencia guardada, si no hay, usa modo oscuro.
  */
 export function initializeTheme() {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else {
-        const timeBasedTheme = getThemeByTime();
-        applyTheme(timeBasedTheme);
-    }
+    applyTheme(savedTheme || 'dark');
 }
 
 /**
