@@ -380,6 +380,7 @@ export function setupPullToRefresh(container) {
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
+            container.style.scrollSnapType = 'none';
         } else {
             ptrPulling = false;
         }
@@ -417,6 +418,7 @@ export function setupPullToRefresh(container) {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
         container.style.transform = '';
+        container.style.scrollSnapType = '';
 
         // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
@@ -460,6 +462,7 @@ export function setupPullToRefresh(container) {
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
+            container.style.scrollSnapType = 'none';
         } else {
             ptrPulling = false;
         }
@@ -494,6 +497,7 @@ export function setupPullToRefresh(container) {
         ptrPulling = false;
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
+        container.style.scrollSnapType = '';
 
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
