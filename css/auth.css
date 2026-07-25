@@ -96,6 +96,7 @@ body {
 .auth-branding {
     text-align: left;
     max-width: 650px;
+    position: relative;
 }
 
 /* Panel derecho: formulario */
@@ -176,12 +177,11 @@ body {
     font-size: 100px;
     font-weight: 600;
     color: var(--color-ink);
-    margin-bottom: 24px;
+    margin-bottom: 180px;
     line-height: 1.05;
     letter-spacing: -0.03em;
     text-align: left;
     width: 100%;
-    min-height: 315px;
 }
 
 .tagline-bold {
@@ -192,9 +192,11 @@ body {
     font-size: 30px;
     color: var(--color-gray-500);
     line-height: 1.6;
-    min-height: 165px;
     margin: 0;
     max-width: 500px;
+    position: absolute;
+    top: 315px;
+    left: 0;
     visibility: hidden;
 }
 
@@ -1054,11 +1056,12 @@ legend {
     .auth-tagline {
         font-size: 70px;
         line-height: 1.05;
+        margin-bottom: 150px;
     }
 
     .auth-subtitle {
-        font-size: 32px;
-        min-height: auto;
+        font-size: 36px;
+        top: 220px;
     }
 
     .auth-right {
@@ -1154,11 +1157,12 @@ legend {
     .auth-tagline {
         font-size: 60px;
         line-height: 1.05;
-        min-height: 190px;
+        margin-bottom: 130px;
     }
 
     .auth-subtitle {
-        font-size: 19px;
+        font-size: 28px;
+        top: 190px;
     }
 
     .auth-section {
