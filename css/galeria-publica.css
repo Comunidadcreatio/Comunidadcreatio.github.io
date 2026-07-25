@@ -615,21 +615,25 @@ html, body {
    PULL-TO-REFRESH (MODO EXPLORAR)
    ============================================== */
 #galeria-container .pull-refresh-indicator {
-    position: absolute;
-    top: -60px;
+    position: fixed;
+    top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: top 0.3s ease;
-    z-index: 100;
+    z-index: 99;
     pointer-events: none;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    background: var(--color-bg);
 }
 
 #galeria-container .pull-refresh-indicator.visible {
-    top: 0;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #galeria-container .pull-refresh-indicator .spinner {
