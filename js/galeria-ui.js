@@ -537,8 +537,25 @@ export function setupPullToRefresh(container) {
         ptrMaxPull = 0;
     }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    container.addEventListener('mousemove', onMouseMove);
+    container.addEventListener('mouseup', onMouseUp);
+
+    // Reset si el mouse sale del container
+    container.addEventListener('mouseleave', () => {
+        if (ptrPulling && !ptrRefreshing) {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+            ptrPulling = false;
+            container.style.transition = 'padding-top 0.3s ease';
+            container.style.paddingTop = '0';
+            container.style.scrollSnapType = '';
+            container.style.userSelect = '';
+            ptrIndicator.classList.remove('visible');
+            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
+            if (circle) circle.style.background = '';
+            ptrPullDist = 0;
+            ptrMaxPull = 0;
+        }
+    });
 }
 
 
