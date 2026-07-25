@@ -96,7 +96,7 @@ body {
     text-align: left;
     max-width: 650px;
     position: relative;
-    transform: translateY(100px);
+    transform: translateY(85px);
 }
 
 /* Panel derecho: formulario */
