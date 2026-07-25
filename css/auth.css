@@ -59,7 +59,7 @@ body {
 .auth-layout {
     display: flex;
     flex: 1;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     padding: 40px 24px;
     gap: 60px;
@@ -80,7 +80,6 @@ body {
     justify-content: center;
     padding: 40px;
     transition: opacity 0.5s ease, transform 0.5s ease;
-    align-self: center;
 }
 
 /* Ocultar branding con fade-out + colapso */
@@ -105,7 +104,6 @@ body {
     display: flex;
     align-items: center;
     transition: flex 0.5s ease;
-    align-self: center;
 }
 
 /* (auth-right-centered en @media 768px) */
@@ -178,7 +176,7 @@ body {
     font-size: 100px;
     font-weight: 600;
     color: var(--color-ink);
-    margin-bottom: 180px;
+    margin-bottom: 40px;
     line-height: 1.05;
     letter-spacing: -0.03em;
     text-align: left;
@@ -195,9 +193,7 @@ body {
     line-height: 1.6;
     margin: 0;
     max-width: 500px;
-    position: absolute;
-    top: 315px;
-    left: 0;
+    position: relative;
     visibility: hidden;
 }
 
@@ -1055,12 +1051,11 @@ legend {
     .auth-tagline {
         font-size: 70px;
         line-height: 1.05;
-        margin-bottom: 150px;
+        margin-bottom: 30px;
     }
 
     .auth-subtitle {
         font-size: 30px;
-        top: 220px;
     }
 
     .auth-right {
@@ -1156,12 +1151,11 @@ legend {
     .auth-tagline {
         font-size: 60px;
         line-height: 1.05;
-        margin-bottom: 130px;
+        margin-bottom: 24px;
     }
 
     .auth-subtitle {
         font-size: 22px;
-        top: 190px;
     }
 
     .auth-section {
