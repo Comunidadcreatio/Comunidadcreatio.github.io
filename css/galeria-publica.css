@@ -639,23 +639,16 @@ html, body {
     border: 2.5px solid var(--color-gray-300);
     border-top-color: var(--color-ink);
     border-radius: 50%;
-    animation: ptr-spin 0.7s linear infinite;
     flex-shrink: 0;
 }
 
+.pull-refresh-indicator.visible .spinner,
 .pull-refresh-indicator.loading .spinner {
     display: block;
 }
 
 .pull-refresh-indicator .ptr-label {
-    font-size: 12px;
-    color: var(--color-gray-500);
-    font-family: 'Nunito', sans-serif;
-    font-weight: 600;
-}
-
-.pull-refresh-indicator.loading .ptr-label {
-    margin-left: 10px;
+    display: none;
 }
 
 @keyframes ptr-spin {
