@@ -350,7 +350,7 @@ function createPTRIndicator(container) {
     }
     ptrIndicator = document.createElement('div');
     ptrIndicator.className = 'pull-refresh-indicator';
-    ptrIndicator.innerHTML = '<svg class="ptr-circle" viewBox="0 0 36 36" width="36" height="36"><circle class="ptr-circle-bg" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/><circle class="ptr-circle-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="94.2"/></svg>';
+    ptrIndicator.innerHTML = '<div class="ptr-circle"><div class="ptr-circle-fill"></div></div>';
     container.insertBefore(ptrIndicator, container.firstChild);
 }
 
@@ -398,7 +398,7 @@ export function setupPullToRefresh(container) {
             const circle = ptrIndicator.querySelector('.ptr-circle-fill');
             if (circle) {
                 circle.style.transition = 'none';
-                circle.setAttribute('stroke-dashoffset', 94.2 * (1 - progress));
+                circle.style.transform = `rotate(${-45 + progress * 360}deg)`;
             }
         }
     }, { passive: false });
@@ -409,11 +409,11 @@ export function setupPullToRefresh(container) {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
 
-        // Animar círculo de vuelta a vacío
+        // Animar círculo de vuelta a inicio
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) {
-            circle.style.transition = 'stroke-dashoffset 0.3s ease';
-            circle.setAttribute('stroke-dashoffset', '94.2');
+            circle.style.transition = 'transform 0.3s ease';
+            circle.style.transform = 'rotate(-45deg)';
         }
 
         if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {

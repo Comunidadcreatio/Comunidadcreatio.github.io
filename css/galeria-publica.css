@@ -623,7 +623,7 @@ html, body {
     width: 100%;
     padding: 0;
     pointer-events: none;
-    background: rgba(255,0,0,0.3);
+    background: transparent;
     grid-column: 1 / -1;
 }
 
@@ -633,7 +633,12 @@ html, body {
 
 .pull-refresh-indicator .ptr-circle {
     display: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(0,0,0,0.12);
     flex-shrink: 0;
+    position: relative;
 }
 
 .pull-refresh-indicator.visible .ptr-circle,
@@ -641,14 +646,17 @@ html, body {
     display: block;
 }
 
-.pull-refresh-indicator .ptr-circle-bg {
-    stroke: rgba(0,0,0,0.15);
-}
-
 .pull-refresh-indicator .ptr-circle-fill {
-    stroke: #1a1a1a;
-    transform: rotate(-90deg);
-    transform-origin: 18px 18px;
+    position: absolute;
+    top: -2.5px;
+    left: -2.5px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    border-top-color: #1a1a1a;
+    transform: rotate(-45deg);
+    transition: none;
 }
 
 .pull-refresh-indicator.loading .ptr-circle-fill {
@@ -660,15 +668,15 @@ html, body {
 }
 
 @keyframes ptr-spin {
-    to { transform: rotate(270deg); }
+    to { transform: rotate(315deg); }
 }
 
-[data-theme="dark"] .pull-refresh-indicator .ptr-circle-bg {
-    stroke: rgba(255,255,255,0.2);
+[data-theme="dark"] .pull-refresh-indicator .ptr-circle {
+    border-color: rgba(255,255,255,0.15);
 }
 
 [data-theme="dark"] .pull-refresh-indicator .ptr-circle-fill {
-    stroke: #f5f5f5;
+    border-top-color: #f5f5f5;
 }
 
 /* ==============================================
