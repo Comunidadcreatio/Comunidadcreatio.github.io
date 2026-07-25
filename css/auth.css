@@ -130,7 +130,7 @@ body {
     padding: 32px 24px;
     width: 100%;
     position: relative;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-xl);
 }
