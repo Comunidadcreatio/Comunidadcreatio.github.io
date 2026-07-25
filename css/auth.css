@@ -133,7 +133,7 @@ body {
     width: 100%;
     position: relative;
     background: rgba(255, 255, 255, 0.47);
-    border: 2px solid rgba(0, 0, 0, 0.79);
+    border: none;
     border-radius: var(--radius-xl);
 }
 
@@ -525,7 +525,7 @@ button[type="submit"]:not(.nav-btn):active,
     padding: 12px 20px;
     background: rgba(0, 0, 0, 0.04);
     color: var(--color-ink);
-    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    border: none;
     border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
@@ -537,7 +537,6 @@ button[type="submit"]:not(.nav-btn):active,
 
 .secondary-btn:hover {
     background: rgba(0, 0, 0, 0.08);
-    border-color: var(--color-ink);
     color: var(--color-ink);
 }
 
@@ -832,13 +831,12 @@ legend {
 .nav-btn.prev-btn {
     background: var(--color-white);
     color: var(--color-ink);
-    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    border: none;
     order: 2;
 }
 
 .nav-btn.prev-btn:hover {
     background: var(--color-gray-100);
-    border-color: var(--color-ink);
     transform: translateY(-1px);
 }
 
@@ -1272,14 +1270,13 @@ legend {
 [data-theme="dark"] .secondary-btn,
 [data-theme="dark"] .nav-btn.prev-btn {
     background: rgba(255, 255, 255, 0.06) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
+    border: none !important;
     color: var(--color-ink) !important;
 }
 
 [data-theme="dark"] .secondary-btn:hover,
 [data-theme="dark"] .nav-btn.prev-btn:hover {
     background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 [data-theme="dark"] .auth-logo {
@@ -1288,7 +1285,7 @@ legend {
 
 [data-theme="dark"] .auth-section {
     background: rgba(0, 0, 0, 0.47) !important;
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    border: none;
 }
 
 [data-theme="dark"] .auth-section h2 {
