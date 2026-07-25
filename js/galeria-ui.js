@@ -505,7 +505,7 @@ export function setupPullToRefresh(container) {
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
 
-        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
+        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             ptrRefreshing = true;
             ptrIndicator.classList.add('loading');
 
@@ -528,6 +528,7 @@ export function setupPullToRefresh(container) {
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
+        ptrMaxPull = 0;
     }
 
     document.addEventListener('mousemove', onMouseMove);
