@@ -19,7 +19,7 @@ import {
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar
-} from './galeria-ui.js?v=20260726d';
+} from './galeria-ui.js?v=20260726e';
 import {
     currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
     aplicarFiltrosPanel, paginaAnterior, paginaSiguiente,
@@ -28,7 +28,7 @@ import {
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { setRefrescarTablaFn } from './galeria-ui.js?v=20260726d';
+import { setRefrescarTablaFn } from './galeria-ui.js?v=20260726e';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=20260725';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
