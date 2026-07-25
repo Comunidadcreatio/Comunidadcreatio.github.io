@@ -800,6 +800,6 @@ document.addEventListener('DOMContentLoaded', function() {
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
-        }, 15000);
+        }, 8000);
     }
 });
