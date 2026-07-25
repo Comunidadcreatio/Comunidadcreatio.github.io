@@ -329,7 +329,6 @@ let ptrStartY = 0;
 let ptrPulling = false;
 let ptrRefreshing = false;
 let ptrPullDist = 0;
-let ptrSetup = false;
 const PTR_THRESHOLD = 70;
 
 function shuffleArray(arr) {
@@ -362,9 +361,12 @@ function ensurePTRInContainer(container) {
 }
 
 export function setupPullToRefresh(container) {
-    if (!container || ptrSetup) return;
-    ptrSetup = true;
+    if (!container) return;
+    // El indicador se recrea siempre (innerHTML lo destruye)
     createPTRIndicator(container);
+    // Listeners solo una vez por container
+    if (container.dataset.ptrReady === '1') return;
+    container.dataset.ptrReady = '1';
 
     container.addEventListener('touchstart', (e) => {
         if (ptrRefreshing) return;
