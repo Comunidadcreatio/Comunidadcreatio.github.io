@@ -623,6 +623,7 @@ html, body {
     padding: 0;
     pointer-events: none;
     background: transparent;
+    grid-column: 1 / -1;
 }
 
 .pull-refresh-indicator.visible {
