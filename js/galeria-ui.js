@@ -329,6 +329,7 @@ let ptrStartY = 0;
 let ptrPulling = false;
 let ptrRefreshing = false;
 let ptrPullDist = 0;
+let ptrMaxPull = 0;
 const PTR_THRESHOLD = 70;
 
 function shuffleArray(arr) {
@@ -392,6 +393,7 @@ export function setupPullToRefresh(container) {
         if (!ptrPulling || ptrRefreshing) return;
         const dist = e.touches[0].clientY - ptrStartY;
         ptrPullDist = dist;
+        if (dist > ptrMaxPull) ptrMaxPull = dist;
 
         if (dist > 5 && container.scrollTop <= 0) {
             e.preventDefault();
@@ -426,7 +428,7 @@ export function setupPullToRefresh(container) {
             circle.style.background = '';
         }
 
-        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
+        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             ptrRefreshing = true;
             ptrIndicator.classList.add('loading');
 
@@ -472,6 +474,7 @@ export function setupPullToRefresh(container) {
         if (!ptrPulling || ptrRefreshing) return;
         const dist = e.clientY - ptrStartY;
         ptrPullDist = dist;
+        if (dist > ptrMaxPull) ptrMaxPull = dist;
 
         if (dist > 5 && container.scrollTop <= 0) {
             e.preventDefault();
