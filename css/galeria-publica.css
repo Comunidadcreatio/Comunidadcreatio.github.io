@@ -614,7 +614,7 @@ html, body {
 /* ==============================================
    PULL-TO-REFRESH (MODO EXPLORAR)
    ============================================== */
-#galeria-container .pull-refresh-indicator {
+.pull-refresh-indicator {
     position: fixed;
     top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
@@ -631,12 +631,12 @@ html, body {
     background: var(--color-bg);
 }
 
-#galeria-container .pull-refresh-indicator.visible {
+.pull-refresh-indicator.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-#galeria-container .pull-refresh-indicator .spinner {
+.pull-refresh-indicator .spinner {
     width: 28px;
     height: 28px;
     border: 2.5px solid var(--color-gray-300);
@@ -647,11 +647,11 @@ html, body {
     transition: opacity 0.2s ease;
 }
 
-#galeria-container .pull-refresh-indicator.loading .spinner {
+.pull-refresh-indicator.loading .spinner {
     opacity: 1;
 }
 
-#galeria-container .pull-refresh-indicator .ptr-label {
+.pull-refresh-indicator .ptr-label {
     font-size: 12px;
     color: var(--color-gray-500);
     margin-left: 10px;
@@ -663,12 +663,12 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
-[data-theme="dark"] #galeria-container .pull-refresh-indicator .spinner {
+[data-theme="dark"] .pull-refresh-indicator .spinner {
     border-color: var(--color-gray-600);
     border-top-color: var(--color-ink);
 }
 
-[data-theme="dark"] #galeria-container .pull-refresh-indicator .ptr-label {
+[data-theme="dark"] .pull-refresh-indicator .ptr-label {
     color: var(--color-gray-400);
 }
 

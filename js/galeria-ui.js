@@ -338,17 +338,17 @@ function shuffleArray(arr) {
     return a;
 }
 
-function createPTRIndicator(container) {
+function createPTRIndicator() {
     if (ptrIndicator) return;
     ptrIndicator = document.createElement('div');
     ptrIndicator.className = 'pull-refresh-indicator';
     ptrIndicator.innerHTML = '<div class="spinner"></div><span class="ptr-label">Suelta para actualizar</span>';
-    container.appendChild(ptrIndicator);
+    document.body.appendChild(ptrIndicator);
 }
 
 export function setupPullToRefresh(container) {
     if (!container) return;
-    createPTRIndicator(container);
+    createPTRIndicator();
 
     container.addEventListener('touchstart', (e) => {
         if (ptrRefreshing) return;
