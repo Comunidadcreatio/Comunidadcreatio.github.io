@@ -78,7 +78,8 @@ body {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 160px 40px 40px 40px;
+    padding: 40px;
+    margin-top: 200px;
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
