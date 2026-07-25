@@ -802,25 +802,4 @@ document.addEventListener('DOMContentLoaded', function() {
             slides[currentSlide].classList.add('active');
         }, 15000);
     }
-
-    // COLUMNA INFINITA MÓVIL — llena el scroll con imágenes duplicadas
-    // ============================================
-    const scrollInner = document.getElementById('auth-bg-scroll-inner');
-    if (scrollInner && slides.length > 0) {
-        const imgUrls = [];
-        slides.forEach(s => {
-            const url = s.style.backgroundImage.replace(/url\(['"]?|['"]?\)/g, '');
-            if (url) imgUrls.push(url);
-        });
-        // Insertar dos copias para bucle infinito
-        const allUrls = [...imgUrls, ...imgUrls];
-        allUrls.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'auth-bg-scroll-img';
-            img.alt = '';
-            img.loading = 'lazy';
-            scrollInner.appendChild(img);
-        });
-    }
 });

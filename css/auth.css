@@ -1432,54 +1432,6 @@ legend {
     opacity: 1;
 }
 
-/* Versión móvil: columna con scroll infinito */
-.auth-bg-scroll {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .auth-bg-slideshow {
-        overflow-y: hidden;
-    }
-    
-    .auth-bg-slide {
-        display: none;
-    }
-    
-    .auth-bg-overlay {
-        display: none;
-    }
-    
-    .auth-bg-scroll {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
-    
-    .auth-bg-scroll-inner {
-        display: flex;
-        flex-direction: column;
-        animation: scrollColumn 60s linear infinite;
-    }
-    
-    .auth-bg-scroll-img {
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-    
-    @keyframes scrollColumn {
-        0%   { transform: translateY(0); }
-        100% { transform: translateY(-50%); }
-    }
-}
-
 .auth-bg-overlay {
     position: absolute;
     top: 0;
