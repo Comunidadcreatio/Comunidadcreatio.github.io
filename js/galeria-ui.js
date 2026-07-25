@@ -286,6 +286,7 @@ export async function toggleExplorar() {
         if (galeriaContainerLocal) {
             galeriaContainerLocal.innerHTML = '';
             galeriaContainerLocal.classList.add('modo-grid');
+            setupPullToRefresh(galeriaContainerLocal);
         }
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
@@ -305,7 +306,10 @@ export async function toggleExplorar() {
         // Cambiar de modo normal a grid
         galeriaModo = 2;
         gridEntering = true;
-        if (galeriaContainerLocal) galeriaContainerLocal.classList.add('modo-grid');
+        if (galeriaContainerLocal) {
+            galeriaContainerLocal.classList.add('modo-grid');
+            setupPullToRefresh(galeriaContainerLocal);
+        }
         actualizarEstadoNavButtons();
         setTimeout(() => { gridEntering = false; }, 700);
     } else {
@@ -313,6 +317,106 @@ export async function toggleExplorar() {
         galeriaModo = 0;
         salirDeModoGrid(() => switchSection(galeria, document.getElementById('pagina-blanca')));
     }
+}
+
+// ============================================================
+// PULL-TO-REFRESH (MODO EXPLORAR / GRID)
+// ============================================================
+let ptrIndicator = null;
+let ptrStartY = 0;
+let ptrPulling = false;
+let ptrRefreshing = false;
+let ptrPullDist = 0;
+const PTR_THRESHOLD = 70;
+
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function createPTRIndicator(container) {
+    if (ptrIndicator) return;
+    ptrIndicator = document.createElement('div');
+    ptrIndicator.className = 'pull-refresh-indicator';
+    ptrIndicator.innerHTML = '<div class="spinner"></div><span class="ptr-label">Suelta para actualizar</span>';
+    container.appendChild(ptrIndicator);
+}
+
+export function setupPullToRefresh(container) {
+    if (!container) return;
+    createPTRIndicator(container);
+
+    container.addEventListener('touchstart', (e) => {
+        if (ptrRefreshing) return;
+        if (container.scrollTop <= 0) {
+            ptrStartY = e.touches[0].clientY;
+            ptrPulling = true;
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        if (!ptrPulling || ptrRefreshing) return;
+        const currentY = e.touches[0].clientY;
+        ptrPullDist = currentY - ptrStartY;
+        if (ptrPullDist > 10) {
+            ptrIndicator.classList.add('visible');
+            ptrIndicator.querySelector('.ptr-label').textContent =
+                ptrPullDist >= PTR_THRESHOLD ? 'Suelta para actualizar' : 'Desliza para actualizar';
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchend', async () => {
+        if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
+        ptrPulling = false;
+
+        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
+            ptrRefreshing = true;
+            ptrIndicator.classList.add('visible', 'loading');
+            ptrIndicator.querySelector('.ptr-label').textContent = 'Actualizando...';
+
+            try {
+                const obras = await cargarGaleria(container);
+                const shuffled = shuffleArray(obras);
+                mostrarGaleria(shuffled, container, (id) => {
+                    seleccionarObraDesdeGrid(id);
+                }, (artistaId) => {
+                    verPerfilArtistaDesdeGaleria(artistaId);
+                });
+            } catch (err) {
+                console.warn('Pull-to-refresh falló:', err);
+            }
+
+            ptrRefreshing = false;
+            ptrIndicator.classList.remove('visible', 'loading');
+            ptrIndicator.querySelector('.ptr-label').textContent = 'Suelta para actualizar';
+        } else {
+            ptrIndicator.classList.remove('visible');
+        }
+        ptrPullDist = 0;
+    });
+
+    // También soportar scroll con rueda del mouse (desktop)
+    container.addEventListener('wheel', (e) => {
+        if (ptrRefreshing) return;
+        if (container.scrollTop <= 0 && e.deltaY < 0 && !ptrPulling) {
+            ptrPulling = true;
+            ptrPullDist = Math.abs(e.deltaY);
+            ptrIndicator.classList.add('visible');
+            ptrIndicator.querySelector('.ptr-label').textContent = 'Desliza para actualizar';
+
+            setTimeout(() => {
+                if (ptrPulling && !ptrRefreshing) {
+                    ptrIndicator.classList.remove('visible');
+                    ptrPulling = false;
+                    ptrPullDist = 0;
+                }
+            }, 800);
+        }
+    }, { passive: true });
 }
 
 export function togglePanel() {
