@@ -1458,6 +1458,7 @@ legend {
 .auth-slide-label {
     position: fixed;
     top: calc(70px + var(--status-bar-height, 24px));
+    left: 28px;
     right: 28px;
     z-index: 5;
     font-family: 'Nunito', sans-serif;
@@ -1466,15 +1467,29 @@ legend {
     opacity: 0;
     transition: opacity 2s ease;
     pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.auth-slide-label.visible {
+    opacity: 1;
+}
+
+.auth-slide-counter {
+    font-size: 13px;
+    color: var(--color-ink);
+    opacity: 0.6;
+    font-weight: 400;
+    flex-shrink: 0;
+}
+
+.auth-slide-info {
     text-align: right;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 1px;
-}
-
-.auth-slide-label.visible {
-    opacity: 1;
 }
 
 .auth-slide-name {
@@ -1487,14 +1502,6 @@ legend {
     color: var(--color-ink);
     opacity: 0.75;
     font-weight: 500;
-}
-
-.auth-slide-counter {
-    font-size: 11px;
-    color: var(--color-ink);
-    opacity: 0.6;
-    font-weight: 400;
-    margin-top: 2px;
 }
 
 [data-theme="dark"] .auth-slide-label {
