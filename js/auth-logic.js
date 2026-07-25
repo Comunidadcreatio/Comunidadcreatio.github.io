@@ -4,7 +4,7 @@ import { login, register } from './auth.js';
 import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
 import { mostrarErrores, debounce, debugLog } from './utils.js';
-import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupDarkModeToggle } from './theme.js';
+import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupDarkModeToggle } from './theme.js'; // v67
 
 // ============================================
 // VARIABLES GLOBALES
