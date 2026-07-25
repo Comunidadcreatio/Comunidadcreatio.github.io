@@ -467,7 +467,6 @@
     <!-- Detector de actualizaciones (con recarga forzada) -->
     <script>
         (function() {
-            var AUTO_RELOAD_DELAY = 60000; // 60 segundos antes de recargar automáticamente
 
             fetch('/version.json?t=' + Date.now(), { cache: 'no-cache' })
                 .then(function(r) { return r.json(); })
@@ -483,23 +482,11 @@
 
                     if (data.version !== localVer) {
                         var bar = document.createElement('div');
-                        bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
-                        bar.innerHTML = '🔄 v' + data.version + ' disponible <button id="btn-refresh-auth" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
+                        bar.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+                        bar.innerHTML = 'v' + data.version + ' disponible <button id="btn-refresh-auth" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
                         document.body.appendChild(bar);
 
-                        // Auto-recarga después de X segundos si el usuario no hace clic
-                        var autoTimer = setTimeout(function() {
-                            var btn = document.getElementById('btn-refresh-auth');
-                            if (btn) {
-                                btn.textContent = 'Recargando...';
-                                btn.style.opacity = '0.6';
-                            }
-                            localStorage.setItem('app_version', data.version);
-                            window.location.reload(true);
-                        }, AUTO_RELOAD_DELAY);
-
                         document.getElementById('btn-refresh-auth').onclick = function() {
-                            clearTimeout(autoTimer);
                             localStorage.setItem('app_version', data.version);
                             window.location.reload(true);
                         };
