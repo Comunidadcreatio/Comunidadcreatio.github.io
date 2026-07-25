@@ -320,6 +320,7 @@ export async function toggleExplorar() {
 }
 
 // ============================================================
+// ============================================================
 // PULL-TO-REFRESH (MODO EXPLORAR / GRID)
 // ============================================================
 let ptrIndicator = null;
@@ -342,7 +343,7 @@ function createPTRIndicator() {
     if (ptrIndicator) return;
     ptrIndicator = document.createElement('div');
     ptrIndicator.className = 'pull-refresh-indicator';
-    ptrIndicator.innerHTML = '<div class="spinner"></div><span class="ptr-label">Suelta para actualizar</span>';
+    ptrIndicator.innerHTML = '<div class="spinner"></div><span class="ptr-label">Desliza para actualizar</span>';
     document.body.appendChild(ptrIndicator);
 }
 
@@ -355,27 +356,36 @@ export function setupPullToRefresh(container) {
         if (container.scrollTop <= 0) {
             ptrStartY = e.touches[0].clientY;
             ptrPulling = true;
+            container.style.transition = 'none';
+        } else {
+            ptrPulling = false;
         }
     }, { passive: true });
 
     container.addEventListener('touchmove', (e) => {
         if (!ptrPulling || ptrRefreshing) return;
-        const currentY = e.touches[0].clientY;
-        ptrPullDist = currentY - ptrStartY;
-        if (ptrPullDist > 10) {
+        const dist = e.touches[0].clientY - ptrStartY;
+        ptrPullDist = dist;
+
+        if (dist > 5 && container.scrollTop <= 0) {
+            e.preventDefault();
+            const damped = Math.min(dist * 0.45, 90);
+            container.style.paddingTop = damped + 'px';
             ptrIndicator.classList.add('visible');
             ptrIndicator.querySelector('.ptr-label').textContent =
-                ptrPullDist >= PTR_THRESHOLD ? 'Suelta para actualizar' : 'Desliza para actualizar';
+                dist >= PTR_THRESHOLD ? 'Suelta para actualizar' : 'Desliza para actualizar';
         }
-    }, { passive: true });
+    }, { passive: false });
 
     container.addEventListener('touchend', async () => {
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
+        container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+        container.style.paddingTop = '0';
 
         if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
             ptrRefreshing = true;
-            ptrIndicator.classList.add('visible', 'loading');
+            ptrIndicator.classList.add('loading');
             ptrIndicator.querySelector('.ptr-label').textContent = 'Actualizando...';
 
             try {
@@ -392,32 +402,14 @@ export function setupPullToRefresh(container) {
 
             ptrRefreshing = false;
             ptrIndicator.classList.remove('visible', 'loading');
-            ptrIndicator.querySelector('.ptr-label').textContent = 'Suelta para actualizar';
+            ptrIndicator.querySelector('.ptr-label').textContent = 'Desliza para actualizar';
         } else {
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
     });
-
-    // También soportar scroll con rueda del mouse (desktop)
-    container.addEventListener('wheel', (e) => {
-        if (ptrRefreshing) return;
-        if (container.scrollTop <= 0 && e.deltaY < 0 && !ptrPulling) {
-            ptrPulling = true;
-            ptrPullDist = Math.abs(e.deltaY);
-            ptrIndicator.classList.add('visible');
-            ptrIndicator.querySelector('.ptr-label').textContent = 'Desliza para actualizar';
-
-            setTimeout(() => {
-                if (ptrPulling && !ptrRefreshing) {
-                    ptrIndicator.classList.remove('visible');
-                    ptrPulling = false;
-                    ptrPullDist = 0;
-                }
-            }, 800);
-        }
-    }, { passive: true });
 }
+
 
 export function togglePanel() {
     if (isTransitioning) return;
