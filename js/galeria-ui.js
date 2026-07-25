@@ -370,7 +370,7 @@ export function setupPullToRefresh(container) {
 
     container.addEventListener('touchstart', (e) => {
         if (ptrRefreshing) return;
-        if (container.scrollTop <= 0) {
+        if (container.scrollTop <= 3) {
             ptrStartY = e.touches[0].clientY;
             ptrPulling = true;
             container.style.transition = 'none';
@@ -384,7 +384,7 @@ export function setupPullToRefresh(container) {
         const dist = e.touches[0].clientY - ptrStartY;
         ptrPullDist = dist;
 
-        if (dist > 5 && container.scrollTop <= 0) {
+        if (dist > 5 && container.scrollTop <= 3) {
             e.preventDefault();
             const damped = Math.min(dist * 0.45, 90);
             container.style.paddingTop = damped + 'px';
@@ -400,7 +400,7 @@ export function setupPullToRefresh(container) {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
 
-        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
+        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 3) {
             ptrRefreshing = true;
             ptrIndicator.classList.add('loading');
             ptrIndicator.querySelector('.ptr-label').textContent = 'Actualizando...';
