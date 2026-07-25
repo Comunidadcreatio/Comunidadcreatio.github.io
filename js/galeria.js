@@ -254,19 +254,9 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                     e.stopPropagation();
                     e.preventDefault();
                     const artistaId = avatarEl.dataset.artistaId;
-                    console.log('[Avatar click] artistaId:', artistaId);
-                    if (artistaId) {
-                        console.log('[Avatar click] llamando onAvatarClick...');
-                        onAvatarClick(artistaId);
-                    } else {
-                        console.warn('[Avatar click] artistaId vacío, no se navega.');
-                    }
+                    if (artistaId) onAvatarClick(artistaId);
                 });
-            } else {
-                console.warn('[Avatar click] No se encontró .obra-avatar-clickable en la card');
             }
-        } else {
-            console.warn('[Avatar click] onAvatarClick no fue pasado a mostrarGaleria');
         }
 
         if (onDetalle) {

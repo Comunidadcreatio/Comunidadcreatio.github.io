@@ -189,7 +189,7 @@ export function verPerfilArtistaDesdeGaleria(artistaId) {
     if (galeria) galeria.classList.add('hidden');
     mostrarPaginaBlanca();
 
-    verPerfilUsuario(artistaId, verificarActividadFn, actualizarEstadoNavButtons);
+    verPerfilUsuario(artistaId, null, actualizarEstadoNavButtons);
 }
 
 export function seleccionarObraDesdeGrid(obraId) {
