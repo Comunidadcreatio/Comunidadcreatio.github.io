@@ -798,6 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const labelName = label?.querySelector('.auth-slide-name');
     const labelMuni = label?.querySelector('.auth-slide-municipio');
     const labelCounter = label?.querySelector('.auth-slide-counter');
+    const labelBandera = label?.querySelector('.auth-slide-bandera');
     const totalSlides = slides.length;
 
     if (slides.length > 1) {
@@ -807,9 +808,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!label) return;
             const name = slides[index].dataset.name || '';
             const muni = slides[index].dataset.municipio || '';
+            const bandera = slides[index].dataset.bandera || '';
             if (labelName) labelName.textContent = name;
             if (labelMuni) labelMuni.textContent = muni;
             if (labelCounter) labelCounter.textContent = (index + 1) + '/' + totalSlides;
+            if (labelBandera) {
+                labelBandera.src = bandera ? 'iconos/banderas/' + bandera : '';
+                labelBandera.alt = muni || name;
+            }
             label.classList.add('visible');
             setTimeout(() => label.classList.remove('visible'), 5500);
         }

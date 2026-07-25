@@ -1485,7 +1485,23 @@ legend {
 }
 
 .auth-slide-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     text-align: right;
+}
+
+.auth-slide-bandera {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.5);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}
+
+.auth-slide-texto {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
