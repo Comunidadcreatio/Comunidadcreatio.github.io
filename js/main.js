@@ -574,7 +574,9 @@ function setupEvents() {
         if (!galeria.classList.contains('hidden')) {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
-                mostrarGaleria(obras, gc);
+                mostrarGaleria(obras, gc, null, (artistaId) => {
+                    import('./galeria-ui.js').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
                     if (target) gc.scrollTop = target.offsetTop;
