@@ -76,9 +76,9 @@ body {
 .auth-left {
     flex: 1 1 500px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 40px;
+    padding: 120px 40px 40px 40px;
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
@@ -96,7 +96,6 @@ body {
     text-align: left;
     max-width: 650px;
     position: relative;
-    transform: translateY(80px);
 }
 
 /* Panel derecho: formulario */
