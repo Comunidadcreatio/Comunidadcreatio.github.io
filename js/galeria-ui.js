@@ -539,32 +539,6 @@ export function setupPullToRefresh(container) {
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-    // Soporte mouse wheel: activa refresh directo
-    container.addEventListener('wheel', (e) => {
-        if (ptrRefreshing || ptrPulling) return;
-        if (container.scrollTop <= 0 && e.deltaY < 0) {
-            e.preventDefault();
-            ptrRefreshing = true;
-            ptrIndicator.classList.add('visible', 'loading');
-
-            (async () => {
-                try {
-                    const obras = await cargarGaleria(container);
-                    const shuffled = shuffleArray(obras);
-                    mostrarGaleria(shuffled, container, (id) => {
-                        seleccionarObraDesdeGrid(id);
-                    }, (artistaId) => {
-                        verPerfilArtistaDesdeGaleria(artistaId);
-                    });
-                    ensurePTRInContainer(container);
-                } catch (err) {
-                    console.warn('Pull-to-refresh (wheel) falló:', err);
-                }
-                ptrRefreshing = false;
-                ptrIndicator.classList.remove('visible', 'loading');
-            })();
-        }
-    }, { passive: false });
 }
 
 
