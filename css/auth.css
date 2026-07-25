@@ -122,6 +122,7 @@ body {
     overflow: visible;
     position: relative;
     margin: 0 auto;
+    padding: 4px;
 }
 
 /* ==============================================
@@ -1198,6 +1199,7 @@ legend {
 [data-theme="dark"] .auth-container {
     background-color: transparent !important;
     border: 1px solid var(--color-border);
+    padding: 0;
 }
 
 [data-theme="dark"] .auth-left {
@@ -1286,7 +1288,6 @@ legend {
 
 [data-theme="dark"] .auth-section {
     background: rgba(0, 0, 0, 0.47) !important;
-    border-color: rgba(255, 255, 255, 0.25);
 }
 
 [data-theme="dark"] .auth-section h2 {
