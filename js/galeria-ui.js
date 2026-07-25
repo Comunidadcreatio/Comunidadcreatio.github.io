@@ -443,9 +443,76 @@ export function setupPullToRefresh(container) {
         ptrPullDist = 0;
     });
 
-    // Soporte mouse/trackpad (desktop)
-    container.addEventListener('wheel', (e) => {
+    // Soporte mouse drag (desktop) — mismo comportamiento que touch
+    container.addEventListener('mousedown', (e) => {
         if (ptrRefreshing) return;
+        if (container.scrollTop <= 0) {
+            ptrStartY = e.clientY;
+            ptrPulling = true;
+            container.style.transition = 'none';
+            container.style.transform = '';
+        } else {
+            ptrPulling = false;
+        }
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (!ptrPulling || ptrRefreshing) return;
+        const dist = e.clientY - ptrStartY;
+        ptrPullDist = dist;
+
+        if (dist > 5 && container.scrollTop <= 0) {
+            e.preventDefault();
+            const damped = Math.min(dist * 0.45, 90);
+            container.style.transform = `translateY(${damped}px)`;
+            ptrIndicator.classList.add('visible');
+            const progress = Math.min(dist / PTR_THRESHOLD, 1);
+            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
+            if (circle) {
+                const deg = Math.round(progress * 360);
+                const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
+                circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
+            }
+        }
+    });
+
+    container.addEventListener('mouseup', async () => {
+        if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
+        ptrPulling = false;
+        container.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+        container.style.transform = '';
+
+        const circle = ptrIndicator.querySelector('.ptr-circle-fill');
+        if (circle) circle.style.background = '';
+
+        if (ptrPullDist >= PTR_THRESHOLD && container.scrollTop <= 0) {
+            ptrRefreshing = true;
+            ptrIndicator.classList.add('loading');
+
+            try {
+                const obras = await cargarGaleria(container);
+                const shuffled = shuffleArray(obras);
+                mostrarGaleria(shuffled, container, (id) => {
+                    seleccionarObraDesdeGrid(id);
+                }, (artistaId) => {
+                    verPerfilArtistaDesdeGaleria(artistaId);
+                });
+                ensurePTRInContainer(container);
+            } catch (err) {
+                console.warn('Pull-to-refresh (mouse) falló:', err);
+            }
+
+            ptrRefreshing = false;
+            ptrIndicator.classList.remove('visible', 'loading');
+        } else {
+            ptrIndicator.classList.remove('visible');
+        }
+        ptrPullDist = 0;
+    });
+
+    // Soporte mouse wheel: activa refresh directo
+    container.addEventListener('wheel', (e) => {
+        if (ptrRefreshing || ptrPulling) return;
         if (container.scrollTop <= 0 && e.deltaY < 0) {
             e.preventDefault();
             ptrRefreshing = true;
