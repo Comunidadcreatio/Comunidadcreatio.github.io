@@ -414,45 +414,45 @@ export function setupPullToRefresh(container) {
         }
     }, { passive: false });
 
-    container.addEventListener('touchend', async () => {
-        if (touchRaf) { cancelAnimationFrame(touchRaf); touchRaf = null; }
-        if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
-        ptrPulling = false;
+    async function doRefresh() {
+        if (ptrMaxPull < PTR_THRESHOLD || container.scrollTop > 0) return;
+        ptrRefreshing = true;
+        ptrIndicator.classList.add('loading');
+        try {
+            const obras = await cargarGaleria(container);
+            const shuffled = shuffleArray(obras);
+            mostrarGaleria(shuffled, container, (id) => {
+                seleccionarObraDesdeGrid(id);
+            }, (artistaId) => {
+                verPerfilArtistaDesdeGaleria(artistaId);
+            });
+            ensurePTRInContainer(container);
+        } catch (err) {
+            console.warn('Pull-to-refresh falló:', err);
+        }
+        ptrRefreshing = false;
+        ptrIndicator.classList.remove('visible', 'loading');
+    }
+
+    function finishPull() {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
         container.style.transform = '';
         container.style.scrollSnapType = '';
         container.style.userSelect = '';
-
-        // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-        if (circle) {
-            circle.style.background = '';
-        }
-
-        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            ptrRefreshing = true;
-            ptrIndicator.classList.add('loading');
-
-            try {
-                const obras = await cargarGaleria(container);
-                const shuffled = shuffleArray(obras);
-                mostrarGaleria(shuffled, container, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
-                });
-                ensurePTRInContainer(container);
-            } catch (err) {
-                console.warn('Pull-to-refresh falló:', err);
-            }
-
-            ptrRefreshing = false;
-            ptrIndicator.classList.remove('visible', 'loading');
-        } else {
-            ptrIndicator.classList.remove('visible');
-        }
+        if (circle) circle.style.background = '';
         ptrPullDist = 0;
+        ptrMaxPull = 0;
+    }
+
+    container.addEventListener('touchend', async () => {
+        if (touchRaf) { cancelAnimationFrame(touchRaf); touchRaf = null; }
+        if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
+        ptrPulling = false;
+        finishPull();
+        await doRefresh();
+        ptrIndicator.classList.remove('visible');
     });
 
     // Soporte mouse drag (desktop)
@@ -503,38 +503,9 @@ export function setupPullToRefresh(container) {
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-        container.style.paddingTop = '0';
-        container.style.scrollSnapType = '';
-        container.style.userSelect = '';
-
-        const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-        if (circle) circle.style.background = '';
-
-        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            ptrRefreshing = true;
-            ptrIndicator.classList.add('loading');
-
-            try {
-                const obras = await cargarGaleria(container);
-                const shuffled = shuffleArray(obras);
-                mostrarGaleria(shuffled, container, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
-                });
-                ensurePTRInContainer(container);
-            } catch (err) {
-                console.warn('Pull-to-refresh (mouse) falló:', err);
-            }
-
-            ptrRefreshing = false;
-            ptrIndicator.classList.remove('visible', 'loading');
-        } else {
-            ptrIndicator.classList.remove('visible');
-        }
-        ptrPullDist = 0;
-        ptrMaxPull = 0;
+        finishPull();
+        await doRefresh();
+        ptrIndicator.classList.remove('visible');
     }
 
     document.addEventListener('mousemove', onMouseMove);
