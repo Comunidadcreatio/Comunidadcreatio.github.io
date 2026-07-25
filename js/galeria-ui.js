@@ -382,6 +382,7 @@ export function setupPullToRefresh(container) {
             container.style.paddingTop = '';
             container.style.transform = '';
             container.style.scrollSnapType = 'none';
+            container.style.userSelect = 'none';
         } else {
             ptrPulling = false;
         }
@@ -421,6 +422,7 @@ export function setupPullToRefresh(container) {
         container.style.paddingTop = '0';
         container.style.transform = '';
         container.style.scrollSnapType = '';
+        container.style.userSelect = '';
 
         // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
@@ -459,12 +461,15 @@ export function setupPullToRefresh(container) {
     container.addEventListener('mousedown', (e) => {
         if (ptrRefreshing) return;
         if (container.scrollTop <= 0) {
+            e.preventDefault();
             ptrStartY = e.clientY;
             ptrPulling = true;
+            ptrMaxPull = 0;
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
             container.style.scrollSnapType = 'none';
+            container.style.userSelect = 'none';
         } else {
             ptrPulling = false;
         }
@@ -501,6 +506,7 @@ export function setupPullToRefresh(container) {
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
         container.style.scrollSnapType = '';
+        container.style.userSelect = '';
 
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
