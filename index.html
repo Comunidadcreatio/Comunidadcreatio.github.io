@@ -836,7 +836,7 @@
 
                         document.getElementById('btn-refresh-app').onclick = function() {
                             localStorage.setItem('app_version', data.version);
-                            window.location.reload(true);
+                            window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
                         };
                     }
                 })
