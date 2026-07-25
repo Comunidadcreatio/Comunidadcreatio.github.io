@@ -128,12 +128,22 @@
 .app-container,
 .auth-container {
     opacity: 0;
+}
+.app-container {
     transition: opacity 0.8s ease 0.3s;
 }
-
-.app-container.visible,
-.auth-container.visible {
+.app-container.visible {
     opacity: 1;
+}
+
+/* Auth usa animation en vez de transition para mayor control */
+.auth-container.visible {
+    animation: authFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+}
+
+@keyframes authFadeIn {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 /* Clase para elementos ocultos visualmente pero accesibles para lectores de pantalla */

@@ -133,16 +133,6 @@ body {
     background: rgba(255, 255, 255, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-xl);
-    opacity: 0;
-}
-
-.auth-container.visible .auth-section {
-    animation: authGlassFadeIn 0.8s ease 0.3s forwards;
-}
-
-@keyframes authGlassFadeIn {
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
 }
 
 /* Login section */
