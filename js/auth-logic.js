@@ -795,27 +795,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     const slides = document.querySelectorAll('.auth-bg-slide');
     const label = document.querySelector('.auth-slide-label');
+    const labelName = label?.querySelector('.auth-slide-name');
+    const labelMuni = label?.querySelector('.auth-slide-municipio');
+    const labelCounter = label?.querySelector('.auth-slide-counter');
+    const totalSlides = slides.length;
+
     if (slides.length > 1) {
         let currentSlide = 0;
+
+        function updateLabel(index) {
+            if (!label) return;
+            const name = slides[index].dataset.name || '';
+            const muni = slides[index].dataset.municipio || '';
+            if (labelName) labelName.textContent = name;
+            if (labelMuni) labelMuni.textContent = muni;
+            if (labelCounter) labelCounter.textContent = (index + 1) + '/' + totalSlides;
+            label.classList.add('visible');
+            setTimeout(() => label.classList.remove('visible'), 5500);
+        }
 
         function showSlide(index) {
             slides.forEach(s => s.classList.remove('active'));
             slides[index].classList.add('active');
-            // Actualizar etiqueta
-            if (label) {
-                const name = slides[index].dataset.name || '';
-                label.textContent = name;
-                label.classList.add('visible');
-                setTimeout(() => label.classList.remove('visible'), 6000);
-            }
+            updateLabel(index);
         }
 
-        // Mostrar nombre de la primera imagen
-        if (label && slides[0].dataset.name) {
-            label.textContent = slides[0].dataset.name;
-            label.classList.add('visible');
-            setTimeout(() => label.classList.remove('visible'), 6000);
-        }
+        // Mostrar la primera
+        updateLabel(0);
 
         setInterval(() => {
             currentSlide = (currentSlide + 1) % slides.length;
