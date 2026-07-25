@@ -117,7 +117,7 @@ body {
     width: 100%;
     max-width: 400px;
     background: transparent;
-    border: 2px solid rgba(0, 0, 0, 0.90);
+    border: 2px solid rgba(0, 0, 0, 0.79);
     border-radius: var(--radius-xl);
     overflow: visible;
     position: relative;
@@ -132,7 +132,7 @@ body {
     width: 100%;
     position: relative;
     background: rgba(255, 255, 255, 0.47);
-    border: 1px solid rgba(0, 0, 0, 0.90);
+    border: 1px solid rgba(0, 0, 0, 0.79);
     border-radius: var(--radius-xl);
 }
 
@@ -1197,7 +1197,7 @@ legend {
 
 [data-theme="dark"] .auth-container {
     background-color: transparent !important;
-    border-color: var(--color-border);
+    border: 1px solid var(--color-border);
 }
 
 [data-theme="dark"] .auth-left {
