@@ -385,6 +385,8 @@ export function setupPullToRefresh(container) {
         }
     }, { passive: true });
 
+    let touchRaf = null;
+
     container.addEventListener('touchmove', (e) => {
         if (!ptrPulling || ptrRefreshing) return;
         const dist = e.touches[0].clientY - ptrStartY;
@@ -392,22 +394,24 @@ export function setupPullToRefresh(container) {
 
         if (dist > 5 && container.scrollTop <= 0) {
             e.preventDefault();
-            const damped = Math.min(dist * 0.45, 90);
-            // padding-top es más compatible con scroll-snap que transform
-            container.style.paddingTop = damped + 'px';
-            ptrIndicator.classList.add('visible');
-            // Actualizar progreso del círculo (conic-gradient)
-            const progress = Math.min(dist / PTR_THRESHOLD, 1);
-            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-            if (circle) {
-                const deg = Math.round(progress * 360);
-                const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
-                circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
-            }
+            if (touchRaf) cancelAnimationFrame(touchRaf);
+            touchRaf = requestAnimationFrame(() => {
+                const damped = Math.min(dist * 0.45, 90);
+                container.style.paddingTop = damped + 'px';
+                ptrIndicator.classList.add('visible');
+                const progress = Math.min(dist / PTR_THRESHOLD, 1);
+                const circle = ptrIndicator.querySelector('.ptr-circle-fill');
+                if (circle) {
+                    const deg = Math.round(progress * 360);
+                    const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
+                    circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
+                }
+            });
         }
     }, { passive: false });
 
     container.addEventListener('touchend', async () => {
+        if (touchRaf) { cancelAnimationFrame(touchRaf); touchRaf = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
@@ -445,7 +449,9 @@ export function setupPullToRefresh(container) {
         ptrPullDist = 0;
     });
 
-    // Soporte mouse drag (desktop) — mismo comportamiento que touch
+    // Soporte mouse drag (desktop)
+    let rafId = null;
+
     container.addEventListener('mousedown', (e) => {
         if (ptrRefreshing) return;
         if (container.scrollTop <= 0) {
@@ -459,46 +465,35 @@ export function setupPullToRefresh(container) {
         }
     });
 
-    // Reset si el mouse sale del container durante el drag
-    container.addEventListener('mouseleave', () => {
-        if (ptrPulling && !ptrRefreshing) {
-            ptrPulling = false;
-            container.style.transition = 'padding-top 0.3s ease';
-            container.style.paddingTop = '0';
-            container.style.transform = '';
-            ptrIndicator.classList.remove('visible');
-            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-            if (circle) circle.style.background = '';
-            ptrPullDist = 0;
-        }
-    });
-
-    container.addEventListener('mousemove', (e) => {
+    function onMouseMove(e) {
         if (!ptrPulling || ptrRefreshing) return;
         const dist = e.clientY - ptrStartY;
         ptrPullDist = dist;
 
         if (dist > 5 && container.scrollTop <= 0) {
             e.preventDefault();
-            const damped = Math.min(dist * 0.45, 90);
-            container.style.transform = `translateY(${damped}px)`;
-            ptrIndicator.classList.add('visible');
-            const progress = Math.min(dist / PTR_THRESHOLD, 1);
-            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-            if (circle) {
-                const deg = Math.round(progress * 360);
-                const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
-                circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
-            }
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                const damped = Math.min(dist * 0.45, 90);
+                container.style.paddingTop = damped + 'px';
+                ptrIndicator.classList.add('visible');
+                const progress = Math.min(dist / PTR_THRESHOLD, 1);
+                const circle = ptrIndicator.querySelector('.ptr-circle-fill');
+                if (circle) {
+                    const deg = Math.round(progress * 360);
+                    const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
+                    circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
+                }
+            });
         }
-    });
+    }
 
-    container.addEventListener('mouseup', async () => {
+    async function onMouseUp() {
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
         container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
         container.style.paddingTop = '0';
-        container.style.transform = '';
 
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
@@ -526,8 +521,10 @@ export function setupPullToRefresh(container) {
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
-    });
+    }
 
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
     // Soporte mouse wheel: activa refresh directo
     container.addEventListener('wheel', (e) => {
         if (ptrRefreshing || ptrPulling) return;
