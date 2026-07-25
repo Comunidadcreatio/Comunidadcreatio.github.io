@@ -19,6 +19,8 @@ html, body {
     /* Snap container */
     overflow-y: auto;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     /* Posición fija entre header y barra inferior (respeta safe-area en móviles) */
