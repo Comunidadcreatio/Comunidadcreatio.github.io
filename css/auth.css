@@ -1159,6 +1159,9 @@ legend {
     }
 
     .auth-subtitle {
+        font-size: 40px;
+    }
+    .auth-subtitle.frase-corta {
         font-size: 35px;
     }
 

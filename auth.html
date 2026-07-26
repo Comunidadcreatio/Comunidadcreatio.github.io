@@ -444,6 +444,8 @@
                 subtitle.style.visibility = 'hidden';
                 subtitle.textContent = f.sub;
                 subtitle.classList.remove('typing');
+                // Clase para diferenciar tamaños
+                subtitle.classList.toggle('frase-corta', index === 0);
                 typeTagline(f.tag, function() {
                     typeSubtitle(f.sub, function() {
                         setTimeout(function() {
