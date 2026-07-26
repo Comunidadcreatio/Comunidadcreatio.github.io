@@ -10,7 +10,7 @@ import {
 } from './notificaciones.js';
 
 // --- Nuevos módulos extraídos ---
-import { setupDarkModeToggle } from './theme.js'; // v120
+import { setupDarkModeToggle } from './theme.js'; // v122
 import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
