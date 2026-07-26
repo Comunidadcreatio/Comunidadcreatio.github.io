@@ -337,28 +337,55 @@
             setTimeout(ocultarPreloader, MIN_DISPLAY_MS);
         })();
     </script>
-    <!-- Efecto typewriter en tagline y subtítulo -->
+    <!-- Efecto typewriter en tagline y subtítulo (carrusel de 5 frases) -->
     <script>
         (function() {
-            // Cursor ÚNICO compartido
             var cursor = document.createElement('span');
             cursor.className = 'typing-cursor';
             cursor.textContent = '|';
-            
-            // --- Tagline (con saltos de línea) ---
+
             var tagline = document.querySelector('.auth-tagline');
-            if (tagline) {
-                var lines = ['Conecta', 'con el Arte', 'en el Táchira'];
+            var subtitle = document.querySelector('.auth-subtitle');
+            if (!tagline || !subtitle) return;
+
+            // 5 frases del Táchira
+            var frases = [
+                {
+                    tag: ['Conecta', 'con el Arte', 'en el Táchira'],
+                    sub: 'Descubre artistas locales, sus obras y participa en concursos. ¡Fortalezcamos juntos el talento tachirense!'
+                },
+                {
+                    tag: ['El talento', 'de los Andes'],
+                    sub: 'Cada obra cuenta una historia. Cada artista deja su huella.'
+                },
+                {
+                    tag: ['Donde el arte', 'florece'],
+                    sub: '29 municipios, un solo lienzo: el Táchira.'
+                },
+                {
+                    tag: ['Tu arte,', 'tu tierra'],
+                    sub: 'Exhibe, conecta y enamora con cada "Cavent".'
+                },
+                {
+                    tag: ['Hecho en', 'el Táchira'],
+                    sub: 'Fortaleciendo la cultura y el arte de nuestra región.'
+                }
+            ];
+
+            var fraseActual = 0;
+            var speed = 220;
+
+            function typeTagline(lines, callback) {
+                var lineIndex = 0;
+                var charIndex = 0;
+                var builtLines = ['', '', ''];
+
                 tagline.textContent = '';
                 tagline.classList.add('typing');
                 tagline.appendChild(cursor);
-                
-                var lineIndex = 0;
-                var charIndex = 0;
-                var speed = 220;
-                var builtLines = ['', '', ''];
-                
-                function typeTagline() {
+                cursor.style.display = '';
+
+                function type() {
                     if (lineIndex < lines.length) {
                         var line = lines[lineIndex];
                         if (charIndex < line.length) {
@@ -371,41 +398,33 @@
                             }
                             tagline.innerHTML = html;
                             tagline.appendChild(cursor);
-                            setTimeout(typeTagline, speed);
+                            setTimeout(type, speed);
                         } else {
                             lineIndex++;
                             charIndex = 0;
-                            setTimeout(typeTagline, speed * 2);
+                            setTimeout(type, speed * 2);
                         }
                     } else {
-                        // Tagline terminó — ocultar cursor del tagline y empezar subtitle
                         cursor.style.display = 'none';
-                        startSubtitle();
+                        if (callback) callback();
                     }
                 }
-                
-                setTimeout(typeTagline, 800);
-            } else {
-                startSubtitle();
+                type();
             }
 
-            function startSubtitle() {
-                var subtitle = document.querySelector('.auth-subtitle');
-                if (!subtitle) return;
-                
+            function typeSubtitle(text, callback) {
                 subtitle.style.visibility = 'visible';
-                var text = subtitle.textContent.trim();
                 subtitle.textContent = '';
                 subtitle.classList.add('typing');
-                
+
                 var subCursor = document.createElement('span');
                 subCursor.className = 'typing-cursor';
                 subCursor.textContent = '|';
-                
+
                 var textNode = document.createTextNode('');
                 subtitle.appendChild(textNode);
                 subtitle.appendChild(subCursor);
-                
+
                 var i = 0;
                 var subSpeed = 33;
                 function typeSub() {
@@ -413,10 +432,29 @@
                         textNode.textContent += text.charAt(i);
                         i++;
                         setTimeout(typeSub, subSpeed);
+                    } else {
+                        if (callback) callback();
                     }
                 }
                 typeSub();
             }
+
+            function mostrarFrase(index) {
+                var f = frases[index];
+                subtitle.style.visibility = 'hidden';
+                subtitle.textContent = f.sub;
+                subtitle.classList.remove('typing');
+                typeTagline(f.tag, function() {
+                    typeSubtitle(f.sub, function() {
+                        setTimeout(function() {
+                            fraseActual = (fraseActual + 1) % frases.length;
+                            mostrarFrase(fraseActual);
+                        }, 8000);
+                    });
+                });
+            }
+
+            setTimeout(function() { mostrarFrase(0); }, 800);
         })();
     </script>
     <!-- Toggle landing → formularios -->
