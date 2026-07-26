@@ -803,6 +803,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (slides.length > 1) {
         let currentSlide = 0;
+        let slideInterval = null;
 
         function updateLabel(index) {
             if (!label) return;
@@ -826,12 +827,34 @@ document.addEventListener('DOMContentLoaded', function() {
             updateLabel(index);
         }
 
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }, 8000);
+        }
+
+        function goTo(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+            resetInterval();
+        }
+
         // Mostrar la primera
         updateLabel(0);
+        resetInterval();
 
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        }, 8000);
+        // Navegación manual
+        const prevBtn = document.querySelector('.auth-slide-prev');
+        const nextBtn = document.querySelector('.auth-slide-next');
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+            const idx = (currentSlide - 1 + slides.length) % slides.length;
+            goTo(idx);
+        });
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            const idx = (currentSlide + 1) % slides.length;
+            goTo(idx);
+        });
     }
 });
