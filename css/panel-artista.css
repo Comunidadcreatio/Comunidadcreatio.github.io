@@ -103,7 +103,7 @@
 #panel-artista {
     max-width: 700px;
     margin: 2rem auto;
-    padding: 20px 1rem calc(140px + env(safe-area-inset-bottom, 16px));
+    padding: calc(64px + var(--status-bar-height, 24px) + 52px) 1rem calc(100px + env(safe-area-inset-bottom, 16px));
 }
 
 #panel-artista h2 {

@@ -627,10 +627,10 @@ function setupStepNavigation() {
         prevBtn.disabled = index === 0;
         
         if (index === totalSteps - 1) {
-            nextBtn.textContent = 'Finalizar';
+            nextBtn.textContent = '✓';
             guardarBtn?.classList.remove('hidden');
         } else {
-            nextBtn.textContent = 'Siguiente';
+            nextBtn.textContent = '>';
             guardarBtn?.classList.add('hidden');
         }
     }

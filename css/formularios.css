@@ -1,7 +1,91 @@
 /* css/formularios.css - Estilos de todos los formularios */
 
 /* ==============================================
-   PROGRESS INDICATOR DEL FORMULARIO
+   BARRA SUPERIOR FIJA: PASOS + NAVEGACIÓN < >
+   ============================================== */
+#obra-step-bar {
+    position: fixed;
+    top: calc(64px + var(--status-bar-height, 24px));
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 16px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-gray-200);
+    box-sizing: border-box;
+    gap: 12px;
+}
+
+#obra-step-bar .step-indicator {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    font-family: 'Nunito', sans-serif;
+    white-space: nowrap;
+}
+
+#obra-step-bar .step-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+#obra-step-bar .nav-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Nunito', sans-serif;
+    border: 1.5px solid var(--color-gray-300);
+    background: var(--color-white);
+    color: var(--color-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+#obra-step-bar .nav-btn:hover:not(:disabled) {
+    background: var(--color-gray-100);
+    border-color: var(--color-ink);
+}
+
+#obra-step-bar .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ==============================================
+   BARRA INFERIOR FIJA: PROGRESO DE COMPLETADO
+   ============================================== */
+#obra-progress-bar {
+    position: fixed;
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    width: 100%;
+    z-index: 997;
+    padding: 8px 16px 10px;
+    background: var(--color-white);
+    border-top: 1px solid var(--color-gray-200);
+    box-sizing: border-box;
+}
+
+#obra-progress-bar .form-progress-bar {
+    margin-bottom: 4px;
+}
+
+#obra-progress-bar .form-progress-text {
+    font-size: 12px;
+}
+
+/* ==============================================
+   PROGRESS INDICATOR DEL FORMULARIO (base)
    ============================================== */
 .form-progress-container {
     margin-bottom: 24px;
@@ -437,30 +521,7 @@ form *,
     overflow-wrap: break-word;
 }
 
-/* Títulos de secciones del formulario */
-#formulario-obra h3 {
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 24px 0 16px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--color-gray-light);
-    text-align: center;
-}
-
-#formulario-obra h3:first-of-type {
-    margin-top: 0;
-}
-
-.form-obra-subtitle {
-    font-size: 13px;
-    color: var(--color-text-muted, #888);
-    text-align: center;
-    margin: -10px 0 16px 0;
-    font-style: italic;
-    line-height: 1.4;
-}
-
+/* Títulos de secciones del formulario (ya no se usa h3 principal) */
 .dimensiones-group input,
 .name-group input,
 .date-group select {
@@ -772,17 +833,7 @@ form,
     padding: 5px;  
 }
 
-/* 4. Ajustamos la navegación inferior */
-.step-navigation {
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    justify-content: center; 
-    margin-top: 25px;
-    padding: 0;
-}
-
-/* 5. Estilo estandarizado tipo píldora para los botones de avance */
+/* 4. Ajustamos la navegación inferior (solo modal registro) */
 #modal-registro button.nav-btn.next-btn {
     background: var(--color-ink);
     color: var(--color-white);
@@ -1025,14 +1076,7 @@ form,
         overflow-x: hidden;
     }
     
-    /* Step Navigation móvil - forzar centrado */
-    .step-navigation {
-        flex-direction: row;
-        gap: 10px;
-        max-width: 100%;
-        margin: 15px auto 0;
-        flex-wrap: nowrap;
-    }
+    /* Step Navigation móvil (ahora en #obra-step-bar fijo) */
 }
 
 @media (max-width: 480px) {
@@ -1071,13 +1115,8 @@ form,
     border-color: #e5e5e5;
 }
 
-[data-theme="dark"] #formulario-obra h2,
-[data-theme="dark"] #formulario-obra h3 {
+[data-theme="dark"] #formulario-obra h2 {
     color: var(--color-ink);
-}
-
-[data-theme="dark"] .form-obra-subtitle {
-    color: #aaa;
 }
 
 [data-theme="dark"] #formulario-obra label {
@@ -1155,6 +1194,34 @@ form,
     background-color: var(--color-ink-light);
 }
 
+[data-theme="dark"] #obra-step-bar {
+    background: #0a0a0a;
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] #obra-step-bar .step-indicator {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-step-bar .nav-btn {
+    background: var(--color-gray-100);
+    border-color: var(--color-border);
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-step-bar .nav-btn:hover:not(:disabled) {
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-progress-bar {
+    background: #0a0a0a;
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] #obra-progress-bar .form-progress-text {
+    color: var(--color-ink);
+}
+
 [data-theme="dark"] .step-indicator {
     color: var(--color-ink);
 }
@@ -1166,21 +1233,6 @@ form,
 }
 
 [data-theme="dark"] .step-number.active {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-}
-
-[data-theme="dark"] .step-navigation button {
-    background-color: #121212;
-    border-color: #e5e5e5;
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .step-navigation button:hover {
-    background-color: #1a1a1a;
-}
-
-[data-theme="dark"] .step-navigation button[type="submit"] {
     background-color: var(--color-ink);
     color: var(--color-white);
 }
@@ -1207,20 +1259,16 @@ form,
 }
 
 /* ==============================================
-   NAVEGACIÓN DE PASOS (CREAR CAVENT)
+   NAVEGACIÓN DE PASOS (ESTILOS BASE - heredados por barra superior)
    ============================================== */
 #obra-step-nav {
-    padding: 16px 0 8px;
-    border-top: 1px solid var(--color-gray-200);
-    margin-top: 12px;
+    /* DEPRECATED: este ID fue reemplazado por #obra-step-bar */
 }
 
 .step-indicator {
-    text-align: center;
     font-size: 13px;
     font-weight: 600;
     color: var(--color-gray-500);
-    margin-bottom: 12px;
     font-family: 'Nunito', sans-serif;
 }
 
@@ -1278,10 +1326,9 @@ form,
     border-color: var(--color-ink);
 }
 
+/* DEPRECATED */
 [data-theme="dark"] #obra-step-nav {
     border-color: var(--color-border);
 }
 
-[data-theme="dark"] .step-indicator {
-    color: var(--color-gray-400);
-}
+/* (duplicado removido) */

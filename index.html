@@ -274,19 +274,17 @@
 
             <!-- Formulario para agregar/editar obra -->
             <div id="panel-crear" class="hidden">
-            <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
-                <h3 id="form-obra-title">Crear Cavent</h3>
-                <p class="form-obra-subtitle">Tu arte tiene valor. Ponlo en vitrina, cuéntale al mundo su historia y crea una nueva oportunidad.</p>
-                
-                <!-- Progress Indicator -->
-                <div class="form-progress-container">
-                    <div class="form-progress-bar">
-                        <div class="form-progress-fill" id="form-progress-fill"></div>
-                    </div>
-                    <div class="form-progress-text">
-                        <span id="form-progress-percentage">0%</span> completado
-                    </div>
+            
+            <!-- Barra superior fija: Paso X de 5 + navegación < > -->
+            <div id="obra-step-bar" class="step-nav-bar">
+                <span class="step-indicator" id="obra-step-indicator">Paso 1 de 5</span>
+                <div class="step-buttons">
+                    <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled aria-label="Paso anterior">&lt;</button>
+                    <button type="button" class="nav-btn next-btn" id="obra-step-next" aria-label="Paso siguiente">&gt;</button>
                 </div>
+            </div>
+
+            <div id="formulario-obra" role="form">
 
                 <form id="obra-form" aria-label="Formulario de obra" novalidate>
                     
@@ -619,15 +617,6 @@
 
                     <input type="hidden" id="input-id-edicion">
 
-                    <!-- Navegación de pasos -->
-                    <div class="step-navigation" id="obra-step-nav">
-                        <div class="step-indicator" id="obra-step-indicator">Paso 1 de 5</div>
-                        <div class="step-buttons">
-                            <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled>← Anterior</button>
-                            <button type="button" class="nav-btn next-btn" id="obra-step-next">Siguiente</button>
-                        </div>
-                    </div>
-
                     <div class="form-actions">
                         <button type="submit" id="btn-guardar">Guardar Obra</button>
                         <button type="button" id="btn-limpiar-campos" class="hidden">🗑️ Limpiar Campos</button>
@@ -637,6 +626,17 @@
                 </form>
 
             </div>
+
+            <!-- Barra inferior fija: progreso de completado -->
+            <div id="obra-progress-bar" class="obra-progress-bar-fixed">
+                <div class="form-progress-bar">
+                    <div class="form-progress-fill" id="form-progress-fill"></div>
+                </div>
+                <div class="form-progress-text">
+                    <span id="form-progress-percentage">0%</span> completado
+                </div>
+            </div>
+
             </div><!-- /#panel-crear -->
 
             <!-- Tabla de obras -->
