@@ -1444,3 +1444,36 @@ form,
 }
 
 /* (duplicado removido) */
+
+/* Ratio toggle (añadido v1.0.150) */
+.carrusel-ratio-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 0 2px;
+}
+.ratio-btn {
+    background: transparent;
+    border: 1px solid var(--color-gray-300);
+    color: var(--color-gray-500);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+}
+.ratio-btn.active {
+    background: var(--color-ink);
+    color: #fff;
+    border-color: var(--color-ink);
+}
+[data-theme="dark"] .ratio-btn {
+    border-color: var(--color-border);
+    color: var(--color-gray-400);
+}
+[data-theme="dark"] .ratio-btn.active {
+    background: var(--color-ink);
+    color: #1a1a1a;
+}

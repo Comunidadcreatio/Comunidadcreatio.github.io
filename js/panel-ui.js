@@ -250,6 +250,7 @@ export async function refrescarTabla(tablaBody) {
 const MAX_IMAGENES = 5;
 let imagenesData = []; // [{src, file}] — datos de imágenes en el carrusel
 let currentSlide = 0;
+let aspectRatio = '4/5';
 
 function actualizarCarrusel() {
     const track = document.getElementById('carrusel-track');
@@ -436,6 +437,16 @@ export function setupImagePreviews() {
     }
 
     actualizarCarrusel();
+
+    // Ratio toggle
+    document.querySelectorAll(".ratio-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".ratio-btn").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            aspectRatio = this.dataset.ratio;
+            document.getElementById("carrusel-viewport").style.aspectRatio = aspectRatio;
+        });
+    });
 }
 
 function tieneImagenEnSlot(index) {
