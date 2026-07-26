@@ -602,16 +602,6 @@ function setupStepNavigation() {
 
     positionStepBar();
     window.addEventListener('resize', positionStepBar);
-    // Re-posicionar cuando el panel se hace visible (por cambios de orientación, etc.)
-    const panelCrear = document.getElementById('panel-crear');
-    if (panelCrear) {
-        const observer = new MutationObserver(() => {
-            if (!panelCrear.classList.contains('hidden')) {
-                positionStepBar();
-            }
-        });
-        observer.observe(panelCrear, { attributes: true, attributeFilter: ['class'] });
-    }
 
     let currentStep = 0;
 
@@ -668,6 +658,18 @@ function setupStepNavigation() {
 
     // Iniciar en paso 1
     showStep(0);
+
+    // Re-sincronizar paso y posición cuando el panel se hace visible
+    const panelCrear = document.getElementById('panel-crear');
+    if (panelCrear) {
+        const observer = new MutationObserver(() => {
+            if (!panelCrear.classList.contains('hidden')) {
+                positionStepBar();
+                showStep(currentStep);
+            }
+        });
+        observer.observe(panelCrear, { attributes: true, attributeFilter: ['class'] });
+    }
 }
 
 export function updateFormProgress() {
