@@ -1476,11 +1476,17 @@ legend {
     opacity: 1;
 }
 
-.auth-slide-left {
+.auth-slide-counter-nav {
+    position: fixed;
+    top: calc(70px + var(--status-bar-height, 24px));
+    left: 28px;
+    z-index: 5;
+    font-family: 'Nunito', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+    pointer-events: none;
 }
 
 .auth-slide-counter {
@@ -1597,7 +1603,7 @@ legend {
         gap: 8px;
     }
 
-    .auth-slide-left {
+    .auth-slide-counter-nav {
         gap: 8px;
     }
 }
