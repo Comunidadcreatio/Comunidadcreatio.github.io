@@ -600,8 +600,29 @@ function setupStepNavigation() {
         stepBar.style.top = headerBottom + 'px';
     }
 
+    // Posicionar barras inferiores justo encima de la barra principal
+    function positionBottomBars() {
+        const togglePanel = document.getElementById('toggle-panel');
+        const progressBar = document.getElementById('obra-progress-bar');
+        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
+        if (!togglePanel) return;
+        const panelTop = togglePanel.getBoundingClientRect().top;
+        const viewH = window.innerHeight;
+        const fromBottom = viewH - panelTop; // px desde el bottom del viewport
+        if (progressBar) {
+            progressBar.style.bottom = fromBottom + 'px';
+        }
+        if (etiquetasBar) {
+            etiquetasBar.style.bottom = (fromBottom + 36) + 'px';
+        }
+    }
+
     positionStepBar();
-    window.addEventListener('resize', positionStepBar);
+    positionBottomBars();
+    window.addEventListener('resize', () => {
+        positionStepBar();
+        positionBottomBars();
+    });
 
     let currentStep = 0;
 
@@ -671,6 +692,7 @@ function setupStepNavigation() {
         const observer = new MutationObserver(() => {
             if (!panelCrear.classList.contains('hidden')) {
                 positionStepBar();
+                positionBottomBars();
                 showStep(currentStep);
             }
         });
