@@ -602,9 +602,31 @@ function setupStepNavigation() {
     const nextBtn = document.getElementById('obra-step-next');
     const indicator = document.getElementById('obra-step-indicator');
     const guardarBtn = document.getElementById('btn-guardar');
+    const stepBar = document.getElementById('obra-step-bar');
     const totalSteps = sections.length;
 
     if (!prevBtn || !nextBtn || !indicator || totalSteps === 0) return;
+
+    // Posicionar la barra de pasos justo debajo del header (calculado en vivo)
+    function positionStepBar() {
+        const mainHeader = document.getElementById('main-header');
+        if (!mainHeader || !stepBar) return;
+        const headerBottom = mainHeader.getBoundingClientRect().bottom;
+        stepBar.style.top = headerBottom + 'px';
+    }
+
+    positionStepBar();
+    window.addEventListener('resize', positionStepBar);
+    // Re-posicionar cuando el panel se hace visible (por cambios de orientación, etc.)
+    const panelCrear = document.getElementById('panel-crear');
+    if (panelCrear) {
+        const observer = new MutationObserver(() => {
+            if (!panelCrear.classList.contains('hidden')) {
+                positionStepBar();
+            }
+        });
+        observer.observe(panelCrear, { attributes: true, attributeFilter: ['class'] });
+    }
 
     let currentStep = 0;
 
