@@ -797,8 +797,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const label = document.querySelector('.auth-slide-label');
     const labelName = label?.querySelector('.auth-slide-name');
     const labelMuni = label?.querySelector('.auth-slide-municipio');
-    const labelCounter = label?.querySelector('.auth-slide-counter');
     const labelBandera = label?.querySelector('.auth-slide-bandera');
+    const counterNav = document.querySelector('.auth-slide-counter-nav');
+    const labelCounter = counterNav?.querySelector('.auth-slide-counter');
     const totalSlides = slides.length;
 
     if (slides.length > 1) {
