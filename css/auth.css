@@ -1458,7 +1458,6 @@ legend {
 .auth-slide-label {
     position: fixed;
     top: calc(70px + var(--status-bar-height, 24px));
-    left: 28px;
     right: 28px;
     z-index: 5;
     font-family: 'Nunito', sans-serif;
@@ -1468,7 +1467,7 @@ legend {
     transition: opacity 2s ease;
     pointer-events: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: flex-start;
 }
 
