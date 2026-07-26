@@ -587,10 +587,7 @@ form *,
 }
 
 .imagen-carrusel {
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 100%;
     margin-bottom: 8px;
 }
 

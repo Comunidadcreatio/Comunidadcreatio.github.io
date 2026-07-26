@@ -610,11 +610,26 @@ function setupStepNavigation() {
         }
     }
 
+    // Posicionar el carrusel fijo debajo de la barra de pasos
+    function positionCarrusel() {
+        const stepBar = document.getElementById('obra-step-bar');
+        const carrusel = document.querySelector('.imagen-carrusel');
+        if (!stepBar || !carrusel) return;
+        const stepBarBottom = stepBar.getBoundingClientRect().bottom;
+        carrusel.style.position = 'fixed';
+        carrusel.style.top = stepBarBottom + 'px';
+        carrusel.style.left = '0';
+        carrusel.style.width = '100%';
+        carrusel.style.zIndex = '1';
+    }
+
     positionStepBar();
     positionBottomBars();
+    positionCarrusel();
     window.addEventListener('resize', () => {
         positionStepBar();
         positionBottomBars();
+        positionCarrusel();
     });
 
     let currentStep = 0;
@@ -686,6 +701,7 @@ function setupStepNavigation() {
             if (!panelCrear.classList.contains('hidden')) {
                 positionStepBar();
                 positionBottomBars();
+                positionCarrusel();
                 showStep(currentStep);
             }
         });
