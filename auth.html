@@ -17,7 +17,7 @@
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="stylesheet" href="css/style.css?v=e98cf9d397">
-    <link rel="stylesheet" href="css/auth.css?v=8703be1522">
+    <link rel="stylesheet" href="css/auth.css?v=d1ca5b875b">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,9 +196,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="reg-ciudad" required data-required="true">
-                            <option value="" disabled selected>Selecciona tu ciudad</option>
-                        </select>
+                        <input type="hidden" id="reg-ciudad" value="">
+                        <div class="custom-select" id="custom-ciudad">
+                            <button type="button" class="custom-select-trigger" id="ciudad-trigger">
+                                Selecciona tu ciudad
+                            </button>
+                            <div class="custom-select-dropdown" id="ciudad-dropdown"></div>
+                        </div>
                     </div>
                     <div class="step-navigation">
                         <button type="button" class="nav-btn prev-btn" data-step="2">← Volver</button>
@@ -312,7 +316,7 @@
     </footer>
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=a59b278beb"></script>
+    <script type="module" src="js/auth-logic.js?v=f775a6916d"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>

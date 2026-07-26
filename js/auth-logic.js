@@ -27,22 +27,72 @@ const ciudadesPorPais = {
     }
 };
 
+const ciudadBandera = {
+    'San Cristóbal': 'san-cristobal.webp',
+    'San Antonio del Táchira': 'bolivar.webp',
+    'San Juan de Colón': 'ayacucho.webp',
+    'Táriba': 'cardenas.webp',
+    'Rubio': 'junin.webp',
+    'La Fría': 'garcia-de-hevia.webp',
+    'San Josecito': 'torbes.webp',
+    'Palmira': 'guasimos.webp',
+    'Capacho Nuevo': 'independencia.webp',
+    'Capacho Viejo': 'libertad.webp',
+    'La Grita': 'jauregui.webp',
+    'Abejales': 'libertador.webp',
+    'Lobatera': 'lobatera.webp',
+    'Michelena': 'michelena.webp',
+    'Ureña': 'pedro-maria-urena.webp',
+    'Cordero': 'andres-bello.webp',
+    'Las Mesas': 'antonio-romulo-costa.webp',
+    'Santa Ana del Táchira': 'cordoba.webp',
+    'San Rafael del Piñal': 'fernandez-feo.webp',
+    'San José de Bolívar': 'francisco-de-miranda.webp',
+    'El Cobre': 'jose-maria-vargas.webp',
+    'Coloncito': 'panamericano.webp',
+    'Delicias': 'rafael-urdaneta.webp',
+    'La Tendida': 'samuel-dario-maldonado.webp',
+    'San Judas Tadeo': 'san-judas-tadeo.webp',
+    'Seboruco': 'seboruco.webp',
+    'San Simón': 'simon-rodriguez.webp',
+    'Queniquea': 'sucre.webp',
+    'Pregonero': 'uribante.webp'
+};
+
 function poblarCiudades(paisSeleccionado) {
-    const ciudadSelect = document.getElementById('reg-ciudad');
-    if (!ciudadSelect) return;
-    ciudadSelect.innerHTML = '<option value="" disabled selected>Selecciona tu ciudad</option>';
+    const hiddenInput = document.getElementById('reg-ciudad');
+    const trigger = document.getElementById('ciudad-trigger');
+    const dropdown = document.getElementById('ciudad-dropdown');
+    if (!hiddenInput || !trigger || !dropdown) return;
+
+    dropdown.innerHTML = '';
+    hiddenInput.value = '';
+    trigger.textContent = 'Selecciona tu ciudad';
+
     if (paisSeleccionado && ciudadesPorPais[paisSeleccionado]) {
         const data = ciudadesPorPais[paisSeleccionado];
         Object.keys(data).forEach(departamento => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = departamento;
+            const groupLabel = document.createElement('div');
+            groupLabel.className = 'custom-select-group';
+            groupLabel.textContent = departamento;
+            dropdown.appendChild(groupLabel);
+
             data[departamento].forEach(ciudad => {
-                const option = document.createElement('option');
-                option.value = ciudad;
-                option.textContent = ciudad;
-                optgroup.appendChild(option);
+                const item = document.createElement('div');
+                item.className = 'custom-select-option';
+                const bandera = ciudadBandera[ciudad] || '';
+                item.innerHTML = (bandera
+                    ? `<img src="iconos/banderas/${bandera}" alt="" class="custom-select-flag" />`
+                    : '') + `<span>${ciudad}</span>`;
+                item.addEventListener('click', () => {
+                    hiddenInput.value = ciudad;
+                    trigger.textContent = ciudad;
+                    // Disparar evento change para validación
+                    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    dropdown.classList.remove('open');
+                });
+                dropdown.appendChild(item);
             });
-            ciudadSelect.appendChild(optgroup);
         });
     }
 }
@@ -53,6 +103,25 @@ function paisChangeHandler() {
         poblarCiudades(paisSelect.value);
     }
 }
+
+// Dropdown toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('ciudad-trigger');
+    const dropdown = document.getElementById('ciudad-dropdown');
+    if (!trigger || !dropdown) return;
+
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select')) {
+            dropdown.classList.remove('open');
+        }
+    });
+});
 
 async function verificarDisponibilidad(tipo, valor, inputElement) {
     const clave = tipo === 'email' ? 'email' : 'nombre';
