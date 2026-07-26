@@ -147,7 +147,7 @@ function initCustomSelect(selectEl, placeholder) {
     function positionDropdown() {
         const rect = trigger.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = Math.min(rect.left, window.innerWidth - 380) + 'px';
+        dropdown.style.left = Math.min(rect.left, window.innerWidth - rect.width - 24) + 'px';
         dropdown.style.width = rect.width + 'px';
     }
 
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function positionDropdown() {
         const rect = trigger.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = Math.min(rect.left, window.innerWidth - 380) + 'px';
+        dropdown.style.left = Math.min(rect.left, window.innerWidth - rect.width - 24) + 'px';
         dropdown.style.width = rect.width + 'px';
     }
 
