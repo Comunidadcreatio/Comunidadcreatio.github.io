@@ -1585,4 +1585,19 @@ legend {
         width: 30px;
         height: 18px;
     }
+
+    .auth-slide-prev,
+    .auth-slide-next {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .auth-slide-nav {
+        gap: 8px;
+    }
+
+    .auth-slide-left {
+        gap: 8px;
+    }
 }
