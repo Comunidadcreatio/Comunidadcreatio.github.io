@@ -588,23 +588,18 @@ export function togglePanel() {
 
 // Panel sub-navegación: nav ↔ crear ↔ mis-cavents
 export function showPanelSubView(view) {
-    const panelNav = document.getElementById('panel-nav');
     const panelCrear = document.getElementById('panel-crear');
     const panelMisCavents = document.getElementById('panel-mis-cavents');
 
-    if (!panelNav || !panelCrear || !panelMisCavents) return;
+    if (!panelCrear || !panelMisCavents) return;
 
-    panelNav.classList.add('hidden');
     panelCrear.classList.add('hidden');
     panelMisCavents.classList.add('hidden');
 
-    if (view === 'nav') {
-        panelNav.classList.remove('hidden');
-    } else if (view === 'crear') {
+    if (view === 'crear') {
         panelCrear.classList.remove('hidden');
     } else if (view === 'mis-cavents') {
         panelMisCavents.classList.remove('hidden');
-        // Refrescar tabla al mostrar
         if (typeof _refrescarTablaFn === 'function') _refrescarTablaFn();
     }
 }
