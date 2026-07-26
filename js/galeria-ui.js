@@ -559,7 +559,7 @@ export function setupPullToRefresh(container) {
 }
 
 
-export function togglePanel() {
+export function togglePanel(view) {
     if (isTransitioning) return;
 
     const panel = document.getElementById('panel-artista');
@@ -568,6 +568,30 @@ export function togglePanel() {
 
     resetGaleriaModo();
 
+    // Si se especifica vista, siempre mostrar (no toggle)
+    if (view) {
+        if (panel.classList.contains('hidden')) {
+            const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+            if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
+            if (artistaActual && artistaActual.nombre_artista) {
+                const inputArtista = document.getElementById('input-artista');
+                if (inputArtista && !inputArtista.value) {
+                    inputArtista.value = artistaActual.nombre_artista;
+                }
+            }
+            switchSection(encontrarSeccionActual(), panel, () => {
+                showPanelSubView(view);
+                if (_refrescarTablaFn) _refrescarTablaFn();
+            });
+        } else {
+            // Panel ya visible, solo cambiar sub-vista
+            showPanelSubView(view);
+            if (view === 'mis-cavents' && typeof _refrescarTablaFn === 'function') _refrescarTablaFn();
+        }
+        return;
+    }
+
+    // Comportamiento toggle original
     if (panel.classList.contains('hidden')) {
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');

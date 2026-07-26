@@ -526,13 +526,11 @@ function setupEvents() {
         });
         document.getElementById('cavents-crear')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            togglePanel();
-            showPanelSubView('crear');
+            togglePanel('crear');
         });
         document.getElementById('cavents-mis-cavents')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            togglePanel();
-            showPanelSubView('mis-cavents');
+            togglePanel('mis-cavents');
         });
     }
 
