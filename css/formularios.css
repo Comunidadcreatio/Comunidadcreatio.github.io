@@ -90,6 +90,43 @@
 }
 
 /* ==============================================
+   BARRA INFERIOR FIJA: INPUT DE ETIQUETAS
+   ============================================== */
+#obra-etiquetas-bar {
+    position: fixed;
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px) + 54px);
+    left: 0;
+    width: 100%;
+    z-index: 997;
+    padding: 8px 16px;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+#obra-etiquetas-bar .input-etiquetas-subtle {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    background: transparent;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--color-text);
+    outline: none;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+
+#obra-etiquetas-bar .input-etiquetas-subtle::placeholder {
+    color: var(--color-gray-400);
+    font-style: italic;
+}
+
+#obra-etiquetas-bar .input-etiquetas-subtle:focus {
+    border-bottom-color: var(--color-ink);
+}
+
+/* ==============================================
    BARRA INFERIOR FIJA: PROGRESO DE COMPLETADO
    ============================================== */
 #obra-progress-bar {
@@ -111,32 +148,6 @@
 
 #obra-progress-bar .form-progress-text {
     font-size: 12px;
-}
-
-/* Input de etiquetas sutil (sobre la barra de progreso) */
-#obra-progress-bar .input-etiquetas-subtle {
-    width: 100%;
-    padding: 6px 0;
-    margin-bottom: 10px;
-    border: none;
-    border-bottom: 1px solid var(--color-gray-300);
-    background: transparent;
-    font-size: 13px;
-    font-family: 'Nunito', sans-serif;
-    color: var(--color-text);
-    outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-    border-radius: 0;
-}
-
-#obra-progress-bar .input-etiquetas-subtle::placeholder {
-    color: var(--color-gray-400);
-    font-style: italic;
-}
-
-#obra-progress-bar .input-etiquetas-subtle:focus {
-    border-bottom-color: var(--color-ink);
 }
 
 /* ==============================================
@@ -1218,16 +1229,16 @@ form,
     color: var(--color-ink);
 }
 
-[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle {
+[data-theme="dark"] #obra-etiquetas-bar .input-etiquetas-subtle {
     color: var(--color-ink);
     border-bottom-color: var(--color-border);
 }
 
-[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle:focus {
+[data-theme="dark"] #obra-etiquetas-bar .input-etiquetas-subtle:focus {
     border-bottom-color: var(--color-ink);
 }
 
-[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle::placeholder {
+[data-theme="dark"] #obra-etiquetas-bar .input-etiquetas-subtle::placeholder {
     color: var(--color-gray-500);
 }
 
