@@ -61,6 +61,19 @@
     cursor: not-allowed;
 }
 
+/* Responsive: misma altura que el header en cada breakpoint */
+@media (max-width: 768px) {
+    #obra-step-bar {
+        top: calc(50px + var(--status-bar-height, 24px) - 1px);
+    }
+}
+
+@media (max-width: 480px) {
+    #obra-step-bar {
+        top: calc(48px + var(--status-bar-height, 24px) - 1px);
+    }
+}
+
 /* ==============================================
    BARRA INFERIOR FIJA: PROGRESO DE COMPLETADO
    ============================================== */

@@ -1155,6 +1155,11 @@
    DISEÑO RESPONSIVO - PANEL DE ARTISTA (general)
    ============================================== */
 @media (max-width: 768px) {
+    /* Ajuste para la barra de pasos fija (header más pequeño en móvil) */
+    #panel-artista {
+        padding-top: calc(50px + var(--status-bar-height, 24px) + 52px);
+    }
+
     /* Controles de filtro en una fila */
     .filter-controls {
         width: 100%;
