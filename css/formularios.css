@@ -5,7 +5,7 @@
    ============================================== */
 #obra-step-bar {
     position: fixed;
-    top: calc(64px + var(--status-bar-height, 24px));
+    top: calc(64px + var(--status-bar-height, 24px) - 1px);
     left: 0;
     width: 100%;
     z-index: 999;
@@ -77,7 +77,8 @@
 }
 
 #obra-progress-bar .form-progress-bar {
-    margin-bottom: 4px;
+    width: 40%;
+    margin: 0 auto 4px;
 }
 
 #obra-progress-bar .form-progress-text {
