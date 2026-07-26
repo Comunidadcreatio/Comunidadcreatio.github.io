@@ -19,7 +19,7 @@ import {
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
-    showPanelSubView, setupPanelNav
+    showPanelSubView
 } from './galeria-ui.js?v=20260726h';
 import {
     currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
@@ -400,7 +400,6 @@ function setupEvents() {
 
     // ----- Modo oscuro -----
     setupDarkModeToggle();
-    setupPanelNav();
 
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
@@ -525,9 +524,15 @@ function setupEvents() {
             caventsPopover.classList.add('hidden');
             toggleGaleria(galeriaContainer);
         });
-        document.getElementById('cavents-registro')?.addEventListener('click', () => {
+        document.getElementById('cavents-crear')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
             togglePanel();
+            showPanelSubView('crear');
+        });
+        document.getElementById('cavents-mis-cavents')?.addEventListener('click', () => {
+            caventsPopover.classList.add('hidden');
+            togglePanel();
+            showPanelSubView('mis-cavents');
         });
     }
 

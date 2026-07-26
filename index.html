@@ -96,9 +96,11 @@
         <div class="header-popover-panel">
             <button id="cavents-explorar" class="logout-option">Explorar</button>
             <div class="divider"></div>
-            <button id="cavents-galeria" class="logout-option">Cavents</button>
+            <button id="cavents-galeria" class="logout-option">Global Cavents</button>
             <div class="divider"></div>
-            <button id="cavents-registro" class="logout-option">Registrar Obra</button>
+            <button id="cavents-crear" class="logout-option">Crear Cavent</button>
+            <div class="divider"></div>
+            <button id="cavents-mis-cavents" class="logout-option">Mis Cavents</button>
         </div>
     </div>
     </div>
@@ -270,25 +272,9 @@
         <!-- SECCIÓN PRIVADA: PANEL DEL ARTISTA -->
         <section id="panel-artista" class="hidden" aria-label="Panel del artista" role="region">
 
-            <!-- Navegación del panel: Crear Cavents / Mis Cavents -->
-            <div id="panel-nav">
-                <h3>Registro de Obra</h3>
-                <div class="panel-nav-buttons">
-                    <button type="button" class="panel-nav-btn" data-target="crear">
-                        <span class="panel-nav-icon">＋</span>
-                        <span class="panel-nav-label">Crear Cavent</span>
-                    </button>
-                    <button type="button" class="panel-nav-btn" data-target="mis-cavents">
-                        <span class="panel-nav-icon">📋</span>
-                        <span class="panel-nav-label">Mis Cavents</span>
-                    </button>
-                </div>
-            </div>
-
             <!-- Formulario para agregar/editar obra -->
             <div id="panel-crear" class="hidden">
             <div id="formulario-obra" role="form" aria-labelledby="form-obra-title">
-                <button type="button" class="panel-back-btn" aria-label="Volver">← Volver</button>
                 <h3 id="form-obra-title">Crear Cavent</h3>
                 <p class="form-obra-subtitle">Tu arte tiene valor. Ponlo en vitrina, cuéntale al mundo su historia y crea una nueva oportunidad.</p>
                 
@@ -645,7 +631,6 @@
 
             <!-- Tabla de obras -->
             <div id="panel-mis-cavents" class="hidden">
-                <button type="button" class="panel-back-btn" aria-label="Volver">← Volver</button>
                 <h3>Mis Cavents</h3>
             <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
                 <input type="text" id="search-input-panel" placeholder="Buscar por ID, título o precio..." aria-label="Buscar obras">
@@ -834,7 +819,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=58012ae7d8" type="module"></script>
+    <script src="js/main.js?v=de27ed6ed6" type="module"></script>
     <!-- Detector de actualizaciones (con recarga forzada) -->
     <script>
         (function() {

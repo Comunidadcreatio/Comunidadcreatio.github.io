@@ -578,6 +578,7 @@ export function togglePanel() {
             }
         }
         switchSection(encontrarSeccionActual(), panel, () => {
+            showPanelSubView('crear');
             if (_refrescarTablaFn) _refrescarTablaFn();
         });
     } else {
