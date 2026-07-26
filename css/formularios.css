@@ -113,11 +113,11 @@
     font-size: 12px;
 }
 
-/* Input de etiquetas sutil (bajo la barra de progreso) */
-.input-etiquetas-subtle {
+/* Input de etiquetas sutil (sobre la barra de progreso) */
+#obra-progress-bar .input-etiquetas-subtle {
     width: 100%;
     padding: 6px 0;
-    margin-top: 8px;
+    margin-bottom: 10px;
     border: none;
     border-bottom: 1px solid var(--color-gray-300);
     background: transparent;
@@ -127,14 +127,15 @@
     outline: none;
     transition: border-color 0.2s;
     box-sizing: border-box;
+    border-radius: 0;
 }
 
-.input-etiquetas-subtle::placeholder {
+#obra-progress-bar .input-etiquetas-subtle::placeholder {
     color: var(--color-gray-400);
     font-style: italic;
 }
 
-.input-etiquetas-subtle:focus {
+#obra-progress-bar .input-etiquetas-subtle:focus {
     border-bottom-color: var(--color-ink);
 }
 
@@ -1217,16 +1218,16 @@ form,
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .input-etiquetas-subtle {
+[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle {
     color: var(--color-ink);
     border-bottom-color: var(--color-border);
 }
 
-[data-theme="dark"] .input-etiquetas-subtle:focus {
+[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle:focus {
     border-bottom-color: var(--color-ink);
 }
 
-[data-theme="dark"] .input-etiquetas-subtle::placeholder {
+[data-theme="dark"] #obra-progress-bar .input-etiquetas-subtle::placeholder {
     color: var(--color-gray-500);
 }
 
