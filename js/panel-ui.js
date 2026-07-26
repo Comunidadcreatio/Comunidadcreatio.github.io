@@ -139,23 +139,9 @@ export async function refrescarTabla(tablaBody) {
                     cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
                     cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
                 ];
-                // Limpiar todos los thumbnails primero
-                for (let i = 0; i < 5; i++) {
-                    const thumb = document.getElementById(`thumb-preview-${i}`);
-                    const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
-                    const inputFile = document.getElementById(`input-imagen-${i}`);
-                    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
-                    const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
-                    if (thumb && thumbPh) {
-                        thumb.src = '';
-                        thumb.style.display = 'none';
-                        thumbPh.style.display = 'block';
-                    }
-                    if (inputFile) inputFile.value = '';
-                    if (thumbSlot) thumbSlot.classList.remove('active');
-                    if (btnEliminar) btnEliminar.style.display = 'none';
-                }
                 imagenesAEliminar.clear();
+                imagenesData = [];
+                currentSlide = 0;
                 // Cargar imágenes existentes
                 imagenes.forEach((url, index) => {
                     if (url) aplicarPreviewImagen(index, url);
@@ -218,26 +204,8 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
 
                 imagenesAEliminar.clear();
-                // Limpiar preview y thumbnails
-                const mainP = document.getElementById('preview-main');
-                const mainPh = document.getElementById('preview-placeholder');
-                if (mainP && mainPh) { mainP.src = ''; mainP.style.display = 'none'; mainPh.style.display = 'block'; }
-                imagenesAEliminar.clear();
-                for (let i = 0; i < 5; i++) {
-                    const thumb = document.getElementById(`thumb-preview-${i}`);
-                    const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
-                    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
-                    const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
-                    if (thumb && thumbPh) {
-                        thumb.src = '';
-                        thumb.style.display = 'none';
-                        thumbPh.style.display = 'block';
-                    }
-                    const inputImg = document.getElementById(`input-imagen-${i}`);
-                    if (inputImg) inputImg.value = '';
-                    if (thumbSlot) thumbSlot.classList.remove('active');
-                    if (btnEliminar) btnEliminar.style.display = 'none';
-                }
+                imagenesData = [];
+                currentSlide = 0;
 
                 document.getElementById('btn-guardar').textContent = 'Guardar Obra';
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
@@ -274,54 +242,113 @@ export async function refrescarTabla(tablaBody) {
 }
 
 // ============================================
-// PREVISUALIZACIÓN DE IMÁGENES
+// PREVISUALIZACIÓN DE IMÁGENES (CARRUSEL)
+
 // ============================================
-let activePreviewIndex = 0; // qué slot se muestra en el preview grande
+// PREVISUALIZACIÓN DE IMÁGENES (CARRUSEL)
+// ============================================
+const MAX_IMAGENES = 5;
+let imagenesData = []; // [{src, file}] — datos de imágenes en el carrusel
+let currentSlide = 0;
 
-function updateMainPreview() {
-    const mainPreview = document.getElementById('preview-main');
-    const mainPlaceholder = document.getElementById('preview-placeholder');
-    if (!mainPreview || !mainPlaceholder) return;
+function actualizarCarrusel() {
+    const track = document.getElementById('carrusel-track');
+    const dots = document.getElementById('carrusel-dots');
+    const count = document.getElementById('carrusel-count');
+    if (!track || !dots || !count) return;
 
-    // Buscar la primera imagen disponible para mostrar
-    let foundUrl = '';
-    for (let i = 0; i < 5; i++) {
-        const thumb = document.getElementById(`thumb-preview-${i}`);
-        if (thumb && thumb.src && thumb.style.display !== 'none') {
-            foundUrl = thumb.src;
-            break;
-        }
-    }
+    track.innerHTML = '';
+    dots.innerHTML = '';
 
-    if (foundUrl) {
-        mainPreview.src = foundUrl;
-        mainPreview.style.display = 'block';
-        mainPlaceholder.style.display = 'none';
+    if (imagenesData.length === 0) {
+        // Slide vacío
+        const emptySlide = document.createElement('div');
+        emptySlide.className = 'carrusel-slide carrusel-slide-empty';
+        emptySlide.innerHTML = '<span class="empty-icon">+</span><span class="empty-text">Agregar imagen</span>';
+        emptySlide.addEventListener('click', () => dispararInput(0));
+        track.appendChild(emptySlide);
     } else {
-        mainPreview.src = '';
-        mainPreview.style.display = 'none';
-        mainPlaceholder.style.display = 'block';
+        imagenesData.forEach((img, i) => {
+            const slide = document.createElement('div');
+            slide.className = 'carrusel-slide';
+            const imgEl = document.createElement('img');
+            imgEl.src = img.src;
+            slide.appendChild(imgEl);
+
+            // Botón eliminar
+            const btnDel = document.createElement('button');
+            btnDel.type = 'button';
+            btnDel.className = 'btn-eliminar-slide';
+            btnDel.textContent = '✕';
+            btnDel.addEventListener('click', (e) => {
+                e.stopPropagation();
+                eliminarImagen(i);
+            });
+            slide.appendChild(btnDel);
+            track.appendChild(slide);
+        });
+
+        // Dots
+        imagenesData.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'carrusel-dot' + (i === currentSlide ? ' active' : '');
+            dot.addEventListener('click', () => irASlide(i));
+            dots.appendChild(dot);
+        });
     }
+
+    // Update count
+    count.textContent = `${imagenesData.length} / ${MAX_IMAGENES}`;
+
+    // Update track position
+    if (imagenesData.length > 0) {
+        track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+
+    // Update dots
+    dots.querySelectorAll('.carrusel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === currentSlide);
+    });
+}
+
+function irASlide(index) {
+    if (imagenesData.length === 0) return;
+    currentSlide = Math.max(0, Math.min(index, imagenesData.length - 1));
+    actualizarCarrusel();
+}
+
+function eliminarImagen(index) {
+    imagenesData.splice(index, 1);
+    const editId = document.getElementById('input-id-edicion').value;
+    if (editId) imagenesAEliminar.add(index);
+    // Limpiar input file correspondiente
+    const inp = document.getElementById(`input-imagen-${index}`);
+    if (inp) inp.value = '';
+    if (currentSlide >= imagenesData.length) {
+        currentSlide = Math.max(0, imagenesData.length - 1);
+    }
+    actualizarCarrusel();
+}
+
+function dispararInput(index) {
+    if (imagenesData.length >= MAX_IMAGENES) return;
+    const inp = document.getElementById(`input-imagen-${index}`);
+    if (inp) inp.click();
+}
+
+function agregarImagen(file, dataUrl) {
+    if (imagenesData.length >= MAX_IMAGENES) return;
+    imagenesData.push({ src: dataUrl, file: file });
+    currentSlide = imagenesData.length - 1;
+    actualizarCarrusel();
 }
 
 export function aplicarPreviewImagen(index, url) {
-    const thumbPreview = document.getElementById(`thumb-preview-${index}`);
-    const thumbPlaceholder = document.getElementById(`thumb-placeholder-${index}`);
-    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${index}"]`);
-    const btnEliminar = document.getElementById(`btn-eliminar-${index}`) || 
-                        thumbSlot?.querySelector('.btn-eliminar-thumb');
-
-    if (thumbPreview && thumbPlaceholder) {
-        thumbPreview.src = url;
-        thumbPreview.style.display = 'block';
-        thumbPlaceholder.style.display = 'none';
-    }
-    if (thumbSlot) {
-        thumbSlot.classList.add('active');
-    }
-    if (btnEliminar) btnEliminar.style.display = 'block';
-
-    updateMainPreview();
+    // Usado al editar/duplicar: agregar imagen desde URL
+    if (imagenesData.length >= MAX_IMAGENES) return;
+    imagenesData.push({ src: url, file: null });
+    if (imagenesData.length === 1) currentSlide = 0;
+    actualizarCarrusel();
 }
 
 export async function cargarUrlEnInput(index, url) {
@@ -343,13 +370,13 @@ export async function cargarUrlEnInput(index, url) {
             img.onerror = () => reject(new Error('Failed to load image'));
             img.src = url;
         });
-
         const file = new File([blob], `duplicada-${index}.jpg`, { type: 'image/jpeg' });
-        const input = document.getElementById(`input-imagen-${index}`);
-        if (input) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            input.files = dt.files;
+        // Update the stored image with the downloaded file
+        for (let i = imagenesData.length - 1; i >= 0; i--) {
+            if (imagenesData[i].src === url && !imagenesData[i].file) {
+                imagenesData[i].file = file;
+                break;
+            }
         }
         return true;
     } catch (err) {
@@ -359,79 +386,62 @@ export async function cargarUrlEnInput(index, url) {
 }
 
 export function setupImagePreviews() {
-    // Click en preview principal → abre primer slot vacío
-    const mainPreviewContainer = document.getElementById('imagen-preview-principal');
-    if (mainPreviewContainer) {
-        mainPreviewContainer.addEventListener('click', () => {
-            for (let i = 0; i < 5; i++) {
-                const thumb = document.getElementById(`thumb-preview-${i}`);
-                if (!thumb || !thumb.src || thumb.style.display === 'none') {
-                    document.getElementById(`input-imagen-${i}`)?.click();
+    // Botón "+ Agregar"
+    const btnAgregar = document.getElementById('btn-agregar-imagen');
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', () => {
+            // Buscar el primer slot sin usar
+            for (let i = 0; i < MAX_IMAGENES; i++) {
+                const inp = document.getElementById(`input-imagen-${i}`);
+                if (inp && !inp.files?.length && !tieneImagenEnSlot(i)) {
+                    inp.click();
                     return;
                 }
             }
         });
     }
 
-    for (let i = 0; i < 5; i++) {
+    // File inputs
+    for (let i = 0; i < MAX_IMAGENES; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
-        const thumbPreview = document.getElementById(`thumb-preview-${i}`);
-        const thumbPlaceholder = document.getElementById(`thumb-placeholder-${i}`);
-        const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
-        const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
-
         if (input) {
             input.addEventListener('change', function() {
                 const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        if (thumbPreview) {
-                            thumbPreview.src = e.target.result;
-                            thumbPreview.style.display = 'block';
-                        }
-                        if (thumbPlaceholder) thumbPlaceholder.style.display = 'none';
-                        if (thumbSlot) thumbSlot.classList.add('active');
-                        if (btnEliminar) btnEliminar.style.display = 'block';
-                        updateMainPreview();
+                        agregarImagen(file, e.target.result);
                     };
                     reader.readAsDataURL(file);
-                } else {
-                    if (thumbPreview) {
-                        thumbPreview.src = '';
-                        thumbPreview.style.display = 'none';
-                    }
-                    if (thumbPlaceholder) thumbPlaceholder.style.display = 'block';
-                    if (thumbSlot) thumbSlot.classList.remove('active');
-                    if (btnEliminar) btnEliminar.style.display = 'none';
-                    updateMainPreview();
-                }
-            });
-        }
-
-        // Botón eliminar (ya existe en HTML)
-        if (btnEliminar) {
-            btnEliminar.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const idx = parseInt(this.dataset.index);
-                const tp = document.getElementById(`thumb-preview-${idx}`);
-                const tph = document.getElementById(`thumb-placeholder-${idx}`);
-                const inp = document.getElementById(`input-imagen-${idx}`);
-                const ts = document.querySelector(`.thumb-slot[data-index="${idx}"]`);
-                if (tp && tp.src && tp.src !== '') {
-                    tp.src = '';
-                    tp.style.display = 'none';
-                    if (tph) tph.style.display = 'block';
-                    if (inp) inp.value = '';
-                    if (ts) ts.classList.remove('active');
-                    this.style.display = 'none';
-                    const editId = document.getElementById('input-id-edicion').value;
-                    if (editId) imagenesAEliminar.add(idx);
-                    updateMainPreview();
                 }
             });
         }
     }
+
+    // Touch/swipe en el carrusel
+    const viewport = document.getElementById('carrusel-viewport');
+    if (viewport) {
+        let startX = 0;
+        viewport.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        }, { passive: true });
+        viewport.addEventListener('touchend', (e) => {
+            if (imagenesData.length <= 1) return;
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) {
+                if (diff > 0) irASlide(currentSlide + 1);
+                else irASlide(currentSlide - 1);
+            }
+        });
+    }
+
+    actualizarCarrusel();
+}
+
+function tieneImagenEnSlot(index) {
+    // Verificar si este slot ya tiene datos (para evitar reusar input)
+    // Como los inputs se mapean 1:1 con imagenesData por orden, esto es menos relevante
+    return false;
 }
 
 // ============================================
@@ -446,29 +456,14 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     document.getElementById('btn-limpiar-campos').classList.add('hidden');
     document.getElementById('btn-guardar').textContent = 'Guardar Obra';
     imagenesAEliminar.clear();
-    // Limpiar preview principal
-    const mainPreview = document.getElementById('preview-main');
-    const mainPlaceholder = document.getElementById('preview-placeholder');
-    if (mainPreview && mainPlaceholder) {
-        mainPreview.src = '';
-        mainPreview.style.display = 'none';
-        mainPlaceholder.style.display = 'block';
-    }
-    // Limpiar thumbnails
+    // Limpiar carrusel
+    imagenesData = [];
+    currentSlide = 0;
+    actualizarCarrusel();
+    // Limpiar inputs file
     for (let i = 0; i < 5; i++) {
-        const thumb = document.getElementById(`thumb-preview-${i}`);
-        const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
         const inputFile = document.getElementById(`input-imagen-${i}`);
-        const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
-        const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
-        if (thumb && thumbPh) {
-            thumb.src = '';
-            thumb.style.display = 'none';
-            thumbPh.style.display = 'block';
-        }
         if (inputFile) inputFile.value = '';
-        if (thumbSlot) thumbSlot.classList.remove('active');
-        if (btnEliminar) btnEliminar.style.display = 'none';
     }
     if (restaurarArtista && artistaActual) {
         document.getElementById('input-artista').value = artistaActual.nombre_artista;
@@ -508,23 +503,8 @@ export function setupObraFormSubmit() {
             .map(t => t.trim())
             .filter(Boolean)
             .join(', ');
-        const archivos = [
-            document.getElementById('input-imagen-0'),
-            document.getElementById('input-imagen-1'),
-            document.getElementById('input-imagen-2'),
-            document.getElementById('input-imagen-3'),
-            document.getElementById('input-imagen-4')
-        ];
-        let imagenFinalVisible = false;
-        const hayArchivosNuevos = archivos.some(input => input && input.files && input.files.length > 0);
-        for (let i = 0; i < 5; i++) {
-            const preview = document.getElementById(`preview-${i}`);
-            if (preview && preview.style.display === 'block' && !imagenesAEliminar.has(i)) {
-                imagenFinalVisible = true;
-                break;
-            }
-        }
-        if (!hayArchivosNuevos && !imagenFinalVisible) {
+        // Validar: al menos una imagen
+        if (imagenesData.length === 0) {
             showWarning("La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
             return;
         }
@@ -554,9 +534,10 @@ export function setupObraFormSubmit() {
         if (imagenesAEliminar.size > 0) {
             formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
         }
-        archivos.forEach((input, index) => {
-            if (input && input.files && input.files.length > 0) {
-                formData.append(`imagen_${index}`, input.files[0]);
+        // Adjuntar archivos desde imagenesData
+        imagenesData.forEach((img, index) => {
+            if (img.file) {
+                formData.append(`imagen_${index}`, img.file);
             }
         });
         const result = await guardarObra(token, formData, idEdicion || null);

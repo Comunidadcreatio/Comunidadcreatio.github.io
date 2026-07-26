@@ -295,60 +295,22 @@
                     <div class="form-section" data-section="imagenes">
                         <div class="form-section-content">
                             
-                            <!-- Preview grande (4:5) -->
-                            <div class="imagen-preview-principal" id="imagen-preview-principal">
-                                <span id="preview-placeholder" class="preview-placeholder-text">+<br>Toca para subir imagen</span>
-                                <img id="preview-main" src="" class="preview-main-img" alt="Vista previa principal">
+                            <!-- Carrusel edge-to-edge 4:5 -->
+                            <div class="imagen-carrusel" id="imagen-carrusel">
+                                <div class="carrusel-viewport" id="carrusel-viewport">
+                                    <div class="carrusel-track" id="carrusel-track"></div>
+                                </div>
+                                <div class="carrusel-dots" id="carrusel-dots"></div>
                             </div>
-
-                            <!-- Thumbnails -->
-                            <div class="imagen-thumbnails" role="group" aria-label="Imágenes de la obra (máximo 5)">
-                                <!-- Slot 1 (Principal) -->
-                                <div class="thumb-slot" data-index="0">
-                                    <label for="input-imagen-0">
-                                        <span id="thumb-placeholder-0" class="thumb-placeholder">+</span>
-                                        <img id="thumb-preview-0" src="" class="thumb-preview-img" alt="Miniatura 1">
-                                        <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal">
-                                    </label>
-                                    <button type="button" class="btn-eliminar-thumb" data-index="0" aria-label="Eliminar imagen 1">✕</button>
-                                </div>
-                                <!-- Slot 2 -->
-                                <div class="thumb-slot" data-index="1">
-                                    <label for="input-imagen-1">
-                                        <span id="thumb-placeholder-1" class="thumb-placeholder">+</span>
-                                        <img id="thumb-preview-1" src="" class="thumb-preview-img" alt="Miniatura 2">
-                                        <input type="file" id="input-imagen-1" accept="image/*" aria-label="Subir imagen adicional 2">
-                                    </label>
-                                    <button type="button" class="btn-eliminar-thumb" data-index="1" aria-label="Eliminar imagen 2">✕</button>
-                                </div>
-                                <!-- Slot 3 -->
-                                <div class="thumb-slot" data-index="2">
-                                    <label for="input-imagen-2">
-                                        <span id="thumb-placeholder-2" class="thumb-placeholder">+</span>
-                                        <img id="thumb-preview-2" src="" class="thumb-preview-img" alt="Miniatura 3">
-                                        <input type="file" id="input-imagen-2" accept="image/*" aria-label="Subir imagen adicional 3">
-                                    </label>
-                                    <button type="button" class="btn-eliminar-thumb" data-index="2" aria-label="Eliminar imagen 3">✕</button>
-                                </div>
-                                <!-- Slot 4 -->
-                                <div class="thumb-slot" data-index="3">
-                                    <label for="input-imagen-3">
-                                        <span id="thumb-placeholder-3" class="thumb-placeholder">+</span>
-                                        <img id="thumb-preview-3" src="" class="thumb-preview-img" alt="Miniatura 4">
-                                        <input type="file" id="input-imagen-3" accept="image/*" aria-label="Subir imagen adicional 4">
-                                    </label>
-                                    <button type="button" class="btn-eliminar-thumb" data-index="3" aria-label="Eliminar imagen 4">✕</button>
-                                </div>
-                                <!-- Slot 5 -->
-                                <div class="thumb-slot" data-index="4">
-                                    <label for="input-imagen-4">
-                                        <span id="thumb-placeholder-4" class="thumb-placeholder">+</span>
-                                        <img id="thumb-preview-4" src="" class="thumb-preview-img" alt="Miniatura 5">
-                                        <input type="file" id="input-imagen-4" accept="image/*" aria-label="Subir imagen adicional 5">
-                                    </label>
-                                    <button type="button" class="btn-eliminar-thumb" data-index="4" aria-label="Eliminar imagen 5">✕</button>
-                                </div>
+                            <div class="carrusel-controles">
+                                <button type="button" id="btn-agregar-imagen" class="btn-agregar-imagen">+ Agregar</button>
+                                <span class="carrusel-count" id="carrusel-count">0 / 5</span>
                             </div>
+                            <input type="file" id="input-imagen-0" accept="image/*" hidden>
+                            <input type="file" id="input-imagen-1" accept="image/*" hidden>
+                            <input type="file" id="input-imagen-2" accept="image/*" hidden>
+                            <input type="file" id="input-imagen-3" accept="image/*" hidden>
+                            <input type="file" id="input-imagen-4" accept="image/*" hidden>
 
                         </div>
                     </div>
