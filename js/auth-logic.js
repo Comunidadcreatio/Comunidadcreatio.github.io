@@ -104,17 +104,34 @@ function paisChangeHandler() {
     }
 }
 
-// Dropdown toggle
+// Dropdown toggle con posicionamiento fixed
 document.addEventListener('DOMContentLoaded', () => {
     const trigger = document.getElementById('ciudad-trigger');
     const dropdown = document.getElementById('ciudad-dropdown');
     if (!trigger || !dropdown) return;
 
+    function positionDropdown() {
+        const rect = trigger.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = Math.min(rect.left, window.innerWidth - 380) + 'px';
+        dropdown.style.width = rect.width + 'px';
+    }
+
     trigger.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        if (!isOpen) positionDropdown();
         dropdown.classList.toggle('open');
     });
+
+    window.addEventListener('scroll', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
 
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.custom-select')) {
