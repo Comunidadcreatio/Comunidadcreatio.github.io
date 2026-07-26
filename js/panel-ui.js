@@ -139,52 +139,26 @@ export async function refrescarTabla(tablaBody) {
                     cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
                     cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
                 ];
-                document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
-                imagenes.forEach((url, index) => {
-                    if (url) {
-                        const preview = document.getElementById(`preview-${index}`);
-                        const placeholder = document.getElementById(`placeholder-${index}`);
-                        if (preview && placeholder) {
-                            preview.src = url;
-                            preview.style.display = 'block';
-                            placeholder.style.display = 'none';
-                            const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
-                            if (recuadro) {
-                                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                                if (btnExistente) btnExistente.remove();
-                                const btnEliminar = document.createElement('button');
-                                btnEliminar.type = 'button';
-                                btnEliminar.className = 'btn-eliminar-imagen';
-                                btnEliminar.dataset.index = index;
-                                btnEliminar.textContent = '✕';
-                                btnEliminar.style.cssText = `
-                                    position: absolute; top: 0; right: 0;
-                                    background: #dc3545; color: white;
-                                    border: none; border-radius: 50%;
-                                    width: 24px; height: 24px;
-                                    cursor: pointer; font-size: 14px;
-                                    display: block; z-index: 10;
-                                    line-height: 24px; text-align: center;
-                                `;
-                                recuadro.style.position = 'relative';
-                                recuadro.appendChild(btnEliminar);
-                                btnEliminar.addEventListener('click', function() {
-                                    const idx = parseInt(this.dataset.index);
-                                    const previewImg = document.getElementById(`preview-${idx}`);
-                                    const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-                                    const inputFile = document.getElementById(`input-imagen-${idx}`);
-                                    if (previewImg.src && previewImg.src !== '') {
-                                        imagenesAEliminar.add(idx);
-                                        previewImg.src = '';
-                                        previewImg.style.display = 'none';
-                                        placeholderSpan.style.display = 'block';
-                                        inputFile.value = '';
-                                        this.style.display = 'none';
-                                    }
-                                });
-                            }
-                        }
+                // Limpiar todos los thumbnails primero
+                for (let i = 0; i < 5; i++) {
+                    const thumb = document.getElementById(`thumb-preview-${i}`);
+                    const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
+                    const inputFile = document.getElementById(`input-imagen-${i}`);
+                    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
+                    const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
+                    if (thumb && thumbPh) {
+                        thumb.src = '';
+                        thumb.style.display = 'none';
+                        thumbPh.style.display = 'block';
                     }
+                    if (inputFile) inputFile.value = '';
+                    if (thumbSlot) thumbSlot.classList.remove('active');
+                    if (btnEliminar) btnEliminar.style.display = 'none';
+                }
+                imagenesAEliminar.clear();
+                // Cargar imágenes existentes
+                imagenes.forEach((url, index) => {
+                    if (url) aplicarPreviewImagen(index, url);
                 });
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
@@ -244,17 +218,25 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
 
                 imagenesAEliminar.clear();
-                document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
+                // Limpiar preview y thumbnails
+                const mainP = document.getElementById('preview-main');
+                const mainPh = document.getElementById('preview-placeholder');
+                if (mainP && mainPh) { mainP.src = ''; mainP.style.display = 'none'; mainPh.style.display = 'block'; }
+                imagenesAEliminar.clear();
                 for (let i = 0; i < 5; i++) {
-                    const preview = document.getElementById(`preview-${i}`);
-                    const placeholder = document.getElementById(`placeholder-${i}`);
-                    if (preview && placeholder) {
-                        preview.src = '';
-                        preview.style.display = 'none';
-                        placeholder.style.display = 'block';
+                    const thumb = document.getElementById(`thumb-preview-${i}`);
+                    const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
+                    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
+                    const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
+                    if (thumb && thumbPh) {
+                        thumb.src = '';
+                        thumb.style.display = 'none';
+                        thumbPh.style.display = 'block';
                     }
                     const inputImg = document.getElementById(`input-imagen-${i}`);
                     if (inputImg) inputImg.value = '';
+                    if (thumbSlot) thumbSlot.classList.remove('active');
+                    if (btnEliminar) btnEliminar.style.display = 'none';
                 }
 
                 document.getElementById('btn-guardar').textContent = 'Guardar Obra';
@@ -294,44 +276,56 @@ export async function refrescarTabla(tablaBody) {
 // ============================================
 // PREVISUALIZACIÓN DE IMÁGENES
 // ============================================
-export function aplicarPreviewImagen(index, url) {
-    const preview = document.getElementById(`preview-${index}`);
-    const placeholder = document.getElementById(`placeholder-${index}`);
-    if (!preview || !placeholder) return;
-    preview.src = url;
-    preview.style.display = 'block';
-    placeholder.style.display = 'none';
-    const recuadro = preview.closest('.recuadro-imagen') || preview.parentElement;
-    if (!recuadro) return;
-    const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-    if (btnExistente) btnExistente.remove();
-    const btnEliminar = document.createElement('button');
-    btnEliminar.type = 'button';
-    btnEliminar.className = 'btn-eliminar-imagen';
-    btnEliminar.dataset.index = index;
-    btnEliminar.textContent = '✕';
-    btnEliminar.style.display = 'block';
-    recuadro.style.position = 'relative';
-    recuadro.appendChild(btnEliminar);
-    btnEliminar.addEventListener('click', function() {
-        const idx = parseInt(this.dataset.index);
-        const previewImg = document.getElementById(`preview-${idx}`);
-        const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-        const inputFile = document.getElementById(`input-imagen-${idx}`);
-        if (previewImg.src && previewImg.src !== '') {
-            imagenesAEliminar.add(idx);
-            previewImg.src = '';
-            previewImg.style.display = 'none';
-            placeholderSpan.style.display = 'block';
-            if (inputFile) inputFile.value = '';
-            this.style.display = 'none';
+let activePreviewIndex = 0; // qué slot se muestra en el preview grande
+
+function updateMainPreview() {
+    const mainPreview = document.getElementById('preview-main');
+    const mainPlaceholder = document.getElementById('preview-placeholder');
+    if (!mainPreview || !mainPlaceholder) return;
+
+    // Buscar la primera imagen disponible para mostrar
+    let foundUrl = '';
+    for (let i = 0; i < 5; i++) {
+        const thumb = document.getElementById(`thumb-preview-${i}`);
+        if (thumb && thumb.src && thumb.style.display !== 'none') {
+            foundUrl = thumb.src;
+            break;
         }
-    });
+    }
+
+    if (foundUrl) {
+        mainPreview.src = foundUrl;
+        mainPreview.style.display = 'block';
+        mainPlaceholder.style.display = 'none';
+    } else {
+        mainPreview.src = '';
+        mainPreview.style.display = 'none';
+        mainPlaceholder.style.display = 'block';
+    }
+}
+
+export function aplicarPreviewImagen(index, url) {
+    const thumbPreview = document.getElementById(`thumb-preview-${index}`);
+    const thumbPlaceholder = document.getElementById(`thumb-placeholder-${index}`);
+    const thumbSlot = document.querySelector(`.thumb-slot[data-index="${index}"]`);
+    const btnEliminar = document.getElementById(`btn-eliminar-${index}`) || 
+                        thumbSlot?.querySelector('.btn-eliminar-thumb');
+
+    if (thumbPreview && thumbPlaceholder) {
+        thumbPreview.src = url;
+        thumbPreview.style.display = 'block';
+        thumbPlaceholder.style.display = 'none';
+    }
+    if (thumbSlot) {
+        thumbSlot.classList.add('active');
+    }
+    if (btnEliminar) btnEliminar.style.display = 'block';
+
+    updateMainPreview();
 }
 
 export async function cargarUrlEnInput(index, url) {
     try {
-        // Usar Image + canvas para evitar problemas CORS con Cloudinary
         const blob = await new Promise((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
@@ -365,68 +359,75 @@ export async function cargarUrlEnInput(index, url) {
 }
 
 export function setupImagePreviews() {
+    // Click en preview principal → abre primer slot vacío
+    const mainPreviewContainer = document.getElementById('imagen-preview-principal');
+    if (mainPreviewContainer) {
+        mainPreviewContainer.addEventListener('click', () => {
+            for (let i = 0; i < 5; i++) {
+                const thumb = document.getElementById(`thumb-preview-${i}`);
+                if (!thumb || !thumb.src || thumb.style.display === 'none') {
+                    document.getElementById(`input-imagen-${i}`)?.click();
+                    return;
+                }
+            }
+        });
+    }
+
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`input-imagen-${i}`);
-        const preview = document.getElementById(`preview-${i}`);
-        const placeholder = document.getElementById(`placeholder-${i}`);
+        const thumbPreview = document.getElementById(`thumb-preview-${i}`);
+        const thumbPlaceholder = document.getElementById(`thumb-placeholder-${i}`);
+        const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
+        const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
+
         if (input) {
-            input.addEventListener('change', function(e) {
+            input.addEventListener('change', function() {
                 const file = this.files[0];
-                const recuadro = this.closest('.recuadro-imagen');
-                if (!recuadro) return;
-                const btnExistente = recuadro.querySelector('.btn-eliminar-imagen');
-                if (btnExistente) btnExistente.remove();
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        if (preview) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
+                        if (thumbPreview) {
+                            thumbPreview.src = e.target.result;
+                            thumbPreview.style.display = 'block';
                         }
-                        if (placeholder) placeholder.style.display = 'none';
-                        const btnEliminar = document.createElement('button');
-                        btnEliminar.type = 'button';
-                        btnEliminar.className = 'btn-eliminar-imagen';
-                        btnEliminar.dataset.index = i;
-                        btnEliminar.textContent = '✕';
-                        btnEliminar.style.cssText = `
-                            position: absolute; top: 0; right: 0;
-                            background: #dc3545; color: white;
-                            border: none; border-radius: 50%;
-                            width: 24px; height: 24px;
-                            cursor: pointer; font-size: 14px;
-                            display: block; z-index: 10;
-                            line-height: 24px; text-align: center;
-                        `;
-                        recuadro.style.position = 'relative';
-                        recuadro.appendChild(btnEliminar);
-                        btnEliminar.addEventListener('click', function() {
-                            const idx = parseInt(this.dataset.index);
-                            const previewImg = document.getElementById(`preview-${idx}`);
-                            const placeholderSpan = document.getElementById(`placeholder-${idx}`);
-                            const inputFile = document.getElementById(`input-imagen-${idx}`);
-                            if (previewImg.src && previewImg.src !== '') {
-                                previewImg.src = '';
-                                previewImg.style.display = 'none';
-                                placeholderSpan.style.display = 'block';
-                                inputFile.value = '';
-                                this.remove();
-                                const editId = document.getElementById('input-id-edicion').value;
-                                if (editId) {
-                                    imagenesAEliminar.add(idx);
-                                }
-                            }
-                        });
+                        if (thumbPlaceholder) thumbPlaceholder.style.display = 'none';
+                        if (thumbSlot) thumbSlot.classList.add('active');
+                        if (btnEliminar) btnEliminar.style.display = 'block';
+                        updateMainPreview();
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    if (preview) {
-                        preview.src = '';
-                        preview.style.display = 'none';
+                    if (thumbPreview) {
+                        thumbPreview.src = '';
+                        thumbPreview.style.display = 'none';
                     }
-                    if (placeholder) placeholder.style.display = 'block';
-                    const btnEliminar = recuadro.querySelector('.btn-eliminar-imagen');
-                    if (btnEliminar) btnEliminar.remove();
+                    if (thumbPlaceholder) thumbPlaceholder.style.display = 'block';
+                    if (thumbSlot) thumbSlot.classList.remove('active');
+                    if (btnEliminar) btnEliminar.style.display = 'none';
+                    updateMainPreview();
+                }
+            });
+        }
+
+        // Botón eliminar (ya existe en HTML)
+        if (btnEliminar) {
+            btnEliminar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const idx = parseInt(this.dataset.index);
+                const tp = document.getElementById(`thumb-preview-${idx}`);
+                const tph = document.getElementById(`thumb-placeholder-${idx}`);
+                const inp = document.getElementById(`input-imagen-${idx}`);
+                const ts = document.querySelector(`.thumb-slot[data-index="${idx}"]`);
+                if (tp && tp.src && tp.src !== '') {
+                    tp.src = '';
+                    tp.style.display = 'none';
+                    if (tph) tph.style.display = 'block';
+                    if (inp) inp.value = '';
+                    if (ts) ts.classList.remove('active');
+                    this.style.display = 'none';
+                    const editId = document.getElementById('input-id-edicion').value;
+                    if (editId) imagenesAEliminar.add(idx);
+                    updateMainPreview();
                 }
             });
         }
@@ -445,17 +446,28 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     document.getElementById('btn-limpiar-campos').classList.add('hidden');
     document.getElementById('btn-guardar').textContent = 'Guardar Obra';
     imagenesAEliminar.clear();
+    // Limpiar preview principal
+    const mainPreview = document.getElementById('preview-main');
+    const mainPlaceholder = document.getElementById('preview-placeholder');
+    if (mainPreview && mainPlaceholder) {
+        mainPreview.src = '';
+        mainPreview.style.display = 'none';
+        mainPlaceholder.style.display = 'block';
+    }
+    // Limpiar thumbnails
     for (let i = 0; i < 5; i++) {
-        const preview = document.getElementById(`preview-${i}`);
-        const placeholder = document.getElementById(`placeholder-${i}`);
+        const thumb = document.getElementById(`thumb-preview-${i}`);
+        const thumbPh = document.getElementById(`thumb-placeholder-${i}`);
         const inputFile = document.getElementById(`input-imagen-${i}`);
-        if (preview && placeholder) {
-            preview.src = '';
-            preview.style.display = 'none';
-            placeholder.style.display = 'block';
+        const thumbSlot = document.querySelector(`.thumb-slot[data-index="${i}"]`);
+        const btnEliminar = thumbSlot?.querySelector('.btn-eliminar-thumb');
+        if (thumb && thumbPh) {
+            thumb.src = '';
+            thumb.style.display = 'none';
+            thumbPh.style.display = 'block';
         }
         if (inputFile) inputFile.value = '';
-        const btnEliminar = document.querySelector(`.btn-eliminar-imagen[data-index="${i}"]`);
+        if (thumbSlot) thumbSlot.classList.remove('active');
         if (btnEliminar) btnEliminar.style.display = 'none';
     }
     if (restaurarArtista && artistaActual) {

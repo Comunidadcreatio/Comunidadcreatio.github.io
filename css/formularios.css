@@ -580,35 +580,77 @@ form *,
     margin-bottom: 6px;
 }
 
-/* --- Contenedor de imágenes --- */
-.imagenes-contenedor {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.recuadro-imagen {
-    width: 100px;
-    height: 100px;
+/* --- Preview principal (4:5) --- */
+.imagen-preview-principal {
+    width: 100%;
+    aspect-ratio: 4 / 5;
     border: 2px dashed var(--color-border);
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: border-color 0.2s, background-color 0.2s;
     background: var(--color-gray-light);
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
 }
 
-.recuadro-imagen:hover {
+.imagen-preview-principal:hover {
     border-color: var(--color-ink);
-    background: var(--color-gray-50);
 }
 
-.recuadro-imagen label {
+.preview-placeholder-text {
+    font-size: 16px;
+    color: #999;
+    text-align: center;
+    pointer-events: none;
+    line-height: 1.4;
+}
+
+.preview-main-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+/* --- Thumbnails --- */
+.imagen-thumbnails {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.thumb-slot {
+    width: 56px;
+    height: 56px;
+    border: 2px dashed var(--color-border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-gray-light);
+    transition: border-color 0.2s;
+}
+
+.thumb-slot:hover {
+    border-color: var(--color-ink);
+}
+
+.thumb-slot.active {
+    border-color: var(--color-ink);
+    border-style: solid;
+}
+
+.thumb-slot label {
     width: 100%;
     height: 100%;
     display: flex;
@@ -617,25 +659,25 @@ form *,
     cursor: pointer;
 }
 
-.placeholder-text {
-    font-size: 12px;
-    color: #888;
-    text-align: center;
+.thumb-placeholder {
+    font-size: 20px;
+    color: #999;
     pointer-events: none;
+    font-weight: 300;
 }
 
-.preview-img {
+.thumb-preview-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: none;
 }
 
-.recuadro-imagen input[type="file"] {
+.thumb-slot input[type="file"] {
     display: none;
 }
 
-.btn-eliminar-imagen {
+.btn-eliminar-thumb {
     position: absolute;
     top: 0;
     right: 0;
@@ -643,14 +685,15 @@ form *,
     color: white;
     border: none;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
     display: none;
     z-index: 10;
-    line-height: 24px;
+    line-height: 18px;
     text-align: center;
+    padding: 0;
 }
 
 
@@ -1023,27 +1066,21 @@ form,
         margin-bottom: 12px;
     }
     
-    /* Contenedor de imágenes */
-    .imagenes-contenedor {
-        gap: 16px;
-        justify-content: center;
-    }
-    
-    .recuadro-imagen {
-        width: 90px;
-        height: 90px;
+    /* Preview y thumbnails en móvil */
+    .thumb-slot {
+        width: 48px;
+        height: 48px;
     }
 
-    /* La (X) para eliminar imagen debe seguir siendo un círculo, no estirarse */
-    #panel-artista .btn-eliminar-imagen,
-    .recuadro-imagen .btn-eliminar-imagen {
-        width: 24px !important;
-        height: 24px !important;
+    /* La (X) para eliminar thumbnail no debe estirarse */
+    .btn-eliminar-thumb {
+        width: 18px !important;
+        height: 18px !important;
         min-width: 0 !important;
         padding: 0 !important;
         border-radius: 50% !important;
-        font-size: 12px !important;
-        line-height: 24px !important;
+        font-size: 10px !important;
+        line-height: 18px !important;
     }
 
     /* Los botones de iconos de la tabla no deben estirarse en móvil */
@@ -1129,9 +1166,9 @@ form,
         padding: 20px 15px;
     }
     
-    .recuadro-imagen {
-        width: 80px;
-        height: 80px;
+    .thumb-slot {
+        width: 44px;
+        height: 44px;
     }
 }
 
@@ -1288,7 +1325,12 @@ form,
     color: var(--color-white);
 }
 
-[data-theme="dark"] .recuadro-imagen {
+[data-theme="dark"] .imagen-preview-principal {
+    border-color: #e5e5e5;
+    background-color: #121212;
+}
+
+[data-theme="dark"] .thumb-slot {
     border-color: #e5e5e5;
     background-color: #121212;
 }
