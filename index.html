@@ -277,18 +277,91 @@
             
             <!-- Barra superior fija: Paso X de 5 + navegación < > -->
             <div id="obra-step-bar" class="step-nav-bar">
-                <span class="step-indicator" id="obra-step-indicator">Paso 1 de 5</span>
-                <div class="step-buttons">
-                    <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled aria-label="Paso anterior">&lt;</button>
-                    <button type="button" class="nav-btn next-btn" id="obra-step-next" aria-label="Paso siguiente">&gt;</button>
+                <div class="step-nav-left">
+                    <span class="step-indicator" id="obra-step-indicator">Paso 1 de 5</span>
+                    <div class="step-buttons">
+                        <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled aria-label="Paso anterior">&lt;</button>
+                        <button type="button" class="nav-btn next-btn" id="obra-step-next" aria-label="Paso siguiente">&gt;</button>
+                    </div>
                 </div>
+                <span class="step-name" id="obra-step-name">Imágenes</span>
             </div>
 
             <div id="formulario-obra" role="form">
 
                 <form id="obra-form" aria-label="Formulario de obra" novalidate>
                     
-                    <!-- SECCIÓN 1: Información Básica -->
+                    <!-- SECCIÓN 1: Imágenes -->
+                    <div class="form-accordion-section" data-section="imagenes">
+                        <button type="button" class="accordion-header" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">Imágenes</span>
+                            <span class="accordion-status">○</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <!-- Etiquetas -->
+                            <div class="form-group">
+                                <label for="input-etiquetas">Etiquetas</label>
+                                <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required data-required="true">
+                            </div>
+
+                            <!-- Contenedor para los 5 recuadros de imágenes -->
+                    <div class="imagenes-contenedor" role="group" aria-label="Imágenes de la obra">
+                        <div class="form-group">
+                            <label>Imágenes de la obra (máximo 5)</label>
+                        </div>
+                        <!-- Recuadro 1 (Imagen Principal - Obligatoria) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-0">
+                                <span id="placeholder-0" class="placeholder-text">+<br>Principal</span>
+                                <img id="preview-0" src="" class="preview-img" alt="Vista previa imagen principal">
+                                <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal">
+                                <button type="button" class="btn-eliminar-imagen" data-index="0" aria-label="Eliminar imagen principal">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 2 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-1">
+                                <span id="placeholder-1" class="placeholder-text">+<br>Imagen 2</span>
+                                <img id="preview-1" src="" class="preview-img" alt="Vista previa imagen 2">
+                                <input type="file" id="input-imagen-1" accept="image/*" aria-label="Subir imagen adicional 2">
+                                <button type="button" class="btn-eliminar-imagen" data-index="1" aria-label="Eliminar imagen 2">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 3 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-2">
+                                <span id="placeholder-2" class="placeholder-text">+<br>Imagen 3</span>
+                                <img id="preview-2" src="" class="preview-img" alt="Vista previa imagen 3">
+                                <input type="file" id="input-imagen-2" accept="image/*" aria-label="Subir imagen adicional 3">
+                                <button type="button" class="btn-eliminar-imagen" data-index="2" aria-label="Eliminar imagen 3">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 4 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-3">
+                                <span id="placeholder-3" class="placeholder-text">+<br>Imagen 4</span>
+                                <img id="preview-3" src="" class="preview-img" alt="Vista previa imagen 4">
+                                <input type="file" id="input-imagen-3" accept="image/*" aria-label="Subir imagen adicional 4">
+                                <button type="button" class="btn-eliminar-imagen" data-index="3" aria-label="Eliminar imagen 4">✕</button>
+                            </label>
+                        </div>
+                        <!-- Recuadro 5 (Opcional) -->
+                        <div class="recuadro-imagen">
+                            <label for="input-imagen-4">
+                                <span id="placeholder-4" class="placeholder-text">+<br>Imagen 5</span>
+                                <img id="preview-4" src="" class="preview-img" alt="Vista previa imagen 5">
+                                <input type="file" id="input-imagen-4" accept="image/*" aria-label="Subir imagen adicional 5">
+                                <button type="button" class="btn-eliminar-imagen" data-index="4" aria-label="Eliminar imagen 5">✕</button>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="vista-previa-imagenes" class="vista-previa"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: Información Básica -->
                     <div class="form-accordion-section" data-section="basica">
                         <button type="button" class="accordion-header" aria-expanded="false">
                             <span class="accordion-icon">▶</span>
@@ -545,73 +618,80 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 5: Imágenes -->
-                    <div class="form-accordion-section" data-section="imagenes">
+                    <!-- SECCIÓN 5: Proveniencia y Autenticidad -->
+                    <div class="form-accordion-section" data-section="proveniencia">
                         <button type="button" class="accordion-header" aria-expanded="false">
                             <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Imágenes</span>
+                            <span class="accordion-title">Proveniencia y Autenticidad</span>
                             <span class="accordion-status">○</span>
                         </button>
                         <div class="accordion-content hidden">
-                            <!-- Etiquetas -->
+                            <!-- Procedencia -->
                             <div class="form-group">
-                                <label for="input-etiquetas">Etiquetas</label>
-                                <input type="text" id="input-etiquetas" placeholder="Etiquetas (separadas por coma)" required data-required="true">
+                                <label for="input-procedencia" class="has-tooltip">
+                                    Procedencia
+                                    <span class="tooltip-icon" data-tooltip="Historial de propiedad de la obra">?</span>
+                                </label>
+                                <select id="input-procedencia" required data-required="true">
+                            <option value="" disabled selected>Selecciona Procedencia</option>
+                        <option value="Colección privada">Colección privada</option>
+                        <option value="Taller del artista">Taller del artista</option>
+                        <option value="Herencia familiar">Herencia familiar</option>
+                        <option value="Compra directa al artista">Compra directa al artista</option>
+                        <option value="Adquisición en subasta">Adquisición en subasta</option>
+                        <option value="Donación">Donación</option>
+                        <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
+                        <option value="Desconocida">Desconocida</option>
+                        </select>
                             </div>
 
-                            <!-- Contenedor para los 5 recuadros de imágenes -->
-                    <div class="imagenes-contenedor" role="group" aria-label="Imágenes de la obra">
-                        <div class="form-group">
-                            <label>Imágenes de la obra (máximo 5)</label>
-                        </div>
-                        <!-- Recuadro 1 (Imagen Principal - Obligatoria) -->
-                        <div class="recuadro-imagen">
-                            <label for="input-imagen-0">
-                                <span id="placeholder-0" class="placeholder-text">+<br>Principal</span>
-                                <img id="preview-0" src="" class="preview-img" alt="Vista previa imagen principal">
-                                <input type="file" id="input-imagen-0" accept="image/*" aria-label="Subir imagen principal">
-                                <button type="button" class="btn-eliminar-imagen" data-index="0" aria-label="Eliminar imagen principal">✕</button>
-                            </label>
-                        </div>
-                        <!-- Recuadro 2 (Opcional) -->
-                        <div class="recuadro-imagen">
-                            <label for="input-imagen-1">
-                                <span id="placeholder-1" class="placeholder-text">+<br>Imagen 2</span>
-                                <img id="preview-1" src="" class="preview-img" alt="Vista previa imagen 2">
-                                <input type="file" id="input-imagen-1" accept="image/*" aria-label="Subir imagen adicional 2">
-                                <button type="button" class="btn-eliminar-imagen" data-index="1" aria-label="Eliminar imagen 2">✕</button>
-                            </label>
-                        </div>
-                        <!-- Recuadro 3 (Opcional) -->
-                        <div class="recuadro-imagen">
-                            <label for="input-imagen-2">
-                                <span id="placeholder-2" class="placeholder-text">+<br>Imagen 3</span>
-                                <img id="preview-2" src="" class="preview-img" alt="Vista previa imagen 3">
-                                <input type="file" id="input-imagen-2" accept="image/*" aria-label="Subir imagen adicional 3">
-                                <button type="button" class="btn-eliminar-imagen" data-index="2" aria-label="Eliminar imagen 3">✕</button>
-                            </label>
-                        </div>
-                        <!-- Recuadro 4 (Opcional) -->
-                        <div class="recuadro-imagen">
-                            <label for="input-imagen-3">
-                                <span id="placeholder-3" class="placeholder-text">+<br>Imagen 4</span>
-                                <img id="preview-3" src="" class="preview-img" alt="Vista previa imagen 4">
-                                <input type="file" id="input-imagen-3" accept="image/*" aria-label="Subir imagen adicional 4">
-                                <button type="button" class="btn-eliminar-imagen" data-index="3" aria-label="Eliminar imagen 4">✕</button>
-                            </label>
-                        </div>
-                        <!-- Recuadro 5 (Opcional) -->
-                        <div class="recuadro-imagen">
-                            <label for="input-imagen-4">
-                                <span id="placeholder-4" class="placeholder-text">+<br>Imagen 5</span>
-                                <img id="preview-4" src="" class="preview-img" alt="Vista previa imagen 5">
-                                <input type="file" id="input-imagen-4" accept="image/*" aria-label="Subir imagen adicional 5">
-                                <button type="button" class="btn-eliminar-imagen" data-index="4" aria-label="Eliminar imagen 5">✕</button>
-                            </label>
-                        </div>
-                    </div>
+                            <!-- Certificado -->
+                            <div class="form-group">
+                                <label for="input-certificado">Certificado</label>
+                                <select id="input-certificado" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Certificado</option>
+                                    <option value="Sí (autenticado)">Sí (autenticado)</option>
+                                    <option value="No">No</option>
+                                    <option value="En trámite">En trámite</option>
+                                    <option value="Certificado digital disponible">Certificado digital disponible</option>
+                                    <option value="Certificado físico disponible">Certificado físico disponible</option>
+                                </select>
+                            </div>
 
-                    <div id="vista-previa-imagenes" class="vista-previa"></div>
+                            <!-- Firma -->
+                            <div class="form-group">
+                                <label for="input-firma">Firma</label>
+                                <select id="input-firma" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Firma</option>
+                                    <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
+                                    <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
+                                    <option value="Firmada en el bastidor">Firmada en el bastidor</option>
+                                    <option value="Iniciales solamente">Iniciales solamente</option>
+                                    <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
+                                    <option value="No firmada">No firmada</option>
+                                    <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
+                                    <option value="Firma ilegible">Firma ilegible</option>
+                                    <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
+                                    <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
+                                </select>
+                            </div>
+
+                            <!-- Conservación -->
+                            <div class="form-group">
+                                <label for="input-conservacion" class="has-tooltip">
+                                    Conservación
+                                    <span class="tooltip-icon" data-tooltip="Estado actual de conservación de la obra">?</span>
+                                </label>
+                                <select id="input-conservacion" required data-required="true">
+                                    <option value="" disabled selected>Selecciona Conservación</option>
+                                    <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
+                                    <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
+                                    <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
+                                    <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
+                                    <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
+                                    <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 

@@ -630,6 +630,16 @@ function setupStepNavigation() {
 
     let currentStep = 0;
 
+    // Nombres de cada paso (en orden: índice 0 = Paso 1, etc.)
+    const stepNames = [
+        'Imágenes',
+        'Información Básica',
+        'Estado y Visibilidad',
+        'Detalles Técnicos',
+        'Proveniencia y Autenticidad'
+    ];
+    const stepNameEl = document.getElementById('obra-step-name');
+
     function showStep(index) {
         sections.forEach((s, i) => {
             const content = s.querySelector('.accordion-content');
@@ -646,6 +656,9 @@ function setupStepNavigation() {
         });
 
         indicator.textContent = `Paso ${index + 1} de ${totalSteps}`;
+        if (stepNameEl && stepNames[index]) {
+            stepNameEl.textContent = stepNames[index];
+        }
         prevBtn.disabled = index === 0;
         
         if (index === totalSteps - 1) {

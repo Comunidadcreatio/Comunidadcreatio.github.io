@@ -11,12 +11,27 @@
     z-index: 999;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     padding: 8px 16px;
     background: var(--color-white);
     border-bottom: 1px solid var(--color-gray-200);
     box-sizing: border-box;
     gap: 12px;
+}
+
+.step-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#obra-step-bar .step-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+    font-family: 'Nunito', sans-serif;
+    white-space: nowrap;
+    text-align: right;
 }
 
 #obra-step-bar .step-indicator {
@@ -1225,6 +1240,10 @@ form,
 
 [data-theme="dark"] #obra-step-bar .nav-btn:hover:not(:disabled) {
     border-color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-step-bar .step-name {
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] #obra-progress-bar {
