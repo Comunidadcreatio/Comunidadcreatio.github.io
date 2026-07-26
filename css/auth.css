@@ -191,7 +191,7 @@ body {
 }
 
 .auth-subtitle {
-    font-size: 24px;
+    font-size: 28px;
     color: var(--color-ink);
     line-height: 1.6;
     margin: 0;
@@ -1059,7 +1059,7 @@ legend {
     }
 
     .auth-subtitle {
-        font-size: 30px;
+        font-size: 34px;
     }
 
     .auth-right {
@@ -1159,7 +1159,7 @@ legend {
     }
 
     .auth-subtitle {
-        font-size: 22px;
+        font-size: 26px;
     }
 
     .auth-section {
