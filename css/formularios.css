@@ -153,87 +153,24 @@
 }
 
 /* ==============================================
-   ACCORDION SECCIONES DEL FORMULARIO
+   SECCIONES DEL FORMULARIO (estilo carrusel)
    ============================================== */
-.form-accordion-section {
+.form-section {
     margin-bottom: 16px;
-    border: 1px solid var(--color-gray-200);
-    border-radius: 8px;
-    overflow: hidden;
     background: var(--color-white);
-    transition: box-shadow 0.2s ease;
 }
 
-.form-accordion-section:hover {
-    box-shadow: var(--shadow-sm);
-}
-
-.form-accordion-section .accordion-header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    background: var(--color-white);
-    border: none;
-    border-bottom: 1px solid var(--color-gray-200);
-    cursor: pointer;
-    transition: background 0.2s ease;
-    gap: 12px;
-}
-
-.form-accordion-section .accordion-header:hover {
-    background: var(--color-gray-50);
-}
-
-.form-accordion-section .accordion-icon {
-    font-size: 12px;
-    color: var(--color-text-muted);
-    transition: transform 0.3s ease;
-    flex-shrink: 0;
-}
-
-.form-accordion-section .accordion-header[aria-expanded="true"] .accordion-icon {
-    transform: rotate(180deg);
-}
-
-.form-accordion-section .accordion-title {
-    flex: 1;
+.form-section-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-text);
-    text-align: left;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
-.form-accordion-section .accordion-status {
-    font-size: 16px;
-    color: var(--color-gray-400);
-    flex-shrink: 0;
-}
-
-.form-accordion-section .accordion-status.completed {
-    color: var(--color-success);
-}
-
-.form-accordion-section .accordion-status.in-progress {
-    color: var(--color-warning);
-}
-
-.form-accordion-section .accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-    padding: 0 20px;
-}
-
-.form-accordion-section .accordion-content:not(.hidden) {
-    max-height: 2000px;
-    padding: 20px;
-}
-
-.form-accordion-section .accordion-content.hidden {
-    display: none;
-}
+.form-section-content {
+    /* contenido siempre visible, controlado por step nav */
 
 /* ==============================================
    TOOLTIPS EXPLICATIVOS

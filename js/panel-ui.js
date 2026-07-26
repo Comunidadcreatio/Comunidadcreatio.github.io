@@ -566,22 +566,7 @@ export function setupObraFormSubmit() {
 // ACCORDIONS DEL FORMULARIO Y PROGRESS
 // ============================================
 export function setupFormAccordions() {
-    const accordionHeaders = document.querySelectorAll('.accordion-header');
     const obraForm = document.getElementById('obra-form');
-
-    accordionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const section = header.closest('.form-accordion-section');
-            const content = section.querySelector('.accordion-content');
-            const isExpanded = header.getAttribute('aria-expanded') === 'true';
-
-            header.setAttribute('aria-expanded', !isExpanded);
-            content.classList.toggle('hidden');
-
-            const icon = header.querySelector('.accordion-icon');
-            icon.textContent = isExpanded ? '▶' : '▼';
-        });
-    });
 
     if (obraForm) {
         const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
@@ -597,7 +582,7 @@ export function setupFormAccordions() {
 }
 
 function setupStepNavigation() {
-    const sections = document.querySelectorAll('.form-accordion-section');
+    const sections = document.querySelectorAll('.form-section');
     const prevBtn = document.getElementById('obra-step-prev');
     const nextBtn = document.getElementById('obra-step-next');
     const indicator = document.getElementById('obra-step-indicator');
@@ -642,18 +627,13 @@ function setupStepNavigation() {
 
     function showStep(index) {
         sections.forEach((s, i) => {
-            const content = s.querySelector('.accordion-content');
-            const header = s.querySelector('.accordion-header');
+            const content = s.querySelector('.form-section-content');
             if (i === index) {
                 s.classList.remove('hidden');
                 content.classList.remove('hidden');
-                header.setAttribute('aria-expanded', 'true');
-                header.querySelector('.accordion-icon').textContent = '▼';
             } else {
                 s.classList.add('hidden');
                 content.classList.add('hidden');
-                header.setAttribute('aria-expanded', 'false');
-                header.querySelector('.accordion-icon').textContent = '▶';
             }
         });
 
@@ -720,49 +700,10 @@ export function updateFormProgress() {
 }
 
 function updateSectionStatus() {
-    const sections = document.querySelectorAll('.form-accordion-section');
-
-    sections.forEach(section => {
-        const content = section.querySelector('.accordion-content');
-        const requiredFields = content.querySelectorAll('[data-required="true"]');
-        const statusIcon = section.querySelector('.accordion-status');
-
-        if (requiredFields.length === 0) return;
-
-        let completedCount = 0;
-        requiredFields.forEach(field => {
-            if (field.value && field.value.trim() !== '') {
-                completedCount++;
-            }
-        });
-
-        const isComplete = completedCount === requiredFields.length;
-        const isInProgress = completedCount > 0 && !isComplete;
-
-        if (isComplete) {
-            statusIcon.textContent = '✓';
-            statusIcon.classList.add('completed');
-            statusIcon.classList.remove('in-progress');
-        } else if (isInProgress) {
-            statusIcon.textContent = '◐';
-            statusIcon.classList.add('in-progress');
-            statusIcon.classList.remove('completed');
-        } else {
-            statusIcon.textContent = '○';
-            statusIcon.classList.remove('completed', 'in-progress');
-        }
-    });
+    // Sin acordeones — la barra de progreso global es suficiente
 }
 
 export function resetAccordionStatus() {
-    const sections = document.querySelectorAll('.form-accordion-section');
-
-    sections.forEach(section => {
-        const statusIcon = section.querySelector('.accordion-status');
-        statusIcon.textContent = '○';
-        statusIcon.classList.remove('completed', 'in-progress');
-    });
-
     const progressFill = document.getElementById('form-progress-fill');
     const progressText = document.getElementById('form-progress-percentage');
 

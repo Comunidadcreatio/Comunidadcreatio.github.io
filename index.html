@@ -292,13 +292,9 @@
                 <form id="obra-form" aria-label="Formulario de obra" novalidate>
                     
                     <!-- SECCIÓN 1: Imágenes -->
-                    <div class="form-accordion-section" data-section="imagenes">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Imágenes</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
+                    <div class="form-section" data-section="imagenes">
+                        <h4 class="form-section-title">Imágenes</h4>
+                        <div class="form-section-content">
                             <!-- Etiquetas -->
                             <div class="form-group">
                                 <label for="input-etiquetas">Etiquetas</label>
@@ -362,13 +358,9 @@
                     </div>
 
                     <!-- SECCIÓN 2: Información Básica -->
-                    <div class="form-accordion-section" data-section="basica">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Información Básica</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
+                    <div class="form-section" data-section="basica">
+                        <h4 class="form-section-title">Información Básica</h4>
+                        <div class="form-section-content">
                             <!-- 1. Título -->
                             <div class="form-group">
                                 <label for="input-titulo">Título</label>
@@ -419,14 +411,10 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 2: Estado y Visibilidad -->
-                    <div class="form-accordion-section" data-section="visibilidad">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Estado y Visibilidad</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
+                    <!-- SECCIÓN 3: Estado y Visibilidad -->
+                    <div class="form-section" data-section="visibilidad">
+                        <h4 class="form-section-title">Estado y Visibilidad</h4>
+                        <div class="form-section-content">
                             <!-- 6. Status -->
                             <div class="form-group">
                                 <label for="input-status">Status</label>
@@ -454,14 +442,10 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 3: Detalles Técnicos -->
-                    <div class="form-accordion-section" data-section="tecnicos">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Detalles Técnicos</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
+                    <!-- SECCIÓN 4: Detalles Técnicos -->
+                    <div class="form-section" data-section="tecnicos">
+                        <h4 class="form-section-title">Detalles Técnicos</h4>
+                        <div class="form-section-content">
                             <!-- Técnica -->
                             <div class="form-group">
                                 <label for="input-descripcion-tecnica" class="has-tooltip">
@@ -541,91 +525,10 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 4: Proveniencia y Autenticidad -->
-                    <div class="form-accordion-section" data-section="proveniencia">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Proveniencia y Autenticidad</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
-                            <!-- Procedencia -->
-                            <div class="form-group">
-                                <label for="input-procedencia" class="has-tooltip">
-                                    Procedencia
-                                    <span class="tooltip-icon" data-tooltip="Historial de propiedad de la obra">?</span>
-                                </label>
-                                <select id="input-procedencia" required data-required="true">
-                            <option value="" disabled selected>Selecciona Procedencia</option>
-                        <option value="Colección privada">Colección privada</option>
-                        <option value="Taller del artista">Taller del artista</option>
-                        <option value="Herencia familiar">Herencia familiar</option>
-                        <option value="Compra directa al artista">Compra directa al artista</option>
-                        <option value="Adquisición en subasta">Adquisición en subasta</option>
-                        <option value="Donación">Donación</option>
-                        <option value="Comodato (préstamo largo)">Comodato (préstamo largo)</option>
-                        <option value="Desconocida">Desconocida</option>
-                        </select>
-                            </div>
-
-                            <!-- Certificado -->
-                            <div class="form-group">
-                                <label for="input-certificado">Certificado</label>
-                                <select id="input-certificado" required data-required="true">
-                                    <option value="" disabled selected>Selecciona Certificado</option>
-                                    <option value="Sí (autenticado)">Sí (autenticado)</option>
-                                    <option value="No">No</option>
-                                    <option value="En trámite">En trámite</option>
-                                    <option value="Certificado digital disponible">Certificado digital disponible</option>
-                                    <option value="Certificado físico disponible">Certificado físico disponible</option>
-                                </select>
-                            </div>
-
-                            <!-- Firma -->
-                            <div class="form-group">
-                                <label for="input-firma">Firma</label>
-                                <select id="input-firma" required data-required="true">
-                                    <option value="" disabled selected>Selecciona Firma</option>
-                                    <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
-                                    <option value="Firmada al dorso (en la parte trasera)">Firmada al dorso (en la parte trasera)</option>
-                                    <option value="Firmada en el bastidor">Firmada en el bastidor</option>
-                                    <option value="Iniciales solamente">Iniciales solamente</option>
-                                    <option value="Sellada (con sello del artista)">Sellada (con sello del artista)</option>
-                                    <option value="No firmada">No firmada</option>
-                                    <option value="Firma dudosa/necesita verificación">Firma dudosa/necesita verificación</option>
-                                    <option value="Firma ilegible">Firma ilegible</option>
-                                    <option value="Firma en la base (para escultura)">Firma en la base (para escultura)</option>
-                                    <option value="Firma en el margen (grabados/ediciones)">Firma en el margen (grabados/ediciones)</option>
-                                </select>
-                            </div>
-
-                            <!-- Conservación -->
-                            <div class="form-group">
-                                <label for="input-conservacion" class="has-tooltip">
-                                    Conservación
-                                    <span class="tooltip-icon" data-tooltip="Estado actual de conservación de la obra">?</span>
-                                </label>
-                                <select id="input-conservacion" required data-required="true">
-                                    <option value="" disabled selected>Selecciona Conservación</option>
-                                    <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
-                                    <option value="Bueno (ligeros signos de edad)">Bueno (ligeros signos de edad)</option>
-                                    <option value="Regular (necesita cuidado)">Regular (necesita cuidado)</option>
-                                    <option value="Con daños menores (restaurable)">Con daños menores (restaurable)</option>
-                                    <option value="Dañado (afecta valor)">Dañado (afecta valor)</option>
-                                    <option value="Restaurado profesionalmente">Restaurado profesionalmente</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- SECCIÓN 5: Proveniencia y Autenticidad -->
-                    <div class="form-accordion-section" data-section="proveniencia">
-                        <button type="button" class="accordion-header" aria-expanded="false">
-                            <span class="accordion-icon">▶</span>
-                            <span class="accordion-title">Proveniencia y Autenticidad</span>
-                            <span class="accordion-status">○</span>
-                        </button>
-                        <div class="accordion-content hidden">
+                    <div class="form-section" data-section="proveniencia">
+                        <h4 class="form-section-title">Proveniencia y Autenticidad</h4>
+                        <div class="form-section-content">
                             <!-- Procedencia -->
                             <div class="form-group">
                                 <label for="input-procedencia" class="has-tooltip">
