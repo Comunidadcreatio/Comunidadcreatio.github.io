@@ -5,7 +5,7 @@
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
-import { escapeHtml, debugLog } from './utils.js';
+import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -477,11 +477,11 @@ function renderizarGridObras(obras, container) {
 
         // Construir array de imágenes
         const imagenes = [];
-        if (obra.imagen_url) imagenes.push(obra.imagen_url);
-        if (obra.imagen_url_1) imagenes.push(obra.imagen_url_1);
-        if (obra.imagen_url_2) imagenes.push(obra.imagen_url_2);
-        if (obra.imagen_url_3) imagenes.push(obra.imagen_url_3);
-        if (obra.imagen_url_4) imagenes.push(obra.imagen_url_4);
+        if (obra.imagen_url) imagenes.push(cloudinaryUrl(obra.imagen_url));
+        if (obra.imagen_url_1) imagenes.push(cloudinaryUrl(obra.imagen_url_1));
+        if (obra.imagen_url_2) imagenes.push(cloudinaryUrl(obra.imagen_url_2));
+        if (obra.imagen_url_3) imagenes.push(cloudinaryUrl(obra.imagen_url_3));
+        if (obra.imagen_url_4) imagenes.push(cloudinaryUrl(obra.imagen_url_4));
 
         const totalImagenes = imagenes.length || 0;
         const primeraImg = imagenes[0] || '';

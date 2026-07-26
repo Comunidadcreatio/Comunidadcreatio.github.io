@@ -1,7 +1,7 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
-import { escapeHtml, debugLog } from './utils.js';
+import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
@@ -36,11 +36,11 @@ const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" heig
  */
 function crearCarruselHTML(obra, overlayHTML = '') {
     const urls = [
-        obra.imagen_url || obra.imagen_thumbnail_url || '',
-        obra.imagen_url_1 || '',
-        obra.imagen_url_2 || '',
-        obra.imagen_url_3 || '',
-        obra.imagen_url_4 || ''
+        cloudinaryUrl(obra.imagen_url || obra.imagen_thumbnail_url || ''),
+        cloudinaryUrl(obra.imagen_url_1 || ''),
+        cloudinaryUrl(obra.imagen_url_2 || ''),
+        cloudinaryUrl(obra.imagen_url_3 || ''),
+        cloudinaryUrl(obra.imagen_url_4 || '')
     ].filter(url => !!url);
 
     function crearDotsHTML(index, total) {
@@ -270,10 +270,4 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
     });
 }
 
-// Función auxiliar para construir URL optimizada de Cloudinary
-function cloudinaryUrl(originalUrl, width, height) {
-    if (!originalUrl) return '';
-    const parts = originalUrl.split('/upload/');
-    if (parts.length !== 2) return originalUrl;
-    return `${parts[0]}/upload/w_${width},h_${height},c_limit,f_auto,q_auto:good/${parts[1]}`;
-}
+// (cloudinaryUrl ahora en utils.js)

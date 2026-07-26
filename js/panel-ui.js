@@ -6,7 +6,7 @@ import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
 import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
-import { decodeHTMLEntities, mostrarErrores, debugLog } from './utils.js';
+import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js';
 
 // ============================================
 // VARIABLES DE ESTADO (PANEL)
@@ -136,8 +136,8 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
                 document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
                 const imagenes = [
-                    obra.imagen_url, obra.imagen_url_1, obra.imagen_url_2,
-                    obra.imagen_url_3, obra.imagen_url_4
+                    cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
+                    cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
                 ];
                 document.querySelectorAll('.btn-eliminar-imagen').forEach(btn => btn.remove());
                 imagenes.forEach((url, index) => {
@@ -263,8 +263,8 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-id-personalizado').focus();
 
                 const imagenesDuplicar = [
-                    obra.imagen_url, obra.imagen_url_1, obra.imagen_url_2,
-                    obra.imagen_url_3, obra.imagen_url_4
+                    cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
+                    cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
                 ];
                 imagenesDuplicar.forEach((url, index) => {
                     if (url) aplicarPreviewImagen(index, url);

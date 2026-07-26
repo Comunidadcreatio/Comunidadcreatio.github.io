@@ -71,3 +71,19 @@ export const debugLog = {
     warn:  (...args) => { if (isDebug()) console.warn(...args); },
     error: (...args) => { if (isDebug()) console.error(...args); }
 };
+
+// ============================================
+// URL DE CLOUDINARY CON TRANSFORMACIONES (1080p, WebP, calidad optimizada)
+// ============================================
+/**
+ * Inserta parámetros de transformación en una URL de Cloudinary.
+ * @param {string} url - URL original de Cloudinary
+ * @param {number} width - Ancho deseado (default 1080)
+ * @returns {string} URL transformada
+ */
+export function cloudinaryUrl(url, width = 1080) {
+    if (!url) return '';
+    const parts = url.split('/upload/');
+    if (parts.length !== 2) return url;
+    return `${parts[0]}/upload/w_${width},c_limit,f_auto,q_auto:good/${parts[1]}`;
+}
