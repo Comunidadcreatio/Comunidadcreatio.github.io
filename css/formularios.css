@@ -1453,13 +1453,13 @@ form,
     padding: 6px 0 2px;
 }
 .ratio-btn {
-    width: 44px;
-    height: 44px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: 1.5px solid var(--color-gray-300);
     background: transparent;
     color: var(--color-gray-500);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
@@ -1471,15 +1471,17 @@ form,
 }
 .ratio-btn.active {
     background: var(--color-ink);
-    color: #fff;
+    color: var(--color-white);
     border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
 }
 [data-theme="dark"] .ratio-btn {
-    border-color: var(--color-border);
-    color: var(--color-gray-400);
+    border-color: #444;
+    color: #888;
 }
 [data-theme="dark"] .ratio-btn.active {
-    background: var(--color-ink);
-    color: #1a1a1a;
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
 }
