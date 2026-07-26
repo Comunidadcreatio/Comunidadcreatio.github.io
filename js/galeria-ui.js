@@ -615,6 +615,8 @@ export function showPanelSubView(view) {
     const panelCrear = document.getElementById('panel-crear');
     const panelMisCavents = document.getElementById('panel-mis-cavents');
 
+    console.log('[panel] showPanelSubView:', view, 'crear:', !!panelCrear, 'mis:', !!panelMisCavents);
+
     if (!panelCrear || !panelMisCavents) return;
 
     panelCrear.classList.add('hidden');
@@ -622,9 +624,13 @@ export function showPanelSubView(view) {
 
     if (view === 'crear') {
         panelCrear.classList.remove('hidden');
+        console.log('[panel] mostrar crear');
     } else if (view === 'mis-cavents') {
         panelMisCavents.classList.remove('hidden');
-        if (typeof _refrescarTablaFn === 'function') _refrescarTablaFn();
+        console.log('[panel] mostrar mis-cavents, refrescar:', typeof _refrescarTablaFn);
+        if (typeof _refrescarTablaFn === 'function') {
+            _refrescarTablaFn();
+        }
     }
 }
 
