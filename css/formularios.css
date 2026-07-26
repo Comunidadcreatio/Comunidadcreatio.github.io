@@ -113,6 +113,31 @@
     font-size: 12px;
 }
 
+/* Input de etiquetas sutil (bajo la barra de progreso) */
+.input-etiquetas-subtle {
+    width: 100%;
+    padding: 6px 0;
+    margin-top: 8px;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.input-etiquetas-subtle::placeholder {
+    color: var(--color-gray-400);
+    font-style: italic;
+}
+
+.input-etiquetas-subtle:focus {
+    border-bottom-color: var(--color-ink);
+}
+
 /* ==============================================
    PROGRESS INDICATOR DEL FORMULARIO (base)
    ============================================== */
@@ -1190,6 +1215,19 @@ form,
 
 [data-theme="dark"] #obra-progress-bar .form-progress-text {
     color: var(--color-ink);
+}
+
+[data-theme="dark"] .input-etiquetas-subtle {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-border);
+}
+
+[data-theme="dark"] .input-etiquetas-subtle:focus {
+    border-bottom-color: var(--color-ink);
+}
+
+[data-theme="dark"] .input-etiquetas-subtle::placeholder {
+    color: var(--color-gray-500);
 }
 
 [data-theme="dark"] .step-indicator {
