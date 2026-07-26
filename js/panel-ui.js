@@ -591,6 +591,66 @@ export function setupFormAccordions() {
         });
         updateFormProgress();
     }
+
+    // === Navegación de pasos ===
+    setupStepNavigation();
+}
+
+function setupStepNavigation() {
+    const sections = document.querySelectorAll('.form-accordion-section');
+    const prevBtn = document.getElementById('obra-step-prev');
+    const nextBtn = document.getElementById('obra-step-next');
+    const indicator = document.getElementById('obra-step-indicator');
+    const guardarBtn = document.getElementById('btn-guardar');
+    const totalSteps = sections.length;
+
+    if (!prevBtn || !nextBtn || !indicator || totalSteps === 0) return;
+
+    let currentStep = 0;
+
+    function showStep(index) {
+        sections.forEach((s, i) => {
+            const content = s.querySelector('.accordion-content');
+            const header = s.querySelector('.accordion-header');
+            if (i === index) {
+                content.classList.remove('hidden');
+                header.setAttribute('aria-expanded', 'true');
+                header.querySelector('.accordion-icon').textContent = '▼';
+            } else {
+                content.classList.add('hidden');
+                header.setAttribute('aria-expanded', 'false');
+                header.querySelector('.accordion-icon').textContent = '▶';
+            }
+        });
+
+        indicator.textContent = `Paso ${index + 1} de ${totalSteps}`;
+        prevBtn.disabled = index === 0;
+        
+        if (index === totalSteps - 1) {
+            nextBtn.textContent = 'Finalizar';
+            guardarBtn?.classList.remove('hidden');
+        } else {
+            nextBtn.textContent = 'Siguiente';
+            guardarBtn?.classList.add('hidden');
+        }
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps - 1) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
+
+    // Iniciar en paso 1
+    showStep(0);
 }
 
 export function updateFormProgress() {

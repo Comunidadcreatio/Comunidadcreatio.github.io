@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=d3e803c396">
+    <link rel="stylesheet" href="css/style.css?v=e40f17684f">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -618,6 +618,16 @@
                     </div>
 
                     <input type="hidden" id="input-id-edicion">
+
+                    <!-- Navegación de pasos -->
+                    <div class="step-navigation" id="obra-step-nav">
+                        <div class="step-indicator" id="obra-step-indicator">Paso 1 de 5</div>
+                        <div class="step-buttons">
+                            <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled>← Anterior</button>
+                            <button type="button" class="nav-btn next-btn" id="obra-step-next">Siguiente</button>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" id="btn-guardar">Guardar Obra</button>
                         <button type="button" id="btn-limpiar-campos" class="hidden">🗑️ Limpiar Campos</button>

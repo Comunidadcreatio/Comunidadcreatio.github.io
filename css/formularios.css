@@ -1205,3 +1205,83 @@ form,
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
 }
+
+/* ==============================================
+   NAVEGACIÓN DE PASOS (CREAR CAVENT)
+   ============================================== */
+#obra-step-nav {
+    padding: 16px 0 8px;
+    border-top: 1px solid var(--color-gray-200);
+    margin-top: 12px;
+}
+
+.step-indicator {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    margin-bottom: 12px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.step-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.step-buttons .nav-btn {
+    padding: 10px 22px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Nunito', sans-serif;
+    border: 1.5px solid var(--color-gray-300);
+    background: var(--color-white);
+    color: var(--color-ink);
+}
+
+.step-buttons .nav-btn:hover:not(:disabled) {
+    background: var(--color-gray-100);
+    border-color: var(--color-ink);
+}
+
+.step-buttons .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.step-buttons .nav-btn.next-btn {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+}
+
+.step-buttons .nav-btn.next-btn:hover:not(:disabled) {
+    background: var(--color-gray-800);
+}
+
+[data-theme="dark"] .step-buttons .nav-btn {
+    background: var(--color-gray-100);
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .step-buttons .nav-btn.next-btn {
+    background: var(--color-ink);
+    color: #1a1a1a;
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] .step-buttons .nav-btn:hover:not(:disabled) {
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-step-nav {
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .step-indicator {
+    color: var(--color-gray-400);
+}
