@@ -140,19 +140,32 @@
     left: 0;
     width: 100%;
     z-index: 997;
-    padding: 8px 16px 10px;
+    padding: 10px 16px;
     background: var(--color-white);
-    border-top: 1px solid var(--color-gray-200);
     box-sizing: border-box;
 }
 
-#obra-progress-bar .form-progress-bar {
-    width: 40%;
-    margin: 0 auto 4px;
+.form-progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 60%;
+    margin: 0 auto;
 }
 
-#obra-progress-bar .form-progress-text {
-    font-size: 12px;
+#obra-progress-bar .form-progress-bar {
+    flex: 1;
+    margin: 0;
+}
+
+#obra-progress-bar .form-progress-text,
+#obra-progress-bar #form-progress-percentage {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* ==============================================
@@ -1230,7 +1243,7 @@ form,
     border-color: var(--color-border);
 }
 
-[data-theme="dark"] #obra-progress-bar .form-progress-text {
+[data-theme="dark"] #obra-progress-bar .form-progress-row #form-progress-percentage {
     color: var(--color-ink);
 }
 
