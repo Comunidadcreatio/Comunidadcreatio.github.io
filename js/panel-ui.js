@@ -645,10 +645,12 @@ function setupStepNavigation() {
             const content = s.querySelector('.accordion-content');
             const header = s.querySelector('.accordion-header');
             if (i === index) {
+                s.classList.remove('hidden');
                 content.classList.remove('hidden');
                 header.setAttribute('aria-expanded', 'true');
                 header.querySelector('.accordion-icon').textContent = '▼';
             } else {
+                s.classList.add('hidden');
                 content.classList.add('hidden');
                 header.setAttribute('aria-expanded', 'false');
                 header.querySelector('.accordion-icon').textContent = '▶';
