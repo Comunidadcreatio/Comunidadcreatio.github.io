@@ -633,6 +633,12 @@ function setupStepNavigation() {
         }
         prevBtn.disabled = index === 0;
         
+        // Etiquetas solo visibles en Paso 1 (Imágenes)
+        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
+        if (etiquetasBar) {
+            etiquetasBar.classList.toggle('hidden', index !== 0);
+        }
+
         if (index === totalSteps - 1) {
             nextBtn.textContent = '✓';
             guardarBtn?.classList.remove('hidden');
