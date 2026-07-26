@@ -104,6 +104,102 @@ function paisChangeHandler() {
     }
 }
 
+// Convierte un <select> en dropdown custom (transparente, fixed, blur)
+function initCustomSelect(selectEl, placeholder) {
+    if (!selectEl || selectEl.dataset.customReady === '1') return;
+    selectEl.dataset.customReady = '1';
+    selectEl.style.display = 'none';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    selectEl.parentNode.insertBefore(wrapper, selectEl);
+    wrapper.appendChild(selectEl);
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.textContent = placeholder || 'Seleccionar';
+    wrapper.appendChild(trigger);
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'custom-select-dropdown';
+    wrapper.appendChild(dropdown);
+
+    function buildOptions() {
+        dropdown.innerHTML = '';
+        const groups = {};
+        Array.from(selectEl.querySelectorAll('option')).forEach(opt => {
+            if (opt.disabled && !opt.value) return; // skip placeholder
+            const item = document.createElement('div');
+            item.className = 'custom-select-option';
+            item.textContent = opt.textContent;
+            item.dataset.value = opt.value;
+            item.addEventListener('click', () => {
+                selectEl.value = opt.value;
+                trigger.textContent = opt.textContent;
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                dropdown.classList.remove('open');
+            });
+            dropdown.appendChild(item);
+        });
+    }
+
+    function positionDropdown() {
+        const rect = trigger.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = Math.min(rect.left, window.innerWidth - 380) + 'px';
+        dropdown.style.width = rect.width + 'px';
+    }
+
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        if (!isOpen) {
+            buildOptions();
+            positionDropdown();
+        }
+        dropdown.classList.toggle('open');
+    });
+
+    window.addEventListener('scroll', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select')) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    // Sync trigger text if select changes programmatically
+    selectEl.addEventListener('change', () => {
+        const selected = selectEl.selectedOptions[0];
+        if (selected) trigger.textContent = selected.textContent;
+    });
+}
+
+function setupAllCustomSelects() {
+    // País
+    initCustomSelect(document.getElementById('reg-pais'), 'Selecciona tu país');
+    // Fecha
+    initCustomSelect(document.getElementById('reg-dia'), 'Día');
+    initCustomSelect(document.getElementById('reg-mes'), 'Mes');
+    initCustomSelect(document.getElementById('reg-ano'), 'Año');
+    // Género
+    initCustomSelect(document.getElementById('reg-genero'), 'Selecciona Género');
+}
+
+// Ejecutar al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAllCustomSelects);
+} else {
+    setupAllCustomSelects();
+}
+
 // Dropdown toggle con posicionamiento fixed
 document.addEventListener('DOMContentLoaded', () => {
     const trigger = document.getElementById('ciudad-trigger');
