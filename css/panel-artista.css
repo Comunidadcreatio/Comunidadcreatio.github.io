@@ -1,6 +1,103 @@
 /* css/panel-artista.css - Estilos del panel del artista */
 
 /* ==============================================
+   NAVEGACIÓN DEL PANEL (Crear / Mis Cavents)
+   ============================================== */
+#panel-nav {
+    text-align: center;
+    padding: 40px 24px;
+}
+
+#panel-nav h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-bottom: 24px;
+}
+
+.panel-nav-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.panel-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 2px solid var(--color-gray-200);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: var(--shadow-md);
+}
+
+.panel-nav-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-ink);
+}
+
+.panel-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.panel-nav-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.panel-nav-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-ink);
+}
+
+.panel-back-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    cursor: pointer;
+    padding: 4px 0 12px;
+    font-family: 'Nunito', sans-serif;
+    transition: color 0.2s;
+}
+
+.panel-back-btn:hover {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .panel-nav-btn {
+    background: var(--color-gray-100);
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .panel-nav-btn:hover {
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] .panel-nav-icon,
+[data-theme="dark"] .panel-nav-label {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .panel-back-btn {
+    color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .panel-back-btn:hover {
+    color: var(--color-ink);
+}
+
+/* ==============================================
    CONTENEDOR PRINCIPAL DEL PANEL
    ============================================== */
 #panel-artista {

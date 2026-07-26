@@ -18,7 +18,8 @@ import {
 } from './perfil.js';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
-    toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar
+    toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
+    showPanelSubView, setupPanelNav
 } from './galeria-ui.js?v=20260726h';
 import {
     currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
@@ -399,6 +400,7 @@ function setupEvents() {
 
     // ----- Modo oscuro -----
     setupDarkModeToggle();
+    setupPanelNav();
 
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');

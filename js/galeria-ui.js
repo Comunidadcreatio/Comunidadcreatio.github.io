@@ -585,6 +585,46 @@ export function togglePanel() {
     }
 }
 
+// Panel sub-navegación: nav ↔ crear ↔ mis-cavents
+export function showPanelSubView(view) {
+    const panelNav = document.getElementById('panel-nav');
+    const panelCrear = document.getElementById('panel-crear');
+    const panelMisCavents = document.getElementById('panel-mis-cavents');
+
+    if (!panelNav || !panelCrear || !panelMisCavents) return;
+
+    panelNav.classList.add('hidden');
+    panelCrear.classList.add('hidden');
+    panelMisCavents.classList.add('hidden');
+
+    if (view === 'nav') {
+        panelNav.classList.remove('hidden');
+    } else if (view === 'crear') {
+        panelCrear.classList.remove('hidden');
+    } else if (view === 'mis-cavents') {
+        panelMisCavents.classList.remove('hidden');
+        // Refrescar tabla al mostrar
+        if (typeof _refrescarTablaFn === 'function') _refrescarTablaFn();
+    }
+}
+
+export function setupPanelNav() {
+    // Botones principales
+    document.querySelectorAll('.panel-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            showPanelSubView(target);
+        });
+    });
+
+    // Botones volver
+    document.querySelectorAll('.panel-back-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            showPanelSubView('nav');
+        });
+    });
+}
+
 export function toggleMiCuenta() {
     if (isTransitioning) return;
 
