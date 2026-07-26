@@ -94,7 +94,7 @@
    ============================================== */
 #obra-etiquetas-bar {
     position: fixed;
-    bottom: calc(50px + env(safe-area-inset-bottom, 0px) + 42px);
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px) + 46px);
     left: 0;
     width: 100%;
     z-index: 997;
@@ -136,7 +136,7 @@
    ============================================== */
 #obra-progress-bar {
     position: fixed;
-    bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px) + 4px);
     left: 0;
     width: 100%;
     z-index: 997;
