@@ -1317,6 +1317,109 @@ legend {
 }
 
 /* ==============================================
+   RESPONSIVE - PANTALLAS PEQUEÑAS (≤380px)
+   Tecno Pop 7, Xiaomi Redmi A1, etc.
+   ============================================== */
+@media (max-width: 380px) {
+    .auth-layout {
+        padding: 12px 8px;
+    }
+
+    .auth-left {
+        padding: 12px 8px 4px;
+        margin-top: 30px;
+    }
+
+    .auth-tagline {
+        font-size: 44px;
+        margin-bottom: 16px;
+    }
+
+    .auth-subtitle {
+        font-size: 17px;
+        max-width: 100%;
+    }
+
+    .auth-section {
+        padding: 16px 12px;
+    }
+
+    .auth-section .reg-step-title {
+        font-size: 22px;
+    }
+
+    .reg-step-subtitle {
+        font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select,
+    #login-form input,
+    #registro-form input {
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+
+    button[type="submit"],
+    .nav-btn,
+    .secondary-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .auth-slide-label {
+        right: 12px;
+    }
+
+    .auth-slide-counter-nav {
+        left: 12px;
+    }
+
+    .auth-slide-name {
+        font-size: 12px;
+    }
+
+    .auth-slide-municipio {
+        font-size: 10px;
+    }
+
+    .auth-slide-counter {
+        font-size: 11px;
+    }
+
+    .auth-slide-prev,
+    .auth-slide-next {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .auth-slide-nav {
+        gap: 4px;
+    }
+
+    .auth-slide-bandera {
+        width: 28px;
+        height: 16px;
+    }
+
+    .custom-select-trigger {
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+
+    .custom-select-dropdown {
+        max-width: calc(100vw - 24px);
+        max-height: 200px;
+    }
+
+    .notification-container {
+        max-width: calc(100vw - 24px);
+        right: 12px;
+    }
+}
+
+/* ==============================================
    MODO OSCURO
    ============================================== */
 [data-theme="dark"] body {

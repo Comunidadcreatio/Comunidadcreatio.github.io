@@ -17,7 +17,7 @@
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="stylesheet" href="css/style.css?v=e98cf9d397">
-    <link rel="stylesheet" href="css/auth.css?v=d9cca11f81">
+    <link rel="stylesheet" href="css/auth.css?v=23bad9f00c">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -565,7 +565,7 @@
 
                     if (data.version !== localVer) {
                         var bar = document.createElement('div');
-                        bar.style.cssText = 'position:fixed;top:115px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+                        bar.style.cssText = 'position:fixed;top:115px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:calc(100vw - 32px);';
                         bar.innerHTML = 'v' + data.version + ' disponible <button id="btn-refresh-auth" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
                         document.body.appendChild(bar);
 
