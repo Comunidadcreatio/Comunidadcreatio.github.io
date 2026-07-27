@@ -1621,7 +1621,7 @@ form,
 }
 
 .form-block .form-row-3 {
-    gap: 1px;
+    gap: 0;
     padding-top: 11px;
     margin-bottom: 4px;
 }
