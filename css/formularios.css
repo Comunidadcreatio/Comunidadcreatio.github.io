@@ -67,6 +67,7 @@
     min-width: auto !important;
     border-radius: 16px !important;
     padding: 0 16px !important;
+    margin: 0 !important;
     font-size: 10px !important;
     font-weight: 700;
     white-space: nowrap;
@@ -75,8 +76,8 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: 'Nunito', sans-serif;
-    margin-left: 6px;
     box-sizing: border-box !important;
+    align-self: center;
 }
 
 #obra-step-bar .crear-btn:hover {
