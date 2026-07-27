@@ -7,13 +7,12 @@
 @import url('galeria-publica.css?v=c04732c155');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=f1b0b32130');
+/* (panel-artista.css ahora vía <link> en index.html) */
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=ab0b7c97d0');
 
-/* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=e6a292fec1');
+/* 5. Formularios y panel — ahora vía <link> en index.html para cache-busting */
 
 .hidden {
     display: none !important;
