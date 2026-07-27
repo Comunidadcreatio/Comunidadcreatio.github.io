@@ -742,7 +742,7 @@ function setupStepNavigation() {
         if (!stepBar || !carrusel) return;
         const stepBarBottom = stepBar.getBoundingClientRect().bottom;
         carrusel.style.position = 'fixed';
-        carrusel.style.top = stepBarBottom + 'px';
+        carrusel.style.top = (stepBarBottom - 1) + 'px';
         carrusel.style.left = '0';
         carrusel.style.width = '100%';
         carrusel.style.zIndex = '1';

@@ -1823,5 +1823,6 @@ form,
         width: calc(100% - 32px);
         border-radius: 12px;
         box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+        padding-top: 16px;
     }
 }
