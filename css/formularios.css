@@ -1573,3 +1573,26 @@ form,
 [data-theme="dark"] #obra-form .form-group label {
     color: var(--color-gray-400);
 }
+
+/* ==============================================
+   CARRUSEL MOBILE: controles compactos
+   (al final para ganar por cascada)
+   ============================================== */
+@media (max-width: 768px) {
+    .carrusel-ratio-toggle {
+        gap: 6px;
+        padding: 4px 0 0;
+    }
+    .ratio-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+    .carrusel-dots {
+        padding: 4px 0;
+    }
+    .carrusel-dot {
+        width: 5px;
+        height: 5px;
+    }
+}
