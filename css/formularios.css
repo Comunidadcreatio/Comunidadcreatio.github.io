@@ -1647,6 +1647,13 @@ form,
     padding-bottom: 2px;
 }
 
+.form-block .form-group input:focus,
+.form-block .form-group select:focus,
+.form-block .form-group textarea:focus {
+    border-bottom-color: var(--color-ink) !important;
+    border-bottom-width: 2px !important;
+}
+
 .form-block .form-group label {
     margin-bottom: 0 !important;
 }
