@@ -323,8 +323,7 @@
                             
                             <!-- Título (full width) -->
                             <div class="form-group">
-                                <label for="input-titulo">Título</label>
-                                <span class="field-hint">Nombre o título de la obra</span>
+                                <label for="input-titulo">Título <span class="field-hint">Nombre o título de la obra</span></label>
                                 <input type="text" id="input-titulo" placeholder="Título de la obra" required aria-required="true" data-required="true">
                             </div>
 
@@ -333,34 +332,28 @@
                                 <div class="form-row form-row-3 form-row-tight">
                                     <div class="form-group">
                                         <label for="input-artista">Artista</label>
-                                        <span class="field-hint">Nombre del artista</span>
                                         <input type="text" id="input-artista" placeholder="Artista" readonly aria-readonly="true">
                                     </div>
                                     <div class="form-group">
                                         <label for="input-id-personalizado">ID</label>
-                                        <span class="field-hint">Identificador único</span>
                                         <input type="text" id="input-id-personalizado" placeholder="ej: 1440001" required aria-required="true" data-required="true">
                                     </div>
                                     <div class="form-group">
                                         <label for="input-ano">Año</label>
-                                        <span class="field-hint">Año de creación</span>
                                         <input type="number" id="input-ano" placeholder="Año" required aria-required="true" data-required="true">
                                     </div>
                                 </div>
                                 <div class="form-row form-row-3">
                                     <div class="form-group">
                                         <label for="input-precio">Precio</label>
-                                        <span class="field-hint">Precio en USD</span>
                                         <input type="number" id="input-precio" placeholder="Precio" required aria-required="true" min="0" step="0.01" data-required="true">
                                     </div>
                                     <div class="form-group">
                                         <label for="input-ancho">Ancho (cm)</label>
-                                        <span class="field-hint">Ancho en centímetros</span>
                                         <input type="number" id="input-ancho" placeholder="Ancho" required data-required="true">
                                     </div>
                                     <div class="form-group">
                                         <label for="input-alto">Alto (cm)</label>
-                                        <span class="field-hint">Alto en centímetros</span>
                                         <input type="number" id="input-alto" placeholder="Alto" required data-required="true">
                                     </div>
                                 </div>
@@ -369,7 +362,6 @@
                             <!-- Descripción Artística -->
                             <div class="form-group">
                                 <label for="input-descripcion-artistica">Descripción Artística</label>
-                                <span class="field-hint">Describe tu obra, su historia e inspiración</span>
                                 <textarea id="input-descripcion-artistica" placeholder="Describe tu obra, su historia, inspiración..." required data-required="true"></textarea>
                             </div>
 
@@ -381,8 +373,7 @@
                         <div class="form-section-content">
                             <!-- 6. Status -->
                             <div class="form-group">
-                                <label for="input-status">Status</label>
-                                <span class="field-hint">Visibilidad en la galería</span>
+                                <label for="input-status">Status <span class="field-hint">Visibilidad en la galería</span></label>
                                 <select id="input-status" required data-required="true">
                                     <option value="" disabled selected>Selecciona Status</option>
                                     <option value="Activo (Visible en Galería)">Activo (Visible en Galería)</option>
@@ -392,8 +383,7 @@
 
                             <!-- Estado de la Obra -->
                             <div class="form-group">
-                                <label for="input-estado-obra">Estado</label>
-                                <span class="field-hint">Disponibilidad actual de la obra</span>
+                                <label for="input-estado-obra">Estado <span class="field-hint">Disponibilidad actual de la obra</span></label>
                                 <select id="input-estado-obra" required data-required="true">
                                     <option value="" disabled selected>Selecciona Estado</option>
                                     <option value="Disponible (en venta)">Disponible (en venta)</option>
@@ -413,8 +403,7 @@
                         <div class="form-section-content">
                             <!-- Técnica -->
                             <div class="form-group">
-                                <label for="input-descripcion-tecnica">Técnica</label>
-                                <span class="field-hint">Método o material usado para crear la obra</span>
+                                <label for="input-descripcion-tecnica">Técnica <span class="field-hint">Método o material usado</span></label>
                                 <select id="input-descripcion-tecnica" required aria-required="true" data-required="true">
                                     <option value="" disabled selected>Selecciona Técnica</option>
                                 <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
@@ -451,8 +440,7 @@
 
                             <!-- Soporte -->
                             <div class="form-group">
-                                <label for="input-soporte">Soporte</label>
-                                <span class="field-hint">Superficie o material donde está creada la obra</span>
+                                <label for="input-soporte">Soporte <span class="field-hint">Superficie o material</span></label>
                                 <select id="input-soporte" required aria-required="true" data-required="true">
                                     <option value="" disabled selected>Selecciona Soporte</option>
                                 <option value="Lienzo (algodón, lino, mezcla)">Lienzo (algodón, lino, mezcla)</option>
@@ -473,8 +461,7 @@
 
                             <!-- Marcos -->
                             <div class="form-group">
-                                <label for="input-marcos">Marcos</label>
-                                <span class="field-hint">Tipo de enmarcado de la obra</span>
+                                <label for="input-marcos">Marcos <span class="field-hint">Tipo de enmarcado</span></label>
                                 <select id="input-marcos" required data-required="true">
                                     <option value="" disabled selected>Selecciona Marcos</option>
                                     <option value="Ya enmarcada (listo para colgar)">Ya enmarcada (listo para colgar)</option>
@@ -492,8 +479,7 @@
                         <div class="form-section-content">
                             <!-- Procedencia -->
                             <div class="form-group">
-                                <label for="input-procedencia">Procedencia</label>
-                                <span class="field-hint">Historial de propiedad de la obra</span>
+                                <label for="input-procedencia">Procedencia <span class="field-hint">Historial de propiedad</span></label>
                                 <select id="input-procedencia" required data-required="true">
                             <option value="" disabled selected>Selecciona Procedencia</option>
                         <option value="Colección privada">Colección privada</option>
@@ -509,8 +495,7 @@
 
                             <!-- Certificado -->
                             <div class="form-group">
-                                <label for="input-certificado">Certificado</label>
-                                <span class="field-hint">Estado del certificado de autenticidad</span>
+                                <label for="input-certificado">Certificado <span class="field-hint">Estado de autenticidad</span></label>
                                 <select id="input-certificado" required data-required="true">
                                     <option value="" disabled selected>Selecciona Certificado</option>
                                     <option value="Sí (autenticado)">Sí (autenticado)</option>
@@ -523,8 +508,7 @@
 
                             <!-- Firma -->
                             <div class="form-group">
-                                <label for="input-firma">Firma</label>
-                                <span class="field-hint">Tipo de firma del artista en la obra</span>
+                                <label for="input-firma">Firma <span class="field-hint">Tipo de firma del artista</span></label>
                                 <select id="input-firma" required data-required="true">
                                     <option value="" disabled selected>Selecciona Firma</option>
                                     <option value="Firmada al frente (en la obra)">Firmada al frente (en la obra)</option>
@@ -542,8 +526,7 @@
 
                             <!-- Conservación -->
                             <div class="form-group">
-                                <label for="input-conservacion">Conservación</label>
-                                <span class="field-hint">Estado actual de conservación de la obra</span>
+                                <label for="input-conservacion">Conservación <span class="field-hint">Estado de conservación</span></label>
                                 <select id="input-conservacion" required data-required="true">
                                     <option value="" disabled selected>Selecciona Conservación</option>
                                     <option value="Excelente (como nuevo)">Excelente (como nuevo)</option>
