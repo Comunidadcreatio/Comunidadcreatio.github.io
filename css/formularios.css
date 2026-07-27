@@ -1545,6 +1545,21 @@ form,
     appearance: none;
 }
 
+/* Opciones de selects con estilo tipo ciudad */
+#obra-form .form-group select option {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 14px;
+    background: var(--color-white);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] #obra-form .form-group select option {
+    background: #1a1a1a;
+    color: var(--color-ink);
+}
+
 #obra-form .form-group label {
     font-size: 11px;
     font-weight: 700;
