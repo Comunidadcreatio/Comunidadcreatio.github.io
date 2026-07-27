@@ -1620,8 +1620,8 @@ form,
 }
 
 .form-block .form-row-3 {
-    border-bottom: 1px solid var(--color-gray-300);
-    padding: 11px 0 0 0;
+    gap: 1px;
+    padding-top: 11px;
     margin-bottom: 4px;
 }
 
@@ -1630,7 +1630,6 @@ form,
 }
 
 .form-block .form-row-3:last-child {
-    border-bottom: 1px solid var(--color-gray-300);
     margin-bottom: 0;
 }
 
@@ -1638,11 +1637,11 @@ form,
     margin-bottom: 0 !important;
 }
 
-/* Ocultar underline individual de cada input dentro del bloque */
+/* Restaurar underline individual pero sin gap entre ellos */
 .form-block .form-group input,
 .form-block .form-group select,
 .form-block .form-group textarea {
-    border-bottom: none !important;
+    border-bottom: 1px solid var(--color-gray-300) !important;
     margin-bottom: 0 !important;
     padding-bottom: 2px;
 }
