@@ -1178,21 +1178,7 @@ form,
     color: var(--color-ink);
 }
 
-[data-theme="dark"] #formulario-obra input[type="text"],
-[data-theme="dark"] #formulario-obra input[type="number"],
-[data-theme="dark"] #formulario-obra input[type="email"],
-[data-theme="dark"] #formulario-obra input[type="password"],
-[data-theme="dark"] #formulario-obra select,
-[data-theme="dark"] #formulario-obra textarea {
-    background-color: #121212;
-    border-color: #e5e5e5;
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] #formulario-obra input::placeholder,
-[data-theme="dark"] #formulario-obra textarea::placeholder {
-    color: var(--color-gray-400);
-}
+/* (estilos dark de inputs ahora en ESTILO MODERNO al final) */
 
 [data-theme="dark"] #formulario-obra button {
     color: var(--color-ink);
@@ -1553,6 +1539,8 @@ form,
 [data-theme="dark"] #obra-form .form-group textarea {
     color: var(--color-ink);
     border-bottom-color: #444;
+    background: transparent;
+    background-color: transparent;
 }
 
 [data-theme="dark"] #obra-form .form-group input:focus,
