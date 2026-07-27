@@ -1632,6 +1632,13 @@ form,
     margin-bottom: 0 !important;
 }
 
+/* Ocultar underline individual de cada input dentro del bloque */
+.form-block .form-group input,
+.form-block .form-group select,
+.form-block .form-group textarea {
+    border-bottom: none !important;
+}
+
 /* Artista readonly: línea sólida, no dashed */
 #obra-form .form-group input:read-only {
     color: var(--color-gray-500);
