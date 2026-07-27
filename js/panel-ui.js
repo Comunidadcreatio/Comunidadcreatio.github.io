@@ -710,63 +710,69 @@ function setupStepNavigation() {
 
     if (!prevBtn || !nextBtn || !indicator || totalSteps === 0) return;
 
-    // Posicionar la barra de pasos justo debajo del header (calculado en vivo)
-    function positionStepBar() {
+    // Posicionar barra de progreso justo debajo del header (ARRIBA)
+    function positionProgressBar() {
         const mainHeader = document.getElementById('main-header');
-        if (!mainHeader || !stepBar) return;
+        const progressBar = document.getElementById('obra-progress-bar');
+        if (!mainHeader || !progressBar) return;
         const headerBottom = mainHeader.getBoundingClientRect().bottom;
-        stepBar.style.top = headerBottom + 'px';
+        progressBar.style.top = headerBottom + 'px';
     }
 
-    // Posicionar barras inferiores justo encima de la barra principal
-    function positionBottomBars() {
+    // Posicionar barra de pasos justo encima del nav (ABAJO)
+    function positionStepBar() {
         const togglePanel = document.getElementById('toggle-panel');
-        const progressBar = document.getElementById('obra-progress-bar');
-        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
-        if (!togglePanel) return;
+        if (!togglePanel || !stepBar) return;
         const panelTop = togglePanel.getBoundingClientRect().top;
         const viewH = window.innerHeight;
-        const fromBottom = viewH - panelTop; // px desde el bottom del viewport
-        if (progressBar) {
-            progressBar.style.bottom = fromBottom + 'px';
-        }
-        if (etiquetasBar) {
-            etiquetasBar.style.bottom = (fromBottom + 25) + 'px';
-        }
+        const fromBottom = viewH - panelTop;
+        stepBar.style.bottom = fromBottom + 'px';
     }
 
-    // Posicionar el carrusel fijo debajo de la barra de pasos
+    // Posicionar etiquetas encima de la barra de pasos
+    function positionEtiquetasBar() {
+        const togglePanel = document.getElementById('toggle-panel');
+        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
+        if (!togglePanel || !etiquetasBar) return;
+        const panelTop = togglePanel.getBoundingClientRect().top;
+        const viewH = window.innerHeight;
+        const fromBottom = viewH - panelTop;
+        const stepBarH = stepBar ? stepBar.offsetHeight : 52;
+        etiquetasBar.style.bottom = (fromBottom + stepBarH + 0) + 'px';
+    }
+
+    // Posicionar el carrusel fijo debajo de la barra de progreso
     function positionCarrusel() {
-        const stepBar = document.getElementById('obra-step-bar');
+        const progressBar = document.getElementById('obra-progress-bar');
         const carrusel = document.querySelector('.imagen-carrusel');
-        if (!stepBar || !carrusel) return;
-        const stepBarBottom = stepBar.getBoundingClientRect().bottom;
+        if (!progressBar || !carrusel) return;
+        const progressBottom = progressBar.getBoundingClientRect().bottom;
         carrusel.style.position = 'fixed';
-        carrusel.style.top = (stepBarBottom - 1) + 'px';
+        carrusel.style.top = (progressBottom - 1) + 'px';
         carrusel.style.left = '0';
         carrusel.style.width = '100%';
         carrusel.style.zIndex = '1';
     }
 
-    // Posicionar el formulario fijo debajo de la barra de pasos (pasos 2-5)
+    // Posicionar el formulario fijo debajo de la barra de progreso (pasos 2-5)
     function positionFormulario() {
-        const stepBar = document.getElementById('obra-step-bar');
+        const progressBar = document.getElementById('obra-progress-bar');
         const formulario = document.getElementById('formulario-obra');
-        if (!stepBar || !formulario) return;
-        const stepBarBottom = stepBar.getBoundingClientRect().bottom;
-        formulario.style.top = stepBarBottom + 'px';
+        if (!progressBar || !formulario) return;
+        const progressBottom = progressBar.getBoundingClientRect().bottom;
+        formulario.style.top = progressBottom + 'px';
     }
 
-    positionStepBar();
-    positionBottomBars();
-    positionCarrusel();
-    positionFormulario();
-    window.addEventListener('resize', () => {
+    function positionAll() {
+        positionProgressBar();
         positionStepBar();
-        positionBottomBars();
+        positionEtiquetasBar();
         positionCarrusel();
         positionFormulario();
-    });
+    }
+
+    positionAll();
+    window.addEventListener('resize', positionAll);
 
     let currentStep = 0;
 
@@ -802,7 +808,7 @@ function setupStepNavigation() {
         const etiquetasBar = document.getElementById('obra-etiquetas-bar');
         if (etiquetasBar) {
             etiquetasBar.classList.toggle('hidden', index !== 0);
-            positionBottomBars(); // recalcular: progress bar baja si etiquetas se oculta
+            positionEtiquetasBar(); // recalcular si etiquetas se oculta
         }
 
         if (index === totalSteps - 1) {
@@ -836,8 +842,9 @@ function setupStepNavigation() {
     if (panelCrear) {
         const observer = new MutationObserver(() => {
             if (!panelCrear.classList.contains('hidden')) {
+                positionProgressBar();
                 positionStepBar();
-                positionBottomBars();
+                positionEtiquetasBar();
                 positionCarrusel();
                 positionFormulario();
                 showStep(currentStep);

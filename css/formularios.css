@@ -1,11 +1,11 @@
 /* css/formularios.css - Estilos de todos los formularios */
 
 /* ==============================================
-   BARRA SUPERIOR FIJA: PASOS + NAVEGACIÓN < >
+   BARRA INFERIOR FIJA: PASOS + NAVEGACIÓN < >
    ============================================== */
 #obra-step-bar {
     position: fixed;
-    top: calc(64px + var(--status-bar-height, 24px) - 1px);
+    bottom: 0; /* JS lo posiciona en vivo */
     left: 0;
     width: 100%;
     z-index: 999;
@@ -14,7 +14,7 @@
     justify-content: space-between;
     padding: 8px 16px;
     background: var(--color-white);
-    border-bottom: 1px solid var(--color-gray-200);
+    border-top: 1px solid var(--color-gray-200);
     box-sizing: border-box;
     gap: 12px;
 }
@@ -76,19 +76,6 @@
     cursor: not-allowed;
 }
 
-/* Responsive: misma altura que el header en cada breakpoint */
-@media (max-width: 768px) {
-    #obra-step-bar {
-        top: calc(50px + var(--status-bar-height, 24px) - 1px);
-    }
-}
-
-@media (max-width: 480px) {
-    #obra-step-bar {
-        top: calc(48px + var(--status-bar-height, 24px) - 1px);
-    }
-}
-
 /* ==============================================
    BARRA INFERIOR FIJA: INPUT DE ETIQUETAS
    ============================================== */
@@ -138,14 +125,14 @@
 }
 
 /* ==============================================
-   BARRA INFERIOR FIJA: PROGRESO DE COMPLETADO
+   BARRA SUPERIOR FIJA: PROGRESO DE COMPLETADO
    ============================================== */
 #obra-progress-bar {
     position: fixed;
-    bottom: 0; /* JS lo posiciona en vivo */
+    top: 0; /* JS lo posiciona en vivo */
     left: 0;
     width: 100%;
-    z-index: 997;
+    z-index: 998;
     height: 36px;
     display: flex;
     align-items: center;
@@ -153,7 +140,7 @@
     padding: 0 16px;
     background: var(--color-white);
     border: none;
-    border-top: none;
+    border-bottom: 1px solid var(--color-gray-200);
     box-sizing: border-box;
 }
 
