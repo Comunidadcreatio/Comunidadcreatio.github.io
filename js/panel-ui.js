@@ -617,7 +617,7 @@ function setupStepNavigation() {
             progressBar.style.bottom = fromBottom + 'px';
         }
         if (etiquetasBar) {
-            etiquetasBar.style.bottom = (fromBottom + 33) + 'px';
+            etiquetasBar.style.bottom = (fromBottom + 29) + 'px';
         }
     }
 
