@@ -53,6 +53,21 @@
     cursor: not-allowed;
 }
 
+#obra-step-bar .crear-btn {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+    width: auto;
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#obra-step-bar .crear-btn:hover {
+    background: var(--color-gray-800);
+}
+
 /* ==============================================
    BARRA INFERIOR FIJA: INPUT DE ETIQUETAS
    ============================================== */
@@ -1264,6 +1279,12 @@ form,
 }
 
 [data-theme="dark"] #obra-step-bar .nav-btn:hover:not(:disabled) {
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-step-bar .crear-btn {
+    background: var(--color-ink);
+    color: #1a1a1a;
     border-color: var(--color-ink);
 }
 

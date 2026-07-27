@@ -812,10 +812,13 @@ function setupStepNavigation() {
         }
 
         if (index === totalSteps - 1) {
-            nextBtn.textContent = '✓';
-            guardarBtn?.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            document.getElementById('obra-step-crear')?.classList.remove('hidden');
+            guardarBtn?.classList.add('hidden');
         } else {
+            nextBtn.classList.remove('hidden');
             nextBtn.textContent = '>';
+            document.getElementById('obra-step-crear')?.classList.add('hidden');
             guardarBtn?.classList.add('hidden');
         }
     }
