@@ -653,13 +653,24 @@ function setupStepNavigation() {
         carrusel.style.zIndex = '1';
     }
 
+    // Posicionar el formulario fijo debajo de la barra de pasos (pasos 2-5)
+    function positionFormulario() {
+        const stepBar = document.getElementById('obra-step-bar');
+        const formulario = document.getElementById('formulario-obra');
+        if (!stepBar || !formulario) return;
+        const stepBarBottom = stepBar.getBoundingClientRect().bottom;
+        formulario.style.top = stepBarBottom + 'px';
+    }
+
     positionStepBar();
     positionBottomBars();
     positionCarrusel();
+    positionFormulario();
     window.addEventListener('resize', () => {
         positionStepBar();
         positionBottomBars();
         positionCarrusel();
+        positionFormulario();
     });
 
     let currentStep = 0;
@@ -733,6 +744,7 @@ function setupStepNavigation() {
                 positionStepBar();
                 positionBottomBars();
                 positionCarrusel();
+                positionFormulario();
                 showStep(currentStep);
             }
         });

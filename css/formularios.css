@@ -233,6 +233,7 @@
 
 .form-section-content {
     /* contenido siempre visible, controlado por step nav */
+    padding: 0 16px;
 }
 
 /* ==============================================
@@ -338,10 +339,19 @@ form *,
 
 /* Contenedor del formulario en panel del artista */
 #panel-artista #formulario-obra {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 12px 24px 24px 24px;
-    border-radius: 8px;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    position: fixed;
+    top: 0; /* JS lo posiciona justo debajo de la step bar */
+    left: 0;
+    width: 100%;
+    bottom: 0;
+    overflow-y: auto;
+    background: var(--color-white);
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Formularios en modales */
