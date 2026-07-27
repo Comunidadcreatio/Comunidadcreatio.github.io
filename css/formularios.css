@@ -1482,11 +1482,11 @@ form,
 
 @media (max-width: 768px) {
     .form-row-3 {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
     .form-row-3 .form-group {
-        flex: 1 1 30%;
-        min-width: 80px;
+        flex: 1;
+        min-width: 0;
     }
 }
 
