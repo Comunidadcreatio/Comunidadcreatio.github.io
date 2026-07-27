@@ -1062,7 +1062,7 @@ form,
     #modal-registro input,
     #modal-registro select,
     #modal-registro button,
-    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide) {
+    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn) {
         width: 100%;
         box-sizing: border-box;
         padding: 14px 12px; /* Mejor área táctil */
