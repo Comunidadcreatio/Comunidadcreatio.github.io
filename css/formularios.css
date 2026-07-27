@@ -1826,4 +1826,13 @@ form,
         box-shadow: 0 2px 16px rgba(0,0,0,0.08);
         padding-top: 16px;
     }
+
+    /* Carrusel con mismo ancho y márgenes que el formulario */
+    .imagen-carrusel {
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 auto !important;
+        width: calc(100% - 32px) !important;
+        max-width: 600px !important;
+    }
 }
