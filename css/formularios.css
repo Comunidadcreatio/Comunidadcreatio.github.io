@@ -19,29 +19,6 @@
     gap: 12px;
 }
 
-.step-nav-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-#obra-step-bar .step-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--color-ink);
-    font-family: 'Nunito', sans-serif;
-    white-space: nowrap;
-    text-align: right;
-}
-
-#obra-step-bar .step-indicator {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-gray-500);
-    font-family: 'Nunito', sans-serif;
-    white-space: nowrap;
-}
-
 #obra-step-bar .step-buttons {
     display: flex;
     gap: 6px;
@@ -136,7 +113,7 @@
     height: 36px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 0 16px;
     background: var(--color-white);
     border: none;
@@ -147,10 +124,18 @@
 .form-progress-row {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    width: 60%;
-    margin: 0 auto;
+    flex: 1;
+    max-width: 60%;
+}
+
+#obra-progress-bar .step-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+    font-family: 'Nunito', sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 #obra-progress-bar .form-progress-bar {
@@ -1273,7 +1258,7 @@ form,
     border-color: var(--color-ink);
 }
 
-[data-theme="dark"] #obra-step-bar .step-name {
+[data-theme="dark"] #obra-progress-bar .step-name {
     color: var(--color-ink);
 }
 
