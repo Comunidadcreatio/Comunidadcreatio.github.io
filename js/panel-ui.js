@@ -613,14 +613,11 @@ function setupStepNavigation() {
         const panelTop = togglePanel.getBoundingClientRect().top;
         const viewH = window.innerHeight;
         const fromBottom = viewH - panelTop; // px desde el bottom del viewport
-        // Etiquetas pegado al nav inferior
-        if (etiquetasBar) {
-            etiquetasBar.style.bottom = fromBottom + 'px';
-        }
-        // Barra de progreso pegada justo encima de etiquetas
         if (progressBar) {
-            const etiquetasH = etiquetasBar ? etiquetasBar.offsetHeight : 36;
-            progressBar.style.bottom = (fromBottom + etiquetasH) + 'px';
+            progressBar.style.bottom = fromBottom + 'px';
+        }
+        if (etiquetasBar) {
+            etiquetasBar.style.bottom = (fromBottom + 33) + 'px';
         }
     }
 
