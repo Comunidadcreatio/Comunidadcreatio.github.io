@@ -299,11 +299,14 @@
                                     <div class="carrusel-track" id="carrusel-track"></div>
                                     <button type="button" id="btn-agregar-imagen" class="btn-agregar-imagen" aria-label="Agregar imagen">+</button>
                                     <span class="carrusel-count" id="carrusel-count">0 / 5</span>
+                                    <div class="carrusel-ratio-toggle" id="carrusel-ratio-toggle">
+                                        <button type="button" class="ratio-btn active" data-ratio="4/5">4:5</button>
+                                        <button type="button" class="ratio-btn" data-ratio="1/1">1:1</button>
+                                    </div>
                                 </div>
                                 <div class="carrusel-dots" id="carrusel-dots"></div>
-                                <div class="carrusel-ratio-toggle" id="carrusel-ratio-toggle">
-                                    <button type="button" class="ratio-btn active" data-ratio="4/5">4:5</button>
-                                    <button type="button" class="ratio-btn" data-ratio="1/1">1:1</button>
+                                <div id="obra-etiquetas-bar">
+                                    <input type="text" id="input-etiquetas" class="input-etiquetas-subtle" placeholder="Etiquetas (separadas por coma)" required data-required="true">
                                 </div>
                             </div>
                             <input type="file" id="input-imagen-0" accept="image/*" hidden>
@@ -548,11 +551,6 @@
 
                 </form>
 
-            </div>
-
-            <!-- Input de etiquetas fijo (sobre la barra de progreso) -->
-            <div id="obra-etiquetas-bar" class="obra-etiquetas-bar-fixed">
-                <input type="text" id="input-etiquetas" class="input-etiquetas-subtle" placeholder="Etiquetas (separadas por coma)" required data-required="true">
             </div>
 
             <!-- Barra inferior fija: progreso de completado -->

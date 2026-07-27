@@ -729,18 +729,6 @@ function setupStepNavigation() {
         stepBar.style.bottom = fromBottom + 'px';
     }
 
-    // Posicionar etiquetas encima de la barra de pasos
-    function positionEtiquetasBar() {
-        const togglePanel = document.getElementById('toggle-panel');
-        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
-        if (!togglePanel || !etiquetasBar) return;
-        const panelTop = togglePanel.getBoundingClientRect().top;
-        const viewH = window.innerHeight;
-        const fromBottom = viewH - panelTop;
-        const stepBarH = stepBar ? stepBar.offsetHeight : 52;
-        etiquetasBar.style.bottom = (fromBottom + stepBarH + 0) + 'px';
-    }
-
     // Posicionar el carrusel fijo debajo de la barra de progreso
     function positionCarrusel() {
         const progressBar = document.getElementById('obra-progress-bar');
@@ -766,7 +754,6 @@ function setupStepNavigation() {
     function positionAll() {
         positionProgressBar();
         positionStepBar();
-        positionEtiquetasBar();
         positionCarrusel();
         positionFormulario();
     }
@@ -808,7 +795,6 @@ function setupStepNavigation() {
         const etiquetasBar = document.getElementById('obra-etiquetas-bar');
         if (etiquetasBar) {
             etiquetasBar.classList.toggle('hidden', index !== 0);
-            positionEtiquetasBar(); // recalcular si etiquetas se oculta
         }
 
         if (index === totalSteps - 1) {
@@ -847,7 +833,6 @@ function setupStepNavigation() {
             if (!panelCrear.classList.contains('hidden')) {
                 positionProgressBar();
                 positionStepBar();
-                positionEtiquetasBar();
                 positionCarrusel();
                 positionFormulario();
                 showStep(currentStep);

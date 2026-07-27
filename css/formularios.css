@@ -97,15 +97,9 @@
    BARRA INFERIOR FIJA: INPUT DE ETIQUETAS
    ============================================== */
 #obra-etiquetas-bar {
-    position: fixed;
-    bottom: 0; /* JS lo posiciona en vivo */
-    left: 0;
-    width: 100%;
-    z-index: 997;
     padding: 8px 16px;
-    background: transparent !important;
-    background-color: transparent !important;
     box-sizing: border-box;
+    width: 100%;
 }
 
 #obra-etiquetas-bar .input-etiquetas-subtle {
@@ -1471,21 +1465,24 @@ form,
 
 /* (duplicado removido) */
 
-/* Ratio toggle (añadido v1.0.150) */
+/* Ratio toggle dentro del viewport (top-left) */
 .carrusel-ratio-toggle {
+    position: absolute;
+    top: 8px;
+    left: 8px;
     display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 6px 0 2px;
+    gap: 6px;
+    z-index: 10;
+    padding: 0;
 }
 .ratio-btn {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    border: 1.5px solid var(--color-gray-300);
-    background: transparent;
-    color: var(--color-gray-500);
-    font-size: 11px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.35);
+    color: rgba(255,255,255,0.8);
+    font-size: 10px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
@@ -1496,19 +1493,20 @@ form,
     padding: 0;
 }
 .ratio-btn.active {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
-    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.15);
 }
 [data-theme="dark"] .ratio-btn {
-    border-color: #444;
-    color: #888;
+    border-color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.5);
 }
 [data-theme="dark"] .ratio-btn.active {
-    background: #fff !important;
-    color: #000 !important;
-    border-color: #fff !important;
+    background: #fff;
+    color: #000;
+    border-color: #fff;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
 }
 
@@ -1656,15 +1654,6 @@ form,
    (al final para ganar por cascada)
    ============================================== */
 @media (max-width: 768px) {
-    .carrusel-ratio-toggle {
-        gap: 6px;
-        padding: 4px 0 0;
-    }
-    .ratio-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 10px;
-    }
     .carrusel-dots {
         padding: 4px 0;
     }
