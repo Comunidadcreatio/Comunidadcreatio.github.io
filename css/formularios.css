@@ -1474,9 +1474,9 @@ form,
     color: #888;
 }
 [data-theme="dark"] .ratio-btn.active {
-    background: #fff;
-    color: #000;
-    border-color: #fff;
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
 }
 
@@ -1650,7 +1650,7 @@ form,
 }
 
 .form-block .form-row-3 {
-    gap: 0;
+    gap: 0 !important;
     padding-top: 11px;
     margin-bottom: 4px;
 }

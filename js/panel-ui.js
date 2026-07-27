@@ -134,7 +134,7 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
                 document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
                 document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
-                document.getElementById('btn-guardar').textContent = 'Actualizar Obra';
+                document.getElementById('btn-guardar').textContent = 'Actualizar Cavent';
                 const imagenes = [
                     cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
                     cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
@@ -207,7 +207,7 @@ export async function refrescarTabla(tablaBody) {
                 imagenesData = [];
                 currentSlide = 0;
 
-                document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+                document.getElementById('btn-guardar').textContent = 'Crear Cavent';
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-id-personalizado').focus();
@@ -484,7 +484,7 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     resetCambiosNoGuardados();
     document.getElementById('input-id-edicion').value = '';
     document.getElementById('btn-limpiar-campos').classList.add('hidden');
-    document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+    document.getElementById('btn-guardar').textContent = 'Crear Cavent';
     imagenesAEliminar.clear();
     // Limpiar carrusel
     imagenesData = [];
@@ -574,7 +574,7 @@ export function setupObraFormSubmit() {
         setButtonLoading(btnGuardar, false);
         if (result.success) {
             showSuccess("Obra guardada correctamente.");
-            document.getElementById('btn-guardar').textContent = 'Guardar Obra';
+            document.getElementById('btn-guardar').textContent = 'Crear Cavent';
             imagenesAEliminar.clear();
             limpiarFormularioCompleto(true);
             await refrescarTabla(document.getElementById('tabla-obras-body'));
