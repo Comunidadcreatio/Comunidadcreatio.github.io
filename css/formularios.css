@@ -1647,6 +1647,20 @@ form,
     padding-bottom: 2px;
 }
 
+/* Borde verde cuando el input está completo */
+.form-block .form-group input:valid,
+.form-block .form-group select:valid {
+    border-bottom-color: var(--color-success) !important;
+}
+
+/* Artista (readonly) siempre en verde */
+.form-block .form-group input:read-only {
+    border-bottom-color: var(--color-success) !important;
+    border-bottom-style: solid;
+    color: var(--color-gray-500);
+}
+
+/* Focus negro — después de :valid para tener prioridad */
 .form-block .form-group input:focus,
 .form-block .form-group select:focus,
 .form-block .form-group textarea:focus {
