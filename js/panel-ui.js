@@ -419,19 +419,38 @@ export function setupImagePreviews() {
         }
     }
 
-    // Touch/swipe en el carrusel
+    // Touch/swipe en el carrusel (arrastre en tiempo real)
     const viewport = document.getElementById('carrusel-viewport');
-    if (viewport) {
+    const track = document.getElementById('carrusel-track');
+    if (viewport && track) {
         let startX = 0;
+        let isDragging = false;
+
         viewport.addEventListener('touchstart', (e) => {
+            if (imagenesData.length <= 1) return;
             startX = e.touches[0].clientX;
+            isDragging = true;
+            track.style.transition = 'none';
         }, { passive: true });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const diff = e.touches[0].clientX - startX;
+            const percent = (diff / viewport.offsetWidth) * 100;
+            track.style.transform = `translateX(${-currentSlide * 100 + percent}%)`;
+        }, { passive: true });
+
         viewport.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.transition = ''; // restaurar transición CSS
             if (imagenesData.length <= 1) return;
             const diff = startX - e.changedTouches[0].clientX;
             if (Math.abs(diff) > 40) {
                 if (diff > 0) irASlide(currentSlide + 1);
                 else irASlide(currentSlide - 1);
+            } else {
+                track.style.transform = `translateX(-${currentSlide * 100}%)`;
             }
         });
     }
