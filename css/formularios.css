@@ -54,17 +54,30 @@
 }
 
 #obra-step-bar .crear-btn {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-gray-300);
     width: auto;
     min-width: auto;
     border-radius: 50px;
-    padding: 6px 14px;
+    padding: 0 14px;
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+#obra-step-bar .crear-btn:hover {
+    background: var(--color-gray-100);
+    border-color: var(--color-ink);
 }
 
 #obra-step-bar .crear-btn:hover {
@@ -1287,12 +1300,13 @@ form,
 
 [data-theme="dark"] #obra-step-bar .crear-btn {
     background: var(--color-gray-100);
-    border-color: var(--color-border);
+    border: 1.5px solid var(--color-border);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] #obra-step-bar .crear-btn:hover {
     border-color: var(--color-ink);
+    background: var(--color-gray-100);
 }
 
 [data-theme="dark"] #obra-progress-bar .step-name {
