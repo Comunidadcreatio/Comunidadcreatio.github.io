@@ -1482,6 +1482,7 @@ form,
 
 @media (max-width: 768px) {
     .form-row-3 {
+        flex-direction: row;
         flex-wrap: nowrap;
     }
     .form-row-3 .form-group {
