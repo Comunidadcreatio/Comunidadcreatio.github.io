@@ -613,11 +613,14 @@ function setupStepNavigation() {
         const panelTop = togglePanel.getBoundingClientRect().top;
         const viewH = window.innerHeight;
         const fromBottom = viewH - panelTop; // px desde el bottom del viewport
-        if (progressBar) {
-            progressBar.style.bottom = fromBottom + 'px';
-        }
+        // Etiquetas pegado al nav inferior
         if (etiquetasBar) {
-            etiquetasBar.style.bottom = (fromBottom + 36) + 'px';
+            etiquetasBar.style.bottom = fromBottom + 'px';
+        }
+        // Barra de progreso pegada justo encima de etiquetas
+        if (progressBar) {
+            const etiquetasH = etiquetasBar ? etiquetasBar.offsetHeight : 36;
+            progressBar.style.bottom = (fromBottom + etiquetasH) + 'px';
         }
     }
 
@@ -677,6 +680,7 @@ function setupStepNavigation() {
         const etiquetasBar = document.getElementById('obra-etiquetas-bar');
         if (etiquetasBar) {
             etiquetasBar.classList.toggle('hidden', index !== 0);
+            positionBottomBars(); // recalcular: progress bar baja si etiquetas se oculta
         }
 
         if (index === totalSteps - 1) {
