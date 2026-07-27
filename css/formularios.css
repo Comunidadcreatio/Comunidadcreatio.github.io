@@ -1181,6 +1181,10 @@ form,
     border-color: #e5e5e5;
 }
 
+[data-theme="dark"] #panel-artista #formulario-obra {
+    background-color: #0a0a0a;
+}
+
 [data-theme="dark"] #formulario-obra h2 {
     color: var(--color-ink);
 }
