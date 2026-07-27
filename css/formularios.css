@@ -439,9 +439,6 @@ form *,
     overflow-x: hidden;
 }
 
-#obra-form input[type="text"],
-#obra-form input[type="number"],
-#obra-form textarea,
 #registro-form input[type="text"],
 #registro-form input[type="email"],
 #registro-form input[type="password"],
@@ -465,9 +462,7 @@ form *,
 }
 
 /* Selects: padding-right amplio para la flecha, heredan resto de estilos de inputs */
-#obra-form select,
-#registro-form select,
-#panel-artista select {
+#registro-form select {
     width: 100%;
     max-width: 100%;
     padding: 12px 40px 12px 14px;
@@ -486,18 +481,12 @@ form *,
     -moz-appearance: none;
 }
 
-#obra-form input[type="text"]:focus,
-#obra-form input[type="number"]:focus,
-#obra-form select:focus,
-#obra-form textarea:focus,
 #registro-form input[type="text"]:focus,
 #registro-form input[type="email"]:focus,
 #registro-form input[type="password"]:focus,
 #registro-form select:focus,
 #login-form input[type="email"]:focus,
-#login-form input[type="password"]:focus,
-#panel-artista input:focus,
-#panel-artista select:focus {
+#login-form input[type="password"]:focus {
     outline: none;
     border-color: var(--color-ink);
 }
@@ -507,9 +496,6 @@ form *,
     resize: vertical;
 }
 
-#obra-form input:read-only {
-    background-color: #f1f1f1;
-}
 
 /* --- Grupos de inputs --- */
 .dimensiones-group,
@@ -1027,8 +1013,6 @@ form,
     #modal-registro input,
     #modal-registro select,
     #modal-registro button,
-    #panel-artista input,
-    #panel-artista select,
     #panel-artista button {
         width: 100%;
         box-sizing: border-box;
@@ -1128,7 +1112,6 @@ form,
     }
     
     /* Selects con padding extra para el icono nativo */
-    #obra-form select,
     #panel-artista select {
         padding-right: 40px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -1161,17 +1144,11 @@ form,
 }
 
 @media (max-width: 480px) {
-    #obra-form input[type="text"],
-    #obra-form input[type="number"],
-    #obra-form select,
-    #obra-form textarea,
-    #panel-artista input,
-    #panel-artista select {
+    #obra-form textarea {
         padding: 12px 10px;
         font-size: 15px;
     }
     
-    #obra-form select,
     #panel-artista select {
         padding-right: 35px;
     }
@@ -1363,7 +1340,6 @@ form,
 }
 
 /* Flecha blanca para selects del panel de obra en modo oscuro (misma especificidad que la regla clara) */
-[data-theme="dark"] #obra-form select,
 [data-theme="dark"] #panel-artista select,
 [data-theme="dark"] #formulario-obra select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
