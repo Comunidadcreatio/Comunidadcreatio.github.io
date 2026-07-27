@@ -1485,3 +1485,30 @@ form,
     border-color: #fff;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
 }
+
+/* Fila de 3 columnas */
+.form-row-3 {
+    display: flex;
+    gap: 12px;
+}
+.form-row-3 .form-group {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Textarea grande para descripción */
+#input-descripcion-artistica {
+    min-height: 140px !important;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .form-row-3 {
+        flex-wrap: wrap;
+    }
+    .form-row-3 .form-group {
+        flex: 1 1 30%;
+        min-width: 80px;
+    }
+}
