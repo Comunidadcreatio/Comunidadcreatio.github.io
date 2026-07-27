@@ -57,6 +57,8 @@
 
 #obra-step-bar .crear-btn {
     height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,6 +80,8 @@
     font-family: 'Nunito', sans-serif;
     box-sizing: border-box !important;
     align-self: center;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 #obra-step-bar .crear-btn:hover {
