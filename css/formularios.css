@@ -351,6 +351,7 @@ form *,
     bottom: 0;
     overflow-y: auto;
     background: var(--color-white);
+    z-index: 0;
     -webkit-overflow-scrolling: touch;
 }
 
