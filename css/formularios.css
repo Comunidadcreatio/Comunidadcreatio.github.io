@@ -1690,3 +1690,108 @@ form,
     color: var(--color-gray-500);
     border-bottom-style: solid;
 }
+
+/* ==============================================
+   DROPDOWN CUSTOM (estilo ciudad)
+   ============================================== */
+#obra-form .custom-select {
+    position: relative;
+    width: 100%;
+}
+
+#obra-form .custom-select-trigger {
+    width: 100%;
+    padding: 10px 28px 10px 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
+    font-size: 15px;
+    background: transparent;
+    color: var(--color-text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 400;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+    appearance: none;
+    outline: none;
+    position: relative;
+}
+
+#obra-form .custom-select-trigger::after {
+    content: '';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #888;
+    pointer-events: none;
+}
+
+#obra-form .custom-select-trigger:focus {
+    border-bottom-color: var(--color-ink);
+    border-bottom-width: 2px;
+}
+
+#obra-form .custom-select-dropdown {
+    position: fixed;
+    max-width: calc(100vw - 48px);
+    max-height: 260px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.93);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    z-index: 9999;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+#obra-form .custom-select-dropdown.open {
+    display: block;
+}
+
+#obra-form .custom-select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+}
+
+#obra-form .custom-select-option:hover {
+    background: var(--color-gray-100);
+}
+
+[data-theme="dark"] #obra-form .custom-select-trigger {
+    color: var(--color-ink);
+    border-bottom-color: #444;
+}
+
+[data-theme="dark"] #obra-form .custom-select-trigger:focus {
+    border-bottom-color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-form .custom-select-dropdown {
+    background: rgba(20, 20, 20, 0.93);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #obra-form .custom-select-option {
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] #obra-form .custom-select-option:hover {
+    background: #262626;
+}

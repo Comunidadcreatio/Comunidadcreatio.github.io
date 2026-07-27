@@ -588,6 +588,98 @@ export function setupObraFormSubmit() {
 // ============================================
 // ACCORDIONS DEL FORMULARIO Y PROGRESS
 // ============================================
+
+// Convierte un <select> en dropdown custom (estilo ciudad)
+function initCustomSelect(selectEl, placeholder) {
+    if (!selectEl || selectEl.dataset.customReady === '1') return;
+    selectEl.dataset.customReady = '1';
+    selectEl.style.display = 'none';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    selectEl.parentNode.insertBefore(wrapper, selectEl);
+    wrapper.appendChild(selectEl);
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.textContent = placeholder || 'Seleccionar';
+    wrapper.appendChild(trigger);
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'custom-select-dropdown';
+    wrapper.appendChild(dropdown);
+
+    function buildOptions() {
+        dropdown.innerHTML = '';
+        Array.from(selectEl.querySelectorAll('option')).forEach(opt => {
+            if (opt.disabled && !opt.value) return;
+            const item = document.createElement('div');
+            item.className = 'custom-select-option';
+            item.textContent = opt.textContent;
+            item.dataset.value = opt.value;
+            item.addEventListener('click', () => {
+                selectEl.value = opt.value;
+                trigger.textContent = opt.textContent;
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                dropdown.classList.remove('open');
+            });
+            dropdown.appendChild(item);
+        });
+    }
+
+    function positionDropdown() {
+        const rect = trigger.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = Math.min(rect.left, window.innerWidth - rect.width - 24) + 'px';
+        dropdown.style.width = rect.width + 'px';
+    }
+
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        if (!isOpen) {
+            buildOptions();
+            positionDropdown();
+        }
+        dropdown.classList.toggle('open');
+    });
+
+    window.addEventListener('scroll', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+        if (dropdown.classList.contains('open')) positionDropdown();
+    }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select')) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    selectEl.addEventListener('change', () => {
+        const selected = selectEl.selectedOptions[0];
+        if (selected) trigger.textContent = selected.textContent;
+    });
+}
+
+function setupCustomSelects() {
+    const formSelectors = [
+        { id: 'input-status', placeholder: 'Selecciona Status' },
+        { id: 'input-estado-obra', placeholder: 'Selecciona Estado' },
+        { id: 'input-descripcion-tecnica', placeholder: 'Selecciona Técnica' },
+        { id: 'input-soporte', placeholder: 'Selecciona Soporte' },
+        { id: 'input-marcos', placeholder: 'Selecciona Marcos' },
+        { id: 'input-procedencia', placeholder: 'Selecciona Procedencia' },
+        { id: 'input-certificado', placeholder: 'Selecciona Certificado' },
+        { id: 'input-firma', placeholder: 'Selecciona Firma' },
+        { id: 'input-conservacion', placeholder: 'Selecciona Conservación' }
+    ];
+    formSelectors.forEach(s => initCustomSelect(document.getElementById(s.id), s.placeholder));
+}
+
 export function setupFormAccordions() {
     const obraForm = document.getElementById('obra-form');
 
@@ -599,6 +691,9 @@ export function setupFormAccordions() {
         });
         updateFormProgress();
     }
+
+    // === Custom selects ===
+    setupCustomSelects();
 
     // === Navegación de pasos ===
     setupStepNavigation();
