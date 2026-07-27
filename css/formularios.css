@@ -1818,8 +1818,9 @@ form,
 @media (min-width: 769px) {
     #panel-artista #formulario-obra {
         max-width: 600px;
-        left: 50% !important;
-        transform: translateX(-50%);
+        left: 0 !important;
+        right: 0;
+        margin: 0 auto;
         width: calc(100% - 32px);
         border-radius: 12px;
         box-shadow: 0 2px 16px rgba(0,0,0,0.08);
