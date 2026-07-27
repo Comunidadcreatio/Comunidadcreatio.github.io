@@ -233,6 +233,7 @@
 
 .form-section-content {
     /* contenido siempre visible, controlado por step nav */
+}
 
 /* ==============================================
    TOOLTIPS EXPLICATIVOS
@@ -1478,23 +1479,26 @@ form,
 /* ==============================================
    ESTILO MODERNO: INPUTS Y SELECTS (underline)
    ============================================== */
+/* Especificidad alta sin !important para que puedas sobreescribir desde cualquier
+   regla posterior con igual o mayor especificidad. Solo se usa !important en
+   propiedades estructurales que colisionan con reglas antiguas del archivo. */
 #obra-form .form-group input[type="text"],
 #obra-form .form-group input[type="number"],
 #obra-form .form-group select,
 #obra-form .form-group textarea {
-    padding: 10px 0 !important;
-    border: none !important;
-    border-bottom: 1px solid var(--color-gray-300) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    font-size: 15px !important;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
+    background: transparent;
+    background-color: transparent;
+    font-size: 15px;
     font-family: 'Nunito', sans-serif;
     color: var(--color-text);
-    outline: none !important;
+    outline: none;
     transition: border-color 0.2s;
-    margin-bottom: 4px !important;
-    box-shadow: none !important;
+    margin-bottom: 4px;
+    box-shadow: none;
     width: 100%;
     max-width: 100%;
 }
@@ -1503,63 +1507,63 @@ form,
 #obra-form .form-group input[type="number"]:focus,
 #obra-form .form-group select:focus,
 #obra-form .form-group textarea:focus {
-    border-bottom-color: var(--color-ink) !important;
-    border-bottom-width: 2px !important;
+    border-bottom-color: var(--color-ink);
+    border-bottom-width: 2px;
 }
 
 #obra-form .form-group input::placeholder,
 #obra-form .form-group textarea::placeholder {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
     opacity: 1;
 }
 
 #obra-form .form-group input:read-only {
-    color: var(--color-gray-500) !important;
-    border-bottom-style: dashed !important;
+    color: var(--color-gray-500);
+    border-bottom-style: dashed;
 }
 
 #obra-form .form-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 4px center;
-    padding-right: 20px !important;
+    padding-right: 20px;
     -webkit-appearance: none;
     appearance: none;
 }
 
 #obra-form .form-group label {
-    font-size: 11px !important;
-    font-weight: 700 !important;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--color-gray-500) !important;
-    margin-bottom: 2px !important;
+    color: var(--color-gray-500);
+    margin-bottom: 2px;
 }
 
-/* Dark mode */
+/* Dark mode — misma especificidad, sin !important superfluo */
 [data-theme="dark"] #obra-form .form-group input[type="text"],
 [data-theme="dark"] #obra-form .form-group input[type="number"],
 [data-theme="dark"] #obra-form .form-group select,
 [data-theme="dark"] #obra-form .form-group textarea {
-    color: var(--color-ink) !important;
-    border-bottom-color: #444 !important;
-    background: transparent !important;
-    background-color: transparent !important;
+    color: var(--color-ink);
+    border-bottom-color: #444;
+    background: transparent;
+    background-color: transparent;
 }
 
 [data-theme="dark"] #obra-form .form-group input:focus,
 [data-theme="dark"] #obra-form .form-group select:focus,
 [data-theme="dark"] #obra-form .form-group textarea:focus {
-    border-bottom-color: var(--color-ink) !important;
+    border-bottom-color: var(--color-ink);
 }
 
 [data-theme="dark"] #obra-form .form-group input::placeholder,
 [data-theme="dark"] #obra-form .form-group textarea::placeholder {
-    color: #555 !important;
+    color: #555;
 }
 
 [data-theme="dark"] #obra-form .form-group input:read-only {
-    color: #666 !important;
+    color: #666;
 }
 
 [data-theme="dark"] #obra-form .form-group select {
@@ -1567,5 +1571,5 @@ form,
 }
 
 [data-theme="dark"] #obra-form .form-group label {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
 }
