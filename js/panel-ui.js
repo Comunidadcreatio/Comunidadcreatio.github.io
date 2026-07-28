@@ -875,8 +875,8 @@ function setupCaventsDropdown() {
             syncCustomSelects();
             updateFormProgress();
         } catch (e) {
-            debugLog.error('Error editando cavent:', e);
-            showError('Error al cargar la obra');
+            debugLog.error('Error editando cavent:', e.message, e.stack);
+            showError('Error al cargar la obra: ' + (e.message || ''));
         }
     }
 
