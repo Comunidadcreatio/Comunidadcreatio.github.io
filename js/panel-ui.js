@@ -19,6 +19,14 @@ export function invalidateCaventsCache() {
 function syncAllCustomSelects() {
     document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
         sel.dispatchEvent(new Event('change', { bubbles: true }));
+        const wrapper = sel.closest('.custom-select');
+        if (wrapper) {
+            const trigger = wrapper.querySelector('.custom-select-trigger');
+            const selected = sel.selectedOptions[0];
+            if (trigger && selected && selected.value) {
+                trigger.textContent = selected.textContent;
+            }
+        }
     });
 }
 
@@ -734,7 +742,17 @@ function setupCaventsDropdown() {
 
     function syncCustomSelects() {
         document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
+            // Disparar change para que el listener interno actualice el trigger
             sel.dispatchEvent(new Event('change', { bubbles: true }));
+            // Respaldo: actualizar el trigger manualmente
+            const wrapper = sel.closest('.custom-select');
+            if (wrapper) {
+                const trigger = wrapper.querySelector('.custom-select-trigger');
+                const selected = sel.selectedOptions[0];
+                if (trigger && selected && selected.value) {
+                    trigger.textContent = selected.textContent;
+                }
+            }
         });
     }
 
