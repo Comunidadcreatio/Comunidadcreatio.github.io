@@ -8,6 +8,13 @@ import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './pa
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js';
 
+// Sincroniza los triggers de los custom selects después de poblar valores
+function syncAllCustomSelects() {
+    document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+}
+
 // ============================================
 // VARIABLES DE ESTADO (PANEL)
 // ============================================
@@ -147,6 +154,7 @@ export async function refrescarTabla(tablaBody) {
                 });
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
+                syncAllCustomSelects();
                 updateFormProgress();
             } catch (error) {
                 debugLog.error("Error al cargar datos de la obra:", error);
@@ -606,6 +614,10 @@ function initCustomSelect(selectEl, placeholder) {
     trigger.type = 'button';
     trigger.className = 'custom-select-trigger';
     trigger.textContent = placeholder || 'Seleccionar';
+    // Si el select ya tiene un valor preseleccionado, mostrarlo
+    if (selectEl.selectedOptions[0] && selectEl.selectedOptions[0].value) {
+        trigger.textContent = selectEl.selectedOptions[0].textContent;
+    }
     wrapper.appendChild(trigger);
 
     const dropdown = document.createElement('div');
@@ -692,6 +704,12 @@ function setupCaventsDropdown() {
     const stepBar = document.getElementById('obra-step-bar');
     if (!caventsBar || !trigger || !dropdown || !stepBar) return;
 
+    const ICONS_CAVENT = {
+        editar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+        duplicar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+        eliminar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
+    };
+
     // Posicionar encima de la barra de pasos
     function positionBar() {
         const togglePanel = document.getElementById('toggle-panel');
@@ -704,6 +722,12 @@ function setupCaventsDropdown() {
     // Esperar a que el DOM esté listo y la step bar posicionada
     setTimeout(positionBar, 100);
     window.addEventListener('resize', positionBar);
+
+    function syncCustomSelects() {
+        document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    }
 
     function setFormMode(mode, caventName) {
         const crearBtn = document.getElementById('obra-step-crear');
@@ -769,9 +793,9 @@ function setupCaventsDropdown() {
                     </div>
                 </div>
                 <div class="cavent-item-actions">
-                    <button class="btn-edit" data-id="${obra.id}" title="Editar">✎</button>
-                    <button class="btn-dup" data-id="${obra.id}" title="Duplicar">⧉</button>
-                    <button class="btn-del" data-id="${obra.id}" title="Eliminar">🗑</button>
+                    <button class="btn-edit" data-id="${obra.id}" title="Editar">${ICONS_CAVENT.editar}</button>
+                    <button class="btn-dup" data-id="${obra.id}" title="Duplicar">${ICONS_CAVENT.duplicar}</button>
+                    <button class="btn-del" data-id="${obra.id}" title="Eliminar">${ICONS_CAVENT.eliminar}</button>
                 </div>
             `;
             
@@ -822,6 +846,7 @@ function setupCaventsDropdown() {
                 if (url) aplicarPreviewImagen(index, url);
             });
             document.getElementById('btn-limpiar-campos').classList.remove('hidden');
+            syncCustomSelects();
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error editando cavent:', e);
@@ -854,6 +879,7 @@ function setupCaventsDropdown() {
             document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
             document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
+            syncCustomSelects();
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error duplicando cavent:', e);
@@ -1032,15 +1058,12 @@ function setupStepNavigation() {
         }
 
         if (index === totalSteps - 1) {
-            nextBtn.classList.add('hidden');
-            document.getElementById('obra-step-crear')?.classList.remove('hidden');
-            guardarBtn?.classList.add('hidden');
+            nextBtn.disabled = true;
         } else {
-            nextBtn.classList.remove('hidden');
-            nextBtn.textContent = '>';
-            document.getElementById('obra-step-crear')?.classList.add('hidden');
-            guardarBtn?.classList.add('hidden');
+            nextBtn.disabled = false;
         }
+        // Crear/Actualizar/Duplicar siempre visible
+        document.getElementById('obra-step-crear')?.classList.remove('hidden');
     }
 
     prevBtn.addEventListener('click', () => {

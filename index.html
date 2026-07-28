@@ -277,12 +277,14 @@
             
             <!-- Barra superior fija: Paso X de 5 + navegación < > -->
             <div id="obra-step-bar" class="step-nav-bar">
-                <span class="step-indicator" id="obra-step-indicator">Paso 1 de 5</span>
-                <div class="step-buttons">
-                    <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled aria-label="Paso anterior">&lt;</button>
-                    <button type="button" class="nav-btn next-btn" id="obra-step-next" aria-label="Paso siguiente">&gt;</button>
-                    <button type="submit" class="nav-btn crear-btn hidden" id="obra-step-crear" form="obra-form">Crear Cavent</button>
+                <div class="step-nav-left">
+                    <span class="step-indicator" id="obra-step-indicator">Paso 1 de 5</span>
+                    <div class="step-buttons">
+                        <button type="button" class="nav-btn prev-btn" id="obra-step-prev" disabled aria-label="Paso anterior">&lt;</button>
+                        <button type="button" class="nav-btn next-btn" id="obra-step-next" aria-label="Paso siguiente">&gt;</button>
+                    </div>
                 </div>
+                <button type="submit" class="nav-btn crear-btn hidden" id="obra-step-crear" form="obra-form">Crear Cavent</button>
             </div>
 
             <div id="formulario-obra" role="form">

@@ -26,6 +26,12 @@
     gap: 6px;
 }
 
+.step-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 #obra-step-bar .nav-btn {
     width: 32px;
     height: 32px;
