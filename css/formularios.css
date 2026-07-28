@@ -95,6 +95,31 @@
     border-color: var(--color-ink);
 }
 
+.step-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+#obra-step-bar .limpiar-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    font-size: 14px !important;
+    background: transparent !important;
+    border: 1.5px solid var(--color-gray-300) !important;
+    color: var(--color-gray-500) !important;
+    padding: 0 !important;
+    min-width: auto !important;
+}
+
+#obra-step-bar .limpiar-btn:hover {
+    background: #fee2e2 !important;
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+}
+
 #obra-step-bar .crear-btn:hover {
     background: var(--color-gray-800);
 }
@@ -1694,6 +1719,12 @@ form,
     margin-bottom: 0 !important;
 }
 
+@media (max-width: 768px) {
+    .form-row-tight {
+        flex-direction: row !important;
+    }
+}
+
 /* Restaurar underline individual pero sin gap entre ellos */
 .form-block .form-group input,
 .form-block .form-group select,
@@ -1880,10 +1911,9 @@ form,
     padding: 10px 16px;
     border: none;
     border-top: 1px solid var(--color-gray-200);
-    border-bottom: 1px solid var(--color-gray-200);
     background: var(--color-white);
     color: var(--color-ink);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     font-family: 'Nunito', sans-serif;
     text-align: left;
@@ -1936,7 +1966,8 @@ form,
 }
 
 .cavent-item-titulo {
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 12px;
     color: var(--color-ink);
     white-space: nowrap;
     overflow: hidden;
@@ -1945,11 +1976,11 @@ form,
 
 .cavent-item-meta {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--color-gray-500);
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .cavent-item-actions {
@@ -1959,12 +1990,13 @@ form,
 }
 
 .cavent-item-num {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--color-gray-400);
-    min-width: 28px;
-    text-align: right;
+    min-width: 22px;
+    text-align: left;
     flex-shrink: 0;
+    padding-right: 8px;
 }
 
 .cavent-item-actions button {

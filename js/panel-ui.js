@@ -494,7 +494,7 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     const crearBtn = document.getElementById('obra-step-crear');
     if (crearBtn) crearBtn.textContent = 'Crear Cavent';
     const caventsTrigger = document.getElementById('cavents-trigger');
-    if (caventsTrigger) caventsTrigger.textContent = 'Mis Cavents ▴';
+    if (caventsTrigger) caventsTrigger.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
     imagenesAEliminar.clear();
     // Limpiar carrusel
     imagenesData = [];
@@ -743,9 +743,9 @@ function setupCaventsDropdown() {
             if (guardarBtn) guardarBtn.textContent = 'Crear Cavent';
         }
         if (caventName) {
-            trigger.textContent = 'Mis Cavents ▴  — ' + caventName;
+            trigger.innerHTML = '<span style="font-size:10px;color:var(--color-gray-500);">Mis Cavents</span> <span style="font-size:11px;">▴ ' + caventName + '</span>';
         } else {
-            trigger.textContent = 'Mis Cavents ▴';
+            trigger.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
         }
     }
 
@@ -880,6 +880,17 @@ function setupCaventsDropdown() {
             document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             syncCustomSelects();
+            // Cargar imágenes para duplicar
+            const imagenesDup = [
+                cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
+                cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
+            ];
+            imagenesAEliminar.clear();
+            imagenesData = [];
+            currentSlide = 0;
+            imagenesDup.forEach((url, index) => {
+                if (url) aplicarPreviewImagen(index, url);
+            });
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error duplicando cavent:', e);
@@ -895,8 +906,9 @@ function setupCaventsDropdown() {
             const resp = await eliminarObra(token, id);
             if (resp.success) {
                 showSuccess('Cavent eliminado');
-                caventsLoaded = false;
-                caventsData = [];
+                // Eliminar de la lista local inmediatamente
+                caventsData = caventsData.filter(o => o.id != id);
+                caventsLoaded = true;
                 // Refrescar tabla si está visible
                 const tablaBody = document.getElementById('tabla-obras-body');
                 if (tablaBody) await refrescarTabla(tablaBody);
@@ -1079,6 +1091,20 @@ function setupStepNavigation() {
             showStep(currentStep);
         }
     });
+
+    // Botón limpiar campos
+    const limpiarBtn = document.getElementById('obra-step-limpiar');
+    if (limpiarBtn) {
+        limpiarBtn.addEventListener('click', () => {
+            if (confirm('¿Limpiar todos los campos del formulario?')) {
+                limpiarFormularioCompleto(true);
+                showStep(0);
+                // Reset trigger
+                const ct = document.getElementById('cavents-trigger');
+                if (ct) ct.textContent = 'Mis Cavents ▴';
+            }
+        });
+    }
 
     // Iniciar en paso 1
     showStep(0);
