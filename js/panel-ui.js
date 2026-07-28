@@ -1052,10 +1052,14 @@ function setupStepNavigation() {
     }
 
     function positionAll() {
-        positionProgressBar();
-        positionStepBar();
-        positionCarrusel();
-        positionFormulario();
+        try {
+            positionProgressBar();
+            positionStepBar();
+            positionCarrusel();
+            positionFormulario();
+        } catch(e) {
+            debugLog.error('positionAll error:', e);
+        }
     }
 
     positionAll();
