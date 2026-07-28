@@ -8,6 +8,13 @@ import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './pa
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js';
 
+// Cache del dropdown Mis Cavents para tiempo real
+let _caventsCache = { loaded: false, data: [] };
+export function invalidateCaventsCache() {
+    _caventsCache.loaded = false;
+    _caventsCache.data = [];
+}
+
 // Sincroniza los triggers de los custom selects después de poblar valores
 function syncAllCustomSelects() {
     document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
@@ -152,7 +159,6 @@ export async function refrescarTabla(tablaBody) {
                 imagenes.forEach((url, index) => {
                     if (url) aplicarPreviewImagen(index, url);
                 });
-                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 syncAllCustomSelects();
                 updateFormProgress();
@@ -214,7 +220,6 @@ export async function refrescarTabla(tablaBody) {
                 currentSlide = 0;
 
                 document.getElementById('btn-guardar').textContent = 'Crear Cavent';
-                document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('input-titulo').focus();
 
@@ -489,7 +494,6 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     obraForm.reset();
     resetCambiosNoGuardados();
     document.getElementById('input-id-edicion').value = '';
-    document.getElementById('btn-limpiar-campos').classList.add('hidden');
     document.getElementById('btn-guardar').textContent = 'Crear Cavent';
     const crearBtn = document.getElementById('obra-step-crear');
     if (crearBtn) crearBtn.textContent = 'Crear Cavent';
@@ -584,6 +588,7 @@ export function setupObraFormSubmit() {
         setButtonLoading(btnGuardar, false);
         if (result.success) {
             showSuccess("Obra guardada correctamente.");
+            invalidateCaventsCache();
             document.getElementById('btn-guardar').textContent = 'Crear Cavent';
             imagenesAEliminar.clear();
             limpiarFormularioCompleto(true);
@@ -749,17 +754,14 @@ function setupCaventsDropdown() {
         }
     }
 
-    let caventsLoaded = false;
-    let caventsData = [];
-
     async function loadCavents() {
-        if (caventsLoaded) return;
+        if (_caventsCache.loaded) return;
         try {
             if (!token) { debugLog.error('Token no disponible para cargar cavents'); return; }
             const result = await cargarMisObras(token, 1, 50);
             if (result.success) {
-                caventsData = result.obras || [];
-                caventsLoaded = true;
+                _caventsCache.data = result.obras || [];
+                _caventsCache.loaded = true;
             } else {
                 debugLog.error('Error API cavents:', result);
             }
@@ -770,11 +772,11 @@ function setupCaventsDropdown() {
 
     function buildDropdown() {
         dropdown.innerHTML = '';
-        if (caventsData.length === 0) {
+        if (_caventsCache.data.length === 0) {
             dropdown.innerHTML = '<div class="cavent-item" style="color:#888;justify-content:center;">No tienes cavents aún</div>';
             return;
         }
-        caventsData.forEach((obra, index) => {
+        _caventsCache.data.forEach((obra, index) => {
             const statusText = obra.status && obra.status.includes('Activo') ? 'Activo' : 
                               obra.status && obra.status.includes('Inactivo') ? 'Inactivo' : '—';
             const statusClass = statusText === 'Activo' ? 'status-activo' : 
@@ -907,8 +909,8 @@ function setupCaventsDropdown() {
             if (resp.success) {
                 showSuccess('Cavent eliminado');
                 // Eliminar de la lista local inmediatamente
-                caventsData = caventsData.filter(o => o.id != id);
-                caventsLoaded = true;
+                _caventsCache.data = _caventsCache.data.filter(o => o.id != id);
+                _caventsCache.loaded = true;
                 // Refrescar tabla si está visible
                 const tablaBody = document.getElementById('tabla-obras-body');
                 if (tablaBody) await refrescarTabla(tablaBody);
