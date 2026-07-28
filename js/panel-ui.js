@@ -710,7 +710,7 @@ function setupCaventsDropdown() {
         if (caventsLoaded) return;
         try {
             if (!token) { debugLog.error('Token no disponible para cargar cavents'); return; }
-            const result = await cargarMisObras(token, 1, 50, '', '', '');
+            const result = await cargarMisObras(token, 1, 50);
             if (result.success) {
                 caventsData = result.obras || [];
                 caventsLoaded = true;
