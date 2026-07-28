@@ -680,6 +680,223 @@ function setupCustomSelects() {
     formSelectors.forEach(s => initCustomSelect(document.getElementById(s.id), s.placeholder));
 }
 
+// ============================================
+// DROPDOWN MIS CAVENTS (sobre barra de pasos)
+// ============================================
+function setupCaventsDropdown() {
+    const caventsBar = document.getElementById('obra-cavents-bar');
+    const trigger = document.getElementById('cavents-trigger');
+    const dropdown = document.getElementById('cavents-dropdown');
+    const stepBar = document.getElementById('obra-step-bar');
+    if (!caventsBar || !trigger || !dropdown || !stepBar) return;
+
+    // Posicionar encima de la barra de pasos
+    function positionBar() {
+        const stepTop = stepBar.getBoundingClientRect().top;
+        caventsBar.style.bottom = (window.innerHeight - stepTop) + 'px';
+    }
+    positionBar();
+    window.addEventListener('resize', positionBar);
+
+    let caventsLoaded = false;
+    let caventsData = [];
+
+    async function loadCavents() {
+        if (caventsLoaded) return;
+        try {
+            const result = await cargarMisObras(token, 1, 50, '', '', '');
+            if (result.success) {
+                caventsData = result.obras || [];
+                caventsLoaded = true;
+            }
+        } catch (e) {
+            debugLog.error('Error cargando cavents:', e);
+        }
+    }
+
+    function buildDropdown() {
+        dropdown.innerHTML = '';
+        if (caventsData.length === 0) {
+            dropdown.innerHTML = '<div class="cavent-item" style="color:#888;justify-content:center;">No tienes cavents aún</div>';
+            return;
+        }
+        caventsData.forEach(obra => {
+            const statusClass = obra.status === 'Activo (Visible en Galería)' ? 'status-activo' :
+                               obra.status === 'Inactivo (Oculto)' ? 'status-inactivo' : 'status-desconocido';
+            const precio = obra.precio ? `$${parseFloat(obra.precio).toFixed(2)}` : '—';
+            
+            const item = document.createElement('div');
+            item.className = 'cavent-item';
+            item.innerHTML = `
+                <div class="cavent-item-info">
+                    <div class="cavent-item-titulo">${obra.titulo || 'Sin título'}</div>
+                    <div class="cavent-item-meta">
+                        <span>${precio}</span>
+                        <span class="status-badge ${statusClass}">${obra.status || '—'}</span>
+                    </div>
+                </div>
+                <div class="cavent-item-actions">
+                    <button class="btn-edit" data-id="${obra.id}" title="Editar">✎</button>
+                    <button class="btn-dup" data-id="${obra.id}" title="Duplicar">⧉</button>
+                    <button class="btn-del" data-id="${obra.id}" title="Eliminar">✕</button>
+                </div>
+            `;
+            
+            // Click en el item (sin botones) → editar
+            item.querySelector('.cavent-item-info').addEventListener('click', () => editarCavent(obra.id));
+            
+            // Botones de acción
+            item.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); editarCavent(obra.id); });
+            item.querySelector('.btn-dup').addEventListener('click', (e) => { e.stopPropagation(); duplicarCavent(obra.id); });
+            item.querySelector('.btn-del').addEventListener('click', (e) => { e.stopPropagation(); eliminarCavent(obra.id); });
+            
+            dropdown.appendChild(item);
+        });
+    }
+
+    async function editarCavent(id) {
+        dropdown.classList.remove('open');
+        try {
+            const resp = await apiRequest('/obras/' + id);
+            if (!resp.success) { showError('No se pudo cargar la obra'); return; }
+            const obra = resp.obra || resp.data;
+            // Mismo código que onEditar en refrescarTabla
+            document.getElementById('input-id-edicion').value = obra.id;
+            document.getElementById('input-titulo').value = obra.titulo || '';
+            document.getElementById('input-id-personalizado').value = obra.id_personalizado || '';
+            document.getElementById('input-ano').value = obra.ano || '';
+            document.getElementById('input-precio').value = obra.precio || '';
+            document.getElementById('input-ancho').value = obra.ancho || '';
+            document.getElementById('input-alto').value = obra.alto || '';
+            document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
+            document.getElementById('input-status').value = obra.status || '';
+            document.getElementById('input-status').dispatchEvent(new Event('change'));
+            document.getElementById('input-estado-obra').value = obra.estado_obra || '';
+            document.getElementById('input-estado-obra').dispatchEvent(new Event('change'));
+            document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
+            document.getElementById('input-descripcion-tecnica').dispatchEvent(new Event('change'));
+            document.getElementById('input-soporte').value = obra.soporte || '';
+            document.getElementById('input-soporte').dispatchEvent(new Event('change'));
+            document.getElementById('input-marcos').value = obra.marcos || '';
+            document.getElementById('input-marcos').dispatchEvent(new Event('change'));
+            document.getElementById('input-procedencia').value = obra.procedencia || '';
+            document.getElementById('input-procedencia').dispatchEvent(new Event('change'));
+            document.getElementById('input-certificado').value = obra.certificado || '';
+            document.getElementById('input-certificado').dispatchEvent(new Event('change'));
+            document.getElementById('input-firma').value = obra.firma || '';
+            document.getElementById('input-firma').dispatchEvent(new Event('change'));
+            document.getElementById('input-conservacion').value = obra.conservacion || '';
+            document.getElementById('input-conservacion').dispatchEvent(new Event('change'));
+            document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+            document.getElementById('btn-guardar').textContent = 'Actualizar Cavent';
+            document.getElementById('btn-guardar').classList.remove('hidden');
+            updateFormProgress();
+            // Switch to step 1
+            const panelCrear = document.getElementById('panel-crear');
+            if (panelCrear) panelCrear.classList.remove('hidden');
+            document.getElementById('panel-mis-cavents')?.classList.add('hidden');
+            // Go to step 1 to see images
+            setupStepNavigation();
+        } catch (e) {
+            debugLog.error('Error editando cavent:', e);
+            showError('Error al cargar la obra');
+        }
+    }
+
+    async function duplicarCavent(id) {
+        dropdown.classList.remove('open');
+        try {
+            const resp = await apiRequest('/obras/' + id);
+            if (!resp.success) { showError('No se pudo cargar la obra'); return; }
+            const obra = resp.obra || resp.data;
+            document.getElementById('input-id-edicion').value = '';
+            document.getElementById('input-titulo').value = (obra.titulo || '') + ' (copia)';
+            document.getElementById('input-id-personalizado').value = '';
+            document.getElementById('input-ano').value = obra.ano || '';
+            document.getElementById('input-precio').value = obra.precio || '';
+            document.getElementById('input-ancho').value = obra.ancho || '';
+            document.getElementById('input-alto').value = obra.alto || '';
+            document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
+            document.getElementById('input-status').value = obra.status || '';
+            document.getElementById('input-status').dispatchEvent(new Event('change'));
+            document.getElementById('input-estado-obra').value = obra.estado_obra || '';
+            document.getElementById('input-estado-obra').dispatchEvent(new Event('change'));
+            document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
+            document.getElementById('input-descripcion-tecnica').dispatchEvent(new Event('change'));
+            document.getElementById('input-soporte').value = obra.soporte || '';
+            document.getElementById('input-soporte').dispatchEvent(new Event('change'));
+            document.getElementById('input-marcos').value = obra.marcos || '';
+            document.getElementById('input-marcos').dispatchEvent(new Event('change'));
+            document.getElementById('input-procedencia').value = obra.procedencia || '';
+            document.getElementById('input-procedencia').dispatchEvent(new Event('change'));
+            document.getElementById('input-certificado').value = obra.certificado || '';
+            document.getElementById('input-certificado').dispatchEvent(new Event('change'));
+            document.getElementById('input-firma').value = obra.firma || '';
+            document.getElementById('input-firma').dispatchEvent(new Event('change'));
+            document.getElementById('input-conservacion').value = obra.conservacion || '';
+            document.getElementById('input-conservacion').dispatchEvent(new Event('change'));
+            document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+            document.getElementById('btn-guardar').textContent = 'Crear Cavent';
+            updateFormProgress();
+            const panelCrear = document.getElementById('panel-crear');
+            if (panelCrear) panelCrear.classList.remove('hidden');
+            document.getElementById('panel-mis-cavents')?.classList.add('hidden');
+        } catch (e) {
+            debugLog.error('Error duplicando cavent:', e);
+            showError('Error al cargar la obra');
+        }
+    }
+
+    async function eliminarCavent(id) {
+        dropdown.classList.remove('open');
+        const confirmado = await showConfirm('¿Eliminar este cavent? Esta acción no se puede deshacer.');
+        if (!confirmado) return;
+        try {
+            const resp = await eliminarObra(token, id);
+            if (resp.success) {
+                showSuccess('Cavent eliminado');
+                caventsLoaded = false;
+                caventsData = [];
+                // Refrescar tabla si está visible
+                const tablaBody = document.getElementById('tabla-obras-body');
+                if (tablaBody) await refrescarTabla(tablaBody);
+            } else {
+                showError(resp.message || 'Error al eliminar');
+            }
+        } catch (e) {
+            debugLog.error('Error eliminando cavent:', e);
+            showError('Error al eliminar');
+        }
+    }
+
+    trigger.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        if (!isOpen) {
+            await loadCavents();
+            buildDropdown();
+            positionBar();
+            // Posicionar dropdown arriba del trigger
+            const triggerBottom = trigger.getBoundingClientRect().bottom;
+            const triggerTop = trigger.getBoundingClientRect().top;
+            dropdown.style.bottom = (window.innerHeight - triggerTop) + 'px';
+        }
+        dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#obra-cavents-bar')) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    // Cerrar al hacer scroll en el dropdown
+    dropdown.addEventListener('click', (e) => {
+        // Permitir clicks en los botones del dropdown
+    });
+}
+
 export function setupFormAccordions() {
     const obraForm = document.getElementById('obra-form');
 
@@ -694,6 +911,9 @@ export function setupFormAccordions() {
 
     // === Custom selects ===
     setupCustomSelects();
+
+    // === Dropdown Mis Cavents ===
+    setupCaventsDropdown();
 
     // === Navegación de pasos ===
     setupStepNavigation();

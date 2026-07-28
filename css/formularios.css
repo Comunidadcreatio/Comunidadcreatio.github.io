@@ -1857,3 +1857,160 @@ form,
         max-width: 600px !important;
     }
 }
+
+/* ==============================================
+   BARRA MIS CAVENTS (sobre barra de pasos)
+   ============================================== */
+#obra-cavents-bar {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    z-index: 998;
+    box-sizing: border-box;
+}
+
+.cavents-trigger {
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    border-top: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.cavents-dropdown {
+    display: none;
+    position: fixed;
+    left: 0;
+    width: 100%;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--color-gray-200);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 997;
+    box-sizing: border-box;
+}
+
+.cavents-dropdown.open {
+    display: block;
+}
+
+.cavent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-gray-100);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cavent-item:hover {
+    background: var(--color-gray-50);
+}
+
+.cavent-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cavent-item-titulo {
+    font-weight: 700;
+    color: var(--color-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cavent-item-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 11px;
+    color: var(--color-gray-500);
+    margin-top: 2px;
+}
+
+.cavent-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.cavent-item-actions button {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--color-gray-200);
+    background: var(--color-white);
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.15s;
+}
+
+.cavent-item-actions .btn-edit:hover {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+}
+
+.cavent-item-actions .btn-dup:hover {
+    background: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+.cavent-item-actions .btn-del:hover {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
+}
+
+/* Dark mode */
+[data-theme="dark"] .cavents-trigger {
+    background: #0a0a0a;
+    border-color: #333;
+    color: var(--color-ink);
+}
+
+[data-theme="dark"] .cavents-dropdown {
+    background: rgba(20, 20, 20, 0.95);
+    border-color: #333;
+}
+
+[data-theme="dark"] .cavent-item {
+    border-color: #222;
+}
+
+[data-theme="dark"] .cavent-item:hover {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] .cavent-item-meta {
+    color: #888;
+}
+
+[data-theme="dark"] .cavent-item-actions button {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #aaa;
+}
