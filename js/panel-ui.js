@@ -692,10 +692,15 @@ function setupCaventsDropdown() {
 
     // Posicionar encima de la barra de pasos
     function positionBar() {
-        const stepTop = stepBar.getBoundingClientRect().top;
-        caventsBar.style.bottom = (window.innerHeight - stepTop) + 'px';
+        const togglePanel = document.getElementById('toggle-panel');
+        if (!togglePanel || !stepBar) return;
+        const panelTop = togglePanel.getBoundingClientRect().top;
+        const fromBottom = window.innerHeight - panelTop;
+        const stepBarH = stepBar.offsetHeight || 48;
+        caventsBar.style.bottom = (fromBottom + stepBarH) + 'px';
     }
-    positionBar();
+    // Esperar a que el DOM esté listo y la step bar posicionada
+    setTimeout(positionBar, 100);
     window.addEventListener('resize', positionBar);
 
     let caventsLoaded = false;
@@ -704,10 +709,13 @@ function setupCaventsDropdown() {
     async function loadCavents() {
         if (caventsLoaded) return;
         try {
+            if (!token) { debugLog.error('Token no disponible para cargar cavents'); return; }
             const result = await cargarMisObras(token, 1, 50, '', '', '');
             if (result.success) {
                 caventsData = result.obras || [];
                 caventsLoaded = true;
+            } else {
+                debugLog.error('Error API cavents:', result);
             }
         } catch (e) {
             debugLog.error('Error cargando cavents:', e);
