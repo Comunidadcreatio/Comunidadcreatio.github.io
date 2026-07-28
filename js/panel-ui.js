@@ -931,7 +931,7 @@ function setupCaventsDropdown() {
         if (!confirmado) return;
         try {
             const resp = await eliminarObra(token, id);
-            if (resp.success) {
+            if (resp) {
                 showSuccess('Cavent eliminado');
                 // Eliminar de la lista local inmediatamente
                 _caventsCache.data = _caventsCache.data.filter(o => o.id != id);
@@ -940,7 +940,7 @@ function setupCaventsDropdown() {
                 const tablaBody = document.getElementById('tabla-obras-body');
                 if (tablaBody) await refrescarTabla(tablaBody);
             } else {
-                showError(resp.message || 'Error al eliminar');
+                showError('Error al eliminar');
             }
         } catch (e) {
             debugLog.error('Error eliminando cavent:', e);
