@@ -765,46 +765,42 @@ function setupCaventsDropdown() {
     async function editarCavent(id) {
         dropdown.classList.remove('open');
         try {
-            const resp = await apiRequest('/obras/' + id);
-            if (!resp.success) { showError('No se pudo cargar la obra'); return; }
-            const obra = resp.obra || resp.data;
-            // Mismo código que onEditar en refrescarTabla
+            const data = await apiRequest('/obras/' + id);
+            if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
+            const obra = data;
             document.getElementById('input-id-edicion').value = obra.id;
             document.getElementById('input-titulo').value = obra.titulo || '';
+            document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
             document.getElementById('input-id-personalizado').value = obra.id_personalizado || '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';
             document.getElementById('input-ancho').value = obra.ancho || '';
             document.getElementById('input-alto').value = obra.alto || '';
-            document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
-            document.getElementById('input-status').value = obra.status || '';
-            document.getElementById('input-status').dispatchEvent(new Event('change'));
-            document.getElementById('input-estado-obra').value = obra.estado_obra || '';
-            document.getElementById('input-estado-obra').dispatchEvent(new Event('change'));
-            document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
-            document.getElementById('input-descripcion-tecnica').dispatchEvent(new Event('change'));
-            document.getElementById('input-soporte').value = obra.soporte || '';
-            document.getElementById('input-soporte').dispatchEvent(new Event('change'));
-            document.getElementById('input-marcos').value = obra.marcos || '';
-            document.getElementById('input-marcos').dispatchEvent(new Event('change'));
-            document.getElementById('input-procedencia').value = obra.procedencia || '';
-            document.getElementById('input-procedencia').dispatchEvent(new Event('change'));
-            document.getElementById('input-certificado').value = obra.certificado || '';
-            document.getElementById('input-certificado').dispatchEvent(new Event('change'));
-            document.getElementById('input-firma').value = obra.firma || '';
-            document.getElementById('input-firma').dispatchEvent(new Event('change'));
-            document.getElementById('input-conservacion').value = obra.conservacion || '';
-            document.getElementById('input-conservacion').dispatchEvent(new Event('change'));
-            document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+            document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
+            document.getElementById('input-status').value = decodeHTMLEntities(obra.status || '');
+            document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra || '');
+            document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica || '');
+            document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte || '');
+            document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos || '');
+            document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia || '');
+            document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado || '');
+            document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
+            document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
+            document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             document.getElementById('btn-guardar').textContent = 'Actualizar Cavent';
-            document.getElementById('btn-guardar').classList.remove('hidden');
+            // Cargar imágenes
+            const imagenes = [
+                cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
+                cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
+            ];
+            imagenesAEliminar.clear();
+            imagenesData = [];
+            currentSlide = 0;
+            imagenes.forEach((url, index) => {
+                if (url) aplicarPreviewImagen(index, url);
+            });
+            document.getElementById('btn-limpiar-campos').classList.remove('hidden');
             updateFormProgress();
-            // Switch to step 1
-            const panelCrear = document.getElementById('panel-crear');
-            if (panelCrear) panelCrear.classList.remove('hidden');
-            document.getElementById('panel-mis-cavents')?.classList.add('hidden');
-            // Go to step 1 to see images
-            setupStepNavigation();
         } catch (e) {
             debugLog.error('Error editando cavent:', e);
             showError('Error al cargar la obra');
@@ -814,41 +810,30 @@ function setupCaventsDropdown() {
     async function duplicarCavent(id) {
         dropdown.classList.remove('open');
         try {
-            const resp = await apiRequest('/obras/' + id);
-            if (!resp.success) { showError('No se pudo cargar la obra'); return; }
-            const obra = resp.obra || resp.data;
+            const data = await apiRequest('/obras/' + id);
+            if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
+            const obra = data;
             document.getElementById('input-id-edicion').value = '';
             document.getElementById('input-titulo').value = (obra.titulo || '') + ' (copia)';
+            document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
             document.getElementById('input-id-personalizado').value = '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';
             document.getElementById('input-ancho').value = obra.ancho || '';
             document.getElementById('input-alto').value = obra.alto || '';
-            document.getElementById('input-descripcion-artistica').value = obra.descripcion_artistica || '';
-            document.getElementById('input-status').value = obra.status || '';
-            document.getElementById('input-status').dispatchEvent(new Event('change'));
-            document.getElementById('input-estado-obra').value = obra.estado_obra || '';
-            document.getElementById('input-estado-obra').dispatchEvent(new Event('change'));
-            document.getElementById('input-descripcion-tecnica').value = obra.descripcion_tecnica || '';
-            document.getElementById('input-descripcion-tecnica').dispatchEvent(new Event('change'));
-            document.getElementById('input-soporte').value = obra.soporte || '';
-            document.getElementById('input-soporte').dispatchEvent(new Event('change'));
-            document.getElementById('input-marcos').value = obra.marcos || '';
-            document.getElementById('input-marcos').dispatchEvent(new Event('change'));
-            document.getElementById('input-procedencia').value = obra.procedencia || '';
-            document.getElementById('input-procedencia').dispatchEvent(new Event('change'));
-            document.getElementById('input-certificado').value = obra.certificado || '';
-            document.getElementById('input-certificado').dispatchEvent(new Event('change'));
-            document.getElementById('input-firma').value = obra.firma || '';
-            document.getElementById('input-firma').dispatchEvent(new Event('change'));
-            document.getElementById('input-conservacion').value = obra.conservacion || '';
-            document.getElementById('input-conservacion').dispatchEvent(new Event('change'));
-            document.getElementById('input-etiquetas').value = obra.etiquetas || '';
+            document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
+            document.getElementById('input-status').value = decodeHTMLEntities(obra.status || '');
+            document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra || '');
+            document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica || '');
+            document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte || '');
+            document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos || '');
+            document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia || '');
+            document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado || '');
+            document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
+            document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
+            document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             document.getElementById('btn-guardar').textContent = 'Crear Cavent';
             updateFormProgress();
-            const panelCrear = document.getElementById('panel-crear');
-            if (panelCrear) panelCrear.classList.remove('hidden');
-            document.getElementById('panel-mis-cavents')?.classList.add('hidden');
         } catch (e) {
             debugLog.error('Error duplicando cavent:', e);
             showError('Error al cargar la obra');
