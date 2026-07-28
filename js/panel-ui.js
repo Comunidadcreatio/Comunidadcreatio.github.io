@@ -871,7 +871,6 @@ function setupCaventsDropdown() {
             imagenes.forEach((url, index) => {
                 if (url) aplicarPreviewImagen(index, url);
             });
-            document.getElementById('btn-limpiar-campos').classList.remove('hidden');
             syncCustomSelects();
             updateFormProgress();
         } catch (e) {
