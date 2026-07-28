@@ -119,7 +119,6 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
                 document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = obra.id_personalizado;
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
                 document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
@@ -187,7 +186,6 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('input-titulo').value = obra.titulo;
                 document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
                 document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-id-personalizado').value = decodeHTMLEntities(obra.id_personalizado);
                 document.getElementById('input-ano').value = obra.ano || '';
                 document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
                 document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
@@ -210,7 +208,7 @@ export async function refrescarTabla(tablaBody) {
                 document.getElementById('btn-guardar').textContent = 'Crear Cavent';
                 document.getElementById('btn-limpiar-campos').classList.remove('hidden');
                 document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                document.getElementById('input-id-personalizado').focus();
+                document.getElementById('input-titulo').focus();
 
                 const imagenesDuplicar = [
                     cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
@@ -485,6 +483,10 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     document.getElementById('input-id-edicion').value = '';
     document.getElementById('btn-limpiar-campos').classList.add('hidden');
     document.getElementById('btn-guardar').textContent = 'Crear Cavent';
+    const crearBtn = document.getElementById('obra-step-crear');
+    if (crearBtn) crearBtn.textContent = 'Crear Cavent';
+    const caventsTrigger = document.getElementById('cavents-trigger');
+    if (caventsTrigger) caventsTrigger.textContent = 'Mis Cavents ▴';
     imagenesAEliminar.clear();
     // Limpiar carrusel
     imagenesData = [];
@@ -513,7 +515,7 @@ export function setupObraFormSubmit() {
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = document.getElementById('input-id-personalizado').value;
+        const idPersonalizado = '';
         const idEdicion = document.getElementById('input-id-edicion').value;
         const ano = document.getElementById('input-ano').value;
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
@@ -703,6 +705,26 @@ function setupCaventsDropdown() {
     setTimeout(positionBar, 100);
     window.addEventListener('resize', positionBar);
 
+    function setFormMode(mode, caventName) {
+        const crearBtn = document.getElementById('obra-step-crear');
+        const guardarBtn = document.getElementById('btn-guardar');
+        if (mode === 'edit') {
+            if (crearBtn) crearBtn.textContent = 'Actualizar Cavent';
+            if (guardarBtn) guardarBtn.textContent = 'Actualizar Cavent';
+        } else if (mode === 'duplicate') {
+            if (crearBtn) crearBtn.textContent = 'Duplicar Cavent';
+            if (guardarBtn) guardarBtn.textContent = 'Duplicar Cavent';
+        } else {
+            if (crearBtn) crearBtn.textContent = 'Crear Cavent';
+            if (guardarBtn) guardarBtn.textContent = 'Crear Cavent';
+        }
+        if (caventName) {
+            trigger.textContent = 'Mis Cavents ▴  — ' + caventName;
+        } else {
+            trigger.textContent = 'Mis Cavents ▴';
+        }
+    }
+
     let caventsLoaded = false;
     let caventsData = [];
 
@@ -728,42 +750,44 @@ function setupCaventsDropdown() {
             dropdown.innerHTML = '<div class="cavent-item" style="color:#888;justify-content:center;">No tienes cavents aún</div>';
             return;
         }
-        caventsData.forEach(obra => {
-            const statusClass = obra.status === 'Activo (Visible en Galería)' ? 'status-activo' :
-                               obra.status === 'Inactivo (Oculto)' ? 'status-inactivo' : 'status-desconocido';
+        caventsData.forEach((obra, index) => {
+            const statusText = obra.status && obra.status.includes('Activo') ? 'Activo' : 
+                              obra.status && obra.status.includes('Inactivo') ? 'Inactivo' : '—';
+            const statusClass = statusText === 'Activo' ? 'status-activo' : 
+                               statusText === 'Inactivo' ? 'status-inactivo' : 'status-desconocido';
             const precio = obra.precio ? `$${parseFloat(obra.precio).toFixed(2)}` : '—';
             
             const item = document.createElement('div');
             item.className = 'cavent-item';
             item.innerHTML = `
+                <span class="cavent-item-num">#${index + 1}</span>
                 <div class="cavent-item-info">
                     <div class="cavent-item-titulo">${obra.titulo || 'Sin título'}</div>
                     <div class="cavent-item-meta">
                         <span>${precio}</span>
-                        <span class="status-badge ${statusClass}">${obra.status || '—'}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
                 </div>
                 <div class="cavent-item-actions">
                     <button class="btn-edit" data-id="${obra.id}" title="Editar">✎</button>
                     <button class="btn-dup" data-id="${obra.id}" title="Duplicar">⧉</button>
-                    <button class="btn-del" data-id="${obra.id}" title="Eliminar">✕</button>
+                    <button class="btn-del" data-id="${obra.id}" title="Eliminar">🗑</button>
                 </div>
             `;
             
-            // Click en el item (sin botones) → editar
-            item.querySelector('.cavent-item-info').addEventListener('click', () => editarCavent(obra.id));
-            
-            // Botones de acción
-            item.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); editarCavent(obra.id); });
-            item.querySelector('.btn-dup').addEventListener('click', (e) => { e.stopPropagation(); duplicarCavent(obra.id); });
+            item.querySelector('.cavent-item-info').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
+            item.querySelector('.cavent-item-num').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
+            item.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); editarCavent(obra.id, obra.titulo); });
+            item.querySelector('.btn-dup').addEventListener('click', (e) => { e.stopPropagation(); duplicarCavent(obra.id, obra.titulo); });
             item.querySelector('.btn-del').addEventListener('click', (e) => { e.stopPropagation(); eliminarCavent(obra.id); });
             
             dropdown.appendChild(item);
         });
     }
 
-    async function editarCavent(id) {
+    async function editarCavent(id, nombre) {
         dropdown.classList.remove('open');
+        setFormMode('edit', nombre);
         try {
             const data = await apiRequest('/obras/' + id);
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
@@ -771,7 +795,6 @@ function setupCaventsDropdown() {
             document.getElementById('input-id-edicion').value = obra.id;
             document.getElementById('input-titulo').value = obra.titulo || '';
             document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-            document.getElementById('input-id-personalizado').value = obra.id_personalizado || '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';
             document.getElementById('input-ancho').value = obra.ancho || '';
@@ -787,7 +810,6 @@ function setupCaventsDropdown() {
             document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
             document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
-            document.getElementById('btn-guardar').textContent = 'Actualizar Cavent';
             // Cargar imágenes
             const imagenes = [
                 cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
@@ -807,8 +829,9 @@ function setupCaventsDropdown() {
         }
     }
 
-    async function duplicarCavent(id) {
+    async function duplicarCavent(id, nombre) {
         dropdown.classList.remove('open');
+        setFormMode('duplicate', nombre + ' (copia)');
         try {
             const data = await apiRequest('/obras/' + id);
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
@@ -816,7 +839,6 @@ function setupCaventsDropdown() {
             document.getElementById('input-id-edicion').value = '';
             document.getElementById('input-titulo').value = (obra.titulo || '') + ' (copia)';
             document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-            document.getElementById('input-id-personalizado').value = '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';
             document.getElementById('input-ancho').value = obra.ancho || '';
@@ -832,7 +854,6 @@ function setupCaventsDropdown() {
             document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
             document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
-            document.getElementById('btn-guardar').textContent = 'Crear Cavent';
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error duplicando cavent:', e);
