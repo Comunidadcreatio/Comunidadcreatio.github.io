@@ -115,9 +115,9 @@
 }
 
 #obra-step-bar .limpiar-btn:hover {
-    background: #fee2e2 !important;
-    border-color: #e74c3c !important;
-    color: #e74c3c !important;
+    background: var(--color-gray-100) !important;
+    border-color: var(--color-ink) !important;
+    color: var(--color-ink) !important;
 }
 
 #obra-step-bar .crear-btn:hover {

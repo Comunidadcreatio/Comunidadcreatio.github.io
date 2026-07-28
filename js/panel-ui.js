@@ -492,6 +492,10 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     const obraForm = document.getElementById('obra-form');
     if (!obraForm) return;
     obraForm.reset();
+    // Resetear todos los custom selects
+    document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
     resetCambiosNoGuardados();
     document.getElementById('input-id-edicion').value = '';
     document.getElementById('btn-guardar').textContent = 'Crear Cavent';
@@ -891,7 +895,10 @@ function setupCaventsDropdown() {
             imagenesData = [];
             currentSlide = 0;
             imagenesDup.forEach((url, index) => {
-                if (url) aplicarPreviewImagen(index, url);
+                if (url) {
+                    aplicarPreviewImagen(index, url);
+                    cargarUrlEnInput(index, url);
+                }
             });
             updateFormProgress();
         } catch (e) {
@@ -1098,13 +1105,11 @@ function setupStepNavigation() {
     const limpiarBtn = document.getElementById('obra-step-limpiar');
     if (limpiarBtn) {
         limpiarBtn.addEventListener('click', () => {
-            if (confirm('¿Limpiar todos los campos del formulario?')) {
-                limpiarFormularioCompleto(true);
-                showStep(0);
-                // Reset trigger
-                const ct = document.getElementById('cavents-trigger');
-                if (ct) ct.textContent = 'Mis Cavents ▴';
-            }
+            limpiarFormularioCompleto(true);
+            showStep(0);
+            // Reset trigger
+            const ct = document.getElementById('cavents-trigger');
+            if (ct) ct.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
         });
     }
 
