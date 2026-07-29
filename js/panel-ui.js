@@ -4,7 +4,7 @@
 
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual } from './auth.js';
-import { cargarMisObras, renderizarTabla, guardarObra, eliminarObra } from './panel.js';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js';
 
