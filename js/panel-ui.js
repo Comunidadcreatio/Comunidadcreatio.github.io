@@ -1128,8 +1128,9 @@ function setupStepNavigation() {
     const limpiarBtn = document.getElementById('obra-step-limpiar');
     if (limpiarBtn) {
         limpiarBtn.addEventListener('click', () => {
-            limpiarFormularioCompleto(true);
+            currentStep = 0;
             showStep(0);
+            limpiarFormularioCompleto(true);
             // Reset trigger
             const ct = document.getElementById('cavents-trigger');
             if (ct) ct.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
