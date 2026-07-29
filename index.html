@@ -99,8 +99,6 @@
             <button id="cavents-galeria" class="logout-option">Global Cavents</button>
             <div class="divider"></div>
             <button id="cavents-crear" class="logout-option">Crear Cavent</button>
-            <div class="divider"></div>
-            <button id="cavents-mis-cavents" class="logout-option">Mis Cavents</button>
         </div>
     </div>
     </div>
@@ -573,56 +571,7 @@
             </div><!-- /#panel-crear -->
 
             <!-- Tabla de obras -->
-            <div id="panel-mis-cavents" class="hidden">
-                <h3>Mis Cavents</h3>
-            <div class="filter-controls" role="search" aria-label="Filtros de búsqueda">
-                <input type="text" id="search-input-panel" placeholder="Buscar por ID, título o precio..." aria-label="Buscar obras">
-                <select id="sort-select" aria-label="Criterio de ordenamiento">
-                    <option value="id">Ordenar por ID</option>
-                    <option value="titulo">Ordenar por Título</option>
-                    <option value="precio">Ordenar por Precio</option>
-                    <option value="status">Ordenar por Status</option>
-                </select>
-                <select id="order-select" aria-label="Orden de clasificación">
-                    <option value="DESC">Descendente</option>
-                    <option value="ASC">Ascendente</option>
-                </select>
-                <select id="limit-select" aria-label="Cantidad de resultados por página">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
 
-            <!-- Controles de paginación -->
-            <div class="pagination-controls" role="navigation" aria-label="Paginación de resultados">
-                <span id="page-info" aria-live="polite">Página 1</span>
-                <div class="pagination-buttons">
-                    <button id="btn-prev" class="pagination-btn" aria-label="Página anterior">« Anterior</button>
-                    <button id="btn-next" class="pagination-btn" aria-label="Página siguiente">Siguiente »</button>
-                </div>
-            </div>
-
-            <!-- Tabla de obras -->
-            <div id="tabla-obras-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Título</th>
-                            <th>Precio</th>
-                            <th>Imagen</th>
-                            <th>Status</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-obras-body">
-                        <!-- Filas de obras -->
-                    </tbody>
-                </table>
-            </div>
-            </div><!-- /#panel-mis-cavents -->
         </section>
 
         <!-- SECCIÓN PRIVADA: MI CUENTA -->

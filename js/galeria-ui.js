@@ -7,10 +7,6 @@ import { artistaActual, token } from './auth.js';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js';
 import { confirmarDescartarCambios } from './panel-ui.js';
 
-// Referencia para refrescarTabla (evita dependencia circular)
-let _refrescarTablaFn = null;
-export function setRefrescarTablaFn(fn) { _refrescarTablaFn = fn; }
-
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
 let gridExiting = false;
@@ -581,12 +577,9 @@ export function togglePanel(view) {
             }
             switchSection(encontrarSeccionActual(), panel, () => {
                 showPanelSubView(view);
-                if (_refrescarTablaFn) _refrescarTablaFn();
             });
         } else {
-            // Panel ya visible, solo cambiar sub-vista
             showPanelSubView(view);
-            if (view === 'mis-cavents' && typeof _refrescarTablaFn === 'function') _refrescarTablaFn();
         }
         return;
     }
@@ -603,7 +596,6 @@ export function togglePanel(view) {
         }
         switchSection(encontrarSeccionActual(), panel, () => {
             showPanelSubView('crear');
-            if (_refrescarTablaFn) _refrescarTablaFn();
         });
     } else {
         switchSection(panel, paginaBlanca);
@@ -613,20 +605,15 @@ export function togglePanel(view) {
 // Panel sub-navegación: nav ↔ crear ↔ mis-cavents
 export function showPanelSubView(view) {
     const panelCrear = document.getElementById('panel-crear');
-    const panelMisCavents = document.getElementById('panel-mis-cavents');
-
-    if (!panelCrear || !panelMisCavents) return;
-
-    panelCrear.classList.add('hidden');
-    panelMisCavents.classList.add('hidden');
+    const panelNav = document.getElementById('panel-nav');
 
     if (view === 'crear') {
-        panelCrear.classList.remove('hidden');
-    } else if (view === 'mis-cavents') {
-        panelMisCavents.classList.remove('hidden');
-        if (typeof _refrescarTablaFn === 'function') {
-            _refrescarTablaFn();
-        }
+        if (panelCrear) panelCrear.classList.remove('hidden');
+        if (panelNav) panelNav.classList.add('hidden');
+    } else {
+        // 'nav' o cualquier otra cosa
+        if (panelCrear) panelCrear.classList.add('hidden');
+        if (panelNav) panelNav.classList.remove('hidden');
     }
 }
 

@@ -34,46 +34,7 @@ function syncAllCustomSelects() {
 // VARIABLES DE ESTADO (PANEL)
 // ============================================
 export const imagenesAEliminar = new Set();
-export let currentPage = 1;
-export let currentLimit = 10;
-export let currentSearch = '';
-export let currentSortBy = 'id';
-export let currentOrder = 'DESC';
-export let totalObras = 0;
 
-export function aplicarFiltrosPanel(search, sortBy, order, limit) {
-    currentSearch = search;
-    currentSortBy = sortBy;
-    currentOrder = order;
-    currentLimit = limit;
-    currentPage = 1;
-}
-
-export function paginaAnterior() {
-    if (currentPage > 1) {
-        currentPage--;
-        return true;
-    }
-    return false;
-}
-
-export function paginaSiguiente() {
-    const totalPages = Math.ceil(totalObras / currentLimit);
-    if (currentPage < totalPages) {
-        currentPage++;
-        return true;
-    }
-    return false;
-}
-
-export function resetPagination() {
-    currentPage = 1;
-    currentSearch = '';
-    currentSortBy = 'id';
-    currentOrder = 'DESC';
-}
-
-// ============================================
 // FORM CHANGE TRACKING
 // ============================================
 let hayCambiosNoGuardados = false;
@@ -937,9 +898,6 @@ function setupCaventsDropdown() {
                 // Eliminar de la lista local inmediatamente
                 _caventsCache.data = _caventsCache.data.filter(o => o.id != id);
                 _caventsCache.loaded = true;
-                // Refrescar tabla si está visible
-                const tablaBody = document.getElementById('tabla-obras-body');
-                if (tablaBody) await refrescarTabla(tablaBody);
             } else {
                 showError('Error al eliminar');
             }

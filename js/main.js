@@ -22,14 +22,10 @@ import {
     showPanelSubView
 } from './galeria-ui.js?v=20260726h';
 import {
-    currentPage, currentLimit, currentSearch, currentSortBy, currentOrder, totalObras,
-    aplicarFiltrosPanel, paginaAnterior, paginaSiguiente,
     setupFormChangeTracking,
-    refrescarTabla,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { setRefrescarTablaFn } from './galeria-ui.js?v=20260726h';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=20260725';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -304,8 +300,7 @@ async function verificarSesionBackend() {
 // CONFIGURACIÓN DE EVENTOS (ORQUESTADOR)
 // ============================================
 function setupEvents() {
-    // ----- Resolver dependencia circular: galeria-ui -> panel-ui.refrescarTabla -----
-    setRefrescarTablaFn(() => refrescarTabla(tablaBody));
+
 
     // ----- Botón de logout del header -----
     const logoutHeaderBtn = document.getElementById('btn-logout-header');
@@ -528,10 +523,7 @@ function setupEvents() {
             caventsPopover.classList.add('hidden');
             togglePanel('crear');
         });
-        document.getElementById('cavents-mis-cavents')?.addEventListener('click', () => {
-            caventsPopover.classList.add('hidden');
-            togglePanel('mis-cavents');
-        });
+
     }
 
     // Cerrar popovers al hacer clic fuera
@@ -607,62 +599,6 @@ function setupEvents() {
         // Safety: dejar de buscar después de 5 segundos
         setTimeout(() => clearInterval(checkInterval), 5000);
     };
-
-    // ----- Filtros (auto-aplicar al cambiar) -----
-    const searchInputPanel = document.getElementById('search-input-panel');
-    const sortSelect = document.getElementById('sort-select');
-    const orderSelect = document.getElementById('order-select');
-    const limitSelect = document.getElementById('limit-select');
-
-    function aplicarFiltros() {
-        if (!tablaBody) return;
-        try {
-            aplicarFiltrosPanel(
-                searchInputPanel?.value || '',
-                sortSelect?.value || 'id',
-                orderSelect?.value || 'DESC',
-                parseInt(limitSelect?.value || '10')
-            );
-            refrescarTabla(tablaBody);
-        } catch(e) {
-            console.error('Error en aplicarFiltros:', e);
-        }
-    }
-
-    let filterDebounce;
-    if (searchInputPanel) {
-        searchInputPanel.addEventListener('input', () => {
-            clearTimeout(filterDebounce);
-            filterDebounce = setTimeout(aplicarFiltros, 300);
-        });
-        searchInputPanel.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                clearTimeout(filterDebounce);
-                aplicarFiltros();
-            }
-        });
-    }
-    if (sortSelect) sortSelect.addEventListener('change', aplicarFiltros);
-    if (orderSelect) orderSelect.addEventListener('change', aplicarFiltros);
-    if (limitSelect) limitSelect.addEventListener('change', aplicarFiltros);
-
-    // ----- Paginación -----
-    const btnPrev = document.getElementById('btn-prev');
-    if (btnPrev) {
-        btnPrev.addEventListener('click', () => {
-            if (paginaAnterior()) {
-                refrescarTabla(tablaBody);
-            }
-        });
-    }
-    const btnNext = document.getElementById('btn-next');
-    if (btnNext) {
-        btnNext.addEventListener('click', () => {
-            if (paginaSiguiente()) {
-                refrescarTabla(tablaBody);
-            }
-        });
-    }
 
     // ----- Sección de perfil -----
     setupPerfilInteracciones(togglePerfil, cerrarTodosLosPaneles);
