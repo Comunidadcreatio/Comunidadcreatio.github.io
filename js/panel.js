@@ -3,7 +3,7 @@
 import { API_BASE_URL, apiRequest } from './config.js';
 import { escapeHtml, debugLog } from './utils.js';
 
-export async function cargarMisObras(token, page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
+export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     try {
         const params = new URLSearchParams({ page, limit, search, sortBy, order });
         const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
@@ -15,7 +15,7 @@ export async function cargarMisObras(token, page = 1, limit = 10, search = '', s
 }
 
 
-export async function guardarObra(token, formData, idEdicion = null) {
+export async function guardarObra(formData, idEdicion = null) {
     const url = idEdicion ? `/obras/${idEdicion}` : '/obras';
     const method = idEdicion ? 'PUT' : 'POST';
     try {
@@ -31,7 +31,7 @@ export async function guardarObra(token, formData, idEdicion = null) {
     }
 }
 
-export async function eliminarObra(token, id) {
+export async function eliminarObra(id) {
     try {
         const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
             method: 'DELETE',

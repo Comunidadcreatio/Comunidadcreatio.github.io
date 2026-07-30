@@ -300,7 +300,7 @@ export async function toggleExplorar() {
                     verPerfilArtistaDesdeGaleria(artistaId);
                 });
                 actualizarEstadoNavButtons();
-                setTimeout(() => { gridEntering = false; }, 700);
+                gridEntering = false;
             });
         });
     } else if (galeriaModo === 1) {
@@ -312,7 +312,10 @@ export async function toggleExplorar() {
             setupPullToRefresh(galeriaContainerLocal);
         }
         actualizarEstadoNavButtons();
-        setTimeout(() => { gridEntering = false; }, 700);
+        // Esperar al siguiente frame para que el CSS de la transición se aplique
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => { gridEntering = false; });
+        });
     } else {
         // Salir del modo grid (volver a normal o cerrar)
         galeriaModo = 0;

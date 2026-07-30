@@ -3,7 +3,7 @@
 // Coordina todos los módulos: autenticación, galería, panel, perfil,
 // búsqueda, cuenta, tema, y gestiona eventos globales.
 
-import { ARTISTA_KEY, apiRequest } from './config.js';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import { debugLog } from './utils.js';
 import {
@@ -301,10 +301,20 @@ function positionMobilePanel(triggerElement, panelElement) {
 async function verificarSesionBackend() {
     if (!token) return false;
     try {
-        const res = await apiRequest('/api/artistas/mis-obras?page=1&limit=1');
-        return res !== null && res.success !== false;
+        // Usamos heartbeat (endpoint ligero) con fetch directo para evitar
+        // el 401 handler de apiRequest que dispara efectos secundarios.
+        // Un error de red NO debe confundirse con sesión expirada.
+        const res = await fetch(`${API_BASE_URL}/api/artistas/heartbeat`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        // Solo 401/403 indica sesión realmente expirada
+        if (res.status === 401 || res.status === 403) return false;
+        return res.ok;
     } catch (error) {
-        return false;
+        // Error de red: asumimos sesión válida (no redirigir por un transient network error)
+        debugLog.warn('verificarSesionBackend: no se pudo contactar el backend, asumiendo sesión válida');
+        return true;
     }
 }
 

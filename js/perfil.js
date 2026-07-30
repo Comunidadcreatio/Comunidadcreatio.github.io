@@ -31,11 +31,31 @@ export function getFotoPerfil() {
 }
 
 export function guardarFotoPerfil(dataUrl) {
+    // Crear thumbnail para no exceder la cuota de localStorage (~5-10 MB)
+    const MAX_THUMB_W = 200;
     try {
-        localStorage.setItem(getFotoPerfilKey(), dataUrl);
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ratio = Math.min(MAX_THUMB_W / img.naturalWidth, 1);
+            canvas.width = img.naturalWidth * ratio;
+            canvas.height = img.naturalHeight * ratio;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const thumbDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            try {
+                localStorage.setItem(getFotoPerfilKey(), thumbDataUrl);
+            } catch (e) {
+                // Si aún excede cuota, eliminar clave vieja y reintentar
+                try { localStorage.removeItem(getFotoPerfilKey()); } catch (_) {}
+                try { localStorage.setItem(getFotoPerfilKey(), thumbDataUrl); } catch (_) {}
+            }
+        };
+        img.src = dataUrl;
     } catch (e) {
-        debugLog.error('No se pudo guardar la foto de perfil:', e);
+        debugLog.error('No se pudo crear thumbnail de la foto:', e);
     }
+    // Siempre actualizar artistaActual (prioridad: Cloudinary URL a tamaño completo)
     if (artistaActual) {
         artistaActual.foto_perfil = dataUrl;
         try {
@@ -149,7 +169,7 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
     try {
         let res;
         if (userId) {
-            res = await apiRequest('/obras');
+            res = await apiRequest('/obras?limit=100');
             if (Array.isArray(res)) {
                 const obrasUsuario = res.filter(obra =>
                     String(obra.artista_user_id) === String(userId) ||
@@ -406,6 +426,12 @@ function setupPerfilTabs() {
 export function activarTabCavents() {
     perfilTabActual = 'cavents';
     perfilExternoId = null;
+    // Restaurar el header del perfil propio (nombre, avatar, ciudad)
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    if (perfilUsuario) {
+        perfilUsuario.dataset.viewing = 'own';
+    }
+    actualizarPerfilUI();
     const tabs = document.querySelectorAll('.perfil-tab-btn');
     tabs.forEach(t => t.classList.remove('active'));
     const caventsTab = document.querySelector('.perfil-tab-btn[data-tab="cavents"]');
@@ -423,7 +449,7 @@ async function cargarContenidoTab(tab) {
         content.innerHTML = '<div class="perfil-grid-loading">Cargando obras...</div>';
         try {
             if (viendoExterno) {
-                const res = await apiRequest('/obras');
+                const res = await apiRequest('/obras?limit=100');
                 if (res && Array.isArray(res)) {
                     const obrasUsuario = res.filter(obra => String(obra.artista_user_id) === String(perfilExternoId));
                     renderizarGridObras(obrasUsuario, content);

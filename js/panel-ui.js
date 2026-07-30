@@ -76,7 +76,7 @@ export async function refrescarTabla(tablaBody) {
         return;
     }
 
-    const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
+    const result = await cargarMisObras(currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     if (!result.success) {
         debugLog.error("Error al cargar obras:", result.error);
         if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
@@ -102,7 +102,7 @@ export async function refrescarTabla(tablaBody) {
             // Editar obra ... (código legacy, los callbacks no se usan ya)
             async (id) => {},
             async (id) => {
-                const exito = await eliminarObra(token, id);
+                const exito = await eliminarObra(id);
                 if (exito) {
                     showSuccess("Obra eliminada correctamente.");
                     invalidateCaventsCache();
@@ -280,7 +280,7 @@ export function setupImagePreviews() {
             // Buscar el primer slot sin usar
             for (let i = 0; i < MAX_IMAGENES; i++) {
                 const inp = document.getElementById(`input-imagen-${i}`);
-                if (inp && !inp.files?.length && !tieneImagenEnSlot(i)) {
+                if (inp && !inp.files?.length) {
                     inp.click();
                     return;
                 }
@@ -352,12 +352,6 @@ export function setupImagePreviews() {
             document.getElementById("carrusel-viewport").style.aspectRatio = aspectRatio;
         });
     });
-}
-
-function tieneImagenEnSlot(index) {
-    // Verificar si este slot ya tiene datos (para evitar reusar input)
-    // Como los inputs se mapean 1:1 con imagenesData por orden, esto es menos relevante
-    return false;
 }
 
 // ============================================
@@ -463,7 +457,7 @@ export function setupObraFormSubmit() {
                 formData.append(`imagen_${img.slot}`, img.file);
             }
         });
-        const result = await guardarObra(token, formData, idEdicion || null);
+        const result = await guardarObra(formData, idEdicion || null);
         setButtonLoading(btnGuardar, false);
         if (result.success) {
             showSuccess("Obra guardada correctamente.");
@@ -649,7 +643,7 @@ function setupCaventsDropdown() {
         if (_caventsCache.loaded) return;
         try {
             if (!token) { debugLog.error('Token no disponible para cargar cavents'); return; }
-            const result = await cargarMisObras(token, 1, 50);
+            const result = await cargarMisObras(1, 50);
             if (result.success) {
                 _caventsCache.data = result.obras || [];
                 _caventsCache.loaded = true;
@@ -800,7 +794,7 @@ function setupCaventsDropdown() {
         const confirmado = await showConfirm('¿Eliminar este cavent? Esta acción no se puede deshacer.');
         if (!confirmado) return;
         try {
-            const resp = await eliminarObra(token, id);
+            const resp = await eliminarObra(id);
             if (resp) {
                 showSuccess('Cavent eliminado');
                 // Eliminar de la lista local inmediatamente
