@@ -1,10 +1,18 @@
 // js/auth.js
 import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
+import { debugLog } from './utils.js';
 
 // El token JWT ahora es una cookie HttpOnly (el frontend NO puede leerlo).
 // Usamos la presencia de artistaActual en localStorage como indicador de sesión.
 export let token = !!localStorage.getItem(ARTISTA_KEY);
-export let artistaActual = JSON.parse(localStorage.getItem(ARTISTA_KEY));
+export let artistaActual = (() => {
+    try {
+        return JSON.parse(localStorage.getItem(ARTISTA_KEY));
+    } catch (e) {
+        localStorage.removeItem(ARTISTA_KEY);
+        return null;
+    }
+})();
 
 export async function login(email, password) {
     try {
@@ -54,7 +62,7 @@ export async function register(nombre_artista, nombre_real, email, password, tel
 
 export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
-    token = null;
+    token = false;
     artistaActual = null;
     document.dispatchEvent(new Event('userLogout'));
 }

@@ -5,6 +5,7 @@
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
+import { debugLog } from './utils.js';
 
 /**
  * Oculta (y resetea) un formulario de la sección Mi Cuenta.

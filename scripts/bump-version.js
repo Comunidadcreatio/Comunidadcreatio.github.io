@@ -166,6 +166,40 @@ function main() {
     } else {
         console.log('\n✅ Cache-busting actualizado. Listo para commit.');
     }
+
+    // 5. Sincronizar a www/ y android/assets/ (para Capacitor)
+    console.log('\n📦 Sincronizando activos a www/ y android/...');
+    const dirs = [
+        { src: '.', dest: 'www' },
+        { src: 'www', dest: 'android/app/src/main/assets/public' }
+    ];
+    const filesToCopy = [
+        'index.html', 'auth.html', 'reset-password.html', 'version.json',
+        'capacitor.config.json', 'capacitor.plugins.json'
+    ];
+    const dirsToCopy = ['css', 'js', 'iconos'];
+
+    for (const { src: srcDir, dest: destDir } of dirs) {
+        if (!fs.existsSync(path.join(projectRoot, destDir))) {
+            fs.mkdirSync(path.join(projectRoot, destDir), { recursive: true });
+        }
+        for (const file of filesToCopy) {
+            const src = path.join(projectRoot, srcDir, file);
+            const dest = path.join(projectRoot, destDir, file);
+            if (fs.existsSync(src)) {
+                fs.copyFileSync(src, dest);
+            }
+        }
+        for (const dir of dirsToCopy) {
+            const src = path.join(projectRoot, srcDir, dir);
+            const dest = path.join(projectRoot, destDir, dir);
+            if (fs.existsSync(src)) {
+                fs.cpSync(src, dest, { recursive: true });
+            }
+        }
+        console.log(`  ✓ ${srcDir}/ → ${destDir}/`);
+    }
+    console.log('📦 Sincronización completada.\n');
 }
 
 main();

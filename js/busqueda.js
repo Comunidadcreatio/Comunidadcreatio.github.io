@@ -67,7 +67,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
 
             let avatarHTML = '';
             if (usuario.foto_perfil) {
-                avatarHTML = `<img src="${escapeHtml(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
+                avatarHTML = `<img src="${usuario.foto_perfil.replace(/"/g, '&quot;')}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
             } else {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
                 avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;
@@ -146,7 +146,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
 
         try {
             const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
-            if (response && response.success && response.usuarios.length > 0) {
+            if (response && response.success && Array.isArray(response.usuarios) && response.usuarios.length > 0) {
                 if (mostrarResultadosBusquedaFn) mostrarResultadosBusquedaFn(response.usuarios);
             } else {
                 showWarning('No se encontraron usuarios con ese nombre');

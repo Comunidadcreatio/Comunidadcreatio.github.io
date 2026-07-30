@@ -2,7 +2,7 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=20260725';
+import { cargarGaleria, mostrarGaleria } from './galeria.js';
 import { artistaActual, token } from './auth.js';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js';
 import { confirmarDescartarCambios } from './panel-ui.js';
@@ -45,7 +45,9 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
 
     isTransitioning = true;
 
+    let safetyFired = false;
     const safetyTimeout = setTimeout(() => {
+        safetyFired = true;
         isTransitioning = false;
         for (const id of SECCIONES) {
             const el = document.getElementById(id);
@@ -54,13 +56,14 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
                 el.classList.add('hidden');
             }
         }
-        if (sectionEntrante) {
+        if (sectionEntrante && document.getElementById(sectionEntrante.id)) {
             sectionEntrante.classList.remove('hidden');
             if (callback) callback();
         }
     }, 800);
 
     function finish() {
+        if (safetyFired) return; // el safety ya limpió todo, no duplicar
         clearTimeout(safetyTimeout);
         isTransitioning = false;
     }

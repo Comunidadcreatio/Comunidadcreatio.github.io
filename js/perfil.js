@@ -49,7 +49,7 @@ export function guardarFotoPerfil(dataUrl) {
 // ============================================
 // ACTUALIZAR UI DEL PERFIL
 // ============================================
-export function actualizarPerfilUI(verificarActividadFn) {
+export function actualizarPerfilUI(verificarActividadFn = null) {
     const onlineIndicator = document.getElementById('perfil-online-indicator');
     const perfilUsuario = document.getElementById('perfil-usuario');
     const viendoPerfilExterno = perfilUsuario && perfilUsuario.dataset.viewing === 'external';
@@ -217,7 +217,7 @@ export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
             <div class="resultado-item" data-user-id="${escapeHtml(String(usuario.id))}">
                 <div class="resultado-avatar">
                     ${usuario.foto_perfil
-                        ? `<img src="${escapeHtml(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}">`
+                        ? `<img src="${usuario.foto_perfil.replace(/"/g, '&quot;')}" alt="${escapeHtml(usuario.nombre_artista)}">`
                         : `<div class="avatar-placeholder">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
                     }
                 </div>

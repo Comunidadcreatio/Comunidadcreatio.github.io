@@ -5,6 +5,7 @@
 
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
+import { debugLog } from './utils.js';
 import {
     showSuccess, showError, showWarning, showInfo, showConfirm
 } from './notificaciones.js';
@@ -20,20 +21,22 @@ import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     showPanelSubView
-} from './galeria-ui.js?v=20260726h';
+} from './galeria-ui.js';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=20260725';
+import { cargarGaleria, mostrarGaleria } from './galeria.js';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
 // ============================================
 // ELEMENTOS DEL DOM (GLOBALES)
 // ============================================
-export const galeriaContainer = document.getElementById('galeria-container');
+export function getGaleriaContainer() {
+    return document.getElementById('galeria-container');
+}
 const tablaBody = document.getElementById('tabla-obras-body');
 
 // Variables para paneles flotantes
@@ -142,17 +145,21 @@ async function closeAllSessions() {
         return;
     }
     if (await showConfirm("⚠️ ¿Estás seguro de que quieres cerrar la sesión en todos los dispositivos?\n\nEsta acción cerrará tu sesión actual.")) {
+        let redirect = false;
         try {
             const res = await apiRequest('/api/artistas/cerrar-todas-sesiones', { method: 'POST' });
             if (res && res.success) {
                 showSuccess("Todas las sesiones han sido cerradas correctamente.");
+                redirect = true;
             } else {
                 showError((res.error || "Error inesperado."));
             }
         } catch (error) {
             debugLog.error("Error al cerrar todas las sesiones:", error);
             showError("Error de conexión. Cerrando sesión local por seguridad.");
-        } finally {
+            redirect = true;
+        }
+        if (redirect) {
             localStorage.removeItem(ARTISTA_KEY);
             window.location.href = '/';
         }
@@ -517,7 +524,7 @@ function setupEvents() {
         });
         document.getElementById('cavents-galeria')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
-            toggleGaleria(galeriaContainer);
+            toggleGaleria(getGaleriaContainer());
         });
         document.getElementById('cavents-crear')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');

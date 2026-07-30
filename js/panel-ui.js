@@ -66,7 +66,16 @@ function resetCambiosNoGuardados() {
 // ============================================
 // REFRESCAR TABLA (CRUD)
 // ============================================
+// NOTA: La tabla HTML de "Mis Cavents" fue eliminada. Esta función ahora
+// solo invalida el cache del dropdown de cavents para forzar recarga.
 export async function refrescarTabla(tablaBody) {
+    // Si los elementos de paginación ya no existen, solo invalidar cache
+    const pageInfo = document.getElementById('page-info');
+    if (!pageInfo) {
+        invalidateCaventsCache();
+        return;
+    }
+
     const result = await cargarMisObras(token, currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
     if (!result.success) {
         debugLog.error("Error al cargar obras:", result.error);
@@ -82,143 +91,29 @@ export async function refrescarTabla(tablaBody) {
     const obras = result.obras;
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
-    document.getElementById('page-info').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-    document.getElementById('btn-prev').disabled = currentPage <= 1;
-    document.getElementById('btn-next').disabled = currentPage >= totalPages;
+    pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    if (btnPrev) btnPrev.disabled = currentPage <= 1;
+    if (btnNext) btnNext.disabled = currentPage >= totalPages;
 
-    renderizarTabla(obras, tablaBody,
-        // Editar obra
-        async (id) => {
-            try {
-                const data = await apiRequest(`/obras/${id}`);
-                if (!data) return;
-                if (data.success === false) {
-                    debugLog.error('Error al obtener obra:', data.error);
-                    showError('Error al cargar la obra: ' + data.error);
-                    return;
+    if (typeof renderizarTabla === 'function') {
+        renderizarTabla(obras, tablaBody,
+            // Editar obra ... (código legacy, los callbacks no se usan ya)
+            async (id) => {},
+            async (id) => {
+                const exito = await eliminarObra(token, id);
+                if (exito) {
+                    showSuccess("Obra eliminada correctamente.");
+                    invalidateCaventsCache();
+                    if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
+                } else {
+                    showError("Error al eliminar la obra.");
                 }
-                const obra = data;
-                document.getElementById('input-id-edicion').value = obra.id;
-                document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-                document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
-                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
-                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
-                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
-                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
-                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
-                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
-                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
-                document.getElementById('input-ancho').value = obra.ancho || '';
-                document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
-                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
-                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
-                document.getElementById('btn-guardar').textContent = 'Actualizar Cavent';
-                const imagenes = [
-                    cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
-                    cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
-                ];
-                imagenesAEliminar.clear();
-                imagenesData = [];
-                currentSlide = 0;
-                // Cargar imágenes existentes
-                imagenes.forEach((url, index) => {
-                    if (url) aplicarPreviewImagen(index, url);
-                });
-                document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                syncAllCustomSelects();
-                updateFormProgress();
-            } catch (error) {
-                debugLog.error("Error al cargar datos de la obra:", error);
-                showError("Error al cargar la obra para editar");
-            }
-        },
-        // Eliminar obra
-        async (id) => {
-            if (!(await showConfirm('¿Estás seguro de eliminar esta obra?'))) return;
-            const btnEliminar = document.querySelector(`.btn-eliminar[data-id="${id}"]`);
-            if (btnEliminar) setButtonLoading(btnEliminar, true);
-
-            const exito = await eliminarObra(token, id);
-            if (btnEliminar) setButtonLoading(btnEliminar, false);
-
-            if (exito) {
-                showSuccess("Obra eliminada correctamente.");
-                await refrescarTabla(tablaBody);
-                window.actualizarEstadisticas();
-            } else {
-                showError("Error al eliminar la obra.");
-            }
-        },
-        // Duplicar obra
-        async (id) => {
-            try {
-                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
-                if (btnDuplicar) setButtonLoading(btnDuplicar, true);
-
-                const res = await apiRequest(`/obras/${id}`);
-                if (!res) return;
-                const obra = res;
-
-                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
-
-                document.getElementById('input-id-edicion').value = '';
-                document.getElementById('input-titulo').value = obra.titulo;
-                document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-                document.getElementById('input-precio').value = obra.precio;
-                document.getElementById('input-ano').value = obra.ano || '';
-                document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica);
-                document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte);
-                document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica);
-                document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra);
-                document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia);
-                document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos);
-                document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado);
-                document.getElementById('input-status').value = decodeHTMLEntities(obra.status);
-                document.getElementById('input-ancho').value = obra.ancho || '';
-                document.getElementById('input-alto').value = obra.alto || '';
-                document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma);
-                document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion);
-                document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas);
-
-                imagenesAEliminar.clear();
-                imagenesData = [];
-                currentSlide = 0;
-
-                document.getElementById('btn-guardar').textContent = 'Crear Cavent';
-                document.getElementById('formulario-obra').scrollIntoView({ behavior: 'smooth' });
-                document.getElementById('input-titulo').focus();
-
-                const imagenesDuplicar = [
-                    cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
-                    cloudinaryUrl(obra.imagen_url_3), cloudinaryUrl(obra.imagen_url_4)
-                ];
-                imagenesDuplicar.forEach((url, index) => {
-                    if (url) aplicarPreviewImagen(index, url);
-                });
-                let algunaCargada = false;
-                for (let index = 0; index < imagenesDuplicar.length; index++) {
-                    const url = imagenesDuplicar[index];
-                    if (url) {
-                        const ok = await cargarUrlEnInput(index, url);
-                        if (ok) algunaCargada = true;
-                    }
-                }
-                if (!algunaCargada && imagenesDuplicar.some(Boolean)) {
-                    showWarning("No se pudieron cargar automáticamente las imágenes. Vuelve a subirlas antes de guardar la obra duplicada.");
-                }
-                updateFormProgress();
-            } catch (error) {
-                debugLog.error("Error al duplicar:", error);
-                const btnDuplicar = document.querySelector(`.btn-duplicar[data-id="${id}"]`);
-                if (btnDuplicar) setButtonLoading(btnDuplicar, false);
-                showError("Error al duplicar la obra.");
-            }
-        }
-    );
+            },
+            async (id) => {}
+        );
+    }
 }
 
 // ============================================
@@ -566,7 +461,7 @@ export function setupObraFormSubmit() {
             imagenesAEliminar.clear();
             limpiarFormularioCompleto(true);
             await refrescarTabla(document.getElementById('tabla-obras-body'));
-            window.actualizarEstadisticas();
+            if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
         } else {
             mostrarErrores(result);
         }
