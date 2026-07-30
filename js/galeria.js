@@ -15,7 +15,9 @@ export async function cargarGaleria(container) {
             return [];
         }
         container.setAttribute('aria-busy', 'false');
-        return Array.isArray(data) ? data : [];
+        // Maneja tanto array directo como {success:true, obras:[...]} / {data:[...]}
+        const obras = Array.isArray(data) ? data : (data?.obras ?? data?.data ?? []);
+        return obras;
     } catch (error) {
         debugLog.error("Error al cargar la galería:", error);
         container.innerHTML = '<p>Error al cargar las obras.</p>';
@@ -134,24 +136,16 @@ function initCarrusel(card) {
     }, { passive: true });
 
     // Soporte para ratón (arrastrar)
-    track.addEventListener('mousedown', (e) => {
-        startX = e.clientX;
-        isDragging = true;
-        track.style.transition = 'none';
-        track.style.cursor = 'grabbing';
-        e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', (e) => {
+    const onMouseMove = (e) => {
         if (!isDragging) return;
         const diff = e.clientX - startX;
         const containerWidth = track.parentElement.offsetWidth;
         dragOffset = (diff / containerWidth) * 100;
         const baseOffset = -currentIndex * 100;
         track.style.transform = `translateX(${baseOffset + dragOffset}%)`;
-    });
+    };
 
-    window.addEventListener('mouseup', () => {
+    const onMouseUp = () => {
         if (!isDragging) return;
         isDragging = false;
         track.style.transition = 'transform 0.35s ease';
@@ -168,6 +162,20 @@ function initCarrusel(card) {
             goTo(currentIndex);
         }
         dragOffset = 0;
+        // Limpiar listeners al soltar
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    track.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        track.style.transition = 'none';
+        track.style.cursor = 'grabbing';
+        e.preventDefault();
+        // Adjuntar listeners solo durante el arrastre
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
     });
 }
 

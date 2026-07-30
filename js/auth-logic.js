@@ -729,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ email })
                 });
                 setButtonLoading(btn, false);
-                if (data.success || res.ok) {
+                if (data.success) {
                     emailInput.value = '';
                     emailInput.classList.remove('input-error');
                     msgEl.textContent = 'Si el correo está registrado, recibirás un enlace en tu bandeja de entrada.';
