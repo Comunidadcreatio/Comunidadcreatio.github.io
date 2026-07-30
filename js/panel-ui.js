@@ -739,6 +739,7 @@ function setupCaventsDropdown() {
                 if (url) aplicarPreviewImagen(index, url);
             });
             syncCustomSelects();
+            resetCambiosNoGuardados();
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error editando cavent:', e.message, e.stack);
@@ -772,6 +773,7 @@ function setupCaventsDropdown() {
             document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             syncCustomSelects();
+            resetCambiosNoGuardados();
             // Cargar imágenes para duplicar
             const imagenesDup = [
                 cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),

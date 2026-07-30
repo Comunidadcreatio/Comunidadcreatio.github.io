@@ -63,9 +63,9 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     }, 800);
 
     function finish() {
-        if (safetyFired) return; // el safety ya limpió todo, no duplicar
+        if (safetyFired) return;
         clearTimeout(safetyTimeout);
-        isTransitioning = false;
+        // isTransitioning se libera al terminar la animación de ENTRADA (en mostrarSeccion)
     }
 
     if (sectionSaliente) {
@@ -94,6 +94,7 @@ function mostrarSeccion(section, callback) {
             section.addEventListener('animationend', function onEnter() {
                 section.removeEventListener('animationend', onEnter);
                 section.classList.remove('section-entering');
+                isTransitioning = false;
                 if (callback) callback();
             }, { once: true });
         });

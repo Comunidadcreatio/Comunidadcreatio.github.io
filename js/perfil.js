@@ -141,10 +141,10 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
         return;
     }
 
-    const fallbackCavents = statsData && (statsData.cavents || statsData.total_obras_activas) ?
-        String(statsData.cavents || statsData.total_obras_activas) : '0';
-    const fallbackProblogs = statsData && statsData.problogs ? String(statsData.problogs) : '0';
-    const fallbackComcons = statsData && statsData.comcons ? String(statsData.comcons) : '0';
+    const fallbackCavents = statsData && (statsData.cavents != null ? statsData.cavents : statsData.total_obras_activas) != null
+        ? String(statsData.cavents != null ? statsData.cavents : statsData.total_obras_activas) : '0';
+    const fallbackProblogs = (statsData && statsData.problogs != null) ? String(statsData.problogs) : '0';
+    const fallbackComcons = (statsData && statsData.comcons != null) ? String(statsData.comcons) : '0';
 
     try {
         let res;
@@ -159,7 +159,7 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
                 const activas = obrasUsuario.filter(obra =>
                     obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
                 ).length;
-                statsCavents.textContent = activas || fallbackCavents;
+                statsCavents.textContent = activas;
             } else {
                 statsCavents.textContent = fallbackCavents;
             }

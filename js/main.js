@@ -46,6 +46,7 @@ let desktopLogoutSingleBtn = null;
 let clickOutsideHandlerLogout = null;
 let headerConfigOutsideHandler = null;
 let headerLogoutOutsideHandler = null;
+let mobileClickOutsideHandler = null;
 
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
@@ -184,6 +185,10 @@ async function ejecutarLogout() {
 function cerrarMobileLogoutModal() {
     const modal = document.getElementById('mobile-logout-options');
     if (modal) modal.classList.add('hidden');
+    if (mobileClickOutsideHandler) {
+        document.removeEventListener('click', mobileClickOutsideHandler);
+        mobileClickOutsideHandler = null;
+    }
 }
 
 function cerrarDesktopLogoutModal() {
@@ -417,16 +422,16 @@ function setupEvents() {
                         mobileModal.classList.remove('hidden');
                         positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
-                            document.addEventListener('click', function onClickOutsideMobile(e) {
+                            mobileClickOutsideHandler = function(e) {
                                 const target = e.target;
                                 const isNavButton = target.closest('#btn-galeria-sidebar') ||
                                     target.closest('#btn-registro-sidebar') ||
                                     target.closest('#btn-perfil-sidebar');
                                 if (!mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
-                                    mobileModal.classList.add('hidden');
-                                    document.removeEventListener('click', onClickOutsideMobile);
+                                    cerrarMobileLogoutModal();
                                 }
-                            });
+                            };
+                            document.addEventListener('click', mobileClickOutsideHandler);
                         }, 0);
                     } else {
                         mobileModal.classList.add('hidden');
@@ -704,6 +709,8 @@ function setupEvents() {
 // INICIALIZACIÓN
 // ============================================
 async function init() {
+    const t0 = performance.now();
+
     const preloader = document.getElementById('preloader');
     let preloaderOcultado = false;
     const ocultarPreloader = () => {
@@ -729,7 +736,8 @@ async function init() {
         ocultarPreloader();
         clearTimeout(timeoutId);
     } else {
-        const remaining = MIN_DISPLAY_MS - performance.now();
+        const elapsed = performance.now() - t0;
+        const remaining = MIN_DISPLAY_MS - elapsed;
         setTimeout(() => {
             ocultarPreloader();
             clearTimeout(timeoutId);
