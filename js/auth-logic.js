@@ -593,9 +593,9 @@ function validateStep(step) {
         if (emailInput && esTLDSospechoso(emailInput.value)) {
             showWarning('El dominio de tu correo parece inusual. Verifica que sea correcto antes de continuar.');
         }
-        if (disponibilidad.email === false) {
+        if (disponibilidad.email !== true) {
             marcarInputError(emailInput);
-            showWarning('Este correo ya está registrado. Usa otro.');
+            showWarning(disponibilidad.email === false ? 'Este correo ya está registrado. Usa otro.' : 'Espera mientras verificamos el correo...');
             return false;
         }
         if (telefonoInput && !esTelefonoValido(telefonoInput.value)) {
@@ -609,9 +609,9 @@ function validateStep(step) {
         const nombreInput = document.getElementById('reg-nombre-artista');
         const passInput = document.getElementById('reg-pass');
 
-        if (disponibilidad.nombre === false) {
+        if (disponibilidad.nombre !== true) {
             marcarInputError(nombreInput);
-            showWarning('Este nombre de usuario ya está en uso. Elige otro.');
+            showWarning(disponibilidad.nombre === false ? 'Este nombre de usuario ya está en uso. Elige otro.' : 'Espera mientras verificamos el nombre...');
             return false;
         }
         if (passInput) {
@@ -894,13 +894,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Validaciones adicionales que validateStep no cubre
             const emailInput = document.getElementById('reg-email');
-            if (emailInput && disponibilidad.email === false) {
-                showWarning('El correo electrónico ya está registrado. Usa otro.');
+            if (emailInput && disponibilidad.email !== true) {
+                showWarning('El correo electrónico ya está registrado o no se ha verificado aún. Usa otro.');
                 currentStep = 4; mostrarPasoActual(); return;
             }
             const nombreInput = document.getElementById('reg-nombre-artista');
-            if (nombreInput && disponibilidad.nombre === false) {
-                showWarning('El nombre de artista ya está en uso. Elige otro.');
+            if (nombreInput && disponibilidad.nombre !== true) {
+                showWarning('El nombre de artista ya está en uso o no se ha verificado aún. Elige otro.');
                 currentStep = 5; mostrarPasoActual(); return;
             }
             

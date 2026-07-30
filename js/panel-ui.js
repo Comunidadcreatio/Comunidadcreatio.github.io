@@ -123,7 +123,7 @@ export async function refrescarTabla(tablaBody) {
 // PREVISUALIZACIÓN DE IMÁGENES (CARRUSEL)
 // ============================================
 const MAX_IMAGENES = 5;
-let imagenesData = []; // [{src, file}] — datos de imágenes en el carrusel
+let imagenesData = []; // [{src, file, slot}] — datos de imágenes en el carrusel
 let currentSlide = 0;
 let aspectRatio = '4/5';
 
@@ -193,12 +193,22 @@ function irASlide(index) {
     actualizarCarrusel();
 }
 
+function getNextFreeSlot() {
+    const used = new Set(imagenesData.map(img => img.slot));
+    for (let i = 0; i < MAX_IMAGENES; i++) {
+        if (!used.has(i)) return i;
+    }
+    return imagenesData.length; // fallback: no debería ocurrir por el guard de MAX_IMAGENES
+}
+
 function eliminarImagen(index) {
+    // Guardar el slot ORIGINAL antes del splice (los índices visuales cambian)
+    const slotEliminado = imagenesData[index].slot;
     imagenesData.splice(index, 1);
     const editId = document.getElementById('input-id-edicion').value;
-    if (editId) imagenesAEliminar.add(index);
+    if (editId) imagenesAEliminar.add(slotEliminado);
     // Limpiar input file correspondiente
-    const inp = document.getElementById(`input-imagen-${index}`);
+    const inp = document.getElementById(`input-imagen-${slotEliminado}`);
     if (inp) inp.value = '';
     if (currentSlide >= imagenesData.length) {
         currentSlide = Math.max(0, imagenesData.length - 1);
@@ -214,15 +224,16 @@ function dispararInput(index) {
 
 function agregarImagen(file, dataUrl) {
     if (imagenesData.length >= MAX_IMAGENES) return;
-    imagenesData.push({ src: dataUrl, file: file });
+    const slot = getNextFreeSlot();
+    imagenesData.push({ src: dataUrl, file: file, slot: slot });
     currentSlide = imagenesData.length - 1;
     actualizarCarrusel();
 }
 
-export function aplicarPreviewImagen(index, url) {
-    // Usado al editar/duplicar: agregar imagen desde URL
+export function aplicarPreviewImagen(slot, url) {
+    // Usado al editar/duplicar: agregar imagen desde URL con su slot original
     if (imagenesData.length >= MAX_IMAGENES) return;
-    imagenesData.push({ src: url, file: null });
+    imagenesData.push({ src: url, file: null, slot: slot });
     if (imagenesData.length === 1) currentSlide = 0;
     actualizarCarrusel();
 }
@@ -446,10 +457,10 @@ export function setupObraFormSubmit() {
         if (imagenesAEliminar.size > 0) {
             formData.append('imagenes_a_eliminar', JSON.stringify([...imagenesAEliminar]));
         }
-        // Adjuntar archivos desde imagenesData
-        imagenesData.forEach((img, index) => {
+        // Adjuntar archivos desde imagenesData (usando el slot original)
+        imagenesData.forEach((img) => {
             if (img.file) {
-                formData.append(`imagen_${index}`, img.file);
+                formData.append(`imagen_${img.slot}`, img.file);
             }
         });
         const result = await guardarObra(token, formData, idEdicion || null);
@@ -769,12 +780,12 @@ function setupCaventsDropdown() {
             imagenesAEliminar.clear();
             imagenesData = [];
             currentSlide = 0;
-            imagenesDup.forEach((url, index) => {
+            for (const [index, url] of imagenesDup.entries()) {
                 if (url) {
                     aplicarPreviewImagen(index, url);
-                    cargarUrlEnInput(index, url);
+                    await cargarUrlEnInput(index, url);
                 }
-            });
+            }
             updateFormProgress();
         } catch (e) {
             debugLog.error('Error duplicando cavent:', e);
