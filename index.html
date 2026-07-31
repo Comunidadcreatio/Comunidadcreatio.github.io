@@ -712,37 +712,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/main.js?v=a9cbfabb72" type="module"></script>
-    <!-- Detector de actualizaciones (con recarga forzada) -->
-    <script>
-        (function() {
-
-            fetch('/version.json?t=' + Date.now(), { cache: 'no-cache' })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var localVer = localStorage.getItem('app_version');
-                    var currentUrl = window.location.href;
-
-                    // Si es primera visita o viene con ?v= (recarga forzada): actualizar y salir
-                    if (!localVer || currentUrl.indexOf('?v=') !== -1) {
-                        localStorage.setItem('app_version', data.version);
-                        return;
-                    }
-
-                    if (data.version !== localVer) {
-                        var bar = document.createElement('div');
-                        bar.id = 'update-pill';
-                        bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:2147483647;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:calc(100vw - 32px);pointer-events:auto;';
-                        bar.innerHTML = 'v' + data.version + ' disponible <button id="btn-refresh-app" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
-                        document.body.appendChild(bar);
-
-                        document.getElementById('btn-refresh-app').onclick = function() {
-                            localStorage.setItem('app_version', data.version);
-                            window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
-                        };
-                    }
-                })
-                .catch(function() {});
-        })();
-    </script>
+    <!-- Detector de actualizaciones compartido -->
+    <script src="js/version-check.js"></script>
 </body>
 </html>

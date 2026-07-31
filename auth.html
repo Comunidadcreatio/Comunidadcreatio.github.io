@@ -6,7 +6,7 @@
     <!-- Detección de altura de barra de estado -->
     <script>
         (function() {
-            document.documentElement.style.setProperty('--status-bar-height', '45px');
+            document.documentElement.style.setProperty('--status-bar-height', '31px');
         })();
     </script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -309,14 +309,14 @@
             <a href="#" onclick="alert('No compartimos tu información personal con terceros.')">Privacidad</a>
         </div>
         <div class="auth-footer-bottom">
-            <span>© 2025 Creatio</span>
+            <span>© 2026 Creatio</span>
             <span>·</span>
             <span>Táchira, Venezuela</span>
         </div>
     </footer>
 
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=09ef23b34f"></script>
+    <script type="module" src="js/auth-logic.js?v=916338dee8"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>
@@ -547,36 +547,7 @@
         })();
     </script>
     </main>
-    <!-- Detector de actualizaciones (con recarga forzada) -->
-    <script>
-        (function() {
-
-            fetch('/version.json?t=' + Date.now(), { cache: 'no-cache' })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var localVer = localStorage.getItem('app_version');
-                    var currentUrl = window.location.href;
-
-                    // Si es primera visita o viene con ?v= (recarga forzada): actualizar y salir
-                    if (!localVer || currentUrl.indexOf('?v=') !== -1) {
-                        localStorage.setItem('app_version', data.version);
-                        return;
-                    }
-
-                    if (data.version !== localVer) {
-                        var bar = document.createElement('div');
-                        bar.style.cssText = 'position:fixed;top:115px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(26,26,26,0.95);color:#fff;padding:14px 24px;text-align:center;font-family:"Nunito",sans-serif;font-size:13px;display:flex;align-items:center;gap:16px;border-radius:50px;box-shadow:0 4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:calc(100vw - 32px);';
-                        bar.innerHTML = 'v' + data.version + ' disponible <button id="btn-refresh-auth" style="background:#fff;color:#000;border:none;padding:8px 18px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;">Actualizar ahora</button>';
-                        document.body.appendChild(bar);
-
-                        document.getElementById('btn-refresh-auth').onclick = function() {
-                            localStorage.setItem('app_version', data.version);
-                            window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
-                        };
-                    }
-                })
-                .catch(function() {});
-        })();
-    </script>
+    <!-- Detector de actualizaciones compartido -->
+    <script src="js/version-check.js"></script>
 </body>
 </html>

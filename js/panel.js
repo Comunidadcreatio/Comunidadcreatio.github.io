@@ -1,17 +1,12 @@
 // js/panel.js
 // js/panel.js
 import { API_BASE_URL, apiRequest } from './config.js';
-import { escapeHtml, debugLog } from './utils.js';
+import { escapeHtml } from './utils.js';
 
 export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
-    try {
-        const params = new URLSearchParams({ page, limit, search, sortBy, order });
-        const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
-        return data;
-    } catch (error) {
-        debugLog.error("Error al cargar mis obras:", error);
-        return { success: false, obras: [], total: 0 };
-    }
+    const params = new URLSearchParams({ page, limit, search, sortBy, order });
+    const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
+    return data;
 }
 
 

@@ -1,10 +1,10 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
 import { login, register } from './auth.js';
-import { API_BASE_URL, ARTISTA_KEY, apiRequest } from './config.js';
-import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
+import { ARTISTA_KEY, apiRequest } from './config.js';
+import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js';
 import { mostrarErrores, debounce, debugLog } from './utils.js';
-import { getThemeByTime, updateDarkModeIcon, applyTheme, initializeTheme, setupDarkModeToggle } from './theme.js'; // v67
+import { setupDarkModeToggle } from './theme.js'; // v67
 
 // ============================================
 // VARIABLES GLOBALES
@@ -127,7 +127,6 @@ function initCustomSelect(selectEl, placeholder) {
 
     function buildOptions() {
         dropdown.innerHTML = '';
-        const groups = {};
         Array.from(selectEl.querySelectorAll('option')).forEach(opt => {
             if (opt.disabled && !opt.value) return; // skip placeholder
             const item = document.createElement('div');
@@ -147,7 +146,7 @@ function initCustomSelect(selectEl, placeholder) {
     function positionDropdown() {
         const rect = trigger.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = Math.min(rect.left, window.innerWidth - rect.width - 24) + 'px';
+        dropdown.style.left = Math.max(0, Math.min(rect.left, window.innerWidth - rect.width - 24)) + 'px';
         dropdown.style.width = rect.width + 'px';
     }
 
@@ -209,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function positionDropdown() {
         const rect = trigger.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = Math.min(rect.left, window.innerWidth - rect.width - 24) + 'px';
+        dropdown.style.left = Math.max(0, Math.min(rect.left, window.innerWidth - rect.width - 24)) + 'px';
         dropdown.style.width = rect.width + 'px';
     }
 
@@ -288,8 +287,8 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
 // VALIDACIONES DE FORMATO
 // ============================================
 
-// Dominios de correo desechable / temporal conocidos
-const DOMINIOS_DESECHABLES = [
+// Dominios de correo desechable / temporal conocidos (deduplicados)
+const DOMINIOS_DESECHABLES = [...new Set([
     'mailinator.com', 'tempmail.com', 'guerrillamail.com', 'throwam.com',
     'sharklasers.com', 'guerrillamailblock.com', 'grr.la', 'guerrillamail.info',
     'guerrillamail.biz', 'guerrillamail.de', 'guerrillamail.net', 'guerrillamail.org',
@@ -298,8 +297,8 @@ const DOMINIOS_DESECHABLES = [
     'jetable.fr.nf', 'nospam.ze.tc', 'nomail.xl.cx', 'mega.zik.dj', 'speed.1s.fr',
     'courriel.fr.nf', 'moncourrier.fr.nf', 'monemail.fr.nf', 'monmail.fr.nf',
     'dispostable.com', 'mailnull.com', 'maildrop.cc', 'discard.email',
-    'spamgourmet.com', 'spamgourmet.net', 'spamgourmet.org', 'spamgourmet.com',
-    'fakeinbox.com', 'throwam.com', 'tempr.email', 'discard.email',
+    'spamgourmet.com', 'spamgourmet.net', 'spamgourmet.org',
+    'fakeinbox.com', 'tempr.email',
     'spamthisplease.com', 'binkmail.com', 'bobmail.info', 'chammy.info',
     'devnullmail.com', 'ditchymail.com', 'dontmailme.org', 'dump-email.info',
     'fudgerub.com', 'iheartspam.org', 'jetable.com', 'jetable.net', 'jetable.org',
@@ -315,35 +314,34 @@ const DOMINIOS_DESECHABLES = [
     'spamgob.com', 'spamherelots.com', 'spamhereplease.com', 'spamhole.com',
     'spamify.com', 'spaminator.de', 'spamkill.info', 'spaml.de', 'spammotel.com',
     'spamobox.com', 'spamoff.de', 'spamslicer.com', 'spamspot.com',
-    'spamthisplease.com', 'spamtrail.com', 'spamtrap.ro', 'speed.1s.fr',
+    'spamtrail.com', 'spamtrap.ro',
     'supergreatmail.com', 'supermailer.jp', 'suremail.info', 'tempe-mail.com',
     'tempinbox.co.uk', 'tempinbox.com', 'temporary-mail.net', 'temporaryemail.net',
     'temporaryemail.us', 'temporaryforwarding.com', 'temporaryinbox.com',
     'temporarymailaddress.com', 'thanksnospam.info', 'thisisnotmyrealemail.com',
-    'throwam.com', 'throwaway.email', 'tilien.com', 'tittbit.in', 'tmailinator.com',
+    'throwaway.email', 'tilien.com', 'tittbit.in', 'tmailinator.com',
     'tosunkaya.com', 'tradermail.info', 'trash-mail.com', 'trash-mail.de',
     'trash-mail.ga', 'trash-mail.io', 'trash-mail.me', 'trash-mail.net',
     'trashdevil.com', 'trashdevil.de', 'trashemail.de', 'trashimail.com',
-    'trashinbox.com', 'trashmail.at', 'trashmail.com', 'trashmail.de',
-    'trashmail.io', 'trashmail.me', 'trashmail.net', 'trashmail.org',
-    'trashmail.xyz', 'trashmailer.com', 'trashtimail.com', 'trashtymail.com',
+    'trashinbox.com', 'trashmail.de',
+    'trashmail.org', 'trashmailer.com', 'trashtimail.com', 'trashtymail.com',
     'trbvm.com', 'turual.com', 'twinmail.de', 'tyldd.com', 'uggsrock.com',
     'uroid.com', 'us.af', 'venompen.com', 'veryrealemail.com', 'viditag.com',
     'viewcastmedia.com', 'viewcastmedia.net', 'viewcastmedia.org', 'webemail.me',
     'webm4il.info', 'wegwerfmail.de', 'wegwerfmail.net', 'wegwerfmail.org',
     'wilemail.com', 'willselfdestruct.com', 'wuzupmail.net', 'xagloo.com',
     'xemaps.com', 'xents.com', 'xmaily.com', 'xoxy.net', 'xyzfree.net',
-    'yep.it', 'yogamaven.com', 'yopmail.com', 'yourdomain.com', 'ypmail.webarnak.fr.eu.org',
+    'yep.it', 'yogamaven.com', 'yourdomain.com', 'ypmail.webarnak.fr.eu.org',
     'yuurok.com', 'z1p.biz', 'za.com', 'zehnminuten.de', 'zehnminutenmail.de',
     'zippymail.info', 'zoemail.net', 'zomg.info', 'temp-mail.org', 'temp-mail.io',
     'tempmail.net', 'tempmail.org', 'tempmail.de', 'tempmail.co', 'tempemail.net',
-    'mohmal.com', 'mailnesia.com', 'mailnull.com', 'crazymailing.com'
-];
+    'mohmal.com', 'mailnesia.com', 'crazymailing.com'
+])];
 
 // TLDs válidos más comunes (lista amplia pero razonable)
 const TLDS_VALIDOS = [
     'com', 'net', 'org', 'edu', 'gov', 'mil', 'int',
-    'co', 've', 'mx', 'ar', 'cl', 'co', 'pe', 'ec', 'bo', 'py', 'uy', 'cr', 'gt',
+    'co', 've', 'mx', 'ar', 'cl', 'pe', 'ec', 'bo', 'py', 'uy', 'cr', 'gt',
     'hn', 'sv', 'ni', 'pa', 'do', 'cu', 'pr', 'ht', 'jm', 'tt', 'bb', 'lc', 'vc',
     'gd', 'ag', 'dm', 'kn', 'us', 'ca', 'es', 'fr', 'de', 'it', 'pt', 'uk', 'io',
     'info', 'biz', 'app', 'dev', 'online', 'site', 'web', 'store', 'shop', 'tech',
@@ -392,7 +390,7 @@ function esTelefonoValido(telefono) {
 }
 
 // Nivel mínimo aceptado para registrarse (3 = "Buena")
-const NIVEL_MIN_PASSWORD = 3;
+const NIVEL_MIN_PASSWORD = 4;
 
 // Evalúa los requisitos de una contraseña
 function evaluarRequisitosPassword(password) {
@@ -565,7 +563,10 @@ function validateStep(step) {
         }
     }
 
-    if (!isValid) return false;
+    if (!isValid) {
+            showWarning('Completa todos los campos requeridos.');
+            return false;
+        }
 
     // 2. Validaciones específicas por paso
     if (step === 2) {
@@ -864,6 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const result = await login(email, password);
                 if (result.success) {
+                    setButtonLoading(submitBtn, false);
                     showSuccess('¡Inicio de sesión exitoso!');
                     setTimeout(() => {
                         window.location.href = 'index.html';
