@@ -37,8 +37,8 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
         const inputWrapper = searchInput.closest('.search-input-wrapper');
         if (!inputWrapper) return;
         const wrapperRect = inputWrapper.getBoundingClientRect();
-        searchDropdown.style.top = `${wrapperRect.top}px`;
-        searchDropdown.style.left = `${wrapperRect.left}px`;
+        searchDropdown.style.top = `${wrapperRect.top + window.scrollY}px`;
+        searchDropdown.style.left = `${wrapperRect.left + window.scrollX}px`;
         searchDropdown.style.width = `${wrapperRect.width}px`;
     };
 
@@ -106,6 +106,13 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
             const response = await fetch(`${API_BASE_URL}/api/artistas/buscar?q=${encodeURIComponent(query)}`, {
                 credentials: 'include'
             });
+
+            if (!response.ok) {
+                searchDropdown.innerHTML = `<div class="search-no-results">Error al buscar. Intenta de nuevo.</div>`;
+                searchDropdown.classList.remove('hidden');
+                return;
+            }
+
             const data = await response.json();
 
             if (data && data.success && Array.isArray(data.usuarios)) {

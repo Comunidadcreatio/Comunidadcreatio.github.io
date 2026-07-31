@@ -62,6 +62,8 @@ export async function register(nombre_artista, nombre_real, email, password, tel
 
 export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
+    localStorage.removeItem('app_version');
+    localStorage.removeItem('DEBUG');
     token = false;
     artistaActual = null;
     document.dispatchEvent(new Event('userLogout'));

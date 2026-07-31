@@ -21,6 +21,10 @@ function minifyCSS(content) {
 }
 
 function minifyJS(content) {
+    // ⚠️ ADVERTENCIA: Los regex de abajo eliminan comentarios // y /* */
+    // basándose en patrones de línea. Esto puede romper código que contenga
+    // "//" o "/*" dentro de strings literales (ej: URLs como "https://...").
+    // Para producción se recomienda usar un minificador AST como Terser.
     return content
         .replace(/\/\/.*$/gm, '')              // comentarios de línea
         .replace(/\/\*[\s\S]*?\*\//g, '')      // comentarios de bloque

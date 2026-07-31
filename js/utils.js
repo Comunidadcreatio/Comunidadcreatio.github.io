@@ -11,9 +11,13 @@ import { showError } from './notificaciones.js';
  */
 export function decodeHTMLEntities(str) {
     if (str === null || str === undefined) return '';
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = String(str);
-    return textarea.value;
+    return String(str)
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x2F;/g, '/')
+        .replace(/&#39;/g, "'");
 }
 
 /**

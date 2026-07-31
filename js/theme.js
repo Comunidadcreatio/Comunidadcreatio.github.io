@@ -54,7 +54,7 @@ export function applyTheme(theme) {
  */
 export function initializeTheme() {
     const savedTheme = localStorage.getItem('theme');
-    applyTheme(savedTheme || 'dark');
+    applyTheme(savedTheme || getThemeByTime());
 }
 
 /**

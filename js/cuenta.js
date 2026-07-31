@@ -8,6 +8,24 @@ import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from 
 import { debugLog } from './utils.js';
 
 /**
+ * Muestra errores del backend en un elemento de error inline del formulario.
+ * Centraliza la lógica repetida en cambiar-email, cambiar-password y eliminar-cuenta.
+ */
+function mostrarErrorBackend(res, errorEl) {
+    if (res && (res.errors || res.error)) {
+        if (Array.isArray(res.errors) && res.errors.length > 0) {
+            errorEl.textContent = '❌ ' + res.errors.join('\n');
+        } else if (res.error) {
+            errorEl.textContent = '❌ ' + res.error;
+        } else {
+            errorEl.textContent = '❌ Error desconocido.';
+        }
+    } else {
+        errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+    }
+}
+
+/**
  * Oculta (y resetea) un formulario de la sección Mi Cuenta.
  */
 function ocultarFormularioCuenta(id) {
@@ -125,16 +143,8 @@ export function setupMiCuenta() {
                     }
                     ocultarFormularioCuenta('form-confirmar-email');
                     ocultarFormularioCuenta('form-cambiar-email');
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
                 } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+                    mostrarErrorBackend(res, errorEl);
                 }
             } catch (error) {
                 setButtonLoading(btnSubmit, false);
@@ -214,16 +224,8 @@ export function setupMiCuenta() {
                 if (res && res.success) {
                     showSuccess(res.message);
                     ocultarFormularioCuenta('form-cambiar-password');
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
                 } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+                    mostrarErrorBackend(res, errorEl);
                 }
             } catch (error) {
                 setButtonLoading(btnSubmit, false);
@@ -263,16 +265,8 @@ export function setupMiCuenta() {
                     showSuccess("Tu cuenta ha sido eliminada correctamente.");
                     logout();
                     location.reload();
-                } else if (res && (res.errors || res.error)) {
-                    if (Array.isArray(res.errors) && res.errors.length > 0) {
-                        errorEl.textContent = '❌ ' + res.errors.join('\n');
-                    } else if (res.error) {
-                        errorEl.textContent = '❌ ' + res.error;
-                    } else {
-                        errorEl.textContent = '❌ Error desconocido.';
-                    }
                 } else {
-                    errorEl.textContent = '❌ Error de conexión. Intenta más tarde.';
+                    mostrarErrorBackend(res, errorEl);
                 }
             } catch (error) {
                 setButtonLoading(btnSubmit, false);

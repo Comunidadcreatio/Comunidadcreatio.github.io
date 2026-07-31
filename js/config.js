@@ -19,7 +19,7 @@ export async function apiRequest(endpoint, options = {}) {
             }
         });
 
-        if (res.status === 401 && !endpoint.includes('/eliminar-cuenta')) {
+        if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta')) {
             debugLog.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
             localStorage.removeItem(ARTISTA_KEY);
             // Disparamos evento para que la app reaccione
@@ -27,7 +27,13 @@ export async function apiRequest(endpoint, options = {}) {
             return { success: false, error: "Sesión expirada. Por favor inicia sesión nuevamente." };
         }
 
-        const data = await res.json();
+        let data;
+        try {
+            data = await res.json();
+        } catch (e) {
+            debugLog.error("Error parsing JSON response:", e);
+            return { success: false, error: "Respuesta inválida del servidor." };
+        }
         return data;
     } catch (error) {
         debugLog.error("Error en apiRequest:", error);

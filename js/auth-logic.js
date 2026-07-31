@@ -528,10 +528,12 @@ function showStep(step) {
 
     // Cargar ciudades al llegar al paso 2
     if (step === 2) {
-        // Resetear país a opción por defecto
+        // Resetear país solo si no tiene valor seleccionado
         const paisSelect = document.getElementById('reg-pais');
-        if (paisSelect) paisSelect.value = '';
-        paisChangeHandler();
+        if (paisSelect && !paisSelect.value) {
+            paisSelect.value = '';
+            paisChangeHandler();
+        }
     }
     // Cargar selectores de fecha al llegar al paso 3
     if (step === 3) {
@@ -549,8 +551,8 @@ function validateStep(step) {
     const stepContainer = document.querySelector(`.step[data-step="${step}"]`);
     if (!stepContainer) return true;
 
-    // Limpiar TODOS los errores previos (global)
-    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    // Limpiar errores previos del paso actual
+    stepContainer.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
     // Validar campos requeridos del paso actual (usar data-required)
     const inputs = stepContainer.querySelectorAll('input, select');
@@ -989,6 +991,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (slides.length > 1) {
         let currentSlide = 0;
         let slideInterval = null;
+        let labelTimeout = null;
 
         function updateLabel(index) {
             if (!label) return;
@@ -1003,7 +1006,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 labelBandera.alt = muni || name;
             }
             label.classList.add('visible');
-            setTimeout(() => label.classList.remove('visible'), 5500);
+            clearTimeout(labelTimeout);
+            labelTimeout = setTimeout(() => label.classList.remove('visible'), 5500);
         }
 
         function showSlide(index) {
@@ -1027,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Mostrar la primera
-        updateLabel(0);
+        showSlide(0);
         resetInterval();
 
         // Navegación manual
