@@ -474,7 +474,14 @@ const verificarNombreDebounced = debounce((valor, input) => {
 // SELECTORES DE FECHA PARA REGISTRO
 // ============================================
 function cargarSelectoresFecha() {
+    // Guardar valores actuales antes de reconstruir (para no perderlos al volver atrás)
     const diaSelect = document.getElementById('reg-dia');
+    const mesSelect = document.getElementById('reg-mes');
+    const anoSelect = document.getElementById('reg-ano');
+    const diaActual = diaSelect ? diaSelect.value : '';
+    const mesActual = mesSelect ? mesSelect.value : '';
+    const anoActual = anoSelect ? anoSelect.value : '';
+
     if (diaSelect) {
         diaSelect.innerHTML = '<option value="" disabled selected>Día</option>';
         for (let i = 1; i <= 31; i++) {
@@ -483,8 +490,8 @@ function cargarSelectoresFecha() {
             option.textContent = i;
             diaSelect.appendChild(option);
         }
+        if (diaActual) diaSelect.value = diaActual;
     }
-    const mesSelect = document.getElementById('reg-mes');
     if (mesSelect) {
         mesSelect.innerHTML = '<option value="" disabled selected>Mes</option>';
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -494,8 +501,8 @@ function cargarSelectoresFecha() {
             option.textContent = nombre;
             mesSelect.appendChild(option);
         });
+        if (mesActual) mesSelect.value = mesActual;
     }
-    const anoSelect = document.getElementById('reg-ano');
     if (anoSelect) {
         anoSelect.innerHTML = '<option value="" disabled selected>Año</option>';
         const maxYear = new Date().getFullYear() - 18;
@@ -505,6 +512,7 @@ function cargarSelectoresFecha() {
             option.textContent = i;
             anoSelect.appendChild(option);
         }
+        if (anoActual) anoSelect.value = anoActual;
     }
 }
 
@@ -528,11 +536,22 @@ function showStep(step) {
 
     // Cargar ciudades al llegar al paso 2
     if (step === 2) {
-        // Resetear país solo si no tiene valor seleccionado
         const paisSelect = document.getElementById('reg-pais');
         if (paisSelect && !paisSelect.value) {
+            // Primera visita: resetear país y cargar ciudades
             paisSelect.value = '';
             paisChangeHandler();
+        } else if (paisSelect && paisSelect.value) {
+            // Volviendo atrás: repoblar dropdown de ciudades pero conservar selección
+            const ciudadActual = document.getElementById('reg-ciudad')?.value || '';
+            poblarCiudades(paisSelect.value);
+            // Restaurar ciudad si aún existe en el nuevo dropdown
+            if (ciudadActual) {
+                const hiddenInput = document.getElementById('reg-ciudad');
+                const trigger = document.getElementById('ciudad-trigger');
+                if (hiddenInput) hiddenInput.value = ciudadActual;
+                if (trigger) trigger.textContent = ciudadActual;
+            }
         }
     }
     // Cargar selectores de fecha al llegar al paso 3
