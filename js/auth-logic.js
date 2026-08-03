@@ -3,7 +3,7 @@
 import { login, register } from './auth.js';
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js';
-import { mostrarErrores, debounce, debugLog, esEmailValido, esDominioDesechable, esTLDSospechoso } from './utils.js';
+import { mostrarErrores, debounce, debugLog } from './utils.js';
 import { setupDarkModeToggle } from './theme.js'; // v67
 
 // ============================================
