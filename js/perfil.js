@@ -3,7 +3,7 @@
 // visualización de perfiles externos y resultados de búsqueda.
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
-import { token, artistaActual } from './auth.js';
+import { token, artistaActual, lastActivityTime } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
 import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
 
@@ -95,7 +95,8 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
     // Mostrar indicador de estado en línea solo para perfil propio
     if (onlineIndicator) {
         if (!viendoPerfilExterno && token && artistaActual) {
-            const activo = verificarActividadFn ? verificarActividadFn() : true;
+            const activo = verificarActividadFn ? verificarActividadFn() :
+                (Date.now() - lastActivityTime) < (5 * 60 * 1000);
             if (activo) {
                 onlineIndicator.classList.add('online');
                 onlineIndicator.classList.remove('offline');

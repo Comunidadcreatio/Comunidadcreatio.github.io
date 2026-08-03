@@ -51,7 +51,7 @@ function crearCarruselHTML(obra, overlayHTML = '') {
 
     const slides = urls.map((url, i) => `
         <div class="obra-carousel-slide">
-            <img src="${url}" alt="Imagen ${i + 1} de obra" loading="${i === 0 ? 'eager' : 'lazy'}">
+            <img src="${url}" alt="Imagen ${i + 1} de obra" loading="eager">
         </div>
     `).join('');
 

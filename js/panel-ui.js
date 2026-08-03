@@ -798,7 +798,7 @@ function setupCaventsDropdown() {
             if (resp) {
                 showSuccess('Cavent eliminado');
                 // Eliminar de la lista local inmediatamente
-                _caventsCache.data = _caventsCache.data.filter(o => o.id != id);
+                _caventsCache.data = _caventsCache.data.filter(o => o.id !== id);
                 _caventsCache.loaded = true;
             } else {
                 showError('Error al eliminar');
@@ -831,9 +831,9 @@ function setupCaventsDropdown() {
         }
     });
 
-    // Cerrar al hacer scroll en el dropdown
+    // Prevenir que clicks en el dropdown se propaguen al document (cerraría el dropdown)
     dropdown.addEventListener('click', (e) => {
-        // Permitir clicks en los botones del dropdown
+        e.stopPropagation();
     });
 }
 

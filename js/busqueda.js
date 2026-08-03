@@ -1,7 +1,7 @@
 // js/busqueda.js
 // Búsqueda de usuarios en tiempo real con dropdown y debounce.
 
-import { API_BASE_URL, apiRequest } from './config.js';
+import { apiRequest } from './config.js';
 import { debounce, escapeHtml, debugLog } from './utils.js';
 import { showWarning, showError } from './notificaciones.js';
 
@@ -103,17 +103,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/artistas/buscar?q=${encodeURIComponent(query)}`, {
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                searchDropdown.innerHTML = `<div class="search-no-results">Error al buscar. Intenta de nuevo.</div>`;
-                searchDropdown.classList.remove('hidden');
-                return;
-            }
-
-            const data = await response.json();
+            const data = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
 
             if (data && data.success && Array.isArray(data.usuarios)) {
                 renderizarResultadosDropdown(data.usuarios);

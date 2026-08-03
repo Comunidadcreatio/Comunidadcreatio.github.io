@@ -5,7 +5,7 @@
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { token, artistaActual, logout } from './auth.js';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js';
-import { debugLog } from './utils.js';
+import { debugLog, esEmailValido, esDominioDesechable } from './utils.js';
 
 /**
  * Muestra errores del backend en un elemento de error inline del formulario.
@@ -93,8 +93,12 @@ export function setupMiCuenta() {
             const errorEl = document.getElementById('error-nuevo-email');
             errorEl.textContent = '';
             const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail);
-            if (!emailValido) {
+            if (!emailValido || !esEmailValido(nuevoEmail)) {
                 errorEl.textContent = 'Ingresa un correo electrónico válido.';
+                return;
+            }
+            if (esDominioDesechable(nuevoEmail)) {
+                errorEl.textContent = 'No se permiten correos temporales o desechables. Usa tu correo personal.';
                 return;
             }
             const emailActual = (document.getElementById('cuenta-email-actual').value || '').trim().toLowerCase();
@@ -175,14 +179,26 @@ export function setupMiCuenta() {
                     if (strengthText) strengthText.textContent = '';
                     return;
                 }
-                let score = 0;
-                if (val.length >= 8) score++;
-                if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
-                if (/\d/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
-                const nivel = Math.max(1, score);
+                // Mismo algoritmo que auth-logic.js para consistencia
+                const req = {
+                    length: val.length >= 8,
+                    lower: /[a-z]/.test(val),
+                    upper: /[A-Z]/.test(val),
+                    number: /\d/.test(val),
+                    special: /[^A-Za-z0-9]/.test(val)
+                };
+                let puntos = Object.values(req).filter(Boolean).length;
+                if (val.length >= 12) puntos++;
+                let nivel;
+                if (puntos <= 2) nivel = 1;
+                else if (puntos === 3) nivel = 2;
+                else if (puntos === 4) nivel = 3;
+                else nivel = 4;
+                if (!req.length) nivel = 1;
                 strengthWidget.setAttribute('data-level', String(nivel));
                 if (strengthText) {
-                    strengthText.textContent = nivel === 1 ? 'Débil' : nivel === 2 ? 'Media' : 'Fuerte';
+                    const etiquetas = { 1: 'Débil', 2: 'Media', 3: 'Buena', 4: 'Fuerte' };
+                    strengthText.textContent = etiquetas[nivel] || '';
                 }
             });
         }
@@ -200,6 +216,20 @@ export function setupMiCuenta() {
             }
             if (nueva.length < 8) {
                 errorEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.';
+                return;
+            }
+            // Verificar fortaleza mínima (mismo criterio que registro y reset)
+            const req = {
+                length: nueva.length >= 8,
+                lower: /[a-z]/.test(nueva),
+                upper: /[A-Z]/.test(nueva),
+                number: /\d/.test(nueva),
+                special: /[^A-Za-z0-9]/.test(nueva)
+            };
+            let puntos = Object.values(req).filter(Boolean).length;
+            if (nueva.length >= 12) puntos++;
+            if (!req.length || puntos < 3) {
+                errorEl.textContent = 'La contraseña es muy débil. Usa mayúsculas, minúsculas, números y símbolos.';
                 return;
             }
             if (nueva === actual) {

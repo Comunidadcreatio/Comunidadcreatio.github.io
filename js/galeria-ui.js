@@ -316,6 +316,8 @@ export async function toggleExplorar() {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => { gridEntering = false; });
         });
+        // Safety: si los RAF nunca se ejecutan (tab en background, etc.), liberar igual
+        setTimeout(() => { gridEntering = false; }, 600);
     } else {
         // Salir del modo grid (volver a normal o cerrar)
         galeriaModo = 0;
@@ -368,6 +370,12 @@ export function setupPullToRefresh(container) {
     if (!container) return;
     // El indicador se recrea siempre (innerHTML lo destruye)
     createPTRIndicator(container);
+    // Limpiar listeners anteriores antes de re-agregar (previene acumulación)
+    if (container._ptrMouseMove) {
+        container.removeEventListener('mousemove', container._ptrMouseMove);
+        container.removeEventListener('mouseup', container._ptrMouseUp);
+        container.removeEventListener('mouseleave', container._ptrMouseLeave);
+    }
     // Listeners solo una vez por container
     if (container.dataset.ptrReady === '1') return;
     container.dataset.ptrReady = '1';
@@ -542,9 +550,12 @@ export function setupPullToRefresh(container) {
 
     container.addEventListener('mousemove', onMouseMove);
     container.addEventListener('mouseup', onMouseUp);
+    // Guardar referencias para posible cleanup futuro
+    container._ptrMouseMove = onMouseMove;
+    container._ptrMouseUp = onMouseUp;
 
     // Reset si el mouse sale del container
-    container.addEventListener('mouseleave', () => {
+    const onMouseLeave = () => {
         if (ptrPulling && !ptrRefreshing) {
             if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
             ptrPulling = false;
@@ -558,7 +569,9 @@ export function setupPullToRefresh(container) {
             ptrPullDist = 0;
             ptrMaxPull = 0;
         }
-    });
+    };
+    container.addEventListener('mouseleave', onMouseLeave);
+    container._ptrMouseLeave = onMouseLeave;
 }
 
 

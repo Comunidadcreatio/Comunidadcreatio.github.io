@@ -3,7 +3,7 @@
 import { login, register } from './auth.js';
 import { ARTISTA_KEY, apiRequest } from './config.js';
 import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js';
-import { mostrarErrores, debounce, debugLog } from './utils.js';
+import { mostrarErrores, debounce, debugLog, esEmailValido, esDominioDesechable, esTLDSospechoso } from './utils.js';
 import { setupDarkModeToggle } from './theme.js'; // v67
 
 // ============================================
@@ -390,7 +390,7 @@ function esTelefonoValido(telefono) {
 }
 
 // Nivel mínimo aceptado para registrarse (3 = "Buena")
-const NIVEL_MIN_PASSWORD = 4;
+const NIVEL_MIN_PASSWORD = 3;
 
 // Evalúa los requisitos de una contraseña
 function evaluarRequisitosPassword(password) {
@@ -526,13 +526,13 @@ function showStep(step) {
     if (target) target.style.display = 'block';
     currentStep = step;
 
-    // Limpiar errores al cambiar de paso
+    // Limpiar solo estilos de error al cambiar de paso (preservar mensajes de disponibilidad)
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.querySelectorAll('.error-message-field.visible').forEach(el => el.classList.remove('visible'));
+    // Solo limpiar clases de disponibilidad visual, no los mensajes
     document.querySelectorAll('.input-available, .input-unavailable').forEach(el => {
         el.classList.remove('input-available', 'input-unavailable');
     });
-    document.querySelectorAll('.validation-message').forEach(el => el.remove());
 
     // Cargar ciudades al llegar al paso 2
     if (step === 2) {

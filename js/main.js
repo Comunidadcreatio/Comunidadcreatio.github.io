@@ -4,7 +4,7 @@
 // búsqueda, cuenta, tema, y gestiona eventos globales.
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
-import { token, artistaActual, logout } from './auth.js';
+import { token, artistaActual, logout, updateLastActivity } from './auth.js';
 import { debugLog } from './utils.js';
 import {
     showSuccess, showError, showWarning, showInfo, showConfirm
@@ -63,6 +63,7 @@ const HEARTBEAT_INTERVAL_MS = 30 * 1000;
 function registrarActividadLocal() {
     ultimaActividadUsuario = Date.now();
     usuarioLocalActivo = true;
+    updateLastActivity();
     enviarHeartbeatSiEsNecesario();
 }
 
@@ -669,26 +670,6 @@ function setupEvents() {
         btnLimpiar.addEventListener('click', () => limpiarFormularioCompleto(true));
     }
 
-    // ----- Navegación entre modales (login/registro) -----
-    const btnIrRegistro = document.getElementById('btn-ir-registro');
-    if (btnIrRegistro) {
-        btnIrRegistro.addEventListener('click', () => {
-            document.getElementById('modal-login').classList.add('hidden');
-            document.getElementById('modal-login').classList.remove('modal-fullscreen');
-            document.getElementById('modal-registro').classList.remove('hidden');
-            document.getElementById('modal-registro').classList.add('modal-fullscreen');
-        });
-    }
-    const btnIrLogin = document.getElementById('btn-ir-login');
-    if (btnIrLogin) {
-        btnIrLogin.addEventListener('click', () => {
-            document.getElementById('modal-registro').classList.add('hidden');
-            document.getElementById('modal-registro').classList.remove('modal-fullscreen');
-            document.getElementById('modal-login').classList.remove('hidden');
-            document.getElementById('modal-login').classList.add('modal-fullscreen');
-        });
-    }
-
     // ----- Mi Cuenta (lazy: 13 KB) -----
     import('./cuenta.js').then(m => m.setupMiCuenta());
 
@@ -714,6 +695,16 @@ function setupEvents() {
         }
     });
 }
+
+// ============================================
+// EVENTO GLOBAL: SESIÓN EXPIRADA (detectada por apiRequest en config.js)
+// ============================================
+document.addEventListener('userLogout', () => {
+    // Limpiar localStorage y redirigir a login
+    localStorage.removeItem(ARTISTA_KEY);
+    localStorage.removeItem('app_version');
+    window.location.href = 'auth.html';
+});
 
 // ============================================
 // INICIALIZACIÓN
