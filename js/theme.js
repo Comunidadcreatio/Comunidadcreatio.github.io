@@ -29,15 +29,19 @@ export function getThemeByTime() {
  * Actualiza el icono/label del botón de modo oscuro.
  */
 export function updateDarkModeIcon(theme) {
-    // Ícono SVG (modo legacy, aún presente en auth.html)
+    // Ícono SVG (modo legacy, auth.html)
     const icon = document.getElementById('dark-mode-icon') || document.getElementById('auth-dark-mode-icon');
     if (icon) {
         icon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
     }
-    // Label de texto en el menú de configuración (index.html)
+    // Ícono SVG + label en el menú de configuración (index.html)
+    const configIcon = document.getElementById('config-dark-icon');
+    if (configIcon) {
+        configIcon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
+    }
     const label = document.getElementById('config-dark-label');
     if (label) {
-        label.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+        label.textContent = theme === 'dark' ? 'Modo claro' : 'Modo oscuro';
     }
 }
 
