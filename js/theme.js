@@ -34,10 +34,10 @@ export function updateDarkModeIcon(theme) {
     if (icon) {
         icon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
     }
-    // Ícono SVG en el menú de configuración (index.html)
-    const configIcon = document.getElementById('config-dark-icon');
-    if (configIcon) {
-        configIcon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
+    // Label de texto en el menú de configuración (index.html)
+    const label = document.getElementById('config-dark-label');
+    if (label) {
+        label.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
     }
 }
 

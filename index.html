@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=dfa4dbe3cf">
+    <link rel="stylesheet" href="css/style.css?v=eaf749ff64">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -126,14 +126,8 @@
         <div class="header-popover-panel">
             <button id="config-mi-cuenta" class="logout-option">Mi cuenta</button>
             <div class="divider"></div>
-            <button id="config-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
-            <div class="divider"></div>
-            <button id="config-logout-single" class="logout-option">Cerrar Sesión</button>
-            <!-- Icono de modo oscuro/claro (esquina inferior derecha del popover) -->
-            <button id="config-dark-mode" class="config-dark-toggle" aria-label="Cambiar modo">
-                <svg id="config-dark-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
+            <button id="config-dark-mode" class="logout-option">
+                <span id="config-dark-label">Modo oscuro</span>
             </button>
         </div>
     </div>
@@ -678,6 +672,37 @@
                     </form>
                 </div>
                 </div>
+
+                <!-- Acordeón: Sesión -->
+                <button class="accordion-header" id="accordion-sesion" aria-expanded="false" aria-controls="sesion-content">
+                    <h3>Sesión</h3>
+                    <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-content" id="sesion-content" hidden>
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-header">
+                            <div class="cuenta-item-info">
+                                <h4>Cerrar demás sesiones</h4>
+                                <p class="cuenta-item-desc">Cierra todas las sesiones activas excepto esta. Útil si olvidaste cerrar sesión en otro dispositivo.</p>
+                            </div>
+                            <div class="cuenta-item-actions">
+                                <button id="btn-cerrar-todas-sesiones" class="btn-cuenta-secundario">Cerrar demás sesiones</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-header">
+                            <div class="cuenta-item-info">
+                                <h4>Cerrar sesión</h4>
+                                <p class="cuenta-item-desc">Cierra tu sesión actual. Podrás volver a iniciar sesión cuando quieras.</p>
+                            </div>
+                            <div class="cuenta-item-actions">
+                                <button id="btn-cerrar-sesion" class="btn-cuenta-secundario">Cerrar Sesión</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -697,7 +722,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=ddd0599bc8" type="module"></script>
+    <script src="js/main.js?v=0c44f4ace4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

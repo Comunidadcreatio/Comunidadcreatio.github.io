@@ -125,7 +125,7 @@ function updateCerrarTodasSesionesButtonState() {
     const allButtons = [
         document.getElementById('mobile-logout-all'),
         document.getElementById('desktop-logout-all'),
-        document.getElementById('config-logout-all')
+        document.getElementById('btn-cerrar-todas-sesiones')
     ];
 
     allButtons.forEach(btn => {
@@ -166,6 +166,8 @@ async function closeAllSessions() {
         }
     }
 }
+// Exponer para cuenta.js (lazy-loaded, no puede importar)
+window.closeAllSessions = closeAllSessions;
 
 // ============================================
 // LOGOUT Y PANELES FLOTANTES
@@ -333,27 +335,11 @@ function setupEvents() {
     if (configBtn) {
         const configMenu = document.getElementById('header-config-menu');
         const configMiCuenta = document.getElementById('config-mi-cuenta');
-        const configLogoutSingle = document.getElementById('config-logout-single');
-        const configLogoutAll = document.getElementById('config-logout-all');
 
         if (configMiCuenta) {
             configMiCuenta.addEventListener('click', () => {
                 cerrarHeaderPopover(configMenu);
                 toggleMiCuenta();
-            });
-        }
-
-        if (configLogoutSingle) {
-            configLogoutSingle.addEventListener('click', async () => {
-                cerrarHeaderPopover(configMenu);
-                await ejecutarLogout();
-            });
-        }
-
-        if (configLogoutAll) {
-            configLogoutAll.addEventListener('click', () => {
-                closeAllSessions();
-                cerrarHeaderPopover(configMenu);
             });
         }
 

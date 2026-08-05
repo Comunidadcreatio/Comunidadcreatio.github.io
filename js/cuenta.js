@@ -68,6 +68,55 @@ export function setupMiCuenta() {
     }
 
     // ============================================
+    // ACCORDION DE SESIÓN (cerrar sesión, cerrar todas)
+    // ============================================
+    const accordionSesion = document.getElementById('accordion-sesion');
+    const sesionContent = document.getElementById('sesion-content');
+    if (accordionSesion && sesionContent) {
+        accordionSesion.addEventListener('click', () => {
+            const isExpanded = accordionSesion.getAttribute('aria-expanded') === 'true';
+            accordionSesion.setAttribute('aria-expanded', !isExpanded);
+            if (isExpanded) {
+                sesionContent.hidden = true;
+                sesionContent.style.maxHeight = '0';
+                sesionContent.style.padding = '0 0';
+            } else {
+                sesionContent.hidden = false;
+                setTimeout(() => {
+                    sesionContent.style.maxHeight = '2000px';
+                    sesionContent.style.padding = '20px 0';
+                }, 10);
+            }
+        });
+    }
+
+    // Botón: Cerrar Sesión
+    const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener('click', async () => {
+            btnCerrarSesion.disabled = true;
+            btnCerrarSesion.textContent = 'Cerrando...';
+            try {
+                await apiRequest('/api/artistas/logout', { method: 'POST' });
+            } catch (e) {
+                debugLog.error('Error en logout backend:', e);
+            }
+            logout();
+        });
+    }
+
+    // Botón: Cerrar demás sesiones (se actualiza desde main.js vía updateCerrarTodasSesionesButtonState)
+    const btnCerrarTodas = document.getElementById('btn-cerrar-todas-sesiones');
+    if (btnCerrarTodas) {
+        btnCerrarTodas.addEventListener('click', () => {
+            // closeAllSessions se define en main.js y es accesible globalmente
+            if (typeof closeAllSessions === 'function') {
+                closeAllSessions();
+            }
+        });
+    }
+
+    // ============================================
     // BOTONES "CANCELAR"
     // ============================================
     document.querySelectorAll('.btn-cuenta-cancelar[data-cancelar]').forEach(btn => {
