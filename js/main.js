@@ -11,7 +11,7 @@ import {
 } from './notificaciones.js';
 
 // --- Nuevos módulos extraídos ---
-import { setupDarkModeToggle, applyTheme } from './theme.js'; // v122
+import { setupDarkModeToggle } from './theme.js'; // v122
 import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
@@ -333,7 +333,6 @@ function setupEvents() {
     if (configBtn) {
         const configMenu = document.getElementById('header-config-menu');
         const configMiCuenta = document.getElementById('config-mi-cuenta');
-        const configDarkMode = document.getElementById('config-dark-mode');
         const configLogoutSingle = document.getElementById('config-logout-single');
         const configLogoutAll = document.getElementById('config-logout-all');
 
@@ -341,15 +340,6 @@ function setupEvents() {
             configMiCuenta.addEventListener('click', () => {
                 cerrarHeaderPopover(configMenu);
                 toggleMiCuenta();
-            });
-        }
-
-        if (configDarkMode) {
-            configDarkMode.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                applyTheme(newTheme);
-                // No cerramos el menú para que el usuario vea el cambio
             });
         }
 
