@@ -708,15 +708,7 @@ input, select, textarea {
 .config-dark-icon-svg {
     display: inline-block;
     vertical-align: middle;
-    width: 18px;
-    height: 18px;
     margin-right: 6px;
-}
-.config-dark-icon-svg svg {
-    display: block;
-    width: 18px;
-    height: 18px;
-    stroke: #ffffff;
 }
 
 /* Opciones de menú */
