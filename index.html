@@ -125,15 +125,14 @@
     <div id="header-config-menu" class="header-popover hidden">
         <div class="header-popover-panel">
             <button id="config-mi-cuenta" class="logout-option">Mi cuenta</button>
-        </div>
-    </div>
-
-    <!-- Bocadillo de cerrar sesión (header superior derecha) -->
-    <div id="header-logout-menu" class="header-popover hidden">
-        <div class="header-popover-panel">
-            <button id="header-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
             <div class="divider"></div>
-            <button id="header-logout-single" class="logout-option">Cerrar Sesión</button>
+            <button id="config-dark-mode" class="logout-option">
+                <span id="config-dark-label">Modo oscuro</span>
+            </button>
+            <div class="divider"></div>
+            <button id="config-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
+            <div class="divider"></div>
+            <button id="config-logout-single" class="logout-option">Cerrar Sesión</button>
         </div>
     </div>
 
@@ -163,25 +162,11 @@
         <div id="search-results-dropdown" class="search-dropdown hidden"></div>
     </div>
 
-        <!-- Icono de modo oscuro (junto al de configuración) -->
-        <button id="btn-dark-mode" class="header-icon" aria-label="Cambiar a modo oscuro">
-            <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </button>
-        <!-- Icono de configuración (junto al de cerrar sesión) -->
+        <!-- Icono de configuración (engranaje) -->
         <button id="btn-configuracion" class="header-icon" aria-label="Configuración">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-        </button>
-        <!-- Icono de cerrar sesión (derecha) -->
-        <button id="btn-logout-header" class="header-icon" aria-label="Cerrar sesión">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
         </button>
     </header>
@@ -710,7 +695,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=a20441ac20" type="module"></script>
+    <script src="js/main.js?v=ddd0599bc8" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

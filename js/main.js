@@ -11,7 +11,7 @@ import {
 } from './notificaciones.js';
 
 // --- Nuevos módulos extraídos ---
-import { setupDarkModeToggle } from './theme.js'; // v122
+import { setupDarkModeToggle, applyTheme } from './theme.js'; // v122
 import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
@@ -45,7 +45,6 @@ let desktopLogoutAllBtn = null;
 let desktopLogoutSingleBtn = null;
 let clickOutsideHandlerLogout = null;
 let headerConfigOutsideHandler = null;
-let headerLogoutOutsideHandler = null;
 let mobileClickOutsideHandler = null;
 
 // Conteo de sesiones activas
@@ -126,7 +125,7 @@ function updateCerrarTodasSesionesButtonState() {
     const allButtons = [
         document.getElementById('mobile-logout-all'),
         document.getElementById('desktop-logout-all'),
-        document.getElementById('header-logout-all')
+        document.getElementById('config-logout-all')
     ];
 
     allButtons.forEach(btn => {
@@ -206,10 +205,6 @@ function cerrarHeaderPopover(panelElement) {
     if (panelElement.id === 'header-config-menu' && headerConfigOutsideHandler) {
         document.removeEventListener('click', headerConfigOutsideHandler);
         headerConfigOutsideHandler = null;
-    }
-    if (panelElement.id === 'header-logout-menu' && headerLogoutOutsideHandler) {
-        document.removeEventListener('click', headerLogoutOutsideHandler);
-        headerLogoutOutsideHandler = null;
     }
 }
 
@@ -325,53 +320,6 @@ async function verificarSesionBackend() {
 function setupEvents() {
 
 
-    // ----- Botón de logout del header -----
-    const logoutHeaderBtn = document.getElementById('btn-logout-header');
-    if (logoutHeaderBtn) {
-        const headerLogoutMenu = document.getElementById('header-logout-menu');
-        const headerLogoutSingle = document.getElementById('header-logout-single');
-        const headerLogoutAll = document.getElementById('header-logout-all');
-
-        if (headerLogoutSingle) {
-            headerLogoutSingle.addEventListener('click', async () => {
-                cerrarHeaderPopover(headerLogoutMenu);
-                await ejecutarLogout();
-            });
-        }
-        if (headerLogoutAll) {
-            headerLogoutAll.addEventListener('click', () => {
-                closeAllSessions();
-                cerrarHeaderPopover(headerLogoutMenu);
-            });
-        }
-
-        logoutHeaderBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!headerLogoutMenu) {
-                ejecutarLogout();
-                return;
-            }
-            if (headerLogoutMenu.classList.contains('hidden')) {
-                cerrarTodosLosPaneles();
-                cerrarHeaderPopover(document.getElementById('header-config-menu'));
-                updateCerrarTodasSesionesButtonState();
-                headerLogoutMenu.classList.remove('hidden');
-                positionHeaderPopover(logoutHeaderBtn, headerLogoutMenu);
-                if (headerLogoutOutsideHandler) {
-                    document.removeEventListener('click', headerLogoutOutsideHandler);
-                }
-                headerLogoutOutsideHandler = (event) => {
-                    if (!headerLogoutMenu.contains(event.target) && event.target !== logoutHeaderBtn && !logoutHeaderBtn.contains(event.target)) {
-                        cerrarHeaderPopover(headerLogoutMenu);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', headerLogoutOutsideHandler), 0);
-            } else {
-                cerrarHeaderPopover(headerLogoutMenu);
-            }
-        });
-    }
-
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     import('./busqueda.js').then(m => {
         m.setupBuscador(
@@ -380,11 +328,14 @@ function setupEvents() {
         );
     });
 
-    // ----- Botón de configuración (Mi Cuenta) -----
+    // ----- Botón de configuración (Mi Cuenta, Modo Oscuro, Logout) -----
     const configBtn = document.getElementById('btn-configuracion');
     if (configBtn) {
         const configMenu = document.getElementById('header-config-menu');
         const configMiCuenta = document.getElementById('config-mi-cuenta');
+        const configDarkMode = document.getElementById('config-dark-mode');
+        const configLogoutSingle = document.getElementById('config-logout-single');
+        const configLogoutAll = document.getElementById('config-logout-all');
 
         if (configMiCuenta) {
             configMiCuenta.addEventListener('click', () => {
@@ -393,12 +344,35 @@ function setupEvents() {
             });
         }
 
+        if (configDarkMode) {
+            configDarkMode.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                // No cerramos el menú para que el usuario vea el cambio
+            });
+        }
+
+        if (configLogoutSingle) {
+            configLogoutSingle.addEventListener('click', async () => {
+                cerrarHeaderPopover(configMenu);
+                await ejecutarLogout();
+            });
+        }
+
+        if (configLogoutAll) {
+            configLogoutAll.addEventListener('click', () => {
+                closeAllSessions();
+                cerrarHeaderPopover(configMenu);
+            });
+        }
+
         configBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (!configMenu) return;
             if (configMenu.classList.contains('hidden')) {
                 cerrarTodosLosPaneles();
-                cerrarHeaderPopover(document.getElementById('header-logout-menu'));
+                updateCerrarTodasSesionesButtonState();
                 configMenu.classList.remove('hidden');
                 positionHeaderPopover(configBtn, configMenu);
                 if (headerConfigOutsideHandler) {
@@ -689,7 +663,7 @@ function setupEvents() {
             });
             cerrarTodosLosPaneles();
             cerrarHeaderPopover(document.getElementById('header-config-menu'));
-            cerrarHeaderPopover(document.getElementById('header-logout-menu'));
+            cerrarHeaderPopover(document.getElementById('header-config-menu'));
             const searchDropdown = document.getElementById('search-results-dropdown');
             if (searchDropdown) searchDropdown.classList.add('hidden');
         }
