@@ -7,13 +7,6 @@ const ICON_SUN = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2
 const ICON_MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
 
 /**
- * Encuentra el elemento que muestra el label del modo oscuro (busca en index y auth).
- */
-function findDarkModeLabel() {
-    return document.getElementById('config-dark-label');
-}
-
-/**
  * Encuentra el botón de modo oscuro (busca en index, menú config, y auth).
  */
 function findDarkModeBtn() {
@@ -41,10 +34,10 @@ export function updateDarkModeIcon(theme) {
     if (icon) {
         icon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
     }
-    // Label del menú de configuración (index.html)
-    const label = document.getElementById('config-dark-label');
-    if (label) {
-        label.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+    // Ícono SVG en el menú de configuración (index.html)
+    const configIcon = document.getElementById('config-dark-icon');
+    if (configIcon) {
+        configIcon.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
     }
 }
 

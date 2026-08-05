@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=eaf749ff64">
+    <link rel="stylesheet" href="css/style.css?v=dfa4dbe3cf">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -126,13 +126,15 @@
         <div class="header-popover-panel">
             <button id="config-mi-cuenta" class="logout-option">Mi cuenta</button>
             <div class="divider"></div>
-            <button id="config-dark-mode" class="logout-option">
-                <span id="config-dark-label">Modo oscuro</span>
-            </button>
-            <div class="divider"></div>
             <button id="config-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
             <div class="divider"></div>
             <button id="config-logout-single" class="logout-option">Cerrar Sesión</button>
+            <!-- Icono de modo oscuro/claro (esquina inferior derecha del popover) -->
+            <button id="config-dark-mode" class="config-dark-toggle" aria-label="Cambiar modo">
+                <svg id="config-dark-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
         </div>
     </div>
 
