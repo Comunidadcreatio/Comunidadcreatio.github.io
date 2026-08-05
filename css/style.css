@@ -718,6 +718,11 @@ input, select, textarea {
     flex-shrink: 0;
 }
 /* Iconos en headers de acordeón de Mi Cuenta */
+.accordion-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
 .accordion-header-icon {
     display: inline-block;
     vertical-align: middle;
