@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=4175753bb1">
+    <link rel="stylesheet" href="css/style.css?v=30136bb5bb">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -167,12 +167,6 @@
         <div id="search-results-dropdown" class="search-dropdown hidden"></div>
     </div>
 
-        <!-- Panel de notificaciones -->
-        <div id="notif-dropdown" class="search-dropdown hidden">
-            <div id="notif-list" class="notif-list"></div>
-            <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
-        </div>
-
         <!-- Icono de notificaciones -->
         <button id="btn-notificaciones" class="header-icon" aria-label="Notificaciones">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -189,6 +183,11 @@
                 <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
         </button>
+        <!-- Panel de notificaciones -->
+        <div id="notif-dropdown" class="notif-panel hidden">
+            <div id="notif-list" class="notif-list"></div>
+            <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+        </div>
     </header>
     <!-- MAIN CONTENT -->
     <main id="main-content">
