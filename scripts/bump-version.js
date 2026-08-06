@@ -218,6 +218,22 @@ function main() {
         }
         console.log(`  ✓ ${srcDir}/ → ${destDir}/`);
     }
+
+    // 5b. Sincronizar capacitor.config.json también al assets/ raíz de Android
+    // (es el que realmente lee Capacitor en tiempo de ejecución)
+    {
+        const srcCap = path.join(projectRoot, 'capacitor.config.json');
+        const destCap = path.join(projectRoot, 'android/app/src/main/assets/capacitor.config.json');
+        if (fs.existsSync(srcCap)) {
+            const destDir = path.dirname(destCap);
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+            fs.copyFileSync(srcCap, destCap);
+            console.log('  ✓ capacitor.config.json → android/app/src/main/assets/');
+        }
+    }
+
     console.log('📦 Sincronización completada.\n');
 }
 
