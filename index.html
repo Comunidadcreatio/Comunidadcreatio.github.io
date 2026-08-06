@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=2fbdca9443">
+    <link rel="stylesheet" href="css/style.css?v=565944f932">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -743,89 +743,52 @@
 
     <!-- Modal de detalles completos del Cavent (fullscreen) -->
     <div id="modal-detalles-cavent" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-content modal-cavent-detalle">
-            <button id="btn-cerrar-detalles-cavent" class="modal-close-btn" aria-label="Cerrar">✕</button>
+        <div class="modal-cavent-detalle-bg"></div>
+        <div class="modal-cavent-detalle">
+            <button id="btn-cerrar-detalles-cavent" class="modal-close-btn" aria-label="Cerrar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             
-            <!-- Info principal -->
-            <div class="detalle-header">
-                <h2 id="detalle-cavent-titulo"></h2>
-                <span id="detalle-cavent-precio" class="detalle-precio"></span>
+            <div class="detalle-scroll">
+                <!-- Info principal -->
+                <div class="detalle-header">
+                    <h2 id="detalle-cavent-titulo"></h2>
+                    <span id="detalle-cavent-precio" class="detalle-precio"></span>
+                </div>
+                
+                <!-- Grid de detalles -->
+                <div class="detalle-grid">
+                    <div class="detalle-campo"><span class="detalle-label">Artista</span><span class="detalle-valor" id="detalle-artista"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Año</span><span class="detalle-valor" id="detalle-ano"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Dimensiones</span><span class="detalle-valor" id="detalle-dimensiones"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Técnica</span><span class="detalle-valor" id="detalle-tecnica"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Soporte</span><span class="detalle-valor" id="detalle-soporte"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Marcos</span><span class="detalle-valor" id="detalle-marcos"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Estado</span><span class="detalle-valor" id="detalle-estado"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Disponibilidad</span><span class="detalle-valor" id="detalle-disponibilidad"></span></div>
+                    <div class="detalle-campo detalle-campo-full"><span class="detalle-label">Descripción Artística</span><p class="detalle-valor" id="detalle-descripcion"></p></div>
+                    <div class="detalle-campo"><span class="detalle-label">Procedencia</span><span class="detalle-valor" id="detalle-procedencia"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Certificado</span><span class="detalle-valor" id="detalle-certificado"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Firma</span><span class="detalle-valor" id="detalle-firma"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Conservación</span><span class="detalle-valor" id="detalle-conservacion"></span></div>
+                    <div class="detalle-campo"><span class="detalle-label">Etiquetas</span><span class="detalle-valor" id="detalle-etiquetas"></span></div>
+                </div>
             </div>
-            
-            <!-- Métricas -->
+
+            <!-- Métricas (barra inferior fija) -->
             <div class="detalle-metricas">
                 <span class="metrica-item" data-tipo="view">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     <span id="detalle-vistas">0</span>
                 </span>
                 <span class="metrica-item" data-tipo="comment">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span id="detalle-comentarios">0</span>
                 </span>
                 <span class="metrica-item" data-tipo="like">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     <span id="detalle-me-gusta">0</span>
                 </span>
-            </div>
-            
-            <!-- Grid de detalles -->
-            <div class="detalle-grid">
-                <div class="detalle-campo">
-                    <span class="detalle-label">Artista</span>
-                    <span id="detalle-artista"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Año</span>
-                    <span id="detalle-ano"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Dimensiones</span>
-                    <span id="detalle-dimensiones"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Técnica</span>
-                    <span id="detalle-tecnica"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Soporte</span>
-                    <span id="detalle-soporte"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Marcos</span>
-                    <span id="detalle-marcos"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Estado</span>
-                    <span id="detalle-estado"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Disponibilidad</span>
-                    <span id="detalle-disponibilidad"></span>
-                </div>
-                <div class="detalle-campo detalle-campo-full">
-                    <span class="detalle-label">Descripción Artística</span>
-                    <p id="detalle-descripcion"></p>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Procedencia</span>
-                    <span id="detalle-procedencia"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Certificado</span>
-                    <span id="detalle-certificado"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Firma</span>
-                    <span id="detalle-firma"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Conservación</span>
-                    <span id="detalle-conservacion"></span>
-                </div>
-                <div class="detalle-campo">
-                    <span class="detalle-label">Etiquetas</span>
-                    <span id="detalle-etiquetas"></span>
-                </div>
             </div>
         </div>
     </div>

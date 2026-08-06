@@ -344,11 +344,10 @@ export async function abrirDetalleCavent(obraId) {
 
     // Cerrar modal
     const closeBtn = document.getElementById('btn-cerrar-detalles-cavent');
-    if (closeBtn) {
-        const cerrar = () => modal.classList.add('hidden');
-        closeBtn.onclick = cerrar;
-        modal.onclick = (e) => { if (e.target === modal) cerrar(); };
-    }
+    const bg = modal.querySelector('.modal-cavent-detalle-bg');
+    const cerrar = () => modal.classList.add('hidden');
+    if (closeBtn) closeBtn.onclick = cerrar;
+    if (bg) bg.onclick = cerrar;
 }
 
 // ============================================
