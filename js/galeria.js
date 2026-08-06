@@ -346,6 +346,15 @@ export async function abrirDetalleCavent(obraId) {
     const volverBtn = document.getElementById('btn-volver-detalles');
     const cerrar = () => modal.classList.add('hidden');
     if (volverBtn) volverBtn.onclick = cerrar;
+
+    // Wire up like en el modal
+    const likeItem = modal.querySelector('.metrica-like');
+    if (likeItem && o.id && o.artista_user_id) {
+        likeItem.onclick = (e) => {
+            e.stopPropagation();
+            manejarReaccion(likeItem, o.id, o.artista_user_id);
+        };
+    }
 }
 
 // ============================================
