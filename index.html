@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e743159289">
+    <link rel="stylesheet" href="css/style.css?v=4f7a80558b">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -746,28 +746,33 @@
         <div class="modal-cavent-detalle-bg"></div>
         <div class="modal-cavent-detalle">
             <div class="detalle-scroll">
-                <!-- Info principal -->
-                <div class="detalle-header">
-                    <h2 id="detalle-cavent-titulo"></h2>
-                    <span id="detalle-cavent-precio" class="detalle-precio"></span>
+                <!-- Grid de detalles en secciones -->
+                <div class="detalle-seccion">
+                    <h3 class="detalle-seccion-titulo">📐 Detalles Técnicos</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-campo"><span class="detalle-label">Técnica</span><span class="detalle-valor" id="detalle-tecnica"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Soporte</span><span class="detalle-valor" id="detalle-soporte"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Marcos</span><span class="detalle-valor" id="detalle-marcos"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Dimensiones</span><span class="detalle-valor" id="detalle-dimensiones"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Año</span><span class="detalle-valor" id="detalle-ano"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Estado</span><span class="detalle-valor" id="detalle-estado"></span></div>
+                    </div>
                 </div>
-                
-                <!-- Grid de detalles -->
-                <div class="detalle-grid">
-                    <div class="detalle-campo"><span class="detalle-label">Artista</span><span class="detalle-valor" id="detalle-artista"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Año</span><span class="detalle-valor" id="detalle-ano"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Dimensiones</span><span class="detalle-valor" id="detalle-dimensiones"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Técnica</span><span class="detalle-valor" id="detalle-tecnica"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Soporte</span><span class="detalle-valor" id="detalle-soporte"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Marcos</span><span class="detalle-valor" id="detalle-marcos"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Estado</span><span class="detalle-valor" id="detalle-estado"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Disponibilidad</span><span class="detalle-valor" id="detalle-disponibilidad"></span></div>
-                    <div class="detalle-campo detalle-campo-full"><span class="detalle-label">Descripción Artística</span><p class="detalle-valor" id="detalle-descripcion"></p></div>
-                    <div class="detalle-campo"><span class="detalle-label">Procedencia</span><span class="detalle-valor" id="detalle-procedencia"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Certificado</span><span class="detalle-valor" id="detalle-certificado"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Firma</span><span class="detalle-valor" id="detalle-firma"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Conservación</span><span class="detalle-valor" id="detalle-conservacion"></span></div>
-                    <div class="detalle-campo"><span class="detalle-label">Etiquetas</span><span class="detalle-valor" id="detalle-etiquetas"></span></div>
+
+                <div class="detalle-seccion">
+                    <h3 class="detalle-seccion-titulo">📝 Descripción</h3>
+                    <p class="detalle-valor detalle-descripcion" id="detalle-descripcion"></p>
+                </div>
+
+                <div class="detalle-seccion">
+                    <h3 class="detalle-seccion-titulo">🔍 Procedencia y Autenticidad</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-campo"><span class="detalle-label">Procedencia</span><span class="detalle-valor" id="detalle-procedencia"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Certificado</span><span class="detalle-valor" id="detalle-certificado"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Firma</span><span class="detalle-valor" id="detalle-firma"></span></div>
+                        <div class="detalle-campo"><span class="detalle-label">Conservación</span><span class="detalle-valor" id="detalle-conservacion"></span></div>
+                        <div class="detalle-campo detalle-campo-full"><span class="detalle-label">Etiquetas</span><span class="detalle-valor" id="detalle-etiquetas"></span></div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -359,19 +359,13 @@ export async function abrirDetalleCavent(obraId, cardElement) {
             return;
         }
 
-        // Poblar campos (artista, título, precio y disponibilidad ocultos — ya visibles en la card)
-        document.getElementById('detalle-cavent-titulo').parentElement.style.display = 'none';
-        document.getElementById('detalle-artista').parentElement.style.display = 'none';
-        document.getElementById('detalle-disponibilidad').parentElement.style.display = 'none';
-        document.getElementById('detalle-cavent-precio').style.display = 'none';
-
-        document.getElementById('detalle-ano').textContent = o.ano || '—';
-        document.getElementById('detalle-dimensiones').textContent = (o.ancho && o.alto) ? `${o.ancho} × ${o.alto} cm` : '—';
+        // Poblar campos
         document.getElementById('detalle-tecnica').textContent = o.descripcion_tecnica || o.tecnica || '—';
         document.getElementById('detalle-soporte').textContent = o.soporte || '—';
         document.getElementById('detalle-marcos').textContent = o.marcos || '—';
+        document.getElementById('detalle-dimensiones').textContent = (o.ancho && o.alto) ? `${o.ancho} × ${o.alto} cm` : '—';
+        document.getElementById('detalle-ano').textContent = o.ano || '—';
         document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
-        document.getElementById('detalle-disponibilidad').textContent = o.status || '—';
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
         document.getElementById('detalle-procedencia').textContent = o.procedencia || '—';
         document.getElementById('detalle-certificado').textContent = o.certificado || '—';
@@ -379,14 +373,9 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         document.getElementById('detalle-conservacion').textContent = o.conservacion || '—';
         document.getElementById('detalle-etiquetas').textContent = o.etiquetas || '—';
 
-        // Métricas
-        document.getElementById('detalle-vistas').textContent = o.vistas || 0;
-        document.getElementById('detalle-comentarios').textContent = o.comentarios || 0;
-        document.getElementById('detalle-me-gusta').textContent = o.me_gusta || 0;
-
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);
-        document.getElementById('detalle-cavent-titulo').textContent = 'Error de conexión.';
+        document.getElementById('detalle-ano').textContent = 'Error de conexión.';
     }
 }
 
