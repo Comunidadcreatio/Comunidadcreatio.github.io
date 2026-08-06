@@ -266,12 +266,12 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
             }
         }
 
-        // Clic en "Ver detalles" → abre modal con toda la info
+        // Clic en "Ver detalles" → abre modal alineado con la barra de la card
         const btnDetalles = card.querySelector('.btn-ver-detalles');
         if (btnDetalles) {
             btnDetalles.addEventListener('click', (e) => {
                 e.stopPropagation();
-                abrirDetalleCavent(obra.id);
+                abrirDetalleCavent(obra.id, card);
             });
         }
 
@@ -298,9 +298,21 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
 // ============================================
 // MODAL DE DETALLES COMPLETOS DEL CAVENT
 // ============================================
-export async function abrirDetalleCavent(obraId) {
+export async function abrirDetalleCavent(obraId, cardElement) {
     const modal = document.getElementById('modal-detalles-cavent');
     if (!modal) return;
+
+    // Alinear borde inferior del modal con el borde superior de la barra de métricas de la card
+    const modalContent = modal.querySelector('.modal-cavent-detalle');
+    if (cardElement && modalContent) {
+        const metricsBar = cardElement.querySelector('.obra-metricas-bar');
+        if (metricsBar) {
+            const rect = metricsBar.getBoundingClientRect();
+            modalContent.style.bottom = (window.innerHeight - rect.top) + 'px';
+        } else {
+            modalContent.style.bottom = '';
+        }
+    }
 
     modal.classList.remove('hidden');
     // Limpiar campos mientras carga
@@ -342,19 +354,9 @@ export async function abrirDetalleCavent(obraId) {
         document.getElementById('detalle-cavent-titulo').textContent = 'Error de conexión.';
     }
 
-    // Cerrar modal con botón volver
-    const volverBtn = document.getElementById('btn-volver-detalles');
-    const cerrar = () => modal.classList.add('hidden');
-    if (volverBtn) volverBtn.onclick = cerrar;
-
-    // Wire up like en el modal
-    const likeItem = modal.querySelector('.metrica-like');
-    if (likeItem && o.id && o.artista_user_id) {
-        likeItem.onclick = (e) => {
-            e.stopPropagation();
-            manejarReaccion(likeItem, o.id, o.artista_user_id);
-        };
-    }
+    // Cerrar con X
+    const closeBtn = document.getElementById('btn-cerrar-detalles-cavent');
+    if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
 }
 
 // ============================================
