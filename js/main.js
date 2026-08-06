@@ -155,16 +155,26 @@ async function cargarNotificaciones() {
 
         // Click en notificación → redirige al cavent en la galería
         list.querySelectorAll('.notif-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', async () => {
                 const obraId = item.dataset.obra;
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
-                    // Navegar a la galería y hacer scroll hasta la card
-                    import('./galeria-ui.js').then(m => m.toggleGaleria());
-                    setTimeout(() => {
+                    // Mostrar galería
+                    const galeriaUI = await import('./galeria-ui.js');
+                    galeriaUI.mostrarSeccion('galeria-publica');
+                    // Esperar a que las cards se rendericen y hacer scroll
+                    const intentarScroll = (intentos = 0) => {
                         const card = document.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
-                        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 400);
+                        if (card) {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            // Resaltar brevemente
+                            card.style.boxShadow = '0 0 0 3px #ef4444';
+                            setTimeout(() => card.style.boxShadow = '', 2000);
+                        } else if (intentos < 10) {
+                            setTimeout(() => intentarScroll(intentos + 1), 300);
+                        }
+                    };
+                    setTimeout(() => intentarScroll(), 500);
                 }
             });
         });
