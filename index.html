@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=4f7a80558b">
+    <link rel="stylesheet" href="css/style.css?v=4175753bb1">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -166,6 +166,12 @@
         <!-- Desplegable de resultados en tiempo real -->
         <div id="search-results-dropdown" class="search-dropdown hidden"></div>
     </div>
+
+        <!-- Panel de notificaciones -->
+        <div id="notif-dropdown" class="search-dropdown hidden">
+            <div id="notif-list" class="notif-list"></div>
+            <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+        </div>
 
         <!-- Icono de notificaciones -->
         <button id="btn-notificaciones" class="header-icon" aria-label="Notificaciones">
@@ -779,7 +785,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=edccb75fe9" type="module"></script>
+    <script src="js/main.js?v=54c166f5ac" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

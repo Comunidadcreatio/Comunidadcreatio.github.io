@@ -15,8 +15,17 @@ export async function cargarGaleria(container) {
             return [];
         }
         container.setAttribute('aria-busy', 'false');
-        // Maneja tanto array directo como {success:true, obras:[...]} / {data:[...]}
         const obras = Array.isArray(data) ? data : (data?.obras ?? data?.data ?? []);
+        
+        // Cargar likes del usuario para persistencia
+        try {
+            const likesData = await apiRequest('/api/artistas/mis-reacciones?tipo=like');
+            if (likesData && likesData.reacciones) {
+                const likedIds = new Set(likesData.reacciones.map(r => r.obra_id));
+                window._likedObras = likedIds;
+            }
+        } catch (e) { /* silencioso */ }
+        
         return obras;
     } catch (error) {
         debugLog.error("Error al cargar la galería:", error);
@@ -309,6 +318,12 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
             });
         }
         container.appendChild(card);
+
+        // Aplicar estado "liked" si el usuario ya reaccionó
+        if (window._likedObras && window._likedObras.has(obra.id)) {
+            const likeItem = card.querySelector('.metrica-like');
+            if (likeItem) likeItem.classList.add('liked');
+        }
     });
 }
 
@@ -397,10 +412,13 @@ function manejarReaccion(itemEl, obraId, artistaOwnerId) {
         // Quitar like
         itemEl.classList.remove('liked');
         counterSpan.textContent = Math.max(0, current - 1);
+        if (window._likedObras) window._likedObras.delete(obraId);
     } else {
         // Dar like
         itemEl.classList.add('liked');
         counterSpan.textContent = current + 1;
+        if (!window._likedObras) window._likedObras = new Set();
+        window._likedObras.add(obraId);
     }
 
     // Enviar al backend

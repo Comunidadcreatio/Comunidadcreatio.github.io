@@ -127,6 +127,45 @@ async function fetchNotificacionesCount() {
     }
 }
 
+async function cargarNotificaciones() {
+    const list = document.getElementById('notif-list');
+    const empty = document.getElementById('notif-empty');
+    if (!list || !empty) return;
+    try {
+        const data = await apiRequest('/api/artistas/notificaciones');
+        if (!data || !data.notificaciones || data.notificaciones.length === 0) {
+            list.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        const iconos = { like: '❤️', comment: '💬', view: '👁', follow: '👤', mention: '📢' };
+        list.innerHTML = data.notificaciones.map(n => `
+            <div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}">
+                <span class="notif-icon">${iconos[n.tipo] || '🔔'}</span>
+                <div class="notif-body">
+                    <div class="notif-mensaje">${n.mensaje}</div>
+                    <div class="notif-tiempo">${timeAgo(n.created_at)}</div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        list.innerHTML = '';
+        empty.textContent = 'Error al cargar notificaciones';
+        empty.style.display = 'block';
+    }
+}
+
+function timeAgo(dateStr) {
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return 'Ahora';
+    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
+    return `Hace ${Math.floor(diff / 86400)} d`;
+}
+
 // ============================================
 // MANEJO DE SESIONES (CERRAR TODAS)
 // ============================================
@@ -395,6 +434,26 @@ function setupEvents() {
 
     // ----- Modo oscuro -----
     setupDarkModeToggle();
+
+    // ----- Notificaciones: click en campana abre/cierra panel -----
+    const notifBtn = document.getElementById('btn-notificaciones');
+    const notifDropdown = document.getElementById('notif-dropdown');
+    if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (notifDropdown.classList.contains('hidden')) {
+                notifDropdown.classList.remove('hidden');
+                cargarNotificaciones();
+            } else {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!notifDropdown.contains(e.target) && e.target !== notifBtn && !notifBtn.contains(e.target)) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+    }
 
     // ----- Panel de logout (escritorio y móvil) -----
     const logoutIcon = document.getElementById('btn-logout-sidebar');
