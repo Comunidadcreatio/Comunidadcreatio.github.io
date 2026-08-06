@@ -327,10 +327,17 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         btn.setAttribute('title', 'Ver detalles');
     });
 
-    // Alinear borde inferior del modal con el borde superior de la barra de métricas de la card
+    // Alinear bordes del modal con la card: top = debajo de la fila artista/título/precio
     const modalContent = modal.querySelector('.modal-cavent-detalle');
     if (cardElement && modalContent) {
+        const artistaRow = cardElement.querySelector('.obra-artista-row');
         const metricsBar = cardElement.querySelector('.obra-metricas-bar');
+        if (artistaRow) {
+            const topRect = artistaRow.getBoundingClientRect();
+            modalContent.style.top = topRect.bottom + 'px';
+        } else {
+            modalContent.style.top = '';
+        }
         if (metricsBar) {
             const rect = metricsBar.getBoundingClientRect();
             modalContent.style.bottom = (window.innerHeight - rect.top) + 'px';
