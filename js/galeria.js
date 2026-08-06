@@ -228,8 +228,9 @@ function crearObraCard(obra) {
 
             <!-- Barra inferior sólida: métricas + botón ver detalles -->
             <div class="obra-metricas-bar">
-                <button class="btn-ver-detalles" aria-label="Ver detalles" title="Ver detalles">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <button class="btn-ver-detalles btn-detalles-toggle" aria-label="Ver detalles" title="Ver detalles">
+                    <svg class="icon-lupa" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 </button>
                 <div class="metrica-right">
                     <span class="metrica-item">${ICON_OJO} <span>0</span></span>
@@ -268,12 +269,26 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
             }
         }
 
-        // Clic en "Ver detalles" → abre modal alineado con la barra de la card
-        const btnDetalles = card.querySelector('.btn-ver-detalles');
-        if (btnDetalles) {
-            btnDetalles.addEventListener('click', (e) => {
+        // Clic en el botón lupa/volver → abre/cierra modal
+        const btnToggle = card.querySelector('.btn-detalles-toggle');
+        if (btnToggle) {
+            btnToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                abrirDetalleCavent(obra.id, card);
+                const modal = document.getElementById('modal-detalles-cavent');
+                const modalOpen = modal && !modal.classList.contains('hidden');
+                if (modalOpen) {
+                    modal.classList.add('hidden');
+                    btnToggle.querySelector('.icon-lupa').style.display = '';
+                    btnToggle.querySelector('.icon-volver').style.display = 'none';
+                    btnToggle.setAttribute('aria-label', 'Ver detalles');
+                    btnToggle.setAttribute('title', 'Ver detalles');
+                } else {
+                    abrirDetalleCavent(obra.id, card);
+                    btnToggle.querySelector('.icon-lupa').style.display = 'none';
+                    btnToggle.querySelector('.icon-volver').style.display = '';
+                    btnToggle.setAttribute('aria-label', 'Volver');
+                    btnToggle.setAttribute('title', 'Volver');
+                }
             });
         }
 
@@ -303,6 +318,14 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
 export async function abrirDetalleCavent(obraId, cardElement) {
     const modal = document.getElementById('modal-detalles-cavent');
     if (!modal) return;
+
+    // Resetear todos los botones toggle a estado "lupa"
+    document.querySelectorAll('.btn-detalles-toggle').forEach(btn => {
+        btn.querySelector('.icon-lupa').style.display = '';
+        btn.querySelector('.icon-volver').style.display = 'none';
+        btn.setAttribute('aria-label', 'Ver detalles');
+        btn.setAttribute('title', 'Ver detalles');
+    });
 
     // Alinear borde inferior del modal con el borde superior de la barra de métricas de la card
     const modalContent = modal.querySelector('.modal-cavent-detalle');
@@ -355,10 +378,6 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         debugLog.error('Error al cargar detalle de obra:', error);
         document.getElementById('detalle-cavent-titulo').textContent = 'Error de conexión.';
     }
-
-    // Cerrar con X
-    const closeBtn = document.getElementById('btn-cerrar-detalles-cavent');
-    if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
 }
 
 // ============================================

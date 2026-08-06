@@ -4,7 +4,7 @@
 @import url('header.css?v=ce339c15cd');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=c04732c155');
+@import url('galeria-publica.css?v=16c8710977');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -800,28 +800,6 @@ input, select, textarea {
     font-size: 0.95rem;
     color: rgba(255,255,255,0.9);
     line-height: 1.4;
-}
-/* X para cerrar el modal */
-.modal-close-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 20;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-.modal-close-btn:hover {
-    background: rgba(255,255,255,0.3);
 }
 /* Like animado */
 .metrica-like.liked .like-icon {
