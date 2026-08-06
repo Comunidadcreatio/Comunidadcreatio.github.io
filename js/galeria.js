@@ -308,11 +308,12 @@ export async function abrirDetalleCavent(obraId) {
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
-        if (!data || !data.obra) {
-            modal.querySelector('.modal-content').innerHTML = '<p style="text-align:center;padding:40px;">Error al cargar los detalles.</p>';
+        // getObraById devuelve la obra directamente, no envuelta en {obra:...}
+        const o = data && (data.obra || data.id) ? (data.obra || data) : null;
+        if (!o || !o.id) {
+            document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;">Error al cargar los detalles.</p>';
             return;
         }
-        const o = data.obra;
 
         // Carrusel de imágenes
         const urls = (o.imagenes && o.imagenes.length > 0)
@@ -383,12 +384,11 @@ export async function abrirDetalleCavent(obraId) {
 // REACCIONES (VISTOS / COMENTARIOS / ME GUSTA)
 // ============================================
 function manejarReaccion(itemEl, obraId, artistaOwnerId) {
-    const tipo = itemEl.innerHTML.includes('M21 12.79') ? 'like'   // corazón
-        : itemEl.innerHTML.includes('M10 13') ? 'view'            // ojo
-        : itemEl.innerHTML.includes('M21 15') ? 'comment'         // comentario
-        : null;
-    if (!tipo) return;
+    // Solo permitir "me gusta" por ahora (comentarios y vistas se programan después)
+    const esLike = itemEl.innerHTML.includes('M20.84 4.61');
+    if (!esLike) return; // ignorar vistas y comentarios
 
+    const tipo = 'like';
     const counterSpan = itemEl.querySelector('span');
     if (!counterSpan) return;
 
