@@ -342,37 +342,49 @@ export async function abrirDetalleCavent(obraId) {
         document.getElementById('detalle-cavent-titulo').textContent = 'Error de conexión.';
     }
 
-    // Cerrar modal
-    const closeBtn = document.getElementById('btn-cerrar-detalles-cavent');
-    const bg = modal.querySelector('.modal-cavent-detalle-bg');
+    // Cerrar modal con botón volver
+    const volverBtn = document.getElementById('btn-volver-detalles');
     const cerrar = () => modal.classList.add('hidden');
-    if (closeBtn) closeBtn.onclick = cerrar;
-    if (bg) bg.onclick = cerrar;
+    if (volverBtn) volverBtn.onclick = cerrar;
 }
 
 // ============================================
 // REACCIONES (VISTOS / COMENTARIOS / ME GUSTA)
 // ============================================
 function manejarReaccion(itemEl, obraId, artistaOwnerId) {
-    // Solo permitir "me gusta" por ahora (comentarios y vistas se programan después)
-    const esLike = itemEl.innerHTML.includes('M20.84 4.61');
-    if (!esLike) return; // ignorar vistas y comentarios
+    // Solo permitir "me gusta" por ahora
+    const esLike = itemEl.classList.contains('metrica-like');
+    if (!esLike) return;
 
-    const tipo = 'like';
     const counterSpan = itemEl.querySelector('span');
     if (!counterSpan) return;
 
-    // Optimistic update
+    const isLiked = itemEl.classList.contains('liked');
     const current = parseInt(counterSpan.textContent) || 0;
-    counterSpan.textContent = current + 1;
+
+    if (isLiked) {
+        // Quitar like
+        itemEl.classList.remove('liked');
+        counterSpan.textContent = Math.max(0, current - 1);
+    } else {
+        // Dar like
+        itemEl.classList.add('liked');
+        counterSpan.textContent = current + 1;
+    }
 
     // Enviar al backend
     apiRequest(`/obras/${obraId}/reaccion`, {
         method: 'POST',
-        body: JSON.stringify({ tipo, artista_owner_id: artistaOwnerId })
+        body: JSON.stringify({ tipo: 'like', artista_owner_id: artistaOwnerId })
     }).catch(err => {
         // Revertir en caso de error
-        counterSpan.textContent = current;
+        if (isLiked) {
+            itemEl.classList.add('liked');
+            counterSpan.textContent = current;
+        } else {
+            itemEl.classList.remove('liked');
+            counterSpan.textContent = current;
+        }
         debugLog.error('Error al enviar reacción:', err);
     });
 }
