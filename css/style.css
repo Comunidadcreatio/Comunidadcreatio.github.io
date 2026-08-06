@@ -802,7 +802,7 @@ input, select, textarea {
     line-height: 1.4;
 }
 /* Like animado */
-.metrica-like.liked .like-icon {
+.metrica-like.liked svg {
     fill: #ef4444;
     stroke: #ef4444;
     animation: like-pop 0.35s ease;
