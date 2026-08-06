@@ -153,14 +153,18 @@ async function cargarNotificaciones() {
             </div>`;
         }).join('');
 
-        // Click en notificación → redirige a la obra
+        // Click en notificación → redirige al cavent en la galería
         list.querySelectorAll('.notif-item').forEach(item => {
             item.addEventListener('click', () => {
                 const obraId = item.dataset.obra;
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
-                    // Importar y llamar abrirDetalleCavent
-                    import('./galeria.js').then(m => m.abrirDetalleCavent(parseInt(obraId)));
+                    // Navegar a la galería y hacer scroll hasta la card
+                    import('./galeria-ui.js').then(m => m.toggleGaleria());
+                    setTimeout(() => {
+                        const card = document.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
+                        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 400);
                 }
             });
         });
