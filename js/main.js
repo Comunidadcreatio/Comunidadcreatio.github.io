@@ -170,8 +170,6 @@ async function cargarNotificaciones() {
                         const card = document.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
                         if (card) {
                             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            card.style.boxShadow = '0 0 0 3px #ef4444';
-                            setTimeout(() => card.style.boxShadow = '', 2000);
                         } else if (intentos < 10) {
                             setTimeout(() => intentarScroll(intentos + 1), 300);
                         }
@@ -489,6 +487,11 @@ function setupEvents() {
                 notifDropdown.classList.add('hidden');
             }
         });
+        // Botón cerrar dentro del panel
+        const notifClose = document.getElementById('notif-close');
+        if (notifClose) {
+            notifClose.addEventListener('click', () => notifDropdown.classList.add('hidden'));
+        }
     }
 
     // ----- Panel de logout (escritorio y móvil) -----

@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=30136bb5bb">
+    <link rel="stylesheet" href="css/style.css?v=a1a2ea11bf">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -185,8 +185,14 @@
         </button>
         <!-- Panel de notificaciones -->
         <div id="notif-dropdown" class="notif-panel hidden">
-            <div id="notif-list" class="notif-list"></div>
-            <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+            <div class="notif-panel-header">
+                <h3>Notificaciones</h3>
+                <button id="notif-close" class="notif-panel-close">✕</button>
+            </div>
+            <div class="notif-panel-scroll">
+                <div id="notif-list" class="notif-list"></div>
+                <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+            </div>
         </div>
     </header>
     <!-- MAIN CONTENT -->
@@ -784,7 +790,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=54c166f5ac" type="module"></script>
+    <script src="js/main.js?v=5988db3ece" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>
