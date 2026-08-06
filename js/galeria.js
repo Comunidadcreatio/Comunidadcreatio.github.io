@@ -229,7 +229,7 @@ function crearObraCard(obra) {
             <!-- Barra inferior sólida: métricas + botón ver detalles -->
             <div class="obra-metricas-bar">
                 <button class="btn-ver-detalles" aria-label="Ver detalles" title="Ver detalles">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
                 <div class="metrica-right">
                     <span class="metrica-item">${ICON_OJO} <span>0</span></span>
