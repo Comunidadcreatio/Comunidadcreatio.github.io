@@ -158,6 +158,25 @@ function main() {
             versionData.date = `${y}-${m}-${d}`;
             fs.writeFileSync(versionPath, JSON.stringify(versionData, null, 2) + '\n', 'utf-8');
             console.log(`✎ ${VERSION_FILE} → versión ${versionData.version} (${versionData.date})`);
+
+            // 4b. Actualizar currentVer en el script auto-recarga de index.html
+            const indexPath = path.join(projectRoot, 'index.html');
+            if (fs.existsSync(indexPath)) {
+                let html = fs.readFileSync(indexPath, 'utf-8');
+                html = html.replace(/var currentVer = '[\d.]+'/, `var currentVer = '${versionData.version}'`);
+                fs.writeFileSync(indexPath, html, 'utf-8');
+            }
+
+            // 4c. Actualizar ?v= en capacitor.config.json para forzar recarga en WebView mobile
+            const capFiles = ['capacitor.config.json', 'www/capacitor.config.json', 'android/app/src/main/assets/capacitor.config.json', 'android/app/src/main/assets/public/capacitor.config.json'];
+            capFiles.forEach(f => {
+                const capPath = path.join(projectRoot, f);
+                if (fs.existsSync(capPath)) {
+                    let cap = fs.readFileSync(capPath, 'utf-8');
+                    cap = cap.replace(/(\?v=)[\d]+/, `$1${versionData.version.replace(/\./g, '')}`);
+                    fs.writeFileSync(capPath, cap, 'utf-8');
+                }
+            });
         }
     }
 
