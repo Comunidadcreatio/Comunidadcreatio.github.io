@@ -189,6 +189,12 @@ function initCarrusel(card) {
 }
 
 function crearObraCard(obra) {
+    const vistas = obra.likes_count !== undefined ? obra.likes_count : 0;
+    // NOTA: likes_count es para "me gusta", views_count para vistas, comments_count para comentarios
+    const likesCount = obra.likes_count || 0;
+    const viewsCount = obra.views_count || 0;
+    const commentsCount = obra.comments_count || 0;
+
     const card = document.createElement('article');
     card.className = 'obra-card';
     if (obra.id !== undefined && obra.id !== null) {
@@ -242,9 +248,9 @@ function crearObraCard(obra) {
                     <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 </button>
                 <div class="metrica-right">
-                    <span class="metrica-item">${ICON_OJO} <span>0</span></span>
-                    <span class="metrica-item">${ICON_COMENTARIO} <span>0</span></span>
-                    <span class="metrica-item metrica-like">${ICON_CORAZON} <span>0</span></span>
+                    <span class="metrica-item">${ICON_OJO} <span>${viewsCount}</span></span>
+                    <span class="metrica-item">${ICON_COMENTARIO} <span>${commentsCount}</span></span>
+                    <span class="metrica-item metrica-like">${ICON_CORAZON} <span>${likesCount}</span></span>
                 </div>
             </div>
         </div>
@@ -421,10 +427,10 @@ function manejarReaccion(itemEl, obraId, artistaOwnerId) {
         window._likedObras.add(obraId);
     }
 
-    // Enviar al backend
+    // Enviar al backend (toggle: añade o quita)
     apiRequest(`/obras/${obraId}/reaccion`, {
         method: 'POST',
-        body: JSON.stringify({ tipo: 'like', artista_owner_id: artistaOwnerId })
+        body: JSON.stringify({ tipo: 'like' })
     }).catch(err => {
         // Revertir en caso de error
         if (isLiked) {
