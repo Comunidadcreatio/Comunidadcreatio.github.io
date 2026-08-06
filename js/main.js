@@ -140,15 +140,30 @@ async function cargarNotificaciones() {
         }
         empty.style.display = 'none';
         const iconos = { like: '❤️', comment: '💬', view: '👁', follow: '👤', mention: '📢' };
-        list.innerHTML = data.notificaciones.map(n => `
-            <div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}">
-                <span class="notif-icon">${iconos[n.tipo] || '🔔'}</span>
+        list.innerHTML = data.notificaciones.map(n => {
+            const avatarHTML = n.actor_foto
+                ? `<div class="notif-avatar-wrap"><img src="${n.actor_foto}" class="notif-avatar" alt="${n.actor_nombre || ''}"><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`
+                : `<span class="notif-icon">${iconos[n.tipo] || '🔔'}</span>`;
+            return `<div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}" data-obra="${n.obra_id || ''}">
+                ${avatarHTML}
                 <div class="notif-body">
                     <div class="notif-mensaje">${n.mensaje}</div>
                     <div class="notif-tiempo">${timeAgo(n.created_at)}</div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
+
+        // Click en notificación → redirige a la obra
+        list.querySelectorAll('.notif-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const obraId = item.dataset.obra;
+                if (obraId) {
+                    document.getElementById('notif-dropdown').classList.add('hidden');
+                    // Importar y llamar abrirDetalleCavent
+                    import('./galeria.js').then(m => m.abrirDetalleCavent(parseInt(obraId)));
+                }
+            });
+        });
     } catch (e) {
         list.innerHTML = '';
         empty.textContent = 'Error al cargar notificaciones';
@@ -444,6 +459,11 @@ function setupEvents() {
             if (notifDropdown.classList.contains('hidden')) {
                 notifDropdown.classList.remove('hidden');
                 cargarNotificaciones();
+                // Marcar como leídas
+                apiRequest('/api/artistas/notificaciones/leidas', { method: 'PUT', body: JSON.stringify({}) }).catch(()=>{});
+                // Ocultar badge
+                const badge = document.getElementById('notif-badge');
+                if (badge) { badge.classList.add('hidden'); badge.dataset.last = '0'; }
             } else {
                 notifDropdown.classList.add('hidden');
             }
