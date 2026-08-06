@@ -51,7 +51,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=5e66978d31">
+    <link rel="stylesheet" href="css/style.css?v=2fbdca9443">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -741,13 +741,10 @@
  </div>
 
 
-    <!-- Modal de detalles completos del Cavent -->
+    <!-- Modal de detalles completos del Cavent (fullscreen) -->
     <div id="modal-detalles-cavent" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-content modal-cavent-detalle">
             <button id="btn-cerrar-detalles-cavent" class="modal-close-btn" aria-label="Cerrar">✕</button>
-            
-            <!-- Carrusel de imágenes -->
-            <div id="detalle-carrusel" class="detalle-carrusel"></div>
             
             <!-- Info principal -->
             <div class="detalle-header">
@@ -757,9 +754,18 @@
             
             <!-- Métricas -->
             <div class="detalle-metricas">
-                <span class="metrica-item">${ICON_OJO} <span id="detalle-vistas">0</span></span>
-                <span class="metrica-item">${ICON_COMENTARIO} <span id="detalle-comentarios">0</span></span>
-                <span class="metrica-item">${ICON_CORAZON} <span id="detalle-me-gusta">0</span></span>
+                <span class="metrica-item" data-tipo="view">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span id="detalle-vistas">0</span>
+                </span>
+                <span class="metrica-item" data-tipo="comment">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span id="detalle-comentarios">0</span>
+                </span>
+                <span class="metrica-item" data-tipo="like">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span id="detalle-me-gusta">0</span>
+                </span>
             </div>
             
             <!-- Grid de detalles -->
@@ -825,7 +831,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=0c44f4ace4" type="module"></script>
+    <script src="js/main.js?v=edccb75fe9" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

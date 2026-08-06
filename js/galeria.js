@@ -302,46 +302,17 @@ export async function abrirDetalleCavent(obraId) {
     const modal = document.getElementById('modal-detalles-cavent');
     if (!modal) return;
 
-    // Mostrar loading
     modal.classList.remove('hidden');
-    document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;">Cargando...</p>';
+    // Limpiar campos mientras carga
+    document.getElementById('detalle-cavent-titulo').textContent = 'Cargando...';
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
-        // getObraById devuelve la obra directamente, no envuelta en {obra:...}
         const o = data && (data.obra || data.id) ? (data.obra || data) : null;
         if (!o || !o.id) {
-            document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;">Error al cargar los detalles.</p>';
+            document.getElementById('detalle-cavent-titulo').textContent = 'Error al cargar los detalles.';
             return;
         }
-
-        // Carrusel de imágenes
-        const urls = (o.imagenes && o.imagenes.length > 0)
-            ? o.imagenes.map(img => cloudinaryUrl(img, 800))
-            : [];
-        const carruselHTML = urls.length > 0
-            ? urls.map((url, i) => `
-                <div class="detalle-slide ${i === 0 ? 'active' : ''}">
-                    <img src="${url}" alt="Imagen ${i + 1}" loading="eager">
-                </div>
-            `).join('')
-                + (urls.length > 1 ? `
-                <div class="detalle-carrusel-dots">
-                    ${urls.map((_, i) => `<span class="detalle-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
-                </div>` : '')
-            : '<p style="text-align:center;color:var(--color-gray-400);">Sin imágenes</p>';
-        document.getElementById('detalle-carrusel').innerHTML = carruselHTML;
-
-        // Inicializar dots del carrusel
-        const dots = document.getElementById('detalle-carrusel').querySelectorAll('.detalle-dot');
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const idx = parseInt(dot.dataset.index);
-                const slides = document.getElementById('detalle-carrusel').querySelectorAll('.detalle-slide');
-                slides.forEach((s, i) => s.classList.toggle('active', i === idx));
-                dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-            });
-        });
 
         // Poblar campos
         document.getElementById('detalle-cavent-titulo').textContent = o.titulo || 'Sin título';
@@ -361,14 +332,14 @@ export async function abrirDetalleCavent(obraId) {
         document.getElementById('detalle-conservacion').textContent = o.conservacion || '—';
         document.getElementById('detalle-etiquetas').textContent = o.etiquetas || '—';
 
-        // Métricas — usar datos reales si están disponibles
+        // Métricas
         document.getElementById('detalle-vistas').textContent = o.vistas || 0;
         document.getElementById('detalle-comentarios').textContent = o.comentarios || 0;
         document.getElementById('detalle-me-gusta').textContent = o.me_gusta || 0;
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);
-        document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;color:var(--color-danger);">Error de conexión.</p>';
+        document.getElementById('detalle-cavent-titulo').textContent = 'Error de conexión.';
     }
 
     // Cerrar modal
