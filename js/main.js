@@ -97,7 +97,34 @@ function iniciarSeguimientoActividad() {
             actualizarPerfilUI(verificarActividadLocal);
         }
         fetchActiveSessionsCount();
+        fetchNotificacionesCount();
     }, 30000);
+}
+
+// ============================================
+// POLLING DE NOTIFICACIONES (BADGE CAMPANA)
+// ============================================
+async function fetchNotificacionesCount() {
+    try {
+        const data = await apiRequest('/api/artistas/notificaciones/no-leidas');
+        const badge = document.getElementById('notif-badge');
+        if (!badge) return;
+        const count = data.no_leidas || 0;
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.classList.remove('hidden');
+            if (count > parseInt(badge.dataset.last || '0')) {
+                badge.classList.add('pulse');
+                setTimeout(() => badge.classList.remove('pulse'), 400);
+            }
+            badge.dataset.last = count;
+        } else {
+            badge.classList.add('hidden');
+            badge.dataset.last = '0';
+        }
+    } catch (e) {
+        // Silencioso — el badge no es crítico
+    }
 }
 
 // ============================================
