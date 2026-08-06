@@ -334,7 +334,8 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         const metricsBar = cardElement.querySelector('.obra-metricas-bar');
         if (artistaRow) {
             const topRect = artistaRow.getBoundingClientRect();
-            modalContent.style.top = topRect.bottom + 'px';
+            const marginBottom = parseFloat(getComputedStyle(artistaRow).marginBottom) || 0;
+            modalContent.style.top = (topRect.bottom + marginBottom) + 'px';
         } else {
             modalContent.style.top = '';
         }
