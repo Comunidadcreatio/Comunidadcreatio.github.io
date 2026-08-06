@@ -253,8 +253,7 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
     obras.forEach(obra => {
         const card = crearObraCard(obra);
 
-        // Clic en el avatar del artista: abre su perfil (tiene prioridad sobre
-        // el clic general de la tarjeta, por eso detiene la propagación).
+        // Clic en el avatar del artista: abre su perfil
         if (onAvatarClick) {
             const avatarEl = card.querySelector('.obra-avatar-clickable');
             if (avatarEl) {
@@ -267,10 +266,28 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
             }
         }
 
+        // Clic en "Ver detalles" → abre modal con toda la info
+        const btnDetalles = card.querySelector('.btn-ver-detalles');
+        if (btnDetalles) {
+            btnDetalles.addEventListener('click', (e) => {
+                e.stopPropagation();
+                abrirDetalleCavent(obra.id);
+            });
+        }
+
+        // Clic en reacciones (vistas/comentarios/me gusta)
+        card.querySelectorAll('.metrica-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                manejarReaccion(item, obra.id, obra.artista_user_id);
+            });
+        });
+
         if (onDetalle) {
             card.addEventListener('click', (e) => {
-                // No navegar si el clic fue en los dots del carrusel (paginación)
                 if (e.target.closest('.obra-carousel-dot')) return;
+                if (e.target.closest('.btn-ver-detalles')) return;
+                if (e.target.closest('.metrica-item')) return;
                 onDetalle(obra.id);
             });
         }
@@ -278,4 +295,114 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
     });
 }
 
-// (cloudinaryUrl ahora en utils.js)
+// ============================================
+// MODAL DE DETALLES COMPLETOS DEL CAVENT
+// ============================================
+export async function abrirDetalleCavent(obraId) {
+    const modal = document.getElementById('modal-detalles-cavent');
+    if (!modal) return;
+
+    // Mostrar loading
+    modal.classList.remove('hidden');
+    document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;">Cargando...</p>';
+
+    try {
+        const data = await apiRequest(`/obras/${obraId}`);
+        if (!data || !data.obra) {
+            modal.querySelector('.modal-content').innerHTML = '<p style="text-align:center;padding:40px;">Error al cargar los detalles.</p>';
+            return;
+        }
+        const o = data.obra;
+
+        // Carrusel de imágenes
+        const urls = (o.imagenes && o.imagenes.length > 0)
+            ? o.imagenes.map(img => cloudinaryUrl(img, 800))
+            : [];
+        const carruselHTML = urls.length > 0
+            ? urls.map((url, i) => `
+                <div class="detalle-slide ${i === 0 ? 'active' : ''}">
+                    <img src="${url}" alt="Imagen ${i + 1}" loading="eager">
+                </div>
+            `).join('')
+                + (urls.length > 1 ? `
+                <div class="detalle-carrusel-dots">
+                    ${urls.map((_, i) => `<span class="detalle-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
+                </div>` : '')
+            : '<p style="text-align:center;color:var(--color-gray-400);">Sin imágenes</p>';
+        document.getElementById('detalle-carrusel').innerHTML = carruselHTML;
+
+        // Inicializar dots del carrusel
+        const dots = document.getElementById('detalle-carrusel').querySelectorAll('.detalle-dot');
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.dataset.index);
+                const slides = document.getElementById('detalle-carrusel').querySelectorAll('.detalle-slide');
+                slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+                dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            });
+        });
+
+        // Poblar campos
+        document.getElementById('detalle-cavent-titulo').textContent = o.titulo || 'Sin título';
+        document.getElementById('detalle-cavent-precio').textContent = o.precio ? `$${o.precio}` : 'N/A';
+        document.getElementById('detalle-artista').textContent = o.artista || '—';
+        document.getElementById('detalle-ano').textContent = o.ano || '—';
+        document.getElementById('detalle-dimensiones').textContent = (o.ancho && o.alto) ? `${o.ancho} × ${o.alto} cm` : '—';
+        document.getElementById('detalle-tecnica').textContent = o.descripcion_tecnica || o.tecnica || '—';
+        document.getElementById('detalle-soporte').textContent = o.soporte || '—';
+        document.getElementById('detalle-marcos').textContent = o.marcos || '—';
+        document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
+        document.getElementById('detalle-disponibilidad').textContent = o.status || '—';
+        document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
+        document.getElementById('detalle-procedencia').textContent = o.procedencia || '—';
+        document.getElementById('detalle-certificado').textContent = o.certificado || '—';
+        document.getElementById('detalle-firma').textContent = o.firma || '—';
+        document.getElementById('detalle-conservacion').textContent = o.conservacion || '—';
+        document.getElementById('detalle-etiquetas').textContent = o.etiquetas || '—';
+
+        // Métricas — usar datos reales si están disponibles
+        document.getElementById('detalle-vistas').textContent = o.vistas || 0;
+        document.getElementById('detalle-comentarios').textContent = o.comentarios || 0;
+        document.getElementById('detalle-me-gusta').textContent = o.me_gusta || 0;
+
+    } catch (error) {
+        debugLog.error('Error al cargar detalle de obra:', error);
+        document.getElementById('detalle-carrusel').innerHTML = '<p style="text-align:center;padding:40px;color:var(--color-danger);">Error de conexión.</p>';
+    }
+
+    // Cerrar modal
+    const closeBtn = document.getElementById('btn-cerrar-detalles-cavent');
+    if (closeBtn) {
+        const cerrar = () => modal.classList.add('hidden');
+        closeBtn.onclick = cerrar;
+        modal.onclick = (e) => { if (e.target === modal) cerrar(); };
+    }
+}
+
+// ============================================
+// REACCIONES (VISTOS / COMENTARIOS / ME GUSTA)
+// ============================================
+function manejarReaccion(itemEl, obraId, artistaOwnerId) {
+    const tipo = itemEl.innerHTML.includes('M21 12.79') ? 'like'   // corazón
+        : itemEl.innerHTML.includes('M10 13') ? 'view'            // ojo
+        : itemEl.innerHTML.includes('M21 15') ? 'comment'         // comentario
+        : null;
+    if (!tipo) return;
+
+    const counterSpan = itemEl.querySelector('span');
+    if (!counterSpan) return;
+
+    // Optimistic update
+    const current = parseInt(counterSpan.textContent) || 0;
+    counterSpan.textContent = current + 1;
+
+    // Enviar al backend
+    apiRequest(`/obras/${obraId}/reaccion`, {
+        method: 'POST',
+        body: JSON.stringify({ tipo, artista_owner_id: artistaOwnerId })
+    }).catch(err => {
+        // Revertir en caso de error
+        counterSpan.textContent = current;
+        debugLog.error('Error al enviar reacción:', err);
+    });
+}
