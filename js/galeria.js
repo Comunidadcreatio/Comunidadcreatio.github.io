@@ -348,20 +348,22 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 
     modal.classList.remove('hidden');
     // Limpiar campos mientras carga
-    document.getElementById('detalle-cavent-titulo').textContent = 'Cargando...';
+    document.getElementById('detalle-ano').textContent = 'Cargando...';
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
         const o = data && (data.obra || data.id) ? (data.obra || data) : null;
         if (!o || !o.id) {
-            document.getElementById('detalle-cavent-titulo').textContent = 'Error al cargar los detalles.';
+            document.getElementById('detalle-ano').textContent = 'Error al cargar.';
             return;
         }
 
-        // Poblar campos
-        document.getElementById('detalle-cavent-titulo').textContent = o.titulo || 'Sin título';
-        document.getElementById('detalle-cavent-precio').textContent = o.precio ? `$${o.precio}` : 'N/A';
-        document.getElementById('detalle-artista').textContent = o.artista || '—';
+        // Poblar campos (artista, título, precio y disponibilidad ocultos — ya visibles en la card)
+        document.getElementById('detalle-cavent-titulo').parentElement.style.display = 'none';
+        document.getElementById('detalle-artista').parentElement.style.display = 'none';
+        document.getElementById('detalle-disponibilidad').parentElement.style.display = 'none';
+        document.getElementById('detalle-cavent-precio').style.display = 'none';
+
         document.getElementById('detalle-ano').textContent = o.ano || '—';
         document.getElementById('detalle-dimensiones').textContent = (o.ancho && o.alto) ? `${o.ancho} × ${o.alto} cm` : '—';
         document.getElementById('detalle-tecnica').textContent = o.descripcion_tecnica || o.tecnica || '—';
