@@ -2,6 +2,7 @@
 // Orquestador principal de la aplicación Creatio.
 // Coordina todos los módulos: autenticación, galería, panel, perfil,
 // búsqueda, cuenta, tema, y gestiona eventos globales.
+// v: ptr-fix-3 (ptrDidDrag gate + paddingTop loading)
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';

@@ -337,6 +337,7 @@ let ptrPullDist = 0;
 let ptrMaxPull = 0;
 const PTR_THRESHOLD = 70;
 let ptrCooldown = 0; // timestamp post-refresh para evitar doble disparo
+let ptrDidDrag = false; // solo true si hubo arrastre real (touchmove con dist > 5)
 
 function shuffleArray(arr) {
     const a = arr.slice();
@@ -393,6 +394,7 @@ export function setupPullToRefresh(container) {
             ptrStartY = e.touches[0].clientY;
             ptrPulling = true;
             ptrMaxPull = 0;
+            ptrDidDrag = false;
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
@@ -412,6 +414,7 @@ export function setupPullToRefresh(container) {
         if (dist > ptrMaxPull) ptrMaxPull = dist;
 
         if (dist > 5 && container.scrollTop <= 0) {
+            ptrDidDrag = true;
             e.preventDefault();
             if (touchRaf) cancelAnimationFrame(touchRaf);
             touchRaf = requestAnimationFrame(() => {
@@ -440,7 +443,7 @@ export function setupPullToRefresh(container) {
             circle.style.background = '';
         }
 
-        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
+        if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             // Mantener espacio del indicador mientras carga (evita que las cards se monten encima)
             container.style.transition = 'padding-top 0.2s ease';
             container.style.paddingTop = '56px';
@@ -494,6 +497,7 @@ export function setupPullToRefresh(container) {
             ptrStartY = e.clientY;
             ptrPulling = true;
             ptrMaxPull = 0;
+            ptrDidDrag = false;
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
@@ -511,6 +515,7 @@ export function setupPullToRefresh(container) {
         if (dist > ptrMaxPull) ptrMaxPull = dist;
 
         if (dist > 5 && container.scrollTop <= 0) {
+            ptrDidDrag = true;
             e.preventDefault();
             if (rafId) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(() => {
@@ -536,7 +541,7 @@ export function setupPullToRefresh(container) {
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
 
-        if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
+        if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             // Mantener espacio del indicador mientras carga
             container.style.transition = 'padding-top 0.2s ease';
             container.style.paddingTop = '56px';
