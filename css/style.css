@@ -844,9 +844,7 @@ input, select, textarea {
     line-height: 1;
 }
 /* Avatar default (sin foto) — círculo con inicial */
-.notif-avatar-default {
-    width: 100%;
-    height: 100%;
+.notif-avatar-wrap.notif-avatar-default {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -854,8 +852,8 @@ input, select, textarea {
     border-radius: 50%;
 }
 .notif-avatar-initial {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: #fff;
     line-height: 1;
 }
