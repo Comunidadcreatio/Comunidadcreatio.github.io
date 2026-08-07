@@ -7,6 +7,8 @@ function initNotificationContainer() {
     if (!container) {
         container = document.createElement('div');
         container.className = 'notification-container';
+        // Forzar z-index máximo inline (no puede ser sobreescrito por CSS)
+        container.style.zIndex = '2147483647';
         document.body.appendChild(container);
     }
     return container;
