@@ -144,7 +144,7 @@ async function cargarNotificaciones() {
         list.innerHTML = data.notificaciones.map(n => {
             const avatarHTML = n.actor_foto
                 ? `<div class="notif-avatar-wrap"><img src="${n.actor_foto}" class="notif-avatar" alt="${n.actor_nombre || ''}"><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`
-                : `<span class="notif-icon">${iconos[n.tipo] || '🔔'}</span>`;
+                : `<div class="notif-avatar-wrap notif-avatar-default"><span class="notif-avatar-initial">${(n.actor_nombre || '?')[0].toUpperCase()}</span><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`;
             return `<div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}" data-obra="${n.obra_id || ''}">
                 ${avatarHTML}
                 <div class="notif-body">

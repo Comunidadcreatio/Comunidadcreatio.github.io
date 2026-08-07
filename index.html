@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.257';
+        var currentVer = '1.0.258';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -69,7 +69,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=10175b7cad">
+    <link rel="stylesheet" href="css/style.css?v=812641c50d">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -204,8 +204,8 @@
         <!-- Panel de notificaciones -->
         <div id="notif-dropdown" class="notif-panel hidden">
             <div class="notif-panel-header">
+                <button id="notif-close" class="notif-panel-close">←</button>
                 <h3>Notificaciones</h3>
-                <button id="notif-close" class="notif-panel-close">✕</button>
             </div>
             <div class="notif-panel-scroll">
                 <div id="notif-list" class="notif-list"></div>
@@ -808,7 +808,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=dd231dc6f3" type="module"></script>
+    <script src="js/main.js?v=0f00bf8c6c" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

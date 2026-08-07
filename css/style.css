@@ -749,7 +749,8 @@ input, select, textarea {
 .notif-panel-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 12px;
     padding: 16px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     flex-shrink: 0;
@@ -761,17 +762,18 @@ input, select, textarea {
     font-weight: 600;
 }
 .notif-panel-close {
-    background: rgba(255,255,255,0.1);
+    background: none;
     border: none;
     color: #fff;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    line-height: 1;
 }
 .notif-panel-scroll {
     flex: 1;
@@ -839,6 +841,22 @@ input, select, textarea {
     align-items: center;
     justify-content: center;
     font-size: 10px;
+    line-height: 1;
+}
+/* Avatar default (sin foto) — círculo con inicial */
+.notif-avatar-default {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+}
+.notif-avatar-initial {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
     line-height: 1;
 }
 @keyframes notif-pulse {
@@ -1131,6 +1149,10 @@ input, select, textarea {
     main {
         padding: 50px 24px 0;
         padding-top: calc(50px + var(--status-bar-height, 24px));
+    }
+
+    .notif-panel {
+        top: calc(50px + var(--status-bar-height, 24px));
     }
 
     .toggle-icon {
