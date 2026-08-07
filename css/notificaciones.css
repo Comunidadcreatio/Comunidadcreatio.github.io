@@ -5,7 +5,7 @@
 /* Contenedor de notificaciones */
 .notification-container {
     position: fixed;
-    top: 20px;
+    top: calc(64px + var(--status-bar-height, 24px) + 10px);
     right: 20px;
     z-index: 10000;
     display: flex;
@@ -247,7 +247,7 @@
    ============================================== */
 @media (max-width: 600px) {
     .notification-container {
-        top: 12px;
+        top: calc(50px + var(--status-bar-height, 24px) + 8px);
         right: 12px;
         left: 12px;
     }
