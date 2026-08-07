@@ -389,6 +389,7 @@ export function setupPullToRefresh(container) {
         if (container.scrollTop <= 0) {
             ptrStartY = e.touches[0].clientY;
             ptrPulling = true;
+            ptrMaxPull = 0;
             container.style.transition = 'none';
             container.style.paddingTop = '';
             container.style.transform = '';
@@ -464,6 +465,7 @@ export function setupPullToRefresh(container) {
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
+        ptrMaxPull = 0;
     });
 
     // Soporte mouse drag (desktop)

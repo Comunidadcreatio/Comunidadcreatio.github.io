@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.253';
+        var currentVer = '1.0.254';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -69,7 +69,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=10175b7cad">
+    <link rel="stylesheet" href="css/style.css?v=bd0b95ef3d">
     <link rel="stylesheet" href="css/notificaciones.css?v=8f6ecd687d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -777,7 +777,7 @@
             <div class="detalle-scroll">
                 <!-- Grid de detalles en secciones -->
                 <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">📐 Detalles Técnicos</h3>
+                    <h3 class="detalle-seccion-titulo">Detalles Técnicos</h3>
                     <div class="detalle-grid">
                         <div class="detalle-campo"><span class="detalle-label">Técnica</span><span class="detalle-valor" id="detalle-tecnica"></span></div>
                         <div class="detalle-campo"><span class="detalle-label">Soporte</span><span class="detalle-valor" id="detalle-soporte"></span></div>
@@ -789,12 +789,12 @@
                 </div>
 
                 <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">📝 Descripción</h3>
+                    <h3 class="detalle-seccion-titulo">Descripción</h3>
                     <p class="detalle-valor detalle-descripcion" id="detalle-descripcion"></p>
                 </div>
 
                 <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">🔍 Procedencia y Autenticidad</h3>
+                    <h3 class="detalle-seccion-titulo">Procedencia y Autenticidad</h3>
                     <div class="detalle-grid">
                         <div class="detalle-campo"><span class="detalle-label">Procedencia</span><span class="detalle-valor" id="detalle-procedencia"></span></div>
                         <div class="detalle-campo"><span class="detalle-label">Certificado</span><span class="detalle-valor" id="detalle-certificado"></span></div>
