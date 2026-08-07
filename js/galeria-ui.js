@@ -300,6 +300,7 @@ export async function toggleExplorar() {
                     verPerfilArtistaDesdeGaleria(artistaId);
                 });
                 actualizarEstadoNavButtons();
+                ensurePTRInContainer(galeriaContainerLocal);
                 gridEntering = false;
             });
         });
@@ -444,10 +445,10 @@ export function setupPullToRefresh(container) {
         }
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            // Mantener espacio del indicador mientras carga (evita que las cards se monten encima)
-            container.style.transition = 'padding-top 0.2s ease';
+            // Snap instantáneo a 56px (sin transición, evita salto en flex)
+            container.style.transition = 'none';
             container.style.paddingTop = '56px';
-            container.style.scrollSnapType = '';
+            // Mantener scrollSnapType desactivado durante la carga
             container.style.userSelect = '';
 
             ptrRefreshing = true;
@@ -468,8 +469,9 @@ export function setupPullToRefresh(container) {
 
             ptrRefreshing = false;
             // Transición suave al quitar el espacio del indicador
-            container.style.transition = 'padding-top 0.25s ease';
+            container.style.transition = 'padding-top 0.3s ease';
             container.style.paddingTop = '0';
+            container.style.scrollSnapType = '';
             ptrIndicator.classList.remove('visible', 'loading');
             // Cooldown post-refresh para evitar que un tap accidental dispare otro refresh
             ptrCooldown = Date.now() + 400;
@@ -542,10 +544,10 @@ export function setupPullToRefresh(container) {
         if (circle) circle.style.background = '';
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            // Mantener espacio del indicador mientras carga
-            container.style.transition = 'padding-top 0.2s ease';
+            // Snap instantáneo a 56px (sin transición, evita salto en flex)
+            container.style.transition = 'none';
             container.style.paddingTop = '56px';
-            container.style.scrollSnapType = '';
+            // Mantener scrollSnapType desactivado durante la carga
             container.style.userSelect = '';
 
             ptrRefreshing = true;
@@ -565,8 +567,9 @@ export function setupPullToRefresh(container) {
             }
 
             ptrRefreshing = false;
-            container.style.transition = 'padding-top 0.25s ease';
+            container.style.transition = 'padding-top 0.3s ease';
             container.style.paddingTop = '0';
+            container.style.scrollSnapType = '';
             ptrIndicator.classList.remove('visible', 'loading');
             ptrCooldown = Date.now() + 400;
         } else {
