@@ -535,7 +535,6 @@ html, body {
     grid-auto-rows: max-content;
     gap: 0;
     padding: 0;
-    scroll-padding-top: 56px;            /* Espacio para el indicador de pull-to-refresh */
     align-items: start;                  /* Las tarjetas usan solo su altura de contenido */
     overflow-y: auto;
     scroll-snap-type: none;

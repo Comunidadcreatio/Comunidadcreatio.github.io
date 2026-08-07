@@ -336,6 +336,7 @@ let ptrRefreshing = false;
 let ptrPullDist = 0;
 let ptrMaxPull = 0;
 const PTR_THRESHOLD = 70;
+let ptrCooldown = 0; // timestamp post-refresh para evitar doble disparo
 
 function shuffleArray(arr) {
     const a = arr.slice();
@@ -382,6 +383,8 @@ export function setupPullToRefresh(container) {
 
     container.addEventListener('touchstart', (e) => {
         if (ptrRefreshing) return;
+        // Cooldown post-refresh: ignorar toques brevemente
+        if (Date.now() < ptrCooldown) return;
         // Forzar scrollTop a 0 si está cerca (scroll-snap a veces lo deja en 1-5px)
         if (container.scrollTop > 0 && container.scrollTop <= 10) {
             container.scrollTop = 0;
@@ -430,11 +433,6 @@ export function setupPullToRefresh(container) {
         if (touchRaf) { cancelAnimationFrame(touchRaf); touchRaf = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-        container.style.paddingTop = '0';
-        container.style.transform = '';
-        container.style.scrollSnapType = '';
-        container.style.userSelect = '';
 
         // Reset círculo — limpiar estilo inline
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
@@ -443,6 +441,12 @@ export function setupPullToRefresh(container) {
         }
 
         if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
+            // Mantener espacio del indicador mientras carga (evita que las cards se monten encima)
+            container.style.transition = 'padding-top 0.2s ease';
+            container.style.paddingTop = '56px';
+            container.style.scrollSnapType = '';
+            container.style.userSelect = '';
+
             ptrRefreshing = true;
             ptrIndicator.classList.add('loading');
 
@@ -460,8 +464,19 @@ export function setupPullToRefresh(container) {
             }
 
             ptrRefreshing = false;
+            // Transición suave al quitar el espacio del indicador
+            container.style.transition = 'padding-top 0.25s ease';
+            container.style.paddingTop = '0';
             ptrIndicator.classList.remove('visible', 'loading');
+            // Cooldown post-refresh para evitar que un tap accidental dispare otro refresh
+            ptrCooldown = Date.now() + 400;
         } else {
+            // No alcanzó el umbral: volver suave a 0 y ocultar
+            container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+            container.style.paddingTop = '0';
+            container.style.transform = '';
+            container.style.scrollSnapType = '';
+            container.style.userSelect = '';
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
@@ -473,8 +488,9 @@ export function setupPullToRefresh(container) {
 
     container.addEventListener('mousedown', (e) => {
         if (ptrRefreshing) return;
+        // Cooldown post-refresh: ignorar interacciones brevemente
+        if (Date.now() < ptrCooldown) return;
         if (container.scrollTop <= 0) {
-            e.preventDefault();
             ptrStartY = e.clientY;
             ptrPulling = true;
             ptrMaxPull = 0;
@@ -516,15 +532,17 @@ export function setupPullToRefresh(container) {
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-        container.style.paddingTop = '0';
-        container.style.scrollSnapType = '';
-        container.style.userSelect = '';
 
         const circle = ptrIndicator.querySelector('.ptr-circle-fill');
         if (circle) circle.style.background = '';
 
         if (ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
+            // Mantener espacio del indicador mientras carga
+            container.style.transition = 'padding-top 0.2s ease';
+            container.style.paddingTop = '56px';
+            container.style.scrollSnapType = '';
+            container.style.userSelect = '';
+
             ptrRefreshing = true;
             ptrIndicator.classList.add('loading');
 
@@ -542,8 +560,15 @@ export function setupPullToRefresh(container) {
             }
 
             ptrRefreshing = false;
+            container.style.transition = 'padding-top 0.25s ease';
+            container.style.paddingTop = '0';
             ptrIndicator.classList.remove('visible', 'loading');
+            ptrCooldown = Date.now() + 400;
         } else {
+            container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+            container.style.paddingTop = '0';
+            container.style.scrollSnapType = '';
+            container.style.userSelect = '';
             ptrIndicator.classList.remove('visible');
         }
         ptrPullDist = 0;
