@@ -8,6 +8,7 @@
 // comentarios drawer v1
 // fix reply selector
 // fix main send button event
+// fix transitionend ghost close
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';
