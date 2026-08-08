@@ -10,10 +10,9 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
             var localVer = localStorage.getItem('app_version');
-            var currentUrl = window.location.href;
 
-            // Primera visita o recarga forzada con ?v= → guardar versión y salir
-            if (!localVer || currentUrl.indexOf('?v=') !== -1) {
+            // Primera visita: guardar versión y salir
+            if (!localVer) {
                 localStorage.setItem('app_version', data.version);
                 return;
             }
