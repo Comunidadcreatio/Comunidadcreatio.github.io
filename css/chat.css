@@ -425,23 +425,20 @@
 .chat-cluster {
     position: fixed;
     right: 12px;
-    /* Pegado al borde superior del nav: el degradado nace ahí */
-    bottom: calc(50px + env(safe-area-inset-bottom, 16px));
+    /* Pequeño aire sobre el nav: el degradado se insinúa sin pegarse a su borde */
+    bottom: calc(56px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
     align-items: center;
     gap: 10px;
-    /* El relleno superior alto deja espacio para que el degradado suba y se pierda
-       justo antes de llegar a la altura de los círculos */
-    padding: 34px 8px 10px 14px;
-    border-radius: 46px;
-    /* Degradado VERTICAL: opaco en el borde del nav, se pierde al llegar
-       a la altura de los círculos (blanco en modo claro) */
+    padding: 8px 8px 8px 14px;
+    border-radius: 40px;
+    /* Degradado VERTICAL SUAVE: nace cerca del nav sin formar una barra sólida
+       (blanco en modo claro) */
     background: linear-gradient(to top,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.55) 18%,
-        rgba(255, 255, 255, 0.15) 32%,
-        rgba(255, 255, 255, 0) 45%);
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 255, 255, 0.15) 45%,
+        rgba(255, 255, 255, 0) 75%);
     /* Solo los círculos y el FAB capturan toques; el área transparente del
        degradado deja pasar los taps hacia los acordeones */
     pointer-events: none;
@@ -521,12 +518,11 @@
     height: 24px;
 }
 [data-theme="dark"] .chat-cluster {
-    /* Degradado VERTICAL negro: nace en el nav y se pierde a la altura de los círculos */
+    /* Degradado VERTICAL SUAVE negro: sin barra sólida (modo oscuro) */
     background: linear-gradient(to top,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.55) 18%,
-        rgba(0, 0, 0, 0.15) 32%,
-        rgba(0, 0, 0, 0) 45%);
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.15) 45%,
+        rgba(0, 0, 0, 0) 75%);
 }
 [data-theme="dark"] .chat-conv-circle {
     border-color: #0a0a0a;
