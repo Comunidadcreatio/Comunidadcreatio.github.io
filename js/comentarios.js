@@ -52,7 +52,10 @@ function cerrarComentarios() {
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {
         drawer.removeEventListener('transitionend', ocultar);
-        drawer.classList.add('hidden');
+        // Solo ocultar si sigue sin estar visible (evita que un reopen dispare el hide)
+        if (!drawer.classList.contains('visible')) {
+            drawer.classList.add('hidden');
+        }
     }, { once: true });
     // Fallback si el transitionend no dispara
     setTimeout(() => {
