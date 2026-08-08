@@ -143,6 +143,32 @@ function main() {
     }
 
     // 4. Actualizar version.json (solo si hubo cambios reales)
+    // 4a. Detectar cambios en módulos ES importados desde main.js
+    const mainPath = path.join(projectRoot, 'js/main.js');
+    if (fs.existsSync(mainPath)) {
+        const modFiles = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js'];
+        let main = fs.readFileSync(mainPath, 'utf-8');
+        let mainChanged = false;
+        modFiles.forEach(mod => {
+            const modFullPath = path.join(projectRoot, 'js', mod);
+            if (!fs.existsSync(modFullPath)) return;
+            const modHash = hashFile(modFullPath);
+            const escaped = mod.replace(/\./g, '\\.');
+            const regex = new RegExp(`from\\s+['\"]\\.\\/${escaped}\\?v=([^'\"]*)['\"]`, 'g');
+            const match = regex.exec(main);
+            if (match && match[1] !== modHash) {
+                main = main.replace(match[0], match[0].replace(match[1], modHash));
+                console.log(`✓ js/main.js import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
+                mainChanged = true;
+                anyChange = true;
+            }
+        });
+        if (mainChanged) {
+            fs.writeFileSync(mainPath, main, 'utf-8');
+            console.log('✎ js/main.js imports actualizados.');
+        }
+    }
+
     if (anyChange) {
         const versionPath = path.join(projectRoot, VERSION_FILE);
         if (fs.existsSync(versionPath)) {
@@ -177,6 +203,30 @@ function main() {
                     fs.writeFileSync(capPath, cap, 'utf-8');
                 }
             });
+
+            // 4d. Actualizar ?v= en imports de módulos ES en main.js
+            const mainPath = path.join(projectRoot, 'js/main.js');
+            if (fs.existsSync(mainPath)) {
+                const modFiles = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js'];
+                let main = fs.readFileSync(mainPath, 'utf-8');
+                let mainChanged = false;
+                modFiles.forEach(mod => {
+                    const modFullPath = path.join(projectRoot, 'js', mod);
+                    if (!fs.existsSync(modFullPath)) return;
+                    const modHash = hashFile(modFullPath);
+                    const regex = new RegExp(`from\\s+['"]\\.\\/${mod.replace('.', '\\.')}\\?v=([^'"]*)['"]`, 'g');
+                    const match = regex.exec(main);
+                    if (match && match[1] !== modHash) {
+                        main = main.replace(match[0], match[0].replace(match[1], modHash));
+                        console.log(`✓ js/main.js import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
+                        mainChanged = true;
+                    }
+                });
+                if (mainChanged) {
+                    fs.writeFileSync(mainPath, main, 'utf-8');
+                    console.log('✎ js/main.js imports actualizados.');
+                }
+            }
         }
     }
 
