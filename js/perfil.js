@@ -6,6 +6,9 @@ import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, lastActivityTime } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
 import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
+// Mismo tracking de vistas que la galería (mismo URL versionado → un solo
+// módulo en memoria; el hash lo mantiene scripts/bump-version.js)
+import { setupViewTracking } from './galeria.js?v=da7fde69fb';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -518,7 +521,7 @@ function renderizarGridObras(obras, container) {
                 ${primeraImg ? `<img src="${primeraImg}" alt="" loading="lazy" class="perfil-card-main-img">` : '<div class="perfil-obra-card-placeholder">🖼️</div>'}
                 ${totalImagenes > 1 ? `<div class="perfil-card-dots">${imagenes.map((_, i) => `<span class="perfil-card-dot${i === 0 ? ' active' : ''}" data-index="${i}"></span>`).join('')}</div>` : ''}
                 <div class="perfil-card-bottom">
-                    <span class="perfil-card-vistas">${ICON_OJO} 0</span>
+                    <span class="perfil-card-vistas">${ICON_OJO} <span class="perfil-card-vistas-num">${obra.views_count || 0}</span></span>
                 </div>
             </div>
         `;
@@ -580,4 +583,11 @@ function renderizarGridObras(obras, container) {
 
     container.innerHTML = '';
     container.appendChild(grid);
+
+    // Contar vistas en tiempo real también desde el perfil (mismo dedup global)
+    try {
+        setupViewTracking(grid, obras);
+    } catch (e) {
+        debugLog.error('setupViewTracking en perfil:', e);
+    }
 }

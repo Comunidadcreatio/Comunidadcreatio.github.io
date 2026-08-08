@@ -65,6 +65,35 @@ function findCssImports(cssContent) {
     return imports;
 }
 
+/**
+ * Actualiza los ?v= de los imports de módulos ES (./mod?v=...) en un archivo JS.
+ * Mantiene en sync main.js y perfil.js cuando cambia galeria.js u otro módulo.
+ */
+function updateModuleImports(projectRoot, jsFile, modFiles, setAnyChange) {
+    const filePath = path.join(projectRoot, jsFile);
+    if (!fs.existsSync(filePath)) return;
+    let content = fs.readFileSync(filePath, 'utf-8');
+    let changed = false;
+    modFiles.forEach(mod => {
+        const modFullPath = path.join(projectRoot, 'js', mod);
+        if (!fs.existsSync(modFullPath)) return;
+        const modHash = hashFile(modFullPath);
+        const escaped = mod.replace(/\./g, '\\.');
+        const regex = new RegExp(`from\\s+['\"]\\.\\/${escaped}\\?v=([^'\"]*)['\"]`, 'g');
+        const match = regex.exec(content);
+        if (match && match[1] !== modHash) {
+            content = content.replace(match[0], match[0].replace(match[1], modHash));
+            console.log(`✓ ${jsFile} import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
+            changed = true;
+            if (setAnyChange) setAnyChange();
+        }
+    });
+    if (changed) {
+        fs.writeFileSync(filePath, content, 'utf-8');
+        console.log(`✎ ${jsFile} imports actualizados.`);
+    }
+}
+
 function processFile(projectRoot, filePath, findFn, labelFn) {
     const fullPath = path.join(projectRoot, filePath);
     if (!fs.existsSync(fullPath)) {
@@ -143,31 +172,10 @@ function main() {
     }
 
     // 4. Actualizar version.json (solo si hubo cambios reales)
-    // 4a. Detectar cambios en módulos ES importados desde main.js
-    const mainPath = path.join(projectRoot, 'js/main.js');
-    if (fs.existsSync(mainPath)) {
-        const modFiles = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js'];
-        let main = fs.readFileSync(mainPath, 'utf-8');
-        let mainChanged = false;
-        modFiles.forEach(mod => {
-            const modFullPath = path.join(projectRoot, 'js', mod);
-            if (!fs.existsSync(modFullPath)) return;
-            const modHash = hashFile(modFullPath);
-            const escaped = mod.replace(/\./g, '\\.');
-            const regex = new RegExp(`from\\s+['\"]\\.\\/${escaped}\\?v=([^'\"]*)['\"]`, 'g');
-            const match = regex.exec(main);
-            if (match && match[1] !== modHash) {
-                main = main.replace(match[0], match[0].replace(match[1], modHash));
-                console.log(`✓ js/main.js import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
-                mainChanged = true;
-                anyChange = true;
-            }
-        });
-        if (mainChanged) {
-            fs.writeFileSync(mainPath, main, 'utf-8');
-            console.log('✎ js/main.js imports actualizados.');
-        }
-    }
+    // 4a. Detectar cambios en módulos ES importados desde main.js / perfil.js
+    const MOD_FILES = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js', 'perfil.js'];
+    const JS_IMPORT_FILES = ['js/main.js', 'js/perfil.js'];
+    JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, () => { anyChange = true; }));
 
     if (anyChange) {
         const versionPath = path.join(projectRoot, VERSION_FILE);
@@ -204,29 +212,8 @@ function main() {
                 }
             });
 
-            // 4d. Actualizar ?v= en imports de módulos ES en main.js
-            const mainPath = path.join(projectRoot, 'js/main.js');
-            if (fs.existsSync(mainPath)) {
-                const modFiles = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js'];
-                let main = fs.readFileSync(mainPath, 'utf-8');
-                let mainChanged = false;
-                modFiles.forEach(mod => {
-                    const modFullPath = path.join(projectRoot, 'js', mod);
-                    if (!fs.existsSync(modFullPath)) return;
-                    const modHash = hashFile(modFullPath);
-                    const regex = new RegExp(`from\\s+['"]\\.\\/${mod.replace('.', '\\.')}\\?v=([^'"]*)['"]`, 'g');
-                    const match = regex.exec(main);
-                    if (match && match[1] !== modHash) {
-                        main = main.replace(match[0], match[0].replace(match[1], modHash));
-                        console.log(`✓ js/main.js import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
-                        mainChanged = true;
-                    }
-                });
-                if (mainChanged) {
-                    fs.writeFileSync(mainPath, main, 'utf-8');
-                    console.log('✎ js/main.js imports actualizados.');
-                }
-            }
+            // 4d. Actualizar ?v= en imports de módulos ES (main.js / perfil.js)
+            JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, null));
         }
     }
 

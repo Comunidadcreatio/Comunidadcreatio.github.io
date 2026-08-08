@@ -28,7 +28,7 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js';
+} from './perfil.js?v=c07dd2fe1b';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
@@ -39,7 +39,7 @@ import {
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=6b7a6abc40';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 

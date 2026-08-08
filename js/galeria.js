@@ -218,7 +218,7 @@ function crearObraCard(obra) {
         <div class="obra-grid-overlay" aria-hidden="true">
             <span class="obra-grid-titulo" title="${titulo}">${titulo}</span>
             <div class="obra-grid-bottom">
-                <span class="obra-grid-vistas">${ICON_OJO} <span>0</span></span>
+                <span class="obra-grid-vistas">${ICON_OJO} <span>${viewsCount}</span></span>
                 <span class="obra-grid-precio">$${precio}</span>
             </div>
         </div>
@@ -346,7 +346,7 @@ if (!window._vistasRegistradas) window._vistasRegistradas = new Set();
 
 const VIEW_TIMERS = new Map(); // obraId → timeout
 
-function setupViewTracking(container, obras) {
+export function setupViewTracking(container, obras) {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const obraId = parseInt(entry.target.dataset.obraId);
@@ -371,28 +371,39 @@ function setupViewTracking(container, obras) {
     }, { threshold: 0.5 });
 
     obras.forEach(obra => {
-        const card = container.querySelector(`.obra-card[data-obra-id="${obra.id}"]`);
+        // [data-obra-id] cubre tanto .obra-card (galería) como .perfil-obra-card (perfil)
+        const card = container.querySelector(`[data-obra-id="${obra.id}"]`);
         if (card) observer.observe(card);
     });
 }
 
+// Actualiza el contador de vistas en TODAS las cards de la obra:
+// galería (barra de métricas + overlay grid) y perfil (miniatura).
+function actualizarContadoresVistas(obraId, vistas) {
+    if (vistas === undefined || vistas === null) return;
+    const todas = document.querySelectorAll(
+        `.obra-card[data-obra-id="${obraId}"], .perfil-obra-card[data-obra-id="${obraId}"]`
+    );
+    todas.forEach(card => {
+        card.querySelectorAll(
+            '.metrica-item.metrica-vistas > span, .obra-grid-vistas > span, .perfil-card-vistas-num'
+        ).forEach(span => { span.textContent = vistas; });
+    });
+}
+
 async function registrarVista(obraId, cardEl) {
+    // No registrar dos veces la misma obra en la sesión (defensa extra:
+    // el mismo card puede estar observado desde galería y perfil)
+    if (window._vistasRegistradas.has(obraId)) return;
     window._vistasRegistradas.add(obraId);
     try {
         const res = await apiRequest(`/obras/${obraId}/reaccion`, {
             method: 'POST',
             body: JSON.stringify({ tipo: 'view' })
         });
-        // Actualizar contador en TODAS las cards de esta obra
-        const todas = document.querySelectorAll(`.obra-card[data-obra-id="${obraId}"]`);
-        todas.forEach(card => {
-            const items = card.querySelectorAll('.metrica-right .metrica-item');
-            const viewItem = items[0];
-            if (viewItem && res.totales && res.totales.views !== undefined) {
-                const span = viewItem.querySelector('span');
-                if (span) span.textContent = res.totales.views;
-            }
-        });
+        if (res && res.totales) {
+            actualizarContadoresVistas(obraId, res.totales.views);
+        }
     } catch (e) {
         // Silencioso
     }
