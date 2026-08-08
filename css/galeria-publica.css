@@ -1127,3 +1127,7 @@ html, body {
     justify-content: center;
     flex-shrink: 0;
 }
+
+.comentarios-enviar svg {
+    display: block;
+}

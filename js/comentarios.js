@@ -33,6 +33,9 @@ export function abrirComentarios(obraId, cardEl) {
 
     input.value = '';
     lista.innerHTML = '<div class="comentarios-loading">Cargando comentarios...</div>';
+    // Limpiar cualquier transform inline residual de swipe
+    drawer.style.transform = '';
+    drawer.style.transition = '';
     drawer.classList.remove('hidden');
     // Forzar reflow antes de la animación
     drawer.offsetHeight;
@@ -43,6 +46,9 @@ export function abrirComentarios(obraId, cardEl) {
 
 function cerrarComentarios() {
     if (!drawer) return;
+    // Limpiar estilos inline del swipe
+    drawer.style.transform = '';
+    drawer.style.transition = '';
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {
         drawer.removeEventListener('transitionend', ocultar);
@@ -215,9 +221,9 @@ drawer?.addEventListener('touchstart', (e) => {
 drawer?.addEventListener('touchmove', (e) => {
     if (!swipePulling) return;
     const dist = e.touches[0].clientY - swipeStartY;
-    if (dist > 10) {
-        // Aplicar resistencia visual
-        const damped = Math.min(dist * 0.6, 120);
+    if (dist > 5) {
+        // Resistencia suave
+        const damped = Math.min(dist * 0.55, 150);
         drawer.style.transform = `translateY(${damped}px)`;
         drawer.style.transition = 'none';
     }
@@ -226,13 +232,14 @@ drawer?.addEventListener('touchmove', (e) => {
 drawer?.addEventListener('touchend', () => {
     if (!swipePulling) return;
     swipePulling = false;
-    const currentTransform = drawer.style.transform;
-    const match = currentTransform.match(/translateY\((\d+)px\)/);
-    const dist = match ? parseInt(match[1]) : 0;
-    if (dist > 60) {
+    const match = drawer.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
+    const dist = match ? parseFloat(match[1]) : 0;
+    if (dist > 80) {
+        drawer.style.transform = '';
         cerrarComentarios();
     } else {
-        drawer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+        // Volver suave a la posición original
+        drawer.style.transition = 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
         drawer.style.transform = '';
     }
 });

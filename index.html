@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.269';
+        var currentVer = '1.0.270';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -69,7 +69,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e33e0d223f">
+    <link rel="stylesheet" href="css/style.css?v=6536514dd3">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -224,7 +224,7 @@
         <div class="comentarios-input-area">
             <img id="comentarios-avatar" class="comentarios-avatar-input" src="" alt="">
             <input type="text" id="comentarios-input" class="comentarios-input" placeholder="Escribe un comentario..." autocomplete="off">
-            <button id="comentarios-enviar" class="comentarios-enviar">➤</button>
+            <button id="comentarios-enviar" class="comentarios-enviar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
         </div>
     </div>
 
