@@ -1207,3 +1207,16 @@ html, body {
     color: rgba(255,255,255,0.3);
     flex-shrink: 0;
 }
+
+/* Flechita del popover (apunta hacia abajo al icono) */
+.vistas-popover::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(30, 30, 30, 0.97);
+}

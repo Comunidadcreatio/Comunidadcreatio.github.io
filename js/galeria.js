@@ -383,15 +383,18 @@ async function registrarVista(obraId, cardEl) {
             method: 'POST',
             body: JSON.stringify({ tipo: 'view' })
         });
-        // Actualizar contador visual en la card
-        const items = cardEl.querySelectorAll('.metrica-right .metrica-item');
-        const viewItem = items[0]; // vistas es el primero
-        if (viewItem && res.totales && res.totales.views !== undefined) {
-            const span = viewItem.querySelector('span');
-            if (span) span.textContent = res.totales.views;
-        }
+        // Actualizar contador en TODAS las cards de esta obra
+        const todas = document.querySelectorAll(`.obra-card[data-obra-id="${obraId}"]`);
+        todas.forEach(card => {
+            const items = card.querySelectorAll('.metrica-right .metrica-item');
+            const viewItem = items[0];
+            if (viewItem && res.totales && res.totales.views !== undefined) {
+                const span = viewItem.querySelector('span');
+                if (span) span.textContent = res.totales.views;
+            }
+        });
     } catch (e) {
-        // Silencioso: si falla, se intentará en otra sesión
+        // Silencioso
     }
 }
 export async function abrirDetalleCavent(obraId, cardElement) {
@@ -491,15 +494,16 @@ async function mostrarVistas(obraId, anchorEl) {
     popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
     popover.style.right = (window.innerWidth - rect.right) + 'px';
 
-    // Cerrar al tocar fuera
+    // Cerrar al tocar fuera o al abrir otro panel
     const closeHandler = (e) => {
         if (!popover.contains(e.target) && e.target !== anchorEl) {
             popover.remove();
             vistasPopover = null;
-            document.removeEventListener('click', closeHandler);
+            document.removeEventListener('click', closeHandler, true);
         }
     };
-    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+    // Usar capture para atrapar el click antes que otros handlers
+    document.addEventListener('click', closeHandler, true);
 
     try {
         const data = await apiRequest(`/obras/${obraId}/vistas`);
