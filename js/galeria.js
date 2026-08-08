@@ -473,9 +473,9 @@ async function mostrarVistas(obraId, anchorEl) {
     document.body.appendChild(popover);
     vistasPopover = popover;
 
-    // Posicionar
+    // Posicionar arriba del ícono
     const rect = anchorEl.getBoundingClientRect();
-    popover.style.top = (rect.bottom + 8) + 'px';
+    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
     popover.style.right = (window.innerWidth - rect.right) + 'px';
 
     // Cerrar al tocar fuera
@@ -510,7 +510,7 @@ async function mostrarVistas(obraId, anchorEl) {
             }).join('')}
         `;
     } catch (err) {
-        popover.innerHTML = '<div class="vistas-popover-empty">Solo tú puedes ver esto</div>';
+        popover.innerHTML = '<div class="vistas-popover-empty">Error al cargar. ¿Ya desplegaste el backend?</div>';
     }
 }
 
