@@ -465,6 +465,18 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 // POPOVER DE VISTAS (solo dueño)
 // ============================================
 let vistasPopover = null;
+let vistasCloseHandler = null;
+
+function cerrarVistasPopover() {
+    if (vistasCloseHandler) {
+        document.removeEventListener('click', vistasCloseHandler, true);
+        vistasCloseHandler = null;
+    }
+    if (vistasPopover) {
+        vistasPopover.remove();
+        vistasPopover = null;
+    }
+}
 
 function timeAgoShortV(dateStr) {
     if (!dateStr) return '';
@@ -480,8 +492,8 @@ function timeAgoShortV(dateStr) {
 }
 
 async function mostrarVistas(obraId, anchorEl) {
-    // Remover popover anterior
-    if (vistasPopover) vistasPopover.remove();
+    // Remover popover anterior (y su listener) para no acumular handlers
+    cerrarVistasPopover();
 
     const popover = document.createElement('div');
     popover.className = 'vistas-popover';
@@ -494,15 +506,15 @@ async function mostrarVistas(obraId, anchorEl) {
     popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
     popover.style.right = (window.innerWidth - rect.right) + 'px';
 
-    // Cerrar al tocar fuera o al abrir otro panel
+    // Cerrar al tocar fuera (capture: atrapa el click antes que otros handlers).
+    // Se usa anchorEl.contains(e.target) porque el click suele caer en el SVG
+    // del ícono y no en el propio elemento anchor.
     const closeHandler = (e) => {
-        if (!popover.contains(e.target) && e.target !== anchorEl) {
-            popover.remove();
-            vistasPopover = null;
-            document.removeEventListener('click', closeHandler, true);
+        if (!popover.contains(e.target) && !anchorEl.contains(e.target)) {
+            cerrarVistasPopover();
         }
     };
-    // Usar capture para atrapar el click antes que otros handlers
+    vistasCloseHandler = closeHandler;
     document.addEventListener('click', closeHandler, true);
 
     try {
@@ -518,6 +530,7 @@ async function mostrarVistas(obraId, anchorEl) {
         }
         popover.innerHTML = `
             <div class="vistas-popover-title">Visto por</div>
+            <div class="vistas-list">
             ${vistas.map(v => {
                 const inicial = (v.nombre_artista || '?')[0].toUpperCase();
                 const avatarHTML = v.foto_perfil
@@ -529,6 +542,7 @@ async function mostrarVistas(obraId, anchorEl) {
                     <span class="vistas-fecha">${timeAgoShortV(v.created_at)}</span>
                 </div>`;
             }).join('')}
+            </div>
         `;
     } catch (err) {
         popover.innerHTML = '<div class="vistas-popover-empty">Error: ' + (err.message || 'desconocido') + '</div>';

@@ -31,21 +31,18 @@
                     window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now();
                 }
 
-                // En reset-password, auto-recargar tras 60s si el usuario no actúa
-                var isResetPassword = window.location.pathname.indexOf('reset-password') !== -1;
-                if (isResetPassword) {
-                    var autoTimer = setTimeout(function() {
-                        var btn = document.getElementById('btn-refresh-app');
-                        if (btn) { btn.textContent = 'Recargando...'; btn.style.opacity = '0.6'; }
-                        recargar();
-                    }, AUTO_RELOAD_DELAY);
-                    document.getElementById('btn-refresh-app').onclick = function() {
-                        clearTimeout(autoTimer);
-                        recargar();
-                    };
-                } else {
-                    document.getElementById('btn-refresh-app').onclick = recargar;
-                }
+                // Auto-recargar tras 60s si el usuario no actúa (aplica a todas
+                // las páginas, incluida la app): garantiza que la WebView llegue
+                // a la última versión publicada aunque nadie toque la pastilla.
+                var autoTimer = setTimeout(function() {
+                    var btn = document.getElementById('btn-refresh-app');
+                    if (btn) { btn.textContent = 'Recargando...'; btn.style.opacity = '0.6'; }
+                    recargar();
+                }, AUTO_RELOAD_DELAY);
+                document.getElementById('btn-refresh-app').onclick = function() {
+                    clearTimeout(autoTimer);
+                    recargar();
+                };
             }
         })
         .catch(function() {});

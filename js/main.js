@@ -39,7 +39,7 @@ import {
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=9d6e51e94b';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=6b7a6abc40';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 

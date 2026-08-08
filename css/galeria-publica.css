@@ -1146,9 +1146,14 @@ html, body {
     padding: 12px 0;
     min-width: 200px;
     max-width: 260px;
-    max-height: 280px;
-    overflow-y: auto;
+    /* El scroll va en .vistas-list (inner): si el popover tiene overflow,
+       recorta la flechita ::after que sobresale por abajo. */
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+/* Contenedor interno con scroll, para que la flechita no se recorte */
+.vistas-list {
+    overflow-y: auto;
+    max-height: 260px;
 }
 .vistas-popover-title {
     font-size: 12px;
