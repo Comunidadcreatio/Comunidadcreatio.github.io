@@ -410,12 +410,9 @@
 @media (min-width: 769px) {
     #chat-global {
         max-width: 700px;
-        margin: 2rem auto;
+        margin: 0 auto;
         height: min(70vh, 620px);
-        border: 1px solid var(--color-gray-200, #e5e5e5);
-        border-radius: 16px;
-        background: var(--color-bg, #fff);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        /* Sin caja: la sección fluye con el fondo de la app (sin borde ni relleno) */
     }
 }
 
