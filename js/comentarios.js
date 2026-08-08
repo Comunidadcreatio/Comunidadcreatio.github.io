@@ -61,7 +61,7 @@ function cerrarComentarios() {
 
 async function cargarComentarios(obraId) {
     try {
-        const data = await apiRequest(`/api/obras/${obraId}/comentarios`);
+        const data = await apiRequest(`/obras/${obraId}/comentarios`);
         const comentarios = data.comentarios || data || [];
         if (!comentarios.length) {
             lista.innerHTML = '<div class="comentarios-vacio">No hay comentarios aún. ¡Sé el primero!</div>';
@@ -98,7 +98,7 @@ async function enviarComentario() {
     btnEnviar.disabled = true;
 
     try {
-        const data = await apiRequest(`/api/obras/${obraIdActual}/comentarios`, {
+        const data = await apiRequest(`/obras/${obraIdActual}/comentarios`, {
             method: 'POST',
             body: JSON.stringify({ texto })
         });
