@@ -186,7 +186,7 @@ init();
 
 btnCerrar?.addEventListener('click', cerrarComentarios);
 
-btnEnviar?.addEventListener('click', enviarComentario);
+btnEnviar?.addEventListener('click', () => enviarComentario());
 
 input?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
