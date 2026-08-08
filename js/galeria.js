@@ -490,6 +490,10 @@ async function mostrarVistas(obraId, anchorEl) {
 
     try {
         const data = await apiRequest(`/obras/${obraId}/vistas`);
+        if (!data || data.error) {
+            popover.innerHTML = '<div class="vistas-popover-empty">' + (data?.error || 'Error de conexión') + '</div>';
+            return;
+        }
         const vistas = data.vistas || [];
         if (!vistas.length) {
             popover.innerHTML = '<div class="vistas-popover-empty">Nadie ha visto tu cavent aún</div>';
@@ -510,7 +514,7 @@ async function mostrarVistas(obraId, anchorEl) {
             }).join('')}
         `;
     } catch (err) {
-        popover.innerHTML = '<div class="vistas-popover-empty">Error al cargar. ¿Ya desplegaste el backend?</div>';
+        popover.innerHTML = '<div class="vistas-popover-empty">Error: ' + (err.message || 'desconocido') + '</div>';
     }
 }
 
