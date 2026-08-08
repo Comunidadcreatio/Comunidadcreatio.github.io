@@ -37,7 +37,6 @@ export function abrirComentarios(obraId, cardEl) {
     // Forzar reflow antes de la animación
     drawer.offsetHeight;
     drawer.classList.add('visible');
-    input.focus();
 
     cargarComentarios(obraId);
 }
@@ -67,50 +66,89 @@ async function cargarComentarios(obraId) {
             lista.innerHTML = '<div class="comentarios-vacio">No hay comentarios aún. ¡Sé el primero!</div>';
             return;
         }
-        lista.innerHTML = comentarios.map(c => renderizarComentario(c)).join('');
+        // Agrupar: raíces y replies
+        const raices = comentarios.filter(c => !c.comentario_padre_id);
+        const replies = comentarios.filter(c => c.comentario_padre_id);
+        lista.innerHTML = raices.map(c => renderizarComentario(c, replies)).join('');
     } catch (err) {
         lista.innerHTML = '<div class="comentarios-error">Error al cargar comentarios</div>';
     }
 }
 
-function renderizarComentario(c) {
+function renderizarComentario(c, todosReplies) {
     const inicial = (c.autor_nombre || '?')[0].toUpperCase();
     const avatarHTML = c.autor_foto
         ? `<img src="${c.autor_foto}" class="comentario-avatar" alt="">`
         : `<div class="comentario-avatar comentario-avatar-default">${inicial}</div>`;
 
     const fecha = timeAgoShort(c.created_at || c.fecha);
+    const likes = c.likes_count || 0;
+
+    // Buscar replies de este comentario
+    const hijos = todosReplies ? todosReplies.filter(r => r.comentario_padre_id === c.id) : [];
+    const repliesHTML = hijos.length
+        ? `<div class="comentario-replies">${hijos.map(h => renderizarComentario(h, todosReplies)).join('')}</div>`
+        : '';
 
     return `
-        <div class="comentario-item">
+        <div class="comentario-item" data-id="${c.id}">
             ${avatarHTML}
             <div class="comentario-body">
                 <div class="comentario-autor">${c.autor_nombre || 'Usuario'}</div>
                 <div class="comentario-texto">${c.texto || c.comentario || ''}</div>
-                <div class="comentario-fecha">${fecha}</div>
+                <div class="comentario-meta">
+                    <span class="comentario-fecha">${fecha}</span>
+                    <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
+                    <button class="comentario-btn-like" data-id="${c.id}">
+                        ♥ <span class="comentario-likes-count">${likes}</span>
+                    </button>
+                </div>
+                <div class="comentario-reply-input hidden" data-parent="${c.id}">
+                    <input type="text" class="comentario-reply-field" placeholder="Escribe una respuesta..." autocomplete="off">
+                    <button class="comentario-reply-send">➤</button>
+                </div>
+                ${repliesHTML}
             </div>
         </div>`;
 }
 
-async function enviarComentario() {
-    const texto = input.value.trim();
+async function enviarComentario(parentId = null) {
+    const isReply = parentId !== null;
+    const texto = isReply
+        ? document.querySelector(`.comentario-reply-field[data-parent="${parentId}"]`)?.value.trim()
+        : input.value.trim();
     if (!texto || !obraIdActual) return;
     btnEnviar.disabled = true;
 
     try {
-        const data = await apiRequest(`/obras/${obraIdActual}/comentarios`, {
+        const body = { texto };
+        if (parentId) body.comentario_padre_id = parentId;
+        await apiRequest(`/obras/${obraIdActual}/comentarios`, {
             method: 'POST',
-            body: JSON.stringify({ texto })
+            body: JSON.stringify(body)
         });
-        input.value = '';
-        // Recargar comentarios
+        if (!isReply) input.value = '';
         await cargarComentarios(obraIdActual);
-        // Actualizar contador en la card
         actualizarContador(cardActual, 1);
     } catch (err) {
         alert('No se pudo enviar el comentario');
     } finally {
         btnEnviar.disabled = false;
+    }
+}
+
+async function likeComentario(commentId) {
+    try {
+        const res = await apiRequest(`/obras/${obraIdActual}/comentarios/${commentId}/like`, { method: 'POST' });
+        const btn = document.querySelector(`.comentario-btn-like[data-id="${commentId}"]`);
+        const span = btn?.querySelector('.comentario-likes-count');
+        if (btn) {
+            if (res.liked) btn.classList.add('liked');
+            else btn.classList.remove('liked');
+        }
+        if (span) span.textContent = res.likes_count;
+    } catch (err) {
+        // silencioso
     }
 }
 
@@ -160,4 +198,81 @@ input?.addEventListener('keydown', (e) => {
 // Cerrar al hacer clic en el fondo oscuro
 drawer?.addEventListener('click', (e) => {
     if (e.target === drawer) cerrarComentarios();
+});
+
+// Swipe-down para cerrar
+let swipeStartY = 0;
+let swipePulling = false;
+
+drawer?.addEventListener('touchstart', (e) => {
+    // Solo si la lista está arriba del todo
+    if (lista.scrollTop <= 0) {
+        swipeStartY = e.touches[0].clientY;
+        swipePulling = true;
+    }
+}, { passive: true });
+
+drawer?.addEventListener('touchmove', (e) => {
+    if (!swipePulling) return;
+    const dist = e.touches[0].clientY - swipeStartY;
+    if (dist > 10) {
+        // Aplicar resistencia visual
+        const damped = Math.min(dist * 0.6, 120);
+        drawer.style.transform = `translateY(${damped}px)`;
+        drawer.style.transition = 'none';
+    }
+}, { passive: true });
+
+drawer?.addEventListener('touchend', () => {
+    if (!swipePulling) return;
+    swipePulling = false;
+    const currentTransform = drawer.style.transform;
+    const match = currentTransform.match(/translateY\((\d+)px\)/);
+    const dist = match ? parseInt(match[1]) : 0;
+    if (dist > 60) {
+        cerrarComentarios();
+    } else {
+        drawer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+        drawer.style.transform = '';
+    }
+});
+
+// Delegación de eventos para replies y likes
+lista?.addEventListener('click', (e) => {
+    // Botón "Responder"
+    const btnResp = e.target.closest('.comentario-btn-responder');
+    if (btnResp) {
+        const parentId = btnResp.dataset.id;
+        const replyInput = lista.querySelector(`.comentario-reply-input[data-parent="${parentId}"]`);
+        if (replyInput) {
+            const hidden = replyInput.classList.toggle('hidden');
+            if (!hidden) replyInput.querySelector('input')?.focus();
+        }
+        return;
+    }
+    // Botón enviar reply
+    const btnSend = e.target.closest('.comentario-reply-send');
+    if (btnSend) {
+        const parentId = btnSend.closest('.comentario-reply-input')?.dataset.parent;
+        if (parentId) enviarComentario(parseInt(parentId));
+        return;
+    }
+    // Botón like
+    const btnLike = e.target.closest('.comentario-btn-like');
+    if (btnLike) {
+        likeComentario(parseInt(btnLike.dataset.id));
+        return;
+    }
+});
+
+// Enter en campo de reply
+lista?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        const field = e.target.closest('.comentario-reply-field');
+        if (field) {
+            e.preventDefault();
+            const parentId = field.closest('.comentario-reply-input')?.dataset.parent;
+            if (parentId) enviarComentario(parseInt(parentId));
+        }
+    }
 });
