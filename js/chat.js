@@ -18,10 +18,11 @@ let lastId = 0;             // último id renderizado (cursor del poll)
 let pollTimer = null;
 let polling = false;        // evita polls superpuestos (ej. cold start de Render)
 
-// El FAB de la sala global solo es visible dentro del directorio del chat.
+// El cluster flotante (sala global + círculos de conversaciones) solo es
+// visible dentro del directorio del chat.
 function setFabVisible(visible) {
-    const fab = document.getElementById('btn-chat-global-fab');
-    if (fab) fab.classList.toggle('hidden', !visible);
+    const cluster = document.getElementById('chat-cluster');
+    if (cluster) cluster.classList.toggle('hidden', !visible);
 }
 
 // ---- Utilidades de datos (js/ciudades.js expone window globals) ----
@@ -246,24 +247,26 @@ function toggleAcordeon(item) {
     if (!estabaAbierto) item.classList.add('open');
 }
 
+// Las conversaciones se muestran como círculos (avatares) junto al círculo
+// de la sala global. El orden se invierte: la más reciente queda pegada al
+// círculo de la sala global (la última en agregarse).
 function renderConversaciones(convs) {
-    const cont = document.getElementById('chat-conversaciones');
+    const cont = document.getElementById('chat-cluster-convs');
+    if (!cont) return;
     cont.innerHTML = '';
     if (!convs || !convs.length) return;
-    const titulo = document.createElement('div');
-    titulo.className = 'chat-subtitulo';
-    titulo.textContent = 'Conversaciones';
-    cont.appendChild(titulo);
-    convs.forEach(c => {
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'chat-conv-item';
-        const preview = c.ultimo
-            ? `${c.ultimo.autor_id === miId() ? 'Tú: ' : ''}${escapeHtml(c.ultimo.contenido)}`
-            : 'Sin mensajes';
-        item.innerHTML = `${avatarHTML(c.otro_foto, c.otro_nombre)}<span class="chat-conv-txt"><strong>${escapeHtml(c.otro_nombre)}</strong><small>${preview}</small></span>`;
-        item.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
-        cont.appendChild(item);
+    const ordenadas = [...convs].reverse(); // newest queda a la derecha, junto al FAB
+    ordenadas.forEach(c => {
+        const circle = document.createElement('button');
+        circle.type = 'button';
+        circle.className = 'chat-conv-circle';
+        circle.setAttribute('aria-label', `Chat con ${c.otro_nombre}`);
+        const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
+        circle.innerHTML = c.otro_foto
+            ? `<img src="${c.otro_foto}" alt="">`
+            : inicial;
+        circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
+        cont.appendChild(circle);
     });
 }
 
