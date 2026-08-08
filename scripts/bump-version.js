@@ -173,7 +173,7 @@ function main() {
 
     // 4. Actualizar version.json (solo si hubo cambios reales)
     // 4a. Detectar cambios en módulos ES importados desde main.js / perfil.js
-    const MOD_FILES = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js', 'perfil.js'];
+    const MOD_FILES = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js', 'perfil.js', 'chat.js'];
     const JS_IMPORT_FILES = ['js/main.js', 'js/perfil.js'];
     JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, () => { anyChange = true; }));
 

@@ -28,7 +28,7 @@ function obtenerGaleriaContainer() {
 // SISTEMA DE TRANSICIONES ENTRE SECCIONES
 // ============================================
 let isTransitioning = false;
-const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca'];
+const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca', 'chat-global'];
 
 export function encontrarSeccionActual() {
     for (const id of SECCIONES) {

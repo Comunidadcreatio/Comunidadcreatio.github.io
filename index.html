@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.284';
+        var currentVer = '1.0.286';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=4b0f63dbae">
+    <link rel="stylesheet" href="css/style.css?v=90805cfe9d">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -100,6 +100,12 @@
                     <rect x="14" y="14" width="7" height="7"></rect>
                 </svg>
                 <span class="toggle-label">cavents</span>
+            </button>
+            <button id="btn-chat-global" class="toggle-nav-btn" aria-label="Chat global">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="toggle-label">Chat</span>
             </button>
         </div>
         <div class="bottom-bar-center">
@@ -781,6 +787,40 @@
             </div>
         </section>
 
+        <!-- SECCIÓN: CHAT GLOBAL + PRIVADO -->
+        <section id="chat-global" class="hidden" aria-label="Chat global" role="region">
+            <div class="chat-header">
+                <h2>Chat</h2>
+                <button id="chat-cerrar" class="chat-cerrar-btn" aria-label="Cerrar chat">✕</button>
+            </div>
+            <div id="chat-contenido">
+                <!-- Vista directorio: sala global + acordeón de pueblos -->
+                <div id="chat-directorio">
+                    <button id="chat-sala-global" class="chat-room-global" type="button">
+                        <span class="chat-room-global-icon">🌐</span>
+                        <span class="chat-room-global-txt">
+                            <strong>Chat Global</strong>
+                            <small>Conversación abierta para todos</small>
+                        </span>
+                    </button>
+                    <div id="chat-conversaciones"></div>
+                    <div id="chat-accordion"></div>
+                </div>
+                <!-- Vista sala: mensajes de un canal (global o privado) -->
+                <div id="chat-sala" class="hidden">
+                    <div class="chat-sala-header">
+                        <button id="chat-volver" class="chat-volver-btn" aria-label="Volver al directorio">←</button>
+                        <div id="chat-sala-titulo" class="chat-sala-titulo"></div>
+                    </div>
+                    <div id="chat-mensajes" class="chat-mensajes"></div>
+                    <form id="chat-form" class="chat-form">
+                        <input id="chat-input" class="chat-input" type="text" maxlength="1000" placeholder="Escribe un mensaje…" autocomplete="off" aria-label="Mensaje">
+                        <button type="submit" id="chat-enviar" class="chat-enviar-btn" aria-label="Enviar">➤</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         
     </main>
  </div>
@@ -824,7 +864,8 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=51059b4a74" type="module"></script>
+    <script src="js/ciudades.js?v=eca7910e5c"></script>
+    <script src="js/main.js?v=dd2f1d96c2" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=746b63951d"></script>
 </body>
