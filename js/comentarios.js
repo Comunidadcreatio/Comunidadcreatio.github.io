@@ -115,7 +115,7 @@ function renderizarComentario(c, todosReplies) {
 async function enviarComentario(parentId = null) {
     const isReply = parentId !== null;
     const texto = isReply
-        ? document.querySelector(`.comentario-reply-field[data-parent="${parentId}"]`)?.value.trim()
+        ? document.querySelector(`.comentario-reply-input[data-parent="${parentId}"] .comentario-reply-field`)?.value.trim()
         : input.value.trim();
     if (!texto || !obraIdActual) return;
     btnEnviar.disabled = true;
