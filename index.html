@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.274';
+        var currentVer = '1.0.275';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -823,7 +823,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=c60dc70fa1" type="module"></script>
+    <script src="js/main.js?v=a99d69aeb1" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

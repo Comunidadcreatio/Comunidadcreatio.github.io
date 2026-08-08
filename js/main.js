@@ -12,6 +12,7 @@
 // vistas con IntersectionObserver
 // popover quien vio
 // popover arriba del icono
+// mejor manejo errores popover
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';
