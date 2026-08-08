@@ -15,8 +15,9 @@
             .then(function(r){ return r.json(); })
             .then(function(data){
                 if (data.version !== currentVer) {
-                    // Nueva versión detectada — recargar sin caché
-                    location.reload(true);
+                    // Forzar recarga con URL única para evitar caché del WebView
+                    var url = location.href.split('?')[0] + '?v=' + Date.now();
+                    location.replace(url);
                 }
             })
             .catch(function(){});

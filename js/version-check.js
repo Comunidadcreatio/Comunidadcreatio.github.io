@@ -29,7 +29,7 @@
 
                 function recargar() {
                     localStorage.setItem('app_version', data.version);
-                    window.location.href = window.location.href.split('?')[0] + '?v=' + data.version;
+                    window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now();
                 }
 
                 // En reset-password, auto-recargar tras 60s si el usuario no actúa
