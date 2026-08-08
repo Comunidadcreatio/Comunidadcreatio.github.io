@@ -463,6 +463,19 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 // ============================================
 let vistasPopover = null;
 
+function timeAgoShortV(dateStr) {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Ahora';
+    if (mins < 60) return `Hace ${mins}m`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Hace ${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `Hace ${days}d`;
+    return new Date(dateStr).toLocaleDateString('es-VE');
+}
+
 async function mostrarVistas(obraId, anchorEl) {
     // Remover popover anterior
     if (vistasPopover) vistasPopover.remove();
@@ -509,7 +522,7 @@ async function mostrarVistas(obraId, anchorEl) {
                 return `<div class="vistas-item">
                     ${avatarHTML}
                     <span class="vistas-nombre">${v.nombre_artista || 'Usuario'}</span>
-                    <span class="vistas-fecha">${timeAgoShort(v.created_at)}</span>
+                    <span class="vistas-fecha">${timeAgoShortV(v.created_at)}</span>
                 </div>`;
             }).join('')}
         `;
