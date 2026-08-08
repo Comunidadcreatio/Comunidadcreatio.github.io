@@ -13,6 +13,7 @@
 // popover quien vio
 // popover arriba del icono
 // mejor manejo errores popover
+// bump forzado v279
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';
