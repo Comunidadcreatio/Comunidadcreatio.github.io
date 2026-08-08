@@ -332,11 +332,68 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
             if (likeItem) likeItem.classList.add('liked');
         }
     });
+
+    // IntersectionObserver: contar vistas automáticamente
+    setupViewTracking(container, obras);
 }
 
 // ============================================
-// MODAL DE DETALLES COMPLETOS DEL CAVENT
+// CONTADOR DE VISTAS (IntersectionObserver)
 // ============================================
+
+// Set global para no repetir vistas en la misma sesión
+if (!window._vistasRegistradas) window._vistasRegistradas = new Set();
+
+const VIEW_TIMERS = new Map(); // obraId → timeout
+
+function setupViewTracking(container, obras) {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const obraId = parseInt(entry.target.dataset.obraId);
+            if (!obraId) return;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                // Visible >50% → iniciar timer de 2.5s
+                if (!VIEW_TIMERS.has(obraId) && !window._vistasRegistradas.has(obraId)) {
+                    const timer = setTimeout(() => {
+                        registrarVista(obraId, entry.target);
+                        VIEW_TIMERS.delete(obraId);
+                    }, 2500);
+                    VIEW_TIMERS.set(obraId, timer);
+                }
+            } else {
+                // Salió del viewport → cancelar timer
+                if (VIEW_TIMERS.has(obraId)) {
+                    clearTimeout(VIEW_TIMERS.get(obraId));
+                    VIEW_TIMERS.delete(obraId);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    obras.forEach(obra => {
+        const card = container.querySelector(`.obra-card[data-obra-id="${obra.id}"]`);
+        if (card) observer.observe(card);
+    });
+}
+
+async function registrarVista(obraId, cardEl) {
+    window._vistasRegistradas.add(obraId);
+    try {
+        const res = await apiRequest(`/obras/${obraId}/reaccion`, {
+            method: 'POST',
+            body: JSON.stringify({ tipo: 'view' })
+        });
+        // Actualizar contador visual en la card
+        const items = cardEl.querySelectorAll('.metrica-right .metrica-item');
+        const viewItem = items[0]; // vistas es el primero
+        if (viewItem && res.totales && res.totales.views !== undefined) {
+            const span = viewItem.querySelector('span');
+            if (span) span.textContent = res.totales.views;
+        }
+    } catch (e) {
+        // Silencioso: si falla, se intentará en otra sesión
+    }
+}
 export async function abrirDetalleCavent(obraId, cardElement) {
     const modal = document.getElementById('modal-detalles-cavent');
     if (!modal) return;
