@@ -114,17 +114,16 @@
    ACORDEÓN DE PUEBLOS
    ============================================== */
 .chat-pueblo {
-    border: 1px solid var(--color-gray-200, #e5e5e5);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    background: var(--color-bg, #fff);
+    background: var(--color-gray-50, #fafafa);
 }
 .chat-pueblo-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    padding: 11px 14px;
+    padding: 8px 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -135,26 +134,26 @@
     background: var(--color-gray-50, #fafafa);
 }
 .chat-pueblo-bandera {
-    width: 30px;
-    height: 20px;
+    width: 22px;
+    height: 14px;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 2px;
     flex-shrink: 0;
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 .chat-pueblo-nombre {
     flex: 1;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-text, #1a1a1a);
 }
 .chat-pueblo-count {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    color: var(--color-primary, #c0392b);
+    color: var(--color-text-muted, #888);
     background: var(--color-gray-100, #f0f0f0);
     border-radius: 20px;
-    padding: 2px 9px;
+    padding: 1px 8px;
 }
 .chat-pueblo-chevron {
     color: var(--color-text-muted, #888);
@@ -184,7 +183,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 9px 14px;
+    padding: 8px 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -194,12 +193,17 @@
 .chat-user-row:hover {
     background: var(--color-gray-50, #fafafa);
 }
+.chat-user-avatar-wrap {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+}
 .chat-user-avatar {
     width: 34px;
     height: 34px;
     border-radius: 50%;
     object-fit: cover;
-    flex-shrink: 0;
     background: var(--color-gray-200, #e0e0e0);
     color: #fff;
     display: flex;
@@ -208,14 +212,45 @@
     font-size: 14px;
     font-weight: 700;
 }
-.chat-user-nombre {
+/* Punto de presencia (igual que en el perfil: verde activo / gris offline) */
+.chat-user-dot {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background-color: #9ca3af;
+    border: 2px solid var(--color-bg, #fff);
+    box-sizing: border-box;
+}
+.chat-user-dot.online {
+    background-color: #22c55e;
+}
+.chat-user-info {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.chat-user-nombre {
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text, #1a1a1a);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.chat-user-estado {
+    font-size: 11.5px;
+    color: var(--color-text-muted, #888);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chat-user-estado .online-text {
+    color: #16a34a;
+    font-weight: 600;
 }
 .chat-user-flecha {
     color: var(--color-text-muted, #aaa);
@@ -228,10 +263,9 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--color-gray-200, #e5e5e5);
-    border-radius: 12px;
-    background: var(--color-bg, #fff);
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: var(--color-gray-50, #fafafa);
     cursor: pointer;
     font-family: inherit;
     text-align: left;
@@ -410,21 +444,53 @@
     cursor: default;
 }
 
-/* Modo oscuro: ajustes finos */
+/* ==============================================
+   MODO OSCURO — el tema invierte la escala de grises
+   (gray-700/800 son CLAROS), así que usamos colores
+   explícitos para las superficies del chat.
+   ============================================== */
 [data-theme="dark"] .chat-msg.other {
-    background: var(--color-gray-700, #3a3a3a);
-    color: var(--color-gray-100, #f0f0f0);
+    background: #1f1f1f;
+    color: #e5e5e5;
 }
-[data-theme="dark"] .chat-room-global,
+[data-theme="dark"] .chat-msg.own {
+    background: #525252;
+    color: #f5f5f5;
+}
+[data-theme="dark"] .chat-room-global {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+}
 [data-theme="dark"] .chat-pueblo,
 [data-theme="dark"] .chat-conv-item {
-    background: var(--color-gray-800, #262626);
-    border-color: var(--color-gray-700, #3a3a3a);
+    background: #1a1a1a;
 }
 [data-theme="dark"] .chat-pueblo-header:hover,
 [data-theme="dark"] .chat-user-row:hover,
 [data-theme="dark"] .chat-conv-item:hover {
-    background: var(--color-gray-700, #3a3a3a);
+    background: #242424;
+}
+[data-theme="dark"] .chat-pueblo-count {
+    background: #2a2a2a;
+    color: #d4d4d4;
+}
+[data-theme="dark"] .chat-input {
+    background: #1f1f1f;
+    color: #e5e5e5;
+    border-color: #404040;
+}
+[data-theme="dark"] .chat-sala-header {
+    border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .chat-form {
+    border-top-color: #2a2a2a;
+}
+[data-theme="dark"] .chat-user-dot {
+    border-color: #0a0a0a;
+}
+[data-theme="dark"] .chat-sin-mensajes,
+[data-theme="dark"] .chat-cargando {
+    color: #a3a3a3;
 }
 
 /* Escritorio */
@@ -437,5 +503,45 @@
         border-radius: 16px;
         background: var(--color-bg, #fff);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+}
+
+/* ==============================================
+   BOTÓN FLOTANTE DEL CHAT (FAB, esquina inferior derecha)
+   ============================================== */
+.chat-fab {
+    position: fixed;
+    right: 14px;
+    bottom: calc(58px + env(safe-area-inset-bottom, 16px));
+    z-index: 999;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-primary, #c0392b);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s;
+}
+.chat-fab:hover {
+    transform: scale(1.06);
+}
+.chat-fab svg {
+    width: 24px;
+    height: 24px;
+}
+[data-theme="dark"] .chat-fab {
+    background: #f5f5f5;
+    color: #0a0a0a;
+}
+@media (min-width: 769px) {
+    .chat-fab {
+        right: 24px;
+        bottom: 24px;
     }
 }

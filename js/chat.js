@@ -31,6 +31,41 @@ function miId() {
     return (artistaActual && artistaActual.id) || 0;
 }
 
+// ---- Presencia (igual que getPublicProfile: activo si hay sesión < 5 min) ----
+const ONLINE_MS = 5 * 60 * 1000;
+
+function esOnline(u) {
+    if (!u.ultima_actividad) return false;
+    const t = new Date(u.ultima_actividad).getTime();
+    return !isNaN(t) && (Date.now() - t) < ONLINE_MS;
+}
+
+function formatFechaCorta(fecha) {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return '';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${dd}/${mm}/${yy}`;
+}
+
+function estadoUsuarioHTML(u) {
+    const online = esOnline(u);
+    const dot = `<span class="chat-user-dot ${online ? 'online' : ''}"></span>`;
+    let estado;
+    if (online) {
+        estado = '<span class="chat-user-estado"><span class="online-text">Activo ahora</span></span>';
+    } else if (u.ultima_actividad) {
+        estado = `<span class="chat-user-estado">Última conexión ${formatFechaCorta(u.ultima_actividad)}</span>`;
+    } else {
+        estado = '<span class="chat-user-estado">Sin conexiones recientes</span>';
+    }
+    return `<span class="chat-user-avatar-wrap">${avatarHTML(u.foto_perfil, u.nombre_artista)}${dot}</span>` +
+        `<span class="chat-user-info"><span class="chat-user-nombre">${escapeHtml(u.nombre_artista)}</span>${estado}</span>` +
+        '<span class="chat-user-flecha">›</span>';
+}
+
 // ---- Helpers de UI ----
 function avatarHTML(foto, nombre) {
     const inicial = (nombre || '?').charAt(0).toUpperCase();
@@ -164,7 +199,7 @@ function renderAcordeon(pueblos) {
                 const row = document.createElement('button');
                 row.type = 'button';
                 row.className = 'chat-user-row';
-                row.innerHTML = `${avatarHTML(u.foto_perfil, u.nombre_artista)}<span class="chat-user-nombre">${escapeHtml(u.nombre_artista)}</span><span class="chat-user-flecha">›</span>`;
+                row.innerHTML = estadoUsuarioHTML(u);
                 row.addEventListener('click', (e) => {
                     e.stopPropagation();
                     abrirPrivado(u);
