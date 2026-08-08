@@ -217,6 +217,13 @@ function main() {
         }
     }
 
+    // 4e. Reprocesar HTMLs: el hash de main.js/perfil.js pudo cambiar en 4a/4d,
+    // así que los ?v= de los HTML deben reflejar el contenido final.
+    for (const htmlFile of HTML_FILES) {
+        processFile(projectRoot, htmlFile, findAssets,
+            (fp) => `${htmlFile} [final]: ${fp}`);
+    }
+
     if (!anyChange) {
         console.log('\n✅ Sin cambios detectados. Nada que actualizar.');
     } else {

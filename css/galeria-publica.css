@@ -1213,15 +1213,26 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Flechita del popover (apunta hacia abajo al icono) */
+/* Flechita del popover (apunta hacia abajo al icono) — con el mismo
+   borde gris del popover: ::before dibuja el borde, ::after el relleno. */
+.vistas-popover::before,
 .vistas-popover::after {
     content: '';
     position: absolute;
-    bottom: -8px;
-    right: 16px;
     width: 0;
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
+}
+/* Borde (mismo color que border del popover), 1px más grande y desplazado */
+.vistas-popover::before {
+    bottom: -9px;
+    right: 15px;
+    border-top: 9px solid rgba(255,255,255,0.1);
+}
+/* Relleno (mismo color de fondo del popover) */
+.vistas-popover::after {
+    bottom: -8px;
+    right: 16px;
     border-top: 8px solid rgba(30, 30, 30, 0.97);
 }
