@@ -5,6 +5,7 @@
 // v: ptr-fix-4 (ensurePTR explorar + snap instant + scrollSnapType none durante carga)
 // test pill v1.0.259
 // z-index toasts inline 2147483647
+// comentarios drawer v1
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';

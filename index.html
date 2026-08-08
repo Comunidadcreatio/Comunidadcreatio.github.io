@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.264';
+        var currentVer = '1.0.266';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -69,7 +69,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=552a91204a">
+    <link rel="stylesheet" href="css/style.css?v=02abb12f23">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -213,6 +213,21 @@
             </div>
         </div>
     </header>
+
+    <!-- Cajón de comentarios -->
+    <div id="comentarios-drawer" class="comentarios-drawer hidden">
+        <div class="comentarios-drawer-header">
+            <button id="comentarios-close" class="comentarios-close">←</button>
+            <h3>Comentarios</h3>
+        </div>
+        <div class="comentarios-lista" id="comentarios-lista"></div>
+        <div class="comentarios-input-area">
+            <img id="comentarios-avatar" class="comentarios-avatar-input" src="" alt="">
+            <input type="text" id="comentarios-input" class="comentarios-input" placeholder="Escribe un comentario..." autocomplete="off">
+            <button id="comentarios-enviar" class="comentarios-enviar">➤</button>
+        </div>
+    </div>
+
     <!-- MAIN CONTENT -->
     <main id="main-content">
         <!-- SECCIÓN PÚBLICA: GALERÍA -->
@@ -808,7 +823,7 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/main.js?v=d44472e0ec" type="module"></script>
+    <script src="js/main.js?v=ccc0303de0" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js"></script>
 </body>

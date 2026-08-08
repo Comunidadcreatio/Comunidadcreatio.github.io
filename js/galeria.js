@@ -2,6 +2,7 @@
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
 import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
+import { abrirComentarios } from './comentarios.js';
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
@@ -249,7 +250,7 @@ function crearObraCard(obra) {
                 </button>
                 <div class="metrica-right">
                     <span class="metrica-item">${ICON_OJO} <span>${viewsCount}</span></span>
-                    <span class="metrica-item">${ICON_COMENTARIO} <span>${commentsCount}</span></span>
+                    <span class="metrica-item metrica-comentario">${ICON_COMENTARIO} <span>${commentsCount}</span></span>
                     <span class="metrica-item metrica-like">${ICON_CORAZON} <span>${likesCount}</span></span>
                 </div>
             </div>
@@ -404,7 +405,13 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 // REACCIONES (VISTOS / COMENTARIOS / ME GUSTA)
 // ============================================
 function manejarReaccion(itemEl, obraId, artistaOwnerId) {
-    // Solo permitir "me gusta" por ahora
+    // Comentarios: abrir drawer
+    if (itemEl.classList.contains('metrica-comentario')) {
+        abrirComentarios(obraId, itemEl.closest('.obra-card'));
+        return;
+    }
+
+    // Solo permitir "me gusta"
     const esLike = itemEl.classList.contains('metrica-like');
     if (!esLike) return;
 
