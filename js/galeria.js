@@ -249,7 +249,7 @@ function crearObraCard(obra) {
                     <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 </button>
                 <div class="metrica-right">
-                    <span class="metrica-item">${ICON_OJO} <span>${viewsCount}</span></span>
+                    <span class="metrica-item metrica-vistas">${ICON_OJO} <span>${viewsCount}</span></span>
                     <span class="metrica-item metrica-comentario">${ICON_COMENTARIO} <span>${commentsCount}</span></span>
                     <span class="metrica-item metrica-like">${ICON_CORAZON} <span>${likesCount}</span></span>
                 </div>
@@ -459,12 +459,76 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 }
 
 // ============================================
+// POPOVER DE VISTAS (solo dueño)
+// ============================================
+let vistasPopover = null;
+
+async function mostrarVistas(obraId, anchorEl) {
+    // Remover popover anterior
+    if (vistasPopover) vistasPopover.remove();
+
+    const popover = document.createElement('div');
+    popover.className = 'vistas-popover';
+    popover.innerHTML = '<div class="vistas-popover-loading">Cargando...</div>';
+    document.body.appendChild(popover);
+    vistasPopover = popover;
+
+    // Posicionar
+    const rect = anchorEl.getBoundingClientRect();
+    popover.style.top = (rect.bottom + 8) + 'px';
+    popover.style.right = (window.innerWidth - rect.right) + 'px';
+
+    // Cerrar al tocar fuera
+    const closeHandler = (e) => {
+        if (!popover.contains(e.target) && e.target !== anchorEl) {
+            popover.remove();
+            vistasPopover = null;
+            document.removeEventListener('click', closeHandler);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+
+    try {
+        const data = await apiRequest(`/obras/${obraId}/vistas`);
+        const vistas = data.vistas || [];
+        if (!vistas.length) {
+            popover.innerHTML = '<div class="vistas-popover-empty">Nadie ha visto tu cavent aún</div>';
+            return;
+        }
+        popover.innerHTML = `
+            <div class="vistas-popover-title">Visto por</div>
+            ${vistas.map(v => {
+                const inicial = (v.nombre_artista || '?')[0].toUpperCase();
+                const avatarHTML = v.foto_perfil
+                    ? `<img src="${v.foto_perfil}" class="vistas-avatar">`
+                    : `<div class="vistas-avatar vistas-avatar-default">${inicial}</div>`;
+                return `<div class="vistas-item">
+                    ${avatarHTML}
+                    <span class="vistas-nombre">${v.nombre_artista || 'Usuario'}</span>
+                    <span class="vistas-fecha">${timeAgoShort(v.created_at)}</span>
+                </div>`;
+            }).join('')}
+        `;
+    } catch (err) {
+        popover.innerHTML = '<div class="vistas-popover-empty">Solo tú puedes ver esto</div>';
+    }
+}
+
+// ============================================
 // REACCIONES (VISTOS / COMENTARIOS / ME GUSTA)
 // ============================================
 function manejarReaccion(itemEl, obraId, artistaOwnerId) {
     // Comentarios: abrir drawer
     if (itemEl.classList.contains('metrica-comentario')) {
         abrirComentarios(obraId, itemEl.closest('.obra-card'));
+        return;
+    }
+
+    // Vistas: mostrar quién vio (solo dueño)
+    if (itemEl.classList.contains('metrica-vistas')) {
+        if (artistaActual && artistaActual.id === artistaOwnerId) {
+            mostrarVistas(obraId, itemEl);
+        }
         return;
     }
 

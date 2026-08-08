@@ -10,6 +10,7 @@
 // fix main send button event
 // fix transitionend ghost close
 // vistas con IntersectionObserver
+// popover quien vio
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';

@@ -1131,3 +1131,79 @@ html, body {
 .comentarios-enviar svg {
     display: block;
 }
+
+/* ==============================================
+   POPOVER DE VISTAS
+   ============================================== */
+.vistas-popover {
+    position: fixed;
+    z-index: 3000;
+    background: rgba(30, 30, 30, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 12px 0;
+    min-width: 200px;
+    max-width: 260px;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.vistas-popover-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 16px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 4px;
+}
+.vistas-popover-loading,
+.vistas-popover-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+}
+.vistas-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    transition: background 0.1s;
+}
+.vistas-item:last-child {
+    border-bottom: none;
+}
+.vistas-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.vistas-avatar-default {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+.vistas-nombre {
+    flex: 1;
+    font-size: 13px;
+    color: #fff;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.vistas-fecha {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
