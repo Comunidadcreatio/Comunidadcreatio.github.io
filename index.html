@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.287';
+        var currentVer = '1.0.288';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=6bf442a255">
+    <link rel="stylesheet" href="css/style.css?v=6232e3a3a1">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -100,6 +100,12 @@
                     <rect x="14" y="14" width="7" height="7"></rect>
                 </svg>
                 <span class="toggle-label">cavents</span>
+            </button>
+            <button id="btn-chat-global" class="toggle-nav-btn" aria-label="Chat">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="toggle-label">Chat</span>
             </button>
         </div>
         <div class="bottom-bar-center">
@@ -788,15 +794,8 @@
                 <button id="chat-cerrar" class="chat-cerrar-btn" aria-label="Cerrar chat">✕</button>
             </div>
             <div id="chat-contenido">
-                <!-- Vista directorio: sala global + acordeón de pueblos -->
+                <!-- Vista directorio: acordeón de pueblos + conversaciones -->
                 <div id="chat-directorio">
-                    <button id="chat-sala-global" class="chat-room-global" type="button">
-                        <span class="chat-room-global-icon">🌐</span>
-                        <span class="chat-room-global-txt">
-                            <strong>Chat Global</strong>
-                            <small>Conversación abierta para todos</small>
-                        </span>
-                    </button>
                     <div id="chat-conversaciones"></div>
                     <div id="chat-accordion"></div>
                 </div>
@@ -818,10 +817,12 @@
         
     </main>
 
-    <!-- Botón flotante del chat (esquina inferior derecha) -->
-    <button id="btn-chat-global" class="chat-fab" aria-label="Chat global">
+    <!-- Botón flotante: acceso directo a la sala "Chat Global" (esquina inferior derecha) -->
+    <button id="btn-chat-global-fab" class="chat-fab" aria-label="Chat global (sala abierta)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
         </svg>
     </button>
  </div>
@@ -866,7 +867,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=eca7910e5c"></script>
-    <script src="js/main.js?v=2d3fd1673a" type="module"></script>
+    <script src="js/main.js?v=ca4305e1d9" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=746b63951d"></script>
 </body>

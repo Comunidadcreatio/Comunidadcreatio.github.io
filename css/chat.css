@@ -65,40 +65,7 @@
     gap: 8px;
 }
 
-/* Sala global destacada */
-.chat-room-global {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--color-gray-200, #e5e5e5);
-    border-radius: 14px;
-    background: var(--color-gray-50, #fafafa);
-    cursor: pointer;
-    text-align: left;
-    transition: background 0.15s;
-    font-family: inherit;
-}
-.chat-room-global:hover {
-    background: var(--color-gray-100, #f0f0f0);
-}
-.chat-room-global-icon {
-    font-size: 22px;
-    line-height: 1;
-}
-.chat-room-global-txt {
-    display: flex;
-    flex-direction: column;
-}
-.chat-room-global-txt strong {
-    font-size: 15px;
-    color: var(--color-text, #1a1a1a);
-}
-.chat-room-global-txt small {
-    font-size: 12px;
-    color: var(--color-text-muted, #777);
-}
+/* Sala global: se abre desde el botón flotante (FAB), ya no hay tarjeta en el directorio */
 
 /* Encabezado de secciones dentro del directorio */
 .chat-subtitulo {
@@ -116,7 +83,7 @@
 .chat-pueblo {
     border-radius: 10px;
     overflow: hidden;
-    background: var(--color-gray-50, #fafafa);
+    background: var(--color-bg, #fff);
 }
 .chat-pueblo-header {
     display: flex;
@@ -265,7 +232,7 @@
     width: 100%;
     padding: 9px 12px;
     border-radius: 10px;
-    background: var(--color-gray-50, #fafafa);
+    background: var(--color-bg, #fff);
     cursor: pointer;
     font-family: inherit;
     text-align: left;
@@ -457,14 +424,6 @@
     background: #525252;
     color: #f5f5f5;
 }
-[data-theme="dark"] .chat-room-global {
-    background: #1a1a1a;
-    border-color: #2a2a2a;
-}
-[data-theme="dark"] .chat-pueblo,
-[data-theme="dark"] .chat-conv-item {
-    background: #1a1a1a;
-}
 [data-theme="dark"] .chat-pueblo-header:hover,
 [data-theme="dark"] .chat-user-row:hover,
 [data-theme="dark"] .chat-conv-item:hover {
@@ -511,8 +470,8 @@
    ============================================== */
 .chat-fab {
     position: fixed;
-    right: 14px;
-    bottom: calc(58px + env(safe-area-inset-bottom, 16px));
+    right: 12px;
+    bottom: 8px;
     z-index: 999;
     width: 48px;
     height: 48px;

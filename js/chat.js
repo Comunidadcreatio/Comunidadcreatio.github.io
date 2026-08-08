@@ -96,9 +96,11 @@ export function setupChat() {
         if (seccion.classList.contains('hidden')) abrirChat();
         else cerrarChat();
     });
+    // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
+    const fab = document.getElementById('btn-chat-global-fab');
+    if (fab) fab.addEventListener('click', abrirChatGlobal);
     document.getElementById('chat-cerrar').addEventListener('click', cerrarChat);
     document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
-    document.getElementById('chat-sala-global').addEventListener('click', () => abrirSala('global', 'Chat Global'));
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
 
     // Si otra navegación oculta la sección, apagar todo
@@ -128,6 +130,17 @@ function abrirChat() {
     chatAbierto = true;
     cargarDirectorio();
     actualizarEstadoNavButtons();
+}
+
+// Acceso directo a la sala global desde el botón flotante (FAB)
+function abrirChatGlobal() {
+    if (!artistaActual) {
+        window.location.href = 'auth.html';
+        return;
+    }
+    const seccion = document.getElementById('chat-global');
+    if (seccion.classList.contains('hidden')) abrirChat();
+    abrirSala('global', 'Chat Global');
 }
 
 function cerrarChat() {
