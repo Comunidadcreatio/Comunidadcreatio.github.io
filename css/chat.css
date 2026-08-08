@@ -425,16 +425,31 @@
 .chat-cluster {
     position: fixed;
     right: 12px;
-    /* Por encima de la barra inferior del nav (50px + safe-area + margen) */
-    bottom: calc(58px + env(safe-area-inset-bottom, 16px));
+    /* Pegado al borde superior del nav: el degradado nace ahí */
+    bottom: calc(50px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 8px 8px 14px;
-    border-radius: 40px;
-    /* Degradado sutil detrás de los círculos (blanco en claro / negro en oscuro) */
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 45%, #ffffff 100%);
+    /* El relleno superior alto deja espacio para que el degradado suba y se pierda
+       justo antes de llegar a la altura de los círculos */
+    padding: 34px 8px 10px 14px;
+    border-radius: 46px;
+    /* Degradado VERTICAL: opaco en el borde del nav, se pierde al llegar
+       a la altura de los círculos (blanco en modo claro) */
+    background: linear-gradient(to top,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.55) 18%,
+        rgba(255, 255, 255, 0.15) 32%,
+        rgba(255, 255, 255, 0) 45%);
+    /* Solo los círculos y el FAB capturan toques; el área transparente del
+       degradado deja pasar los taps hacia los acordeones */
+    pointer-events: none;
+}
+.chat-cluster-convs,
+.chat-cluster-convs *,
+.chat-fab {
+    pointer-events: auto;
 }
 .chat-cluster.hidden {
     display: none;
@@ -508,8 +523,12 @@
     height: 24px;
 }
 [data-theme="dark"] .chat-cluster {
-    /* Degradado negro sutil para el modo oscuro */
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 45%, #0a0a0a 100%);
+    /* Degradado VERTICAL negro: nace en el nav y se pierde a la altura de los círculos */
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.55) 18%,
+        rgba(0, 0, 0, 0.15) 32%,
+        rgba(0, 0, 0, 0) 45%);
 }
 [data-theme="dark"] .chat-conv-circle {
     border-color: #0a0a0a;
