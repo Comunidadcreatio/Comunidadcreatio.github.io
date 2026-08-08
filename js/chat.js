@@ -18,6 +18,12 @@ let lastId = 0;             // último id renderizado (cursor del poll)
 let pollTimer = null;
 let polling = false;        // evita polls superpuestos (ej. cold start de Render)
 
+// El FAB de la sala global solo es visible dentro del directorio del chat.
+function setFabVisible(visible) {
+    const fab = document.getElementById('btn-chat-global-fab');
+    if (fab) fab.classList.toggle('hidden', !visible);
+}
+
 // ---- Utilidades de datos (js/ciudades.js expone window globals) ----
 function pueblosTachira() {
     const p = window.CIUDADES_POR_PAIS;
@@ -103,11 +109,12 @@ export function setupChat() {
     document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
 
-    // Si otra navegación oculta la sección, apagar todo
+    // Si otra navegación oculta la sección, apagar todo y ocultar el FAB
     new MutationObserver(() => {
         if (seccion.classList.contains('hidden')) {
             chatAbierto = false;
             detenerPoll();
+            setFabVisible(false);
         }
     }).observe(seccion, { attributes: true, attributeFilter: ['class'] });
 
@@ -129,6 +136,7 @@ function abrirChat() {
     seccion.classList.remove('hidden');
     chatAbierto = true;
     cargarDirectorio();
+    setFabVisible(true); // en el directorio, el FAB de la sala global sí se muestra
     actualizarEstadoNavButtons();
 }
 
@@ -149,6 +157,7 @@ function cerrarChat() {
     chatAbierto = false;
     detenerPoll();
     canalActivo = null;
+    setFabVisible(false);
     actualizarEstadoNavButtons();
 }
 
@@ -157,6 +166,7 @@ function volverDirectorio() {
     canalActivo = null;
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
+    setFabVisible(true); // de vuelta al directorio
     cargarDirectorio(); // refresca conversaciones recientes
 }
 
@@ -271,6 +281,7 @@ async function abrirSala(canal, titulo, fotoOtro) {
     detenerPoll();
     canalActivo = canal;
     lastId = 0;
+    setFabVisible(false); // al entrar a una sala (global o privada) se oculta
 
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');

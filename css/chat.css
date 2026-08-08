@@ -491,6 +491,10 @@
 .chat-fab:hover {
     transform: scale(1.06);
 }
+/* Solo visible dentro del directorio del chat (lo controla chat.js) */
+.chat-fab.hidden {
+    display: none;
+}
 .chat-fab svg {
     width: 24px;
     height: 24px;
