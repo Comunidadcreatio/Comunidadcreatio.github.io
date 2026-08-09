@@ -397,7 +397,7 @@
    ============================================== */
 .chat-cluster {
     position: fixed;
-    right: 5px; /* aire lateral de 5px */
+    right: 0; /* el contenedor llega hasta el borde derecho de la pantalla */
     /* Pegado al borde superior del nav: el degradado nace ahí */
     bottom: calc(50px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
@@ -428,9 +428,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Deslizable horizontalmente con el dedo cuando hay muchos círculos;
-       el scroll inicia al final (FAB + más recientes visibles) */
-    max-width: calc(100vw - 24px);
+    /* Ancho completo: los círculos llegan hasta el borde de la pantalla */
+    max-width: 100vw;
     overflow-x: auto;
     overflow-y: visible;
     scrollbar-width: none;
@@ -493,6 +492,8 @@
     padding: 0;
     transition: transform 0.15s;
     flex-shrink: 0;
+    /* Aire lateral de 5px hacia el borde derecho de la pantalla */
+    margin-right: 5px;
 }
 .chat-fab:hover {
     transform: scale(1.06);

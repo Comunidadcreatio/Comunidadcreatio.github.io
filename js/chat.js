@@ -254,9 +254,11 @@ function toggleAcordeon(item) {
 function renderConversaciones(convs) {
     const cont = document.getElementById('chat-cluster-convs');
     if (!cont) return;
-    cont.innerHTML = '';
+    // Conservar el FAB de la sala global: solo se eliminan los círculos de conversación
+    cont.querySelectorAll('.chat-conv-circle').forEach(c => c.remove());
     if (!convs || !convs.length) return;
     const ordenadas = [...convs].reverse(); // newest queda a la derecha, junto al FAB
+    const fab = cont.querySelector('.chat-fab');
     ordenadas.forEach(c => {
         const circle = document.createElement('button');
         circle.type = 'button';
@@ -267,7 +269,9 @@ function renderConversaciones(convs) {
             ? `<img src="${c.otro_foto}" alt="">`
             : inicial;
         circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
-        cont.appendChild(circle);
+        // Insertar antes del FAB para que la sala global quede en el extremo derecho
+        if (fab) cont.insertBefore(circle, fab);
+        else cont.appendChild(circle);
     });
     // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
     requestAnimationFrame(() => { cont.scrollLeft = cont.scrollWidth; });
