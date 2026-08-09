@@ -263,8 +263,7 @@ function renderGridPueblos(pueblos) {
             ? `<img class="chat-pueblo-tile-bandera" src="iconos/banderas/${bandera}" alt="" loading="lazy">`
             : '<span class="chat-pueblo-tile-bandera chat-pueblo-tile-bandera-vacia"></span>';
         tile.innerHTML = banderaHTML +
-            `<span class="chat-pueblo-tile-nombre">${escapeHtml(ciudad)}</span>` +
-            `<span class="chat-pueblo-tile-count">${users.length}</span>`;
+            `<span class="chat-pueblo-tile-info"><span class="chat-pueblo-tile-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-tile-count">${users.length}</span></span>`;
         tile.addEventListener('click', () => mostrarPueblo(ciudad, users));
         grid.appendChild(tile);
     });

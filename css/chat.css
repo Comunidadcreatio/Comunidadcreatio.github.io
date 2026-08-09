@@ -35,7 +35,7 @@
     overflow-y: auto;
     /* Padding inferior alto: los últimos acordeones terminan por encima de
        los círculos para poder desplegarlos sin interferencia */
-    padding: 4px 6px 200px;
+    padding: 0 0 200px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -49,66 +49,70 @@
 .chat-pueblos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 4px 0;
+    gap: 0; /* sin aire entre contenedores */
+    padding: 0;
 }
 .chat-pueblo-tile {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 4px 5px;
-    background: var(--color-bg, #fff);
-    border: 1px solid var(--color-gray-200, #e5e5e5);
-    border-radius: 10px;
+    gap: 2px;
+    padding: 0;
+    background: none; /* sin fondo */
+    border: none; /* sin línea alrededor */
+    border-radius: 0; /* sin esquinas curvas */
     cursor: pointer;
     font-family: inherit;
-    text-align: center;
+    text-align: left;
 }
 .chat-pueblo-tile:hover {
     background: var(--color-gray-50, #fafafa);
-    border-color: var(--color-gray-300, #ccc);
 }
 .chat-pueblo-tile-bandera {
     width: 100%;
-    height: 42px;
+    height: auto; /* el grid se ajusta a la escala real de la bandera */
     object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
     display: block;
 }
 .chat-pueblo-tile-bandera-vacia {
     background: var(--color-gray-200, #e0e0e0);
+    aspect-ratio: 3 / 2;
+}
+.chat-pueblo-tile-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    width: 100%;
+    padding: 2px 4px 4px;
 }
 .chat-pueblo-tile-nombre {
+    flex: 1;
+    min-width: 0;
     font-size: 10.5px;
     font-weight: 600;
     color: var(--color-text, #1a1a1a);
     line-height: 1.15;
+    text-align: left; /* justificado a la izquierda */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 24px;
     word-break: break-word;
 }
 .chat-pueblo-tile-count {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    min-width: 17px;
-    height: 17px;
+    flex-shrink: 0;
+    min-width: 16px;
+    height: 16px;
     padding: 0 4px;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #e53935;
     color: #fff;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
-    line-height: 17px;
+    line-height: 16px;
     text-align: center;
     box-sizing: border-box;
-    border: 1.5px solid var(--color-bg, #fff);
 }
 
 /* Vista de usuarios de un pueblo (drill-down con volver) */
@@ -417,10 +421,6 @@
 [data-theme="dark"] .chat-pueblo-volver:hover,
 [data-theme="dark"] .chat-user-row:hover {
     background: #242424;
-}
-[data-theme="dark"] .chat-pueblo-tile {
-    background: var(--color-bg, #0a0a0a);
-    border-color: var(--color-gray-700, #3a3a3a);
 }
 [data-theme="dark"] .chat-pueblo-count {
     background: #2a2a2a;
