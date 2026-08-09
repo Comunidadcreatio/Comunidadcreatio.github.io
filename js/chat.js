@@ -348,7 +348,7 @@ function renderUsuariosPueblo(ciudad) {
         info.innerHTML =
             `<span class="chat-pueblo-info-titulo">${titulo}</span>` +
             `<span class="chat-pueblo-info-contadores">` +
-            `<span class="chat-pueblo-info-contador on">${activos} <em>en línea</em></span>` +
+            `<span class="chat-pueblo-info-contador on">${activos} <em>En línea</em></span>` +
             `<span class="chat-pueblo-info-contador tot">${users.length} <em>Artistas</em></span>` +
             `</span>`;
     }

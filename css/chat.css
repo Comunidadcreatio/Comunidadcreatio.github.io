@@ -101,45 +101,52 @@
     display: block;
 }
 
-/* Barra de información superior: nombre arriba (izq.) y contadores debajo (der.) */
+/* Barra de información superior: nombre y contadores centrados */
 .chat-pueblo-info {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    align-items: center; /* todo centrado */
+    gap: 6px;
     padding: 10px 8px 8px;
 }
 .chat-pueblo-info-titulo {
-    font-size: 14.5px;
+    max-width: 100%;
+    font-size: 15px;
     font-weight: 700;
     color: var(--color-text, #1a1a1a);
-    text-align: left; /* justificado a la izquierda */
+    text-align: center; /* centrado */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .chat-pueblo-info-municipio {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-text-muted, #888);
 }
 .chat-pueblo-info-contadores {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* a la izquierda, junto al nombre */
-    gap: 8px; /* poco espacio entre "en línea" y "Artistas" */
+    justify-content: center; /* centrado */
+    gap: 8px;
 }
 .chat-pueblo-info-contador {
-    font-size: 11px; /* más pequeño */
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--color-gray-100, #f0f0f0);
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
     white-space: nowrap;
-    color: var(--color-text, #1a1a1a); /* sin colores llamativos */
+    color: var(--color-text, #1a1a1a);
 }
 .chat-pueblo-info-contador em {
     font-style: normal;
     font-weight: 500;
-    font-size: 10px;
+    font-size: 10.5px;
     color: var(--color-text-muted, #888);
-    margin-left: 2px;
 }
 .chat-pueblo-usuarios {
     display: flex;
@@ -398,6 +405,9 @@
 }
 [data-theme="dark"] .chat-user-row:hover {
     background: #242424;
+}
+[data-theme="dark"] .chat-pueblo-info-contador {
+    background: #2a2a2a;
 }
 [data-theme="dark"] .chat-pueblo-slide-bandera {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
