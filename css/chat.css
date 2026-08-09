@@ -477,6 +477,53 @@
 }
 
 /* ==============================================
+   BADGES DE NO LEÍDOS (chat)
+   ============================================== */
+#btn-chat-global {
+    position: relative;
+}
+/* Punto rojo en el icono de chat del nav (arriba a la derecha) */
+.chat-nav-badge {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #e53935;
+    border: 2px solid var(--color-bg, #fff);
+}
+/* Badge numérico en los círculos de conversación y en el FAB de la sala global */
+.chat-fab {
+    position: relative;
+}
+.chat-fab-badge,
+.chat-circle-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 4px;
+    border-radius: 10px;
+    background: #e53935;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+    box-sizing: border-box;
+    border: 2px solid var(--color-bg, #fff);
+    z-index: 2;
+    pointer-events: none;
+}
+[data-theme="dark"] .chat-nav-badge,
+[data-theme="dark"] .chat-fab-badge,
+[data-theme="dark"] .chat-circle-badge {
+    border-color: #0a0a0a;
+}
+
+/* ==============================================
    BOTÓN FLOTANTE DEL CHAT (FAB, dentro del cluster)
    ============================================== */
 .chat-fab {

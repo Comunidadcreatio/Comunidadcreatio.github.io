@@ -147,6 +147,7 @@ function abrirChat() {
     seccion.classList.remove('hidden');
     chatAbierto = true;
     cargarDirectorio();
+    refrescarChatNoLeidos(); // badges al abrir el chat
     setFabVisible(true); // en el directorio, el FAB de la sala global sí se muestra
     actualizarEstadoNavButtons();
 }
@@ -182,6 +183,43 @@ function volverDirectorio() {
     setFabVisible(true); // de vuelta al directorio
     cargarDirectorio(); // refresca conversaciones recientes
 }
+
+let noLeidos = {}; // canal -> nº de mensajes sin leer (viene de GET /chat/no-leidos)
+
+// Aplica los badges de no leídos: punto en el icono del nav, número en el FAB
+// de la sala global y en cada círculo de conversación.
+function aplicarNoLeidos() {
+    const total = Object.values(noLeidos).reduce((s, n) => s + n, 0);
+    const nav = document.getElementById('chat-nav-badge');
+    if (nav) nav.classList.toggle('hidden', total === 0);
+
+    const fabBadge = document.getElementById('chat-fab-badge');
+    if (fabBadge) {
+        const n = noLeidos['global'] || 0;
+        fabBadge.textContent = n > 99 ? '99+' : String(n);
+        fabBadge.classList.toggle('hidden', n === 0);
+    }
+
+    document.querySelectorAll('.chat-conv-circle').forEach(circle => {
+        const badge = circle.querySelector('.chat-circle-badge');
+        if (!badge) return;
+        const n = noLeidos[circle.dataset.canal] || 0;
+        badge.textContent = n > 99 ? '99+' : String(n);
+        badge.classList.toggle('hidden', n === 0);
+    });
+}
+
+// GET /chat/no-leidos — refresca los contadores de no leídos (nav, FAB, círculos).
+async function refrescarChatNoLeidos() {
+    try {
+        const data = await apiRequest('/chat/no-leidos');
+        if (!data || !data.success) return;
+        noLeidos = {};
+        (data.canales || []).forEach(c => { noLeidos[c.canal] = c.n; });
+        aplicarNoLeidos();
+    } catch (e) { /* silencioso: el siguiente ciclo reintenta */ }
+}
+window.refrescarChatNoLeidos = refrescarChatNoLeidos;
 
 // ============================================
 // DIRECTORIO: sala global + acordeón de pueblos
@@ -280,6 +318,9 @@ function renderConversaciones(convs) {
         circle.innerHTML = c.otro_foto
             ? `<img src="${c.otro_foto}" alt="">`
             : inicial;
+        const badge = document.createElement('span');
+        badge.className = 'chat-circle-badge hidden';
+        circle.appendChild(badge);
         circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
         // Insertar antes del FAB para que la sala global quede en el extremo derecho
         if (fab) cont.insertBefore(circle, fab);
@@ -287,6 +328,7 @@ function renderConversaciones(convs) {
     });
     // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
     requestAnimationFrame(() => { cont.scrollLeft = cont.scrollWidth; });
+    aplicarNoLeidos(); // badges sobre los círculos recién renderizados
 }
 
 function abrirPrivado(u) {
@@ -363,6 +405,7 @@ function iniciarPoll() {
                 // Hay mensajes nuevos y la sala está visible: marcar como leído
                 marcarLeido(canalActivo);
             }
+            refrescarChatNoLeidos(); // mantiene los badges al día mientras el chat está abierto
         } catch (e) {
             // silencioso: el siguiente poll reintenta
         } finally {
@@ -382,12 +425,17 @@ function detenerPoll() {
 // backend para agrupar mensajes en una sola notificación y omitir el push si
 // el usuario está viendo la conversación).
 async function marcarLeido(canal) {
-    if (!canal || canal === 'global') return;
+    if (!canal) return;
     try {
         await apiRequest('/chat/leido', {
             method: 'POST',
             body: JSON.stringify({ canal })
         });
+        // Limpia el badge de ese canal al instante (sin esperar el próximo poll)
+        if (noLeidos[canal]) {
+            noLeidos[canal] = 0;
+            aplicarNoLeidos();
+        }
     } catch (e) { /* silencioso: solo es un contador */ }
 }
 
