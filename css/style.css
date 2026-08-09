@@ -7,7 +7,7 @@
 @import url('galeria-publica.css?v=c665129405');
 
 /* Chat global + privado */
-@import url('chat.css?v=1dda637d93');
+@import url('chat.css?v=1b0f68dd46');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -437,6 +437,7 @@ body {
     background-color: var(--color-bg);
     color: var(--color-text);
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden; /* evita el paneo horizontal de toda la página */
 }
 
 /* Ocultar la barra de scroll global (lado derecho) en escritorio y móvil,
