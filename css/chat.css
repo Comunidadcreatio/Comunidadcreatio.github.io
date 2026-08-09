@@ -404,15 +404,15 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Padding superior alto: el degradado ocupa más altura y se nota más */
-    padding: 30px 0 8px;
+    /* Padding superior alto: el degradado ocupa mucha altura y se nota más */
+    padding: 44px 0 8px;
     /* Degradado vertical marcado: nace fuerte en el borde del nav y se va
-       perdiendo por encima de la mitad de los círculos (blanco en claro) */
+       perdiendo muy por encima de los círculos (blanco en claro) */
     background: linear-gradient(to top,
         rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.55) 35%,
-        rgba(255, 255, 255, 0.15) 55%,
-        rgba(255, 255, 255, 0) 68%);
+        rgba(255, 255, 255, 0.6) 40%,
+        rgba(255, 255, 255, 0.2) 60%,
+        rgba(255, 255, 255, 0) 80%);
     /* Solo los círculos y el FAB capturan toques */
     pointer-events: none;
 }
@@ -427,8 +427,10 @@
 .chat-cluster-convs {
     display: flex;
     align-items: center;
+    justify-content: flex-end; /* con pocos círculos quedan pegados a la derecha */
     gap: 10px;
-    /* Deslizable horizontalmente con el dedo cuando hay muchos círculos */
+    /* Deslizable horizontalmente con el dedo cuando hay muchos círculos;
+       el scroll inicia al final (FAB + más recientes visibles) */
     max-width: calc(100vw - 24px);
     overflow-x: auto;
     overflow-y: visible;
@@ -495,13 +497,13 @@
     height: 24px;
 }
 [data-theme="dark"] .chat-cluster {
-    /* Degradado vertical negro marcado: nace en el nav y se pierde por encima
-       de la mitad de los círculos */
+    /* Degradado vertical negro marcado: nace en el nav y se pierde muy por
+       encima de los círculos */
     background: linear-gradient(to top,
         rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.55) 35%,
-        rgba(0, 0, 0, 0.15) 55%,
-        rgba(0, 0, 0, 0) 68%);
+        rgba(0, 0, 0, 0.6) 40%,
+        rgba(0, 0, 0, 0.2) 60%,
+        rgba(0, 0, 0, 0) 80%);
 }
 [data-theme="dark"] .chat-conv-circle {
     border-color: #0a0a0a;

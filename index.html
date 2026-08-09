@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.299';
+        var currentVer = '1.0.300';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=d68205784c">
+    <link rel="stylesheet" href="css/style.css?v=2f12078aba">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -814,14 +814,15 @@
 
     <!-- Cluster flotante (esquina inferior derecha): círculos de conversaciones + sala "Chat Global" -->
     <div id="chat-cluster" class="chat-cluster hidden">
-        <div id="chat-cluster-convs" class="chat-cluster-convs"></div>
-        <button id="btn-chat-global-fab" class="chat-fab" aria-label="Chat global (sala abierta)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-        </button>
+        <div id="chat-cluster-convs" class="chat-cluster-convs">
+            <button id="btn-chat-global-fab" class="chat-fab" aria-label="Chat global (sala abierta)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+            </button>
+        </div>
     </div>
  </div>
 
@@ -865,7 +866,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=eca7910e5c"></script>
-    <script src="js/main.js?v=909b69c7f3" type="module"></script>
+    <script src="js/main.js?v=31dd7d3856" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=746b63951d"></script>
 </body>

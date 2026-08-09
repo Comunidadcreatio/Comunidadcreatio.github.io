@@ -269,6 +269,8 @@ function renderConversaciones(convs) {
         circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
         cont.appendChild(circle);
     });
+    // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
+    cont.scrollLeft = cont.scrollWidth;
 }
 
 function abrirPrivado(u) {
