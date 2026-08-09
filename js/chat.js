@@ -185,6 +185,7 @@ function volverDirectorio() {
 }
 
 let noLeidos = {}; // canal -> nº de mensajes sin leer (viene de GET /chat/no-leidos)
+let ultimosPueblos = {}; // último directorio recibido (para volver al grid desde un pueblo)
 
 // Aplica los badges de no leídos: punto en el icono del nav, número en el FAB
 // de la sala global y en cada círculo de conversación.
@@ -232,7 +233,7 @@ async function cargarDirectorio() {
             apiRequest('/chat/directorio'),
             apiRequest('/chat/conversaciones')
         ]);
-        renderAcordeon(dirRes && dirRes.success ? dirRes.pueblos : {});
+        renderGridPueblos(dirRes && dirRes.success ? dirRes.pueblos : {});
         renderConversaciones(convRes && convRes.success ? convRes.conversaciones : []);
     } catch (e) {
         debugLog.error('directorio chat:', e);
@@ -240,7 +241,8 @@ async function cargarDirectorio() {
     }
 }
 
-function renderAcordeon(pueblos) {
+function renderGridPueblos(pueblos) {
+    ultimosPueblos = pueblos || {};
     const cont = document.getElementById('chat-accordion');
     cont.innerHTML = '';
     const lista = pueblosTachira();
@@ -248,53 +250,58 @@ function renderAcordeon(pueblos) {
         cont.innerHTML = '<div class="chat-sin-mensajes">No hay pueblos disponibles.</div>';
         return;
     }
-    const frag = document.createDocumentFragment();
+    const grid = document.createElement('div');
+    grid.className = 'chat-pueblos-grid';
     lista.forEach(ciudad => {
-        const users = (pueblos && pueblos[ciudad]) || [];
-        const item = document.createElement('div');
-        item.className = 'chat-pueblo';
-
+        const users = (ultimosPueblos[ciudad]) || [];
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.className = 'chat-pueblo-tile';
+        tile.setAttribute('aria-label', `${ciudad}: ${users.length} usuarios`);
         const bandera = banderaDe(ciudad);
         const banderaHTML = bandera
-            ? `<img class="chat-pueblo-bandera" src="iconos/banderas/${bandera}" alt="">`
-            : '<span class="chat-pueblo-bandera"></span>';
-
-        const header = document.createElement('button');
-        header.type = 'button';
-        header.className = 'chat-pueblo-header';
-        header.setAttribute('aria-expanded', 'false');
-        header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-count">${users.length}</span><span class="chat-pueblo-chevron">▼</span>`;
-        header.addEventListener('click', () => toggleAcordeon(item));
-
-        const cuerpo = document.createElement('div');
-        cuerpo.className = 'chat-pueblo-cuerpo';
-        if (users.length) {
-            users.forEach(u => {
-                const row = document.createElement('button');
-                row.type = 'button';
-                row.className = 'chat-user-row';
-                row.innerHTML = estadoUsuarioHTML(u);
-                row.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    abrirPrivado(u);
-                });
-                cuerpo.appendChild(row);
-            });
-        } else {
-            cuerpo.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
-        }
-
-        item.appendChild(header);
-        item.appendChild(cuerpo);
-        frag.appendChild(item);
+            ? `<img class="chat-pueblo-tile-bandera" src="iconos/banderas/${bandera}" alt="" loading="lazy">`
+            : '<span class="chat-pueblo-tile-bandera chat-pueblo-tile-bandera-vacia"></span>';
+        tile.innerHTML = banderaHTML +
+            `<span class="chat-pueblo-tile-nombre">${escapeHtml(ciudad)}</span>` +
+            `<span class="chat-pueblo-tile-count">${users.length}</span>`;
+        tile.addEventListener('click', () => mostrarPueblo(ciudad, users));
+        grid.appendChild(tile);
     });
-    cont.appendChild(frag);
+    cont.appendChild(grid);
 }
 
-function toggleAcordeon(item) {
-    const estabaAbierto = item.classList.contains('open');
-    document.querySelectorAll('#chat-accordion .chat-pueblo.open').forEach(el => el.classList.remove('open'));
-    if (!estabaAbierto) item.classList.add('open');
+// Drill-down: al tocar una bandera se muestra la lista de usuarios de ese
+// pueblo, con un botón de volver al grid.
+function mostrarPueblo(ciudad, users) {
+    const cont = document.getElementById('chat-accordion');
+    cont.innerHTML = '';
+    const volver = document.createElement('button');
+    volver.type = 'button';
+    volver.className = 'chat-pueblo-volver';
+    const bandera = banderaDe(ciudad);
+    const banderaHTML = bandera
+        ? `<img class="chat-pueblo-bandera" src="iconos/banderas/${bandera}" alt="">`
+        : '<span class="chat-pueblo-bandera"></span>';
+    volver.innerHTML = `<span class="chat-pueblo-volver-flecha">‹</span>${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-count">${users.length}</span>`;
+    volver.addEventListener('click', () => renderGridPueblos(ultimosPueblos));
+    cont.appendChild(volver);
+
+    const lista = document.createElement('div');
+    lista.className = 'chat-pueblo-usuarios';
+    if (users.length) {
+        users.forEach(u => {
+            const row = document.createElement('button');
+            row.type = 'button';
+            row.className = 'chat-user-row';
+            row.innerHTML = estadoUsuarioHTML(u);
+            row.addEventListener('click', () => abrirPrivado(u));
+            lista.appendChild(row);
+        });
+    } else {
+        lista.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
+    }
+    cont.appendChild(lista);
 }
 
 // Las conversaciones se muestran como círculos (avatares) junto al círculo
