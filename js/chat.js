@@ -168,6 +168,7 @@ function cerrarChat() {
     chatAbierto = false;
     detenerPoll();
     canalActivo = null;
+    window._canalChatActivo = null;
     setFabVisible(false);
     actualizarEstadoNavButtons();
 }
@@ -175,6 +176,7 @@ function cerrarChat() {
 function volverDirectorio() {
     detenerPoll();
     canalActivo = null;
+    window._canalChatActivo = null;
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
     setFabVisible(true); // de vuelta al directorio
@@ -300,6 +302,7 @@ function abrirPrivado(u) {
 async function abrirSala(canal, titulo, fotoOtro) {
     detenerPoll();
     canalActivo = canal;
+    window._canalChatActivo = canal; // lo usa push.js para no mostrar banner si ya estás leyendo aquí
     lastId = 0;
     setFabVisible(false); // al entrar a una sala (global o privada) se oculta
 

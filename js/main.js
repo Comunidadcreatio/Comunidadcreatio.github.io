@@ -40,8 +40,8 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
-import { setupChat } from './chat.js?v=729826d5d1';
-import { setupPush } from './push.js?v=d2a21707e5';
+import { setupChat } from './chat.js?v=d1b46fc50b';
+import { setupPush } from './push.js?v=1ceaf6f993';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 

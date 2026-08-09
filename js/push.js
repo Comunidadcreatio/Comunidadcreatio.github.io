@@ -51,6 +51,9 @@ export function setupPush() {
             Push.addListener('pushNotificationReceived', (n) => {
                 const d = (n && n.data) || {};
                 if (d.tipo === 'chat') {
+                    // Si ya estás viendo esa conversación, el polling la muestra:
+                    // no hace falta banner. (En segundo plano el sistema notifica.)
+                    if (d.canal && window._canalChatActivo === d.canal) return;
                     // En segundo plano/cerrada, el sistema muestra la notificación
                     // con la imagen grande (BigPicture). En primer plano, banner.
                     mostrarBannerChat(d, n.title || 'Nuevo mensaje', n.body || '');
