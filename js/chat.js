@@ -210,7 +210,7 @@ function aplicarNoLeidos() {
 }
 
 // GET /chat/no-leidos — refresca los contadores de no leídos (nav, FAB, círculos).
-async function refrescarChatNoLeidos() {
+export async function refrescarChatNoLeidos() {
     try {
         const data = await apiRequest('/chat/no-leidos');
         if (!data || !data.success) return;
