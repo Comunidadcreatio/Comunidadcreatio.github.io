@@ -427,7 +427,6 @@
 .chat-cluster-convs {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* con pocos círculos quedan pegados a la derecha */
     gap: 10px;
     /* Deslizable horizontalmente con el dedo cuando hay muchos círculos;
        el scroll inicia al final (FAB + más recientes visibles) */
@@ -437,6 +436,12 @@
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
+}
+.chat-cluster-convs > :first-child {
+    /* Alinea el grupo a la derecha cuando cabe; colapsa a 0 si desborda.
+       (justify-content:flex-end rompe el scroll horizontal con overflow,
+       por eso se usa margin auto) */
+    margin-left: auto;
 }
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;

@@ -270,7 +270,7 @@ function renderConversaciones(convs) {
         cont.appendChild(circle);
     });
     // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
-    cont.scrollLeft = cont.scrollWidth;
+    requestAnimationFrame(() => { cont.scrollLeft = cont.scrollWidth; });
 }
 
 function abrirPrivado(u) {
