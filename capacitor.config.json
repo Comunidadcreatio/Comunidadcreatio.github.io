@@ -3,7 +3,7 @@
   "appName": "Creatio",
   "webDir": "www",
   "server": {
-    "url": "https://comunidadcreatio.vercel.app/?v=10320",
+    "url": "https://comunidadcreatio.vercel.app/?v=10321",
     "hostname": "comunidadcreatio.vercel.app",
     "cleartext": true
   },
