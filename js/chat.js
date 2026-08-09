@@ -341,7 +341,8 @@ function renderUsuariosPueblo(ciudad) {
     // Barra superior: nombre a la izquierda, contadores a la derecha
     if (info) {
         const municipio = municipioDe(ciudad);
-        const titulo = municipio && municipio !== ciudad
+        // El municipio se muestra siempre, justo después del pueblo
+        const titulo = municipio
             ? `${escapeHtml(ciudad)} <span class="chat-pueblo-info-municipio">· ${escapeHtml(municipio)}</span>`
             : escapeHtml(ciudad);
         info.innerHTML =

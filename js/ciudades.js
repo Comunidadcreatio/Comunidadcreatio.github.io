@@ -74,8 +74,8 @@
         'La Tendida': 'Samuel Darío Maldonado',
         'San Judas Tadeo': 'San Judas Tadeo',
         'Seboruco': 'Seboruco',
-        'San Simón': 'San Simón',
-        'Queniquea': 'Queniquea',
+        'San Simón': 'Simón Rodríguez',
+        'Queniquea': 'Sucre',
         'Pregonero': 'Uribante'
     };
 })();
