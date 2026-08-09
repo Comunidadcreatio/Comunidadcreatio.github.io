@@ -124,7 +124,7 @@ function mostrarBannerChat(d, titulo, cuerpo) {
         banner = document.createElement('div');
         banner.id = 'chat-push-banner';
         banner.style.cssText = [
-            'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+            'position:fixed', 'left:0', 'right:0', 'z-index:99999',
             'display:flex', 'align-items:center', 'gap:10px',
             'padding:12px 14px', 'background:#1a1a1a', 'color:#fff',
             'box-shadow:0 4px 16px rgba(0,0,0,.4)', 'cursor:pointer',
@@ -141,6 +141,7 @@ function mostrarBannerChat(d, titulo, cuerpo) {
             }
         });
         document.body.appendChild(banner);
+        posicionarBanner(); // debajo del header, respetando la barra de estado
     }
 
     // Contenido: avatar circular + título + cuerpo
@@ -171,3 +172,14 @@ function ocultarBanner() {
     const banner = document.getElementById('chat-push-banner');
     if (banner) banner.style.transform = 'translateY(-100%)';
 }
+
+// Posiciona el banner justo debajo del header de la app (respeta la barra de
+// estado de Android y los distintos tamaños de header por breakpoint).
+function posicionarBanner() {
+    const banner = document.getElementById('chat-push-banner');
+    if (!banner) return;
+    const header = document.getElementById('main-header');
+    const top = header ? header.getBoundingClientRect().bottom + 6 : 6;
+    banner.style.top = Math.round(top) + 'px';
+}
+window.addEventListener('resize', posicionarBanner);
