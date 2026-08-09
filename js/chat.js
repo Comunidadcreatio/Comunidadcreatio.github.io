@@ -404,32 +404,34 @@ function setupDragEliminar() {
     const UMBRAL = 450;   // ms de pulsación para activar el arrastre
     const MOVER_ANTES = 10; // px de movimiento que cancela la pulsación (es scroll)
 
+    const cluster = cont.closest('.chat-cluster');
+
     let timer = null;
     let circle = null;     // círculo en modo arrastre
     let activo = false;    // arrastre en curso
     let startX = 0, startY = 0;
-    let size = 56;
 
     function ocultarTrash() {
         trash.classList.remove('activo', 'hover');
         veil.classList.remove('activo');
     }
 
-    // Restaura el círculo dentro del contenedor (antes del FAB)
-    function restaurar(el) {
-        el.classList.remove('dragging');
-        el.style.cssText = '';
-        const fab = cont.querySelector('.chat-fab');
-        if (fab) cont.insertBefore(el, fab);
-        else cont.appendChild(el);
+    // Termina el arrastre y restaura el círculo a su lugar
+    function finArrastre() {
+        cont.style.overflow = ''; // restaurar recorte del contenedor
+        if (cluster) cluster.style.zIndex = ''; // restaurar nivel de apilado
+        if (circle) {
+            circle.classList.remove('dragging');
+            circle.style.transform = '';
+        }
+        activo = false;
+        circle = null;
+        ocultarTrash();
     }
 
     function cancelar() {
         if (timer) { clearTimeout(timer); timer = null; }
-        if (activo && circle) restaurar(circle);
-        activo = false;
-        circle = null;
-        ocultarTrash();
+        if (activo) finArrastre();
     }
 
     function iniciarArrastre(el, x, y) {
@@ -438,26 +440,20 @@ function setupDragEliminar() {
         circle = el;
         startX = x;
         startY = y;
-        const rect = el.getBoundingClientRect();
-        size = rect.width || 56;
-        // Sacar del contenedor (su overflow recorta el círculo al subir) y
-        // fijarlo al body para que siga al dedo sin cortarse
         el.classList.add('dragging');
-        document.body.appendChild(el);
-        el.style.position = 'fixed';
-        el.style.left = rect.left + 'px';
-        el.style.top = rect.top + 'px';
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-        el.style.margin = '0';
+        // El círculo NO sale del contenedor (si no, los touchmove dejan de
+        // burbujear hasta aquí y el arrastre se congela). En su lugar se
+        // habilita el overflow visible para que suba sin recortarse, y se eleva
+        // el cluster para que el círculo quede por encima del velo y la papelera.
+        cont.style.overflow = 'visible';
+        if (cluster) cluster.style.zIndex = '1004';
         trash.classList.add('activo');
         veil.classList.add('activo');
     }
 
     function mover(x, y) {
         if (!activo || !circle) return;
-        circle.style.left = (x - size / 2) + 'px';
-        circle.style.top = (y - size / 2) + 'px';
+        circle.style.transform = `translate(${x - startX}px, ${y - startY}px)`;
         const r = trash.getBoundingClientRect();
         const cr = circle.getBoundingClientRect();
         const cx = cr.left + cr.width / 2;
@@ -471,17 +467,13 @@ function setupDragEliminar() {
         const hover = trash.classList.contains('hover');
         const canal = circle.dataset.canal;
         const el = circle;
-        activo = false;
-        circle = null;
-        // Evita que el click posterior abra la sala tras el arrastre
-        suprimirProximoClick();
+        suprimirProximoClick(); // evita que el click posterior abra la sala
         if (hover && canal) {
             el.remove(); // se eliminó la conversación
-            ocultarTrash();
+            finArrastre();
             eliminarConversacion(canal);
         } else {
-            restaurar(el); // vuelve a su lugar
-            ocultarTrash();
+            finArrastre(); // vuelve a su lugar
         }
     }
 
