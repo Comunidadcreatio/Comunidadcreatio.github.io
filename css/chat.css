@@ -83,26 +83,39 @@
     height: auto; /* el grid se ajusta a la escala real de la bandera */
     object-fit: cover;
     display: block;
+    /* Estética: esquinas suaves solo en la imagen y sombra que la despega */
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.chat-pueblo-tile:hover .chat-pueblo-tile-bandera {
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+}
+.chat-pueblo-tile:active .chat-pueblo-tile-bandera {
+    transform: scale(0.97);
 }
 .chat-pueblo-tile-bandera-vacia {
-    background: var(--color-gray-200, #e0e0e0);
+    background: linear-gradient(135deg, #ececec, #d6d6d6);
     aspect-ratio: 3 / 2;
+    border-radius: 6px;
 }
 .chat-pueblo-tile-info {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 4px;
+    gap: 6px;
     width: 100%;
-    padding: 2px 4px 4px;
+    padding: 5px 6px 6px;
 }
 .chat-pueblo-tile-nombre {
     flex: 1;
     min-width: 0;
-    font-size: 10.5px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--color-text, #1a1a1a);
-    line-height: 1.15;
+    line-height: 1.2;
+    letter-spacing: -0.1px;
     text-align: left; /* justificado a la izquierda */
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -112,17 +125,18 @@
 }
 .chat-pueblo-tile-count {
     flex-shrink: 0;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 8px;
-    background: #e53935;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #ef5350, #c62828);
     color: #fff;
-    font-size: 9.5px;
-    font-weight: 700;
-    line-height: 16px;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 18px;
     text-align: center;
     box-sizing: border-box;
+    box-shadow: 0 1px 4px rgba(198, 40, 40, 0.35);
 }
 
 /* Vista de usuarios de un pueblo (drill-down con volver) */
@@ -435,6 +449,15 @@
 [data-theme="dark"] .chat-pueblo-count {
     background: #2a2a2a;
     color: #d4d4d4;
+}
+[data-theme="dark"] .chat-pueblo-tile-bandera {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+[data-theme="dark"] .chat-pueblo-tile:hover .chat-pueblo-tile-bandera {
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.65);
+}
+[data-theme="dark"] .chat-pueblo-tile-bandera-vacia {
+    background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
 }
 [data-theme="dark"] .chat-input {
     background: #1f1f1f;
