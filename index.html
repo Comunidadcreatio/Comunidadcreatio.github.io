@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.297';
+        var currentVer = '1.0.298';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=93e222174f">
+    <link rel="stylesheet" href="css/style.css?v=bb8b321431">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -789,10 +789,6 @@
 
         <!-- SECCIÓN: CHAT GLOBAL + PRIVADO -->
         <section id="chat-global" class="hidden" aria-label="Chat global" role="region">
-            <div class="chat-header">
-                <h2>Chat</h2>
-                <button id="chat-cerrar" class="chat-cerrar-btn" aria-label="Cerrar chat">✕</button>
-            </div>
             <div id="chat-contenido">
                 <!-- Vista directorio: acordeón de pueblos -->
                 <div id="chat-directorio">
@@ -869,7 +865,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=eca7910e5c"></script>
-    <script src="js/main.js?v=adb0d86188" type="module"></script>
+    <script src="js/main.js?v=909b69c7f3" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=746b63951d"></script>
 </body>

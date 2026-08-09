@@ -17,32 +17,6 @@
     display: none;
 }
 
-.chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px 10px;
-}
-.chat-header h2 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-    color: var(--color-text, #1a1a1a);
-}
-.chat-cerrar-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: var(--color-text-muted, #666);
-    padding: 6px 10px;
-    border-radius: 8px;
-    line-height: 1;
-}
-.chat-cerrar-btn:hover {
-    background: var(--color-gray-100, #f0f0f0);
-}
-
 /* --- Contenido (scroll) --- */
 #chat-contenido {
     flex: 1;
@@ -59,7 +33,9 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 4px 10px 16px; /* menos aire lateral para las banderas */
+    /* Padding inferior alto: los últimos acordeones terminan por encima de
+       los círculos para poder desplegarlos sin interferencia */
+    padding: 4px 6px 170px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -80,7 +56,7 @@
     align-items: center;
     gap: 8px;
     width: 100%;
-    padding: 8px 10px; /* menos aire lateral */
+    padding: 8px 8px; /* menos aire lateral */
     background: none;
     border: none;
     cursor: pointer;
@@ -140,7 +116,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 8px 10px; /* menos aire lateral */
+    padding: 8px 8px; /* menos aire lateral */
     background: none;
     border: none;
     cursor: pointer;
@@ -421,15 +397,20 @@
    ============================================== */
 .chat-cluster {
     position: fixed;
-    right: 0; /* sin aire lateral: los círculos van pegados al borde derecho */
-    /* Pequeño aire sobre el nav */
-    bottom: calc(56px + env(safe-area-inset-bottom, 16px));
+    right: 2px; /* aire lateral mínimo (1-2px) */
+    /* Pegado al borde superior del nav: el degradado nace ahí */
+    bottom: calc(50px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 0;
-    background: transparent; /* sin rectángulo ni degradado de fondo */
+    /* Degradado vertical: nace en el borde del nav y se pierde a mitad
+       de los círculos (blanco en modo claro) */
+    background: linear-gradient(to top,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.4) 30%,
+        rgba(255, 255, 255, 0) 50%);
     /* Solo los círculos y el FAB capturan toques */
     pointer-events: none;
 }
@@ -505,7 +486,11 @@
     height: 24px;
 }
 [data-theme="dark"] .chat-cluster {
-    background: transparent; /* sin rectángulo ni degradado en modo oscuro */
+    /* Degradado vertical negro: nace en el nav y se pierde a mitad de los círculos */
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.4) 30%,
+        rgba(0, 0, 0, 0) 50%);
 }
 [data-theme="dark"] .chat-conv-circle {
     border-color: #0a0a0a;

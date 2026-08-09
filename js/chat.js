@@ -106,7 +106,8 @@ export function setupChat() {
     // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
     const fab = document.getElementById('btn-chat-global-fab');
     if (fab) fab.addEventListener('click', abrirChatGlobal);
-    document.getElementById('chat-cerrar').addEventListener('click', cerrarChat);
+    const cerrarBtn = document.getElementById('chat-cerrar');
+    if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarChat);
     document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
 
