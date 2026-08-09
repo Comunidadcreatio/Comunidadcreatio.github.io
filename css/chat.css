@@ -59,9 +59,8 @@
    ============================================== */
 .chat-pueblos-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 banderas por fila */
+    grid-template-columns: 1fr; /* una sola columna */
     gap: 0; /* sin aire vertical entre filas */
-    column-gap: 5px; /* 5px de aire entre las tarjetas (laterales) */
     padding: 0;
     /* Solo gestos verticales: el dedo no puede desplazar el grid en horizontal */
     touch-action: pan-y;
@@ -70,6 +69,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    align-items: center; /* centra la bandera reducida */
     gap: 2px;
     padding: 0;
     background: none; /* sin fondo */
@@ -83,7 +83,7 @@
     background: var(--color-gray-50, #fafafa);
 }
 .chat-pueblo-tile-bandera {
-    width: 100%;
+    width: 70%; /* reducida a escala (mantiene la proporción 3:2) */
     height: auto; /* el grid se ajusta a la escala real de la bandera */
     object-fit: cover;
     display: block;
@@ -109,8 +109,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    width: 100%;
-    padding: 5px 6px 6px;
+    width: 70%; /* alineado con la bandera reducida */
+    padding: 5px 0 6px;
 }
 .chat-pueblo-tile-nombre {
     flex: 1;
