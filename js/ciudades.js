@@ -43,4 +43,39 @@
         'Queniquea': 'sucre.webp',
         'Pregonero': 'uribante.webp'
     };
+
+    // Municipio al que pertenece cada pueblo del Táchira (las banderas del
+    // carrusel son de los municipios; el pueblo es la capital). Cuando el
+    // municipio se llama igual que el pueblo, se omite en la UI.
+    window.MUNICIPIO_POR_PUEBLO = {
+        'San Cristóbal': 'San Cristóbal',
+        'San Antonio del Táchira': 'Bolívar',
+        'San Juan de Colón': 'Ayacucho',
+        'Táriba': 'Cárdenas',
+        'Rubio': 'Junín',
+        'La Fría': 'García de Hevía',
+        'San Josecito': 'Torbes',
+        'Palmira': 'Guásimos',
+        'Capacho Nuevo': 'Independencia',
+        'Capacho Viejo': 'Libertad',
+        'La Grita': 'Jáuregui',
+        'Abejales': 'Libertador',
+        'Lobatera': 'Lobatera',
+        'Michelena': 'Michelena',
+        'Ureña': 'Pedro María Ureña',
+        'Cordero': 'Andrés Bello',
+        'Las Mesas': 'Antonio Rómulo Costa',
+        'Santa Ana del Táchira': 'Córdoba',
+        'San Rafael del Piñal': 'Fernández Feo',
+        'San José de Bolívar': 'Francisco de Miranda',
+        'El Cobre': 'José María Vargas',
+        'Coloncito': 'Panamericano',
+        'Delicias': 'Rafael Urdaneta',
+        'La Tendida': 'Samuel Darío Maldonado',
+        'San Judas Tadeo': 'San Judas Tadeo',
+        'Seboruco': 'Seboruco',
+        'San Simón': 'San Simón',
+        'Queniquea': 'Queniquea',
+        'Pregonero': 'Uribante'
+    };
 })();

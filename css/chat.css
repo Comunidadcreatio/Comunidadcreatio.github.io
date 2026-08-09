@@ -60,7 +60,7 @@
 .chat-pueblos-carrusel {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 8px; /* vecinas más juntas */
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -103,44 +103,57 @@
 
 /* Panel del municipio seleccionado (usuarios) */
 .chat-pueblo-panel {
-    padding: 8px 4px 0;
+    padding: 10px 4px 0;
 }
 .chat-pueblo-panel-titulo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 6px;
-}
-.chat-pueblo-panel-bandera {
-    width: 26px;
-    height: 17px;
-    object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-.chat-pueblo-panel-nombre {
-    flex: 1;
-    min-width: 0;
-    font-size: 14px;
+    text-align: center; /* nombre del pueblo en el centro */
+    font-size: 15px;
     font-weight: 700;
     color: var(--color-text, #1a1a1a);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 2px 6px;
 }
-.chat-pueblo-panel-count {
-    flex-shrink: 0;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #ef5350, #c62828);
+.chat-pueblo-panel-municipio {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+}
+.chat-pueblo-panel-contadores {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* los dos círculos en el centro */
+    gap: 24px;
+    padding: 8px 0 2px;
+}
+.chat-pueblo-contador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.chat-pueblo-contador-circle {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 7px;
+    border-radius: 15px;
     color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
-    line-height: 20px;
+    line-height: 30px;
     text-align: center;
-    box-shadow: 0 1px 4px rgba(198, 40, 40, 0.35);
+    box-sizing: border-box;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+.chat-pueblo-contador-activos {
+    background: linear-gradient(135deg, #66bb6a, #2e7d32);
+}
+.chat-pueblo-contador-total {
+    background: linear-gradient(135deg, #ef5350, #c62828);
+}
+.chat-pueblo-contador small {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+    letter-spacing: 0.2px;
 }
 .chat-pueblo-usuarios {
     display: flex;
@@ -405,6 +418,9 @@
 }
 [data-theme="dark"] .chat-pueblo-slide-bandera-vacia {
     background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+}
+[data-theme="dark"] .chat-pueblo-contador-circle {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
 [data-theme="dark"] .chat-input {
     background: #1f1f1f;

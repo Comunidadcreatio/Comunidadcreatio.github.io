@@ -292,8 +292,8 @@ function renderCarruselPueblos(pueblos) {
             const sc = s.offsetLeft + s.offsetWidth / 2;
             const d = Math.abs(sc - centro);
             const k = d / carrusel.clientWidth;
-            s.style.transform = `scale(${Math.max(0.72, 1 - k * 0.55)})`;
-            s.style.opacity = String(0.4 + (1 - Math.min(1, k * 1.5)) * 0.6);
+            s.style.transform = `scale(${Math.max(0.55, 1 - k * 0.8)})`;
+            s.style.opacity = String(0.35 + (1 - Math.min(1, k * 1.5)) * 0.65);
             if (d < mejorD) { mejorD = d; mejor = s; }
         });
         const pueblo = mejor ? mejor.dataset.pueblo : null;
@@ -318,16 +318,30 @@ function renderCarruselPueblos(pueblos) {
     });
 }
 
+// Municipio al que pertenece el pueblo (para el encabezado del panel)
+function municipioDe(ciudad) {
+    try {
+        return (window.MUNICIPIO_POR_PUEBLO && window.MUNICIPIO_POR_PUEBLO[ciudad]) || '';
+    } catch (e) { return ''; }
+}
+
 // Lista de usuarios del municipio seleccionado en el carrusel
 function renderUsuariosPueblo(ciudad) {
     const panel = document.getElementById('chat-pueblo-panel');
     if (!panel) return;
     const users = ultimosPueblos[ciudad] || [];
-    const bandera = banderaDe(ciudad);
-    const banderaHTML = bandera
-        ? `<img class="chat-pueblo-panel-bandera" src="iconos/banderas/${bandera}" alt="">`
-        : '';
-    panel.innerHTML = `<div class="chat-pueblo-panel-titulo">${banderaHTML}<span class="chat-pueblo-panel-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-panel-count">${users.length}</span></div>`;
+    const activos = users.filter(esOnline).length;
+    const municipio = municipioDe(ciudad);
+    // Pueblo en el centro; el municipio justo después (solo si difieren)
+    const nombreLinea = municipio && municipio !== ciudad
+        ? `${escapeHtml(ciudad)} <span class="chat-pueblo-panel-municipio">· ${escapeHtml(municipio)}</span>`
+        : escapeHtml(ciudad);
+    panel.innerHTML =
+        `<div class="chat-pueblo-panel-titulo">${nombreLinea}</div>` +
+        `<div class="chat-pueblo-panel-contadores">` +
+        `<span class="chat-pueblo-contador"><span class="chat-pueblo-contador-circle chat-pueblo-contador-activos" title="Usuarios en línea ahora">${activos}</span><small>en línea</small></span>` +
+        `<span class="chat-pueblo-contador"><span class="chat-pueblo-contador-circle chat-pueblo-contador-total" title="Total de usuarios de la región">${users.length}</span><small>total</small></span>` +
+        `</div>`;
     const lista = document.createElement('div');
     lista.className = 'chat-pueblo-usuarios';
     if (users.length) {
