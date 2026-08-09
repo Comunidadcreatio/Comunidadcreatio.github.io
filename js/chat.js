@@ -323,6 +323,8 @@ async function abrirSala(canal, titulo, fotoOtro) {
             cont.innerHTML = '<div class="chat-sin-mensajes">Sin mensajes todavía. ¡Escribe el primero!</div>';
         }
         iniciarPoll();
+        // La sala está visible: resetea el contador de no leídos de este canal
+        marcarLeido(canal);
     } catch (e) {
         debugLog.error('cargar mensajes:', e);
         cont.innerHTML = '<div class="chat-sin-mensajes">Error de conexión.</div>';
@@ -355,6 +357,8 @@ function iniciarPoll() {
                     if (m.id > lastId) appendMensaje(m, m.autor_id === miId());
                 });
                 scrollMensajes();
+                // Hay mensajes nuevos y la sala está visible: marcar como leído
+                marcarLeido(canalActivo);
             }
         } catch (e) {
             // silencioso: el siguiente poll reintenta
@@ -369,6 +373,19 @@ function detenerPoll() {
         clearInterval(pollTimer);
         pollTimer = null;
     }
+}
+
+// POST /chat/leido — resetea el contador de no leídos del canal (lo usa el
+// backend para agrupar mensajes en una sola notificación y omitir el push si
+// el usuario está viendo la conversación).
+async function marcarLeido(canal) {
+    if (!canal || canal === 'global') return;
+    try {
+        await apiRequest('/chat/leido', {
+            method: 'POST',
+            body: JSON.stringify({ canal })
+        });
+    } catch (e) { /* silencioso: solo es un contador */ }
 }
 
 // ============================================
