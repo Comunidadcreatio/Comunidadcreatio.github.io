@@ -40,7 +40,8 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
-import { setupChat } from './chat.js?v=679667aae4';
+import { setupChat } from './chat.js?v=182db6984a';
+import { setupPush } from './push.js?v=337315e89d';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
@@ -139,6 +140,8 @@ async function fetchNotificacionesCount() {
         // Silencioso — el badge no es crítico
     }
 }
+// Expuesto para que js/push.js pueda refrescar el badge al recibir un push
+window.refrescarNotificaciones = fetchNotificacionesCount;
 
 async function cargarNotificaciones() {
     const list = document.getElementById('notif-list');
@@ -714,6 +717,7 @@ function setupEvents() {
     // ----- Sección de perfil -----
     setupPerfilInteracciones(togglePerfil, cerrarTodosLosPaneles);
     setupChat();
+    setupPush();
 
     // ----- Cambiar foto de perfil -----
     const inputFotoPerfil = document.getElementById('input-foto-perfil');

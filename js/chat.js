@@ -112,6 +112,14 @@ export function setupChat() {
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
     setupDragEliminar();
 
+    // Abrir una conversación desde una notificación push (evento de js/push.js)
+    window.addEventListener('chat-abrir-canal', (e) => {
+        const detail = (e && e.detail) || {};
+        if (!detail.canal) return;
+        abrirChat();
+        abrirSala(detail.canal, detail.titulo || 'Conversación', null);
+    });
+
     // Si otra navegación oculta la sección, apagar todo y ocultar el FAB
     new MutationObserver(() => {
         if (seccion.classList.contains('hidden')) {
