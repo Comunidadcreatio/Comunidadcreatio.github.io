@@ -125,7 +125,7 @@
 .chat-pueblo-info-contadores {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* a la derecha */
+    justify-content: flex-start; /* a la izquierda, junto al nombre */
     gap: 14px;
 }
 .chat-pueblo-info-contador {
