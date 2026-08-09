@@ -55,140 +55,92 @@
 /* Sala global: se abre desde el botón flotante (FAB), ya no hay tarjeta en el directorio */
 
 /* ==============================================
-   GRID DE PUEBLOS (3 por fila)
+   CARRUSEL DE BANDERAS (coverflow)
    ============================================== */
-.chat-pueblos-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* una sola columna */
-    gap: 0; /* sin aire vertical entre filas */
-    padding: 0;
-    /* Solo gestos verticales: el dedo no puede desplazar el grid en horizontal */
-    touch-action: pan-y;
-}
-.chat-pueblo-tile {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* banderas justificadas a la izquierda */
-    gap: 2px;
-    padding: 0;
-    background: none; /* sin fondo */
-    border: none; /* sin línea alrededor */
-    border-radius: 0; /* sin esquinas curvas */
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
-}
-.chat-pueblo-tile:hover {
-    background: var(--color-gray-50, #fafafa);
-}
-.chat-pueblo-tile-bandera {
-    width: 50%; /* más pequeña, a escala (mantiene la proporción 3:2) */
-    height: auto; /* el grid se ajusta a la escala real de la bandera */
-    object-fit: cover;
-    display: block;
-    /* Estética: vértices curvos y sombra que la despega */
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-.chat-pueblo-tile:hover .chat-pueblo-tile-bandera {
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
-    transform: translateY(-1px);
-}
-.chat-pueblo-tile:active .chat-pueblo-tile-bandera {
-    transform: scale(0.97);
-}
-.chat-pueblo-tile-bandera-vacia {
-    background: linear-gradient(135deg, #ececec, #d6d6d6);
-    aspect-ratio: 3 / 2;
-    border-radius: 12px;
-}
-.chat-pueblo-tile-info {
+.chat-pueblos-carrusel {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    width: 50%; /* alineado con la bandera (izquierda) */
-    padding: 5px 0 6px;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Padding lateral calculado para que la primera y la última bandera
+       también puedan quedar centradas (slide de 240px -> 120px a cada lado) */
+    padding: 14px calc(50% - 120px) 18px;
+    /* Solo gestos horizontales sobre el carrusel; el padre sigue en vertical */
+    touch-action: pan-x;
 }
-.chat-pueblo-tile-nombre {
-    flex: 1;
-    min-width: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--color-text, #1a1a1a);
-    line-height: 1.2;
-    letter-spacing: -0.1px;
-    text-align: left; /* justificado a la izquierda */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: break-word;
+.chat-pueblos-carrusel::-webkit-scrollbar {
+    display: none;
 }
-.chat-pueblo-tile-count {
-    flex-shrink: 0;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, #ef5350, #c62828);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 18px;
-    text-align: center;
-    box-sizing: border-box;
-    box-shadow: 0 1px 4px rgba(198, 40, 40, 0.35);
+.chat-pueblo-slide {
+    flex: 0 0 240px;
+    scroll-snap-align: center;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    transform-origin: center;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.chat-pueblo-slide-bandera {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    pointer-events: none; /* el clic va al botón, no a la imagen */
+}
+.chat-pueblo-slide-bandera-vacia {
+    aspect-ratio: 3 / 2;
+    background: linear-gradient(135deg, #ececec, #d6d6d6);
+    border-radius: 14px;
+    display: block;
 }
 
-/* Vista de usuarios de un pueblo (drill-down con volver) */
-.chat-pueblo-volver {
+/* Panel del municipio seleccionado (usuarios) */
+.chat-pueblo-panel {
+    padding: 8px 4px 0;
+}
+.chat-pueblo-panel-titulo {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
     padding: 8px 6px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
-    border-bottom: 1px solid var(--color-gray-100, #eee);
-    margin-bottom: 4px;
 }
-.chat-pueblo-volver:hover {
-    background: var(--color-gray-50, #fafafa);
-}
-.chat-pueblo-volver-flecha {
-    font-size: 20px;
-    line-height: 1;
-    color: var(--color-primary, #c0392b);
-    font-weight: 700;
-}
-/* Elementos reutilizados en el header de "volver" del drill-down */
-.chat-pueblo-bandera {
-    width: 22px;
-    height: 14px;
+.chat-pueblo-panel-bandera {
+    width: 26px;
+    height: 17px;
     object-fit: cover;
-    border-radius: 2px;
+    border-radius: 4px;
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.08);
 }
-.chat-pueblo-nombre {
+.chat-pueblo-panel-nombre {
     flex: 1;
-    font-size: 13px;
-    font-weight: 600;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--color-text, #1a1a1a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.chat-pueblo-count {
+.chat-pueblo-panel-count {
+    flex-shrink: 0;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ef5350, #c62828);
+    color: #fff;
     font-size: 11px;
-    font-weight: 600;
-    color: var(--color-text-muted, #888);
-    background: var(--color-gray-100, #f0f0f0);
-    border-radius: 20px;
-    padding: 1px 8px;
+    font-weight: 800;
+    line-height: 20px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(198, 40, 40, 0.35);
 }
 .chat-pueblo-usuarios {
     display: flex;
@@ -445,22 +397,13 @@
     background: #525252;
     color: #f5f5f5;
 }
-[data-theme="dark"] .chat-pueblo-tile:hover,
-[data-theme="dark"] .chat-pueblo-volver:hover,
 [data-theme="dark"] .chat-user-row:hover {
     background: #242424;
 }
-[data-theme="dark"] .chat-pueblo-count {
-    background: #2a2a2a;
-    color: #d4d4d4;
+[data-theme="dark"] .chat-pueblo-slide-bandera {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
-[data-theme="dark"] .chat-pueblo-tile-bandera {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
-}
-[data-theme="dark"] .chat-pueblo-tile:hover .chat-pueblo-tile-bandera {
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.65);
-}
-[data-theme="dark"] .chat-pueblo-tile-bandera-vacia {
+[data-theme="dark"] .chat-pueblo-slide-bandera-vacia {
     background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
 }
 [data-theme="dark"] .chat-input {

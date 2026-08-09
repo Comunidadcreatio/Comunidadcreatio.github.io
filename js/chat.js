@@ -233,7 +233,7 @@ async function cargarDirectorio() {
             apiRequest('/chat/directorio'),
             apiRequest('/chat/conversaciones')
         ]);
-        renderGridPueblos(dirRes && dirRes.success ? dirRes.pueblos : {});
+        renderCarruselPueblos(dirRes && dirRes.success ? dirRes.pueblos : {});
         renderConversaciones(convRes && convRes.success ? convRes.conversaciones : []);
     } catch (e) {
         debugLog.error('directorio chat:', e);
@@ -241,7 +241,11 @@ async function cargarDirectorio() {
     }
 }
 
-function renderGridPueblos(pueblos) {
+// CARRUSEL DE BANDERAS: se deslizan horizontalmente; la bandera que queda en
+// el centro es la seleccionada (la más grande) y debajo se cargan sus usuarios.
+let ultimoPuebloSeleccionado = null;
+
+function renderCarruselPueblos(pueblos) {
     ultimosPueblos = pueblos || {};
     const cont = document.getElementById('chat-accordion');
     cont.innerHTML = '';
@@ -250,42 +254,80 @@ function renderGridPueblos(pueblos) {
         cont.innerHTML = '<div class="chat-sin-mensajes">No hay pueblos disponibles.</div>';
         return;
     }
-    const grid = document.createElement('div');
-    grid.className = 'chat-pueblos-grid';
+
+    const carrusel = document.createElement('div');
+    carrusel.className = 'chat-pueblos-carrusel';
+    carrusel.setAttribute('aria-label', 'Selecciona un municipio del Táchira');
     lista.forEach(ciudad => {
-        const users = (ultimosPueblos[ciudad]) || [];
-        const tile = document.createElement('button');
-        tile.type = 'button';
-        tile.className = 'chat-pueblo-tile';
-        tile.setAttribute('aria-label', `${ciudad}: ${users.length} usuarios`);
+        const users = ultimosPueblos[ciudad] || [];
+        const slide = document.createElement('button');
+        slide.type = 'button';
+        slide.className = 'chat-pueblo-slide';
+        slide.dataset.pueblo = ciudad;
+        slide.setAttribute('aria-label', `${ciudad}: ${users.length} usuarios`);
         const bandera = banderaDe(ciudad);
-        const banderaHTML = bandera
-            ? `<img class="chat-pueblo-tile-bandera" src="iconos/banderas/${bandera}" alt="" loading="lazy">`
-            : '<span class="chat-pueblo-tile-bandera chat-pueblo-tile-bandera-vacia"></span>';
-        tile.innerHTML = banderaHTML +
-            `<span class="chat-pueblo-tile-info"><span class="chat-pueblo-tile-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-tile-count">${users.length}</span></span>`;
-        tile.addEventListener('click', () => mostrarPueblo(ciudad, users));
-        grid.appendChild(tile);
+        slide.innerHTML = bandera
+            ? `<img class="chat-pueblo-slide-bandera" src="iconos/banderas/${bandera}" alt="" loading="lazy" draggable="false">`
+            : '<span class="chat-pueblo-slide-bandera chat-pueblo-slide-bandera-vacia"></span>';
+        slide.addEventListener('click', () => {
+            // Al tocar una bandera se centra (snap) y el scroll carga sus usuarios
+            slide.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        });
+        carrusel.appendChild(slide);
     });
-    cont.appendChild(grid);
+    cont.appendChild(carrusel);
+
+    const panel = document.createElement('div');
+    panel.id = 'chat-pueblo-panel';
+    panel.className = 'chat-pueblo-panel';
+    panel.innerHTML = '<div class="chat-pueblo-vacio">Desliza para elegir un municipio</div>';
+    cont.appendChild(panel);
+
+    // Escala las banderas según su distancia al centro y detecta la central
+    function actualizarCarrusel() {
+        const centro = carrusel.scrollLeft + carrusel.clientWidth / 2;
+        let mejor = null;
+        let mejorD = Infinity;
+        carrusel.querySelectorAll('.chat-pueblo-slide').forEach(s => {
+            const sc = s.offsetLeft + s.offsetWidth / 2;
+            const d = Math.abs(sc - centro);
+            const k = d / carrusel.clientWidth;
+            s.style.transform = `scale(${Math.max(0.72, 1 - k * 0.55)})`;
+            s.style.opacity = String(0.4 + (1 - Math.min(1, k * 1.5)) * 0.6);
+            if (d < mejorD) { mejorD = d; mejor = s; }
+        });
+        const pueblo = mejor ? mejor.dataset.pueblo : null;
+        if (pueblo && pueblo !== ultimoPuebloSeleccionado) {
+            ultimoPuebloSeleccionado = pueblo;
+            renderUsuariosPueblo(pueblo);
+        }
+    }
+    let raf = null;
+    carrusel.addEventListener('scroll', () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => { raf = null; actualizarCarrusel(); });
+    });
+
+    // Centrar la primera bandera y cargar sus usuarios
+    requestAnimationFrame(() => {
+        const s0 = carrusel.querySelector('.chat-pueblo-slide');
+        if (s0) {
+            carrusel.scrollLeft = s0.offsetLeft - (carrusel.clientWidth - s0.offsetWidth) / 2;
+        }
+        actualizarCarrusel();
+    });
 }
 
-// Drill-down: al tocar una bandera se muestra la lista de usuarios de ese
-// pueblo, con un botón de volver al grid.
-function mostrarPueblo(ciudad, users) {
-    const cont = document.getElementById('chat-accordion');
-    cont.innerHTML = '';
-    const volver = document.createElement('button');
-    volver.type = 'button';
-    volver.className = 'chat-pueblo-volver';
+// Lista de usuarios del municipio seleccionado en el carrusel
+function renderUsuariosPueblo(ciudad) {
+    const panel = document.getElementById('chat-pueblo-panel');
+    if (!panel) return;
+    const users = ultimosPueblos[ciudad] || [];
     const bandera = banderaDe(ciudad);
     const banderaHTML = bandera
-        ? `<img class="chat-pueblo-bandera" src="iconos/banderas/${bandera}" alt="">`
-        : '<span class="chat-pueblo-bandera"></span>';
-    volver.innerHTML = `<span class="chat-pueblo-volver-flecha">‹</span>${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-count">${users.length}</span>`;
-    volver.addEventListener('click', () => renderGridPueblos(ultimosPueblos));
-    cont.appendChild(volver);
-
+        ? `<img class="chat-pueblo-panel-bandera" src="iconos/banderas/${bandera}" alt="">`
+        : '';
+    panel.innerHTML = `<div class="chat-pueblo-panel-titulo">${banderaHTML}<span class="chat-pueblo-panel-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-panel-count">${users.length}</span></div>`;
     const lista = document.createElement('div');
     lista.className = 'chat-pueblo-usuarios';
     if (users.length) {
@@ -300,7 +342,7 @@ function mostrarPueblo(ciudad, users) {
     } else {
         lista.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
     }
-    cont.appendChild(lista);
+    panel.appendChild(lista);
 }
 
 // Las conversaciones se muestran como círculos (avatares) junto al círculo
