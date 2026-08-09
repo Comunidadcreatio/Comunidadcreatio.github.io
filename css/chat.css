@@ -67,8 +67,8 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     /* Padding lateral calculado para que la primera y la última bandera
-       también puedan quedar centradas (slide de 240px -> 120px a cada lado) */
-    padding: 14px calc(50% - 120px) 18px;
+       también puedan quedar centradas (slide de 200px -> 100px a cada lado) */
+    padding: 14px calc(50% - 100px) 18px;
     /* Solo gestos horizontales sobre el carrusel; el padre sigue en vertical */
     touch-action: pan-x;
 }
@@ -76,7 +76,7 @@
     display: none;
 }
 .chat-pueblo-slide {
-    flex: 0 0 240px;
+    flex: 0 0 200px; /* carrusel más pequeño */
     scroll-snap-align: center;
     border: none;
     background: none;
