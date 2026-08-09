@@ -58,7 +58,7 @@
    ============================================== */
 .chat-pueblos-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 2 banderas por fila */
     gap: 0; /* sin aire entre contenedores */
     padding: 0;
 }
