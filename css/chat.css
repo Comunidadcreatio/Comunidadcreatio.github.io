@@ -69,7 +69,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center; /* centra la bandera reducida */
+    align-items: flex-start; /* banderas justificadas a la izquierda */
     gap: 2px;
     padding: 0;
     background: none; /* sin fondo */
@@ -83,12 +83,12 @@
     background: var(--color-gray-50, #fafafa);
 }
 .chat-pueblo-tile-bandera {
-    width: 70%; /* reducida a escala (mantiene la proporción 3:2) */
+    width: 50%; /* más pequeña, a escala (mantiene la proporción 3:2) */
     height: auto; /* el grid se ajusta a la escala real de la bandera */
     object-fit: cover;
     display: block;
-    /* Estética: esquinas suaves solo en la imagen y sombra que la despega */
-    border-radius: 6px;
+    /* Estética: vértices curvos y sombra que la despega */
+    border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
     transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -102,14 +102,14 @@
 .chat-pueblo-tile-bandera-vacia {
     background: linear-gradient(135deg, #ececec, #d6d6d6);
     aspect-ratio: 3 / 2;
-    border-radius: 6px;
+    border-radius: 12px;
 }
 .chat-pueblo-tile-info {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    width: 70%; /* alineado con la bandera reducida */
+    width: 50%; /* alineado con la bandera (izquierda) */
     padding: 5px 0 6px;
 }
 .chat-pueblo-tile-nombre {
