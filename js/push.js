@@ -114,6 +114,7 @@ function manejarPush(d) {
 let bannerTimer = null;
 let bannerCanal = null;
 let bannerTitulo = null;
+let bannerVisible = false;
 
 function mostrarBannerChat(d, titulo, cuerpo) {
     bannerCanal = d.canal || null;
@@ -163,14 +164,22 @@ function mostrarBannerChat(d, titulo, cuerpo) {
     banner.appendChild(img);
     banner.appendChild(txt);
 
-    requestAnimationFrame(() => { banner.style.transform = 'translateY(0)'; });
+    requestAnimationFrame(() => {
+        bannerVisible = true;
+        banner.style.transform = 'translateY(0)';
+    });
     if (bannerTimer) clearTimeout(bannerTimer);
     bannerTimer = setTimeout(ocultarBanner, 5000);
 }
 
 function ocultarBanner() {
     const banner = document.getElementById('chat-push-banner');
-    if (banner) banner.style.transform = 'translateY(-100%)';
+    if (!banner) return;
+    bannerVisible = false;
+    // Sube lo necesario para salir por el borde superior de la pantalla
+    // (su altura + su offset actual debajo del header).
+    const top = parseFloat(banner.style.top) || 0;
+    banner.style.transform = `translateY(calc(-100% - ${top}px))`;
 }
 
 // Posiciona el banner justo debajo del header de la app (respeta la barra de
@@ -181,5 +190,9 @@ function posicionarBanner() {
     const header = document.getElementById('main-header');
     const top = header ? header.getBoundingClientRect().bottom + 6 : 6;
     banner.style.top = Math.round(top) + 'px';
+    // Si está oculto, mantenerlo fuera de pantalla con el nuevo offset
+    if (!bannerVisible) {
+        banner.style.transform = `translateY(calc(-100% - ${banner.style.top}))`;
+    }
 }
 window.addEventListener('resize', posicionarBanner);
