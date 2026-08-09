@@ -397,17 +397,18 @@
    ============================================== */
 .chat-cluster {
     position: fixed;
-    right: 0; /* el contenedor llega hasta el borde derecho de la pantalla */
-    /* Pegado al borde superior del nav: el degradado nace ahí */
+    left: 0;
+    right: 0; /* el degradado va del borde izquierdo al derecho, siempre */
     bottom: calc(50px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
+    justify-content: flex-end; /* la fila de círculos queda pegada a la derecha */
     align-items: center;
     gap: 10px;
     /* Padding superior alto: el degradado ocupa mucha altura y se nota más */
     padding: 56px 0 8px;
-    /* Degradado vertical marcado: nace fuerte en el borde del nav y se va
-       perdiendo muy por encima de los círculos (blanco en claro) */
+    /* Degradado vertical a ancho completo: nace fuerte en el borde del nav y
+       se va perdiendo muy por encima de los círculos (blanco en claro) */
     background: linear-gradient(to top,
         rgba(255, 255, 255, 1) 0%,
         rgba(255, 255, 255, 0.7) 40%,
@@ -428,19 +429,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Ancho completo: los círculos llegan hasta el borde de la pantalla */
-    max-width: 100vw;
+    /* Ancho máximo del 100%: la fila no estira el degradado, solo se alinea
+       a la derecha; desliza horizontalmente cuando hay muchos círculos */
+    max-width: 100%;
     overflow-x: auto;
     overflow-y: visible;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
-}
-.chat-cluster-convs > :first-child {
-    /* Alinea el grupo a la derecha cuando cabe; colapsa a 0 si desborda.
-       (justify-content:flex-end rompe el scroll horizontal con overflow,
-       por eso se usa margin auto) */
-    margin-left: auto;
 }
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;
@@ -520,8 +516,7 @@
 }
 @media (min-width: 769px) {
     .chat-cluster {
-        right: 24px;
-        bottom: 24px;
+        bottom: 24px; /* el degradado mantiene el ancho completo */
     }
 }
 
