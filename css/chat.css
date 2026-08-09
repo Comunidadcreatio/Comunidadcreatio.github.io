@@ -126,7 +126,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start; /* a la izquierda, junto al nombre */
-    gap: 14px;
+    gap: 8px; /* poco espacio entre "en línea" y "Artistas" */
 }
 .chat-pueblo-info-contador {
     font-size: 11px; /* más pequeño */

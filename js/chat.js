@@ -349,7 +349,7 @@ function renderUsuariosPueblo(ciudad) {
             `<span class="chat-pueblo-info-titulo">${titulo}</span>` +
             `<span class="chat-pueblo-info-contadores">` +
             `<span class="chat-pueblo-info-contador on">${activos} <em>en línea</em></span>` +
-            `<span class="chat-pueblo-info-contador tot">${users.length} <em>total</em></span>` +
+            `<span class="chat-pueblo-info-contador tot">${users.length} <em>Artistas</em></span>` +
             `</span>`;
     }
     if (!panel) return;
