@@ -397,8 +397,9 @@ async function enviarMensaje(e) {
 // ============================================
 function setupDragEliminar() {
     const trash = document.getElementById('chat-trash');
+    const veil = document.getElementById('chat-trash-veil');
     const cont = document.getElementById('chat-cluster-convs');
-    if (!trash || !cont) return;
+    if (!trash || !veil || !cont) return;
 
     const UMBRAL = 450;   // ms de pulsación para activar el arrastre
     const MOVER_ANTES = 10; // px de movimiento que cancela la pulsación (es scroll)
@@ -407,13 +408,28 @@ function setupDragEliminar() {
     let circle = null;     // círculo en modo arrastre
     let activo = false;    // arrastre en curso
     let startX = 0, startY = 0;
+    let size = 56;
+
+    function ocultarTrash() {
+        trash.classList.remove('activo', 'hover');
+        veil.classList.remove('activo');
+    }
+
+    // Restaura el círculo dentro del contenedor (antes del FAB)
+    function restaurar(el) {
+        el.classList.remove('dragging');
+        el.style.cssText = '';
+        const fab = cont.querySelector('.chat-fab');
+        if (fab) cont.insertBefore(el, fab);
+        else cont.appendChild(el);
+    }
 
     function cancelar() {
         if (timer) { clearTimeout(timer); timer = null; }
-        if (activo && circle) circle.classList.remove('dragging');
+        if (activo && circle) restaurar(circle);
         activo = false;
         circle = null;
-        trash.classList.remove('activo', 'hover');
+        ocultarTrash();
     }
 
     function iniciarArrastre(el, x, y) {
@@ -422,13 +438,26 @@ function setupDragEliminar() {
         circle = el;
         startX = x;
         startY = y;
+        const rect = el.getBoundingClientRect();
+        size = rect.width || 56;
+        // Sacar del contenedor (su overflow recorta el círculo al subir) y
+        // fijarlo al body para que siga al dedo sin cortarse
         el.classList.add('dragging');
+        document.body.appendChild(el);
+        el.style.position = 'fixed';
+        el.style.left = rect.left + 'px';
+        el.style.top = rect.top + 'px';
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
+        el.style.margin = '0';
         trash.classList.add('activo');
+        veil.classList.add('activo');
     }
 
     function mover(x, y) {
         if (!activo || !circle) return;
-        circle.style.transform = `translate(${x - startX}px, ${y - startY}px)`;
+        circle.style.left = (x - size / 2) + 'px';
+        circle.style.top = (y - size / 2) + 'px';
         const r = trash.getBoundingClientRect();
         const cr = circle.getBoundingClientRect();
         const cx = cr.left + cr.width / 2;
@@ -441,12 +470,18 @@ function setupDragEliminar() {
         if (!activo || !circle) { cancelar(); return; }
         const hover = trash.classList.contains('hover');
         const canal = circle.dataset.canal;
-        circle.classList.remove('dragging');
-        circle.style.transform = '';
-        cancelar();
+        const el = circle;
+        activo = false;
+        circle = null;
+        // Evita que el click posterior abra la sala tras el arrastre
+        suprimirProximoClick();
         if (hover && canal) {
-            suprimirProximoClick();
+            el.remove(); // se eliminó la conversación
+            ocultarTrash();
             eliminarConversacion(canal);
+        } else {
+            restaurar(el); // vuelve a su lugar
+            ocultarTrash();
         }
     }
 
