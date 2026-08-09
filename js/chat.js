@@ -110,6 +110,7 @@ export function setupChat() {
     if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarChat);
     document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
+    setupDragEliminar();
 
     // Si otra navegación oculta la sección, apagar todo y ocultar el FAB
     new MutationObserver(() => {
@@ -264,6 +265,7 @@ function renderConversaciones(convs) {
         circle.type = 'button';
         circle.className = 'chat-conv-circle';
         circle.setAttribute('aria-label', `Chat con ${c.otro_nombre}`);
+        circle.dataset.canal = c.canal;
         const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
         circle.innerHTML = c.otro_foto
             ? `<img src="${c.otro_foto}" alt="">`
@@ -386,5 +388,140 @@ async function enviarMensaje(e) {
     } catch (err) {
         input.value = texto;
         debugLog.error('enviar mensaje:', err);
+    }
+}
+
+// ============================================
+// ELIMINAR CONVERSACIÓN: mantener pulsado un círculo
+// y arrastrarlo hacia arriba hasta la papelera
+// ============================================
+function setupDragEliminar() {
+    const trash = document.getElementById('chat-trash');
+    const cont = document.getElementById('chat-cluster-convs');
+    if (!trash || !cont) return;
+
+    const UMBRAL = 450;   // ms de pulsación para activar el arrastre
+    const MOVER_ANTES = 10; // px de movimiento que cancela la pulsación (es scroll)
+
+    let timer = null;
+    let circle = null;     // círculo en modo arrastre
+    let activo = false;    // arrastre en curso
+    let startX = 0, startY = 0;
+
+    function cancelar() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        if (activo && circle) circle.classList.remove('dragging');
+        activo = false;
+        circle = null;
+        trash.classList.remove('activo', 'hover');
+    }
+
+    function iniciarArrastre(el, x, y) {
+        timer = null;
+        activo = true;
+        circle = el;
+        startX = x;
+        startY = y;
+        el.classList.add('dragging');
+        trash.classList.add('activo');
+    }
+
+    function mover(x, y) {
+        if (!activo || !circle) return;
+        circle.style.transform = `translate(${x - startX}px, ${y - startY}px)`;
+        const r = trash.getBoundingClientRect();
+        const cr = circle.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2;
+        const cy = cr.top + cr.height / 2;
+        trash.classList.toggle('hover',
+            cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom);
+    }
+
+    function soltar() {
+        if (!activo || !circle) { cancelar(); return; }
+        const hover = trash.classList.contains('hover');
+        const canal = circle.dataset.canal;
+        circle.classList.remove('dragging');
+        circle.style.transform = '';
+        cancelar();
+        if (hover && canal) {
+            suprimirProximoClick();
+            eliminarConversacion(canal);
+        }
+    }
+
+    // --- Touch (móvil) ---
+    cont.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        const el = e.target.closest('.chat-conv-circle');
+        if (!el) return;
+        startX = t.clientX;
+        startY = t.clientY;
+        timer = setTimeout(() => iniciarArrastre(el, startX, startY), UMBRAL);
+    }, { passive: true });
+
+    cont.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        if (activo) {
+            e.preventDefault();
+            mover(t.clientX, t.clientY);
+        } else if (timer &&
+            (Math.abs(t.clientX - startX) > MOVER_ANTES || Math.abs(t.clientY - startY) > MOVER_ANTES)) {
+            clearTimeout(timer);
+            timer = null; // es deslizamiento/scroll, no pulsación
+        }
+    }, { passive: false });
+
+    cont.addEventListener('touchend', () => {
+        if (activo) soltar();
+        else if (timer) { clearTimeout(timer); timer = null; }
+    }, { passive: true });
+    cont.addEventListener('touchcancel', cancelar, { passive: true });
+
+    // --- Mouse (escritorio) ---
+    cont.addEventListener('mousedown', (e) => {
+        const el = e.target.closest('.chat-conv-circle');
+        if (!el) return;
+        startX = e.clientX;
+        startY = e.clientY;
+        timer = setTimeout(() => iniciarArrastre(el, startX, startY), UMBRAL);
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (activo) mover(e.clientX, e.clientY);
+        else if (timer &&
+            (Math.abs(e.clientX - startX) > MOVER_ANTES || Math.abs(e.clientY - startY) > MOVER_ANTES)) {
+            clearTimeout(timer);
+            timer = null;
+        }
+    });
+    document.addEventListener('mouseup', () => {
+        if (activo) soltar();
+        else if (timer) { clearTimeout(timer); timer = null; }
+    });
+}
+
+// Evita el click que se dispara justo después de un arrastre con soltado
+function suprimirProximoClick() {
+    const cap = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        document.removeEventListener('click', cap, true);
+    };
+    document.addEventListener('click', cap, true);
+}
+
+async function eliminarConversacion(canal) {
+    try {
+        const data = await apiRequest('/chat/conversaciones', {
+            method: 'DELETE',
+            body: JSON.stringify({ canal })
+        });
+        if (data && data.success) {
+            cargarDirectorio(); // refresca los círculos de conversaciones
+        } else {
+            debugLog.error('eliminar conversación:', data && data.error);
+        }
+    } catch (e) {
+        debugLog.error('eliminar conversación:', e);
     }
 }

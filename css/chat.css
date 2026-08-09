@@ -35,7 +35,7 @@
     overflow-y: auto;
     /* Padding inferior alto: los últimos acordeones terminan por encima de
        los círculos para poder desplegarlos sin interferencia */
-    padding: 4px 6px 170px;
+    padding: 4px 6px 200px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -405,14 +405,14 @@
     align-items: center;
     gap: 10px;
     /* Padding superior alto: el degradado ocupa mucha altura y se nota más */
-    padding: 44px 0 8px;
+    padding: 56px 0 8px;
     /* Degradado vertical marcado: nace fuerte en el borde del nav y se va
        perdiendo muy por encima de los círculos (blanco en claro) */
     background: linear-gradient(to top,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.6) 40%,
-        rgba(255, 255, 255, 0.2) 60%,
-        rgba(255, 255, 255, 0) 80%);
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.7) 40%,
+        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0) 85%);
     /* Solo los círculos y el FAB capturan toques */
     pointer-events: none;
 }
@@ -447,8 +447,8 @@
 }
 .chat-conv-circle {
     position: relative;
-    width: 48px; /* mismo tamaño que el círculo de la sala global */
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: 2px solid var(--color-bg, #fff);
     cursor: pointer;
@@ -456,7 +456,7 @@
     flex-shrink: 0;
     background: var(--color-gray-200, #e0e0e0);
     color: #fff;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -479,8 +479,8 @@
    BOTÓN FLOTANTE DEL CHAT (FAB, dentro del cluster)
    ============================================== */
 .chat-fab {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: none;
     background: var(--color-primary, #c0392b);
@@ -506,10 +506,10 @@
     /* Degradado vertical negro marcado: nace en el nav y se pierde muy por
        encima de los círculos */
     background: linear-gradient(to top,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.6) 40%,
-        rgba(0, 0, 0, 0.2) 60%,
-        rgba(0, 0, 0, 0) 80%);
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.7) 40%,
+        rgba(0, 0, 0, 0.3) 60%,
+        rgba(0, 0, 0, 0) 85%);
 }
 [data-theme="dark"] .chat-conv-circle {
     border-color: #0a0a0a;
@@ -523,4 +523,62 @@
         right: 24px;
         bottom: 24px;
     }
+}
+
+/* ==============================================
+   PAPELERA PARA ELIMINAR CONVERSACIONES
+   (mantener pulsado un círculo y arrastrarlo hasta aquí)
+   ============================================== */
+.chat-trash {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 40px;
+    background: #1f1f1f;
+    color: #f5f5f5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s, background 0.2s;
+}
+.chat-trash.activo {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.chat-trash.hover {
+    background: #dc2626; /* rojo al pasar el círculo encima */
+    transform: translateX(-50%) translateY(0) scale(1.06);
+}
+.chat-trash svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+.chat-trash span {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+[data-theme="dark"] .chat-trash {
+    background: #f5f5f5;
+    color: #0a0a0a;
+}
+[data-theme="dark"] .chat-trash.hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Círculo en modo arrastre (sigue al dedo) */
+.chat-conv-circle.dragging {
+    position: relative;
+    z-index: 1001;
+    pointer-events: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: none;
 }
