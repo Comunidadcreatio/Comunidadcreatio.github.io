@@ -30,15 +30,35 @@ export function setupPush() {
             return Push.register();
         })
         .then(() => {
+            // Canal de notificaciones (Android) para las locales en primer plano
+            if (Push.createChannel) {
+                Push.createChannel({
+                    id: 'default',
+                    name: 'Notificaciones',
+                    importance: 4,
+                    visibility: 1
+                }).catch(() => { /* el canal 'default' suele existir ya */ });
+            }
             Push.addListener('registration', (data) => {
                 if (data && data.value) registrarToken(data.value);
             });
             Push.addListener('registrationError', (err) => {
                 debugLog.error('FCM registro:', err);
             });
-            // App en primer plano: el sistema no muestra la notificación,
-            // así que la manejamos aquí (badge / abrir chat)
+            // App en primer plano: el sistema NO muestra la notificación sola.
+            // La programamos como notificación local para que igual suene.
             Push.addListener('pushNotificationReceived', (n) => {
+                if (n && (n.title || n.body)) {
+                    Push.schedule({
+                        notifications: [{
+                            id: Math.floor(Date.now() / 1000) % 2147483647,
+                            title: n.title || 'Creatio',
+                            body: n.body || '',
+                            channelId: 'default',
+                            data: n.data || {}
+                        }]
+                    }).catch(() => { /* si falla la local, seguimos */ });
+                }
                 manejarPush(n && n.data);
             });
             // El usuario tocó la notificación (app en segundo plano/cerrada)
