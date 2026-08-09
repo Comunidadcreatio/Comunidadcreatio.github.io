@@ -275,6 +275,13 @@ function renderCarruselPueblos(pueblos) {
         });
         carrusel.appendChild(slide);
     });
+    // Barra de información: nombre del municipio (izq.) + contadores (der.)
+    const info = document.createElement('div');
+    info.id = 'chat-pueblo-info';
+    info.className = 'chat-pueblo-info';
+    info.innerHTML = '<span class="chat-pueblo-info-titulo">Desliza para elegir un municipio</span>';
+    cont.appendChild(info);
+
     cont.appendChild(carrusel);
 
     const panel = document.createElement('div');
@@ -328,20 +335,24 @@ function municipioDe(ciudad) {
 // Lista de usuarios del municipio seleccionado en el carrusel
 function renderUsuariosPueblo(ciudad) {
     const panel = document.getElementById('chat-pueblo-panel');
-    if (!panel) return;
+    const info = document.getElementById('chat-pueblo-info');
     const users = ultimosPueblos[ciudad] || [];
     const activos = users.filter(esOnline).length;
-    const municipio = municipioDe(ciudad);
-    // Pueblo en el centro; el municipio justo después (solo si difieren)
-    const nombreLinea = municipio && municipio !== ciudad
-        ? `${escapeHtml(ciudad)} <span class="chat-pueblo-panel-municipio">· ${escapeHtml(municipio)}</span>`
-        : escapeHtml(ciudad);
-    panel.innerHTML =
-        `<div class="chat-pueblo-panel-titulo">${nombreLinea}</div>` +
-        `<div class="chat-pueblo-panel-contadores">` +
-        `<span class="chat-pueblo-contador"><span class="chat-pueblo-contador-circle chat-pueblo-contador-activos" title="Usuarios en línea ahora">${activos}</span><small>en línea</small></span>` +
-        `<span class="chat-pueblo-contador"><span class="chat-pueblo-contador-circle chat-pueblo-contador-total" title="Total de usuarios de la región">${users.length}</span><small>total</small></span>` +
-        `</div>`;
+    // Barra superior: nombre a la izquierda, contadores a la derecha
+    if (info) {
+        const municipio = municipioDe(ciudad);
+        const titulo = municipio && municipio !== ciudad
+            ? `${escapeHtml(ciudad)} <span class="chat-pueblo-info-municipio">· ${escapeHtml(municipio)}</span>`
+            : escapeHtml(ciudad);
+        info.innerHTML =
+            `<span class="chat-pueblo-info-titulo">${titulo}</span>` +
+            `<span class="chat-pueblo-info-contadores">` +
+            `<span class="chat-pueblo-info-contador on">${activos} <em>en línea</em></span>` +
+            `<span class="chat-pueblo-info-contador tot">${users.length} <em>total</em></span>` +
+            `</span>`;
+    }
+    if (!panel) return;
+    panel.innerHTML = '';
     const lista = document.createElement('div');
     lista.className = 'chat-pueblo-usuarios';
     if (users.length) {

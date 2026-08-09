@@ -101,59 +101,53 @@
     display: block;
 }
 
-/* Panel del municipio seleccionado (usuarios) */
-.chat-pueblo-panel {
-    padding: 10px 4px 0;
+/* Barra de información superior: nombre (izq.) + contadores (der.) */
+.chat-pueblo-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 8px 8px;
 }
-.chat-pueblo-panel-titulo {
-    text-align: center; /* nombre del pueblo en el centro */
-    font-size: 15px;
+.chat-pueblo-info-titulo {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
     font-weight: 700;
     color: var(--color-text, #1a1a1a);
-    padding: 2px 6px;
+    text-align: left; /* justificado a la izquierda */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.chat-pueblo-panel-municipio {
-    font-size: 13px;
+.chat-pueblo-info-municipio {
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--color-text-muted, #888);
 }
-.chat-pueblo-panel-contadores {
+.chat-pueblo-info-contadores {
     display: flex;
     align-items: center;
-    justify-content: center; /* los dos círculos en el centro */
-    gap: 24px;
-    padding: 8px 0 2px;
+    gap: 12px;
+    flex-shrink: 0;
 }
-.chat-pueblo-contador {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-.chat-pueblo-contador-circle {
-    min-width: 30px;
-    height: 30px;
-    padding: 0 7px;
-    border-radius: 15px;
-    color: #fff;
+.chat-pueblo-info-contador {
     font-size: 12px;
-    font-weight: 800;
-    line-height: 30px;
-    text-align: center;
-    box-sizing: border-box;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+    font-weight: 700;
+    white-space: nowrap;
 }
-.chat-pueblo-contador-activos {
-    background: linear-gradient(135deg, #66bb6a, #2e7d32);
-}
-.chat-pueblo-contador-total {
-    background: linear-gradient(135deg, #ef5350, #c62828);
-}
-.chat-pueblo-contador small {
-    font-size: 9px;
+.chat-pueblo-info-contador em {
+    font-style: normal;
     font-weight: 600;
+    font-size: 11px;
     color: var(--color-text-muted, #888);
-    letter-spacing: 0.2px;
+    margin-left: 2px;
+}
+.chat-pueblo-info-contador.on {
+    color: #2e7d32;
+}
+.chat-pueblo-info-contador.tot {
+    color: #c62828;
 }
 .chat-pueblo-usuarios {
     display: flex;
@@ -413,14 +407,21 @@
 [data-theme="dark"] .chat-user-row:hover {
     background: #242424;
 }
+[data-theme="dark"] .chat-pueblo-info-contador.on {
+    color: #66bb6a;
+}
+[data-theme="dark"] .chat-pueblo-info-contador.tot {
+    color: #ef5350;
+}
 [data-theme="dark"] .chat-pueblo-slide-bandera {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 [data-theme="dark"] .chat-pueblo-slide-bandera-vacia {
     background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
 }
-[data-theme="dark"] .chat-pueblo-contador-circle {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+/* Panel de la lista de usuarios del municipio seleccionado */
+.chat-pueblo-panel {
+    padding: 6px 4px 0;
 }
 [data-theme="dark"] .chat-input {
     background: #1f1f1f;
