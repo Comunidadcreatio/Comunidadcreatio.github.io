@@ -434,14 +434,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Ancho máximo del 100%: la fila no estira el degradado, solo se alinea
-       a la derecha; desliza horizontalmente cuando hay muchos círculos */
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: visible;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    /* Sin recorte: los badges de los círculos sobresalen libremente; si hay
+       muchos círculos, la fila desborda la pantalla hacia la izquierda */
+    overflow: visible;
 }
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;
@@ -462,7 +457,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    /* Sin overflow hidden: el badge numérico debe poder sobresalir del borde */
+    overflow: visible;
     font-family: inherit;
     transition: transform 0.15s;
 }
@@ -470,6 +466,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
     display: block;
 }
 .chat-conv-circle:hover {
@@ -482,13 +479,18 @@
 #btn-chat-global {
     position: relative;
 }
-/* Punto rojo en el icono de chat del nav (arriba a la derecha) */
+/* Punto rojo en el icono de chat del nav: anclado al icono (no al botón),
+   pequeño y en la esquina inferior derecha del icono */
+.chat-nav-icon-wrap {
+    position: relative;
+    display: inline-flex;
+}
 .chat-nav-badge {
     position: absolute;
-    top: 3px;
-    right: 10px;
-    width: 9px;
-    height: 9px;
+    bottom: -2px;
+    right: -5px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #e53935;
     border: 2px solid var(--color-bg, #fff);
