@@ -57,20 +57,24 @@
         .then(function(data) {
             var localVer = localStorage.getItem('app_version');
             var apkUrl = (data && data.apk) || '';
-            // Solo se ofrece el APK a apps nativas sin el plugin de push,
-            // y si no se ocultó el aviso en las últimas 24h
-            var necesitaApk = apkSinPush() && !!apkUrl && !apkAvisoOcultoReciente();
+            var esNativa = esAppNativa();
+            // En apps nativas con APK disponible, la pastilla de versión nueva
+            // SIEMPRE ofrece descargar la app (sin depender del aviso de 24h).
+            var descargarDisponible = esNativa && !!apkUrl;
+            // Aviso independiente solo para APKs viejos sin el plugin de push,
+            // y si no se ocultó en las últimas 24h.
+            var necesitaApkStandalone = apkSinPush() && !!apkUrl && !apkAvisoOcultoReciente();
 
             // Primera visita: guardar versión y salir (el aviso de APK sí aplica)
             if (!localVer) {
                 localStorage.setItem('app_version', data.version);
-                if (necesitaApk) mostrarPillApk(apkUrl);
+                if (necesitaApkStandalone) mostrarPillApk(apkUrl);
                 return;
             }
 
             if (data.version !== localVer) {
-                mostrarPillActualizar(data.version, data.apk, necesitaApk);
-            } else if (necesitaApk) {
+                mostrarPillActualizar(data.version, data.apk, descargarDisponible);
+            } else if (necesitaApkStandalone) {
                 mostrarPillApk(apkUrl);
             }
         })

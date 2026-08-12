@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.354';
+        var currentVer = '1.0.355';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -899,6 +899,6 @@
     <script src="js/ciudades.js?v=b803270665"></script>
     <script src="js/main.js?v=b41e576dd1" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
-    <script src="js/version-check.js?v=ce1020a77c"></script>
+    <script src="js/version-check.js?v=640e09febb"></script>
 </body>
 </html>
