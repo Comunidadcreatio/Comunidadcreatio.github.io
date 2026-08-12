@@ -3,7 +3,7 @@
 // Economía: sin websockets. El cliente hace polling condicional — solo
 // mientras el chat está abierto y la pestaña visible — pidiendo
 // GET /chat/mensajes?canal=...&afterId=último (respuestas de pocos KB).
-import { apiRequest } from './config.js';
+import { apiRequest, API_BASE_URL } from './config.js';
 import { artistaActual } from './auth.js';
 import { escapeHtml, debugLog } from './utils.js';
 import { encontrarSeccionActual, actualizarEstadoNavButtons } from './galeria-ui.js';
@@ -92,6 +92,485 @@ function scrollMensajes() {
 }
 
 // ============================================
+// TOAST (aviso breve)
+// ============================================
+function mostrarToast(msg) {
+    let t = document.getElementById('chat-toast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'chat-toast';
+        t.className = 'chat-toast';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+
+// ============================================
+// MENÚS FLOTANTES (mensajes, sala, filas del directorio)
+// ============================================
+function cerrarMenusFlotantes() {
+    if (menuActual) {
+        menuActual.menu.remove();
+        menuActual.velo.remove();
+        menuActual = null;
+    }
+    const v = document.querySelector('.chat-menu-velo');
+    if (v) v.remove();
+    const p = document.querySelector('.chat-picker');
+    if (p) p.remove();
+}
+
+function abrirMenuOpciones(items, x, y) {
+    cerrarMenusFlotantes();
+    const menu = document.createElement('div');
+    menu.className = 'chat-menu';
+    items.forEach(it => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chat-menu-item';
+        b.textContent = it.txt;
+        b.addEventListener('click', () => { cerrarMenusFlotantes(); it.fn(); });
+        menu.appendChild(b);
+    });
+    const velo = document.createElement('div');
+    velo.className = 'chat-menu-velo';
+    velo.addEventListener('click', cerrarMenusFlotantes);
+    document.body.appendChild(velo);
+    document.body.appendChild(menu);
+    menuActual = { menu, velo };
+    requestAnimationFrame(() => {
+        menu.style.left = Math.min(window.innerWidth - menu.offsetWidth - 8, Math.max(8, x)) + 'px';
+        menu.style.top = Math.min(window.innerHeight - menu.offsetHeight - 8, Math.max(8, y)) + 'px';
+    });
+}
+
+// ============================================
+// REACCIONES EMOJI
+// ============================================
+function renderReacciones(div, reacciones, mensajeId) {
+    const antiguo = div.querySelector('.chat-msg-reacciones');
+    if (antiguo) antiguo.remove();
+    const cont = document.createElement('div');
+    cont.className = 'chat-msg-reacciones';
+    const reac = reacciones || {};
+    EMOJIS_REACCION.forEach(e => {
+        if (!reac[e]) return;
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chat-reaccion-chip' + (reac[e].mio ? ' mio' : '');
+        chip.innerHTML = `${e}<span>${reac[e].n}</span>`;
+        chip.addEventListener('click', () => toggleReaccion(mensajeId, e, div));
+        cont.appendChild(chip);
+    });
+    const mas = document.createElement('button');
+    mas.type = 'button';
+    mas.className = 'chat-reaccion-mas';
+    mas.textContent = '➕';
+    mas.setAttribute('aria-label', 'Reaccionar');
+    mas.addEventListener('click', (ev) => { ev.stopPropagation(); abrirPickerReacciones(div, mensajeId); });
+    cont.appendChild(mas);
+    div.appendChild(cont);
+}
+
+async function toggleReaccion(mensajeId, emoji, div) {
+    try {
+        const data = await apiRequest('/chat/reaccion', {
+            method: 'POST',
+            body: JSON.stringify({ mensaje_id: mensajeId, emoji })
+        });
+        if (data && data.success) {
+            renderReacciones(div, data.reacciones || {}, mensajeId);
+        }
+    } catch (e) { debugLog.error('reaccion:', e); }
+}
+
+function abrirPickerReacciones(div, mensajeId) {
+    cerrarMenusFlotantes();
+    const velo = document.createElement('div');
+    velo.className = 'chat-menu-velo';
+    velo.addEventListener('click', cerrarMenusFlotantes);
+    const picker = document.createElement('div');
+    picker.className = 'chat-picker';
+    EMOJIS_REACCION.forEach(e => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chat-picker-emoji';
+        b.textContent = e;
+        b.addEventListener('click', () => { cerrarMenusFlotantes(); toggleReaccion(mensajeId, e, div); });
+        picker.appendChild(b);
+    });
+    document.body.appendChild(velo);
+    document.body.appendChild(picker);
+    const r = div.getBoundingClientRect();
+    requestAnimationFrame(() => {
+        picker.style.top = Math.max(8, r.top - picker.offsetHeight - 6) + 'px';
+        picker.style.left = Math.min(window.innerWidth - picker.offsetWidth - 8, Math.max(8, r.left)) + 'px';
+    });
+}
+
+// ============================================
+// MENÚ DE ACCIONES DE UN MENSAJE (pulsación larga / clic derecho)
+// ============================================
+function setupMsgMenu(div, m, esPropio) {
+    let timer = null, sx = 0, sy = 0, activado = false;
+    const UMBRAL = 450, MOVER = 10;
+    function cancelar() { if (timer) { clearTimeout(timer); timer = null; } activado = false; }
+    div.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        sx = e.clientX; sy = e.clientY; activado = false;
+        timer = setTimeout(() => { activado = true; abrirMenuMensaje(div, m, esPropio, e.clientX, e.clientY); }, UMBRAL);
+    });
+    div.addEventListener('pointermove', (e) => {
+        if (timer && (Math.abs(e.clientX - sx) > MOVER || Math.abs(e.clientY - sy) > MOVER)) cancelar();
+    });
+    div.addEventListener('pointerup', () => { if (timer && !activado) cancelar(); });
+    div.addEventListener('pointerleave', () => { if (timer && !activado) cancelar(); });
+    div.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        cancelar();
+        abrirMenuMensaje(div, m, esPropio, e.clientX, e.clientY);
+    });
+    // Evita que el clic posterior a una pulsación larga dispare algo
+    div.addEventListener('click', (e) => {
+        if (activado) { e.preventDefault(); e.stopPropagation(); activado = false; }
+    });
+}
+
+function abrirMenuMensaje(div, m, esPropio, x, y) {
+    const items = [
+        { txt: '❤️ Reaccionar', fn: () => abrirPickerReacciones(div, m.id) },
+        { txt: '↩️ Responder', fn: () => iniciarRespuesta(m) }
+    ];
+    if (esPropio && !m.eliminado && m.tipo_mensaje === 'texto') {
+        items.push({ txt: '✏️ Editar', fn: () => editarMensaje(div, m) });
+    }
+    if (esPropio && !m.eliminado) {
+        items.push({ txt: '🗑️ Borrar', fn: () => borrarMensaje(div, m) });
+    }
+    abrirMenuOpciones(items, x, y);
+}
+
+// ============================================
+// RESPONDER A UN MENSAJE
+// ============================================
+function iniciarRespuesta(m) {
+    replyTo = {
+        id: m.id,
+        autor: m.nombre_artista || 'Usuario',
+        contenido: m.tipo_mensaje === 'imagen' ? '📷 Imagen' : (m.contenido || ''),
+        tipo: m.tipo_mensaje
+    };
+    const bar = document.getElementById('chat-reply-bar');
+    if (bar) {
+        bar.classList.remove('hidden');
+        const info = document.getElementById('chat-reply-info');
+        if (info) info.textContent = `Respondiendo a ${replyTo.autor}: ${replyTo.contenido.slice(0, 60)}`;
+    }
+    const input = document.getElementById('chat-input');
+    if (input) input.focus();
+}
+
+function cancelarRespuesta() {
+    replyTo = null;
+    const bar = document.getElementById('chat-reply-bar');
+    if (bar) bar.classList.add('hidden');
+}
+
+// ============================================
+// EDITAR / BORRAR MENSAJE
+// ============================================
+function editarMensaje(div, m) {
+    const cuerpo = div.querySelector('.chat-msg-texto');
+    if (!cuerpo) return;
+    const textoActual = cuerpo.textContent;
+    const ta = document.createElement('textarea');
+    ta.className = 'chat-edit-input';
+    ta.value = textoActual;
+    ta.maxLength = 1000;
+    const guardar = document.createElement('button');
+    guardar.type = 'button';
+    guardar.className = 'chat-edit-guardar';
+    guardar.textContent = '✓';
+    const cancelar = document.createElement('button');
+    cancelar.type = 'button';
+    cancelar.className = 'chat-edit-cancelar';
+    cancelar.textContent = '✕';
+    cuerpo.replaceWith(ta);
+    ta.insertAdjacentElement('afterend', guardar);
+    guardar.insertAdjacentElement('afterend', cancelar);
+    const restaurar = () => {
+        const txt = document.createElement('span');
+        txt.className = 'chat-msg-texto';
+        txt.textContent = textoActual;
+        ta.replaceWith(txt);
+        guardar.remove();
+        cancelar.remove();
+    };
+    guardar.addEventListener('click', async () => {
+        const nuevo = ta.value.trim();
+        if (!nuevo || nuevo === textoActual) { restaurar(); return; }
+        try {
+            const data = await apiRequest(`/chat/mensajes/${m.id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ contenido: nuevo })
+            });
+            if (data && data.success) {
+                const txt = document.createElement('span');
+                txt.className = 'chat-msg-texto';
+                txt.textContent = nuevo;
+                ta.replaceWith(txt);
+                guardar.remove();
+                cancelar.remove();
+                if (!div.querySelector('.chat-msg-editado')) {
+                    div.insertAdjacentHTML('beforeend', '<span class="chat-msg-editado">(editado)</span>');
+                }
+            } else {
+                mostrarToast((data && data.error) || 'No se pudo editar');
+            }
+        } catch (e) { debugLog.error('editar:', e); mostrarToast('Error al editar'); }
+    });
+    cancelar.addEventListener('click', restaurar);
+    ta.focus();
+}
+
+async function borrarMensaje(div, m) {
+    if (!window.confirm('¿Borrar este mensaje?')) return;
+    try {
+        const data = await apiRequest(`/chat/mensajes/${m.id}`, { method: 'DELETE' });
+        if (data && data.success) {
+            div.classList.add('eliminado');
+            div.querySelectorAll('.chat-msg-texto, .chat-msg-imagen, .chat-msg-reacciones, .chat-msg-editado, .chat-msg-reply').forEach(el => el.remove());
+            div.insertAdjacentHTML('beforeend', '<span class="chat-msg-eliminado-texto">🗑️ Mensaje eliminado</span>');
+        } else {
+            mostrarToast((data && data.error) || 'No se pudo borrar');
+        }
+    } catch (e) { debugLog.error('borrar:', e); mostrarToast('Error al borrar'); }
+}
+
+// ============================================
+// INDICADOR "ESCRIBIENDO…"
+// ============================================
+function setupTypingInput() {
+    const input = document.getElementById('chat-input');
+    if (!input) return;
+    input.addEventListener('input', () => {
+        const ahora = Date.now();
+        if (!input.value.trim()) return;
+        if (ahora - ultimoTypingEnvio < 2500) return;
+        ultimoTypingEnvio = ahora;
+        apiRequest('/chat/typing', { method: 'POST', body: JSON.stringify({ canal: canalActivo }) }).catch(() => {});
+    });
+}
+
+function mostrarTyping(ids) {
+    const el = document.getElementById('chat-typing');
+    if (!el) return;
+    if (!ids || !ids.length || !canalActivo) { el.classList.add('hidden'); return; }
+    let texto = null;
+    if (!canalEsPriv) {
+        texto = 'Alguien está escribiendo…';
+    } else if (canalOtroId && ids.includes(canalOtroId)) {
+        texto = `${canalOtroNombre || 'Alguien'} está escribiendo…`;
+    }
+    if (texto === null) { el.classList.add('hidden'); return; }
+    el.textContent = texto;
+    el.classList.remove('hidden');
+}
+
+// ============================================
+// VISTO / RECIBIDO (✓✓)
+// ============================================
+function actualizarTicksLeidos(hasta) {
+    leidoHastaLocal = hasta || 0;
+    document.querySelectorAll('#chat-mensajes .chat-msg.own[data-id]').forEach(el => {
+        const id = parseInt(el.dataset.id, 10);
+        const t = el.querySelector('.chat-msg-leido');
+        if (t && id > 0) t.textContent = id <= leidoHastaLocal ? '✓✓' : '✓';
+    });
+}
+
+// ============================================
+// ENVIAR IMAGEN
+// ============================================
+function setupImagenBtn() {
+    const btn = document.getElementById('chat-imagen-btn');
+    const fileInput = document.getElementById('chat-imagen-input');
+    if (!btn || !fileInput) return;
+    btn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+        const file = fileInput.files && fileInput.files[0];
+        fileInput.value = '';
+        if (!file || !canalActivo) return;
+        if (file.size > 8 * 1024 * 1024) {
+            mostrarToast('La imagen es demasiado grande (máx. 8 MB)');
+            return;
+        }
+        const caption = document.getElementById('chat-input').value.trim();
+        btn.disabled = true;
+        btn.textContent = '⏳';
+        try {
+            const fd = new FormData();
+            fd.append('imagen', file);
+            const res = await fetch(`${API_BASE_URL_CHAT}/chat/imagen`, { method: 'POST', credentials: 'include', body: fd });
+            let data = null;
+            try { data = await res.json(); } catch (e) { /* no JSON */ }
+            if (data && data.success && data.url) {
+                document.getElementById('chat-input').value = '';
+                const envio = await apiRequest('/chat/mensajes', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        canal: canalActivo,
+                        tipo_mensaje: 'imagen',
+                        imagen_url: data.url,
+                        contenido: caption,
+                        responde_a: replyTo ? replyTo.id : null
+                    })
+                });
+                if (envio && envio.success && envio.mensaje) {
+                    appendMensaje(envio.mensaje, true);
+                    scrollMensajes();
+                    cancelarRespuesta();
+                } else {
+                    mostrarToast((envio && envio.error) || 'No se pudo enviar la imagen');
+                }
+            } else {
+                mostrarToast((data && data.error) || 'Error al subir la imagen');
+            }
+        } catch (e) {
+            debugLog.error('subir imagen:', e);
+            mostrarToast('Error de conexión al subir la imagen');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🖼️';
+        }
+    });
+}
+
+// ============================================
+// BLOQUEAR / DENUNCIAR USUARIO
+// ============================================
+function setupSalaMenu() {
+    const btn = document.getElementById('chat-sala-menu-btn');
+    if (!btn) return;
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!canalEsPriv || !canalOtroId) return;
+        const r = btn.getBoundingClientRect();
+        abrirMenuOpciones([
+            { txt: '🚫 Bloquear usuario', fn: () => bloquearUsuario(canalOtroId, canalOtroNombre) },
+            { txt: '⚠️ Denunciar usuario', fn: () => denunciarUsuario(canalOtroId, canalOtroNombre) }
+        ], r.left, r.bottom + 4);
+    });
+}
+
+async function bloquearUsuario(uid, nombre) {
+    if (!window.confirm(`¿Bloquear a ${nombre}? No podrán enviarse mensajes en ninguna dirección.`)) return;
+    try {
+        const data = await apiRequest('/chat/bloquear', { method: 'POST', body: JSON.stringify({ usuario_id: uid }) });
+        mostrarToast(data && data.success ? '🚫 Usuario bloqueado' : ((data && data.error) || 'Error al bloquear'));
+    } catch (e) { mostrarToast('Error al bloquear'); }
+}
+
+async function denunciarUsuario(uid, nombre) {
+    const motivo = window.prompt(`Motivo de la denuncia a ${nombre}:`, '');
+    if (motivo === null) return;
+    const texto = motivo.trim();
+    if (!texto) { mostrarToast('Motivo requerido'); return; }
+    try {
+        const data = await apiRequest('/chat/denunciar', {
+            method: 'POST',
+            body: JSON.stringify({ usuario_id: uid, motivo: texto.slice(0, 300) })
+        });
+        mostrarToast(data && data.success ? '⚠️ Denuncia enviada. ¡Gracias!' : ((data && data.error) || 'Error al denunciar'));
+    } catch (e) { mostrarToast('Error al denunciar'); }
+}
+
+// Menú de bloqueo/denuncia en las filas del directorio (pulsación larga)
+function setupUsuarioRowMenu(row, u) {
+    let timer = null, sx = 0, sy = 0, activado = false;
+    const UMBRAL = 450, MOVER = 10;
+    function cancelar() { if (timer) { clearTimeout(timer); timer = null; } activado = false; }
+    row.addEventListener('pointerdown', (e) => {
+        sx = e.clientX; sy = e.clientY; activado = false;
+        timer = setTimeout(() => {
+            activado = true;
+            abrirMenuOpciones([
+                { txt: '💬 Abrir chat', fn: () => abrirPrivado(u) },
+                { txt: '🚫 Bloquear', fn: () => bloquearUsuario(u.id, u.nombre_artista) },
+                { txt: '⚠️ Denunciar', fn: () => denunciarUsuario(u.id, u.nombre_artista) }
+            ], e.clientX, e.clientY);
+        }, UMBRAL);
+    });
+    row.addEventListener('pointermove', (e) => {
+        if (timer && (Math.abs(e.clientX - sx) > MOVER || Math.abs(e.clientY - sy) > MOVER)) cancelar();
+    });
+    row.addEventListener('pointerup', () => { if (timer && !activado) cancelar(); });
+    row.addEventListener('pointerleave', () => { if (timer && !activado) cancelar(); });
+    row.addEventListener('click', (e) => {
+        if (activado) { e.stopImmediatePropagation(); e.preventDefault(); activado = false; }
+    }, true); // capture: corre antes que el clic de abrir el chat
+}
+
+// ============================================
+// BUSCADOR DE ARTISTAS EN EL DIRECTORIO
+// ============================================
+function setupBuscador() {
+    const cont = document.getElementById('chat-accordion');
+    if (!cont) return;
+    if (cont.querySelector('.chat-buscador')) return;
+    const box = document.createElement('div');
+    box.className = 'chat-buscador';
+    box.innerHTML = '<input type="search" id="chat-buscar" class="chat-buscar" placeholder="🔍 Buscar artista…" autocomplete="off" aria-label="Buscar artista">';
+    cont.insertBefore(box, cont.firstChild);
+    const input = box.querySelector('input');
+    input.addEventListener('input', () => {
+        const q = input.value.trim().toLowerCase();
+        const carrusel = cont.querySelector('.chat-pueblos-carrusel');
+        const info = cont.querySelector('.chat-pueblo-info');
+        const panel = document.getElementById('chat-pueblo-panel');
+        if (q.length < 2) {
+            if (carrusel) carrusel.style.display = '';
+            if (info) info.style.display = '';
+            if (panel) {
+                if (ultimoPuebloSeleccionado && ultimosPueblos[ultimoPuebloSeleccionado]) renderUsuariosPueblo(ultimoPuebloSeleccionado);
+                else panel.innerHTML = '<div class="chat-pueblo-vacio">Desliza para elegir un municipio</div>';
+            }
+            return;
+        }
+        if (carrusel) carrusel.style.display = 'none';
+        if (info) info.style.display = 'none';
+        const resultados = [];
+        Object.entries(ultimosPueblos).forEach(([ciudad, users]) => {
+            (users || []).forEach(u => {
+                const nom = (u.nombre_artista || '').toLowerCase();
+                if (nom.includes(q)) resultados.push(Object.assign({}, u, { ciudad }));
+            });
+        });
+        if (!panel) return;
+        panel.innerHTML = `<div class="chat-buscar-titulo">Resultados (${resultados.length})</div>`;
+        const lista = document.createElement('div');
+        lista.className = 'chat-pueblo-usuarios';
+        if (resultados.length) {
+            resultados.slice(0, 30).forEach(u => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'chat-user-row';
+                row.innerHTML = estadoUsuarioHTML(u);
+                row.addEventListener('click', () => abrirPrivado(u));
+                setupUsuarioRowMenu(row, u);
+                lista.appendChild(row);
+            });
+        } else {
+            lista.innerHTML = '<div class="chat-pueblo-vacio">Sin resultados</div>';
+        }
+        panel.appendChild(lista);
+    });
+}
+
+// ============================================
 // APERTURA / CIERRE DEL PANEL
 // ============================================
 export function setupChat() {
@@ -111,6 +590,11 @@ export function setupChat() {
     document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
     setupDragEliminar();
+    setupImagenBtn();
+    setupTypingInput();
+    setupSalaMenu();
+    const replyCancel = document.getElementById('chat-reply-cancel');
+    if (replyCancel) replyCancel.addEventListener('click', cancelarRespuesta);
 
     // Abrir una conversación desde una notificación push (evento de js/push.js)
     window.addEventListener('chat-abrir-canal', (e) => {
@@ -178,6 +662,10 @@ function volverDirectorio() {
     detenerPoll();
     canalActivo = null;
     window._canalChatActivo = null;
+    cancelarRespuesta();
+    const typ = document.getElementById('chat-typing');
+    if (typ) typ.classList.add('hidden');
+    cerrarMenusFlotantes();
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
     setFabVisible(true); // de vuelta al directorio
@@ -186,6 +674,19 @@ function volverDirectorio() {
 
 let noLeidos = {}; // canal -> nº de mensajes sin leer (viene de GET /chat/no-leidos)
 let ultimosPueblos = {}; // último directorio recibido (para volver al grid desde un pueblo)
+
+// ---- Estado de las funciones nuevas ----
+let replyTo = null;           // mensaje que se está respondiendo {id, autor, contenido, tipo}
+let leidoHastaLocal = 0;      // hasta qué id leyó el otro participante (priv) → ✓✓
+let canalEsPriv = false;
+let canalOtroId = null;
+let canalOtroNombre = '';
+let ultimoTypingEnvio = 0;    // throttle del POST /chat/typing
+let menuActual = null;        // {menu, velo} del menú flotante abierto
+let toastTimer = null;
+
+const EMOJIS_REACCION = ['❤️', '👍', '😂', '😮', '🎉', '😢', '🔥'];
+const API_BASE_URL_CHAT = API_BASE_URL || '';
 
 // Aplica los badges de no leídos: punto en el icono del nav, número en el FAB
 // de la sala global y en cada círculo de conversación.
@@ -282,6 +783,9 @@ function renderCarruselPueblos(pueblos) {
     info.innerHTML = '<span class="chat-pueblo-info-titulo">Desliza para elegir un municipio</span>';
     cont.appendChild(info);
 
+    // Buscador de artistas (encima del carrusel)
+    setupBuscador();
+
     cont.appendChild(carrusel);
 
     const panel = document.createElement('div');
@@ -363,6 +867,7 @@ function renderUsuariosPueblo(ciudad) {
             row.className = 'chat-user-row';
             row.innerHTML = estadoUsuarioHTML(u);
             row.addEventListener('click', () => abrirPrivado(u));
+            setupUsuarioRowMenu(row, u);
             lista.appendChild(row);
         });
     } else {
@@ -422,6 +927,15 @@ async function abrirSala(canal, titulo, fotoOtro) {
     lastId = 0;
     setFabVisible(false); // al entrar a una sala (global o privada) se oculta
 
+    // Estado del canal privado (para ✓✓, typing y el menú ⋯)
+    canalEsPriv = canal !== 'global';
+    canalOtroId = canalEsPriv ? otroDeCanal(canal) : null;
+    canalOtroNombre = canalEsPriv ? titulo : '';
+    leidoHastaLocal = 0;
+    cancelarRespuesta();
+    const menuBtn = document.getElementById('chat-sala-menu-btn');
+    if (menuBtn) menuBtn.style.display = canalEsPriv ? '' : 'none';
+
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');
 
@@ -441,6 +955,8 @@ async function abrirSala(canal, titulo, fotoOtro) {
         } else {
             cont.innerHTML = '<div class="chat-sin-mensajes">Sin mensajes todavía. ¡Escribe el primero!</div>';
         }
+        if (data && data.leido_hasta != null) leidoHastaLocal = data.leido_hasta;
+        if (data && data.escribiendo) mostrarTyping(data.escribiendo);
         iniciarPoll();
         // La sala está visible: resetea el contador de no leídos de este canal
         marcarLeido(canal);
@@ -450,16 +966,56 @@ async function abrirSala(canal, titulo, fotoOtro) {
     }
 }
 
+// Id del otro participante en un canal privado
+function otroDeCanal(canal) {
+    if (!canal || canal === 'global') return null;
+    const nums = canal.replace('priv:', '').split(':').map(Number);
+    const me = miId();
+    return nums.find(n => n !== me) || null;
+}
+
 function appendMensaje(m, esPropio) {
     const cont = document.getElementById('chat-mensajes');
+    if (!cont) return;
     const vacio = cont.querySelector('.chat-sin-mensajes');
     if (vacio) vacio.remove();
 
     const div = document.createElement('div');
-    div.className = 'chat-msg ' + (esPropio ? 'own' : 'other');
-    const autor = esPropio ? '' : `<div class="chat-msg-autor">${escapeHtml(m.nombre_artista || 'Usuario')}</div>`;
-    div.innerHTML = autor + escapeHtml(m.contenido) + `<span class="chat-msg-tiempo">${formatHora(m.created_at)}</span>`;
+    div.className = 'chat-msg ' + (esPropio ? 'own' : 'other') + (m.eliminado ? ' eliminado' : '');
+    div.dataset.id = m.id;
+    if (esPropio) div.dataset.own = '1';
+
+    let html = '';
+    if (!esPropio) {
+        html += `<div class="chat-msg-autor">${escapeHtml(m.nombre_artista || 'Usuario')}</div>`;
+    }
+    // Cita de respuesta
+    if (m.responde) {
+        const textoResp = m.responde.tipo === 'imagen' ? '📷 Imagen' : (m.responde.contenido || '');
+        html += `<div class="chat-msg-reply"><span class="chat-msg-reply-autor">${escapeHtml(m.responde.autor)}</span><span class="chat-msg-reply-texto">${escapeHtml(textoResp)}</span></div>`;
+    }
+    // Cuerpo
+    if (m.eliminado) {
+        html += '<span class="chat-msg-eliminado-texto">🗑️ Mensaje eliminado</span>';
+    } else if (m.tipo_mensaje === 'imagen' && m.imagen_url) {
+        html += `<img class="chat-msg-imagen" src="${m.imagen_url}" alt="Imagen" loading="lazy">`;
+        if (m.contenido) html += `<div class="chat-msg-texto">${escapeHtml(m.contenido)}</div>`;
+    } else {
+        html += `<span class="chat-msg-texto">${escapeHtml(m.contenido || '')}</span>`;
+    }
+    if (m.editado && !m.eliminado) html += '<span class="chat-msg-editado">(editado)</span>';
+    // Pie: hora + visto
+    let pie = `<span class="chat-msg-tiempo">${formatHora(m.created_at)}</span>`;
+    if (esPropio && canalEsPriv) {
+        const leido = (m.leido !== null && m.leido !== undefined) ? m.leido : false;
+        pie += `<span class="chat-msg-leido">${leido ? '✓✓' : '✓'}</span>`;
+    }
+    html += `<span class="chat-msg-pie">${pie}</span>`;
+    div.innerHTML = html;
     cont.appendChild(div);
+
+    renderReacciones(div, m.reacciones || {}, m.id);
+    setupMsgMenu(div, m, esPropio);
     lastId = Math.max(lastId, m.id);
 }
 
@@ -471,13 +1027,18 @@ function iniciarPoll() {
         polling = true;
         try {
             const data = await apiRequest(`/chat/mensajes?canal=${encodeURIComponent(canalActivo)}&afterId=${lastId}`);
-            if (data && data.success && data.mensajes && data.mensajes.length) {
-                data.mensajes.forEach(m => {
-                    if (m.id > lastId) appendMensaje(m, m.autor_id === miId());
-                });
-                scrollMensajes();
-                // Hay mensajes nuevos y la sala está visible: marcar como leído
-                marcarLeido(canalActivo);
+            if (data && data.success) {
+                if (data.mensajes && data.mensajes.length) {
+                    data.mensajes.forEach(m => {
+                        if (m.id > lastId) appendMensaje(m, m.autor_id === miId());
+                    });
+                    scrollMensajes();
+                    // Hay mensajes nuevos y la sala está visible: marcar como leído
+                    marcarLeido(canalActivo);
+                }
+                // "Escribiendo…" y ticks de leído en tiempo real
+                if (data.escribiendo) mostrarTyping(data.escribiendo);
+                if (data.leido_hasta != null) actualizarTicksLeidos(data.leido_hasta);
             }
             refrescarChatNoLeidos(); // mantiene los badges al día mientras el chat está abierto
         } catch (e) {
@@ -526,11 +1087,12 @@ async function enviarMensaje(e) {
     try {
         const data = await apiRequest('/chat/mensajes', {
             method: 'POST',
-            body: JSON.stringify({ canal: canalActivo, contenido: texto })
+            body: JSON.stringify({ canal: canalActivo, contenido: texto, responde_a: replyTo ? replyTo.id : null })
         });
         if (data && data.success && data.mensaje) {
             appendMensaje(data.mensaje, true);
             scrollMensajes();
+            cancelarRespuesta();
         } else {
             input.value = texto;
             debugLog.error('enviar mensaje:', data && data.error);
