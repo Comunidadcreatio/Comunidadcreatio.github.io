@@ -12,7 +12,15 @@
     var isAuthPage = window.location.pathname.endsWith('auth.html');
 
     function esAppNativa() {
-        return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        try {
+            if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function') {
+                return !!window.Capacitor.isNativePlatform();
+            }
+            // Fallback: si Capacitor está definido, es la app nativa (WebView)
+            return !!window.Capacitor;
+        } catch (e) {
+            return false;
+        }
     }
 
     // APK viejo = app nativa que NO expone el plugin de notificaciones (push)
