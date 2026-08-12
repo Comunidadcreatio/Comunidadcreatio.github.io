@@ -54,9 +54,15 @@ body.teclado-abierto #main-header {
 body.teclado-abierto #chat-global {
     overflow: hidden;
     height: calc(100dvh - 50px - var(--status-bar-height, 24px));
+    overscroll-behavior: contain;
 }
 body.teclado-abierto #toggle-panel {
     display: none;
+}
+/* Contiene el rebote para que el input/botones no se desplacen al llegar al final */
+body.teclado-abierto #chat-contenido,
+body.teclado-abierto #chat-sala {
+    overscroll-behavior: contain;
 }
 
 /* ==============================================
@@ -349,6 +355,9 @@ body.teclado-abierto #toggle-panel {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    /* Evita que el rebote (overscroll bounce) se propague y mueva el input */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 .chat-msg {
     max-width: 78%;
