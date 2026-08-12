@@ -496,6 +496,18 @@ function setupImagenBtn() {
 }
 
 // ============================================
+// SYNC DE ENTREGA EN SEGUNDO PLANO (✓✓ gris)
+// ============================================
+// La app abierta marca como ENTREGADOS los mensajes de todas sus
+// conversaciones: el remitente ve ✓✓ gris aunque el otro aún no abra la sala.
+async function syncChatEntregas() {
+    try {
+        await apiRequest('/chat/sync', { method: 'POST', body: '{}' });
+    } catch (e) { /* silencioso: solo es un marcador */ }
+}
+window.syncChatEntregas = syncChatEntregas;
+
+// ============================================
 // BLOQUEAR / DENUNCIAR USUARIO
 // ============================================
 function setupSalaMenu() {

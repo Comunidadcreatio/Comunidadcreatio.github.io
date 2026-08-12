@@ -40,7 +40,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=e60ff743b1';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=ac385b8e85';
 import { setupPush } from './push.js?v=60d889bb24';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -113,6 +113,7 @@ function iniciarSeguimientoActividad() {
         fetchActiveSessionsCount();
         fetchNotificacionesCount();
         refrescarChatNoLeidos(); // badges de chat (nav, círculos, sala global) también con el chat cerrado
+        if (window.syncChatEntregas) window.syncChatEntregas(); // ✓✓ gris: marcar entregados en segundo plano
     }, 30000);
 }
 
