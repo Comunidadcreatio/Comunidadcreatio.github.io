@@ -772,8 +772,8 @@
     padding: 2px 4px;
 }
 
-/* Texto del mensaje (ahora envuelto en span) */
-.chat-msg-texto { display: block; }
+/* Texto del mensaje: inline para que la hora quede justo al lado */
+.chat-msg-texto { display: inline; }
 
 /* Imagen en la burbuja */
 .chat-msg-imagen {
@@ -818,19 +818,21 @@
     opacity: 0.6;
 }
 
-/* Pie del mensaje (hora + visto) */
+/* Pie del mensaje (hora + visto) — inline, justo al lado del texto */
 .chat-msg-pie {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: flex-end;
     gap: 4px;
-    margin-top: 3px;
+    margin-left: 6px;
+    vertical-align: baseline;
 }
 .chat-msg-pie .chat-msg-tiempo { margin-top: 0; }
 .chat-msg-leido {
     font-size: 11px;
     color: #aee9c8;
 }
+.chat-msg-imagen + .chat-msg-pie { margin-left: 0; }
 
 /* Reacciones */
 .chat-msg-reacciones {

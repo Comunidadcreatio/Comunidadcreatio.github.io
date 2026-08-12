@@ -165,14 +165,7 @@ function renderReacciones(div, reacciones, mensajeId) {
         chip.addEventListener('click', () => toggleReaccion(mensajeId, e, div));
         cont.appendChild(chip);
     });
-    const mas = document.createElement('button');
-    mas.type = 'button';
-    mas.className = 'chat-reaccion-mas';
-    mas.textContent = '➕';
-    mas.setAttribute('aria-label', 'Reaccionar');
-    mas.addEventListener('click', (ev) => { ev.stopPropagation(); abrirPickerReacciones(div, mensajeId); });
-    cont.appendChild(mas);
-    div.appendChild(cont);
+    if (cont.childNodes.length) div.appendChild(cont);
 }
 
 async function toggleReaccion(mensajeId, emoji, div) {
@@ -187,7 +180,7 @@ async function toggleReaccion(mensajeId, emoji, div) {
     } catch (e) { debugLog.error('reaccion:', e); }
 }
 
-function abrirPickerReacciones(div, mensajeId) {
+function abrirPickerReacciones(div, m, esPropio) {
     cerrarMenusFlotantes();
     const velo = document.createElement('div');
     velo.className = 'chat-menu-velo';
@@ -199,9 +192,22 @@ function abrirPickerReacciones(div, mensajeId) {
         b.type = 'button';
         b.className = 'chat-picker-emoji';
         b.textContent = e;
-        b.addEventListener('click', () => { cerrarMenusFlotantes(); toggleReaccion(mensajeId, e, div); });
+        b.addEventListener('click', () => { cerrarMenusFlotantes(); toggleReaccion(m.id, e, div); });
         picker.appendChild(b);
     });
+    // Más acciones (responder/editar/borrar) desde el propio picker
+    const mas = document.createElement('button');
+    mas.type = 'button';
+    mas.className = 'chat-picker-mas';
+    mas.textContent = '⋯';
+    mas.setAttribute('aria-label', 'Más opciones');
+    mas.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const r = picker.getBoundingClientRect();
+        cerrarMenusFlotantes();
+        abrirMenuMensaje(div, m, esPropio, r.left, r.bottom + 4);
+    });
+    picker.appendChild(mas);
     document.body.appendChild(velo);
     document.body.appendChild(picker);
     const r = div.getBoundingClientRect();
@@ -221,7 +227,7 @@ function setupMsgMenu(div, m, esPropio) {
     div.addEventListener('pointerdown', (e) => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         sx = e.clientX; sy = e.clientY; activado = false;
-        timer = setTimeout(() => { activado = true; abrirMenuMensaje(div, m, esPropio, e.clientX, e.clientY); }, UMBRAL);
+        timer = setTimeout(() => { activado = true; abrirPickerReacciones(div, m, esPropio); }, UMBRAL);
     });
     div.addEventListener('pointermove', (e) => {
         if (timer && (Math.abs(e.clientX - sx) > MOVER || Math.abs(e.clientY - sy) > MOVER)) cancelar();
@@ -241,7 +247,7 @@ function setupMsgMenu(div, m, esPropio) {
 
 function abrirMenuMensaje(div, m, esPropio, x, y) {
     const items = [
-        { txt: '❤️ Reaccionar', fn: () => abrirPickerReacciones(div, m.id) },
+        { txt: '❤️ Reaccionar', fn: () => abrirPickerReacciones(div, m, esPropio) },
         { txt: '↩️ Responder', fn: () => iniciarRespuesta(m) }
     ];
     if (esPropio && !m.eliminado && m.tipo_mensaje === 'texto') {
