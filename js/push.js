@@ -152,6 +152,9 @@ export function setupPush() {
         });
 
         const d = (n && n.data) || {};
+        // En mensajes chat data-only, title/body vienen dentro de data
+        const tituloNotif = (n && n.title) || d.title || 'Nuevo mensaje';
+        const cuerpoNotif = (n && n.body) || d.body || '';
         if (d.tipo === 'chat') {
             // Si ya estás viendo esa conversación, el polling la muestra:
             // no hace falta banner. (En segundo plano el sistema notifica.)
@@ -159,20 +162,20 @@ export function setupPush() {
                 diag('suppressed', 'Chat activo — banner suprimido (canal=' + d.canal + ')');
                 return;
             }
-            diag('banner', 'Mostrando banner chat: ' + (d.otro_nombre || '?') + ' — ' + (n.body || '').slice(0, 60));
+            diag('banner', 'Mostrando banner chat: ' + (d.otro_nombre || '?') + ' — ' + cuerpoNotif.slice(0, 60));
             // En segundo plano/cerrada, el sistema muestra la notificación
-            // con la imagen grande (BigPicture). En primer plano, banner + sonido.
+            // estilo chat (MessagingStyle). En primer plano, banner + sonido.
             reproducirSonidoNotificacion();
-            mostrarBannerChat(d, n.title || 'Nuevo mensaje', n.body || '');
+            mostrarBannerChat(d, tituloNotif, cuerpoNotif);
             return;
         }
-        if (n && (n.title || n.body)) {
+        if (tituloNotif || cuerpoNotif) {
             diag('localNotif', 'Programando notificación local para sonido');
             Push.schedule({
                 notifications: [{
                     id: Math.floor(Date.now() / 1000) % 2147483647,
-                    title: n.title || 'Creatio',
-                    body: n.body || '',
+                    title: tituloNotif,
+                    body: cuerpoNotif,
                     channelId: 'chat',
                     data: n.data || {}
                 }]
