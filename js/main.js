@@ -41,7 +41,7 @@ import {
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=9086def862';
-import { setupPush } from './push.js?v=87fad882bc';
+import { setupPush } from './push.js?v=126b24dcf2';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 

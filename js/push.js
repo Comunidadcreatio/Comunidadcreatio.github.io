@@ -173,7 +173,7 @@ export function setupPush() {
                     id: Math.floor(Date.now() / 1000) % 2147483647,
                     title: n.title || 'Creatio',
                     body: n.body || '',
-                    channelId: 'default',
+                    channelId: 'chat',
                     data: n.data || {}
                 }]
             }).catch((e) => diag('localNotifError', e.message || String(e)));
@@ -216,15 +216,31 @@ export function setupPush() {
                 diag('permDenied', '⚠️ Permiso de notificaciones DENEGADO — no se registrará para push');
                 return;
             }
-            // Canal de notificaciones (Android) para las locales en primer plano
+            // Canales de notificación (Android)
             if (Push.createChannel) {
-                diag('channel', 'Creando canal "default"…');
+                // Canal dedicado de chat: sonido + vibración + luz de acento.
+                // Se usa para las notificaciones externas (app cerrada/segundo plano)
+                // y es configurable por el usuario en Ajustes → Notificaciones.
+                diag('channel', 'Creando canal "chat"…');
+                Push.createChannel({
+                    id: 'chat',
+                    name: 'Mensajes de chat',
+                    description: 'Sonido y vibración al recibir mensajes',
+                    importance: 4,
+                    visibility: 1,
+                    sound: 'default',
+                    vibration: true,
+                    lights: true,
+                    lightColor: '#C0392B'
+                }).then(() => diag('channel', 'Canal "chat" creado OK'))
+                  .catch((e) => diag('channelError', e.message || String(e)));
+                // Canal genérico para las locales en primer plano (like/comment)
                 Push.createChannel({
                     id: 'default',
                     name: 'Notificaciones',
                     importance: 4,
                     visibility: 1
-                }).then(() => diag('channel', 'Canal creado OK'))
+                }).then(() => diag('channel', 'Canal "default" creado OK'))
                   .catch((e) => diag('channelError', e.message || String(e)));
             }
             diag('register', 'Llamando Push.register()…');
