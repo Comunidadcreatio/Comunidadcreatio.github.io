@@ -687,18 +687,34 @@ function setupKeyboardHandling() {
         document.body.classList.toggle('teclado-abierto', keyboardOpen);
         if (chat) {
             if (keyboardOpen) {
-                // Altura visible real menos el header (la barra inferior se desliza fuera)
                 const headerH = header ? header.offsetHeight : (50 + 24);
                 const nueva = Math.max(200, vv.height - headerH);
-                // Solo actualizar si cambió al menos 6px: evita transiciones espurias
-                // durante el despliegue del teclado (la transición CSS las suaviza)
                 if (Math.abs(nueva - ultimaAltura) > 6) {
+                    if (ultimaAltura === -1) {
+                        // Primera vez: la altura salta al instante (sin hueco) pero
+                        // el formulario se desliza hacia arriba a la misma velocidad
+                        // del teclado usando transform (no afecta el layout).
+                        const form = document.querySelector('.chat-form');
+                        const vieja = chat.offsetHeight;
+                        const gap = Math.max(0, vieja - nueva);
+                        chat.style.height = nueva + 'px';
+                        if (form && gap > 0) {
+                            form.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
+                            form.style.transform = `translateY(${gap}px)`;
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => { form.style.transform = 'translateY(0)'; });
+                            });
+                        }
+                    } else {
+                        chat.style.height = nueva + 'px';
+                    }
                     ultimaAltura = nueva;
-                    chat.style.height = nueva + 'px';
                 }
             } else {
                 chat.style.height = '';
                 ultimaAltura = -1;
+                const form = document.querySelector('.chat-form');
+                if (form) { form.style.transform = ''; form.style.transition = ''; }
             }
         }
     };
