@@ -671,6 +671,34 @@ function setupBuscador() {
 }
 
 // ============================================
+// TECLADO: evita que header/chat se desplacen al abrir el teclado
+// (fallback robusto al adjustResize + interactive-widget=resizes-content)
+// ============================================
+function setupKeyboardHandling() {
+    if (!window.visualViewport) return;
+    const chat = document.getElementById('chat-global');
+    const ajustar = () => {
+        const vv = window.visualViewport;
+        if (!vv || !vv.height) return;
+        const keyboardOpen = vv.height < window.innerHeight * 0.85;
+        document.body.classList.toggle('teclado-abierto', keyboardOpen);
+        if (chat) {
+            if (keyboardOpen) {
+                // Altura visible real (sin el teclado) menos header y barra inferior
+                const headerH = 50 + parseInt(getComputedStyle(document.documentElement).getPropertyValue('--status-bar-height') || '24', 10);
+                const bottomH = 50 + 16;
+                chat.style.height = Math.max(200, vv.height - headerH - bottomH) + 'px';
+            } else {
+                chat.style.height = '';
+            }
+        }
+    };
+    window.visualViewport.addEventListener('resize', ajustar);
+    window.visualViewport.addEventListener('scroll', ajustar);
+    ajustar();
+}
+
+// ============================================
 // APERTURA / CIERRE DEL PANEL
 // ============================================
 export function setupChat() {
@@ -695,6 +723,7 @@ export function setupChat() {
     setupSalaMenu();
     const replyCancel = document.getElementById('chat-reply-cancel');
     if (replyCancel) replyCancel.addEventListener('click', cancelarRespuesta);
+    setupKeyboardHandling();
 
     // Abrir una conversación desde una notificación push (evento de js/push.js)
     window.addEventListener('chat-abrir-canal', (e) => {

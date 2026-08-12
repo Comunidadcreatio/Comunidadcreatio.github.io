@@ -36,6 +36,15 @@
     overflow: hidden;
 }
 
+/* Teclado abierto: el chat se ajusta a la altura visual real sin empujar el header */
+body.teclado-abierto #main-header {
+    position: fixed;
+    top: 0;
+}
+body.teclado-abierto #chat-global {
+    overflow: hidden;
+}
+
 /* ==============================================
    VISTA DIRECTORIO
    ============================================== */
