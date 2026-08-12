@@ -508,19 +508,36 @@ async function syncChatEntregas() {
 window.syncChatEntregas = syncChatEntregas;
 
 // ============================================
-// BLOQUEAR / DENUNCIAR USUARIO
+// BLOQUEAR / DESBLOQUEAR / DENUNCIAR USUARIO
 // ============================================
+async function cargarBloqueados() {
+    try {
+        const data = await apiRequest('/chat/bloqueos');
+        bloqueadosSet = new Set((data && data.bloqueados) || []);
+    } catch (e) { /* silencioso */ }
+}
+
+async function estaBloqueado(uid) {
+    if (bloqueadosSet.size === 0) await cargarBloqueados();
+    return bloqueadosSet.has(uid);
+}
+
 function setupSalaMenu() {
     const btn = document.getElementById('chat-sala-menu-btn');
     if (!btn) return;
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!canalEsPriv || !canalOtroId) return;
         const r = btn.getBoundingClientRect();
-        abrirMenuOpciones([
-            { icon: ICONOS.bloquear, txt: 'Bloquear usuario', fn: () => bloquearUsuario(canalOtroId, canalOtroNombre) },
-            { icon: ICONOS.denunciar, txt: 'Denunciar usuario', fn: () => denunciarUsuario(canalOtroId, canalOtroNombre) }
-        ], r.left, r.bottom + 4);
+        const bloqueado = await estaBloqueado(canalOtroId);
+        const items = [];
+        if (bloqueado) {
+            items.push({ icon: ICONOS.desbloquear, txt: 'Desbloquear usuario', fn: () => desbloquearUsuario(canalOtroId, canalOtroNombre) });
+        } else {
+            items.push({ icon: ICONOS.bloquear, txt: 'Bloquear usuario', fn: () => bloquearUsuario(canalOtroId, canalOtroNombre) });
+        }
+        items.push({ icon: ICONOS.denunciar, txt: 'Denunciar usuario', fn: () => denunciarUsuario(canalOtroId, canalOtroNombre) });
+        abrirMenuOpciones(items, r.left, r.bottom + 4);
     });
 }
 
@@ -528,8 +545,26 @@ async function bloquearUsuario(uid, nombre) {
     if (!window.confirm(`¿Bloquear a ${nombre}? No podrán enviarse mensajes en ninguna dirección.`)) return;
     try {
         const data = await apiRequest('/chat/bloquear', { method: 'POST', body: JSON.stringify({ usuario_id: uid }) });
-        mostrarToast(data && data.success ? '🚫 Usuario bloqueado' : ((data && data.error) || 'Error al bloquear'));
+        if (data && data.success) {
+            bloqueadosSet.add(uid);
+            mostrarToast('🚫 Usuario bloqueado');
+        } else {
+            mostrarToast((data && data.error) || 'Error al bloquear');
+        }
     } catch (e) { mostrarToast('Error al bloquear'); }
+}
+
+async function desbloquearUsuario(uid, nombre) {
+    if (!window.confirm(`¿Desbloquear a ${nombre}? Podrán volver a enviarse mensajes.`)) return;
+    try {
+        const data = await apiRequest('/chat/bloquear', { method: 'DELETE', body: JSON.stringify({ usuario_id: uid }) });
+        if (data && data.success) {
+            bloqueadosSet.delete(uid);
+            mostrarToast('✅ Usuario desbloqueado');
+        } else {
+            mostrarToast((data && data.error) || 'Error al desbloquear');
+        }
+    } catch (e) { mostrarToast('Error al desbloquear'); }
 }
 
 async function denunciarUsuario(uid, nombre) {
@@ -546,20 +581,26 @@ async function denunciarUsuario(uid, nombre) {
     } catch (e) { mostrarToast('Error al denunciar'); }
 }
 
-// Menú de bloqueo/denuncia en las filas del directorio (pulsación larga)
+// Menú de bloqueo/desbloqueo/denuncia en las filas del directorio (pulsación larga)
 function setupUsuarioRowMenu(row, u) {
     let timer = null, sx = 0, sy = 0, activado = false;
     const UMBRAL = 450, MOVER = 10;
     function cancelar() { if (timer) { clearTimeout(timer); timer = null; } activado = false; }
     row.addEventListener('pointerdown', (e) => {
         sx = e.clientX; sy = e.clientY; activado = false;
-        timer = setTimeout(() => {
+        timer = setTimeout(async () => {
             activado = true;
-            abrirMenuOpciones([
-                { icon: ICONOS.chat, txt: 'Abrir chat', fn: () => abrirPrivado(u) },
-                { icon: ICONOS.bloquear, txt: 'Bloquear', fn: () => bloquearUsuario(u.id, u.nombre_artista) },
-                { icon: ICONOS.denunciar, txt: 'Denunciar', fn: () => denunciarUsuario(u.id, u.nombre_artista) }
-            ], e.clientX, e.clientY);
+            const bloqueado = await estaBloqueado(u.id);
+            const items = [
+                { icon: ICONOS.chat, txt: 'Abrir chat', fn: () => abrirPrivado(u) }
+            ];
+            if (bloqueado) {
+                items.push({ icon: ICONOS.desbloquear, txt: 'Desbloquear', fn: () => desbloquearUsuario(u.id, u.nombre_artista) });
+            } else {
+                items.push({ icon: ICONOS.bloquear, txt: 'Bloquear', fn: () => bloquearUsuario(u.id, u.nombre_artista) });
+            }
+            items.push({ icon: ICONOS.denunciar, txt: 'Denunciar', fn: () => denunciarUsuario(u.id, u.nombre_artista) });
+            abrirMenuOpciones(items, e.clientX, e.clientY);
         }, UMBRAL);
     });
     row.addEventListener('pointermove', (e) => {
@@ -740,6 +781,7 @@ let entregadoHastaLocal = 0;  // hasta qué id recibió el otro (priv) → ✓�
 let canalEsPriv = false;
 let canalOtroId = null;
 let canalOtroNombre = '';
+let bloqueadosSet = new Set(); // IDs de usuarios bloqueados por el usuario actual
 let ultimoTypingEnvio = 0;    // throttle del POST /chat/typing
 let menuActual = null;        // {menu, velo} del menú flotante abierto
 let toastTimer = null;
@@ -755,6 +797,7 @@ const ICONOS = {
     editar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>',
     borrar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>',
     bloquear: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>',
+    desbloquear: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>',
     denunciar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
     chat: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
 };
@@ -805,6 +848,7 @@ async function cargarDirectorio() {
             apiRequest('/chat/directorio'),
             apiRequest('/chat/conversaciones')
         ]);
+        cargarBloqueados(); // en paralelo, no bloquea
         renderCarruselPueblos(dirRes && dirRes.success ? dirRes.pueblos : {});
         renderConversaciones(convRes && convRes.success ? convRes.conversaciones : []);
     } catch (e) {
