@@ -476,6 +476,7 @@ function setupImagenBtn() {
                     })
                 });
                 if (envio && envio.success && envio.mensaje) {
+                    envio.mensaje.entregado = true; // entregado al servidor → ✓✓ instantáneo
                     appendMensaje(envio.mensaje, true);
                     scrollMensajes();
                     cancelarRespuesta();
@@ -1055,7 +1056,7 @@ async function abrirSala(canal, titulo, fotoOtro) {
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');
 
-    // Avatar del otro usuario (a la izquierda, antes de la flecha de atrás)
+    // Avatar del otro usuario (después de la flecha de volver)
     const avatarEl = document.getElementById('chat-sala-avatar');
     if (avatarEl) avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
     const tituloEl = document.getElementById('chat-sala-titulo');
@@ -1137,7 +1138,34 @@ function appendMensaje(m, esPropio) {
 
     renderReacciones(div, m.reacciones || {}, m.id);
     setupMsgMenu(div, m, esPropio);
+    // Click en imagen para ver a tamaño completo
+    if (!m.eliminado && m.tipo_mensaje === 'imagen' && m.imagen_url) {
+        const img = div.querySelector('.chat-msg-imagen');
+        if (img) {
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', () => abrirVisorImagen(m.imagen_url));
+        }
+    }
     lastId = Math.max(lastId, m.id);
+}
+
+// Visor de imagen a pantalla completa
+function abrirVisorImagen(url) {
+    // Eliminar visor previo si existe
+    const prev = document.getElementById('chat-visor-img');
+    if (prev) prev.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'chat-visor-img';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    overlay.addEventListener('click', () => overlay.remove());
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:4px;';
+    img.addEventListener('click', (e) => e.stopPropagation()); // no cerrar al clickear la imagen
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
 }
 
 function iniciarPoll() {
@@ -1211,6 +1239,7 @@ async function enviarMensaje(e) {
             body: JSON.stringify({ canal: canalActivo, contenido: texto, responde_a: replyTo ? replyTo.id : null })
         });
         if (data && data.success && data.mensaje) {
+            data.mensaje.entregado = true; // entregado al servidor → ✓✓ instantáneo
             appendMensaje(data.mensaje, true);
             scrollMensajes();
             cancelarRespuesta();

@@ -262,15 +262,20 @@
 .chat-volver-btn {
     background: none;
     border: none;
-    font-size: 20px;
     cursor: pointer;
     color: var(--color-text, #1a1a1a);
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: 8px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 .chat-volver-btn:hover {
     background: var(--color-gray-100, #f0f0f0);
+}
+.chat-volver-btn svg {
+    display: block;
 }
 .chat-sala-titulo {
     display: flex;
@@ -294,11 +299,12 @@
     text-overflow: ellipsis;
 }
 
-/* Avatar del otro usuario en el header de la sala (izquierda, antes de la flecha) */
+/* Avatar del otro usuario en el header de la sala (después de la flecha) */
 .chat-sala-avatar {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    margin-left: 2px;
 }
 .chat-sala-avatar .chat-user-avatar {
     width: 32px;
