@@ -24,12 +24,51 @@ export function setupPush() {
         }).catch(() => { /* silencioso */ });
     });
 
+    // ⚠️ Adjuntar TODOS los listeners ANTES de register(): si el evento
+    // 'registration' dispara antes de adjuntarlo, el token NUNCA se registra
+    // y el push falla en silencio (el backend no encuentra tokens).
+    Push.addListener('registration', (data) => {
+        if (data && data.value) registrarToken(data.value);
+    });
+    Push.addListener('registrationError', (err) => {
+        debugLog.error('FCM registro:', err);
+    });
+    // App en primer plano: el sistema NO muestra la notificación sola.
+    // Para chat mostramos un banner personalizado (con avatar); para
+    // like/comment programamos una notificación local para que suene.
+    Push.addListener('pushNotificationReceived', (n) => {
+        const d = (n && n.data) || {};
+        if (d.tipo === 'chat') {
+            // Si ya estás viendo esa conversación, el polling la muestra:
+            // no hace falta banner. (En segundo plano el sistema notifica.)
+            if (d.canal && window._canalChatActivo === d.canal) return;
+            // En segundo plano/cerrada, el sistema muestra la notificación
+            // con la imagen grande (BigPicture). En primer plano, banner.
+            mostrarBannerChat(d, n.title || 'Nuevo mensaje', n.body || '');
+            return;
+        }
+        if (n && (n.title || n.body)) {
+            Push.schedule({
+                notifications: [{
+                    id: Math.floor(Date.now() / 1000) % 2147483647,
+                    title: n.title || 'Creatio',
+                    body: n.body || '',
+                    channelId: 'default',
+                    data: n.data || {}
+                }]
+            }).catch(() => { /* si falla la local, seguimos */ });
+        }
+        manejarPush(d);
+    });
+    // El usuario tocó la notificación (app en segundo plano/cerrada)
+    Push.addListener('pushNotificationActionPerformed', (n) => {
+        manejarPush(n && n.notification && n.notification.data);
+    });
+
+    // Pedir permiso y registrar (los listeners ya están arriba, sin carrera)
     Push.requestPermissions()
         .then((perm) => {
             if (!perm || !perm.receive) return;
-            return Push.register();
-        })
-        .then(() => {
             // Canal de notificaciones (Android) para las locales en primer plano
             if (Push.createChannel) {
                 Push.createChannel({
@@ -39,43 +78,7 @@ export function setupPush() {
                     visibility: 1
                 }).catch(() => { /* el canal 'default' suele existir ya */ });
             }
-            Push.addListener('registration', (data) => {
-                if (data && data.value) registrarToken(data.value);
-            });
-            Push.addListener('registrationError', (err) => {
-                debugLog.error('FCM registro:', err);
-            });
-            // App en primer plano: el sistema NO muestra la notificación sola.
-            // Para chat mostramos un banner personalizado (con avatar); para
-            // like/comment programamos una notificación local para que suene.
-            Push.addListener('pushNotificationReceived', (n) => {
-                const d = (n && n.data) || {};
-                if (d.tipo === 'chat') {
-                    // Si ya estás viendo esa conversación, el polling la muestra:
-                    // no hace falta banner. (En segundo plano el sistema notifica.)
-                    if (d.canal && window._canalChatActivo === d.canal) return;
-                    // En segundo plano/cerrada, el sistema muestra la notificación
-                    // con la imagen grande (BigPicture). En primer plano, banner.
-                    mostrarBannerChat(d, n.title || 'Nuevo mensaje', n.body || '');
-                    return;
-                }
-                if (n && (n.title || n.body)) {
-                    Push.schedule({
-                        notifications: [{
-                            id: Math.floor(Date.now() / 1000) % 2147483647,
-                            title: n.title || 'Creatio',
-                            body: n.body || '',
-                            channelId: 'default',
-                            data: n.data || {}
-                        }]
-                    }).catch(() => { /* si falla la local, seguimos */ });
-                }
-                manejarPush(d);
-            });
-            // El usuario tocó la notificación (app en segundo plano/cerrada)
-            Push.addListener('pushNotificationActionPerformed', (n) => {
-                manejarPush(n && n.notification && n.notification.data);
-            });
+            return Push.register();
         })
         .catch((e) => debugLog.error('push setup:', e));
 }
