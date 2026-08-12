@@ -17,6 +17,15 @@
     display: none;
 }
 
+/* Despliegue suave hacia arriba al abrir el chat */
+@keyframes chatSlideUp {
+    from { transform: translateY(48px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+#chat-global:not(.hidden) {
+    animation: chatSlideUp 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* En móvil el chat ocupa todo el ancho de pantalla: las banderas del grid
    llegan hasta los bordes, sin el padding lateral de main (24px) */
 @media (max-width: 768px) {
@@ -36,13 +45,18 @@
     overflow: hidden;
 }
 
-/* Teclado abierto: el chat se ajusta a la altura visual real sin empujar el header */
+/* Teclado abierto: el chat se ajusta a la altura visual real sin empujar el header,
+   y la barra inferior se oculta para que el input quede pegado al teclado */
 body.teclado-abierto #main-header {
     position: fixed;
     top: 0;
 }
 body.teclado-abierto #chat-global {
     overflow: hidden;
+    height: calc(100dvh - 50px - var(--status-bar-height, 24px));
+}
+body.teclado-abierto #toggle-panel {
+    display: none;
 }
 
 /* ==============================================
