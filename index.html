@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.349';
+        var currentVer = '1.0.350';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=af7bb4cedb">
+    <link rel="stylesheet" href="css/style.css?v=1ad222ef7f">
     <link rel="stylesheet" href="css/notificaciones.css?v=2194d2943d">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -897,7 +897,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=ba8af09c47" type="module"></script>
+    <script src="js/main.js?v=f703825ebe" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=ce1020a77c"></script>
 </body>

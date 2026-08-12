@@ -12,6 +12,8 @@
     height: calc(100dvh - 50px - var(--status-bar-height, 24px) - 50px - env(safe-area-inset-bottom, 16px));
     box-sizing: border-box;
     background: transparent;
+    /* Transición suave de altura: el input sube a la misma velocidad que el teclado */
+    transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 #chat-global.hidden {
     display: none;
@@ -57,12 +59,34 @@ body.teclado-abierto #chat-global {
     overscroll-behavior: contain;
 }
 body.teclado-abierto #toggle-panel {
-    display: none;
+    /* Se desliza hacia abajo, fuera de pantalla, en sincronía con el teclado */
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 /* Contiene el rebote para que el input/botones no se desplacen al llegar al final */
 body.teclado-abierto #chat-contenido,
 body.teclado-abierto #chat-sala {
     overscroll-behavior: contain;
+}
+
+/* Efecto creativo: el formulario (input + botones) "despierta" con un pop suave */
+body.teclado-abierto .chat-form {
+    animation: chatFormPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes chatFormPop {
+    0%   { transform: scale(0.96); opacity: 0.5; }
+    60%  { transform: scale(1.02); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* El botón enviar hace un pulso juguetón al abrir el teclado */
+body.teclado-abierto .chat-enviar-btn {
+    animation: chatBtnPulse 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes chatBtnPulse {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.18) rotate(-4deg); }
+    70%  { transform: scale(0.95) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
 }
 
 /* ==============================================

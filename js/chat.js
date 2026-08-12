@@ -679,6 +679,7 @@ function setupKeyboardHandling() {
     if (!window.visualViewport) return;
     const chat = document.getElementById('chat-global');
     const header = document.getElementById('main-header');
+    let ultimaAltura = -1;
     const ajustar = () => {
         const vv = window.visualViewport;
         if (!vv || !vv.height) return;
@@ -686,11 +687,18 @@ function setupKeyboardHandling() {
         document.body.classList.toggle('teclado-abierto', keyboardOpen);
         if (chat) {
             if (keyboardOpen) {
-                // Altura visible real menos el header (la barra inferior se oculta)
+                // Altura visible real menos el header (la barra inferior se desliza fuera)
                 const headerH = header ? header.offsetHeight : (50 + 24);
-                chat.style.height = Math.max(200, vv.height - headerH) + 'px';
+                const nueva = Math.max(200, vv.height - headerH);
+                // Solo actualizar si cambió al menos 6px: evita transiciones espurias
+                // durante el despliegue del teclado (la transición CSS las suaviza)
+                if (Math.abs(nueva - ultimaAltura) > 6) {
+                    ultimaAltura = nueva;
+                    chat.style.height = nueva + 'px';
+                }
             } else {
                 chat.style.height = '';
+                ultimaAltura = -1;
             }
         }
     };
