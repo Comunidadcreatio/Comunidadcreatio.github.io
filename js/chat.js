@@ -131,7 +131,7 @@ function abrirMenuOpciones(items, x, y) {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'chat-menu-item';
-        b.textContent = it.txt;
+        b.innerHTML = `${it.icon ? `<span class="chat-menu-item-icon">${it.icon}</span>` : ''}<span class="chat-menu-item-txt">${it.txt}</span>`;
         b.addEventListener('click', () => { cerrarMenusFlotantes(); it.fn(); });
         menu.appendChild(b);
     });
@@ -247,14 +247,14 @@ function setupMsgMenu(div, m, esPropio) {
 
 function abrirMenuMensaje(div, m, esPropio, x, y) {
     const items = [
-        { txt: '❤️ Reaccionar', fn: () => abrirPickerReacciones(div, m, esPropio) },
-        { txt: '↩️ Responder', fn: () => iniciarRespuesta(m) }
+        { icon: ICONOS.corazon, txt: 'Reaccionar', fn: () => abrirPickerReacciones(div, m, esPropio) },
+        { icon: ICONOS.responder, txt: 'Responder', fn: () => iniciarRespuesta(m) }
     ];
     if (esPropio && !m.eliminado && m.tipo_mensaje === 'texto') {
-        items.push({ txt: '✏️ Editar', fn: () => editarMensaje(div, m) });
+        items.push({ icon: ICONOS.editar, txt: 'Editar', fn: () => editarMensaje(div, m) });
     }
     if (esPropio && !m.eliminado) {
-        items.push({ txt: '🗑️ Borrar', fn: () => borrarMensaje(div, m) });
+        items.push({ icon: ICONOS.borrar, txt: 'Borrar', fn: () => borrarMensaje(div, m) });
     }
     abrirMenuOpciones(items, x, y);
 }
@@ -387,14 +387,18 @@ function mostrarTyping(ids) {
 }
 
 // ============================================
-// VISTO / RECIBIDO (✓✓)
+// VISTO / RECIBIDO (✓ enviado · ✓✓ entregado · ✓✓ azul visto)
 // ============================================
-function actualizarTicksLeidos(hasta) {
+function actualizarTicksLeidos(hasta, entregadoHasta) {
     leidoHastaLocal = hasta || 0;
+    entregadoHastaLocal = entregadoHasta || 0;
     document.querySelectorAll('#chat-mensajes .chat-msg.own[data-id]').forEach(el => {
         const id = parseInt(el.dataset.id, 10);
         const t = el.querySelector('.chat-msg-leido');
-        if (t && id > 0) t.textContent = id <= leidoHastaLocal ? '✓✓' : '✓';
+        if (!t || id <= 0) return;
+        if (id <= leidoHastaLocal) { t.className = 'chat-msg-leido visto'; t.textContent = '✓✓'; }
+        else if (id <= entregadoHastaLocal) { t.className = 'chat-msg-leido entregado'; t.textContent = '✓✓'; }
+        else { t.className = 'chat-msg-leido enviado'; t.textContent = '✓'; }
     });
 }
 
@@ -486,7 +490,7 @@ function setupImagenBtn() {
             mostrarToast('Error de conexión al subir la imagen');
         } finally {
             btn.disabled = false;
-            btn.textContent = '🖼️';
+            btn.innerHTML = ICONOS.imagen;
         }
     });
 }
@@ -502,8 +506,8 @@ function setupSalaMenu() {
         if (!canalEsPriv || !canalOtroId) return;
         const r = btn.getBoundingClientRect();
         abrirMenuOpciones([
-            { txt: '🚫 Bloquear usuario', fn: () => bloquearUsuario(canalOtroId, canalOtroNombre) },
-            { txt: '⚠️ Denunciar usuario', fn: () => denunciarUsuario(canalOtroId, canalOtroNombre) }
+            { icon: ICONOS.bloquear, txt: 'Bloquear usuario', fn: () => bloquearUsuario(canalOtroId, canalOtroNombre) },
+            { icon: ICONOS.denunciar, txt: 'Denunciar usuario', fn: () => denunciarUsuario(canalOtroId, canalOtroNombre) }
         ], r.left, r.bottom + 4);
     });
 }
@@ -540,9 +544,9 @@ function setupUsuarioRowMenu(row, u) {
         timer = setTimeout(() => {
             activado = true;
             abrirMenuOpciones([
-                { txt: '💬 Abrir chat', fn: () => abrirPrivado(u) },
-                { txt: '🚫 Bloquear', fn: () => bloquearUsuario(u.id, u.nombre_artista) },
-                { txt: '⚠️ Denunciar', fn: () => denunciarUsuario(u.id, u.nombre_artista) }
+                { icon: ICONOS.chat, txt: 'Abrir chat', fn: () => abrirPrivado(u) },
+                { icon: ICONOS.bloquear, txt: 'Bloquear', fn: () => bloquearUsuario(u.id, u.nombre_artista) },
+                { icon: ICONOS.denunciar, txt: 'Denunciar', fn: () => denunciarUsuario(u.id, u.nombre_artista) }
             ], e.clientX, e.clientY);
         }, UMBRAL);
     });
@@ -719,7 +723,8 @@ let ultimosPueblos = {}; // último directorio recibido (para volver al grid des
 
 // ---- Estado de las funciones nuevas ----
 let replyTo = null;           // mensaje que se está respondiendo {id, autor, contenido, tipo}
-let leidoHastaLocal = 0;      // hasta qué id leyó el otro participante (priv) → ✓✓
+let leidoHastaLocal = 0;      // hasta qué id leyó el otro participante (priv) → ✓✓ visto
+let entregadoHastaLocal = 0;  // hasta qué id recibió el otro (priv) → ✓✓ entregado
 let canalEsPriv = false;
 let canalOtroId = null;
 let canalOtroNombre = '';
@@ -729,6 +734,18 @@ let toastTimer = null;
 
 const EMOJIS_REACCION = ['❤️', '👍', '😂', '😮', '🎉', '😢', '🔥'];
 const API_BASE_URL_CHAT = API_BASE_URL || '';
+
+// Iconos minimalistas (SVG feather, 18px)
+const ICONOS = {
+    imagen: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+    corazon: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
+    responder: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>',
+    editar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>',
+    borrar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>',
+    bloquear: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>',
+    denunciar: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    chat: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
+};
 
 // Aplica los badges de no leídos: punto en el icono del nav, número en el FAB
 // de la sala global y en cada círculo de conversación.
@@ -974,6 +991,7 @@ async function abrirSala(canal, titulo, fotoOtro) {
     canalOtroId = canalEsPriv ? otroDeCanal(canal) : null;
     canalOtroNombre = canalEsPriv ? titulo : '';
     leidoHastaLocal = 0;
+    entregadoHastaLocal = 0;
     cancelarRespuesta();
     const menuBtn = document.getElementById('chat-sala-menu-btn');
     if (menuBtn) menuBtn.style.display = canalEsPriv ? '' : 'none';
@@ -981,10 +999,11 @@ async function abrirSala(canal, titulo, fotoOtro) {
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');
 
+    // Avatar del otro usuario (a la izquierda, antes de la flecha de atrás)
+    const avatarEl = document.getElementById('chat-sala-avatar');
+    if (avatarEl) avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
     const tituloEl = document.getElementById('chat-sala-titulo');
-    tituloEl.innerHTML = fotoOtro
-        ? `${avatarHTML(fotoOtro, titulo)}<span>${escapeHtml(titulo)}</span>`
-        : `<span>${escapeHtml(titulo)}</span>`;
+    tituloEl.innerHTML = `<span>${escapeHtml(titulo)}</span>`;
 
     const cont = document.getElementById('chat-mensajes');
     cont.innerHTML = '<div class="chat-cargando">Cargando mensajes…</div>';
@@ -998,6 +1017,7 @@ async function abrirSala(canal, titulo, fotoOtro) {
             cont.innerHTML = '<div class="chat-sin-mensajes">Sin mensajes todavía. ¡Escribe el primero!</div>';
         }
         if (data && data.leido_hasta != null) leidoHastaLocal = data.leido_hasta;
+        if (data && data.entregado_hasta != null) entregadoHastaLocal = data.entregado_hasta;
         if (data && data.escribiendo) mostrarTyping(data.escribiendo);
         iniciarPoll();
         // La sala está visible: resetea el contador de no leídos de este canal
@@ -1028,7 +1048,8 @@ function appendMensaje(m, esPropio) {
     if (esPropio) div.dataset.own = '1';
 
     let html = '';
-    if (!esPropio) {
+    // En chats privados se omite el nombre del otro (ya se sabe con quién se habla)
+    if (!esPropio && !canalEsPriv) {
         html += `<div class="chat-msg-autor">${escapeHtml(m.nombre_artista || 'Usuario')}</div>`;
     }
     // Cita de respuesta
@@ -1046,11 +1067,13 @@ function appendMensaje(m, esPropio) {
         html += `<span class="chat-msg-texto">${escapeHtml(m.contenido || '')}</span>`;
     }
     if (m.editado && !m.eliminado) html += '<span class="chat-msg-editado">(editado)</span>';
-    // Pie: hora + visto
+    // Pie: hora + visto (3 estados: enviado ✓ / entregado ✓✓ / visto ✓✓ azul)
     let pie = `<span class="chat-msg-tiempo">${formatHora(m.created_at)}</span>`;
     if (esPropio && canalEsPriv) {
         const leido = (m.leido !== null && m.leido !== undefined) ? m.leido : false;
-        pie += `<span class="chat-msg-leido">${leido ? '✓✓' : '✓'}</span>`;
+        const entregado = (m.entregado !== null && m.entregado !== undefined) ? m.entregado : false;
+        const estado = leido ? 'visto' : (entregado ? 'entregado' : 'enviado');
+        pie += `<span class="chat-msg-leido ${estado}">${(leido || entregado) ? '✓✓' : '✓'}</span>`;
     }
     html += `<span class="chat-msg-pie">${pie}</span>`;
     div.innerHTML = html;
@@ -1080,7 +1103,7 @@ function iniciarPoll() {
                 }
                 // "Escribiendo…" y ticks de leído en tiempo real
                 if (data.escribiendo) mostrarTyping(data.escribiendo);
-                if (data.leido_hasta != null) actualizarTicksLeidos(data.leido_hasta);
+                if (data.leido_hasta != null) actualizarTicksLeidos(data.leido_hasta, data.entregado_hasta);
             }
             refrescarChatNoLeidos(); // mantiene los badges al día mientras el chat está abierto
         } catch (e) {
