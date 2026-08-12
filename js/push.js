@@ -9,6 +9,51 @@ import { debugLog } from './utils.js';
 const TOKEN_KEY = 'fcm_token';
 
 // ============================================
+// SONIDO DE NOTIFICACIÓN (Web Audio API — sin archivos)
+// ============================================
+let _audioCtx = null;
+
+// Desbloquea el AudioContext con el primer gesto del usuario (requisito de Android)
+function desbloquearAudio() {
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!_audioCtx) _audioCtx = new AC();
+        if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
+    } catch (e) { /* silencioso */ }
+}
+window.addEventListener('pointerdown', desbloquearAudio, { once: true });
+window.addEventListener('touchend', desbloquearAudio, { once: true });
+
+// "Ding" suave de dos tonos ascendentes (La5 → Re6), estilo notificación
+function reproducirSonidoNotificacion() {
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!_audioCtx) _audioCtx = new AC();
+        if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
+
+        const t0 = _audioCtx.currentTime;
+        const notas = [880, 1174.66]; // La5 → Re6
+
+        notas.forEach((freq, i) => {
+            const osc = _audioCtx.createOscillator();
+            const gain = _audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const inicio = t0 + i * 0.12;
+            const duracion = 0.45;
+            gain.gain.setValueAtTime(0.0001, inicio);
+            gain.gain.exponentialRampToValueAtTime(0.22, inicio + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+            osc.connect(gain).connect(_audioCtx.destination);
+            osc.start(inicio);
+            osc.stop(inicio + duracion + 0.05);
+        });
+    } catch (e) { /* silencioso */ }
+}
+
+// ============================================
 // DIAGNÓSTICO EN CONSOLA (ring buffer 100 eventos)
 // ============================================
 const _diag = [];
@@ -116,7 +161,8 @@ export function setupPush() {
             }
             diag('banner', 'Mostrando banner chat: ' + (d.otro_nombre || '?') + ' — ' + (n.body || '').slice(0, 60));
             // En segundo plano/cerrada, el sistema muestra la notificación
-            // con la imagen grande (BigPicture). En primer plano, banner.
+            // con la imagen grande (BigPicture). En primer plano, banner + sonido.
+            reproducirSonidoNotificacion();
             mostrarBannerChat(d, n.title || 'Nuevo mensaje', n.body || '');
             return;
         }
