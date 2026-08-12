@@ -399,8 +399,39 @@ function actualizarTicksLeidos(hasta) {
 }
 
 // ============================================
-// ENVIAR IMAGEN
+// ENVIAR IMAGEN (con compresión en el teléfono)
 // ============================================
+// Redimensiona a máx 1200px y re-comprime a JPEG calidad 0.8: una foto de
+// cámara (3-5 MB) pasa a ~200-400 KB, ~90% menos datos móviles.
+function comprimirImagen(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            const MAX = 1200;
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            if (w > MAX || h > MAX) {
+                const escala = Math.min(MAX / w, MAX / h);
+                w = Math.round(w * escala);
+                h = Math.round(h * escala);
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(url);
+            canvas.toBlob((blob) => {
+                if (blob && blob.size > 0) resolve(blob);
+                else reject(new Error('no se pudo comprimir'));
+            }, 'image/jpeg', 0.8);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('imagen ilegible')); };
+        img.src = url;
+    });
+}
+
 function setupImagenBtn() {
     const btn = document.getElementById('chat-imagen-btn');
     const fileInput = document.getElementById('chat-imagen-input');
@@ -418,8 +449,13 @@ function setupImagenBtn() {
         btn.disabled = true;
         btn.textContent = '⏳';
         try {
+            // Compresión en el teléfono; si falla, se sube el original
+            let aEnviar = file;
+            try {
+                aEnviar = await comprimirImagen(file);
+            } catch (e) { debugLog.warn('comprimir imagen:', e); }
             const fd = new FormData();
-            fd.append('imagen', file);
+            fd.append('imagen', aEnviar, aEnviar === file ? file.name : 'imagen.jpg');
             const res = await fetch(`${API_BASE_URL_CHAT}/chat/imagen`, { method: 'POST', credentials: 'include', body: fd });
             let data = null;
             try { data = await res.json(); } catch (e) { /* no JSON */ }
