@@ -1086,17 +1086,12 @@ input, select, textarea {
     animation: sectionExit 0.25s ease-in forwards;
 }
 
-/* Página en blanco */
+/* Página en blanco: se mantiene en el DOM (la navegación la usa como estado
+   intermedio) pero sin fondo — ya no se ve el bloque sólido blanco/negro
+   que aparecía al abrir la app (se ve el vidrio con el fondo rotativo). */
 #pagina-blanca {
     flex: 1;
-    background-color: var(--color-white);
     min-height: calc(100vh - 70px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-#pagina-blanca.hidden {
-    display: none;
 }
 
 /* 2. Responsive - Escritorio (≥ 769px) */
