@@ -247,7 +247,7 @@
    ============================================== */
 @media (max-width: 600px) {
     .notification-container {
-        top: calc(50px + var(--status-bar-height, 24px) + 8px);
+        top: calc(60px + var(--status-bar-height, 24px) + 8px);
         right: 12px;
         left: 12px;
     }

@@ -1,17 +1,17 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=246a0ade88');
+@import url('header.css?v=e3155209e5');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=c665129405');
+@import url('galeria-publica.css?v=b8648a15e7');
 
 /* Chat global + privado */
-@import url('chat.css?v=62e290cc75');
+@import url('chat.css?v=d3006d01b3');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=3a7fe6b513');
+@import url('panel-artista.css?v=b445c3380c');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=ab0b7c97d0');
@@ -1150,11 +1150,11 @@ input, select, textarea {
 
     main {
         padding: 50px 24px 0;
-        padding-top: calc(50px + var(--status-bar-height, 24px));
+        padding-top: calc(60px + var(--status-bar-height, 24px));
     }
 
     .notif-panel {
-        top: calc(50px + var(--status-bar-height, 24px));
+        top: calc(60px + var(--status-bar-height, 24px));
     }
 
     .toggle-icon {

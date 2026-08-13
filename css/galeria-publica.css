@@ -337,7 +337,7 @@ html, body {
    ============================================== */
 @media (max-width: 768px) {
     #galeria-container {
-        top: calc(50px + var(--status-bar-height, 24px));
+        top: calc(60px + var(--status-bar-height, 24px));
         bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
