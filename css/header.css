@@ -394,7 +394,7 @@ picture {
 
 @media (max-width: 480px) {
     #main-header {
-        height: calc(48px + var(--status-bar-height, 24px));
+        height: calc(60px + var(--status-bar-height, 24px));
         padding: 0 0.5rem;
         padding-top: var(--status-bar-height, 24px);
         gap: 0.25rem;
@@ -405,30 +405,30 @@ picture {
     }
 
     .header__logo {
-        height: 24px;
-        max-width: 32px;
+        height: 34px;
+        max-width: 36px;
     }
 
     .header-icon {
-        width: 28px;
-        height: 28px;
+        width: 38px;
+        height: 38px;
     }
     .header-icon svg {
-        width: 18px;
-        height: 18px;
+        width: 24px;
+        height: 24px;
     }
 
     .search-input-wrapper {
-        height: 28px;
+        height: 38px;
     }
 
     #search-input {
         padding: 0 8px;
         font-size: 12px;
-        line-height: 28px;
+        line-height: 38px;
     }
     #search-input::placeholder {
-        line-height: 28px;
+        line-height: 38px;
     }
 
     .search-button {
