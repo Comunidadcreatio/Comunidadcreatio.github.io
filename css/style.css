@@ -743,7 +743,8 @@ input, select, textarea {
     top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* arriba del trigger Mis Cavents (nav 60 + stepbar 48 + trigger ~42) para no taparlo */
+    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
     background: rgba(10,10,10,0.95);
     z-index: 1100;
     display: flex;
