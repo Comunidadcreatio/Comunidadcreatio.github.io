@@ -9,7 +9,7 @@
     max-width: 700px;
     margin: 0 auto;
     /* header móvil (50px + status bar) + barra inferior (56px + safe-area) */
-    height: calc(100dvh - 50px - var(--status-bar-height, 24px) - 56px - env(safe-area-inset-bottom, 16px));
+    height: calc(100dvh - 50px - var(--status-bar-height, 24px) - 60px - env(safe-area-inset-bottom, 16px));
     box-sizing: border-box;
     background: transparent;
 }
@@ -670,7 +670,7 @@ body.teclado-abierto .chat-enviar-btn {
     position: fixed;
     left: 0;
     right: 0; /* el degradado va del borde izquierdo al derecho, siempre */
-    bottom: calc(56px + env(safe-area-inset-bottom, 16px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
     justify-content: flex-end; /* la fila de círculos queda pegada a la derecha */

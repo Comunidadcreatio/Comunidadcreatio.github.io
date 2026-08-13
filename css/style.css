@@ -7,7 +7,7 @@
 @import url('galeria-publica.css?v=c665129405');
 
 /* Chat global + privado */
-@import url('chat.css?v=ef5a0fbceb');
+@import url('chat.css?v=62e290cc75');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -479,7 +479,7 @@ input, select, textarea {
     display: flex;
     align-items: center;
     width: 100%;
-    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
     padding: 0 16px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background-color: var(--color-white);
@@ -533,8 +533,8 @@ input, select, textarea {
     transition: color 0.3s ease, transform 0.15s ease;
 }
 .toggle-nav-btn svg {
-    width: 23px;
-    height: 23px;
+    width: 26px;
+    height: 26px;
     display: block;
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
@@ -595,8 +595,8 @@ input, select, textarea {
 .toggle-label { display: none !important; }
 
 .toggle-icon {
-    width: 23px;
-    height: 23px;
+    width: 26px;
+    height: 26px;
     object-fit: contain;
     flex-shrink: 0;
 }
@@ -617,8 +617,8 @@ input, select, textarea {
     flex-shrink: 0;
     z-index: 2;
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     transition: transform 0.2s ease;
 }
 .btn-perfil-circular:hover {
@@ -626,8 +626,8 @@ input, select, textarea {
 }
 .btn-perfil-circular .perfil-avatar-img {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     object-fit: cover;
     background-color: var(--color-gray-200);
@@ -741,7 +741,7 @@ input, select, textarea {
     top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     background: rgba(10,10,10,0.95);
     z-index: 1100;
     display: flex;
@@ -1146,7 +1146,7 @@ input, select, textarea {
 
 /* 3. Responsive - Móviles (≤ 768px) */
 @media (max-width: 768px) {
-    body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 16px)); }
+    body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 16px)); }
 
     main {
         padding: 50px 24px 0;
