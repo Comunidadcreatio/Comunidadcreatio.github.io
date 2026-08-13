@@ -1632,9 +1632,9 @@ input, select, textarea {
     position: fixed;
     left: 0;
     right: 0;
-    /* arriba: casi hasta la barra de progreso; abajo: arriba del trigger Mis Cavents */
+    /* arriba: casi hasta la barra de progreso; abajo: justo despues del nav */
     top: calc(60px + var(--status-bar-height, 24px) + 36px);
-    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     z-index: 0;
     pointer-events: none;
     opacity: 0;
