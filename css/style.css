@@ -1626,12 +1626,16 @@ input, select, textarea {
     border-top: none !important;
 }
 
-/* Degradado DEBAJO de la lista de cavents (mas alto y grande) */
+/* Degradado DETRAS de la lista: los cavents quedan sobrepuestos encima */
 .cavents-dropdown::after {
     content: '';
+    position: sticky;
+    bottom: 0;
     display: block;
     height: 140px;
+    margin-top: -140px; /* la banda ocupa el fondo; los items quedan encima */
     pointer-events: none;
+    z-index: 0;
     background: linear-gradient(to top,
         rgba(255, 255, 255, 1) 0%,
         rgba(255, 255, 255, 0.7) 35%,
@@ -1644,4 +1648,9 @@ input, select, textarea {
         rgba(0, 0, 0, 0.7) 35%,
         rgba(0, 0, 0, 0.3) 60%,
         rgba(0, 0, 0, 0) 100%);
+}
+/* Los cavents (tarjetas solidas) pintan por encima del degradado */
+.cavent-item {
+    position: relative;
+    z-index: 1;
 }
