@@ -743,8 +743,7 @@ input, select, textarea {
     top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
-    /* arriba del trigger Mis Cavents (nav 60 + stepbar 48 + trigger ~42) para no taparlo */
-    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     background: rgba(10,10,10,0.95);
     z-index: 1100;
     display: flex;
@@ -1633,9 +1632,9 @@ input, select, textarea {
     position: fixed;
     left: 0;
     right: 0;
-    /* arriba: casi hasta la barra de progreso (header + barra); abajo: hasta el nav */
+    /* arriba: casi hasta la barra de progreso; abajo: arriba del trigger Mis Cavents */
     top: calc(60px + var(--status-bar-height, 24px) + 36px);
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
     z-index: 0;
     pointer-events: none;
     opacity: 0;
@@ -1662,4 +1661,10 @@ input, select, textarea {
 .cavent-item {
     position: relative;
     z-index: 1;
+}
+
+/* El trigger Mis Cavents siempre por encima del degradado */
+.cavents-trigger {
+    position: relative;
+    z-index: 1000;
 }
