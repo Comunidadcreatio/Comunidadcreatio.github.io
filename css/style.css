@@ -1500,3 +1500,21 @@ input, select, textarea {
 [data-theme="dark"] .form-section {
     background: transparent;
 }
+
+/* ==============================================
+   CREAR CAVENT: eliminar rellenos blanco/negro
+   (botones de pasos, barra de progreso, boton limpiar)
+   ============================================== */
+#obra-step-bar .nav-btn,
+#obra-step-bar .crear-btn,
+#btn-limpiar-campos,
+#obra-progress-bar {
+    background: transparent !important;
+}
+.form-progress-bar {
+    background: transparent;
+}
+#obra-step-bar .nav-btn:hover:not(:disabled),
+#obra-step-bar .crear-btn:hover {
+    background: var(--color-gray-100) !important;
+}
