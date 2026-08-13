@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.390';
+        var currentVer = '1.0.391';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=74261a5be5">
+    <link rel="stylesheet" href="css/style.css?v=2fa2761b46">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -402,9 +402,6 @@
                                     </div>
                                 </div>
                                 <div class="carrusel-dots" id="carrusel-dots"></div>
-                                <div id="obra-etiquetas-bar">
-                                    <input type="text" id="input-etiquetas" class="input-etiquetas-subtle" placeholder="Etiquetas (separadas por coma)" required data-required="true">
-                                </div>
                             </div>
                             <input type="file" id="input-imagen-0" accept="image/*" hidden>
                             <input type="file" id="input-imagen-1" accept="image/*" hidden>
@@ -457,6 +454,11 @@
                             <div class="form-group">
                                 <label for="input-descripcion-artistica">Descripción Artística</label>
                                 <textarea id="input-descripcion-artistica" placeholder="Describe tu obra, su historia, inspiración..." required data-required="true"></textarea>
+                            </div>
+
+                            <!-- Etiquetas (al final del paso 2) -->
+                            <div id="obra-etiquetas-bar">
+                                <input type="text" id="input-etiquetas" class="input-etiquetas-subtle" placeholder="Etiquetas (separadas por coma)" required data-required="true">
                             </div>
 
                         </div>

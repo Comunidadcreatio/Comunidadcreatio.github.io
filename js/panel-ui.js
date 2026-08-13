@@ -955,10 +955,10 @@ function setupStepNavigation() {
         }
         prevBtn.disabled = index === 0;
         
-        // Etiquetas solo visibles en Paso 1 (Imágenes)
+        // Etiquetas visibles en Paso 2 (Información Básica)
         const etiquetasBar = document.getElementById('obra-etiquetas-bar');
         if (etiquetasBar) {
-            etiquetasBar.classList.toggle('hidden', index !== 0);
+            etiquetasBar.classList.toggle('hidden', index !== 1);
         }
 
         if (index === totalSteps - 1) {

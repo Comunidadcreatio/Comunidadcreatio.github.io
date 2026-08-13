@@ -1511,12 +1511,20 @@ input, select, textarea {
 #obra-progress-bar {
     background: transparent !important;
 }
+[data-theme="dark"] #obra-step-bar .nav-btn,
+[data-theme="dark"] #obra-step-bar .crear-btn,
+[data-theme="dark"] #btn-limpiar-campos,
+[data-theme="dark"] #obra-progress-bar {
+    background: transparent !important;
+}
 .form-progress-bar {
     background: transparent;
 }
 #obra-step-bar .nav-btn:hover:not(:disabled),
-#obra-step-bar .crear-btn:hover {
-    background: var(--color-gray-100) !important;
+#obra-step-bar .crear-btn:hover,
+[data-theme="dark"] #obra-step-bar .nav-btn:hover:not(:disabled),
+[data-theme="dark"] #obra-step-bar .crear-btn:hover {
+    background: transparent !important;
 }
 
 /* ==============================================
@@ -1538,17 +1546,19 @@ input, select, textarea {
     background: transparent;
 }
 
-/* Carrusel de imagenes: quitar relleno y poner borde como los demas */
+/* Carrusel de imagenes: sin relleno, solo borde inferior, sin esquinas */
 .carrusel-viewport,
-.carrusel-slide {
-    background: transparent;
+.carrusel-slide,
+.carrusel-slide-empty {
+    background: transparent !important;
 }
 .carrusel-viewport {
-    border: 1px solid var(--color-gray-300);
-    border-radius: 8px;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
 }
 [data-theme="dark"] .carrusel-viewport {
-    border-color: #3a3a3a;
+    border-bottom-color: #3a3a3a;
 }
 
 /* Barra inferior (flechas <> / limpiar / crear-duplicar-actualizar): sin relleno */
