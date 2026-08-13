@@ -97,9 +97,16 @@ body.teclado-abierto .chat-enviar-btn {
    ACORDEÓN DE PUEBLOS
    ============================================== */
 .chat-pueblo {
-    border-radius: 0; /* sin esquinas: los acordeones quedan pegados, sin aire */
+    border-radius: 0; /* del medio sin esquinas: quedan pegados, sin aire */
     overflow: hidden;
     background: var(--color-bg, #fff);
+}
+/* Bordes curvos solo en los extremos de la lista (estilo agrupado) */
+.chat-pueblo:first-child {
+    border-radius: 12px 12px 0 0;
+}
+.chat-pueblo:last-child {
+    border-radius: 0 0 12px 12px;
 }
 .chat-pueblo-header {
     display: flex;
