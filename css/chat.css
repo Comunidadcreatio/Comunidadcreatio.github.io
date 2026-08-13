@@ -435,8 +435,10 @@ body.teclado-abierto .chat-enviar-btn {
 }
 .chat-sala-titulo {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column; /* nombre arriba, presencia justo debajo */
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
     font-size: 15px;
     font-weight: 700;
     color: var(--color-text, #1a1a1a);
@@ -454,16 +456,17 @@ body.teclado-abierto .chat-enviar-btn {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-/* Nombre (flex 1) + presencia ("Activo ahora" / "Activo hace X") al lado */
+/* Nombre (arriba) + presencia ("Activo ahora" / "Activo hace X") debajo, a la izquierda */
 .chat-sala-nombre {
-    flex: 1;
+    width: 100%;
     min-width: 0;
+    line-height: 1.2;
 }
 .chat-sala-presencia {
     font-size: 11px;
     font-weight: 600;
     color: var(--color-text-muted, #888);
-    flex-shrink: 0;
+    line-height: 1.2;
 }
 .chat-sala-presencia.on {
     color: #16a34a;
