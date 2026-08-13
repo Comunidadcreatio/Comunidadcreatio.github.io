@@ -1478,3 +1478,22 @@ input, select, textarea {
     background: var(--color-bg);
     z-index: 1;
 }
+
+/* ==============================================
+   RELLENOS: solo queda la capa solida del contenido
+   (se eliminan los fondos blanco/negro de tarjetas y paneles;
+    quedan visibles las letras y los bordes)
+   ============================================== */
+.obra-artista-row,
+.obra-metricas-bar,
+.chat-pueblo,
+#chat-accordion,
+.form-section,
+.chat-cluster {
+    background: transparent;
+}
+[data-theme="dark"] .obra-metricas-bar,
+[data-theme="dark"] .chat-pueblo,
+[data-theme="dark"] .form-section {
+    background: transparent;
+}
