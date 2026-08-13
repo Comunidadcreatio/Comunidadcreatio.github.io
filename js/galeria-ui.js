@@ -273,12 +273,14 @@ export async function toggleGaleria(galeriaContainer) {
     }
 }
 
-export async function toggleExplorar() {
-    if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
+// Activa el modo explorar (galería en grid). A diferencia de toggleExplorar,
+// NO alterna: si la galería ya está en grid, no hace nada.
+async function activarExplorar() {
+    if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return false;
 
     const galeria = document.getElementById('galeria-publica');
     const galeriaContainerLocal = obtenerGaleriaContainer();
-    if (!galeria) return;
+    if (!galeria) return false;
 
     if (galeria.classList.contains('hidden')) {
         // Mostrar galería directamente en modo grid
@@ -319,6 +321,24 @@ export async function toggleExplorar() {
         });
         // Safety: si los RAF nunca se ejecutan (tab en background, etc.), liberar igual
         setTimeout(() => { gridEntering = false; }, 600);
+    }
+    return true;
+}
+
+// "Explorar" desde la lupa: muestra la galería en grid sin alternar.
+export function mostrarExplorar() {
+    activarExplorar();
+}
+
+export async function toggleExplorar() {
+    if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
+
+    const galeria = document.getElementById('galeria-publica');
+    const galeriaContainerLocal = obtenerGaleriaContainer();
+    if (!galeria) return;
+
+    if (galeria.classList.contains('hidden') || galeriaModo === 1) {
+        activarExplorar();
     } else {
         // Salir del modo grid (volver a normal o cerrar)
         galeriaModo = 0;

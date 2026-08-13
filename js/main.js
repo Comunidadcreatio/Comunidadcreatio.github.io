@@ -32,7 +32,7 @@ import {
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
-    showPanelSubView
+    mostrarExplorar, showPanelSubView
 } from './galeria-ui.js';
 import {
     setupFormChangeTracking,
@@ -436,10 +436,12 @@ function setupEvents() {
 
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
+    // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
     import('./busqueda.js').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
-            (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons))
+            (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
+            () => mostrarExplorar()
         );
     });
 
@@ -627,10 +629,6 @@ function setupEvents() {
 
     if (caventsPopover) {
         // Opciones del menú cavents
-        document.getElementById('cavents-explorar')?.addEventListener('click', () => {
-            caventsPopover.classList.add('hidden');
-            toggleExplorar();
-        });
         document.getElementById('cavents-galeria')?.addEventListener('click', () => {
             caventsPopover.classList.add('hidden');
             toggleGaleria(getGaleriaContainer());

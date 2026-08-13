@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.405';
+        var currentVer = '1.0.406';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=96fc1d3b4a">
+    <link rel="stylesheet" href="css/style.css?v=141da87cbb">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -161,14 +161,20 @@
                 <img id="perfil-avatar-mini" class="perfil-avatar-img" src="iconos/avatar-default.svg" alt="Foto de perfil">
             </button>
         </div>
-        <div class="bottom-bar-right"></div>
+        <div class="bottom-bar-right">
+            <button id="btn-buscar" class="toggle-nav-btn" aria-label="Buscar artista">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span class="toggle-label">Buscar</span>
+            </button>
+        </div>
     </div>
 
     <!-- Popover del menú cavents (se muestra sobre la barra inferior) -->
     <div id="cavents-popover" class="header-popover hidden">
         <div class="header-popover-panel">
-            <button id="cavents-explorar" class="logout-option">Explorar</button>
-            <div class="divider"></div>
             <button id="cavents-galeria" class="logout-option">Global Cavents</button>
         </div>
     </div>
@@ -221,14 +227,6 @@
             <img src="iconos/Logo-temporal.svg" alt="Creatio" class="header__logo">
         </picture>
 
-        <!-- Icono de búsqueda: abre la sección para buscar artistas -->
-        <button id="btn-buscar" class="header-icon" aria-label="Buscar artista">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-
         <!-- Icono de notificaciones -->
         <button id="btn-notificaciones" class="header-icon" aria-label="Notificaciones">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -245,23 +243,25 @@
                 <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
         </button>
-        <!-- Panel de notificaciones -->
-        <div id="notif-dropdown" class="notif-panel hidden">
-            <div class="notif-panel-header">
-                <button id="notif-close" class="notif-panel-close">←</button>
-                <h3>Notificaciones</h3>
-            </div>
-            <div class="notif-panel-scroll">
-                <div id="notif-list" class="notif-list"></div>
-                <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
-            </div>
-        </div>
+    </header>
 
-        <!-- Panel de búsqueda de artistas -->
-        <div id="search-panel" class="notif-panel hidden">
-            <div class="search-panel-top">
-                <button id="search-close" class="chat-volver-btn" aria-label="Volver">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    <!-- Panel de notificaciones -->
+    <div id="notif-dropdown" class="notif-panel hidden">
+        <div class="notif-panel-header">
+            <button id="notif-close" class="notif-panel-close">←</button>
+            <h3>Notificaciones</h3>
+        </div>
+        <div class="notif-panel-scroll">
+            <div id="notif-list" class="notif-list"></div>
+            <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+        </div>
+    </div>
+
+    <!-- Panel de búsqueda de artistas -->
+    <div id="search-panel" class="notif-panel hidden">
+        <div class="search-panel-top">
+            <button id="search-close" class="chat-volver-btn" aria-label="Volver">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
                 <div class="search-input-wrapper">
                     <input type="text" id="search-input" placeholder="Escribe el nombre del artista..." aria-label="Buscar usuario" autocomplete="off">
@@ -269,7 +269,6 @@
             </div>
             <div id="search-results-dropdown" class="search-panel-results"></div>
         </div>
-    </header>
 
     <!-- Cajón de comentarios -->
     <div id="comentarios-drawer" class="comentarios-drawer hidden">
@@ -949,7 +948,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=ef49ca8db5" type="module"></script>
+    <script src="js/main.js?v=a2fcf4332f" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=3c3da86940"></script>
 </body>

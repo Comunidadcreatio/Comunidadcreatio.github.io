@@ -330,16 +330,33 @@ picture {
     padding: 0 16px;
 }
 .search-panel-results {
-    flex: 1;
+    max-height: 40vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 4px 0;
 }
-/* El panel de búsqueda usa el fondo de la app (los resultados son del tema) */
+/* El panel de búsqueda es una barra compacta justo debajo del header (no
+   fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
+   header a propósito: el backdrop-filter del header rompía el containing
+   block del position:fixed y lo mostraba encima del header. */
 #search-panel {
+    position: fixed;
+    top: calc(64px + var(--status-bar-height, 24px));
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: auto;
+    max-height: calc(100vh - var(--status-bar-height, 24px) - 64px - 60px);
     background: var(--color-bg, #fff);
+    z-index: 1100;
+}
+@media (max-width: 768px) {
+    #search-panel {
+        top: calc(60px + var(--status-bar-height, 24px));
+        max-height: calc(100vh - var(--status-bar-height, 24px) - 60px - 60px);
+    }
 }
 
 /* ==============================================

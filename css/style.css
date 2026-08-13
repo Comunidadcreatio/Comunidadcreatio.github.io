@@ -1,7 +1,7 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=f16b8980e4');
+@import url('header.css?v=887173d748');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=ea97eb5e91');
@@ -512,10 +512,16 @@ input, select, textarea {
     flex-shrink: 0;
 }
 
-/* Columna derecha: spacer para balancear */
+/* Columna derecha: spacer para balancear + lupa junto al perfil */
 .bottom-bar-right {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.bottom-bar-right .toggle-nav-btn {
+    margin-left: 16px;
 }
 
 .toggle-nav-btn {
@@ -1109,6 +1115,11 @@ input, select, textarea {
         box-sizing: border-box;
     }
 
+    /* Con el buscador abierto, el contenido baja para no quedar detrás de la barra */
+    body.search-abierto main {
+        padding-top: calc(122px + var(--status-bar-height, 24px));
+    }
+
     #galeria-publica,
     #perfil-usuario,
     #pagina-blanca {
@@ -1148,6 +1159,11 @@ input, select, textarea {
     main {
         padding: 50px 24px 0;
         padding-top: calc(60px + var(--status-bar-height, 24px));
+    }
+
+    /* Con el buscador abierto (móvil), el contenido baja debajo de la barra */
+    body.search-abierto main {
+        padding-top: calc(118px + var(--status-bar-height, 24px));
     }
 
     .notif-panel {

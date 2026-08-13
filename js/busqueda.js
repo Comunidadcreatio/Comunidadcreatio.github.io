@@ -10,8 +10,9 @@ import { showWarning, showError } from './notificaciones.js';
  * Configura el buscador de artistas.
  * @param {Function} verPerfilUsuarioFn - función para navegar al perfil del usuario
  * @param {Function} mostrarResultadosBusquedaFn - función para mostrar resultados full
+ * @param {Function} abrirExplorarFn - función para mostrar la sección Explorar junto al buscador
  */
-export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
+export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, abrirExplorarFn) {
     const lupaBtn = document.getElementById('btn-buscar');
     const panel = document.getElementById('search-panel');
     const cerrarBtn = document.getElementById('search-close');
@@ -23,9 +24,12 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
         return;
     }
 
-    // Abrir la sección de búsqueda al tocar la lupa
+    // Abrir la sección de búsqueda al tocar la lupa (debajo del header),
+    // y mostrar también la sección Explorar.
     const abrirPanel = () => {
         if (panel) panel.classList.remove('hidden');
+        document.body.classList.add('search-abierto');
+        if (abrirExplorarFn) abrirExplorarFn();
         setTimeout(() => searchInput.focus(), 60);
     };
     if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);
@@ -33,10 +37,19 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
     // Cerrar la sección (botón ←)
     const cerrarPanel = () => {
         if (panel) panel.classList.add('hidden');
+        document.body.classList.remove('search-abierto');
         searchInput.value = '';
         resultados.innerHTML = '';
     };
     if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarPanel);
+
+    // Auto-cerrar al tocar fuera del panel (otro botón del nav, una obra, etc.)
+    document.addEventListener('click', (e) => {
+        if (!panel || panel.classList.contains('hidden')) return;
+        if (panel.contains(e.target)) return;
+        if (lupaBtn && lupaBtn.contains(e.target)) return;
+        cerrarPanel();
+    });
 
     // Renderizar resultados dentro del panel
     const renderizarResultados = (usuarios) => {
