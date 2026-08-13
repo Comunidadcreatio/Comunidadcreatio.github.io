@@ -130,13 +130,27 @@ body.teclado-abierto .chat-enviar-btn {
     font-weight: 600;
     color: var(--color-text, #1a1a1a);
 }
+.chat-pueblo-counts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
 .chat-pueblo-count {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--color-text-muted, #888);
     background: var(--color-gray-100, #f0f0f0);
     border-radius: 20px;
-    padding: 3px 10px;
+    padding: 2px 9px;
+    white-space: nowrap;
+}
+.chat-pueblo-count.act {
+    color: #2e7d32;
+}
+.chat-pueblo-count.tot {
+    color: var(--color-text-muted, #888);
 }
 .chat-pueblo-chevron {
     color: var(--color-text-muted, #888);

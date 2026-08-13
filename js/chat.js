@@ -882,7 +882,12 @@ function renderAcordeon(pueblos) {
         header.type = 'button';
         header.className = 'chat-pueblo-header';
         header.setAttribute('aria-expanded', 'false');
-        header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-count">${users.length}</span><span class="chat-pueblo-chevron">▼</span>`;
+        const activos = users.filter(esOnline).length;
+        header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span>` +
+            `<span class="chat-pueblo-counts">` +
+            `<span class="chat-pueblo-count act">${activos} activos</span>` +
+            `<span class="chat-pueblo-count tot">${users.length} artistas</span>` +
+            `</span><span class="chat-pueblo-chevron">▼</span>`;
         header.addEventListener('click', () => toggleAcordeon(item));
 
         const cuerpo = document.createElement('div');
