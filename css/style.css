@@ -1616,3 +1616,37 @@ input, select, textarea {
     max-height: 60vh !important;
     overflow-y: auto !important;
 }
+
+/* ==============================================
+   CREAR CAVENT 4: linea gris + degradado inferior
+   ============================================== */
+/* Ocultar la linea delgada gris en la parte superior de Mis Cavents */
+.cavents-trigger,
+.cavents-dropdown {
+    border-top: none !important;
+}
+
+/* Degradado inferior al desplegar la lista (igual que el chat bajo los circulos) */
+.cavents-dropdown::after {
+    content: '';
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    display: block;
+    pointer-events: none;
+    margin-top: -64px;
+    background: linear-gradient(to top,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.7) 40%,
+        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0) 85%);
+}
+[data-theme="dark"] .cavents-dropdown::after {
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.7) 40%,
+        rgba(0, 0, 0, 0.3) 60%,
+        rgba(0, 0, 0, 0) 85%);
+}
