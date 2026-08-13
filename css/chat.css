@@ -97,16 +97,16 @@ body.teclado-abierto .chat-enviar-btn {
    ACORDEÓN DE PUEBLOS
    ============================================== */
 .chat-pueblo {
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     background: var(--color-bg, #fff);
 }
 .chat-pueblo-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     width: 100%;
-    padding: 8px 8px; /* menos aire lateral */
+    padding: 16px 14px; /* más alto: contenedor más grande */
     background: none;
     border: none;
     cursor: pointer;
@@ -117,30 +117,30 @@ body.teclado-abierto .chat-enviar-btn {
     background: var(--color-gray-50, #fafafa);
 }
 .chat-pueblo-bandera {
-    width: 22px;
-    height: 14px;
+    width: 34px;
+    height: 22px;
     object-fit: cover;
-    border-radius: 2px;
+    border-radius: 3px;
     flex-shrink: 0;
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 .chat-pueblo-nombre {
     flex: 1;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--color-text, #1a1a1a);
 }
 .chat-pueblo-count {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--color-text-muted, #888);
     background: var(--color-gray-100, #f0f0f0);
     border-radius: 20px;
-    padding: 1px 8px;
+    padding: 3px 10px;
 }
 .chat-pueblo-chevron {
     color: var(--color-text-muted, #888);
-    font-size: 11px;
+    font-size: 12px;
     transition: transform 0.2s;
 }
 .chat-pueblo.open .chat-pueblo-chevron {
