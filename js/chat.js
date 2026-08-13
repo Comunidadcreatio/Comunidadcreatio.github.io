@@ -886,7 +886,7 @@ function renderAcordeon(pueblos) {
         header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span>` +
             `<span class="chat-pueblo-counts">` +
             `<span class="chat-pueblo-count act${activos >= 1 ? ' ok' : ''}">${activos} Activos</span>` +
-            `<span class="chat-pueblo-count tot${users.length > 1 ? ' ok' : ''}">${users.length} Artistas</span>` +
+            `<span class="chat-pueblo-count tot${users.length >= 1 ? ' ok' : ''}">${users.length} Artistas</span>` +
             `</span><span class="chat-pueblo-chevron">▼</span>`;
         header.addEventListener('click', () => toggleAcordeon(item));
 

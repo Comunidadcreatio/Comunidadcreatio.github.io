@@ -151,7 +151,7 @@ body.teclado-abierto .chat-enviar-btn {
     background: #2e7d32;
     color: #fff;
 }
-/* Artistas: azul si hay > 1 registrado, gris si 0 o 1 */
+/* Artistas: azul si hay >= 1 registrado, gris si 0 */
 .chat-pueblo-count.tot.ok {
     background: #1976d2;
     color: #fff;
