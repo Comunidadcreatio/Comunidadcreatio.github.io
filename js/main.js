@@ -585,70 +585,17 @@ function setupEvents() {
     }
 
     // ----- Botones de navegación de la barra inferior -----
+    // Cavents abre directamente la galería (Global Cavents); ya no hay popover.
     const btnCaventsHub = document.getElementById('btn-cavents-hub');
-    const caventsPopover = document.getElementById('cavents-popover');
-
-    if (btnCaventsHub && caventsPopover) {
-        btnCaventsHub.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isHidden = caventsPopover.classList.contains('hidden');
-            // Cerrar otros popovers
-            document.querySelectorAll('.header-popover').forEach(p => p.classList.add('hidden'));
-            if (isHidden) {
-                posicionarCaventsPopover(btnCaventsHub, caventsPopover);
-            }
-        });
-    }
-
-    function posicionarCaventsPopover(trigger, popover) {
-        const panelDiv = popover.querySelector('.header-popover-panel');
-        if (!panelDiv) return;
-        // Forzar display block y reflow para medir correctamente
-        popover.classList.remove('hidden');
-        popover.style.display = 'block';
-        void popover.offsetHeight; // forzar reflow
-        const triggerRect = trigger.getBoundingClientRect();
-        const panelRect = panelDiv.getBoundingClientRect();
-        const margin = 8;
-        const gap = 15;
-        const iconCenterX = triggerRect.left + triggerRect.width / 2;
-        // Posicionar arriba del botón
-        let top = triggerRect.top - panelRect.height - gap;
-        if (top < margin) top = margin;
-        let left = iconCenterX - panelRect.width / 2;
-        const maxLeft = window.innerWidth - panelRect.width - margin;
-        if (left > maxLeft) left = maxLeft;
-        if (left < margin) left = margin;
-        popover.style.top = `${top}px`;
-        popover.style.left = `${left}px`;
-        popover.style.display = '';
-        // Cola apuntando al centro del botón
-        const tailX = iconCenterX - left;
-        panelDiv.style.setProperty('--tail-x', `${tailX}px`);
-    }
-
-    if (caventsPopover) {
-        // Opciones del menú cavents
-        document.getElementById('cavents-galeria')?.addEventListener('click', () => {
-            caventsPopover.classList.add('hidden');
+    if (btnCaventsHub) {
+        btnCaventsHub.addEventListener('click', () => {
             toggleGaleria(getGaleriaContainer());
         });
-
     }
 
     // ----- Botón "+" de la barra inferior: abre Crear Cavent -----
     document.getElementById('btn-crear-cavent')?.addEventListener('click', () => {
-        if (caventsPopover) caventsPopover.classList.add('hidden');
         togglePanel('crear');
-    });
-
-    // Cerrar popovers al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (caventsPopover && !caventsPopover.classList.contains('hidden')) {
-            if (!caventsPopover.contains(e.target) && e.target !== btnCaventsHub) {
-                caventsPopover.classList.add('hidden');
-            }
-        }
     });
 
     // ----- Botones del panel móvil de logout -----

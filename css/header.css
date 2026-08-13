@@ -81,8 +81,8 @@ picture {
     margin-left: auto;
 }
 
-/* Empuja los 3 iconos (lupa, notificaciones, menú) hacia la derecha */
-#btn-buscar {
+/* Empuja los iconos restantes (notificaciones, menú) hacia la derecha */
+#btn-notificaciones {
     margin-left: auto;
 }
 

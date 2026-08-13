@@ -1,7 +1,7 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=887173d748');
+@import url('header.css?v=ad581c44d4');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=ea97eb5e91');
@@ -504,24 +504,27 @@ input, select, textarea {
     margin-right: 16px;
 }
 
-/* Columna central: el perfil perfectamente centrado */
+/* Columna central: el perfil perfectamente centrado (absoluto sobre el nav) */
 .bottom-bar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    z-index: 3;
 }
 
-/* Columna derecha: spacer para balancear + lupa junto al perfil */
+/* Columna derecha: spacer + lupa justo al lado del perfil.
+   El perfil mide 44px, así que su mitad son 22px; +16px de separación. */
 .bottom-bar-right {
     flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-}
-.bottom-bar-right .toggle-nav-btn {
-    margin-left: 16px;
+    padding-left: calc(22px + 16px);
 }
 
 .toggle-nav-btn {
@@ -1029,21 +1032,6 @@ input, select, textarea {
     height: 1px;
     background-color: var(--color-gray-dark);
     margin: 4px 16px;
-}
-
-/* ==============================================
-   POPOVER CAVENTS (sobre la barra inferior)
-   Cola apuntando hacia ABAJO
-   ============================================== */
-#cavents-popover .header-popover-panel::after {
-    top: auto;
-    bottom: -8px;
-    border-top: 8px solid var(--color-black);
-    border-bottom: none;
-}
-
-[data-theme="dark"] #cavents-popover .header-popover-panel::after {
-    border-top-color: var(--color-gray-100);
 }
 
 /* ==============================================
