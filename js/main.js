@@ -860,3 +860,18 @@ async function init() {
 }
 
 init();
+
+// ============================================
+// SLIDESHOW DE FONDO — cambia cada 8s (como auth.html)
+// ============================================
+(function rotarFondo() {
+    const slides = document.querySelectorAll('.auth-bg-slide');
+    if (slides.length < 2) return;
+    let actual = 0;
+    slides[0].classList.add('active');
+    setInterval(() => {
+        actual = (actual + 1) % slides.length;
+        slides.forEach(s => s.classList.remove('active'));
+        slides[actual].classList.add('active');
+    }, 8000);
+})();
