@@ -964,19 +964,13 @@ function setupStepNavigation() {
 
         // El input de etiquetas está al fondo del paso 2: el navegador tiende a
         // desplazar todo el formulario al enfocarlo y abrir el teclado. Lo
-        // evitamos restaurando la posición de scroll (igual que los demás inputs).
+        // evitamos enfocando con preventScroll (igual que los demás inputs).
         const inputEtiquetas = document.getElementById('input-etiquetas');
-        const formCont = document.getElementById('formulario-obra');
-        if (inputEtiquetas && formCont && !inputEtiquetas.dataset.fixScroll) {
+        if (inputEtiquetas && !inputEtiquetas.dataset.fixScroll) {
             inputEtiquetas.dataset.fixScroll = '1';
-            let scrollPrevio = 0;
-            inputEtiquetas.addEventListener('focus', () => {
-                scrollPrevio = formCont.scrollTop;
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        formCont.scrollTop = scrollPrevio;
-                    });
-                });
+            inputEtiquetas.addEventListener('pointerdown', (e) => {
+                e.preventDefault(); // cancela el focus auto-scroll del navegador
+                inputEtiquetas.focus({ preventScroll: true });
             });
         }
 
