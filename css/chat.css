@@ -673,9 +673,17 @@ body.teclado-abierto .chat-enviar-btn {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Sin recorte: los badges de los círculos sobresalen libremente; si hay
-       muchos círculos, la fila desborda la pantalla hacia la izquierda */
-    overflow: visible;
+    /* Scroll horizontal: cuando hay muchas conversaciones, la fila se desliza
+       libremente a la izquierda/derecha. El scrollbar se oculta. */
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Padding para que los badges (no leídos) y los nombres no se recorten */
+    padding: 6px 0 2px;
+    /* Solo gestos horizontales sobre la fila de círculos */
+    touch-action: pan-x;
 }
 /* Envoltorio de cada círculo/FAB + su nombre debajo */
 .chat-conv-wrap {
