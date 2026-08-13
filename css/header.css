@@ -366,6 +366,11 @@ picture {
         max-width: 44vw;
         height: auto;
         object-fit: contain;
+        transform: translateY(3px); /* bajar un poco */
+    }
+
+    .header-icon {
+        transform: translateY(3px); /* bajar un poco */
     }
 
     .header-icon {
