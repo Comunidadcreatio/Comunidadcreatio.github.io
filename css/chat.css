@@ -97,7 +97,7 @@ body.teclado-abierto .chat-enviar-btn {
    ACORDEÓN DE PUEBLOS
    ============================================== */
 .chat-pueblo {
-    border-radius: 12px;
+    border-radius: 0; /* sin esquinas: los acordeones quedan pegados, sin aire */
     overflow: hidden;
     background: var(--color-bg, #fff);
 }
@@ -126,7 +126,7 @@ body.teclado-abierto .chat-enviar-btn {
 }
 .chat-pueblo-nombre {
     flex: 1;
-    font-size: 15px;
+    font-size: 13px; /* un poco más pequeño */
     font-weight: 600;
     color: var(--color-text, #1a1a1a);
 }
@@ -168,7 +168,6 @@ body.teclado-abierto .chat-enviar-btn {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    border-top: 1px solid var(--color-gray-100, #eee);
 }
 .chat-pueblo-cuerpo-contenido {
     overflow: hidden;
@@ -179,6 +178,7 @@ body.teclado-abierto .chat-enviar-btn {
 }
 .chat-pueblo.open .chat-pueblo-cuerpo {
     grid-template-rows: 1fr;
+    border-top: 1px solid var(--color-gray-100, #eee);
 }
 .chat-pueblo.open .chat-pueblo-cuerpo-contenido {
     opacity: 1;
@@ -644,7 +644,7 @@ body.teclado-abierto .chat-enviar-btn {
     align-items: center;
     gap: 10px;
     /* Padding superior alto: el degradado ocupa mucha altura y se nota más */
-    padding: 56px 0 8px;
+    padding: 56px 0 26px; /* más aire abajo para los nombres de los círculos */
     /* Degradado vertical a ancho completo: nace fuerte en el borde del nav y
        se va perdiendo muy por encima de los círculos (blanco en claro) */
     background: linear-gradient(to top,
@@ -670,6 +670,29 @@ body.teclado-abierto .chat-enviar-btn {
     /* Sin recorte: los badges de los círculos sobresalen libremente; si hay
        muchos círculos, la fila desborda la pantalla hacia la izquierda */
     overflow: visible;
+}
+/* Envoltorio de cada círculo/FAB + su nombre debajo */
+.chat-conv-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    pointer-events: auto;
+}
+.chat-conv-nombre {
+    max-width: 76px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    line-height: 1.2;
+}
+[data-theme="dark"] .chat-conv-nombre {
+    color: #a3a3a3;
 }
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;

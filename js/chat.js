@@ -978,11 +978,14 @@ function renderConversaciones(convs) {
     const cont = document.getElementById('chat-cluster-convs');
     if (!cont) return;
     // Conservar el FAB de la sala global: solo se eliminan los círculos de conversación
-    cont.querySelectorAll('.chat-conv-circle').forEach(c => c.remove());
+    cont.querySelectorAll('.chat-conv-wrap:not(.chat-fab-wrap)').forEach(w => w.remove());
     if (!convs || !convs.length) return;
     const ordenadas = [...convs].reverse(); // newest queda a la derecha, junto al FAB
     const fab = cont.querySelector('.chat-fab');
+    const fabWrap = fab ? fab.closest('.chat-conv-wrap') : null;
     ordenadas.forEach(c => {
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-conv-wrap';
         const circle = document.createElement('button');
         circle.type = 'button';
         circle.className = 'chat-conv-circle';
@@ -996,9 +999,14 @@ function renderConversaciones(convs) {
         badge.className = 'chat-circle-badge hidden';
         circle.appendChild(badge);
         circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
+        const nombre = document.createElement('span');
+        nombre.className = 'chat-conv-nombre';
+        nombre.textContent = c.otro_nombre || 'Conversación';
+        wrap.appendChild(circle);
+        wrap.appendChild(nombre);
         // Insertar antes del FAB para que la sala global quede en el extremo derecho
-        if (fab) cont.insertBefore(circle, fab);
-        else cont.appendChild(circle);
+        if (fabWrap) cont.insertBefore(wrap, fabWrap);
+        else cont.appendChild(wrap);
     });
     // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
     requestAnimationFrame(() => { cont.scrollLeft = cont.scrollWidth; });
