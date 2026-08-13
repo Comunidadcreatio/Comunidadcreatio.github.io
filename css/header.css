@@ -360,11 +360,11 @@ picture {
         flex-shrink: 0;
     }
 
-    /* Logo wordmark "Creatio" completo, a la izquierda */
+    /* Logo wordmark "Creatio" completo, horizontal, a la izquierda */
     .header__logo {
-        height: 20px;
-        width: auto;
-        max-width: 50vw;
+        width: 44vw;
+        max-width: 44vw;
+        height: auto;
         object-fit: contain;
     }
 
@@ -446,12 +446,16 @@ picture {
     }
 
     picture {
-        max-width: 32px;
+        height: 100%;
+        display: flex;
+        align-items: center;
     }
 
     .header__logo {
-        height: 34px;
-        max-width: 36px;
+        width: 44vw;
+        max-width: 44vw;
+        height: auto;
+        object-fit: contain;
     }
 
     .header-icon {
