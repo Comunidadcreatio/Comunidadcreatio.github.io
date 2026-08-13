@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.380';
+        var currentVer = '1.0.381';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=1cad4cfdf5">
+    <link rel="stylesheet" href="css/style.css?v=bd7cb1ddab">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -173,10 +173,8 @@
 
     <!-- HEADER -->
     <header id="main-header" role="banner">
-       <picture>
-           <source media="(max-width: 768px)" srcset="iconos/Logo-temporal2.svg">
-    <!-- Versión para pantallas de hasta 768px (móvil) -->
-            <!-- Versión para escritorio -->
+        <picture>
+            <!-- Logo completo "Creatio" (wordmark) en todas las pantallas -->
             <img src="iconos/Logo-temporal.svg" alt="Creatio" class="header__logo">
         </picture>
 
@@ -218,16 +216,15 @@
 
         <!-- Panel de búsqueda de artistas -->
         <div id="search-panel" class="notif-panel hidden">
-            <div class="notif-panel-header">
-                <button id="search-close" class="notif-panel-close">←</button>
-                <h3>Buscar artista</h3>
-            </div>
-            <div class="search-panel-body">
+            <div class="search-panel-top">
+                <button id="search-close" class="chat-volver-btn" aria-label="Volver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
                 <div class="search-input-wrapper">
                     <input type="text" id="search-input" placeholder="Escribe el nombre del artista..." aria-label="Buscar usuario" autocomplete="off">
                 </div>
-                <div id="search-results-dropdown" class="search-panel-results"></div>
             </div>
+            <div id="search-results-dropdown" class="search-panel-results"></div>
         </div>
     </header>
 

@@ -81,6 +81,11 @@ picture {
     margin-left: auto;
 }
 
+/* Empuja los 3 iconos (lupa, notificaciones, menú) hacia la derecha */
+#btn-buscar {
+    margin-left: auto;
+}
+
 .header-icon:hover {
     background-color: var(--color-gray-100);
 }
@@ -301,20 +306,21 @@ picture {
 /* ==============================================
    PANEL DE BÚSQUEDA (se abre desde el icono de la lupa)
    ============================================== */
-.search-panel-body {
-    padding: 12px 16px;
+/* Fila superior: flecha (igual que chat) + input de búsqueda */
+.search-panel-top {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 8px;
-    overflow-y: auto;
-    height: calc(100% - 50px);
+    padding: 12px 16px 6px;
+    flex-shrink: 0;
 }
-.search-panel-body .search-input-wrapper {
+.search-panel-top .search-input-wrapper {
+    flex: 1;
     height: 40px;
-    width: 100%;
     margin: 0;
+    min-width: 0;
 }
-.search-panel-body .search-input-wrapper input {
+.search-panel-top .search-input-wrapper input {
     line-height: 40px;
     height: 40px;
     font-size: 14px;
@@ -324,20 +330,16 @@ picture {
     padding: 0 16px;
 }
 .search-panel-results {
+    flex: 1;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    padding: 4px 0;
 }
 /* El panel de búsqueda usa el fondo de la app (los resultados son del tema) */
 #search-panel {
     background: var(--color-bg, #fff);
-}
-#search-panel .notif-panel-header {
-    border-bottom: 1px solid var(--color-gray-200, #e5e5e5);
-}
-#search-panel .notif-panel-header h3,
-#search-panel .notif-panel-close {
-    color: var(--color-text, #1a1a1a);
 }
 
 /* ==============================================
@@ -352,16 +354,17 @@ picture {
     }
 
     picture {
-        max-width: 36px;
         height: 100%;
         display: flex;
         align-items: center;
+        flex-shrink: 0;
     }
 
+    /* Logo wordmark "Creatio" completo, a la izquierda */
     .header__logo {
-        height: 34px;      /* Similar al tamaño de los iconos */
+        height: 20px;
         width: auto;
-        max-width: 36px;
+        max-width: 50vw;
         object-fit: contain;
     }
 
