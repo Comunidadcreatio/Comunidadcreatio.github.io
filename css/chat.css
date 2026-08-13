@@ -94,6 +94,80 @@ body.teclado-abierto .chat-enviar-btn {
 /* Sala global: se abre desde el botón flotante (FAB), ya no hay tarjeta en el directorio */
 
 /* ==============================================
+   ACORDEÓN DE PUEBLOS
+   ============================================== */
+.chat-pueblo {
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-bg, #fff);
+}
+.chat-pueblo-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 8px; /* menos aire lateral */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+}
+.chat-pueblo-header:hover {
+    background: var(--color-gray-50, #fafafa);
+}
+.chat-pueblo-bandera {
+    width: 22px;
+    height: 14px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.chat-pueblo-nombre {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text, #1a1a1a);
+}
+.chat-pueblo-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+    background: var(--color-gray-100, #f0f0f0);
+    border-radius: 20px;
+    padding: 1px 8px;
+}
+.chat-pueblo-chevron {
+    color: var(--color-text-muted, #888);
+    font-size: 11px;
+    transition: transform 0.2s;
+}
+.chat-pueblo.open .chat-pueblo-chevron {
+    transform: rotate(180deg);
+}
+.chat-pueblo-cuerpo {
+    display: none;
+    border-top: 1px solid var(--color-gray-100, #eee);
+    padding: 4px 0;
+}
+.chat-pueblo.open .chat-pueblo-cuerpo {
+    display: block;
+}
+.chat-pueblo-vacio {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--color-text-muted, #999);
+}
+[data-theme="dark"] .chat-pueblo-header:hover {
+    background: #242424;
+}
+[data-theme="dark"] .chat-pueblo-count {
+    background: #2a2a2a;
+    color: #d4d4d4;
+}
+
+/* ==============================================
    CARRUSEL DE BANDERAS (coverflow)
    ============================================== */
 .chat-pueblos-carrusel {

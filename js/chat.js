@@ -615,62 +615,6 @@ function setupUsuarioRowMenu(row, u) {
 }
 
 // ============================================
-// BUSCADOR DE ARTISTAS EN EL DIRECTORIO
-// ============================================
-function setupBuscador() {
-    const cont = document.getElementById('chat-accordion');
-    if (!cont) return;
-    if (cont.querySelector('.chat-buscador')) return;
-    const box = document.createElement('div');
-    box.className = 'chat-buscador';
-    box.innerHTML = '<input type="search" id="chat-buscar" class="chat-buscar" placeholder="🔍 Buscar artista…" autocomplete="off" aria-label="Buscar artista">';
-    cont.insertBefore(box, cont.firstChild);
-    const input = box.querySelector('input');
-    input.addEventListener('input', () => {
-        const q = input.value.trim().toLowerCase();
-        const carrusel = cont.querySelector('.chat-pueblos-carrusel');
-        const info = cont.querySelector('.chat-pueblo-info');
-        const panel = document.getElementById('chat-pueblo-panel');
-        if (q.length < 2) {
-            if (carrusel) carrusel.style.display = '';
-            if (info) info.style.display = '';
-            if (panel) {
-                if (ultimoPuebloSeleccionado && ultimosPueblos[ultimoPuebloSeleccionado]) renderUsuariosPueblo(ultimoPuebloSeleccionado);
-                else panel.innerHTML = '<div class="chat-pueblo-vacio">Desliza para elegir un municipio</div>';
-            }
-            return;
-        }
-        if (carrusel) carrusel.style.display = 'none';
-        if (info) info.style.display = 'none';
-        const resultados = [];
-        Object.entries(ultimosPueblos).forEach(([ciudad, users]) => {
-            (users || []).forEach(u => {
-                const nom = (u.nombre_artista || '').toLowerCase();
-                if (nom.includes(q)) resultados.push(Object.assign({}, u, { ciudad }));
-            });
-        });
-        if (!panel) return;
-        panel.innerHTML = `<div class="chat-buscar-titulo">Resultados (${resultados.length})</div>`;
-        const lista = document.createElement('div');
-        lista.className = 'chat-pueblo-usuarios';
-        if (resultados.length) {
-            resultados.slice(0, 30).forEach(u => {
-                const row = document.createElement('button');
-                row.type = 'button';
-                row.className = 'chat-user-row';
-                row.innerHTML = estadoUsuarioHTML(u);
-                row.addEventListener('click', () => abrirPrivado(u));
-                setupUsuarioRowMenu(row, u);
-                lista.appendChild(row);
-            });
-        } else {
-            lista.innerHTML = '<div class="chat-pueblo-vacio">Sin resultados</div>';
-        }
-        panel.appendChild(lista);
-    });
-}
-
-// ============================================
 // TECLADO: fija el header y ajusta la altura del chat al abrirse el teclado.
 // (El viewport meta interactive-widget no siempre lo resuelve en WebViews
 //  antiguas; visualViewport sí mide la altura visible real.)
@@ -904,7 +848,7 @@ async function cargarDirectorio() {
             apiRequest('/chat/conversaciones')
         ]);
         cargarBloqueados(); // en paralelo, no bloquea
-        renderCarruselPueblos(dirRes && dirRes.success ? dirRes.pueblos : {});
+        renderAcordeon(dirRes && dirRes.success ? dirRes.pueblos : {});
         renderConversaciones(convRes && convRes.success ? convRes.conversaciones : []);
     } catch (e) {
         debugLog.error('directorio chat:', e);
@@ -912,11 +856,9 @@ async function cargarDirectorio() {
     }
 }
 
-// CARRUSEL DE BANDERAS: se deslizan horizontalmente; la bandera que queda en
-// el centro es la seleccionada (la más grande) y debajo se cargan sus usuarios.
-let ultimoPuebloSeleccionado = null;
-
-function renderCarruselPueblos(pueblos) {
+// ACORDEÓN DE PUEBLOS: lista vertical de municipios con bandera; al tocar uno
+// se despliega (tipo acordeón) la lista de sus usuarios.
+function renderAcordeon(pueblos) {
     ultimosPueblos = pueblos || {};
     const cont = document.getElementById('chat-accordion');
     cont.innerHTML = '';
@@ -925,78 +867,53 @@ function renderCarruselPueblos(pueblos) {
         cont.innerHTML = '<div class="chat-sin-mensajes">No hay pueblos disponibles.</div>';
         return;
     }
-
-    const carrusel = document.createElement('div');
-    carrusel.className = 'chat-pueblos-carrusel';
-    carrusel.setAttribute('aria-label', 'Selecciona un municipio del Táchira');
+    const frag = document.createDocumentFragment();
     lista.forEach(ciudad => {
-        const users = ultimosPueblos[ciudad] || [];
-        const slide = document.createElement('button');
-        slide.type = 'button';
-        slide.className = 'chat-pueblo-slide';
-        slide.dataset.pueblo = ciudad;
-        slide.setAttribute('aria-label', `${ciudad}: ${users.length} usuarios`);
+        const users = (pueblos && pueblos[ciudad]) || [];
+        const item = document.createElement('div');
+        item.className = 'chat-pueblo';
+
         const bandera = banderaDe(ciudad);
-        slide.innerHTML = bandera
-            ? `<img class="chat-pueblo-slide-bandera" src="iconos/banderas/${bandera}" alt="" loading="lazy" draggable="false">`
-            : '<span class="chat-pueblo-slide-bandera chat-pueblo-slide-bandera-vacia"></span>';
-        slide.addEventListener('click', () => {
-            // Al tocar una bandera se centra (snap) y el scroll carga sus usuarios
-            slide.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-        });
-        carrusel.appendChild(slide);
-    });
-    // Barra de información: nombre del municipio (izq.) + contadores (der.)
-    const info = document.createElement('div');
-    info.id = 'chat-pueblo-info';
-    info.className = 'chat-pueblo-info';
-    info.innerHTML = '<span class="chat-pueblo-info-titulo">Desliza para elegir un municipio</span>';
-    cont.appendChild(info);
+        const banderaHTML = bandera
+            ? `<img class="chat-pueblo-bandera" src="iconos/banderas/${bandera}" alt="">`
+            : '<span class="chat-pueblo-bandera"></span>';
 
-    // Buscador de artistas (encima del carrusel)
-    setupBuscador();
+        const header = document.createElement('button');
+        header.type = 'button';
+        header.className = 'chat-pueblo-header';
+        header.setAttribute('aria-expanded', 'false');
+        header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span><span class="chat-pueblo-count">${users.length}</span><span class="chat-pueblo-chevron">▼</span>`;
+        header.addEventListener('click', () => toggleAcordeon(item));
 
-    cont.appendChild(carrusel);
-
-    const panel = document.createElement('div');
-    panel.id = 'chat-pueblo-panel';
-    panel.className = 'chat-pueblo-panel';
-    panel.innerHTML = '<div class="chat-pueblo-vacio">Desliza para elegir un municipio</div>';
-    cont.appendChild(panel);
-
-    // Escala las banderas según su distancia al centro y detecta la central
-    function actualizarCarrusel() {
-        const centro = carrusel.scrollLeft + carrusel.clientWidth / 2;
-        let mejor = null;
-        let mejorD = Infinity;
-        carrusel.querySelectorAll('.chat-pueblo-slide').forEach(s => {
-            const sc = s.offsetLeft + s.offsetWidth / 2;
-            const d = Math.abs(sc - centro);
-            const k = d / carrusel.clientWidth;
-            s.style.transform = `scale(${Math.max(0.55, 1 - k * 0.8)})`;
-            s.style.opacity = String(0.35 + (1 - Math.min(1, k * 1.5)) * 0.65);
-            if (d < mejorD) { mejorD = d; mejor = s; }
-        });
-        const pueblo = mejor ? mejor.dataset.pueblo : null;
-        if (pueblo && pueblo !== ultimoPuebloSeleccionado) {
-            ultimoPuebloSeleccionado = pueblo;
-            renderUsuariosPueblo(pueblo);
+        const cuerpo = document.createElement('div');
+        cuerpo.className = 'chat-pueblo-cuerpo';
+        if (users.length) {
+            users.forEach(u => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'chat-user-row';
+                row.innerHTML = estadoUsuarioHTML(u);
+                row.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirPrivado(u);
+                });
+                cuerpo.appendChild(row);
+            });
+        } else {
+            cuerpo.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
         }
-    }
-    let raf = null;
-    carrusel.addEventListener('scroll', () => {
-        if (raf) return;
-        raf = requestAnimationFrame(() => { raf = null; actualizarCarrusel(); });
-    });
 
-    // Centrar la primera bandera y cargar sus usuarios
-    requestAnimationFrame(() => {
-        const s0 = carrusel.querySelector('.chat-pueblo-slide');
-        if (s0) {
-            carrusel.scrollLeft = s0.offsetLeft - (carrusel.clientWidth - s0.offsetWidth) / 2;
-        }
-        actualizarCarrusel();
+        item.appendChild(header);
+        item.appendChild(cuerpo);
+        frag.appendChild(item);
     });
+    cont.appendChild(frag);
+}
+
+function toggleAcordeon(item) {
+    const estabaAbierto = item.classList.contains('open');
+    document.querySelectorAll('#chat-accordion .chat-pueblo.open').forEach(el => el.classList.remove('open'));
+    if (!estabaAbierto) item.classList.add('open');
 }
 
 // Municipio al que pertenece el pueblo (para el encabezado del panel)
