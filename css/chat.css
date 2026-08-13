@@ -146,11 +146,15 @@ body.teclado-abierto .chat-enviar-btn {
     padding: 2px 9px;
     white-space: nowrap;
 }
-.chat-pueblo-count.act {
-    color: #2e7d32;
+/* Activos: verde si hay >= 1 usuario en línea, gris si 0 */
+.chat-pueblo-count.act.ok {
+    background: #2e7d32;
+    color: #fff;
 }
-.chat-pueblo-count.tot {
-    color: var(--color-text-muted, #888);
+/* Artistas: azul si hay > 1 registrado, gris si 0 o 1 */
+.chat-pueblo-count.tot.ok {
+    background: #1976d2;
+    color: #fff;
 }
 .chat-pueblo-chevron {
     color: var(--color-text-muted, #888);
