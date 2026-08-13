@@ -27,7 +27,7 @@ html, body {
     top: calc(64px + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
-    bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     /* Ocultar la barra de scroll (escritorio y móvil) sin desactivar el scroll */
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -338,7 +338,7 @@ html, body {
 @media (max-width: 768px) {
     #galeria-container {
         top: calc(60px + var(--status-bar-height, 24px));
-        bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     }
 
     .obra-artista-row {
@@ -400,8 +400,8 @@ html, body {
    ============================================== */
 @media (max-width: 480px) {
     #galeria-container {
-        top: calc(48px + var(--status-bar-height, 24px));
-        bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+        top: calc(60px + var(--status-bar-height, 24px));
+        bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     }
 
     .obra-card {
@@ -611,8 +611,17 @@ html, body {
 }
 
 #galeria-container.modo-grid .obra-carousel-viewport {
-    aspect-ratio: 9 / 16;
+    aspect-ratio: auto;
     height: auto;
+}
+#galeria-container.modo-grid .obra-carousel,
+#galeria-container.modo-grid .obra-carousel-track,
+#galeria-container.modo-grid .obra-carousel-slide {
+    height: auto;
+}
+#galeria-container.modo-grid .obra-carousel-slide img {
+    height: auto;
+    object-fit: contain; /* respeta la proporcion subida por el usuario */
 }
 
 /* ---- En grid ocultamos la fila de artista; usamos el overlay sobre la imagen ---- */

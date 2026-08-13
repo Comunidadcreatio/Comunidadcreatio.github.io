@@ -4,7 +4,7 @@
 @import url('header.css?v=f16b8980e4');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=b8648a15e7');
+@import url('galeria-publica.css?v=ea97eb5e91');
 
 /* Chat global + privado */
 @import url('chat.css?v=d3006d01b3');
@@ -1437,4 +1437,31 @@ input, select, textarea {
 }
 [data-theme="dark"] #toggle-panel {
     background: rgba(10, 10, 10, 0.35);
+}
+
+/* ==============================================
+   AJUSTES VIDRIO (Crear Cavent) + BARRAS DE TARJETA
+   ============================================== */
+/* Crear Cavent: el contenedor del formulario no tapa el fondo rotativo */
+#panel-artista #formulario-obra {
+    background: transparent;
+}
+[data-theme="dark"] #panel-artista #formulario-obra {
+    background: transparent;
+}
+/* Barra de pasos (abajo, junto al nav): vidrio */
+#obra-step-bar {
+    background: rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+[data-theme="dark"] #obra-step-bar {
+    background: rgba(10, 10, 10, 0.35);
+}
+/* Barra de la tarjeta (avatar, nombre, titulo, precio): fondo solido del modo */
+.obra-artista-row {
+    background: var(--color-white);
+}
+[data-theme="dark"] .obra-artista-row {
+    background: #1a1a1a;
 }
