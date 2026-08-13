@@ -1568,3 +1568,51 @@ input, select, textarea {
     -webkit-backdrop-filter: none !important;
     box-shadow: none;
 }
+
+/* ==============================================
+   CREAR CAVENT 3: contraste ratio + cavents solidos con animacion
+   ============================================== */
+/* Boton de ratio seleccionado: circulo blanco + texto NEGRO siempre (contraste) */
+.ratio-btn.active,
+[data-theme="dark"] .ratio-btn.active {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+}
+.ratio-btn:not(.active),
+[data-theme="dark"] .ratio-btn:not(.active) {
+    background: rgba(0, 0, 0, 0.45) !important;
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Mis Cavents: cada cavent con relleno solido (tarjetas) */
+.cavent-item {
+    background: var(--color-white);
+    margin: 6px 10px;
+    border-radius: 10px;
+    border-bottom: none;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.cavent-item:hover {
+    background: var(--color-gray-50);
+}
+[data-theme="dark"] .cavent-item {
+    background: #1a1a1a;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .cavent-item:hover {
+    background: #242424;
+}
+
+/* Mis Cavents: despliegue fluido (max-height animado) */
+.cavents-dropdown {
+    display: block !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.cavents-dropdown.open {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+}
