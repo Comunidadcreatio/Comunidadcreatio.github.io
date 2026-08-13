@@ -655,8 +655,8 @@ body.teclado-abierto .chat-enviar-btn {
        se va perdiendo muy por encima de los círculos (blanco en claro) */
     background: linear-gradient(to top,
         rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.7) 40%,
-        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0.88) 35%,
+        rgba(255, 255, 255, 0.55) 60%,
         rgba(255, 255, 255, 0) 85%);
     /* Solo los círculos y el FAB capturan toques */
     pointer-events: none;
@@ -848,8 +848,8 @@ body.teclado-abierto .chat-enviar-btn {
        encima de los círculos */
     background: linear-gradient(to top,
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.7) 40%,
-        rgba(0, 0, 0, 0.3) 60%,
+        rgba(0, 0, 0, 0.88) 35%,
+        rgba(0, 0, 0, 0.55) 60%,
         rgba(0, 0, 0, 0) 85%);
 }
 [data-theme="dark"] .chat-conv-circle {
