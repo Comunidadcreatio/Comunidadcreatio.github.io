@@ -47,6 +47,20 @@ function esOnline(u) {
     return !isNaN(t) && (Date.now() - t) < ONLINE_MS;
 }
 
+// "Activo hace X" → Xmin / Xh / Xd (redondeado, ejemplo: 1min, 5min, 1h, 2d)
+function tiempoActivoHace(ultimaActividad) {
+    if (!ultimaActividad) return '';
+    const t = new Date(ultimaActividad).getTime();
+    if (isNaN(t)) return '';
+    const seg = Math.max(0, Math.floor((Date.now() - t) / 1000));
+    if (seg < 60) return '1min';
+    const min = Math.floor(seg / 60);
+    if (min < 60) return `${min}min`;
+    const h = Math.floor(min / 60);
+    if (h < 24) return `${h}h`;
+    return `${Math.floor(h / 24)}d`;
+}
+
 function formatFechaCorta(fecha) {
     if (!fecha) return '';
     const d = new Date(fecha);
@@ -780,6 +794,7 @@ let entregadoHastaLocal = 0;  // hasta qué id recibió el otro (priv) → ✓�
 let canalEsPriv = false;
 let canalOtroId = null;
 let canalOtroNombre = '';
+let canalOtroActividad = null; // ultima_actividad del otro (para presencia en el header)
 let bloqueadosSet = new Set(); // IDs de usuarios bloqueados por el usuario actual
 let ultimoTypingEnvio = 0;    // throttle del POST /chat/typing
 let menuActual = null;        // {menu, velo} del menú flotante abierto
@@ -999,7 +1014,7 @@ function renderConversaciones(convs) {
         const badge = document.createElement('span');
         badge.className = 'chat-circle-badge hidden';
         circle.appendChild(badge);
-        circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto));
+        circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto, c.ultima_actividad));
         const nombre = document.createElement('span');
         nombre.className = 'chat-conv-nombre';
         nombre.textContent = c.otro_nombre || 'Conversación';
@@ -1018,13 +1033,13 @@ function abrirPrivado(u) {
     const me = miId();
     if (!me || u.id === me) return;
     const canal = me < u.id ? `priv:${me}:${u.id}` : `priv:${u.id}:${me}`;
-    abrirSala(canal, u.nombre_artista, u.foto_perfil);
+    abrirSala(canal, u.nombre_artista, u.foto_perfil, u.ultima_actividad);
 }
 
 // ============================================
 // SALA: cargar mensajes + poll condicional
 // ============================================
-async function abrirSala(canal, titulo, fotoOtro) {
+async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     detenerPoll();
     canalActivo = canal;
     window._canalChatActivo = canal; // lo usa push.js para no mostrar banner si ya estás leyendo aquí
@@ -1035,6 +1050,7 @@ async function abrirSala(canal, titulo, fotoOtro) {
     canalEsPriv = canal !== 'global';
     canalOtroId = canalEsPriv ? otroDeCanal(canal) : null;
     canalOtroNombre = canalEsPriv ? titulo : '';
+    canalOtroActividad = canalEsPriv ? (actividadOtro || null) : null;
     leidoHastaLocal = 0;
     entregadoHastaLocal = 0;
     cancelarRespuesta();
@@ -1044,11 +1060,24 @@ async function abrirSala(canal, titulo, fotoOtro) {
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');
 
-    // Avatar del otro usuario (después de la flecha de volver)
+    // Avatar del otro usuario (después de la flecha de volver), con punto de presencia
     const avatarEl = document.getElementById('chat-sala-avatar');
-    if (avatarEl) avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
+    if (avatarEl) {
+        if (canalEsPriv) {
+            const online = esOnline({ ultima_actividad: canalOtroActividad });
+            avatarEl.innerHTML = `<span class="chat-sala-avatar-wrap">${avatarHTML(fotoOtro, titulo)}<span class="chat-user-dot ${online ? 'online' : ''}"></span></span>`;
+        } else {
+            avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
+        }
+    }
     const tituloEl = document.getElementById('chat-sala-titulo');
-    tituloEl.innerHTML = `<span>${escapeHtml(titulo)}</span>`;
+    if (canalEsPriv && canalOtroActividad) {
+        const online = esOnline({ ultima_actividad: canalOtroActividad });
+        const pres = online ? 'Activo ahora' : `Activo hace ${tiempoActivoHace(canalOtroActividad)}`;
+        tituloEl.innerHTML = `<span class="chat-sala-nombre">${escapeHtml(titulo)}</span><span class="chat-sala-presencia ${online ? 'on' : ''}">${pres}</span>`;
+    } else {
+        tituloEl.innerHTML = `<span>${escapeHtml(titulo)}</span>`;
+    }
 
     const cont = document.getElementById('chat-mensajes');
     cont.innerHTML = '<div class="chat-cargando">Cargando mensajes…</div>';

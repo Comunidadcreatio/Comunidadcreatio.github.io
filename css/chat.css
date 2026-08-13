@@ -454,13 +454,37 @@ body.teclado-abierto .chat-enviar-btn {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+/* Nombre (flex 1) + presencia ("Activo ahora" / "Activo hace X") al lado */
+.chat-sala-nombre {
+    flex: 1;
+    min-width: 0;
+}
+.chat-sala-presencia {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+    flex-shrink: 0;
+}
+.chat-sala-presencia.on {
+    color: #16a34a;
+}
 
-/* Avatar del otro usuario en el header de la sala (después de la flecha) */
+/* Avatar del otro usuario en el header (con punto de presencia) */
 .chat-sala-avatar {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     margin-left: 2px;
+}
+.chat-sala-avatar-wrap {
+    position: relative;
+    display: inline-flex;
+}
+.chat-sala-avatar-wrap .chat-user-dot {
+    width: 11px;
+    height: 11px;
+    right: -1px;
+    bottom: -1px;
 }
 .chat-sala-avatar .chat-user-avatar {
     width: 32px;
@@ -719,6 +743,7 @@ body.teclado-abierto .chat-enviar-btn {
     position: relative;
     width: 56px;
     height: 56px;
+    box-sizing: border-box; /* el borde entra en los 56px (igual que el FAB) */
     border-radius: 50%;
     border: 2px solid var(--color-bg, #fff);
     cursor: pointer;
