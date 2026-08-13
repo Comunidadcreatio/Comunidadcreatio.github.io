@@ -1626,27 +1626,22 @@ input, select, textarea {
     border-top: none !important;
 }
 
-/* Degradado inferior al desplegar la lista (igual que el chat bajo los circulos) */
+/* Degradado DEBAJO de la lista de cavents (mas alto y grande) */
 .cavents-dropdown::after {
     content: '';
-    position: sticky;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
     display: block;
+    height: 140px;
     pointer-events: none;
-    margin-top: -64px;
     background: linear-gradient(to top,
         rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.7) 40%,
+        rgba(255, 255, 255, 0.7) 35%,
         rgba(255, 255, 255, 0.3) 60%,
-        rgba(255, 255, 255, 0) 85%);
+        rgba(255, 255, 255, 0) 100%);
 }
 [data-theme="dark"] .cavents-dropdown::after {
     background: linear-gradient(to top,
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.7) 40%,
+        rgba(0, 0, 0, 0.7) 35%,
         rgba(0, 0, 0, 0.3) 60%,
-        rgba(0, 0, 0, 0) 85%);
+        rgba(0, 0, 0, 0) 100%);
 }
