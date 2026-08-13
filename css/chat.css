@@ -97,16 +97,15 @@ body.teclado-abierto .chat-enviar-btn {
    ACORDEÓN DE PUEBLOS
    ============================================== */
 .chat-pueblo {
-    border-radius: 0; /* del medio sin esquinas: quedan pegados, sin aire */
+    border-radius: 12px; /* esquinas curvas en cada acordeón */
     overflow: hidden;
     background: var(--color-bg, #fff);
 }
-/* Bordes curvos solo en los extremos de la lista (estilo agrupado) */
-.chat-pueblo:first-child {
-    border-radius: 12px 12px 0 0;
-}
-.chat-pueblo:last-child {
-    border-radius: 0 0 12px 12px;
+/* La lista tiene el mismo fondo que los acordeones: las esquinas curvas
+   no dejan huecos (aire) entre ellos */
+#chat-accordion {
+    background: var(--color-bg, #fff);
+    border-radius: 12px;
 }
 .chat-pueblo-header {
     display: flex;
