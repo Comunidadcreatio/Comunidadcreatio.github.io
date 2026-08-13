@@ -743,6 +743,25 @@ body.teclado-abierto .chat-enviar-btn {
     border-radius: 50%;
     display: block;
 }
+/* Punto de presencia en los círculos de conversación (verde activo / gris offline) */
+.chat-conv-dot {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #9ca3af;
+    border: 2px solid var(--color-bg, #fff);
+    box-sizing: border-box;
+    z-index: 1;
+}
+.chat-conv-dot.online {
+    background-color: #22c55e;
+}
+[data-theme="dark"] .chat-conv-dot {
+    border-color: #0a0a0a;
+}
 .chat-conv-circle:hover {
     transform: scale(1.06);
 }

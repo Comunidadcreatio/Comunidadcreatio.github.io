@@ -992,9 +992,10 @@ function renderConversaciones(convs) {
         circle.setAttribute('aria-label', `Chat con ${c.otro_nombre}`);
         circle.dataset.canal = c.canal;
         const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
-        circle.innerHTML = c.otro_foto
+        const online = esOnline(c);
+        circle.innerHTML = (c.otro_foto
             ? `<img src="${c.otro_foto}" alt="">`
-            : inicial;
+            : inicial) + `<span class="chat-conv-dot${online ? ' online' : ''}"></span>`;
         const badge = document.createElement('span');
         badge.className = 'chat-circle-badge hidden';
         circle.appendChild(badge);
