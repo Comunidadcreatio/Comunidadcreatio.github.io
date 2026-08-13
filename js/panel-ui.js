@@ -633,7 +633,8 @@ function setupCaventsDropdown() {
             if (guardarBtn) guardarBtn.textContent = 'Crear Cavent';
         }
         if (caventName) {
-            trigger.innerHTML = '<span style="font-size:10px;color:var(--color-gray-500);">Mis Cavents</span> <span style="font-size:11px;">▴ ' + caventName + '</span>';
+            // Solo el titulo del cavent, izquierda, mismo tamaño que "Mis Cavents"
+            trigger.textContent = caventName;
         } else {
             trigger.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
         }
