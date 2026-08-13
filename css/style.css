@@ -1475,8 +1475,11 @@ input, select, textarea {
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     left: 0;
     right: 0;
-    background: var(--color-bg);
+    background: rgba(255, 255, 255, 0.80); /* 80% opacidad */
     z-index: 1;
+}
+[data-theme="dark"] .app-content-solid {
+    background: rgba(10, 10, 10, 0.80); /* 80% opacidad */
 }
 
 /* ==============================================
