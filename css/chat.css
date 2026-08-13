@@ -165,12 +165,23 @@ body.teclado-abierto .chat-enviar-btn {
     transform: rotate(180deg);
 }
 .chat-pueblo-cuerpo {
-    display: none;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     border-top: 1px solid var(--color-gray-100, #eee);
+}
+.chat-pueblo-cuerpo-contenido {
+    overflow: hidden;
+    min-height: 0;
+    opacity: 0;
     padding: 4px 0;
+    transition: opacity 0.3s ease;
 }
 .chat-pueblo.open .chat-pueblo-cuerpo {
-    display: block;
+    grid-template-rows: 1fr;
+}
+.chat-pueblo.open .chat-pueblo-cuerpo-contenido {
+    opacity: 1;
 }
 .chat-pueblo-vacio {
     padding: 12px 16px;

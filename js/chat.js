@@ -892,6 +892,8 @@ function renderAcordeon(pueblos) {
 
         const cuerpo = document.createElement('div');
         cuerpo.className = 'chat-pueblo-cuerpo';
+        const contenido = document.createElement('div');
+        contenido.className = 'chat-pueblo-cuerpo-contenido';
         if (users.length) {
             users.forEach(u => {
                 const row = document.createElement('button');
@@ -902,11 +904,12 @@ function renderAcordeon(pueblos) {
                     e.stopPropagation();
                     abrirPrivado(u);
                 });
-                cuerpo.appendChild(row);
+                contenido.appendChild(row);
             });
         } else {
-            cuerpo.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
+            contenido.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
         }
+        cuerpo.appendChild(contenido);
 
         item.appendChild(header);
         item.appendChild(cuerpo);
