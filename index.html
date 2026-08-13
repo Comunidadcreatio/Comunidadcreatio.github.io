@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.379';
+        var currentVer = '1.0.380';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=077cc2e552">
+    <link rel="stylesheet" href="css/style.css?v=1cad4cfdf5">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -180,20 +180,13 @@
             <img src="iconos/Logo-temporal.svg" alt="Creatio" class="header__logo">
         </picture>
 
-        <!-- Buscador de usuarios (centro) -->
-        <div class="header-search">
-    <div class="search-input-wrapper">
-        <input type="text" id="search-input" placeholder="Buscar artista..." aria-label="Buscar usuario" autocomplete="off">
-        <button id="search-btn" class="search-button" aria-label="Buscar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Icono de búsqueda: abre la sección para buscar artistas -->
+        <button id="btn-buscar" class="header-icon" aria-label="Buscar artista">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
         </button>
-    </div>
-        <!-- Desplegable de resultados en tiempo real -->
-        <div id="search-results-dropdown" class="search-dropdown hidden"></div>
-    </div>
 
         <!-- Icono de notificaciones -->
         <button id="btn-notificaciones" class="header-icon" aria-label="Notificaciones">
@@ -220,6 +213,20 @@
             <div class="notif-panel-scroll">
                 <div id="notif-list" class="notif-list"></div>
                 <div id="notif-empty" class="search-no-results">No tienes notificaciones</div>
+            </div>
+        </div>
+
+        <!-- Panel de búsqueda de artistas -->
+        <div id="search-panel" class="notif-panel hidden">
+            <div class="notif-panel-header">
+                <button id="search-close" class="notif-panel-close">←</button>
+                <h3>Buscar artista</h3>
+            </div>
+            <div class="search-panel-body">
+                <div class="search-input-wrapper">
+                    <input type="text" id="search-input" placeholder="Escribe el nombre del artista..." aria-label="Buscar usuario" autocomplete="off">
+                </div>
+                <div id="search-results-dropdown" class="search-panel-results"></div>
             </div>
         </div>
     </header>

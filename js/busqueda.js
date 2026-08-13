@@ -1,66 +1,50 @@
 // js/busqueda.js
-// Búsqueda de usuarios en tiempo real con dropdown y debounce.
+// Búsqueda de artistas en una sección (panel) que se abre desde el icono de la
+// lupa del header. Resultados en tiempo real con debounce.
 
 import { apiRequest } from './config.js';
 import { debounce, escapeHtml, debugLog } from './utils.js';
 import { showWarning, showError } from './notificaciones.js';
 
 /**
- * Configura el buscador de usuarios en tiempo real.
+ * Configura el buscador de artistas.
  * @param {Function} verPerfilUsuarioFn - función para navegar al perfil del usuario
  * @param {Function} mostrarResultadosBusquedaFn - función para mostrar resultados full
  */
 export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
+    const lupaBtn = document.getElementById('btn-buscar');
+    const panel = document.getElementById('search-panel');
+    const cerrarBtn = document.getElementById('search-close');
     const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const searchDropdown = document.getElementById('search-results-dropdown');
+    const resultados = document.getElementById('search-results-dropdown');
 
-    if (!searchInput || !searchBtn || !searchDropdown) {
+    if (!searchInput || !resultados) {
         debugLog.warn('Buscador: elementos no encontrados');
         return;
     }
 
-    // Cerrar el dropdown al hacer clic fuera
-    const cerrarDropdown = () => {
-        searchDropdown.classList.add('hidden');
-        searchInput.classList.remove('input-available', 'input-unavailable');
+    // Abrir la sección de búsqueda al tocar la lupa
+    const abrirPanel = () => {
+        if (panel) panel.classList.remove('hidden');
+        setTimeout(() => searchInput.focus(), 60);
     };
+    if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);
 
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
-            cerrarDropdown();
-        }
-    });
-
-    // Reposicionar el dropdown según el wrapper del input
-    const posicionarDropdown = () => {
-        const inputWrapper = searchInput.closest('.search-input-wrapper');
-        if (!inputWrapper) return;
-        const wrapperRect = inputWrapper.getBoundingClientRect();
-        searchDropdown.style.top = `${wrapperRect.top + window.scrollY}px`;
-        searchDropdown.style.left = `${wrapperRect.left + window.scrollX}px`;
-        searchDropdown.style.width = `${wrapperRect.width}px`;
+    // Cerrar la sección (botón ←)
+    const cerrarPanel = () => {
+        if (panel) panel.classList.add('hidden');
+        searchInput.value = '';
+        resultados.innerHTML = '';
     };
+    if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarPanel);
 
-    // Mantener el dropdown alineado al cambiar tamaño de ventana o al hacer scroll
-    const reposicionarSiVisible = () => {
-        if (!searchDropdown.classList.contains('hidden')) {
-            posicionarDropdown();
-        }
-    };
-    window.addEventListener('resize', reposicionarSiVisible);
-    window.addEventListener('scroll', reposicionarSiVisible, true);
-
-    // Renderizar resultados en el dropdown
-    const renderizarResultadosDropdown = (usuarios) => {
-        searchDropdown.innerHTML = '';
-
+    // Renderizar resultados dentro del panel
+    const renderizarResultados = (usuarios) => {
+        resultados.innerHTML = '';
         if (!usuarios || usuarios.length === 0) {
-            searchDropdown.innerHTML = `<div class="search-no-results">No se encontraron usuarios</div>`;
-            searchDropdown.classList.remove('hidden');
+            resultados.innerHTML = '<div class="search-no-results">No se encontraron artistas</div>';
             return;
         }
-
         usuarios.forEach(usuario => {
             const item = document.createElement('div');
             item.className = 'search-result-item';
@@ -72,7 +56,6 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
                 avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;
             }
-
             const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${escapeHtml(usuario.nombre_real)}</div>` : '';
 
             item.innerHTML = `
@@ -82,83 +65,57 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn) {
                     ${nombreReal}
                 </div>
             `;
-
             item.addEventListener('click', () => {
-                cerrarDropdown();
+                cerrarPanel();
                 if (verPerfilUsuarioFn) verPerfilUsuarioFn(usuario.id);
             });
-
-            searchDropdown.appendChild(item);
+            resultados.appendChild(item);
         });
-
-        posicionarDropdown();
-        searchDropdown.classList.remove('hidden');
     };
 
     // Búsqueda en tiempo real
     const buscarUsuariosTiempoReal = async (query) => {
         if (query.length < 1) {
-            searchDropdown.classList.add('hidden');
+            resultados.innerHTML = '';
             return;
         }
-
         try {
             const data = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
-
-            if (data && data.success && Array.isArray(data.usuarios)) {
-                renderizarResultadosDropdown(data.usuarios);
-            } else {
-                renderizarResultadosDropdown([]);
-            }
+            renderizarResultados((data && data.success && Array.isArray(data.usuarios)) ? data.usuarios : []);
         } catch (error) {
             debugLog.error('Error en búsqueda en tiempo real:', error);
-            searchDropdown.classList.add('hidden');
+            resultados.innerHTML = '';
         }
     };
 
-    // Versión con debounce de 500ms
     const buscarConDebounce = debounce((query) => {
         buscarUsuariosTiempoReal(query);
-    }, 500);
+    }, 400);
 
-    // Evento input (tiempo real)
     searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim();
-        if (query.length >= 1) {
-            buscarConDebounce(query);
-            searchInput.classList.add('input-available');
-        } else {
-            searchDropdown.classList.add('hidden');
-            searchInput.classList.remove('input-available', 'input-unavailable');
-        }
+        buscarConDebounce(e.target.value.trim());
     });
 
-    // Búsqueda tradicional con botón (resultados completos)
-    const buscarUsuarioConBoton = async () => {
+    // Enter: abrir la sección de resultados completos
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key !== 'Enter') return;
         const query = searchInput.value.trim();
         if (query.length < 2) {
             showWarning('El término de búsqueda debe tener al menos 2 caracteres');
             return;
         }
-
-        try {
-            const response = await apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`);
-            if (response && response.success && Array.isArray(response.usuarios) && response.usuarios.length > 0) {
-                if (mostrarResultadosBusquedaFn) mostrarResultadosBusquedaFn(response.usuarios);
-            } else {
-                showWarning('No se encontraron usuarios con ese nombre');
-            }
-        } catch (error) {
-            debugLog.error('Error al buscar usuarios:', error);
-            showError('Error al buscar usuarios. Por favor intenta nuevamente.');
-        }
-    };
-
-    searchBtn.addEventListener('click', buscarUsuarioConBoton);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            buscarUsuarioConBoton();
-            cerrarDropdown();
-        }
+        apiRequest(`/api/artistas/buscar?q=${encodeURIComponent(query)}`)
+            .then(response => {
+                if (response && response.success && Array.isArray(response.usuarios) && response.usuarios.length > 0) {
+                    cerrarPanel();
+                    if (mostrarResultadosBusquedaFn) mostrarResultadosBusquedaFn(response.usuarios);
+                } else {
+                    showWarning('No se encontraron usuarios con ese nombre');
+                }
+            })
+            .catch(error => {
+                debugLog.error('Error al buscar usuarios:', error);
+                showError('Error al buscar usuarios. Por favor intenta nuevamente.');
+            });
     });
 }

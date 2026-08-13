@@ -299,6 +299,48 @@ picture {
 }
 
 /* ==============================================
+   PANEL DE BÚSQUEDA (se abre desde el icono de la lupa)
+   ============================================== */
+.search-panel-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    height: calc(100% - 50px);
+}
+.search-panel-body .search-input-wrapper {
+    height: 40px;
+    width: 100%;
+    margin: 0;
+}
+.search-panel-body .search-input-wrapper input {
+    line-height: 40px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 16px;
+}
+.search-panel-results {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+/* El panel de búsqueda usa el fondo de la app (los resultados son del tema) */
+#search-panel {
+    background: var(--color-bg, #fff);
+}
+#search-panel .notif-panel-header {
+    border-bottom: 1px solid var(--color-gray-200, #e5e5e5);
+}
+#search-panel .notif-panel-header h3,
+#search-panel .notif-panel-close {
+    color: var(--color-text, #1a1a1a);
+}
+
+/* ==============================================
    RESPONSIVE - MÓVIL
    ============================================== */
 @media (max-width: 768px) {
