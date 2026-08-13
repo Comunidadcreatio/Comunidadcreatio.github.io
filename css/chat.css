@@ -177,6 +177,14 @@ body.teclado-abierto .chat-enviar-btn {
     font-size: 13px;
     color: var(--color-text-muted, #999);
 }
+/* Línea divisoria delgada entre cada acordeón */
+.chat-pueblo + .chat-pueblo {
+    border-top: 1px solid var(--color-gray-200, #e5e5e5);
+}
+/* Línea divisoria delgada entre usuarios dentro del acordeón */
+.chat-pueblo-cuerpo .chat-user-row + .chat-user-row {
+    border-top: 1px solid var(--color-gray-100, #eee);
+}
 [data-theme="dark"] .chat-pueblo-header:hover {
     background: #242424;
 }
