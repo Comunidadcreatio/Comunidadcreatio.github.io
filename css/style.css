@@ -1465,3 +1465,16 @@ input, select, textarea {
 [data-theme="dark"] .obra-artista-row {
     background: #1a1a1a;
 }
+
+/* Capa solida del contenido: blanca (claro) / negra (oscuro), solo entre
+   header y nav. Las franjas del header/nav quedan transparentes para que
+   el vidrio (blur) muestre las imagenes rotativas de fondo. */
+.app-content-solid {
+    position: fixed;
+    top: calc(60px + var(--status-bar-height, 24px));
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    z-index: 1;
+}
