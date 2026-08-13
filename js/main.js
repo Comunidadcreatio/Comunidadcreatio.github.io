@@ -635,12 +635,14 @@ function setupEvents() {
             caventsPopover.classList.add('hidden');
             toggleGaleria(getGaleriaContainer());
         });
-        document.getElementById('cavents-crear')?.addEventListener('click', () => {
-            caventsPopover.classList.add('hidden');
-            togglePanel('crear');
-        });
 
     }
+
+    // ----- Botón "+" de la barra inferior: abre Crear Cavent -----
+    document.getElementById('btn-crear-cavent')?.addEventListener('click', () => {
+        if (caventsPopover) caventsPopover.classList.add('hidden');
+        togglePanel('crear');
+    });
 
     // Cerrar popovers al hacer clic fuera
     document.addEventListener('click', (e) => {
