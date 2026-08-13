@@ -686,6 +686,10 @@ body.teclado-abierto .chat-enviar-btn {
     flex-shrink: 0;
     pointer-events: auto;
 }
+/* Aire al borde derecho solo para el wrap del FAB (el nombre queda centrado) */
+.chat-fab-wrap {
+    margin-right: 5px;
+}
 .chat-conv-nombre {
     max-width: 76px;
     font-size: 10px;
@@ -804,8 +808,6 @@ body.teclado-abierto .chat-enviar-btn {
     padding: 0;
     transition: transform 0.15s;
     flex-shrink: 0;
-    /* Aire lateral de 5px hacia el borde derecho de la pantalla */
-    margin-right: 5px;
 }
 .chat-fab:hover {
     transform: scale(1.06);
