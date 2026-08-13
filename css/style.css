@@ -1518,3 +1518,43 @@ input, select, textarea {
 #obra-step-bar .crear-btn:hover {
     background: var(--color-gray-100) !important;
 }
+
+/* ==============================================
+   CREAR CAVENT 2: quitar rellenos restantes
+   (Mis Cavents, carrusel de imagenes, barra inferior)
+   ============================================== */
+/* Mis Cavents (acordeon desplegable): sin relleno, solo borde */
+.cavents-trigger {
+    background: transparent;
+}
+.cavents-dropdown {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+}
+[data-theme="dark"] .cavents-trigger,
+[data-theme="dark"] .cavents-dropdown {
+    background: transparent;
+}
+
+/* Carrusel de imagenes: quitar relleno y poner borde como los demas */
+.carrusel-viewport,
+.carrusel-slide {
+    background: transparent;
+}
+.carrusel-viewport {
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+}
+[data-theme="dark"] .carrusel-viewport {
+    border-color: #3a3a3a;
+}
+
+/* Barra inferior (flechas <> / limpiar / crear-duplicar-actualizar): sin relleno */
+#obra-step-bar {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none;
+}
