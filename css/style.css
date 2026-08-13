@@ -1,7 +1,7 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=ad581c44d4');
+@import url('header.css?v=5a34e0528b');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=ea97eb5e91');
@@ -516,15 +516,16 @@ input, select, textarea {
     z-index: 3;
 }
 
-/* Columna derecha: spacer + lupa justo al lado del perfil.
-   El perfil mide 44px, así que su mitad son 22px; +16px de separación. */
+/* Columna derecha: spacer + lupa justo al lado del perfil, con el MISMO
+   aire que los iconos de la izquierda. El perfil mide 44px + borde 2px
+   (content-box) = 48px total, mitad 24px; +16px = separación idéntica. */
 .bottom-bar-right {
     flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: calc(22px + 16px);
+    padding-left: calc(24px + 16px);
 }
 
 .toggle-nav-btn {

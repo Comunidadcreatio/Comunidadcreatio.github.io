@@ -133,9 +133,10 @@ export function actualizarEstadoNavButtons() {
         btnCaventsHub.classList.remove('nav-btn-active', 'nav-btn-grid');
 
         if (galeriaVisible) {
-            if (galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid')) {
-                btnCaventsHub.classList.add('nav-btn-grid');
-            } else {
+            // El modo grid (Explorar) ya no se vincula al botón cavents:
+            // explorar sale de la lupa, así que no se marca en amarillo.
+            const enGrid = galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid');
+            if (!enGrid) {
                 btnCaventsHub.classList.add('nav-btn-active');
             }
         }
