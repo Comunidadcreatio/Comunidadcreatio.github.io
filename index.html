@@ -10,7 +10,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.411';
+        var currentVer = '1.0.412';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -70,7 +70,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=f6524c995f">
+    <link rel="stylesheet" href="css/style.css?v=0c6cf84caa">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -401,6 +401,7 @@
                                         <button type="button" class="ratio-btn active" data-ratio="4/5">4:5</button>
                                         <button type="button" class="ratio-btn" data-ratio="1/1">1:1</button>
                                     </div>
+                                    <span class="carrusel-ratio-hint">Las imágenes se recortarán automáticamente a 4:5 o 1:1</span>
                                 </div>
                                 <div class="carrusel-dots" id="carrusel-dots"></div>
                             </div>

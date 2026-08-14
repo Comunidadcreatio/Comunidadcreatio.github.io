@@ -222,12 +222,70 @@ function dispararInput(index) {
     if (inp) inp.click();
 }
 
-function agregarImagen(file, dataUrl) {
+// Recorta una imagen (centrada) al ratio indicado ('4/5' o '1/1') con canvas.
+// Devuelve { file, dataURL } con la imagen ya normalizada (JPEG, alto 1080).
+// Así el archivo que se guarda SIEMPRE queda en 4:5 o 1:1 y el grid/carrusel
+// solo muestran esos formatos.
+function cropearImagen(file, aspect) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            try {
+                const target = aspect === '1/1' ? 1 : 4 / 5;
+                const iw = img.naturalWidth, ih = img.naturalHeight;
+                const imgAspect = iw / ih;
+                let sw, sh, sx, sy;
+                if (imgAspect > target) {
+                    // Más ancha que el target → recortar lados
+                    sh = ih; sw = Math.round(ih * target); sx = Math.round((iw - sw) / 2); sy = 0;
+                } else {
+                    // Más alta que el target → recortar arriba/abajo
+                    sw = iw; sh = Math.round(iw / target); sx = 0; sy = Math.round((ih - sh) / 2);
+                }
+                const outH = 1080; // calidad suficiente (Cloudinary limita ancho a 1080)
+                const outW = Math.round(outH * target);
+                const canvas = document.createElement('canvas');
+                canvas.width = outW;
+                canvas.height = outH;
+                const ctx = canvas.getContext('2d');
+                // Fondo blanco: evita fondo negro al exportar JPEG si la imagen tiene transparencia
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, outW, outH);
+                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+                canvas.toBlob((blob) => {
+                    URL.revokeObjectURL(url);
+                    if (!blob) return reject(new Error('No se pudo recortar la imagen'));
+                    const nombre = (file.name || 'imagen').replace(/\.[^.]+$/, '') + '.jpg';
+                    const cropped = new File([blob], nombre, { type: 'image/jpeg' });
+                    resolve({ file: cropped, dataURL: canvas.toDataURL('image/jpeg', 0.9) });
+                }, 'image/jpeg', 0.9);
+            } catch (e) {
+                URL.revokeObjectURL(url);
+                reject(e);
+            }
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo cargar la imagen')); };
+        img.src = url;
+    });
+}
+
+async function agregarImagen(file, dataUrl) {
     if (imagenesData.length >= MAX_IMAGENES) return;
-    const slot = getNextFreeSlot();
-    imagenesData.push({ src: dataUrl, file: file, slot: slot });
-    currentSlide = imagenesData.length - 1;
-    actualizarCarrusel();
+    try {
+        // Recortar al ratio seleccionado (4:5 o 1:1)
+        const recortada = await cropearImagen(file, aspectRatio);
+        const slot = getNextFreeSlot();
+        imagenesData.push({ src: recortada.dataURL, file: recortada.file, slot: slot });
+        currentSlide = imagenesData.length - 1;
+        actualizarCarrusel();
+    } catch (e) {
+        debugLog.error('No se pudo recortar la imagen, se usa la original:', e);
+        const slot = getNextFreeSlot();
+        imagenesData.push({ src: dataUrl, file: file, slot: slot });
+        currentSlide = imagenesData.length - 1;
+        actualizarCarrusel();
+    }
 }
 
 export function aplicarPreviewImagen(slot, url) {
@@ -345,11 +403,23 @@ export function setupImagePreviews() {
 
     // Ratio toggle
     document.querySelectorAll(".ratio-btn").forEach(btn => {
-        btn.addEventListener("click", function() {
+        btn.addEventListener("click", async function() {
             document.querySelectorAll(".ratio-btn").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
             aspectRatio = this.dataset.ratio;
             document.getElementById("carrusel-viewport").style.aspectRatio = aspectRatio;
+            // Re-recortar las imágenes ya agregadas al nuevo ratio
+            // (solo las que tienen archivo real; las de edición por URL se respetan)
+            for (const img of imagenesData.filter(i => i.file)) {
+                try {
+                    const recortada = await cropearImagen(img.file, aspectRatio);
+                    img.src = recortada.dataURL;
+                    img.file = recortada.file;
+                } catch (e) {
+                    debugLog.error('No se pudo re-recortar la imagen al cambiar ratio:', e);
+                }
+            }
+            actualizarCarrusel();
         });
     });
 }

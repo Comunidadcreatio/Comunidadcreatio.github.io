@@ -1506,6 +1506,17 @@ form,
     z-index: 10;
     padding: 0;
 }
+.carrusel-ratio-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-gray-500);
+    pointer-events: none;
+    z-index: 10;
+}
 .ratio-btn {
     width: 28px;
     height: 28px;
