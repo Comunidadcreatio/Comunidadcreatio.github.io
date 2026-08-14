@@ -516,16 +516,18 @@ input, select, textarea {
     z-index: 3;
 }
 
-/* Columna derecha: spacer + lupa justo al lado del perfil, con el MISMO
-   aire que los iconos de la izquierda. El perfil mide 44px + borde 2px
-   (content-box) = 48px total, mitad 24px; +16px = separación idéntica. */
+/* Columna derecha: spacer + lupa junto al perfil con aire claramente
+   generoso. El perfil mide 44px + borde 2px (content-box) = 48px total,
+   mitad 24px. El usuario percibe la lupa más pegada que cavents (lado
+   izquierdo), así que la separación derecha es mayor a la izquierda para
+   que ópticamente se vea el mismo aire. Ajustable a gusto. */
 .bottom-bar-right {
     flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: calc(24px + 16px);
+    padding-left: calc(24px + 24px);
 }
 
 .toggle-nav-btn {
