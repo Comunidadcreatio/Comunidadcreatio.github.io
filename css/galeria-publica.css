@@ -605,23 +605,26 @@ html, body {
     flex: 0 0 auto;                  /* No crece: la tarjeta mide solo el contenido de la imagen */
 }
 
-/* En grid: carrusel mantiene proporción 9/16 vertical (igual q modo azul) */
+/* En grid: TODOS los cavents (nuevos y viejos) se muestran a 4:5,
+   recortando el sobrante con object-fit: cover — así el grid queda uniforme
+   sin importar la proporción original del archivo */
 #galeria-container.modo-grid .obra-carousel {
     flex: none;
 }
 
 #galeria-container.modo-grid .obra-carousel-viewport {
-    aspect-ratio: auto;
+    aspect-ratio: 4 / 5;
     height: auto;
 }
 #galeria-container.modo-grid .obra-carousel,
 #galeria-container.modo-grid .obra-carousel-track,
 #galeria-container.modo-grid .obra-carousel-slide {
-    height: auto;
+    height: 100%;
 }
 #galeria-container.modo-grid .obra-carousel-slide img {
-    height: auto;
-    object-fit: contain; /* respeta la proporcion subida por el usuario */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 8px;
 }
 
