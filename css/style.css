@@ -504,30 +504,29 @@ input, select, textarea {
     margin-right: 16px;
 }
 
-/* Columna central: el perfil perfectamente centrado (absoluto sobre el nav) */
+/* Columna central: el perfil perfectamente centrado entre columnas flex:1
+   iguales (en flujo, NO absoluto: un padding en las columnas laterales
+   desbalancea el flex y corre el divisor, pegando la lupa al perfil) */
 .bottom-bar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    z-index: 3;
 }
 
-/* Columna derecha: spacer + lupa junto al perfil con aire claramente
-   generoso. El perfil mide 44px + borde 2px (content-box) = 48px total,
-   mitad 24px. El usuario percibe la lupa más pegada que cavents (lado
-   izquierdo), así que la separación derecha es mayor a la izquierda para
-   que ópticamente se vea el mismo aire. Ajustable a gusto. */
+/* Columna derecha: spacer + lupa con el MISMO margen que los iconos de la
+   izquierda (margin en el botón, no padding en la columna, para no
+   desbalancear el flex). Así la distancia perfil↔lupa es idéntica a
+   cavents↔perfil, con el perfil como punto central. */
 .bottom-bar-right {
     flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: calc(24px + 24px);
+}
+.bottom-bar-right .toggle-nav-btn {
+    margin-left: 16px;
 }
 
 .toggle-nav-btn {
