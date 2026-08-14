@@ -1,10 +1,10 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=5a34e0528b');
+@import url('header.css?v=ad6de06015');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=ea97eb5e91');
+@import url('galeria-publica.css?v=b7336e4191');
 
 /* Chat global + privado */
 @import url('chat.css?v=d3006d01b3');
@@ -1110,6 +1110,12 @@ input, select, textarea {
         padding-top: calc(122px + var(--status-bar-height, 24px));
     }
 
+    /* S1: con el buscador abierto, el grid Explorar baja debajo de la barra
+       (header 64px + barra 68px) para que la primera fila no quede cortada */
+    body.search-abierto #galeria-container {
+        top: calc(132px + var(--status-bar-height, 24px));
+    }
+
     #galeria-publica,
     #perfil-usuario,
     #pagina-blanca {
@@ -1154,6 +1160,11 @@ input, select, textarea {
     /* Con el buscador abierto (móvil), el contenido baja debajo de la barra */
     body.search-abierto main {
         padding-top: calc(118px + var(--status-bar-height, 24px));
+    }
+
+    /* S1 (móvil): grid Explorar debajo de la barra (header 60px + barra 68px) */
+    body.search-abierto #galeria-container {
+        top: calc(128px + var(--status-bar-height, 24px));
     }
 
     .notif-panel {
