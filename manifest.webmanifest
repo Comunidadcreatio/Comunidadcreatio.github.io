@@ -1,0 +1,26 @@
+{
+  "name": "Creatio — Galería de Arte del Táchira",
+  "short_name": "Creatio",
+  "description": "Conecta con el arte en el Táchira. Descubre artistas locales y sus obras.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "categories": ["art", "social", "shopping"],
+  "icons": [
+    {
+      "src": "iconos/Logo-temporal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "iconos/Metaweb.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg"
+    }
+  ]
+}

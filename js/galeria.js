@@ -1,7 +1,7 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
-import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl } from './utils.js';
 import { abrirComentarios } from './comentarios.js';
 
 export async function cargarGaleria(container) {
@@ -211,7 +211,7 @@ function crearObraCard(obra) {
 
     const artistaUserId = obra.artista_user_id !== undefined && obra.artista_user_id !== null ? obra.artista_user_id : '';
     const avatarHTML = tieneAvatar 
-        ? `<img src="${fotoArtista}" alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
+        ? `<img src="${safeImgUrl(fotoArtista)}" alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
         : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
     const gridOverlayHTML = `
@@ -545,11 +545,11 @@ async function mostrarVistas(obraId, anchorEl) {
             ${vistas.map(v => {
                 const inicial = (v.nombre_artista || '?')[0].toUpperCase();
                 const avatarHTML = v.foto_perfil
-                    ? `<img src="${v.foto_perfil}" class="vistas-avatar">`
+                    ? `<img src="${safeImgUrl(v.foto_perfil)}" class="vistas-avatar">`
                     : `<div class="vistas-avatar vistas-avatar-default">${inicial}</div>`;
                 return `<div class="vistas-item">
                     ${avatarHTML}
-                    <span class="vistas-nombre">${v.nombre_artista || 'Usuario'}</span>
+                    <span class="vistas-nombre">${renderText(v.nombre_artista) || 'Usuario'}</span>
                     <span class="vistas-fecha">${timeAgoShortV(v.created_at)}</span>
                 </div>`;
             }).join('')}

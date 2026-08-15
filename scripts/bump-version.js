@@ -23,7 +23,8 @@ const VERSION_FILE = 'version.json';
  * Calcula el hash MD5 de un archivo.
  */
 function hashFile(filePath) {
-    const content = fs.readFileSync(filePath, 'utf-8');
+    // Leer como Buffer: hash idéntico para texto UTF-8 y correcto para binarios (iconos)
+    const content = fs.readFileSync(filePath);
     return crypto.createHash('md5').update(content).digest('hex').slice(0, 10);
 }
 
@@ -212,6 +213,22 @@ function main() {
                 }
             });
 
+            // 4c2. Sincronizar versión del APK Android (android/app/build.gradle)
+            // android/ está en .gitignore, pero mantiene el APK local alineado con la web
+            const gradlePath = path.join(projectRoot, 'android/app/build.gradle');
+            if (fs.existsSync(gradlePath)) {
+                let gradle = fs.readFileSync(gradlePath, 'utf-8');
+                const g1 = gradle.replace(/versionName\s+\x22[\d.]+\x22/, 'versionName \x22' + versionData.version + '\x22');
+                const g2 = g1.replace(/versionCode\s+\d+/, (m) => {
+                    const n = parseInt(m.replace(/\D/g, ''), 10) + 1;
+                    return 'versionCode ' + n;
+                });
+                if (g2 !== gradle) {
+                    fs.writeFileSync(gradlePath, g2, 'utf-8');
+                    console.log('✎ android/app/build.gradle → versionName ' + versionData.version + ' (versionCode +1)');
+                }
+            }
+
             // 4d. Actualizar ?v= en imports de módulos ES (main.js / perfil.js)
             JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, null));
         }
@@ -238,7 +255,8 @@ function main() {
     ];
     const filesToCopy = [
         'index.html', 'auth.html', 'reset-password.html', 'version.json',
-        'capacitor.config.json', 'capacitor.plugins.json'
+        'capacitor.config.json', 'capacitor.plugins.json',
+        'sw.js', 'manifest.webmanifest'
     ];
     const dirsToCopy = ['css', 'js', 'iconos'];
 
@@ -278,7 +296,41 @@ function main() {
         }
     }
 
-    console.log('📦 Sincronización completada.\n');
+    // 5c. Verificar que las copias (raíz / www / android) quedaron idénticas
+    const verifyPairs = [];
+    for (const file of filesToCopy) {
+        verifyPairs.push(['.', 'www', file], ['www', 'android/app/src/main/assets/public', file]);
+    }
+    const walkFiles = (rootRel, rel) => {
+        const abs = path.join(projectRoot, rootRel, rel);
+        if (!fs.existsSync(abs)) return;
+        if (fs.statSync(abs).isDirectory()) {
+            for (const e of fs.readdirSync(abs)) walkFiles(rootRel, path.join(rel, e));
+        } else {
+            const fullRel = path.join(rootRel, rel);
+            verifyPairs.push(['.', 'www', fullRel], ['www', 'android/app/src/main/assets/public', fullRel]);
+        }
+    };
+    for (const dir of dirsToCopy) walkFiles(dir, '');
+    let syncErrors = 0;
+    for (const [srcDir, destDir, rel] of verifyPairs) {
+        const s = path.join(projectRoot, srcDir, rel);
+        const d = path.join(projectRoot, destDir, rel);
+        if (!fs.existsSync(s)) continue; // origen no existe (ej: capacitor.plugins.json opcional)
+        if (!fs.existsSync(d)) {
+            console.log('  ⚠ FALTA en ' + destDir + '/: ' + rel);
+            syncErrors++;
+        } else if (hashFile(s) !== hashFile(d)) {
+            console.log('  ⚠ DIFERENTE en ' + destDir + '/: ' + rel);
+            syncErrors++;
+        }
+    }
+    if (syncErrors > 0) {
+        console.error('\n❌ Sync incompleto (' + syncErrors + ' archivo(s) no idénticos). Revisa los marcados.');
+        process.exitCode = 1;
+    } else {
+        console.log('  ✓ Verificación de sync: raíz / www / android idénticos.\n');
+    }
 }
 
 main();

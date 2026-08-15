@@ -2,6 +2,7 @@
 // Drawer de comentarios — se desliza desde la parte inferior.
 import { apiRequest } from './config.js';
 import { artistaActual } from './auth.js';
+import { renderText, safeImgUrl } from './utils.js';
 
 let obraIdActual = null;
 let cardActual = null;
@@ -87,7 +88,7 @@ async function cargarComentarios(obraId) {
 function renderizarComentario(c, todosReplies) {
     const inicial = (c.autor_nombre || '?')[0].toUpperCase();
     const avatarHTML = c.autor_foto
-        ? `<img src="${c.autor_foto}" class="comentario-avatar" alt="">`
+        ? `<img src="${safeImgUrl(c.autor_foto)}" class="comentario-avatar" alt="">`
         : `<div class="comentario-avatar comentario-avatar-default">${inicial}</div>`;
 
     const fecha = timeAgoShort(c.created_at || c.fecha);
@@ -103,8 +104,8 @@ function renderizarComentario(c, todosReplies) {
         <div class="comentario-item" data-id="${c.id}">
             ${avatarHTML}
             <div class="comentario-body">
-                <div class="comentario-autor">${c.autor_nombre || 'Usuario'}</div>
-                <div class="comentario-texto">${c.texto || c.comentario || ''}</div>
+                <div class="comentario-autor">${renderText(c.autor_nombre) || 'Usuario'}</div>
+                <div class="comentario-texto">${renderText(c.texto || c.comentario)}</div>
                 <div class="comentario-meta">
                     <span class="comentario-fecha">${fecha}</span>
                     <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>

@@ -17,7 +17,7 @@
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';
-import { debugLog } from './utils.js';
+import { debugLog, renderText, safeImgUrl } from './utils.js';
 import {
     showSuccess, showError, showWarning, showInfo, showConfirm
 } from './notificaciones.js';
@@ -28,7 +28,7 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=c07dd2fe1b';
+} from './perfil.js?v=fc1de70207';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
@@ -39,8 +39,8 @@ import {
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=da7fde69fb';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=062a6e6a06';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=7a54ba97ce';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=e895578507';
 import { setupPush } from './push.js?v=25ed43e820';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -160,12 +160,12 @@ async function cargarNotificaciones() {
         const iconos = { like: '❤️', comment: '💬', view: '👁', follow: '👤', mention: '📢' };
         list.innerHTML = data.notificaciones.map(n => {
             const avatarHTML = n.actor_foto
-                ? `<div class="notif-avatar-wrap"><img src="${n.actor_foto}" class="notif-avatar" alt="${n.actor_nombre || ''}"><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`
+                ? `<div class="notif-avatar-wrap"><img src="${safeImgUrl(n.actor_foto)}" class="notif-avatar" alt="${renderText(n.actor_nombre)}"><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`
                 : `<div class="notif-avatar-wrap notif-avatar-default"><span class="notif-avatar-initial">${(n.actor_nombre || '?')[0].toUpperCase()}</span><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`;
             return `<div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}" data-obra="${n.obra_id || ''}">
                 ${avatarHTML}
                 <div class="notif-body">
-                    <div class="notif-mensaje">${n.mensaje}</div>
+                    <div class="notif-mensaje">${renderText(n.mensaje)}</div>
                     <div class="notif-tiempo">${timeAgo(n.created_at)}</div>
                 </div>
             </div>`;

@@ -3,7 +3,7 @@
 // lupa del header. Resultados en tiempo real con debounce.
 
 import { apiRequest } from './config.js';
-import { debounce, escapeHtml, debugLog } from './utils.js';
+import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js';
 import { showWarning, showError } from './notificaciones.js';
 
 /**
@@ -64,7 +64,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
 
             let avatarHTML = '';
             if (usuario.foto_perfil) {
-                avatarHTML = `<img src="${usuario.foto_perfil.replace(/"/g, '&quot;')}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
+                avatarHTML = `<img src="${safeImgUrl(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
             } else {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
                 avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;

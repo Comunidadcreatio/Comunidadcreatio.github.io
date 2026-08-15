@@ -4,3 +4,7 @@ www/
 android/
 node_modules/
 .idea/
+
+# Memoria/estado del agente Reasonix (cambia solo, no es código fuente)
+reasonix.toml
+.reasonix/

@@ -62,6 +62,30 @@ export function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+/**
+ * Renderiza texto de usuario de forma segura ante XSS.
+ * El backend escapa con express-validator .escape() en algunos campos y en
+ * otros no; esta función normaliza AMBOS casos a la misma salida segura:
+ *   1) decodeHTMLEntities() revierte el escapado del backend (si existe).
+ *   2) escapeHtml() vuelve a escapar para inserción en el DOM.
+ * Resultado: el texto se muestra idéntico y nunca se interpreta como HTML.
+ */
+export function renderText(str) {
+    return escapeHtml(decodeHTMLEntities(str));
+}
+
+/**
+ * Sanea URLs para atributos src de imágenes.
+ *  - Solo permite http(s) o data:image/... (bloquea javascript:, data:text/html, etc.)
+ *  - Neutraliza comillas dobles para no romper el atributo (no-op si el backend ya escapó).
+ */
+export function safeImgUrl(url) {
+    if (!url) return '';
+    const u = String(url).trim();
+    if (!/^(https?:|data:image\/)/i.test(u)) return '';
+    return u.replace(/"/g, '&quot;');
+}
+
 // ============================================
 // LOGGING CONDICIONAL (solo en desarrollo)
 // ============================================

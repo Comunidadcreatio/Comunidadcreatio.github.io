@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Sintaxis JS (ES modules + scripts)
+        run: |
+          set -e
+          for f in js/*.js; do
+            node --input-type=module --check < "$f"
+          done
+          node --check scripts/bump-version.js
+          node --check scripts/minify.js
+
+      - name: JSON valido (configs y manifest)
+        run: |
+          node -e "for (const f of ['package.json','capacitor.config.json','vercel.json','version.json','manifest.webmanifest']) { JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('OK', f); }"
+
+      - name: Estado post-bump (version y cache-busting consistentes)
+        run: |
+          node scripts/bump-version.js > /tmp/bump.log 2>&1 || { echo "::error::bump-version.js fallo"; cat /tmp/bump.log; exit 1; }
+          if ! git diff --quiet --exit-code; then
+            echo "::error::El repo NO esta en estado post-bump: hay hashes/version desactualizados. Corre localmente: node scripts/bump-version.js"
+            git diff --stat
+            exit 1
+          fi
+          echo "OK: version, hashes y sync consistentes."

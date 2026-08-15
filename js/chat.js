@@ -5,7 +5,7 @@
 // GET /chat/mensajes?canal=...&afterId=último (respuestas de pocos KB).
 import { apiRequest, API_BASE_URL } from './config.js';
 import { artistaActual } from './auth.js';
-import { escapeHtml, debugLog } from './utils.js';
+import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js';
 import { encontrarSeccionActual, actualizarEstadoNavButtons } from './galeria-ui.js';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -1009,7 +1009,7 @@ function renderConversaciones(convs) {
         const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
         const online = esOnline(c);
         circle.innerHTML = (c.otro_foto
-            ? `<img src="${c.otro_foto}" alt="">`
+            ? `<img src="${safeImgUrl(c.otro_foto)}" alt="">`
             : inicial) + `<span class="chat-conv-dot${online ? ' online' : ''}"></span>`;
         const badge = document.createElement('span');
         badge.className = 'chat-circle-badge hidden';
@@ -1135,7 +1135,7 @@ function appendMensaje(m, esPropio) {
     if (m.eliminado) {
         html += '<span class="chat-msg-eliminado-texto">🗑️ Mensaje eliminado</span>';
     } else if (m.tipo_mensaje === 'imagen' && m.imagen_url) {
-        html += `<img class="chat-msg-imagen" src="${m.imagen_url}" alt="Imagen" loading="lazy">`;
+        html += `<img class="chat-msg-imagen" src="${safeImgUrl(m.imagen_url)}" alt="Imagen" loading="lazy">`;
         if (m.contenido) html += `<div class="chat-msg-texto">${escapeHtml(m.contenido)}</div>`;
     } else {
         html += `<span class="chat-msg-texto">${escapeHtml(m.contenido || '')}</span>`;

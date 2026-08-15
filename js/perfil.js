@@ -5,10 +5,10 @@
 import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
 import { token, artistaActual, lastActivityTime } from './auth.js';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js';
-import { escapeHtml, debugLog, cloudinaryUrl } from './utils.js';
+import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=da7fde69fb';
+import { setupViewTracking } from './galeria.js?v=7a54ba97ce';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -241,7 +241,7 @@ export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
             <div class="resultado-item" data-user-id="${escapeHtml(String(usuario.id))}">
                 <div class="resultado-avatar">
                     ${usuario.foto_perfil
-                        ? `<img src="${usuario.foto_perfil.replace(/"/g, '&quot;')}" alt="${escapeHtml(usuario.nombre_artista)}">`
+                        ? `<img src="${safeImgUrl(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}">`
                         : `<div class="avatar-placeholder">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
                     }
                 </div>
