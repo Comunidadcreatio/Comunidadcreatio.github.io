@@ -67,31 +67,43 @@ function findCssImports(cssContent) {
 }
 
 /**
- * Actualiza los ?v= de los imports de módulos ES (./mod?v=...) en un archivo JS.
- * Mantiene en sync main.js y perfil.js cuando cambia galeria.js u otro módulo.
+ * Actualiza los ?v= de TODOS los imports de módulos ES en TODOS los js/*.js.
+ * Antes solo se rastreaban unos pocos módulos (main.js/perfil.js → MOD_FILES) y
+ * los módulos compartidos (config.js, utils.js, auth.js…) quedaban SIN ?v=: con
+ * la caché immutable de Vercel (1 año) un cambio en config.js rompía la app
+ * (SyntaxError: export no provisto). Este updater garantiza que cualquier
+ * módulo importado lleve el hash de su contenido.
+ * Se repite hasta converger: cambiar un import modifica el hash del importador,
+ * y eso a su vez cambia los ?v= de quien lo importa.
  */
-function updateModuleImports(projectRoot, jsFile, modFiles, setAnyChange) {
-    const filePath = path.join(projectRoot, jsFile);
-    if (!fs.existsSync(filePath)) return;
-    let content = fs.readFileSync(filePath, 'utf-8');
-    let changed = false;
-    modFiles.forEach(mod => {
-        const modFullPath = path.join(projectRoot, 'js', mod);
-        if (!fs.existsSync(modFullPath)) return;
-        const modHash = hashFile(modFullPath);
-        const escaped = mod.replace(/\./g, '\\.');
-        const regex = new RegExp(`from\\s+['\"]\\.\\/${escaped}\\?v=([^'\"]*)['\"]`, 'g');
-        const match = regex.exec(content);
-        if (match && match[1] !== modHash) {
-            content = content.replace(match[0], match[0].replace(match[1], modHash));
-            console.log(`✓ ${jsFile} import: ./${mod} ?v=${match[1]} → ?v=${modHash}`);
-            changed = true;
-            if (setAnyChange) setAnyChange();
+function updateAllModuleImports(projectRoot, setAnyChange) {
+    const jsDir = path.join(projectRoot, 'js');
+    const files = fs.readdirSync(jsDir).filter(f => f.endsWith('.js') && !f.includes('.min.') && !f.includes('.check.'));
+    for (let pass = 0; pass < 6; pass++) {
+        let passChanged = false;
+        for (const importer of files) {
+            const filePath = path.join(jsDir, importer);
+            let content = fs.readFileSync(filePath, 'utf-8');
+            let changed = false;
+            content = content.replace(/from\s+['\"]\.\/([A-Za-z0-9_-]+\.js)(\?v=[^'\"]*)?['\"]/g, (match, modFile) => {
+                const modPath = path.join(jsDir, modFile);
+                if (!fs.existsSync(modPath)) return match;
+                const h = hashFile(modPath);
+                const newMatch = `from './${modFile}?v=${h}'`;
+                if (newMatch !== match) {
+                    changed = true;
+                    console.log(`✓ ${importer} import: ./${modFile} ?v=${h}`);
+                }
+                return newMatch;
+            });
+            if (changed) {
+                fs.writeFileSync(filePath, content, 'utf-8');
+                console.log(`✎ ${importer} imports actualizados.`);
+                passChanged = true;
+                if (setAnyChange) setAnyChange();
+            }
         }
-    });
-    if (changed) {
-        fs.writeFileSync(filePath, content, 'utf-8');
-        console.log(`✎ ${jsFile} imports actualizados.`);
+        if (!passChanged) break;
     }
 }
 
@@ -173,10 +185,8 @@ function main() {
     }
 
     // 4. Actualizar version.json (solo si hubo cambios reales)
-    // 4a. Detectar cambios en módulos ES importados desde main.js / perfil.js
-    const MOD_FILES = ['galeria.js', 'galeria-ui.js', 'comentarios.js', 'notificaciones.js', 'perfil.js', 'chat.js', 'push.js'];
-    const JS_IMPORT_FILES = ['js/main.js', 'js/perfil.js'];
-    JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, () => { anyChange = true; }));
+    // 4a. Detectar cambios en imports de módulos ES (todos los js/*.js)
+    updateAllModuleImports(projectRoot, () => { anyChange = true; });
 
     if (anyChange) {
         const versionPath = path.join(projectRoot, VERSION_FILE);
@@ -229,8 +239,8 @@ function main() {
                 }
             }
 
-            // 4d. Actualizar ?v= en imports de módulos ES (main.js / perfil.js)
-            JS_IMPORT_FILES.forEach(f => updateModuleImports(projectRoot, f, MOD_FILES, null));
+            // 4d. Actualizar ?v= en imports de módulos ES (todos los js/*.js)
+            updateAllModuleImports(projectRoot, null);
         }
     }
 

@@ -1,7 +1,7 @@
 // js/utils.js
 // Funciones auxiliares compartidas por todos los módulos
 
-import { showError } from './notificaciones.js';
+import { showError } from './notificaciones.js?v=53cd86fdba';
 
 /**
  * Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").

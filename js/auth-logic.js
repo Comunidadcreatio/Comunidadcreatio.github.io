@@ -1,10 +1,10 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js';
-import { ARTISTA_KEY, apiRequest } from './config.js';
-import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js';
-import { mostrarErrores, debounce, debugLog } from './utils.js';
-import { setupDarkModeToggle } from './theme.js'; // v67
+import { login, register } from './auth.js?v=bed860245a';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=9d0b140cf8';
+import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js?v=53cd86fdba';
+import { mostrarErrores, debounce, debugLog } from './utils.js?v=58a350cb86';
+import { setupDarkModeToggle } from './theme.js?v=4207440b17'; // v67
 
 // ============================================
 // VARIABLES GLOBALES

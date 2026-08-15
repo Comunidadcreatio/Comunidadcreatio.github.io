@@ -1,8 +1,8 @@
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest } from './config.js';
-import { artistaActual } from './auth.js';
-import { renderText, safeImgUrl } from './utils.js';
+import { apiRequest } from './config.js?v=9d0b140cf8';
+import { artistaActual } from './auth.js?v=bed860245a';
+import { renderText, safeImgUrl } from './utils.js?v=58a350cb86';
 
 let obraIdActual = null;
 let cardActual = null;

@@ -1,8 +1,8 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js';
-import { artistaActual } from './auth.js';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl } from './utils.js';
-import { abrirComentarios } from './comentarios.js';
+import { API_BASE_URL, apiRequest } from './config.js?v=9d0b140cf8';
+import { artistaActual } from './auth.js?v=bed860245a';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl } from './utils.js?v=58a350cb86';
+import { abrirComentarios } from './comentarios.js?v=7584b6dc79';
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
