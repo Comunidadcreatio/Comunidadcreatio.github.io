@@ -1,6 +1,6 @@
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest } from './config.js';
+import { API_BASE_URL, apiRequest, getAuthToken } from './config.js';
 import { debugLog } from './utils.js';
 
 export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
@@ -14,9 +14,11 @@ export async function guardarObra(formData, idEdicion = null) {
     const url = idEdicion ? `/obras/${idEdicion}` : '/obras';
     const method = idEdicion ? 'PUT' : 'POST';
     try {
+        const authToken = getAuthToken();
         const res = await fetch(`${API_BASE_URL}${url}`, {
             method: method,
             credentials: 'include',
+            headers: authToken ? { Authorization: 'Bearer ' + authToken } : {},
             body: formData
         });
         return await res.json();
@@ -28,9 +30,11 @@ export async function guardarObra(formData, idEdicion = null) {
 
 export async function eliminarObra(id) {
     try {
+        const authToken = getAuthToken();
         const res = await fetch(`${API_BASE_URL}/obras/${id}`, {
             method: 'DELETE',
-            credentials: 'include'
+            credentials: 'include',
+            headers: authToken ? { Authorization: 'Bearer ' + authToken } : {}
         });
         return res.ok;
     } catch (error) {

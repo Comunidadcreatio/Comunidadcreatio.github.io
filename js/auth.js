@@ -1,5 +1,5 @@
 // js/auth.js
-import { ARTISTA_KEY, apiRequest } from './config.js';
+import { ARTISTA_KEY, AUTH_TOKEN_KEY, apiRequest } from './config.js';
 import { debugLog } from './utils.js';
 
 // Timestamp de última actividad del usuario (compartido con main.js y perfil.js)
@@ -30,7 +30,11 @@ export async function login(email, password) {
             token = true;
             artistaActual = data.artista;
             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
-            return { success: true, artista: data.artista };
+            // Token para navegador (fallback a la cookie): sessionStorage, se borra al cerrar la pestaña
+            if (data.token) {
+                try { sessionStorage.setItem(AUTH_TOKEN_KEY, data.token); } catch (e) { /* silencioso */ }
+            }
+            return { success: true, artista: data.artista, token: data.token };
         } else {
             return { success: false, error: data.error };
         }
@@ -66,6 +70,7 @@ export async function register(nombre_artista, nombre_real, email, password, tel
 export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
     localStorage.removeItem('DEBUG');
+    try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) { /* silencioso */ }
     token = false;
     artistaActual = null;
     document.dispatchEvent(new Event('userLogout'));

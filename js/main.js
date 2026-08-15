@@ -15,7 +15,7 @@
 // mejor manejo errores popover
 // bump forzado v279
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest } from './config.js';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js';
 import { token, artistaActual, logout, updateLastActivity } from './auth.js';
 import { debugLog, renderText, safeImgUrl } from './utils.js';
 import {
@@ -28,7 +28,7 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=fc1de70207';
+} from './perfil.js?v=8f0ff9f636';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
@@ -40,7 +40,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=7a54ba97ce';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=e895578507';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=6b8c77b307';
 import { setupPush } from './push.js?v=cb4facd342';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -415,9 +415,11 @@ async function verificarSesionBackend() {
         // Usamos heartbeat (endpoint ligero) con fetch directo para evitar
         // el 401 handler de apiRequest que dispara efectos secundarios.
         // Un error de red NO debe confundirse con sesión expirada.
+        const authToken = getAuthToken();
         const res = await fetch(`${API_BASE_URL}/api/artistas/heartbeat`, {
             method: 'POST',
-            credentials: 'include'
+            credentials: 'include',
+            headers: authToken ? { Authorization: 'Bearer ' + authToken } : {}
         });
         // Solo 401/403 indica sesión realmente expirada
         if (res.status === 401 || res.status === 403) return false;

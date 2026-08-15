@@ -3,7 +3,7 @@
 // Economía: sin websockets. El cliente hace polling condicional — solo
 // mientras el chat está abierto y la pestaña visible — pidiendo
 // GET /chat/mensajes?canal=...&afterId=último (respuestas de pocos KB).
-import { apiRequest, API_BASE_URL } from './config.js';
+import { apiRequest, API_BASE_URL, getAuthToken } from './config.js';
 import { artistaActual } from './auth.js';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js';
 import { encontrarSeccionActual, actualizarEstadoNavButtons } from './galeria-ui.js';
@@ -474,7 +474,13 @@ function setupImagenBtn() {
             } catch (e) { debugLog.warn('comprimir imagen:', e); }
             const fd = new FormData();
             fd.append('imagen', aEnviar, aEnviar === file ? file.name : 'imagen.jpg');
-            const res = await fetch(`${API_BASE_URL_CHAT}/chat/imagen`, { method: 'POST', credentials: 'include', body: fd });
+            const authToken = getAuthToken();
+            const res = await fetch(`${API_BASE_URL_CHAT}/chat/imagen`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: authToken ? { Authorization: 'Bearer ' + authToken } : {},
+                body: fd
+            });
             let data = null;
             try { data = await res.json(); } catch (e) { /* no JSON */ }
             if (data && data.success && data.url) {
