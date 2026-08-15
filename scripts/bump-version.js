@@ -84,6 +84,11 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
         for (const importer of files) {
             const filePath = path.join(jsDir, importer);
             let content = fs.readFileSync(filePath, 'utf-8');
+            // Salvaguarda: jamás escribir un archivo vacío sobre uno con contenido
+            if (!content && fs.statSync(filePath).size > 0) {
+                console.error('⚠ ' + importer + ': lectura vacía de un archivo con ' + fs.statSync(filePath).size + ' bytes — SE OMITE para no corromper.');
+                continue;
+            }
             let changed = false;
             content = content.replace(/from\s+['\"]\.\/([A-Za-z0-9_-]+\.js)(\?v=[^'\"]*)?['\"]/g, (match, modFile) => {
                 const modPath = path.join(jsDir, modFile);
