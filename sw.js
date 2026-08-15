@@ -50,6 +50,7 @@ self.addEventListener('push', function (event) {
         badge: data.badge || 'iconos/Logo-temporal.svg',
         data: { url: data.url || './' }
     };
+    if (data.tag) options.tag = data.tag; // agrupa notificaciones del mismo chat/cavent
     event.waitUntil(self.registration.showNotification(title, options));
 });
 

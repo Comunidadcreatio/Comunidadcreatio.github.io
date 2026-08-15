@@ -41,7 +41,7 @@ import {
 } from './panel-ui.js';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=7a54ba97ce';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=e895578507';
-import { setupPush } from './push.js?v=25ed43e820';
+import { setupPush } from './push.js?v=cb4facd342';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
@@ -807,6 +807,31 @@ async function init() {
 }
 
 init();
+
+// ============================================
+// DEEP LINK desde notificación web push: ?obra=ID
+// Abre la galería y hace scroll al cavent indicado.
+// ============================================
+(function manejarDeepLinkObra() {
+    const params = new URLSearchParams(window.location.search);
+    const obraDeep = params.get('obra');
+    if (!obraDeep) return;
+    const abrir = async () => {
+        try {
+            const galeriaUI = await import('./galeria-ui.js');
+            const galeriaContainer = document.getElementById('galeria-container');
+            if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
+            const intentarScroll = (intentos = 0) => {
+                const card = document.querySelector('.obra-card[data-obra-id="' + obraDeep + '"]');
+                if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                else if (intentos < 10) setTimeout(() => intentarScroll(intentos + 1), 300);
+            };
+            setTimeout(() => intentarScroll(), 500);
+        } catch (e) { /* silencioso */ }
+    };
+    // Esperar a que la app termine de cargar (las cards se pintan tras init)
+    setTimeout(abrir, 800);
+})();
 
 // ============================================
 // SLIDESHOW DE FONDO — cambia cada 8s (como auth.html)

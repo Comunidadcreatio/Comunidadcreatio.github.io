@@ -3,7 +3,7 @@
 // contenido remoto, así que se habla con el plugin NATIVO a través del puente
 // `window.Capacitor.Plugins.PushNotifications` (sin bundler).
 // En navegador web (sin Capacitor) esto simplemente no hace nada.
-import { apiRequest } from './config.js';
+import { apiRequest, ARTISTA_KEY } from './config.js';
 import { debugLog } from './utils.js';
 
 const TOKEN_KEY = 'fcm_token';
@@ -93,6 +93,76 @@ window.__diagnosticoPush = function () {
     return { capacitor: cap, pushPlugin: push, token: token || null, eventos: ct, detalle: _diag };
 };
 
+// ============================================
+// PUSH WEB (navegador) — VAPID + Service Worker
+// ============================================
+// Suscribe el navegador a notificaciones web. Requiere:
+//  - backend con claves VAPID (GET /api/push/web/claves)
+//  - Service Worker registrado (js/pwa.js)
+// Si algo falla se ignora: el push nativo (Capacitor) sigue siendo el camino
+// principal en Android.
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+    return outputArray;
+}
+
+function setupWebPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        debugLog.log('Web push no disponible en este navegador');
+        return;
+    }
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+
+    // Al cerrar sesión → desuscribir y borrar del backend
+    document.addEventListener('userLogout', () => {
+        navigator.serviceWorker.getRegistration().then(reg => {
+            if (!reg) return;
+            reg.pushManager.getSubscription().then(sub => {
+                if (!sub) return;
+                apiRequest('/api/push/web/suscribir', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ endpoint: sub.endpoint })
+                }).catch(() => {});
+                sub.unsubscribe().catch(() => {});
+            });
+        }).catch(() => {});
+    });
+
+    // Solo con sesión activa (el login redirige a index.html, así que al
+    // cargar la página ya hay sesión si el usuario está logueado)
+    if (!localStorage.getItem(ARTISTA_KEY)) return;
+
+    (async () => {
+        try {
+            const res = await apiRequest('/api/push/web/claves');
+            if (!res || !res.success || !res.publicKey) {
+                debugLog.log('Web push: backend sin claves VAPID — omitido');
+                return;
+            }
+            const reg = await navigator.serviceWorker.ready;
+            let sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+                sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(res.publicKey)
+                });
+            }
+            const subJson = sub.toJSON();
+            const saved = await apiRequest('/api/push/web/suscribir', {
+                method: 'POST',
+                body: JSON.stringify({ endpoint: subJson.endpoint, keys: subJson.keys })
+            });
+            debugLog.log('Web push suscripción ' + (saved && saved.success ? 'registrada ✓' : 'falló'));
+        } catch (e) {
+            debugLog.warn('Web push: error al suscribir:', e);
+        }
+    })();
+}
+
 export function setupPush() {
     diag('init', 'setupPush() llamado');
 
@@ -106,6 +176,8 @@ export function setupPush() {
     const Push = (Cap && Cap.Plugins && Cap.Plugins.PushNotifications) || null;
     if (!Push) {
         diag('abort', 'PushNotifications NO disponible — ¿navegador? ¿plugin no instalado?');
+        // Navegador web: push vía Service Worker + VAPID (silencioso si no aplica)
+        setupWebPush();
         return;
     }
     diag('plugin', 'PushNotifications plugin encontrado ✓');
