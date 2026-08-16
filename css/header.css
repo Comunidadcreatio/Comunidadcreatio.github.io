@@ -476,25 +476,22 @@ body.search-escribiendo #toggle-panel {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 7px 14px;
     border-radius: 20px;              /* bordes curvos */
-    border: 1px solid var(--color-gray-300);
-    background: var(--color-white);
-    color: var(--color-text);
+    border: 1px solid transparent;    /* el color de fondo viene inline (uno por etiqueta) */
+    color: var(--color-white);
     font-size: 13px;
     font-weight: 600;
     font-family: 'Nunito', sans-serif;
     cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .tag-chip:hover {
-    border-color: var(--color-ink);
     transform: translateY(-1px);
 }
 .tag-chip.activa {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
+    border: 2px solid var(--color-white);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 .tag-nombre {
     white-space: nowrap;
@@ -502,41 +499,23 @@ body.search-escribiendo #toggle-panel {
 .tag-count {
     font-size: 11px;
     font-weight: 700;
-    background: var(--color-gray-100);
-    color: var(--color-gray-700);
-    border-radius: 10px;
-    padding: 1px 7px;
-    min-width: 20px;
-    text-align: center;
-}
-.tag-chip.activa .tag-count {
-    background: rgba(255, 255, 255, 0.25);
-    color: var(--color-white);
+    color: rgba(255, 255, 255, 0.85); /* sin rectángulo de fondo */
+    margin-left: 2px;
 }
 .tag-x {
     font-size: 15px;
     line-height: 1;
-    margin-left: 2px;
+    margin-left: 3px;
     cursor: pointer;
     font-weight: 700;
-    color: inherit;
-}
-[data-theme="dark"] .tag-chip {
-    background: var(--color-gray-100);
-    border-color: var(--color-border);
-    color: var(--color-ink);
-}
-[data-theme="dark"] .tag-chip:hover {
-    border-color: var(--color-ink);
-}
-[data-theme="dark"] .tag-count {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--color-ink);
+    color: var(--color-white);
 }
 [data-theme="dark"] .tag-chip.activa {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
+    border-color: var(--color-white);
+}
+/* En modo búsqueda (estado B) el carrusel se oculta bajo el velo, como el grid */
+#search-panel.modo-busqueda .tags-carrusel {
+    display: none;
 }
 
 /* El grid baja más cuando el carrusel de etiquetas está visible,

@@ -10,19 +10,28 @@ let gridContainerEl = null;
 let gridCallbacks = null;
 export function getObrasGrid() { return obrasGrid; }
 
-// Filtra el grid por una etiqueta (null o vacío = mostrar todas)
-export function filtrarGridPorEtiqueta(tag) {
+// Filtra el grid por una o varias etiquetas (AND: el cavent debe tener TODAS).
+// Acepta null, un string, un array o un Set. Vacío = mostrar todas.
+export function filtrarGridPorEtiqueta(tags) {
     if (!gridContainerEl) return;
     const onDetalle = gridCallbacks && gridCallbacks.onDetalle;
     const onAvatarClick = gridCallbacks && gridCallbacks.onAvatarClick;
-    if (!tag) {
+    let lista = [];
+    if (typeof tags === 'string') {
+        lista = tags.trim() ? [tags] : [];
+    } else if (tags instanceof Set) {
+        lista = [...tags];
+    } else if (Array.isArray(tags)) {
+        lista = tags;
+    }
+    if (lista.length === 0) {
         mostrarGaleria(obrasGrid, gridContainerEl, onDetalle, onAvatarClick);
         return;
     }
-    const t = normalizarTexto(tag);
+    const norm = lista.map(t => normalizarTexto(String(t).trim()));
     const filtradas = obrasGrid.filter(o => {
         const ets = String(o.etiquetas || '').split(',').map(e => normalizarTexto(e.trim()));
-        return ets.includes(t);
+        return norm.every(t => ets.includes(t)); // AND
     });
     mostrarGaleria(filtradas, gridContainerEl, onDetalle, onAvatarClick);
 }
