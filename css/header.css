@@ -411,11 +411,19 @@ body.search-escribiendo #galeria-container {
 .search-panel-results.resultados-saliendo {
     opacity: 0;
 }
-/* BORDE NEON: SOLO el borde (interior 100% transparente), colores RGB vivos.
-   Técnica de máscara (mask-composite: exclude): el gradiente solo se ve en
-   la franja del borde (1px); el interior queda sin relleno. */
+/* BORDE NEON: SOLO el borde (interior transparente), colores RGB vivos.
+   La máscara va en un PSEUDO-ELEMENTO (no en el wrapper) para que el texto
+   del input se siga viendo: el pseudo solo pinta la franja del borde (1px)
+   con el gradiente animado, el interior queda libre. */
 #search-panel .search-panel-top .search-input-wrapper.escribiendo {
-    border: 1px solid transparent;
+    border-color: transparent;   /* el borde gris se quita (lo pinta el gradiente) */
+}
+#search-panel .search-panel-top .search-input-wrapper.escribiendo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;      /* mismo radio del input (20px) */
+    padding: 1px;                /* grosor del borde visible */
     background: linear-gradient(90deg, #ff0033 0%, #33ff00 25%, #0033ff 50%, #ff00ff 75%, #ff0033 100%);
     background-size: 200% 100%;
     animation: bordeNeon 2.5s linear infinite;
@@ -423,6 +431,8 @@ body.search-escribiendo #galeria-container {
     -webkit-mask-composite: xor;
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
+    pointer-events: none;        /* no bloquea clics ni el texto */
+    z-index: 1;
 }
 @keyframes bordeNeon {
     from { background-position: 0% 0; }
