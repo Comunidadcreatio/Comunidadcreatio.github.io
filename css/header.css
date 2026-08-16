@@ -387,6 +387,15 @@ picture {
 body.search-escribiendo #galeria-container {
     pointer-events: none;       /* B: el grid no recibe toques (la capa lo cubre) */
 }
+/* El header y la barra inferior quedan POR ENCIMA del velo de opacidad
+   mientras se busca (z 1050: sobre la capa 1000, bajo los paneles 1100),
+   igual que los iconos del nav inferior. */
+body.search-escribiendo #main-header {
+    z-index: 1050;
+}
+body.search-escribiendo #toggle-panel {
+    z-index: 1050;
+}
 #search-panel.modo-busqueda .search-input-wrapper {
     /* B: fondo sutil en el input al entrar en modo búsqueda */
     background: rgba(128, 128, 128, 0.08);

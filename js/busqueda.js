@@ -58,9 +58,6 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         // Si se vuelve a entrar antes de que termine el fade-out, cancelarlo
         clearTimeout(timeoutResultados);
         resultados.classList.remove('resultados-saliendo');
-        if (!searchInput.value.trim() && !resultados.innerHTML) {
-            resultados.innerHTML = '<div class="search-no-results">Escribe el nombre del artista...</div>';
-        }
     };
     searchInput.addEventListener('focus', entrarModoBusqueda);
 
