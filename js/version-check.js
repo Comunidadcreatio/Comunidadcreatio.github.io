@@ -60,6 +60,7 @@
             'font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;';
     }
 
+    function comprobarVersion() {
     fetch('/version.json?t=' + Date.now(), { cache: 'no-cache' })
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -87,6 +88,15 @@
             }
         })
         .catch(function() {});
+    }
+
+    // Al cargar y cada vez que la app vuelve al primer plano (WebView/APK)
+    // se re-comprueba si hay una versión nueva publicada.
+    comprobarVersion();
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') comprobarVersion();
+    });
+    window.addEventListener('pageshow', comprobarVersion);
 
     // Pastilla de actualización web (+ botón de APK si el usuario tiene APK viejo)
     function mostrarPillActualizar(nuevaVersion, apkUrl, conApk) {
