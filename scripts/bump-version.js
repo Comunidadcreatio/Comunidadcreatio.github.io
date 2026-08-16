@@ -101,6 +101,18 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
                 }
                 return newMatch;
             });
+            // Import() dinámicos (lazy): import('./mod.js?v=...')
+            content = content.replace(/import\(\s*['"]\.\/([A-Za-z0-9_-]+\.js)(\?v=[^'"]*)?['"]\s*\)/g, (match, modFile) => {
+                const modPath = path.join(jsDir, modFile);
+                if (!fs.existsSync(modPath)) return match;
+                const h = hashFile(modPath);
+                const newMatch = "import('./' + modFile + '?v=' + h + ')'";
+                if (newMatch !== match) {
+                    changed = true;
+                    console.log(`✓ ${importer} lazy import: ./${modFile} ?v=${h}`);
+                }
+                return newMatch;
+            });
             if (changed) {
                 fs.writeFileSync(filePath, content, 'utf-8');
                 console.log(`✎ ${importer} imports actualizados.`);

@@ -178,7 +178,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js');
+                    const galeriaUI = await import('./' + modFile + '?v=' + h + ')';
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -439,7 +439,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js').then(m => {
+    import('./' + modFile + '?v=' + h + ')'.then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -637,7 +637,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./' + modFile + '?v=' + h + ')'.then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -715,7 +715,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js').then(m => m.setupMiCuenta());
+    import('./' + modFile + '?v=' + h + ')'.then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
@@ -820,7 +820,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js');
+            const galeriaUI = await import('./' + modFile + '?v=' + h + ')';
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {
