@@ -384,13 +384,13 @@ body.search-escribiendo #galeria-publica::before {
     position: fixed;
     left: 0;
     right: 0;
+    top: 0;                                 /* cubre TODA la altura */
     bottom: 0;
-    top: calc(128px + var(--status-bar-height, 24px));
-    background: rgba(255, 255, 255, 0.6);   /* claro */
+    background: rgba(255, 255, 255, 0.75);  /* claro */
     z-index: 1000;
 }
 [data-theme="dark"] body.search-escribiendo #galeria-publica::before {
-    background: rgba(0, 0, 0, 0.6);          /* oscuro */
+    background: rgba(0, 0, 0, 0.75);         /* oscuro */
 }
 /* El panel de búsqueda es una barra compacta justo debajo del header (no
    fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
