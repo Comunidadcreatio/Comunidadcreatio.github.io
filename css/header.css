@@ -411,20 +411,22 @@ body.search-escribiendo #galeria-container {
 .search-panel-results.resultados-saliendo {
     opacity: 0;
 }
-/* BORDE NEON animado mientras hay texto escrito en el buscador.
-   Gradiente de colores que se desplaza por el borde (técnica padding-box/
-   border-box: interior con fondo sutil, borde con el gradiente). */
+/* BORDE NEON: SOLO el borde (interior 100% transparente), colores RGB vivos.
+   Técnica de máscara (mask-composite: exclude): el gradiente solo se ve en
+   la franja del borde (1px); el interior queda sin relleno. */
 #search-panel .search-panel-top .search-input-wrapper.escribiendo {
     border: 1px solid transparent;
-    background:
-        linear-gradient(rgba(128, 128, 128, 0.08), rgba(128, 128, 128, 0.08)) padding-box,
-        linear-gradient(90deg, #ff6b6b 0%, #feca57 25%, #48dbfb 50%, #ff9ff3 75%, #ff6b6b 100%) border-box;
-    background-size: auto, 200% 100%;
+    background: linear-gradient(90deg, #ff0033 0%, #33ff00 25%, #0033ff 50%, #ff00ff 75%, #ff0033 100%);
+    background-size: 200% 100%;
     animation: bordeNeon 2.5s linear infinite;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
 }
 @keyframes bordeNeon {
-    from { background-position: 0 0, 0% 0; }
-    to   { background-position: 0 0, 200% 0; }
+    from { background-position: 0% 0; }
+    to   { background-position: 200% 0; }
 }
 /* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid
    y POR DEBAJO de los resultados (panel z-index 1100 > capa 1000).
