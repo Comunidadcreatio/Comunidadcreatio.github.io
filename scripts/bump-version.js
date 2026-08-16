@@ -102,11 +102,15 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
                 return newMatch;
             });
             // Import() dinámicos (lazy): import('./mod.js?v=...')
+            // ⚠ Fix 1.0.441: la versión anterior generaba el TEXTO LITERAL
+            // "import('./' + modFile + '?v=' + h + ')'" (sin interpolar modFile/h,
+            // y con el ')' final dentro de la cadena) → SyntaxError en main.js que
+            // dejaba el preloader pegado para siempre. Ahora se interpola de verdad:
             content = content.replace(/import\(\s*['"]\.\/([A-Za-z0-9_-]+\.js)(\?v=[^'"]*)?['"]\s*\)/g, (match, modFile) => {
                 const modPath = path.join(jsDir, modFile);
                 if (!fs.existsSync(modPath)) return match;
                 const h = hashFile(modPath);
-                const newMatch = "import('./' + modFile + '?v=' + h + ')'";
+                const newMatch = `import('./${modFile}?v=${h}')`;
                 if (newMatch !== match) {
                     changed = true;
                     console.log(`✓ ${importer} lazy import: ./${modFile} ?v=${h}`);
