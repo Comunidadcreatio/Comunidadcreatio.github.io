@@ -374,12 +374,23 @@ picture {
     background: transparent;
 }
 body.search-escribiendo #galeria-container {
-    opacity: 0.60;              /* B: grid semitransparente debajo */
-    pointer-events: none;       /* los toques van al panel, no al grid */
-    transition: opacity 0.2s ease;
+    pointer-events: none;       /* B: el grid no recibe toques (la capa lo cubre) */
 }
-body.search-escribiendo #galeria-publica {
-    pointer-events: none;
+/* CAPA DE OPACIDAD: se muestra al tocar el input, POR ENCIMA del grid
+   y POR DEBAJO de los resultados (panel z-index 1100 > capa 1000).
+   Blanca en modo claro, negra en modo oscuro. */
+body.search-escribiendo #galeria-publica::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: calc(128px + var(--status-bar-height, 24px));
+    background: rgba(255, 255, 255, 0.6);   /* claro */
+    z-index: 1000;
+}
+[data-theme="dark"] body.search-escribiendo #galeria-publica::before {
+    background: rgba(0, 0, 0, 0.6);          /* oscuro */
 }
 /* El panel de búsqueda es una barra compacta justo debajo del header (no
    fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
