@@ -31,6 +31,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         document.body.classList.remove('search-abierto');
         document.body.classList.remove('search-escribiendo');
         searchInput.value = '';
+        if (actualizarBordeNeon) actualizarBordeNeon();
         resultados.innerHTML = '';
     };
 
@@ -141,6 +142,13 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     searchInput.addEventListener('input', (e) => {
         buscarConDebounce(e.target.value.trim());
     });
+
+    // Borde neon mientras haya texto escrito en el buscador
+    const inputWrapper = searchInput.closest('.search-input-wrapper') || searchInput.parentElement;
+    const actualizarBordeNeon = () => {
+        if (inputWrapper) inputWrapper.classList.toggle('escribiendo', searchInput.value.trim().length > 0);
+    };
+    searchInput.addEventListener('input', actualizarBordeNeon);
 
     // Enter: abrir la sección de resultados completos
     searchInput.addEventListener('keypress', (e) => {
