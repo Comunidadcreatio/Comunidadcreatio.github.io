@@ -374,7 +374,7 @@ picture {
     background: transparent;
 }
 body.search-escribiendo #galeria-container {
-    opacity: 0.35;              /* B: grid semitransparente debajo */
+    opacity: 0.60;              /* B: grid semitransparente debajo */
     pointer-events: none;       /* los toques van al panel, no al grid */
     transition: opacity 0.2s ease;
 }
