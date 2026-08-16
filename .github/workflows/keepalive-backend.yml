@@ -1,0 +1,16 @@
+name: keepalive-backend
+
+on:
+  schedule:
+    # Cada 10 minutos — Render free tier duerme tras ~15 min sin trafico.
+    # Este repo es PUBLICO → minutos de GitHub Actions ilimitados.
+    - cron: '*/10 * * * *'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health (mantiene despierto el backend)
+        run: |
+          curl -s -o /dev/null -w "health -> HTTP %{http_code} en %{time_total}s\n" --max-time 120 https://backend-fundacion-atpe.onrender.com/health
+          # El primer ping tras dormir puede tardar (arranque en frio): no fallamos

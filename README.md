@@ -84,6 +84,16 @@ si el repo llega con hashes/versión desactualizados, falla con un mensaje claro
 - Render free tier duerme tras ~15 min sin tráfico: el primer request tras
   dormir tarda hasta ~1 min (arranque en frío). El heartbeat cada 30 s lo
   mantiene despierto mientras haya usuarios activos.
+- KEEP-ALIVE AUTOMÁTICO: el workflow .github/workflows/keepalive-backend.yml
+  (repo público, Actions ilimitado) hace ping a /health cada 10 min. También
+  puedes usar UptimeRobot/cron-job.org apuntando a
+  https://backend-fundacion-atpe.onrender.com/health.
+- Dependencias del backend: npm audit da 0 vulnerabilidades tras actualizar
+  cloudinary@2 y bcrypt@6 (APIs compatibles verificadas). Tras tocar subidas
+  de imágenes, probar un upload en producción.
+- APK: es una WebView que carga la URL de Vercel — NO se reconstruye por
+  cambios web (los usuarios reciben las actualizaciones al abrir). Reconstruir
+  solo al cambiar la capa nativa (plugins, permisos, iconos, versionName).
 - Rama master: quedó alineada con main (histórico). No usarla; borrarla en
   el remoto es seguro (git push origin --delete master).
 - reasonix.toml y .reasonix/ son memoria local del agente: están en
