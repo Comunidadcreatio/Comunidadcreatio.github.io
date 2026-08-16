@@ -62,6 +62,10 @@ export function renderEtiquetasCarrusel() {
 
     contenedor.querySelectorAll('.tag-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
+            // Garantizar modo A al filtrar: buscador y carrusel SIEMPRE visibles
+            const panel = document.getElementById('search-panel');
+            if (panel) panel.classList.remove('modo-busqueda');
+            document.body.classList.remove('search-escribiendo');
             const tag = chip.dataset.tag;
             const key = normalizarTexto(tag);
             if (e.target.closest('.tag-x')) {
