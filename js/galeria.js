@@ -10,7 +10,8 @@ let gridContainerEl = null;
 let gridCallbacks = null;
 export function getObrasGrid() { return obrasGrid; }
 
-// Filtra el grid por una o varias etiquetas (AND: el cavent debe tener TODAS).
+// Filtra el grid por una o varias etiquetas (OR: el cavent debe tener
+// CUALQUIERA de las seleccionadas — cada etiqueta añade más cavents).
 // Acepta null, un string, un array o un Set. Vacío = mostrar todas.
 export function filtrarGridPorEtiqueta(tags) {
     if (!gridContainerEl) return;
@@ -31,7 +32,7 @@ export function filtrarGridPorEtiqueta(tags) {
     const norm = lista.map(t => normalizarTexto(String(t).trim()));
     const filtradas = obrasGrid.filter(o => {
         const ets = String(o.etiquetas || '').split(',').map(e => normalizarTexto(e.trim()));
-        return norm.every(t => ets.includes(t)); // AND
+        return norm.some(t => ets.includes(t)); // OR
     });
     mostrarGaleria(filtradas, gridContainerEl, onDetalle, onAvatarClick);
 }

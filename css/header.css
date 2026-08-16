@@ -512,6 +512,8 @@ body.search-escribiendo #toggle-panel {
 }
 [data-theme="dark"] .tag-chip.activa {
     border-color: var(--color-white);
+    /* En oscuro el anillo de selección también debe ser blanco (no negro) */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 /* En modo búsqueda (estado B) el carrusel se oculta bajo el velo, como el grid */
 #search-panel.modo-busqueda .tags-carrusel {

@@ -28,19 +28,19 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=1be73cd7f8';
+} from './perfil.js?v=7cf0b05cfc';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView
-} from './galeria-ui.js?v=1a89cbe159';
+} from './galeria-ui.js?v=57fd905bf7';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=11fc4daeee';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=ee65b6c1a3';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=5c4306254a';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=1f1f790a6a';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=74fa54d7fd';
 import { setupPush } from './push.js?v=e33b2583d5';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
