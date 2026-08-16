@@ -62,6 +62,10 @@ export function renderEtiquetasCarrusel() {
 
     contenedor.querySelectorAll('.tag-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
+            // CRÍTICO: evitar que el clic burbujee al outside-click de busqueda.js.
+            // Al re-renderizar el carrusel, el chip se destruye y panel.contains()
+            // da false, lo que cerraba el buscador como si se tocara fuera.
+            e.stopPropagation();
             // Garantizar modo A al filtrar: buscador y carrusel SIEMPRE visibles
             const panel = document.getElementById('search-panel');
             if (panel) panel.classList.remove('modo-busqueda');
