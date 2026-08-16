@@ -1,8 +1,31 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js?v=9d0b140cf8';
-import { artistaActual } from './auth.js?v=bed860245a';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl } from './utils.js?v=58a350cb86';
-import { abrirComentarios } from './comentarios.js?v=7584b6dc79';
+import { API_BASE_URL, apiRequest } from './config.js?v=3cac708192';
+import { artistaActual } from './auth.js?v=3517742095';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=f1ecb334f1';
+import { abrirComentarios } from './comentarios.js?v=65a1490097';
+
+// Estado compartido del grid (para el carrusel de etiquetas y re-render)
+let obrasGrid = [];
+let gridContainerEl = null;
+let gridCallbacks = null;
+export function getObrasGrid() { return obrasGrid; }
+
+// Filtra el grid por una etiqueta (null o vacío = mostrar todas)
+export function filtrarGridPorEtiqueta(tag) {
+    if (!gridContainerEl) return;
+    const onDetalle = gridCallbacks && gridCallbacks.onDetalle;
+    const onAvatarClick = gridCallbacks && gridCallbacks.onAvatarClick;
+    if (!tag) {
+        mostrarGaleria(obrasGrid, gridContainerEl, onDetalle, onAvatarClick);
+        return;
+    }
+    const t = normalizarTexto(tag);
+    const filtradas = obrasGrid.filter(o => {
+        const ets = String(o.etiquetas || '').split(',').map(e => normalizarTexto(e.trim()));
+        return ets.includes(t);
+    });
+    mostrarGaleria(filtradas, gridContainerEl, onDetalle, onAvatarClick);
+}
 
 export async function cargarGaleria(container) {
     container.setAttribute('aria-busy', 'true');
@@ -17,6 +40,7 @@ export async function cargarGaleria(container) {
         }
         container.setAttribute('aria-busy', 'false');
         const obras = Array.isArray(data) ? data : (data?.obras ?? data?.data ?? []);
+        obrasGrid = obras;
         
         // Cargar likes del usuario para persistencia
         try {
@@ -264,6 +288,8 @@ function crearObraCard(obra) {
 }
 
 export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
+    gridContainerEl = container;
+    gridCallbacks = { onDetalle, onAvatarClick };
     container.innerHTML = '';
     if (!obras || obras.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:var(--color-gray-400); padding: 2rem;">No hay obras disponibles.</p>';

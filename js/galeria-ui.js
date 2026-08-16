@@ -2,10 +2,11 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=3d0577863b';
-import { artistaActual, token } from './auth.js?v=bed860245a';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=d59609a78c';
-import { confirmarDescartarCambios } from './panel-ui.js?v=194ea1e5bb';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=ef39746f70';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=056c601051';
+import { artistaActual, token } from './auth.js?v=3517742095';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=b032b9c546';
+import { confirmarDescartarCambios } from './panel-ui.js?v=11fc4daeee';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -295,16 +296,22 @@ async function activarExplorar() {
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
-        switchSection(encontrarSeccionActual(), galeria, () => {
-            cargarGaleria(galeriaContainerLocal).then(obras => {
-                mostrarGaleria(obras, galeriaContainerLocal, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
+        // Devolvemos una Promise que resuelve cuando el grid está listo,
+        // para que el buscador y el grid aparezcan sincronizados.
+        return new Promise((resolve) => {
+            switchSection(encontrarSeccionActual(), galeria, () => {
+                cargarGaleria(galeriaContainerLocal).then(obras => {
+                    mostrarGaleria(obras, galeriaContainerLocal, (id) => {
+                        seleccionarObraDesdeGrid(id);
+                    }, (artistaId) => {
+                        verPerfilArtistaDesdeGaleria(artistaId);
+                    });
+                    actualizarEstadoNavButtons();
+                    ensurePTRInContainer(galeriaContainerLocal);
+                    gridEntering = false;
+                    renderEtiquetasCarrusel();
+                    resolve(true);
                 });
-                actualizarEstadoNavButtons();
-                ensurePTRInContainer(galeriaContainerLocal);
-                gridEntering = false;
             });
         });
     } else if (galeriaModo === 1) {
@@ -327,8 +334,9 @@ async function activarExplorar() {
 }
 
 // "Explorar" desde la lupa: muestra la galería en grid sin alternar.
+// Devuelve la promesa de activarExplorar para sincronizar con el buscador.
 export function mostrarExplorar() {
-    activarExplorar();
+    return activarExplorar();
 }
 
 export async function toggleExplorar() {
@@ -368,6 +376,45 @@ function shuffleArray(arr) {
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+}
+
+// Ejecuta el refresh del grid: recarga, reordena, re-renderiza y limpia
+// el indicador. Reutilizable por el gesto PTR y por triggerRefreshGrid().
+async function ejecutarRefreshGrid(container) {
+    ptrRefreshing = true;
+    ptrIndicator.classList.add('loading');
+    try {
+        const obras = await cargarGaleria(container);
+        const shuffled = shuffleArray(obras);
+        mostrarGaleria(shuffled, container, (id) => {
+            seleccionarObraDesdeGrid(id);
+        }, (artistaId) => {
+            verPerfilArtistaDesdeGaleria(artistaId);
+        });
+        ensurePTRInContainer(container);
+        resetEtiquetas();
+        renderEtiquetasCarrusel();
+    } catch (err) {
+        console.warn('Pull-to-refresh falló:', err);
+    }
+    ptrRefreshing = false;
+    container.style.transition = 'padding-top 0.3s ease';
+    container.style.paddingTop = '0';
+    container.style.scrollSnapType = '';
+    ptrIndicator.classList.remove('visible', 'loading');
+    ptrCooldown = Date.now() + 400;
+}
+
+// Refresca el grid programáticamente (al pulsar la lupa con el buscador abierto)
+export async function triggerRefreshGrid() {
+    const container = obtenerGaleriaContainer();
+    if (!container || ptrRefreshing) return;
+    createPTRIndicator(container);
+    ptrIndicator.classList.add('visible');
+    container.style.transition = 'none';
+    container.style.paddingTop = '56px';
+    container.style.scrollSnapType = 'none';
+    await ejecutarRefreshGrid(container);
 }
 
 function createPTRIndicator(container) {
@@ -472,30 +519,7 @@ export function setupPullToRefresh(container) {
             // Mantener scrollSnapType desactivado durante la carga
             container.style.userSelect = '';
 
-            ptrRefreshing = true;
-            ptrIndicator.classList.add('loading');
-
-            try {
-                const obras = await cargarGaleria(container);
-                const shuffled = shuffleArray(obras);
-                mostrarGaleria(shuffled, container, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
-                });
-                ensurePTRInContainer(container);
-            } catch (err) {
-                console.warn('Pull-to-refresh falló:', err);
-            }
-
-            ptrRefreshing = false;
-            // Transición suave al quitar el espacio del indicador
-            container.style.transition = 'padding-top 0.3s ease';
-            container.style.paddingTop = '0';
-            container.style.scrollSnapType = '';
-            ptrIndicator.classList.remove('visible', 'loading');
-            // Cooldown post-refresh para evitar que un tap accidental dispare otro refresh
-            ptrCooldown = Date.now() + 400;
+            await ejecutarRefreshGrid(container);
         } else {
             // No alcanzó el umbral: volver suave a 0 y ocultar
             container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';

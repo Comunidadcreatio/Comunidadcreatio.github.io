@@ -15,9 +15,9 @@
 // mejor manejo errores popover
 // bump forzado v279
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=9d0b140cf8';
-import { token, artistaActual, logout, updateLastActivity } from './auth.js?v=bed860245a';
-import { debugLog, renderText, safeImgUrl } from './utils.js?v=58a350cb86';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=3cac708192';
+import { token, artistaActual, logout, updateLastActivity } from './auth.js?v=3517742095';
+import { debugLog, renderText, safeImgUrl } from './utils.js?v=f1ecb334f1';
 import {
     showSuccess, showError, showWarning, showInfo, showConfirm
 } from './notificaciones.js?v=53cd86fdba';
@@ -28,20 +28,20 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=d59609a78c';
+} from './perfil.js?v=b032b9c546';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView
-} from './galeria-ui.js?v=c9454cb808';
+} from './galeria-ui.js?v=c549dd53d2';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
-} from './panel-ui.js?v=194ea1e5bb';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=3d0577863b';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=86766d2d4d';
-import { setupPush } from './push.js?v=c44cb2fc37';
+} from './panel-ui.js?v=11fc4daeee';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=ef39746f70';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=181d28ac6d';
+import { setupPush } from './push.js?v=e33b2583d5';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 

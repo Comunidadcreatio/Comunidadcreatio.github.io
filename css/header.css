@@ -447,6 +447,97 @@ body.search-escribiendo #toggle-panel {
     from { background-position: 0% 0; }
     to   { background-position: 200% 0; }
 }
+
+/* ==============================================
+   CARRUSEL DE ETIQUETAS (entre el buscador y el grid)
+   Chips con borde curvo + contador, scroll horizontal con snap.
+   ============================================== */
+.tags-carrusel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 8px 16px 10px;
+    touch-action: pan-x;
+}
+.tags-carrusel::-webkit-scrollbar {
+    display: none;
+}
+.tags-carrusel.hidden {
+    display: none;
+}
+.tag-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;              /* bordes curvos */
+    border: 1px solid var(--color-gray-300);
+    background: var(--color-white);
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+.tag-chip:hover {
+    border-color: var(--color-ink);
+    transform: translateY(-1px);
+}
+.tag-chip.activa {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+}
+.tag-nombre {
+    white-space: nowrap;
+}
+.tag-count {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border-radius: 10px;
+    padding: 1px 7px;
+    min-width: 20px;
+    text-align: center;
+}
+.tag-chip.activa .tag-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--color-white);
+}
+.tag-x {
+    font-size: 15px;
+    line-height: 1;
+    margin-left: 2px;
+    cursor: pointer;
+    font-weight: 700;
+    color: inherit;
+}
+[data-theme="dark"] .tag-chip {
+    background: var(--color-gray-100);
+    border-color: var(--color-border);
+    color: var(--color-ink);
+}
+[data-theme="dark"] .tag-chip:hover {
+    border-color: var(--color-ink);
+}
+[data-theme="dark"] .tag-count {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--color-ink);
+}
+[data-theme="dark"] .tag-chip.activa {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+}
 /* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid
    y POR DEBAJO de los resultados (panel z-index 1100 > capa 1000).
    Blanca en modo claro, negra en modo oscuro. */

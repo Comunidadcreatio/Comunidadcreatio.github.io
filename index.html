@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.431';
+        var currentVer = '1.0.433';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=bb59ff1ede">
+    <link rel="stylesheet" href="css/style.css?v=c3a477fed0">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -267,6 +267,8 @@
                     <input type="text" id="search-input" placeholder="Buscar artista..." aria-label="Buscar usuario" autocomplete="off">
                 </div>
             </div>
+            <!-- Carrusel de etiquetas de los cavents (entre el buscador y el grid) -->
+            <div id="tags-carrusel" class="tags-carrusel hidden" aria-label="Etiquetas de cavents"></div>
             <div id="search-results-dropdown" class="search-panel-results"></div>
         </div>
 
@@ -949,7 +951,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=7ea981fe18" type="module"></script>
+    <script src="js/main.js?v=1cbb60af7a" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=3c3da86940"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

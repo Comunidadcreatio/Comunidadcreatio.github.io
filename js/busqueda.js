@@ -2,9 +2,10 @@
 // Búsqueda de artistas en una sección (panel) que se abre desde el icono de la
 // lupa del header. Resultados en tiempo real con debounce.
 
-import { apiRequest } from './config.js?v=9d0b140cf8';
-import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=58a350cb86';
+import { apiRequest } from './config.js?v=3cac708192';
+import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=f1ecb334f1';
 import { showWarning, showError } from './notificaciones.js?v=53cd86fdba';
+import { triggerRefreshGrid } from './galeria-ui.js?v=c549dd53d2';
 
 /**
  * Configura el buscador de artistas.
@@ -36,14 +37,22 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     };
 
     // Abrir la sección desde la lupa (estado A): sin flecha <, grid visible.
-    // Si ya estaba abierta, se cierra (toggle).
-    const abrirPanel = () => {
-        if (panel && !panel.classList.contains('hidden')) { cerrarPanel(); return; }
+    // Si el buscador YA está abierto, la lupa activa el círculo de refresco
+    // del grid (pull-to-refresh) en lugar de cerrar.
+    const abrirPanel = async () => {
+        if (panel && !panel.classList.contains('hidden')) {
+            try { await triggerRefreshGrid(); } catch (e) { debugLog.warn('Refresh desde lupa:', e); }
+            return;
+        }
+        // Buscador y grid sincronizados: se prepara el grid y cuando está
+        // listo aparecen ambos juntos (sin 'primero uno y luego el otro').
+        let ok = true;
+        if (abrirExplorarFn) ok = await abrirExplorarFn();
+        if (ok === false) return; // (p.ej. confirmarDescartarCambios canceló)
         if (panel) panel.classList.remove('hidden');
         document.body.classList.add('search-abierto');
         if (panel) panel.classList.remove('modo-busqueda');
         document.body.classList.remove('search-escribiendo');
-        if (abrirExplorarFn) abrirExplorarFn();
         // Sin autofocus: el teclado NO se despliega automáticamente al abrir
     };
     if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);

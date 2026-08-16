@@ -75,6 +75,17 @@ export function renderText(str) {
 }
 
 /**
+ * Normaliza texto para comparaciones: minúsculas y sin tildes/acentos.
+ * Útil para etiquetas: 'Óleo' y 'oleo' deben coincidir.
+ */
+export function normalizarTexto(str) {
+    return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+/**
  * Sanea URLs para atributos src de imágenes.
  *  - Solo permite http(s) o data:image/... (bloquea javascript:, data:text/html, etc.)
  *  - Neutraliza comillas dobles para no romper el atributo (no-op si el backend ya escapó).
