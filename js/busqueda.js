@@ -84,10 +84,17 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     if (cerrarBtn) cerrarBtn.addEventListener('click', volverAlGrid);
 
     // Auto-cerrar al tocar fuera del panel (otro botón del nav, una obra, etc.)
+    // EXCEPCIÓN: los botones que cambian el modo claro/oscuro NO cierran el
+    // buscador (el carrusel de etiquetas debe seguir visible al cambiar el tema).
+    const botonesModo = ['btn-dark-mode', 'config-dark-mode', 'auth-dark-mode-btn'];
     document.addEventListener('click', (e) => {
         if (!panel || panel.classList.contains('hidden')) return;
         if (panel.contains(e.target)) return;
         if (lupaBtn && lupaBtn.contains(e.target)) return;
+        for (const id of botonesModo) {
+            const el = document.getElementById(id);
+            if (el && el.contains(e.target)) return;
+        }
         cerrarPanel();
     });
 
