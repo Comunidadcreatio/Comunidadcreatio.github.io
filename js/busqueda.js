@@ -24,24 +24,48 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         return;
     }
 
-    // Abrir la sección de búsqueda al tocar la lupa (debajo del header),
-    // y mostrar también la sección Explorar.
+    // Cerrar la sección por completo (toque fuera, resultado, lupa de nuevo)
+    const cerrarPanel = () => {
+        if (panel) panel.classList.add('hidden');
+        if (panel) panel.classList.remove('modo-busqueda');
+        document.body.classList.remove('search-abierto');
+        document.body.classList.remove('search-escribiendo');
+        searchInput.value = '';
+        resultados.innerHTML = '';
+    };
+
+    // Abrir la sección desde la lupa (estado A): sin flecha <, grid visible.
+    // Si ya estaba abierta, se cierra (toggle).
     const abrirPanel = () => {
+        if (panel && !panel.classList.contains('hidden')) { cerrarPanel(); return; }
         if (panel) panel.classList.remove('hidden');
         document.body.classList.add('search-abierto');
+        if (panel) panel.classList.remove('modo-busqueda');
+        document.body.classList.remove('search-escribiendo');
         if (abrirExplorarFn) abrirExplorarFn();
         // Sin autofocus: el teclado NO se despliega automáticamente al abrir
     };
     if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);
 
-    // Cerrar la sección (botón ←)
-    const cerrarPanel = () => {
-        if (panel) panel.classList.add('hidden');
-        document.body.classList.remove('search-abierto');
-        searchInput.value = '';
+    // Al tocar el input se entra al "modo búsqueda" (estado B):
+    // el grid queda semitransparente, aparecen los resultados
+    // y se muestra la flecha < para volver al grid.
+    const entrarModoBusqueda = () => {
+        if (panel) panel.classList.add('modo-busqueda');
+        document.body.classList.add('search-escribiendo');
+        if (!searchInput.value.trim() && !resultados.innerHTML) {
+            resultados.innerHTML = '<div class="search-no-results">Escribe el nombre del artista...</div>';
+        }
+    };
+    searchInput.addEventListener('focus', entrarModoBusqueda);
+
+    // La flecha < vuelve al grid (NO cierra la sección)
+    const volverAlGrid = () => {
+        if (panel) panel.classList.remove('modo-busqueda');
+        document.body.classList.remove('search-escribiendo');
         resultados.innerHTML = '';
     };
-    if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarPanel);
+    if (cerrarBtn) cerrarBtn.addEventListener('click', volverAlGrid);
 
     // Auto-cerrar al tocar fuera del panel (otro botón del nav, una obra, etc.)
     document.addEventListener('click', (e) => {

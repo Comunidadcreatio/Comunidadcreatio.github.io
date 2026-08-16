@@ -353,6 +353,42 @@ picture {
     gap: 2px;
     padding: 4px 0;
 }
+
+/* ==============================================
+   BUSCADOR — modos A/B
+   A (abierto desde la lupa): sin flecha <, grid visible debajo.
+   B (al tocar el input): flecha < visible, grid semitransparente,
+   resultados encima. La flecha < vuelve a A.
+   ============================================== */
+.search-panel-top #search-close {
+    display: none;              /* A: flecha oculta al abrir desde la lupa */
+}
+#search-panel.modo-busqueda .search-panel-top #search-close {
+    display: flex;              /* B: aparece la flecha para volver al grid */
+}
+#search-panel.modo-busqueda {
+    /* B: fondo más sólido para leer los resultados sobre el grid */
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(255, 255, 255, 0.95) 40%,
+        rgba(255, 255, 255, 0.85) 70%,
+        rgba(255, 255, 255, 0.7) 100%);
+}
+[data-theme="dark"] #search-panel.modo-busqueda {
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.98) 0%,
+        rgba(0, 0, 0, 0.95) 40%,
+        rgba(0, 0, 0, 0.85) 70%,
+        rgba(0, 0, 0, 0.7) 100%);
+}
+body.search-escribiendo #galeria-container {
+    opacity: 0.25;              /* B: grid semitransparente debajo */
+    pointer-events: none;       /* los toques van al panel, no al grid */
+    transition: opacity 0.2s ease;
+}
+body.search-escribiendo #galeria-publica {
+    pointer-events: none;
+}
 /* El panel de búsqueda es una barra compacta justo debajo del header (no
    fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
    header a propósito: el backdrop-filter del header rompía el containing
