@@ -50,20 +50,29 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     // Al tocar el input se entra al "modo búsqueda" (estado B):
     // el grid queda semitransparente, aparecen los resultados
     // y se muestra la flecha < para volver al grid.
+    let timeoutResultados = null;
     const entrarModoBusqueda = () => {
         if (panel) panel.classList.add('modo-busqueda');
         document.body.classList.add('search-escribiendo');
+        // Si se vuelve a entrar antes de que termine el fade-out, cancelarlo
+        clearTimeout(timeoutResultados);
+        resultados.classList.remove('resultados-saliendo');
         if (!searchInput.value.trim() && !resultados.innerHTML) {
             resultados.innerHTML = '<div class="search-no-results">Escribe el nombre del artista...</div>';
         }
     };
     searchInput.addEventListener('focus', entrarModoBusqueda);
 
-    // La flecha < vuelve al grid (NO cierra la sección)
+    // La flecha < vuelve al grid (NO cierra la sección): salida suave
     const volverAlGrid = () => {
         if (panel) panel.classList.remove('modo-busqueda');
         document.body.classList.remove('search-escribiendo');
-        resultados.innerHTML = '';
+        resultados.classList.add('resultados-saliendo');   // fade-out
+        clearTimeout(timeoutResultados);
+        timeoutResultados = setTimeout(() => {
+            resultados.classList.remove('resultados-saliendo');
+            resultados.innerHTML = '';
+        }, 200);
     };
     if (cerrarBtn) cerrarBtn.addEventListener('click', volverAlGrid);
 

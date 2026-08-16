@@ -119,7 +119,7 @@ picture {
     border-radius: 20px;
     border: 1px solid var(--color-gray-300);
     background: transparent;     /* Sin relleno interno (pedido del cliente) */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
     overflow: hidden;
     align-items: center;
 }
@@ -362,10 +362,20 @@ picture {
    resultados encima. La flecha < vuelve a A.
    ============================================== */
 .search-panel-top #search-close {
-    display: none;              /* A: flecha oculta al abrir desde la lupa */
+    /* A: flecha colapsada (sin espacio, invisible) — se expande con animación */
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateX(-10px);
+    transition: width 0.25s ease, padding 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
 }
 #search-panel.modo-busqueda .search-panel-top #search-close {
-    display: flex;              /* B: aparece la flecha para volver al grid */
+    /* B: la flecha se desliza hacia dentro */
+    width: 32px;
+    padding: 4px 6px;
+    opacity: 1;
+    transform: translateX(0);
 }
 #search-panel.modo-busqueda {
     /* B: SIN relleno — los perfiles se ven directamente sobre el grid */
@@ -377,10 +387,34 @@ picture {
 body.search-escribiendo #galeria-container {
     pointer-events: none;       /* B: el grid no recibe toques (la capa lo cubre) */
 }
-/* CAPA DE OPACIDAD: se muestra al tocar el input, POR ENCIMA del grid
+#search-panel.modo-busqueda .search-input-wrapper {
+    /* B: fondo sutil en el input al entrar en modo búsqueda */
+    background: rgba(128, 128, 128, 0.08);
+}
+/* Resultados: entrada animada (fade + slide) con stagger sutil */
+.search-panel-results .search-result-item {
+    animation: buscarItemIn 0.25s ease both;
+}
+.search-panel-results .search-result-item:nth-child(2) { animation-delay: 0.04s; }
+.search-panel-results .search-result-item:nth-child(3) { animation-delay: 0.08s; }
+.search-panel-results .search-result-item:nth-child(4) { animation-delay: 0.12s; }
+.search-panel-results .search-result-item:nth-child(5) { animation-delay: 0.16s; }
+.search-panel-results .search-result-item:nth-child(n+6) { animation-delay: 0.20s; }
+@keyframes buscarItemIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Salida suave de los resultados al volver con la flecha < */
+.search-panel-results {
+    transition: opacity 0.2s ease;
+}
+.search-panel-results.resultados-saliendo {
+    opacity: 0;
+}
+/* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid
    y POR DEBAJO de los resultados (panel z-index 1100 > capa 1000).
    Blanca en modo claro, negra en modo oscuro. */
-body.search-escribiendo #galeria-publica::before {
+#galeria-publica::before {
     content: '';
     position: fixed;
     left: 0;
@@ -389,9 +423,16 @@ body.search-escribiendo #galeria-publica::before {
     bottom: 0;
     background: rgba(255, 255, 255, 0.85);  /* claro */
     z-index: 1000;
+    opacity: 0;                             /* invisible por defecto */
+    pointer-events: none;
+    transition: opacity 0.25s ease;
 }
-[data-theme="dark"] body.search-escribiendo #galeria-publica::before {
+[data-theme="dark"] #galeria-publica::before {
     background: rgba(0, 0, 0, 0.85);         /* oscuro */
+}
+body.search-escribiendo #galeria-publica::before {
+    opacity: 1;                             /* fade in al tocar el input */
+    pointer-events: auto;                   /* bloquea toques al grid */
 }
 /* El panel de búsqueda es una barra compacta justo debajo del header (no
    fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
