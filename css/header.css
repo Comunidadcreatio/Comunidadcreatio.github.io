@@ -228,6 +228,7 @@ picture {
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
+    border-bottom: 1px solid var(--color-gray-200); /* línea divisoria */
 }
 
 .search-result-item:hover {
@@ -237,8 +238,8 @@ picture {
 }
 
 .search-result-avatar {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--color-gray-200);
@@ -252,8 +253,8 @@ picture {
 }
 
 .search-result-avatar-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -261,7 +262,7 @@ picture {
     background: linear-gradient(135deg, var(--color-gray-200) 0%, var(--color-gray-300) 100%);
     color: var(--color-gray-700);
     font-weight: 700;
-    font-size: 16px;
+    font-size: 20px;
     border: 2px solid var(--color-gray-300);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease;
@@ -282,7 +283,7 @@ picture {
 }
 
 .search-result-name {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--color-text);
     margin-bottom: 2px;
@@ -290,7 +291,7 @@ picture {
 }
 
 .search-result-real-name {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--color-gray-500);
     font-weight: 400;
     font-family: 'Nunito', sans-serif;
@@ -386,11 +387,11 @@ body.search-escribiendo #galeria-publica::before {
     right: 0;
     top: 0;                                 /* cubre TODA la altura */
     bottom: 0;
-    background: rgba(255, 255, 255, 0.75);  /* claro */
+    background: rgba(255, 255, 255, 0.85);  /* claro */
     z-index: 1000;
 }
 [data-theme="dark"] body.search-escribiendo #galeria-publica::before {
-    background: rgba(0, 0, 0, 0.75);         /* oscuro */
+    background: rgba(0, 0, 0, 0.85);         /* oscuro */
 }
 /* El panel de búsqueda es una barra compacta justo debajo del header (no
    fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
@@ -511,22 +512,22 @@ body.search-escribiendo #galeria-publica::before {
     }
 
     .search-result-avatar {
-        width: 28px;
-        height: 28px;
+        width: 40px;
+        height: 40px;
     }
 
     .search-result-avatar-placeholder {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 
     .search-result-name {
-        font-size: 13px;
+        font-size: 15px;
     }
 
     .search-result-real-name {
-        font-size: 11px;
+        font-size: 13px;
     }
 }
 
@@ -596,22 +597,22 @@ body.search-escribiendo #galeria-publica::before {
     }
 
     .search-result-avatar {
-        width: 24px;
-        height: 24px;
+        width: 34px;
+        height: 34px;
     }
 
     .search-result-avatar-placeholder {
-        width: 24px;
-        height: 24px;
-        font-size: 11px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
     }
 
     .search-result-name {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .search-result-real-name {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
 
