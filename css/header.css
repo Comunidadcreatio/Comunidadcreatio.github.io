@@ -118,7 +118,7 @@ picture {
     height: 40px;                /* Misma altura que logo e iconos */
     border-radius: 20px;
     border: 1px solid var(--color-gray-300);
-    background: var(--color-white);
+    background: transparent;     /* Sin relleno interno (pedido del cliente) */
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
     align-items: center;
@@ -340,10 +340,10 @@ picture {
     pointer-events: none;
     z-index: 1;
 }
-/* Anillo de foco al escribir */
+/* Foco sin anillo azul neon (pedido del cliente): borde neutro, sin glow */
 .search-input-wrapper:focus-within {
-    border-color: #5BA0D9;
-    box-shadow: 0 0 0 3px rgba(91, 160, 217, 0.25);
+    border-color: var(--color-gray-300);
+    box-shadow: none;
 }
 .search-panel-results {
     max-height: 40vh;

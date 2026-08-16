@@ -30,7 +30,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         if (panel) panel.classList.remove('hidden');
         document.body.classList.add('search-abierto');
         if (abrirExplorarFn) abrirExplorarFn();
-        setTimeout(() => searchInput.focus(), 60);
+        // Sin autofocus: el teclado NO se despliega automáticamente al abrir
     };
     if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);
 
