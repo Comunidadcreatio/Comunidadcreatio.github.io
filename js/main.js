@@ -33,14 +33,14 @@ import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView
-} from './galeria-ui.js?v=c549dd53d2';
+} from './galeria-ui.js?v=c4c4b7c895';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=11fc4daeee';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=ef39746f70';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=181d28ac6d';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=55fa2033ec';
 import { setupPush } from './push.js?v=e33b2583d5';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador

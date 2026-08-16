@@ -538,6 +538,17 @@ body.search-escribiendo #toggle-panel {
     color: var(--color-white);
     border-color: var(--color-ink);
 }
+
+/* El grid baja más cuando el carrusel de etiquetas está visible,
+   para que los chips no se solapen con la primera fila de cavents. */
+body.search-abierto.search-con-etiquetas #galeria-container {
+    top: calc(132px + 48px + var(--status-bar-height, 24px));
+}
+@media (max-width: 768px) {
+    body.search-abierto.search-con-etiquetas #galeria-container {
+        top: calc(128px + 48px + var(--status-bar-height, 24px));
+    }
+}
 /* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid
    y POR DEBAJO de los resultados (panel z-index 1100 > capa 1000).
    Blanca en modo claro, negra en modo oscuro. */

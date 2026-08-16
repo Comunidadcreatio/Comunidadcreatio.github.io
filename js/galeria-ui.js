@@ -3,7 +3,7 @@
 // y modo grid de la galería.
 
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=ef39746f70';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=056c601051';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=cb6923f6ca';
 import { artistaActual, token } from './auth.js?v=3517742095';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=b032b9c546';
 import { confirmarDescartarCambios } from './panel-ui.js?v=11fc4daeee';

@@ -35,9 +35,12 @@ export function renderEtiquetasCarrusel() {
     if (tags.length === 0) {
         contenedor.innerHTML = '';
         contenedor.classList.add('hidden');
+        document.body.classList.remove('search-con-etiquetas');
         return;
     }
     contenedor.classList.remove('hidden');
+    // El grid debe bajar para dejar espacio al carrusel
+    document.body.classList.add('search-con-etiquetas');
     contenedor.innerHTML = tags.map(t => {
         const activa = etiquetaActiva === normalizarTexto(t.nombre);
         const x = activa
