@@ -472,17 +472,24 @@ body.search-escribiendo #toggle-panel {
     z-index: 900;
     align-items: center;
     gap: 8px;
+    padding: 8px 0 10px; /* sin aire lateral: los chips llegan al borde de la pantalla */
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px; /* al hacer scroll, los chips respiran del borde */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: 8px 16px 10px;
     touch-action: pan-x;
 }
 /* Solo visible cuando el buscador está abierto y hay etiquetas */
 body.search-abierto .tags-carrusel:not(.hidden) {
     display: flex;
+}
+/* Cuando el carrusel desborda (más etiquetas de las que caben), los chips
+   cortados en los bordes se desvanecen suavemente en vez de cortarse en seco */
+.tags-carrusel.desborda {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
 }
 @media (max-width: 768px) {
     .tags-carrusel {
@@ -496,7 +503,9 @@ body.search-abierto .tags-carrusel:not(.hidden) {
     display: none;
 }
 .tag-chip {
-    flex: 0 0 auto;
+    flex: 1 1 auto;                /* si caben, llenan el ancho (sin aire en los lados) */
+    min-width: max-content;        /* si no caben, conservan su tamaño y hay scroll */
+    justify-content: center;       /* texto centrado al estirarse */
     scroll-snap-align: start;
     display: inline-flex;
     align-items: center;
