@@ -118,6 +118,12 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
                 return newMatch;
             });
             if (changed) {
+                // Salvaguarda dura: jamás escribir un archivo vacío (p.ej. si la
+                // lectura devolvió '' por un bloqueo transitorio del filesystem).
+                if (!content) {
+                    console.error('⚠ ' + importer + ': contenido vacío tras procesar — SE OMITE la escritura para no corromper.');
+                    continue;
+                }
                 fs.writeFileSync(filePath, content, 'utf-8');
                 console.log(`✎ ${importer} imports actualizados.`);
                 passChanged = true;
