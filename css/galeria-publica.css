@@ -1,4 +1,4 @@
-﻿/* css/galeria-publica.css - Diseño de tarjetas de obras */
+/* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
    SCROLL SNAPPING — contenedor fixed como snap container
    ============================================== */
@@ -639,7 +639,11 @@ html, body {
 }
 
 /* ==============================================
-   PULL-TO-REFRESH (MODO EXPLORAR)
+   PULL-TO-REFRESH (MODO EXPLORAR / GRID)
+   Círculo de refresco profesional: anillo SVG que se
+   llena con el arrastre (arco redondeado), se eleva y
+   brilla al superar el umbral, gira como spinner mientras
+   carga y hace un "pop" de confirmación al terminar.
    ============================================== */
 .pull-refresh-indicator {
     display: none;
@@ -656,55 +660,100 @@ html, body {
     z-index: 2;
 }
 
-:root { --ptr-fill: #1a1a1a; }
-[data-theme="dark"] { --ptr-fill: #f5f5f5; }
-
 .pull-refresh-indicator.visible {
     display: flex;
 }
 
+/* Anillo: aparece con un pop elástico */
 .pull-refresh-indicator .ptr-circle {
-    display: none;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    border: 2.5px solid rgba(0,0,0,0.12);
     flex-shrink: 0;
     position: relative;
     background: transparent;
-    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(0.4);
 }
 
-.pull-refresh-indicator.visible .ptr-circle,
-.pull-refresh-indicator.loading .ptr-circle {
-    display: block;
+.pull-refresh-indicator.visible .ptr-circle {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.18s ease-out, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.pull-refresh-indicator .ptr-circle-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Al ocultarse: desvanecido suave (JS lo retira tras la transición) */
+.pull-refresh-indicator.hiding .ptr-circle {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.pull-refresh-indicator .ptr-svg {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    background: conic-gradient(var(--ptr-fill, #1a1a1a) 0deg, var(--ptr-fill, #1a1a1a) 0deg, transparent 0deg);
+    display: block;
+    transform: rotate(-90deg); /* el arco arranca en las 12 en punto */
+    overflow: visible;
+}
+
+.pull-refresh-indicator .ptr-track {
+    fill: none;
+    stroke: var(--color-gray-200);
+    stroke-width: 3;
+    transition: opacity 0.2s ease;
+}
+
+.pull-refresh-indicator .ptr-arc {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 97.39; /* 2π·15.5 */
+    stroke-dashoffset: 97.39; /* progreso 0: arco vacío */
+    transition: stroke-dashoffset 0.25s ease, stroke 0.25s ease;
+}
+
+/* Durante el arrastre el arco sigue al dedo sin interpolación */
+.pull-refresh-indicator.pulling .ptr-arc {
     transition: none;
 }
 
-.pull-refresh-indicator.loading .ptr-circle-fill {
-    animation: ptr-spin 0.8s linear infinite;
+/* Umbral superado: el anillo se eleva y gana un brillo sutil */
+.pull-refresh-indicator.ready .ptr-circle {
+    transform: scale(1.12);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
 }
 
-.pull-refresh-indicator .ptr-label {
-    display: none;
+/* Cargando: arco ~75% girando como spinner clásico; la pista se atenúa */
+.pull-refresh-indicator.loading .ptr-track {
+    opacity: 0.3;
+}
+.pull-refresh-indicator.loading .ptr-svg {
+    animation: ptr-spin 0.9s linear infinite;
+}
+
+/* Confirmación: anillo completo con pop y desvanecido final */
+.pull-refresh-indicator.done .ptr-svg {
+    animation: none;
+}
+.pull-refresh-indicator.done .ptr-circle {
+    animation: ptr-done 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes ptr-spin {
-    to { transform: rotate(360deg); }
+    from { transform: rotate(-90deg); }
+    to   { transform: rotate(270deg); }
 }
 
-[data-theme="dark"] .pull-refresh-indicator .ptr-circle {
-    border-color: rgba(255,255,255,0.15);
+@keyframes ptr-done {
+    0%   { transform: scale(1.05); opacity: 1; }
+    55%  { transform: scale(1.35); opacity: 1; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+[data-theme="dark"] .pull-refresh-indicator .ptr-track {
+    stroke: rgba(255, 255, 255, 0.18);
 }
 
 /* ==============================================

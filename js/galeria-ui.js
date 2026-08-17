@@ -358,6 +358,9 @@ export async function toggleExplorar() {
 // ============================================================
 // ============================================================
 // PULL-TO-REFRESH (MODO EXPLORAR / GRID)
+// Círculo de refresco profesional: anillo SVG que se llena con
+// el arrastre, gira como spinner mientras carga y hace un pop
+// de confirmación al terminar. Comparte lógica táctil y ratón.
 // ============================================================
 let ptrIndicator = null;
 let ptrStartY = 0;
@@ -366,8 +369,13 @@ let ptrRefreshing = false;
 let ptrPullDist = 0;
 let ptrMaxPull = 0;
 const PTR_THRESHOLD = 70;
+const PTR_CIRC = 97.39; // 2π·15.5 — circunferencia del anillo SVG
 let ptrCooldown = 0; // timestamp post-refresh para evitar doble disparo
-let ptrDidDrag = false; // solo true si hubo arrastre real (touchmove con dist > 5)
+let ptrDidDrag = false; // solo true si hubo arrastre real (dist > 5)
+let ptrDoneTimer = null; // timer de la animación de confirmación
+let ptrHideTimer = null; // timer del desvanecido al cancelar
+let ptrTouchRaf = null; // rAF del gesto táctil
+let ptrMouseRaf = null; // rAF del gesto con ratón
 
 function shuffleArray(arr) {
     const a = arr.slice();
@@ -378,11 +386,52 @@ function shuffleArray(arr) {
     return a;
 }
 
-// Ejecuta el refresh del grid: recarga, reordena, re-renderiza y limpia
-// el indicador. Reutilizable por el gesto PTR y por triggerRefreshGrid().
+// ---- Ayudantes del indicador ---------------------------------
+
+// Progreso del arco (0..1). Se aplica directo al stroke-dashoffset
+// para máxima compatibilidad (sin calc() ni gradientes por frame).
+function setPtrProgress(progress) {
+    if (!ptrIndicator) return;
+    const arc = ptrIndicator.querySelector('.ptr-arc');
+    if (!arc) return;
+    const p = Math.min(Math.max(progress, 0), 1);
+    arc.style.strokeDashoffset = String(PTR_CIRC * (1 - p));
+}
+
+// Fija el estado visual del indicador (visible/pulling/ready/loading/done/hiding)
+function setPtrState(...classes) {
+    if (!ptrIndicator) return;
+    ptrIndicator.classList.remove('visible', 'pulling', 'ready', 'loading', 'done', 'hiding');
+    if (classes.length) ptrIndicator.classList.add(...classes);
+}
+
+// Muestra el indicador al empezar el arrastre (con pop elástico)
+function mostrarPtrPulling() {
+    clearTimeout(ptrHideTimer);
+    clearTimeout(ptrDoneTimer); // cancelar el desvanecido de confirmación pendiente
+    if (ptrIndicator && !ptrIndicator.classList.contains('visible')) {
+        setPtrState('visible', 'pulling');
+        setPtrProgress(0);
+    }
+}
+
+// Oculta el indicador con desvanecido (JS lo retira tras la transición)
+function ocultarPtr(ms = 220) {
+    if (!ptrIndicator || !ptrIndicator.classList.contains('visible')) return;
+    ptrIndicator.classList.add('hiding');
+    clearTimeout(ptrHideTimer);
+    ptrHideTimer = setTimeout(() => {
+        if (!ptrPulling && !ptrRefreshing) setPtrState();
+    }, ms);
+}
+
+// Ejecuta el refresh del grid: recarga, reordena, re-renderiza y
+// finaliza con la animación de confirmación. Reutilizable por el
+// gesto PTR y por triggerRefreshGrid().
 async function ejecutarRefreshGrid(container) {
     ptrRefreshing = true;
-    ptrIndicator.classList.add('loading');
+    setPtrState('visible', 'loading');
+    setPtrProgress(0.75); // arco de 270° girando durante la carga
     try {
         const obras = await cargarGaleria(container);
         const shuffled = shuffleArray(obras);
@@ -398,11 +447,58 @@ async function ejecutarRefreshGrid(container) {
         console.warn('Pull-to-refresh falló:', err);
     }
     ptrRefreshing = false;
-    container.style.transition = 'padding-top 0.3s ease';
-    container.style.paddingTop = '0';
+    finalizarRefresh(container);
+}
+
+// Confirmación: anillo completo con pop y desvanecido, grid asentado
+function finalizarRefresh(container) {
+    container.style.transition = 'padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    container.style.paddingTop = ''; // restaura el padding CSS (0 en flex, 6px en grid)
     container.style.scrollSnapType = '';
-    ptrIndicator.classList.remove('visible', 'loading');
+    container.style.userSelect = '';
+    setPtrState('done');
+    setPtrProgress(1);
+    clearTimeout(ptrDoneTimer);
+    ptrDoneTimer = setTimeout(() => {
+        if (!ptrPulling && !ptrRefreshing) setPtrState();
+    }, 600);
     ptrCooldown = Date.now() + 400;
+}
+
+// Arrastre que superó el umbral: asentar a 56px y refrescar
+async function dispararRefresh(container) {
+    container.style.transition = 'padding-top 0.18s ease-out';
+    container.style.paddingTop = '56px';
+    container.style.userSelect = '';
+    setPtrProgress(1); // anillo completo antes de entrar en carga
+    await ejecutarRefreshGrid(container);
+}
+
+// Arrastre que no superó el umbral (o cancelado): volver suave
+function revertirPtr(container) {
+    container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+    container.style.paddingTop = '';
+    container.style.scrollSnapType = '';
+    container.style.userSelect = '';
+    ocultarPtr(220);
+    ptrPullDist = 0;
+    ptrMaxPull = 0;
+}
+
+// Cancelación del gesto (touchcancel/pointercancel/blur): restaura todo
+function cancelarPtr(container) {
+    if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = null; }
+    if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = null; }
+    if (!ptrPulling || ptrRefreshing) return;
+    ptrPulling = false;
+    ptrDidDrag = false;
+    container.style.transition = 'padding-top 0.3s ease';
+    container.style.paddingTop = '';
+    container.style.scrollSnapType = '';
+    container.style.userSelect = '';
+    ocultarPtr(220);
+    ptrPullDist = 0;
+    ptrMaxPull = 0;
 }
 
 // Refresca el grid programáticamente (al pulsar la lupa con el buscador abierto)
@@ -410,7 +506,6 @@ export async function triggerRefreshGrid() {
     const container = obtenerGaleriaContainer();
     if (!container || ptrRefreshing) return;
     createPTRIndicator(container);
-    ptrIndicator.classList.add('visible');
     container.style.transition = 'none';
     container.style.paddingTop = '56px';
     container.style.scrollSnapType = 'none';
@@ -427,7 +522,13 @@ function createPTRIndicator(container) {
     }
     ptrIndicator = document.createElement('div');
     ptrIndicator.className = 'pull-refresh-indicator';
-    ptrIndicator.innerHTML = '<div class="ptr-circle"><div class="ptr-circle-fill"></div></div>';
+    ptrIndicator.innerHTML =
+        '<div class="ptr-circle">' +
+            '<svg class="ptr-svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">' +
+                '<circle class="ptr-track" cx="18" cy="18" r="15.5"></circle>' +
+                '<circle class="ptr-arc" cx="18" cy="18" r="15.5"></circle>' +
+            '</svg>' +
+        '</div>';
     container.insertBefore(ptrIndicator, container.firstChild);
 }
 
@@ -441,20 +542,17 @@ export function setupPullToRefresh(container) {
     if (!container) return;
     // El indicador se recrea siempre (innerHTML lo destruye)
     createPTRIndicator(container);
-    // Limpiar listeners anteriores antes de re-agregar (previene acumulación)
-    if (container._ptrMouseMove) {
-        container.removeEventListener('mousemove', container._ptrMouseMove);
-        container.removeEventListener('mouseup', container._ptrMouseUp);
-        container.removeEventListener('mouseleave', container._ptrMouseLeave);
-    }
-    // Listeners solo una vez por container
-    if (container.dataset.ptrReady === '1') return;
-    container.dataset.ptrReady = '1';
 
-    container.addEventListener('touchstart', (e) => {
+    // Setup idempotente: limpiar listeners previos y volver a añadir
+    if (container._ptrCleanup) container._ptrCleanup();
+
+    // ---- Gestos compartidos (táctil y ratón) -------------------
+
+    function onTouchStart(e) {
         if (ptrRefreshing) return;
         // Cooldown post-refresh: ignorar toques brevemente
         if (Date.now() < ptrCooldown) return;
+        clearTimeout(ptrDoneTimer); // interrumpir la confirmación si se vuelve a tirar
         // Forzar scrollTop a 0 si está cerca (scroll-snap a veces lo deja en 1-5px)
         if (container.scrollTop > 0 && container.scrollTop <= 10) {
             container.scrollTop = 0;
@@ -466,17 +564,15 @@ export function setupPullToRefresh(container) {
             ptrDidDrag = false;
             container.style.transition = 'none';
             container.style.paddingTop = '';
-            container.style.transform = '';
             container.style.scrollSnapType = 'none';
             container.style.userSelect = 'none';
+            setPtrProgress(0);
         } else {
             ptrPulling = false;
         }
-    }, { passive: true });
+    }
 
-    let touchRaf = null;
-
-    container.addEventListener('touchmove', (e) => {
+    function onTouchMove(e) {
         if (!ptrPulling || ptrRefreshing) return;
         const dist = e.touches[0].clientY - ptrStartY;
         ptrPullDist = dist;
@@ -485,61 +581,38 @@ export function setupPullToRefresh(container) {
         if (dist > 5 && container.scrollTop <= 0) {
             ptrDidDrag = true;
             e.preventDefault();
-            if (touchRaf) cancelAnimationFrame(touchRaf);
-            touchRaf = requestAnimationFrame(() => {
+            if (ptrTouchRaf) cancelAnimationFrame(ptrTouchRaf);
+            ptrTouchRaf = requestAnimationFrame(() => {
                 const damped = Math.min(dist * 0.45, 90);
                 container.style.paddingTop = damped + 'px';
-                ptrIndicator.classList.add('visible');
+                mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
-                const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-                if (circle) {
-                    const deg = Math.round(progress * 360);
-                    const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
-                    circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
-                }
+                setPtrProgress(progress);
+                ptrIndicator.classList.toggle('ready', progress >= 1);
             });
         }
-    }, { passive: false });
+    }
 
-    container.addEventListener('touchend', async () => {
-        if (touchRaf) { cancelAnimationFrame(touchRaf); touchRaf = null; }
+    async function onTouchEnd() {
+        if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-
-        // Reset círculo — limpiar estilo inline
-        const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-        if (circle) {
-            circle.style.background = '';
-        }
+        if (ptrIndicator) ptrIndicator.classList.remove('pulling'); // activa transiciones del arco
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            // Snap instantáneo a 56px (sin transición, evita salto en flex)
-            container.style.transition = 'none';
-            container.style.paddingTop = '56px';
-            // Mantener scrollSnapType desactivado durante la carga
-            container.style.userSelect = '';
-
-            await ejecutarRefreshGrid(container);
+            await dispararRefresh(container);
         } else {
-            // No alcanzó el umbral: volver suave a 0 y ocultar
-            container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-            container.style.paddingTop = '0';
-            container.style.transform = '';
-            container.style.scrollSnapType = '';
-            container.style.userSelect = '';
-            ptrIndicator.classList.remove('visible');
+            revertirPtr(container);
         }
         ptrPullDist = 0;
         ptrMaxPull = 0;
-    });
+    }
 
-    // Soporte mouse drag (desktop)
-    let rafId = null;
-
-    container.addEventListener('mousedown', (e) => {
+    function onMouseDown(e) {
         if (ptrRefreshing) return;
         // Cooldown post-refresh: ignorar interacciones brevemente
         if (Date.now() < ptrCooldown) return;
+        clearTimeout(ptrDoneTimer); // interrumpir la confirmación si se vuelve a tirar
         if (container.scrollTop <= 0) {
             ptrStartY = e.clientY;
             ptrPulling = true;
@@ -547,13 +620,13 @@ export function setupPullToRefresh(container) {
             ptrDidDrag = false;
             container.style.transition = 'none';
             container.style.paddingTop = '';
-            container.style.transform = '';
             container.style.scrollSnapType = 'none';
             container.style.userSelect = 'none';
+            setPtrProgress(0);
         } else {
             ptrPulling = false;
         }
-    });
+    }
 
     function onMouseMove(e) {
         if (!ptrPulling || ptrRefreshing) return;
@@ -564,94 +637,64 @@ export function setupPullToRefresh(container) {
         if (dist > 5 && container.scrollTop <= 0) {
             ptrDidDrag = true;
             e.preventDefault();
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => {
+            if (ptrMouseRaf) cancelAnimationFrame(ptrMouseRaf);
+            ptrMouseRaf = requestAnimationFrame(() => {
                 const damped = Math.min(dist * 0.45, 90);
                 container.style.paddingTop = damped + 'px';
-                ptrIndicator.classList.add('visible');
+                mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
-                const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-                if (circle) {
-                    const deg = Math.round(progress * 360);
-                    const fill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f5f5f5' : '#1a1a1a';
-                    circle.style.background = `conic-gradient(${fill} 0deg, ${fill} ${deg}deg, transparent ${deg}deg)`;
-                }
+                setPtrProgress(progress);
+                ptrIndicator.classList.toggle('ready', progress >= 1);
             });
         }
     }
 
     async function onMouseUp() {
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = null; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-
-        const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-        if (circle) circle.style.background = '';
+        if (ptrIndicator) ptrIndicator.classList.remove('pulling');
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
-            // Snap instantáneo a 56px (sin transición, evita salto en flex)
-            container.style.transition = 'none';
-            container.style.paddingTop = '56px';
-            // Mantener scrollSnapType desactivado durante la carga
-            container.style.userSelect = '';
-
-            ptrRefreshing = true;
-            ptrIndicator.classList.add('loading');
-
-            try {
-                const obras = await cargarGaleria(container);
-                const shuffled = shuffleArray(obras);
-                mostrarGaleria(shuffled, container, (id) => {
-                    seleccionarObraDesdeGrid(id);
-                }, (artistaId) => {
-                    verPerfilArtistaDesdeGaleria(artistaId);
-                });
-                ensurePTRInContainer(container);
-            } catch (err) {
-                console.warn('Pull-to-refresh (mouse) falló:', err);
-            }
-
-            ptrRefreshing = false;
-            container.style.transition = 'padding-top 0.3s ease';
-            container.style.paddingTop = '0';
-            container.style.scrollSnapType = '';
-            ptrIndicator.classList.remove('visible', 'loading');
-            ptrCooldown = Date.now() + 400;
+            await dispararRefresh(container);
         } else {
-            container.style.transition = 'padding-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
-            container.style.paddingTop = '0';
-            container.style.scrollSnapType = '';
-            container.style.userSelect = '';
-            ptrIndicator.classList.remove('visible');
+            revertirPtr(container);
         }
         ptrPullDist = 0;
         ptrMaxPull = 0;
     }
 
+    // ---- Registro de listeners + cleanup idempotente ------------
+
+    const onTouchCancel = () => cancelarPtr(container);
+    const onPointerCancel = () => cancelarPtr(container);
+    const onMouseLeave = () => cancelarPtr(container);
+    const onWindowBlur = () => cancelarPtr(container);
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('touchcancel', onTouchCancel);
+    container.addEventListener('pointercancel', onPointerCancel);
+    container.addEventListener('mousedown', onMouseDown);
     container.addEventListener('mousemove', onMouseMove);
     container.addEventListener('mouseup', onMouseUp);
-    // Guardar referencias para posible cleanup futuro
-    container._ptrMouseMove = onMouseMove;
-    container._ptrMouseUp = onMouseUp;
-
-    // Reset si el mouse sale del container
-    const onMouseLeave = () => {
-        if (ptrPulling && !ptrRefreshing) {
-            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-            ptrPulling = false;
-            container.style.transition = 'padding-top 0.3s ease';
-            container.style.paddingTop = '0';
-            container.style.scrollSnapType = '';
-            container.style.userSelect = '';
-            ptrIndicator.classList.remove('visible');
-            const circle = ptrIndicator.querySelector('.ptr-circle-fill');
-            if (circle) circle.style.background = '';
-            ptrPullDist = 0;
-            ptrMaxPull = 0;
-        }
-    };
     container.addEventListener('mouseleave', onMouseLeave);
-    container._ptrMouseLeave = onMouseLeave;
+    // Si la ventana pierde el foco a mitad de un arrastre, cancelar
+    window.addEventListener('blur', onWindowBlur);
+
+    container._ptrCleanup = () => {
+        container.removeEventListener('touchstart', onTouchStart);
+        container.removeEventListener('touchmove', onTouchMove);
+        container.removeEventListener('touchend', onTouchEnd);
+        container.removeEventListener('touchcancel', onTouchCancel);
+        container.removeEventListener('pointercancel', onPointerCancel);
+        container.removeEventListener('mousedown', onMouseDown);
+        container.removeEventListener('mousemove', onMouseMove);
+        container.removeEventListener('mouseup', onMouseUp);
+        container.removeEventListener('mouseleave', onMouseLeave);
+        window.removeEventListener('blur', onWindowBlur);
+    };
 }
 
 
