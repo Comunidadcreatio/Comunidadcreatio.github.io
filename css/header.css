@@ -347,12 +347,20 @@ picture {
     box-shadow: none;
 }
 .search-panel-results {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 68px; /* justo debajo de la barra del buscador */
     max-height: 40vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 4px 0;
+}
+/* Con el carrusel de etiquetas visible, los resultados bajan para no taparlo */
+body.search-con-etiquetas .search-panel-results {
+    top: 116px; /* barra 68px + etiquetas 48px */
 }
 
 /* ==============================================
@@ -451,9 +459,17 @@ body.search-escribiendo #toggle-panel {
 /* ==============================================
    CARRUSEL DE ETIQUETAS (entre el buscador y el grid)
    Chips con borde curvo + contador, scroll horizontal con snap.
+   Vive FUERA del panel de búsqueda (en la sección de la galería) para que
+   el velo de opacidad del buscador lo tape como al grid en lugar de ocultarlo.
+   z-index 900: por debajo del velo (1000) y del panel/resultados (1100).
    ============================================== */
 .tags-carrusel {
-    display: flex;
+    display: none;
+    position: fixed;
+    top: calc(132px + var(--status-bar-height, 24px));
+    left: 0;
+    right: 0;
+    z-index: 900;
     align-items: center;
     gap: 8px;
     overflow-x: auto;
@@ -463,6 +479,15 @@ body.search-escribiendo #toggle-panel {
     -ms-overflow-style: none;
     padding: 8px 16px 10px;
     touch-action: pan-x;
+}
+/* Solo visible cuando el buscador está abierto y hay etiquetas */
+body.search-abierto .tags-carrusel:not(.hidden) {
+    display: flex;
+}
+@media (max-width: 768px) {
+    .tags-carrusel {
+        top: calc(128px + var(--status-bar-height, 24px));
+    }
 }
 .tags-carrusel::-webkit-scrollbar {
     display: none;
@@ -515,10 +540,8 @@ body.search-escribiendo #toggle-panel {
     /* En oscuro el anillo de selección también debe ser blanco (no negro) */
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 2px 10px rgba(0, 0, 0, 0.5);
 }
-/* En modo búsqueda (estado B) el carrusel se oculta bajo el velo, como el grid */
-#search-panel.modo-busqueda .tags-carrusel {
-    display: none;
-}
+/* En modo búsqueda (estado B) el carrusel YA NO se oculta: queda visible y el
+   velo de opacidad (z 1000) lo tapa como al grid (z 900 < 1000). */
 
 /* El grid baja más cuando el carrusel de etiquetas está visible,
    para que los chips no se solapen con la primera fila de cavents. */

@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.446';
+        var currentVer = '1.0.447';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=728ed843c0">
+    <link rel="stylesheet" href="css/style.css?v=5ede0d6bca">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -267,8 +267,6 @@
                     <input type="text" id="search-input" placeholder="Buscar artista..." aria-label="Buscar usuario" autocomplete="off">
                 </div>
             </div>
-            <!-- Carrusel de etiquetas de los cavents (entre el buscador y el grid) -->
-            <div id="tags-carrusel" class="tags-carrusel hidden" aria-label="Etiquetas de cavents"></div>
             <div id="search-results-dropdown" class="search-panel-results"></div>
         </div>
 
@@ -291,6 +289,10 @@
         <!-- SECCIÓN PÚBLICA: GALERÍA -->
         <section id="galeria-publica" aria-labelledby="galeria-title" role="region">
             <h2 id="galeria-title" class="visually-hidden">Galería Pública</h2>
+            <!-- Carrusel de etiquetas (entre el buscador y el grid). Vive aquí
+                 (fuera del panel) para que el velo de opacidad del buscador lo
+                 tape como al grid en lugar de ocultarlo. -->
+            <div id="tags-carrusel" class="tags-carrusel hidden" aria-label="Etiquetas de cavents"></div>
             <div id="galeria-container" role="feed" aria-busy="true">
                 <!-- Las tarjetas de obras se cargarán aquí -->
             </div>
