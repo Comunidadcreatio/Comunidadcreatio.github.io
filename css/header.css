@@ -485,12 +485,6 @@ body.search-escribiendo #toggle-panel {
 body.search-abierto .tags-carrusel:not(.hidden) {
     display: flex;
 }
-/* Cuando el carrusel desborda (más etiquetas de las que caben), los chips
-   cortados en los bordes se desvanecen suavemente en vez de cortarse en seco */
-.tags-carrusel.desborda {
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
-}
 @media (max-width: 768px) {
     .tags-carrusel {
         top: calc(128px + var(--status-bar-height, 24px));

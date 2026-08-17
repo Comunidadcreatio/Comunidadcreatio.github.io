@@ -42,7 +42,6 @@ export function renderEtiquetasCarrusel() {
     if (tags.length === 0) {
         contenedor.innerHTML = '';
         contenedor.classList.add('hidden');
-        contenedor.classList.remove('desborda');
         document.body.classList.remove('search-con-etiquetas');
         return;
     }
@@ -60,14 +59,6 @@ export function renderEtiquetasCarrusel() {
             '<span class="tag-nombre">' + escapeHtml(t.nombre) + '</span>' +
             '<span class="tag-count">' + t.count + '</span>' + x + '</button>';
     }).join('');
-    // Si las etiquetas no caben (overflow), los chips de los bordes se desvanecen.
-    // Se mide tras el layout (doble rAF): al abrir el buscador el carrusel pasa
-    // de display:none a flex, y scrollWidth solo es fiable con el elemento visible.
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            contenedor.classList.toggle('desborda', contenedor.scrollWidth > contenedor.clientWidth + 1);
-        });
-    });
 
     contenedor.querySelectorAll('.tag-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
