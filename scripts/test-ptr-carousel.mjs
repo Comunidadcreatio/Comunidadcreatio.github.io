@@ -49,7 +49,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
       };
   })();`
 });
-await send('Page.navigate', { url: 'http://127.0.0.1:8099/' });
+await send('Page.navigate', { url: process.argv[2] || 'http://127.0.0.1:8099/' });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(400); }
 await sleep(1000);
 await evalJs(`document.getElementById('btn-cavents-hub').click()`);

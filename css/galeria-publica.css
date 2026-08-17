@@ -662,6 +662,11 @@ html, body {
     position: sticky;
     top: 0;
     z-index: 2;
+    /* En el modo carrusel (flex column) las tarjetas tienen flex-shrink:0 y
+       sin esto el indicador absorbía TODO el encogimiento hasta 30px (el alto
+       del círculo), dejándolo pegado al borde superior y a la tarjeta. Con
+       flex-shrink:0 mantiene 56px y el círculo respira arriba y abajo. */
+    flex-shrink: 0;
 }
 
 .pull-refresh-indicator.visible {
