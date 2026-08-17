@@ -99,9 +99,23 @@
     window.addEventListener('pageshow', comprobarVersion);
 
     // Pastilla de actualización web (+ botón de APK si el usuario tiene APK viejo)
+    var autoTimer = null;
     function mostrarPillActualizar(nuevaVersion, apkUrl, conApk) {
+        // Dedupe: comprobarVersion puede dispararse varias veces seguidas
+        // (llamada directa + pageshow en la carga inicial + visibilitychange
+        // al volver al primer plano). Sin esto se creaban píldoras duplicadas
+        // con el mismo id: la de arriba quedaba SIN onclick y el botón
+        // "Actualizar ahora" no reaccionaba al tocarlo.
+        var prev = document.getElementById('update-pill');
+        if (prev) {
+            if (prev.dataset.version === nuevaVersion) return; // ya mostrada
+            prev.remove();
+        }
+        clearTimeout(autoTimer);
+
         var bar = document.createElement('div');
         bar.id = 'update-pill';
+        bar.dataset.version = nuevaVersion;
         var posStyle = isAuthPage ? 'top:115px' : 'bottom:80px';
         bar.style.cssText = estiloPill(posStyle);
         var botones = '<button id="btn-refresh-app" style="' + estiloBtn(false) + '">Actualizar ahora</button>';
@@ -119,7 +133,7 @@
         // Auto-recargar tras 60s si el usuario no actúa (aplica a todas las
         // páginas, incluida la app): garantiza que la WebView llegue a la
         // última versión publicada aunque nadie toque la pastilla.
-        var autoTimer = setTimeout(function() {
+        autoTimer = setTimeout(function() {
             var btn = document.getElementById('btn-refresh-app');
             if (btn) { btn.textContent = 'Recargando...'; btn.style.opacity = '0.6'; }
             recargar();
@@ -138,6 +152,10 @@
 
     // Pastilla independiente: nueva versión de la APP (APK) disponible
     function mostrarPillApk(apkUrl) {
+        // Dedupe (mismo motivo que mostrarPillActualizar)
+        var prev = document.getElementById('update-pill-apk');
+        if (prev) prev.remove();
+
         var bar = document.createElement('div');
         bar.id = 'update-pill-apk';
         var posStyle = isAuthPage ? 'top:115px' : 'bottom:80px';
