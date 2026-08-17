@@ -28,6 +28,10 @@ html, body {
     left: 0;
     right: 0;
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* Sin scroll anchoring: al animar el padding del pull-to-refresh el
+       navegador no debe compensar desplazando el grid (dejaba el círculo
+       superpuesto a la primera fila durante la carga). */
+    overflow-anchor: none;
     /* Ocultar la barra de scroll (escritorio y móvil) sin desactivar el scroll */
     scrollbar-width: none;
     -ms-overflow-style: none;

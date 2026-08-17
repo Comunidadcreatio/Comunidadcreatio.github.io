@@ -85,7 +85,7 @@ async function main() {
     }
     if (m.method === 'Runtime.consoleAPICalled') {
       const txt = (m.params.args || []).map(a => a.value ?? a.description ?? '').join(' ');
-      if (txt.startsWith('EVT ')) logs.push(`[evt] ${txt}`);
+      if (txt.startsWith('[clamp]') || txt.startsWith('EVT ')) logs.push(txt);
       else if (['error', 'warning'].includes(m.params.type)) logs.push(`[console.${m.params.type}] ${txt}`);
     }
   };
@@ -114,25 +114,45 @@ async function main() {
   }
   await sleep(1200);
 
-  // Abrir Explorar (grid)
-  await evalJs(`document.getElementById('btn-cavents-hub').click()`);
+  // Abrir Explorar (GRID) — se abre desde la lupa (btn-cavents-hub abre carrusel)
+  await evalJs(`document.getElementById('btn-buscar').click()`);
   let cards = 0;
   for (let i = 0; i < 40; i++) {
-    cards = await evalJs(`document.querySelectorAll('#galeria-container .obra-card').length`) || 0;
-    if (cards >= 9) break;
+    const st = await evalJs(`JSON.stringify({ c: document.querySelectorAll('#galeria-container .obra-card').length, grid: document.getElementById('galeria-container').classList.contains('modo-grid') })`);
+    const s = JSON.parse(st);
+    cards = s.c;
+    if (s.grid && cards >= 9) break;
     await sleep(400);
   }
   console.log(`GRID ABIERTO con ${cards} tarjetas`);
+  console.log('elementFromPoint(200,150):', await evalJs(`(() => { const el = document.elementFromPoint(200, 150); return el ? el.tagName + '#' + el.id + '.' + el.className : 'null'; })()`));
+  console.log('search-panel rect:', await evalJs(`(() => { const p = document.getElementById('search-panel'); if (!p) return 'no panel'; const r = p.getBoundingClientRect(); return JSON.stringify({ x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height), hidden: p.classList.contains('hidden') }); })()`));
 
   const indicatorState = () => evalJs(`(() => {
       const el = document.querySelector('.pull-refresh-indicator');
       const arc = el?.querySelector('.ptr-arc');
       const c = document.getElementById('galeria-container');
+      const r = el ? el.getBoundingClientRect() : null;
+      const cr = el ? el.querySelector('.ptr-circle').getBoundingClientRect() : null;
+      const card = c.querySelector('.obra-card');
+      const cardR = card ? card.getBoundingClientRect() : null;
       return JSON.stringify({
           classes: el ? el.className : 'NO-INDICATOR',
           dashoffset: arc ? arc.style.strokeDashoffset : null,
           paddingTop: c.style.paddingTop,
           scrollTop: c.scrollTop,
+          scrollHeight: c.scrollHeight,
+          clientHeight: c.clientHeight,
+          clientWidth: c.clientWidth,
+          modoGrid: c.classList.contains('modo-grid'),
+          snapComputed: getComputedStyle(c).scrollSnapType,
+          cardW: cardR ? Math.round(cardR.width) : null,
+          cardH: cardR ? Math.round(cardR.height) : null,
+          overflowInline: c.style.overflow,
+          overflowComputed: getComputedStyle(c).overflow,
+          indicadorY: r ? Math.round(r.y) : null,
+          circuloY: cr ? Math.round(cr.y) : null,
+          primeraCardY: cardR ? Math.round(cardR.y) : null,
           cards: document.querySelectorAll('#galeria-container .obra-card').length
       });
   })()`);
@@ -140,6 +160,8 @@ async function main() {
   // ---- TEST A: pull completo (dist 110 ≥ umbral 70) ----
   console.log('\n=== TEST A: pull-to-refresh completo ===');
   const shot = async (name) => {
+    // Desactivado temporalmente para aislar si captureScreenshot causa scroll
+    return;
     const r = await send('Page.captureScreenshot', { format: 'png' });
     if (r.result?.data) {
       const { writeFileSync } = await import('node:fs');
@@ -155,30 +177,44 @@ async function main() {
     await send('Input.dispatchTouchEvent', params);
     if (type === 'touchStart') await sleep(60); // dejar asentar el toque
   };
-  await touch('touchStart', 200, 150);
-  await touch('touchMove', 200, 170); await sleep(30);
-  await touch('touchMove', 200, 200); await sleep(30);
-  await touch('touchMove', 200, 230); await sleep(30);
+  await touch('touchStart', 200, 400);
+  await touch('touchMove', 200, 420); await sleep(30);
+  await touch('touchMove', 200, 450); await sleep(30);
+  await touch('touchMove', 200, 480); await sleep(30);
   console.log('A1 (a mitad de arrastre, dist≈80):', await indicatorState());
-  await shot('1-pulling'); // ~50% de arco según dist
-  await touch('touchMove', 200, 260); await sleep(30);
+  await touch('touchMove', 200, 510); await sleep(30);
   console.log('A2 (arrastre completo, dist=110):', await indicatorState());
-  await shot('2-ready'); // umbral superado: anillo elevado y lleno
-  await touch('touchEnd', 200, 260); await sleep(80);
+  await touch('touchEnd', 200, 510); await sleep(80);
   console.log('A3 (justo tras soltar — debe estar loading):', await indicatorState());
-  await shot('3-loading'); // spinner girando
-  await sleep(1700);
+  await sleep(550);
+  console.log('A3b (estado loading asentado, sin transición):', await indicatorState());
+  const estilo = await evalJs(`(() => {
+      const el = document.querySelector('.pull-refresh-indicator');
+      if (!el) return 'NO-IND';
+      const cs = getComputedStyle(el);
+      const circ = el.querySelector('.ptr-circle');
+      const cc = getComputedStyle(circ);
+      return JSON.stringify({
+          indHeight: cs.height,
+          indAlignItems: cs.alignItems,
+          indPos: cs.position,
+          indTop: cs.top,
+          circTransform: cc.transform,
+          circOpacity: cc.opacity
+      });
+  })()`);
+  console.log('A3b-estilos:', estilo);
+  await sleep(1200);
   console.log('A4 (tras refrescar — debe estar oculto y con tarjetas):', await indicatorState());
-  await shot('4-done'); // confirmación (si aún es visible)
   await sleep(800);
 
   // ---- TEST B: pull corto (cancelación, dist 30 < umbral) ----
   console.log('\n=== TEST B: pull corto (no refresca) ===');
-  await touch('touchStart', 200, 150);
-  await touch('touchMove', 200, 170); await sleep(30);
-  await touch('touchMove', 200, 180); await sleep(30);
+  await touch('touchStart', 200, 400);
+  await touch('touchMove', 200, 420); await sleep(30);
+  await touch('touchMove', 200, 430); await sleep(30);
   console.log('B1 (arrastre corto):', await indicatorState());
-  await touch('touchEnd', 200, 180); await sleep(700);
+  await touch('touchEnd', 200, 430); await sleep(700);
   console.log('B2 (tras soltar — debe ocultarse sin refrescar):', await indicatorState());
 
   // ---- TEST C: refresh programático (lupa/buscador) ----
@@ -214,8 +250,8 @@ async function main() {
 
   // ---- TEST D: touchcancel deja todo restaurado ----
   console.log('\n=== TEST D: touchcancel (robustez) ===');
-  await touch('touchStart', 200, 150);
-  await touch('touchMove', 200, 200); await sleep(30);
+  await touch('touchStart', 200, 400);
+  await touch('touchMove', 200, 450); await sleep(30);
   console.log('D1 (arrastrando):', await indicatorState());
   await send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
   await sleep(600);

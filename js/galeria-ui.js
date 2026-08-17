@@ -376,6 +376,32 @@ let ptrDoneTimer = null; // timer de la animación de confirmación
 let ptrHideTimer = null; // timer del desvanecido al cancelar
 let ptrTouchRaf = null; // rAF del gesto táctil
 let ptrMouseRaf = null; // rAF del gesto con ratón
+let ptrAssertRaf = null; // bucle que fija el grid arriba durante la carga
+
+// Bloquea/restaura el scroll del grid durante el gesto PTR y la carga.
+// Al bloquear overflow el navegador no inicia scroll nativo ni rubber-band
+// (que dejaba un scroll residual ~30px al soltar, superponiendo el círculo
+// a la primera fila). Se restaura al terminar.
+function ptrBloquearScroll(container, bloquear) {
+    if (bloquear) {
+        container.style.overflow = 'hidden';
+    } else {
+        container.style.overflow = '';
+    }
+}
+
+// Reafirma scrollTop = 0 cada frame mientras la carga está activa: el
+// compositor puede conservar un scroll residual del gesto aunque overflow
+// esté oculto; el main thread gana por frame y el grid queda fijo arriba.
+function ptrAfirmarArriba(container) {
+    if (ptrAssertRaf) cancelAnimationFrame(ptrAssertRaf);
+    const loop = () => {
+        if (!ptrRefreshing) return;
+        if (container.scrollTop !== 0) container.scrollTop = 0;
+        ptrAssertRaf = requestAnimationFrame(loop);
+    };
+    ptrAssertRaf = requestAnimationFrame(loop);
+}
 
 function shuffleArray(arr) {
     const a = arr.slice();
@@ -432,6 +458,8 @@ async function ejecutarRefreshGrid(container) {
     ptrRefreshing = true;
     setPtrState('visible', 'loading');
     setPtrProgress(0.75); // arco de 270° girando durante la carga
+    ptrBloquearScroll(container, true); // sin scroll nativo ni rubber-band durante la carga
+    ptrAfirmarArriba(container); // el grid queda fijo arriba mientras carga
     try {
         const obras = await cargarGaleria(container);
         const shuffled = shuffleArray(obras);
@@ -454,21 +482,32 @@ async function ejecutarRefreshGrid(container) {
 function finalizarRefresh(container) {
     container.style.transition = 'padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
     container.style.paddingTop = ''; // restaura el padding CSS (0 en flex, 6px en grid)
-    container.style.scrollSnapType = '';
     container.style.userSelect = '';
+    if (ptrAssertRaf) { cancelAnimationFrame(ptrAssertRaf); ptrAssertRaf = null; }
+    ptrBloquearScroll(container, false); // el grid vuelve a ser scrolleable
+    container.scrollTop = 0; // el grid siempre queda arriba tras refrescar
     setPtrState('done');
     setPtrProgress(1);
     clearTimeout(ptrDoneTimer);
     ptrDoneTimer = setTimeout(() => {
-        if (!ptrPulling && !ptrRefreshing) setPtrState();
+        if (!ptrPulling && !ptrRefreshing) {
+            // Restaurar el scroll-snap solo al ocultar el indicador: si se
+            // restaurara antes, el snap (carrusel) anclaría a la posición de
+            // la primera tarjeta desplazada por el indicador visible.
+            container.style.scrollSnapType = '';
+            setPtrState();
+        }
     }, 600);
     ptrCooldown = Date.now() + 400;
 }
 
-// Arrastre que superó el umbral: asentar a 56px y refrescar
+// Arrastre que superó el umbral: el grid vuelve a su posición normal y el
+// círculo queda arriba — en el sitio del que salió — girando sin hueco encima.
+// El scroll-snap (carrusel) se mantiene desactivado durante la carga y se
+// restaura en finalizarRefresh al ocultar el indicador.
 async function dispararRefresh(container) {
     container.style.transition = 'padding-top 0.18s ease-out';
-    container.style.paddingTop = '56px';
+    container.style.paddingTop = '';
     container.style.userSelect = '';
     setPtrProgress(1); // anillo completo antes de entrar en carga
     await ejecutarRefreshGrid(container);
@@ -480,6 +519,7 @@ function revertirPtr(container) {
     container.style.paddingTop = '';
     container.style.scrollSnapType = '';
     container.style.userSelect = '';
+    ptrBloquearScroll(container, false);
     ocultarPtr(220);
     ptrPullDist = 0;
     ptrMaxPull = 0;
@@ -496,6 +536,7 @@ function cancelarPtr(container) {
     container.style.paddingTop = '';
     container.style.scrollSnapType = '';
     container.style.userSelect = '';
+    ptrBloquearScroll(container, false);
     ocultarPtr(220);
     ptrPullDist = 0;
     ptrMaxPull = 0;
@@ -507,9 +548,9 @@ export async function triggerRefreshGrid() {
     if (!container || ptrRefreshing) return;
     createPTRIndicator(container);
     container.style.transition = 'none';
-    container.style.paddingTop = '56px';
+    container.style.paddingTop = '';
     container.style.scrollSnapType = 'none';
-    await ejecutarRefreshGrid(container);
+    await ejecutarRefreshGrid(container); // bloquea scroll durante la carga y lo restaura
 }
 
 function createPTRIndicator(container) {
@@ -566,6 +607,7 @@ export function setupPullToRefresh(container) {
             container.style.paddingTop = '';
             container.style.scrollSnapType = 'none';
             container.style.userSelect = 'none';
+            ptrBloquearScroll(container, true); // el gesto no debe iniciar scroll nativo
             setPtrProgress(0);
         } else {
             ptrPulling = false;
@@ -622,6 +664,7 @@ export function setupPullToRefresh(container) {
             container.style.paddingTop = '';
             container.style.scrollSnapType = 'none';
             container.style.userSelect = 'none';
+            ptrBloquearScroll(container, true); // el gesto no debe iniciar scroll nativo
             setPtrProgress(0);
         } else {
             ptrPulling = false;
