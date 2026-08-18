@@ -59,6 +59,7 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
         }
         if (sectionEntrante && document.getElementById(sectionEntrante.id)) {
             sectionEntrante.classList.remove('hidden');
+            actualizarVisibilidadHamburguesa(sectionEntrante);
             if (callback) callback();
         }
     }, 800);
@@ -85,9 +86,19 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     }
 }
 
+// La hamburguesa (Mi Cuenta) solo se muestra en el perfil y en Mi Cuenta:
+// para el resto de secciones/acciones permanece oculta.
+function actualizarVisibilidadHamburguesa(section) {
+    const btn = document.getElementById('btn-configuracion');
+    if (!btn) return;
+    const mostrar = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
+    btn.classList.toggle('hidden', !mostrar);
+}
+
 function mostrarSeccion(section, callback) {
     if (!section) return;
     section.classList.remove('hidden', 'section-exiting');
+    actualizarVisibilidadHamburguesa(section);
     actualizarEstadoNavButtons();
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -114,6 +125,7 @@ export function ocultarTodasLasSecciones() {
 
 export function mostrarPaginaBlanca() {
     ocultarTodasLasSecciones();
+    actualizarVisibilidadHamburguesa(null);
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
     const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
