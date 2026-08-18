@@ -1060,13 +1060,38 @@ input, select, textarea {
     }
 }
 
+/* ==============================================
+   SECCIÓN PROBLOGS (placeholder — contenido por implementar)
+   ============================================== */
+.problogs-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+    padding: 0 1.5rem;
+}
+.problogs-placeholder h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-ink);
+}
+.problogs-placeholder p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
 /* Las secciones obtienen animación solo cuando JS lo activa */
 #galeria-publica.section-entering,
 #panel-artista.section-entering,
 #mi-cuenta.section-entering,
 #perfil-usuario.section-entering,
 #resultados-busqueda.section-entering,
-#pagina-blanca.section-entering {
+#pagina-blanca.section-entering,
+#problogs.section-entering {
     animation: sectionEnter 0.35s ease-out forwards;
 }
 
@@ -1075,7 +1100,8 @@ input, select, textarea {
 #mi-cuenta.section-exiting,
 #perfil-usuario.section-exiting,
 #resultados-busqueda.section-exiting,
-#pagina-blanca.section-exiting {
+#pagina-blanca.section-exiting,
+#problogs.section-exiting {
     animation: sectionExit 0.25s ease-in forwards;
 }
 

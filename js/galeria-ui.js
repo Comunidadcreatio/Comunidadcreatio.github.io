@@ -29,7 +29,7 @@ function obtenerGaleriaContainer() {
 // SISTEMA DE TRANSICIONES ENTRE SECCIONES
 // ============================================
 let isTransitioning = false;
-const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca', 'chat-global'];
+const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca', 'chat-global', 'problogs'];
 
 export function encontrarSeccionActual() {
     for (const id of SECCIONES) {
@@ -450,6 +450,25 @@ export async function toggleExplorar() {
         // Salir del modo grid (volver a normal o cerrar)
         galeriaModo = 0;
         salirDeModoGrid(() => switchSection(galeria, document.getElementById('pagina-blanca')));
+    }
+}
+
+// ============================================
+// PROBLOGS: toggle entre Problogs y Cavents.
+// Al presionar el icono se abre Problogs (contenido por
+// implementar); al presionarlo de nuevo se vuelve a Cavents.
+// ============================================
+export function toggleProblogs() {
+    if (isTransitioning || gridEntering || gridExiting) return;
+
+    const problogs = document.getElementById('problogs');
+    if (!problogs) return;
+
+    if (problogs.classList.contains('hidden')) {
+        switchSection(encontrarSeccionActual(), problogs);
+    } else {
+        // Volver a Cavents (galería en carrusel)
+        toggleGaleria(obtenerGaleriaContainer());
     }
 }
 

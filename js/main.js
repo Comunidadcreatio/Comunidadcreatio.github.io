@@ -32,16 +32,16 @@ import {
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
-    mostrarExplorar, showPanelSubView,
+    mostrarExplorar, showPanelSubView, toggleProblogs,
     abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono
-} from './galeria-ui.js?v=51f1c35be9';
+} from './galeria-ui.js?v=bf44ac279a';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=11fc4daeee';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=1f1f790a6a';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=ab481aa745';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=4e31bc583d';
 import { setupPush } from './push.js?v=e33b2583d5';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -178,7 +178,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js?v=51f1c35be9');
+                    const galeriaUI = await import('./galeria-ui.js?v=bf44ac279a');
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -406,7 +406,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js?v=5fff039baa').then(m => {
+    import('./busqueda.js?v=f2058a627c').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -541,6 +541,14 @@ function setupEvents() {
         });
     }
 
+    // ----- Botón Problogs: alterna entre Problogs y Cavents -----
+    const btnProblogs = document.getElementById('btn-problogs');
+    if (btnProblogs) {
+        btnProblogs.addEventListener('click', () => {
+            toggleProblogs();
+        });
+    }
+
     // ----- Botón "+" (header): abre Crear Cavent; si ya está abierto, es flecha -----
     const btnCrear = document.getElementById('btn-crear-cavent');
     if (btnCrear) {
@@ -591,7 +599,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js?v=51f1c35be9').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./galeria-ui.js?v=bf44ac279a').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -772,7 +780,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js?v=51f1c35be9');
+            const galeriaUI = await import('./galeria-ui.js?v=bf44ac279a');
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {

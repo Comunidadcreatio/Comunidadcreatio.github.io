@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.460';
+        var currentVer = '1.0.461';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=29fab9b369">
+    <link rel="stylesheet" href="css/style.css?v=80657d9645">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -205,6 +205,16 @@
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
             <span id="notif-badge" class="notif-badge hidden">0</span>
+        </button>
+        <!-- Icono de Problogs: alterna entre Problogs y Cavents -->
+        <button id="btn-problogs" class="header-icon" aria-label="Problogs">
+            <svg class="icono-original" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
         </button>
         <!-- Icono de crear (+): solo visible en la galería (Cavents), junto a la campana.
              Al activarse se convierte en flecha de volver. -->
@@ -892,6 +902,14 @@
             </div>
         </section>
 
+        <!-- SECCIÓN: PROBLOGS (contenido por implementar — solo la navegación) -->
+        <section id="problogs" class="hidden" aria-label="Problogs" role="region">
+            <div class="problogs-placeholder">
+                <h2>Problogs</h2>
+                <p>Próximamente podrás crear y ver publicaciones de artistas.</p>
+            </div>
+        </section>
+
         
     </main>
 
@@ -967,7 +985,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=96115bc15d" type="module"></script>
+    <script src="js/main.js?v=04f8a79701" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
