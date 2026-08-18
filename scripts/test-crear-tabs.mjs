@@ -83,13 +83,20 @@ await evalJs(`document.getElementById('tab-cavents').click()`);
 await sleep(300);
 console.log(await estado());
 
-console.log('\n=== 4) Posición de las etiquetas (justo encima de la barra de pasos) ===');
+console.log('\n=== 4) Posición: etiquetas DEBAJO de la barra de pasos + sin relleno ===');
 const pos = await evalJs(`(() => {
     const tabs = document.getElementById('crear-tabs');
     const stepBar = document.getElementById('obra-step-bar');
     const tr = tabs.getBoundingClientRect();
     const sr = stepBar.getBoundingClientRect();
-    return JSON.stringify({ tabsBottom: Math.round(tr.bottom), stepBarTop: Math.round(sr.top), gap: Math.round(sr.top - tr.bottom) });
+    const nav = document.getElementById('toggle-panel').getBoundingClientRect();
+    return JSON.stringify({
+        tabsY: Math.round(tr.y), tabsBottom: Math.round(tr.bottom),
+        stepBarY: Math.round(sr.y), stepBarBottom: Math.round(sr.bottom),
+        navTop: Math.round(nav.top),
+        tabsDebajoDeBarra: tr.y > sr.y,
+        tabsBackground: getComputedStyle(tabs).backgroundColor
+    });
 })()`);
 console.log(pos);
 

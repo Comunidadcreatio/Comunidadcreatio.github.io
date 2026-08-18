@@ -1911,7 +1911,7 @@ form,
    ============================================== */
 /* ==============================================
    ETIQUETAS DE TIPO DE CREACIÓN (Cavents / Problogs)
-   Barra fija justo sobre la barra de pasos.
+   En el borde inferior, debajo de la barra de pasos, sin relleno.
    ============================================== */
 #crear-tabs {
     position: fixed;
@@ -1919,8 +1919,7 @@ form,
     width: 100%;
     z-index: 999;
     display: flex;
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-gray-200);
+    background: transparent; /* sin relleno */
     box-sizing: border-box;
 }
 .crear-tab {

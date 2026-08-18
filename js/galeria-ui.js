@@ -6,7 +6,7 @@ import { cargarGaleria, mostrarGaleria } from './galeria.js?v=1f1f790a6a';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=c2bd683837';
 import { artistaActual, token } from './auth.js?v=3517742095';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=7cf0b05cfc';
-import { confirmarDescartarCambios } from './panel-ui.js?v=b0045416d6';
+import { confirmarDescartarCambios } from './panel-ui.js?v=a1457f8853';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;

@@ -979,25 +979,28 @@ function setupStepNavigation() {
         progressBar.style.top = headerBottom + 'px';
     }
 
-    // Posicionar barra de pasos justo encima del nav (ABAJO)
+    // Posicionar barra de pasos justo encima del nav, DEBAJO de las etiquetas:
+    // orden desde el borde inferior: [nav][etiquetas][barra de pasos]
     function positionStepBar() {
         const togglePanel = document.getElementById('toggle-panel');
+        const tabsBar = document.getElementById('crear-tabs');
         if (!togglePanel || !stepBar) return;
         const panelTop = togglePanel.getBoundingClientRect().top;
         const viewH = window.innerHeight;
         const fromBottom = viewH - panelTop;
-        stepBar.style.bottom = fromBottom + 'px';
+        const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
+        stepBar.style.bottom = (fromBottom + tabsH) + 'px';
     }
 
-    // Posicionar las etiquetas Cavents/Problogs justo encima de la barra de pasos
+    // Posicionar las etiquetas Cavents/Problogs en el borde inferior, debajo
+    // de la barra de pasos (justo encima del nav)
     function positionTabs() {
         const togglePanel = document.getElementById('toggle-panel');
         const tabsBar = document.getElementById('crear-tabs');
-        if (!togglePanel || !tabsBar || !stepBar) return;
+        if (!togglePanel || !tabsBar) return;
         const panelTop = togglePanel.getBoundingClientRect().top;
         const fromBottom = window.innerHeight - panelTop;
-        const stepBarH = stepBar.offsetHeight || 48;
-        tabsBar.style.bottom = (fromBottom + stepBarH) + 'px';
+        tabsBar.style.bottom = fromBottom + 'px';
     }
 
     // Posicionar el carrusel fijo debajo de la barra de progreso
