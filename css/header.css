@@ -97,6 +97,41 @@ picture {
 }
 
 /* ==============================================
+   HAMBURGUESA — aparición profesional
+   Al entrar al perfil/Mi Cuenta aparece con un pop
+   elástico (fade + desliz desde la derecha + escala),
+   y la campana se desliza suavemente para dejarle sitio
+   (en vez de saltar por el reflow del flex).
+   ============================================== */
+#btn-configuracion:not(.hidden) {
+    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes hamburguesaAparece {
+    from {
+        opacity: 0;
+        transform: translateX(18px) scale(0.6) rotate(-35deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1) rotate(0);
+    }
+}
+/* La campana se desliza a la izquierda para cederle el espacio */
+#main-header:has(#btn-configuracion:not(.hidden)) #btn-notificaciones {
+    animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes campanaDesliza {
+    from { transform: translateX(56px); } /* escritorio: hamburguesa 40px + gap 16px */
+    to   { transform: translateX(0); }
+}
+@media (max-width: 768px) {
+    @keyframes campanaDesliza {
+        from { transform: translateX(42px); } /* móvil: gap 8px (medido) */
+        to   { transform: translateX(0); }
+    }
+}
+
+/* ==============================================
    BUSCADOR (escritorio)
    ============================================== */
 .header-search {
