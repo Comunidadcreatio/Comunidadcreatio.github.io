@@ -427,8 +427,10 @@
     transition: background 0.2s ease;
 }
 
-.cuenta-seccion .accordion-header:hover {
-    background: var(--color-gray-50, #fafafa);
+/* Sin relleno al pasar el cursor ni al seleccionar/desplegar */
+.cuenta-seccion .accordion-header:hover,
+.cuenta-seccion .accordion-header:active {
+    background: transparent;
 }
 
 .cuenta-seccion .accordion-header h3 {
@@ -1348,7 +1350,7 @@
 }
 
 [data-theme="dark"] .cuenta-item {
-    background-color: var(--color-bg);
+    background-color: transparent;
     border-color: var(--color-border);
 }
 
