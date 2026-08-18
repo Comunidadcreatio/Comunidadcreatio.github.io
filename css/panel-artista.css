@@ -574,7 +574,7 @@
     padding: 12px 20px;
     border: 1.5px solid var(--color-ink);
     border-radius: 8px;
-    background: var(--color-white);
+    background: transparent; /* sin relleno: solo borde y texto */
     color: var(--color-ink);
     font-weight: 600;
     font-size: 14px;
@@ -584,8 +584,9 @@
 }
 
 .btn-cuenta-secundario:hover {
-    background: var(--color-ink);
-    color: var(--color-white);
+    background: transparent;
+    color: var(--color-text-muted);
+    border-color: var(--color-gray-400);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -602,6 +603,11 @@
     border: 1px solid var(--color-gray-200);
     border-radius: 12px;
     animation: fadeIn 0.3s ease;
+}
+
+/* Solo el formulario de cambiar contraseña: sin relleno sólido */
+#form-cambiar-password {
+    background: transparent;
 }
 
 @keyframes fadeIn {
@@ -1365,7 +1371,7 @@
 }
 
 [data-theme="dark"] .btn-cuenta-secundario {
-    background-color: var(--color-bg);
+    background-color: transparent;
     border-color: var(--color-border);
     color: var(--color-ink);
 }

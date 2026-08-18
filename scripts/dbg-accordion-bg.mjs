@@ -50,7 +50,7 @@ const dump = () => evalJs(`(() => {
         if (!el || depth > 8) return;
         const bg = getComputedStyle(el).backgroundColor;
         if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-            conFondo.push((el.className || el.id || el.tagName) + ' → ' + bg);
+            conFondo.push((el.id || el.className || el.tagName) + ' → ' + bg);
         }
         for (const c of el.children) walk(c, depth + 1);
     };
@@ -61,27 +61,37 @@ const dump = () => evalJs(`(() => {
     });
 })()`);
 
+const expandirPassword = async () => {
+  await evalJs(`(() => {
+      const acc = document.getElementById('accordion-seguridad');
+      if (acc.getAttribute('aria-expanded') !== 'true') acc.click();
+      return 'ok';
+  })()`);
+  await sleep(500);
+  await evalJs(`(() => { const b = document.getElementById('btn-cambiar-password'); if (b) b.click(); return 'ok'; })()`);
+  await sleep(400);
+};
+
 console.log('=== MODO CLARO ===');
 await evalJs(`localStorage.setItem('theme','light'); location.reload()`);
 await sleep(2500);
 await evalJs(`document.getElementById('btn-configuracion').click()`);
 await sleep(700);
+await expandirPassword();
+console.log('form password bg claro:', await evalJs(`getComputedStyle(document.getElementById('form-cambiar-password')).backgroundColor`));
+console.log('form email bg claro:', await evalJs(`getComputedStyle(document.getElementById('form-cambiar-email')).backgroundColor`));
+console.log('btn secundario bg claro:', await evalJs(`getComputedStyle(document.querySelector('.btn-cuenta-secundario')).backgroundColor`));
 console.log(await dump());
-// Hover real sobre el primer accordion-header
-const r1 = await evalJs(`(() => { const el = document.querySelector('.accordion-header'); const r = el.getBoundingClientRect(); return { x: Math.round(r.left + 10), y: Math.round(r.top + r.height / 2) }; })()`);
-await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r1.x, y: r1.y });
-await sleep(200);
-console.log('hover claro:', await evalJs(`getComputedStyle(document.querySelector('.accordion-header')).backgroundColor`));
 
 console.log('=== MODO OSCURO ===');
 await evalJs(`localStorage.setItem('theme','dark'); location.reload()`);
 await sleep(2500);
 await evalJs(`document.getElementById('btn-configuracion').click()`);
 await sleep(700);
+await expandirPassword();
+console.log('form password bg oscuro:', await evalJs(`getComputedStyle(document.getElementById('form-cambiar-password')).backgroundColor`));
+console.log('form email bg oscuro:', await evalJs(`getComputedStyle(document.getElementById('form-cambiar-email')).backgroundColor`));
+console.log('btn secundario bg oscuro:', await evalJs(`getComputedStyle(document.querySelector('.btn-cuenta-secundario')).backgroundColor`));
 console.log(await dump());
-const r2 = await evalJs(`(() => { const el = document.querySelector('.accordion-header'); const r = el.getBoundingClientRect(); return { x: Math.round(r.left + 10), y: Math.round(r.top + r.height / 2) }; })()`);
-await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r2.x, y: r2.y });
-await sleep(200);
-console.log('hover oscuro:', await evalJs(`getComputedStyle(document.querySelector('.accordion-header')).backgroundColor`));
 
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}
