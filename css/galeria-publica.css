@@ -309,24 +309,24 @@ html, body {
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    color: #ffffff;
+    color: var(--color-ink);   /* claro: iconos negros (oscuro: blanco, ver abajo) */
     font-size: 1.05rem;
     font-weight: 600;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-shadow: none;
 }
 
 .obra-metricas-bar .metrica-item svg {
     width: 25px;
     height: 25px;
-    color: #ffffff;
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+    color: var(--color-ink);
+    filter: none;
 }
 
 /* Botón "Ver detalles" — outline, visible en ambos modos */
 .btn-ver-detalles {
     background: transparent;
-    color: #ffffff;
-    border: 2px solid rgba(255,255,255,0.5);
+    color: var(--color-ink);
+    border: 2px solid var(--color-gray-400);
     border-radius: 50%;
     width: 42px;
     height: 42px;
@@ -339,8 +339,8 @@ html, body {
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 .btn-ver-detalles:hover {
-    border-color: #ffffff;
-    background: rgba(255,255,255,0.1);
+    border-color: var(--color-ink);
+    background: rgba(0, 0, 0, 0.05);
 }
 .btn-ver-detalles svg {
     width: 22px;
