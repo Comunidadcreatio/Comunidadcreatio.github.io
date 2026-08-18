@@ -121,11 +121,21 @@ function visibilidadIconoHeader(btn, mostrar) {
     }
 }
 
+// El icono se convierte en flecha de volver cuando su sub-sección está activa
+function actualizarModoFlecha(btn, esFlecha, labelNormal, labelFlecha) {
+    if (!btn) return;
+    btn.classList.toggle('modo-flecha', !!esFlecha);
+    btn.setAttribute('aria-label', esFlecha ? labelFlecha : labelNormal);
+}
+
 function actualizarVisibilidadIconosHeader(section) {
     const ham = document.getElementById('btn-configuracion');
     const plus = document.getElementById('btn-crear-cavent');
     const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
-    const mostrarPlus = !!section && section.id === 'galeria-publica';
+    const mostrarPlus = !!section && (section.id === 'galeria-publica' || section.id === 'panel-artista');
+    // Modo flecha: en Mi Cuenta (hamburguesa) y en el panel Crear (+)
+    actualizarModoFlecha(ham, !!section && section.id === 'mi-cuenta', 'Menú', 'Volver');
+    actualizarModoFlecha(plus, !!section && section.id === 'panel-artista', 'Crear Cavent', 'Volver');
     // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
     if (!mostrarHam) visibilidadIconoHeader(ham, false);
     if (!mostrarPlus) visibilidadIconoHeader(plus, false);
@@ -135,6 +145,35 @@ function actualizarVisibilidadIconosHeader(section) {
 }
 // Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
 export { actualizarVisibilidadIconosHeader };
+
+// ============================================
+// FLECHA DE VOLVER: al activar un icono del header
+// (hamburguesa → Mi Cuenta, "+" → Crear) se recuerda la
+// sección anterior para que la flecha regrese a ella.
+// ============================================
+let iconoAnterior = null; // { seccion, modoGrid }
+
+export function abrirMiCuentaDesdeIcono() {
+    iconoAnterior = { seccion: 'perfil-usuario' };
+    toggleMiCuenta();
+}
+
+export function abrirCrearDesdeIcono() {
+    iconoAnterior = { seccion: 'galeria-publica', modoGrid: galeriaModo === 2 };
+    togglePanel('crear');
+}
+
+export function volverDesdeIcono() {
+    const prev = iconoAnterior;
+    iconoAnterior = null;
+    if (!prev) return;
+    if (prev.seccion === 'perfil-usuario') {
+        togglePerfil();
+    } else if (prev.seccion === 'galeria-publica') {
+        if (prev.modoGrid) toggleExplorar();
+        else toggleGaleria(obtenerGaleriaContainer());
+    }
+}
 
 function mostrarSeccion(section, callback) {
     if (!section) return;
