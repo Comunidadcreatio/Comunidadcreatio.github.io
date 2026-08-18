@@ -13,6 +13,8 @@ export function getObrasGrid() { return obrasGrid; }
 // Filtra el grid por una o varias etiquetas (OR: el cavent debe tener
 // CUALQUIERA de las seleccionadas — cada etiqueta añade más cavents).
 // Acepta null, un string, un array o un Set. Vacío = mostrar todas.
+// Con transición fluida: el grid se desvanece, se re-renderiza filtrado y
+// vuelve a aparecer (clase .grid-filtrando en css/galeria-publica.css).
 export function filtrarGridPorEtiqueta(tags) {
     if (!gridContainerEl) return;
     const onDetalle = gridCallbacks && gridCallbacks.onDetalle;
@@ -25,16 +27,28 @@ export function filtrarGridPorEtiqueta(tags) {
     } else if (Array.isArray(tags)) {
         lista = tags;
     }
-    if (lista.length === 0) {
-        mostrarGaleria(obrasGrid, gridContainerEl, onDetalle, onAvatarClick);
-        return;
-    }
-    const norm = lista.map(t => normalizarTexto(String(t).trim()));
-    const filtradas = obrasGrid.filter(o => {
-        const ets = String(o.etiquetas || '').split(',').map(e => normalizarTexto(e.trim()));
-        return norm.some(t => ets.includes(t)); // OR
-    });
-    mostrarGaleria(filtradas, gridContainerEl, onDetalle, onAvatarClick);
+    if (gridContainerEl._filtroTimer) clearTimeout(gridContainerEl._filtroTimer);
+    gridContainerEl.classList.add('grid-filtrando');
+    gridContainerEl._filtroTimer = setTimeout(() => {
+        const aplicar = () => {
+            if (lista.length === 0) {
+                mostrarGaleria(obrasGrid, gridContainerEl, onDetalle, onAvatarClick);
+                return;
+            }
+            const norm = lista.map(t => normalizarTexto(String(t).trim()));
+            const filtradas = obrasGrid.filter(o => {
+                const ets = String(o.etiquetas || '').split(',').map(e => normalizarTexto(e.trim()));
+                return norm.some(t => ets.includes(t)); // OR
+            });
+            mostrarGaleria(filtradas, gridContainerEl, onDetalle, onAvatarClick);
+        };
+        aplicar();
+        // Doble rAF: esperar a que el navegador pinte el grid nuevo y luego
+        // quitar la clase para que el fade-in sea suave.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            gridContainerEl.classList.remove('grid-filtrando');
+        }));
+    }, 170); // ~duración del fade out (0.18s)
 }
 
 export async function cargarGaleria(container) {

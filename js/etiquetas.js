@@ -3,7 +3,7 @@
 // Se muestra entre el buscador y el grid: cada etiqueta en un chip de color
 // con un contador de apariciones. Selección MÚLTIPLE (AND): cada etiqueta
 // activa muestra una "x"; el grid se filtra en vivo con las seleccionadas.
-import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=1f1f790a6a';
+import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=5193b237c3';
 import { escapeHtml, normalizarTexto } from './utils.js?v=f1ecb334f1';
 
 // Paleta de colores para los chips (cada etiqueta un color distinto)
@@ -63,8 +63,6 @@ export function renderEtiquetasCarrusel() {
     contenedor.querySelectorAll('.tag-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             // CRÍTICO: evitar que el clic burbujee al outside-click de busqueda.js.
-            // Al re-renderizar el carrusel, el chip se destruye y panel.contains()
-            // da false, lo que cerraba el buscador como si se tocara fuera.
             e.stopPropagation();
             // Garantizar modo A al filtrar: buscador y carrusel SIEMPRE visibles
             const panel = document.getElementById('search-panel');
@@ -80,8 +78,46 @@ export function renderEtiquetasCarrusel() {
                 if (etiquetasActivas.has(key)) etiquetasActivas.delete(key);
                 else etiquetasActivas.add(key);
             }
+            // Actualizar SOLO este chip en el sitio (sin re-render de todo el
+            // carrusel): la activación se anima con transición CSS + "pop".
+            actualizarChipEnSitio(chip, key);
+            // Si el chip quedó fuera de la pantalla, centrarlo con scroll suave
+            centrarChipSiNecesario(chip);
             filtrarGridPorEtiqueta([...etiquetasActivas]);
-            renderEtiquetasCarrusel();
         });
     });
+}
+
+// Activa/desactiva UN chip en el sitio: clase .activa + "×" de quitar filtro.
+// (Antes se re-renderizaba todo el carrusel, lo que rompía la transición fluida.)
+function actualizarChipEnSitio(chip, key) {
+    const activa = etiquetasActivas.has(key);
+    chip.classList.toggle('activa', activa);
+    let x = chip.querySelector('.tag-x');
+    if (activa && !x) {
+        x = document.createElement('span');
+        x.className = 'tag-x';
+        x.dataset.tag = chip.dataset.tag;
+        x.title = 'Quitar filtro';
+        x.textContent = '×';
+        chip.appendChild(x);
+    } else if (!activa && x) {
+        x.remove();
+    }
+    // "Pop" sutil de confirmación (se reinicia aunque se toque repetido)
+    chip.classList.remove('tag-pop');
+    void chip.offsetWidth;
+    chip.classList.add('tag-pop');
+}
+
+// Si el chip tocado está parcialmente fuera de la pantalla, lo centra con
+// scroll suave (con scroll-snap queda alineado).
+function centrarChipSiNecesario(chip) {
+    const contenedor = document.getElementById('tags-carrusel');
+    if (!contenedor) return;
+    const cr = contenedor.getBoundingClientRect();
+    const r = chip.getBoundingClientRect();
+    if (r.left < cr.left || r.right > cr.right) {
+        chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
 }

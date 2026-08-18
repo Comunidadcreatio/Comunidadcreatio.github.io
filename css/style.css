@@ -1,10 +1,10 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=d5d63d0aa3');
+@import url('header.css?v=4eb026300e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=f9f80cfa16');
+@import url('galeria-publica.css?v=fdd8802dc5');
 
 /* Chat global + privado */
 @import url('chat.css?v=d3006d01b3');

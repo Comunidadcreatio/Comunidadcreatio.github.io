@@ -40,6 +40,17 @@ html, body {
     display: none;
 }
 
+/* Transición suave al filtrar por etiquetas: el grid se desvanece (fade out),
+   se re-renderiza con las tarjetas filtradas y vuelve a aparecer (fade in).
+   La clase .grid-filtrando la pone/quito filtrarGridPorEtiqueta (galeria.js). */
+#galeria-container {
+    transition: opacity 0.18s ease;
+}
+#galeria-container.grid-filtrando {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Tarjeta: altura con margen de seguridad + degradado en la base */
 .obra-card {
     display: flex;
