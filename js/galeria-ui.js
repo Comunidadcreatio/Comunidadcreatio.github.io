@@ -132,7 +132,10 @@ function actualizarVisibilidadIconosHeader(section) {
     const ham = document.getElementById('btn-configuracion');
     const plus = document.getElementById('btn-crear-cavent');
     const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
-    const mostrarPlus = !!section && (section.id === 'galeria-publica' || section.id === 'panel-artista');
+    // El "+" solo en el carrusel de Cavents (no en Explorar/grid) y en el panel Crear
+    const enCarrusel = !!section && section.id === 'galeria-publica' && galeriaModo === 1;
+    const enPanelCrear = !!section && section.id === 'panel-artista';
+    const mostrarPlus = enCarrusel || enPanelCrear;
     // Modo flecha: en Mi Cuenta (hamburguesa) y en el panel Crear (+)
     actualizarModoFlecha(ham, !!section && section.id === 'mi-cuenta', 'Menú', 'Volver');
     actualizarModoFlecha(plus, !!section && section.id === 'panel-artista', 'Crear Cavent', 'Volver');
@@ -290,6 +293,7 @@ export function seleccionarObraDesdeGrid(obraId) {
     if (galeriaModo !== 2 || gridExiting || gridEntering) return;
 
     galeriaModo = 1;
+    actualizarVisibilidadIconosHeader(encontrarSeccionActual()); // vuelve el "+"
     actualizarEstadoNavButtons();
 
     salirDeModoGrid(() => {
@@ -352,6 +356,7 @@ export async function toggleGaleria(galeriaContainer) {
     } else if (galeriaModo === 2) {
         // Cambiar de grid a carrusel
         galeriaModo = 1;
+        actualizarVisibilidadIconosHeader(encontrarSeccionActual()); // vuelve el "+"
         salirDeModoGrid(() => {
             if (galeriaContainerLocal) {
                 galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c) => {
@@ -409,6 +414,7 @@ async function activarExplorar() {
     } else if (galeriaModo === 1) {
         // Cambiar de modo normal a grid
         galeriaModo = 2;
+        actualizarVisibilidadIconosHeader(encontrarSeccionActual()); // se oculta el "+"
         gridEntering = true;
         if (galeriaContainerLocal) {
             galeriaContainerLocal.classList.add('modo-grid');
