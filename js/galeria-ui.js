@@ -91,12 +91,27 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
 //  - crear "+" (#btn-crear-cavent): solo en la galería (Cavents)
 // Aparecen con un pop elástico y se ocultan con un desvanecido (se añade
 // .ocultando y se retrasa el display:none hasta terminar la animación).
+// IMPORTANTE: al pasar de una sección con icono a otra con icono distinto
+// (p.ej. perfil → Cavents) los efectos se SECUENCIAN: el icono nuevo espera
+// a que el que se oculta termine, para que no choquen en el mismo espacio
+// del header ni la campana haga un doble salto.
 function visibilidadIconoHeader(btn, mostrar) {
     if (!btn) return;
     if (mostrar) {
+        // Si el OTRO icono se está ocultando, diferir la aparición ~300ms
+        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando');
+        if (ocultandose && ocultandose !== btn) {
+            clearTimeout(btn._mostrarTimer);
+            btn._mostrarTimer = setTimeout(() => {
+                btn.classList.remove('ocultando', 'hidden');
+            }, 300);
+            return;
+        }
+        clearTimeout(btn._mostrarTimer);
         clearTimeout(btn._ocultarTimer);
         btn.classList.remove('ocultando', 'hidden');
     } else {
+        clearTimeout(btn._mostrarTimer); // cancelar una aparición pendiente
         if (btn.classList.contains('hidden') || btn.classList.contains('ocultando')) return;
         btn.classList.add('ocultando');
         btn._ocultarTimer = setTimeout(() => {
@@ -107,14 +122,16 @@ function visibilidadIconoHeader(btn, mostrar) {
 }
 
 function actualizarVisibilidadIconosHeader(section) {
-    visibilidadIconoHeader(
-        document.getElementById('btn-configuracion'),
-        !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta')
-    );
-    visibilidadIconoHeader(
-        document.getElementById('btn-crear-cavent'),
-        !!section && section.id === 'galeria-publica'
-    );
+    const ham = document.getElementById('btn-configuracion');
+    const plus = document.getElementById('btn-crear-cavent');
+    const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
+    const mostrarPlus = !!section && section.id === 'galeria-publica';
+    // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
+    if (!mostrarHam) visibilidadIconoHeader(ham, false);
+    if (!mostrarPlus) visibilidadIconoHeader(plus, false);
+    // Pasada 2: mostrar (ya con los ocultados marcados → se secuencian)
+    if (mostrarHam) visibilidadIconoHeader(ham, true);
+    if (mostrarPlus) visibilidadIconoHeader(plus, true);
 }
 // Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
 export { actualizarVisibilidadIconosHeader };
