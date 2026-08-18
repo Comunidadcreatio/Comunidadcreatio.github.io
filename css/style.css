@@ -17,7 +17,7 @@
 @import url('modales.css?v=ab0b7c97d0');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=7ee0e3611e');
+@import url('formularios.css?v=be26a966d1');
 
 .hidden {
     display: none !important;

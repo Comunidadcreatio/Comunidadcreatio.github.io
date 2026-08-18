@@ -643,6 +643,30 @@ function setupCustomSelects() {
 }
 
 // ============================================
+// ETIQUETAS DE TIPO DE CREACIÓN (Cavents / Problogs)
+// "Cavents" muestra el formulario actual; "Problogs" aún vacío
+// (contenido por implementar).
+// ============================================
+function setupCrearTabs() {
+    const tabCavents = document.getElementById('tab-cavents');
+    const tabProblogs = document.getElementById('tab-problogs');
+    const proContenido = document.getElementById('crear-problogs-contenido');
+    if (!tabCavents || !tabProblogs) return;
+
+    function seleccionarTipo(tipo) {
+        const esProblogs = tipo === 'problogs';
+        tabCavents.classList.toggle('activa', !esProblogs);
+        tabProblogs.classList.toggle('activa', esProblogs);
+        document.body.classList.toggle('creando-problogs', esProblogs);
+        if (proContenido) proContenido.classList.toggle('hidden', !esProblogs);
+    }
+
+    tabCavents.addEventListener('click', () => seleccionarTipo('cavents'));
+    tabProblogs.addEventListener('click', () => seleccionarTipo('problogs'));
+    seleccionarTipo('cavents'); // estado inicial: Cavents seleccionada
+}
+
+// ============================================
 // DROPDOWN MIS CAVENTS (sobre barra de pasos)
 // ============================================
 function setupCaventsDropdown() {
@@ -658,14 +682,16 @@ function setupCaventsDropdown() {
         eliminar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
     };
 
-    // Posicionar encima de la barra de pasos
+    // Posicionar encima de la barra de pasos y de las etiquetas
     function positionBar() {
         const togglePanel = document.getElementById('toggle-panel');
         if (!togglePanel || !stepBar) return;
         const panelTop = togglePanel.getBoundingClientRect().top;
         const fromBottom = window.innerHeight - panelTop;
         const stepBarH = stepBar.offsetHeight || 48;
-        caventsBar.style.bottom = (fromBottom + stepBarH) + 'px';
+        const tabsBar = document.getElementById('crear-tabs');
+        const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
+        caventsBar.style.bottom = (fromBottom + stepBarH + tabsH) + 'px';
     }
     // Esperar a que el DOM esté listo y la step bar posicionada
     setTimeout(positionBar, 100);
@@ -923,6 +949,9 @@ export function setupFormAccordions() {
     // === Custom selects ===
     setupCustomSelects();
 
+    // === Etiquetas de tipo de creación (Cavents / Problogs) ===
+    setupCrearTabs();
+
     // === Dropdown Mis Cavents ===
     setupCaventsDropdown();
 
@@ -960,6 +989,17 @@ function setupStepNavigation() {
         stepBar.style.bottom = fromBottom + 'px';
     }
 
+    // Posicionar las etiquetas Cavents/Problogs justo encima de la barra de pasos
+    function positionTabs() {
+        const togglePanel = document.getElementById('toggle-panel');
+        const tabsBar = document.getElementById('crear-tabs');
+        if (!togglePanel || !tabsBar || !stepBar) return;
+        const panelTop = togglePanel.getBoundingClientRect().top;
+        const fromBottom = window.innerHeight - panelTop;
+        const stepBarH = stepBar.offsetHeight || 48;
+        tabsBar.style.bottom = (fromBottom + stepBarH) + 'px';
+    }
+
     // Posicionar el carrusel fijo debajo de la barra de progreso
     function positionCarrusel() {
         const progressBar = document.getElementById('obra-progress-bar');
@@ -986,6 +1026,7 @@ function setupStepNavigation() {
         try {
             positionProgressBar();
             positionStepBar();
+            positionTabs();
             positionCarrusel();
             positionFormulario();
         } catch(e) {
