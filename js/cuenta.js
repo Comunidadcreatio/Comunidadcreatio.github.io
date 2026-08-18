@@ -90,6 +90,29 @@ export function setupMiCuenta() {
         });
     }
 
+    // ============================================
+    // ACCORDION DE MODO (claro/oscuro)
+    // ============================================
+    const accordionModo = document.getElementById('accordion-modo');
+    const modoContent = document.getElementById('modo-content');
+    if (accordionModo && modoContent) {
+        accordionModo.addEventListener('click', () => {
+            const isExpanded = accordionModo.getAttribute('aria-expanded') === 'true';
+            accordionModo.setAttribute('aria-expanded', !isExpanded);
+            if (isExpanded) {
+                modoContent.hidden = true;
+                modoContent.style.maxHeight = '0';
+                modoContent.style.padding = '0 0';
+            } else {
+                modoContent.hidden = false;
+                setTimeout(() => {
+                    modoContent.style.maxHeight = '2000px';
+                    modoContent.style.padding = '20px 0';
+                }, 10);
+            }
+        });
+    }
+
     // Botón: Cerrar Sesión
     const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
     if (btnCerrarSesion) {

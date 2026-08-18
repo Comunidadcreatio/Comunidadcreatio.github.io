@@ -58,7 +58,6 @@ let desktopLogoutModal = null;
 let desktopLogoutAllBtn = null;
 let desktopLogoutSingleBtn = null;
 let clickOutsideHandlerLogout = null;
-let headerConfigOutsideHandler = null;
 let mobileClickOutsideHandler = null;
 
 // Conteo de sesiones activas
@@ -314,15 +313,6 @@ function cerrarDesktopLogoutModal() {
     }
 }
 
-function cerrarHeaderPopover(panelElement) {
-    if (!panelElement) return;
-    panelElement.classList.add('hidden');
-    if (panelElement.id === 'header-config-menu' && headerConfigOutsideHandler) {
-        document.removeEventListener('click', headerConfigOutsideHandler);
-        headerConfigOutsideHandler = null;
-    }
-}
-
 function cerrarTodosLosPaneles() {
     if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
         cerrarDesktopLogoutModal();
@@ -331,30 +321,6 @@ function cerrarTodosLosPaneles() {
     if (mobileLogoutModal && !mobileLogoutModal.classList.contains('hidden')) {
         cerrarMobileLogoutModal();
     }
-}
-
-function positionHeaderPopover(triggerElement, panelElement) {
-    if (!panelElement || !triggerElement) return;
-    const rect = triggerElement.getBoundingClientRect();
-    const panelDiv = panelElement.querySelector('.header-popover-panel');
-    if (!panelDiv) return;
-
-    const panelRect = panelDiv.getBoundingClientRect();
-    const margin = 8;
-    const iconCenterX = rect.left + rect.width / 2;
-
-    const top = rect.bottom + 12;
-
-    let left = iconCenterX - panelRect.width / 2;
-    const maxLeft = window.innerWidth - panelRect.width - margin;
-    if (left > maxLeft) left = maxLeft;
-    if (left < margin) left = margin;
-
-    panelElement.style.top = `${top}px`;
-    panelElement.style.left = `${left}px`;
-
-    const tailX = iconCenterX - left;
-    panelDiv.style.setProperty('--tail-x', `${tailX}px`);
 }
 
 function positionDesktopPanel(triggerElement, panelElement) {
@@ -447,39 +413,13 @@ function setupEvents() {
         );
     });
 
-    // ----- Botón de configuración (Mi Cuenta, Modo Oscuro, Logout) -----
+    // ----- Botón de configuración (hamburguesa): abre Mi Cuenta directo -----
+    // (ya no hay popover: el modo claro/oscuro vive como acordeón en Mi Cuenta)
     const configBtn = document.getElementById('btn-configuracion');
     if (configBtn) {
-        const configMenu = document.getElementById('header-config-menu');
-        const configMiCuenta = document.getElementById('config-mi-cuenta');
-
-        if (configMiCuenta) {
-            configMiCuenta.addEventListener('click', () => {
-                cerrarHeaderPopover(configMenu);
-                toggleMiCuenta();
-            });
-        }
-
-        configBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!configMenu) return;
-            if (configMenu.classList.contains('hidden')) {
-                cerrarTodosLosPaneles();
-                updateCerrarTodasSesionesButtonState();
-                configMenu.classList.remove('hidden');
-                positionHeaderPopover(configBtn, configMenu);
-                if (headerConfigOutsideHandler) {
-                    document.removeEventListener('click', headerConfigOutsideHandler);
-                }
-                headerConfigOutsideHandler = (event) => {
-                    if (!configMenu.contains(event.target) && event.target !== configBtn && !configBtn.contains(event.target)) {
-                        cerrarHeaderPopover(configMenu);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', headerConfigOutsideHandler), 0);
-            } else {
-                cerrarHeaderPopover(configMenu);
-            }
+        configBtn.addEventListener('click', () => {
+            updateCerrarTodasSesionesButtonState();
+            toggleMiCuenta();
         });
     }
 
@@ -715,7 +655,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js?v=82404d4dac').then(m => m.setupMiCuenta());
+    import('./cuenta.js?v=c6e998dc85').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
@@ -732,8 +672,6 @@ function setupEvents() {
                 modal.classList.add('hidden');
             });
             cerrarTodosLosPaneles();
-            cerrarHeaderPopover(document.getElementById('header-config-menu'));
-            cerrarHeaderPopover(document.getElementById('header-config-menu'));
             const searchDropdown = document.getElementById('search-results-dropdown');
             if (searchDropdown) searchDropdown.classList.add('hidden');
         }

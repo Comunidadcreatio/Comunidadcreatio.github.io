@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.451';
+        var currentVer = '1.0.452';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=5f2975bf18">
+    <link rel="stylesheet" href="css/style.css?v=8322ffafb7">
     <link rel="stylesheet" href="css/notificaciones.css?v=ef228d4b19">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -192,26 +192,6 @@
             <button id="mobile-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
             <div class="divider"></div>
             <button id="mobile-logout-single" class="logout-option">Cerrar Sesión</button>
-        </div>
-    </div>
-
-    <!-- Bocadillo de configuración (engranaje, header superior izquierda) -->
-    <div id="header-config-menu" class="header-popover hidden">
-        <div class="header-popover-panel">
-            <button id="config-mi-cuenta" class="logout-option">
-                <svg class="menu-icon-svg" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Mi cuenta
-            </button>
-            <div class="divider"></div>
-            <button id="config-dark-mode" class="logout-option">
-                <svg id="config-dark-icon" class="config-dark-icon-svg" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <span id="config-dark-label">Modo oscuro</span>
-            </button>
         </div>
     </div>
 
@@ -803,6 +783,30 @@
                 </div>
                 </div>
 
+                <!-- Acordeón: Modo (claro/oscuro) -->
+                <button class="accordion-header" id="accordion-modo" aria-expanded="false" aria-controls="modo-content">
+                    <span class="accordion-header-left">
+                        <svg id="config-dark-icon" class="accordion-header-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <h3>Modo</h3>
+                    </span>
+                    <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-content" id="modo-content" hidden>
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-header">
+                            <div class="cuenta-item-info">
+                                <h4>Apariencia</h4>
+                                <p class="cuenta-item-desc">Cambia entre el tema oscuro y claro de la aplicación.</p>
+                            </div>
+                            <div class="cuenta-item-actions">
+                                <button type="button" id="config-dark-mode" class="btn-cuenta-secundario"><span id="config-dark-label">Modo oscuro</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Acordeón: Sesión -->
                 <button class="accordion-header" id="accordion-sesion" aria-expanded="false" aria-controls="sesion-content">
                     <span class="accordion-header-left">
@@ -953,7 +957,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=466caaaeec" type="module"></script>
+    <script src="js/main.js?v=460614f46e" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
