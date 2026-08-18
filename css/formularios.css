@@ -1087,7 +1087,7 @@ form,
     #modal-registro input,
     #modal-registro select,
     #modal-registro button,
-    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn) {
+    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab) {
         width: 100%;
         box-sizing: border-box;
         padding: 14px 12px; /* Mejor área táctil */
@@ -1912,6 +1912,9 @@ form,
 /* ==============================================
    ETIQUETAS DE TIPO DE CREACIÓN (Cavents / Problogs)
    En el borde inferior, debajo de la barra de pasos, sin relleno.
+   Barra BAJA y grupo CENTRADO: las dos pestañas quedan unidas entre sí
+   (no estiradas a los bordes). Al cambiar de pestaña, el subrayado de una
+   se encoge mientras el de la otra crece (transición cruzada fluida).
    ============================================== */
 #crear-tabs {
     position: fixed;
@@ -1919,26 +1922,30 @@ form,
     width: 100%;
     z-index: 999;
     display: flex;
+    justify-content: center; /* grupo centrado: pestañas unidas, no a los bordes */
+    gap: 4px;
     background: transparent; /* sin relleno */
     box-sizing: border-box;
+    padding: 0 16px;
 }
 .crear-tab {
-    flex: 1;
-    padding: 11px 0;
+    flex: 0 1 auto;
+    min-width: 104px;        /* área de toque cómoda */
+    padding: 7px 18px;       /* barra más baja (antes 11px 0) */
     border: none;
     background: transparent;
     color: var(--color-text-muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     font-family: 'Nunito', sans-serif;
     cursor: pointer;
     position: relative;
-    transition: color 0.2s ease;
+    transition: color 0.25s ease;
 }
-.crear-tab.activa {
-    color: var(--color-ink);
-}
-.crear-tab.activa::after {
+/* Subrayado SIEMPRE presente (oculto en reposo): al activarse crece desde
+   el centro (scaleX) y al desactivarse se encoge — transición fluida al
+   pasar de una pestaña a la otra, sin parpadeos */
+.crear-tab::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -1947,6 +1954,16 @@ form,
     height: 2px;
     background: var(--color-ink);
     border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.crear-tab.activa {
+    color: var(--color-ink);
+}
+.crear-tab.activa::after {
+    opacity: 1;
+    transform: scaleX(1);
 }
 
 /* Contenido de creación de Problogs (por implementar) */
@@ -1959,6 +1976,19 @@ form,
     color: var(--color-text-muted);
     padding: 0 1.5rem;
     font-size: 0.95rem;
+}
+/* Entrada suave del contenido al cambiar de pestaña (se reproduce cada vez
+   que el elemento pasa de display:none a flex) */
+.crear-problogs-contenido {
+    animation: crearContenidoIn 0.3s ease;
+}
+@keyframes crearContenidoIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Al volver a Cavents, el formulario reaparece con el mismo fade */
+body:not(.creando-problogs) #formulario-obra {
+    animation: crearContenidoIn 0.3s ease;
 }
 /* Al crear Problogs se ocultan los elementos del formulario de Cavents */
 body.creando-problogs #obra-progress-bar,
