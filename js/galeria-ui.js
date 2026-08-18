@@ -59,7 +59,7 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
         }
         if (sectionEntrante && document.getElementById(sectionEntrante.id)) {
             sectionEntrante.classList.remove('hidden');
-            actualizarVisibilidadHamburguesa(sectionEntrante);
+            actualizarVisibilidadIconosHeader(sectionEntrante);
             if (callback) callback();
         }
     }, 800);
@@ -86,19 +86,43 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     }
 }
 
-// La hamburguesa (Mi Cuenta) solo se muestra en el perfil y en Mi Cuenta:
-// para el resto de secciones/acciones permanece oculta.
-function actualizarVisibilidadHamburguesa(section) {
-    const btn = document.getElementById('btn-configuracion');
+// Iconos del header condicionales (mismo patrón):
+//  - hamburguesa (#btn-configuracion): solo en perfil / Mi Cuenta
+//  - crear "+" (#btn-crear-cavent): solo en la galería (Cavents)
+// Aparecen con un pop elástico y se ocultan con un desvanecido (se añade
+// .ocultando y se retrasa el display:none hasta terminar la animación).
+function visibilidadIconoHeader(btn, mostrar) {
     if (!btn) return;
-    const mostrar = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
-    btn.classList.toggle('hidden', !mostrar);
+    if (mostrar) {
+        clearTimeout(btn._ocultarTimer);
+        btn.classList.remove('ocultando', 'hidden');
+    } else {
+        if (btn.classList.contains('hidden') || btn.classList.contains('ocultando')) return;
+        btn.classList.add('ocultando');
+        btn._ocultarTimer = setTimeout(() => {
+            btn.classList.remove('ocultando');
+            btn.classList.add('hidden');
+        }, 280); // 0.26s de animación + margen
+    }
 }
+
+function actualizarVisibilidadIconosHeader(section) {
+    visibilidadIconoHeader(
+        document.getElementById('btn-configuracion'),
+        !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta')
+    );
+    visibilidadIconoHeader(
+        document.getElementById('btn-crear-cavent'),
+        !!section && section.id === 'galeria-publica'
+    );
+}
+// Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
+export { actualizarVisibilidadIconosHeader };
 
 function mostrarSeccion(section, callback) {
     if (!section) return;
     section.classList.remove('hidden', 'section-exiting');
-    actualizarVisibilidadHamburguesa(section);
+    actualizarVisibilidadIconosHeader(section);
     actualizarEstadoNavButtons();
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -125,7 +149,7 @@ export function ocultarTodasLasSecciones() {
 
 export function mostrarPaginaBlanca() {
     ocultarTodasLasSecciones();
-    actualizarVisibilidadHamburguesa(null);
+    actualizarVisibilidadIconosHeader(null);
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
     const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');

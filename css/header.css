@@ -116,8 +116,9 @@ picture {
         transform: translateX(0) scale(1) rotate(0);
     }
 }
-/* La campana se desliza a la izquierda para cederle el espacio */
-#main-header:has(#btn-configuracion:not(.hidden)) #btn-notificaciones {
+/* La campana se desliza a la izquierda para cederle el espacio a cualquiera
+   de los iconos condicionales (hamburguesa o "+") */
+#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden)) #btn-notificaciones {
     animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes campanaDesliza {
@@ -128,6 +129,73 @@ picture {
     @keyframes campanaDesliza {
         from { transform: translateX(42px); } /* móvil: gap 8px (medido) */
         to   { transform: translateX(0); }
+    }
+}
+
+/* ==============================================
+   HAMBURGUESA — ocultado con la misma elegancia
+   Al salir del perfil/Mi Cuenta se desvanece (fade +
+   escala + desliz inverso) y la campana vuelve a su
+   sitio deslizándose; el display:none se aplica al
+   terminar la animación (JS añade .ocultando primero).
+   ============================================== */
+#btn-configuracion.ocultando {
+    animation: hamburguesaOculta 0.26s ease-in forwards;
+}
+@keyframes hamburguesaOculta {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1) rotate(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(18px) scale(0.6) rotate(35deg);
+    }
+}
+/* La campana se desliza de vuelta a la derecha mientras se oculta */
+#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando) #btn-notificaciones {
+    animation: campanaRegresa 0.26s ease-in;
+}
+@keyframes campanaRegresa {
+    from { transform: translateX(0); }
+    to   { transform: translateX(56px); } /* escritorio */
+}
+@media (max-width: 768px) {
+    @keyframes campanaRegresa {
+        to { transform: translateX(42px); } /* móvil */
+    }
+}
+
+/* ==============================================
+   ICONO CREAR "+" — mismo patrón que la hamburguesa
+   Aparece junto a la campana solo en la galería (Cavents),
+   con un pop elástico (el signo gira al entrar) y se oculta
+   con el mismo desvanecido.
+   ============================================== */
+#btn-crear-cavent:not(.hidden) {
+    animation: crearAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes crearAparece {
+    from {
+        opacity: 0;
+        transform: translateX(18px) scale(0.6) rotate(-90deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1) rotate(0);
+    }
+}
+#btn-crear-cavent.ocultando {
+    animation: crearOculta 0.26s ease-in forwards;
+}
+@keyframes crearOculta {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1) rotate(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(18px) scale(0.6) rotate(90deg);
     }
 }
 

@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=3cac708192';
 import { artistaActual } from './auth.js?v=3517742095';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=f1ecb334f1';
-import { encontrarSeccionActual, actualizarEstadoNavButtons } from './galeria-ui.js?v=a7ea86c8e5';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader } from './galeria-ui.js?v=0710c2dda1';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
@@ -747,6 +747,7 @@ function abrirChat() {
     const actual = encontrarSeccionActual();
     if (actual && actual !== seccion) actual.classList.add('hidden');
     seccion.classList.remove('hidden');
+    actualizarVisibilidadIconosHeader(seccion); // el chat no pasa por mostrarSeccion
     chatAbierto = true;
     cargarDirectorio();
     refrescarChatNoLeidos(); // badges al abrir el chat
@@ -768,6 +769,7 @@ function abrirChatGlobal() {
 function cerrarChat() {
     const seccion = document.getElementById('chat-global');
     if (seccion) seccion.classList.add('hidden');
+    actualizarVisibilidadIconosHeader(null); // sin sección visible → iconos ocultos
     chatAbierto = false;
     detenerPoll();
     canalActivo = null;
