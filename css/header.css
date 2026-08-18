@@ -117,19 +117,14 @@ picture {
     }
 }
 /* La campana se desliza a la izquierda para cederle el espacio a cualquiera
-   de los iconos condicionales (hamburguesa o "+") */
-#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden)) #btn-notificaciones {
+   de los iconos condicionales (hamburguesa, "+" o Problogs/Cavents).
+   La distancia la calcula JS (--iconos-derecha = iconos visibles × ancho+gap). */
+#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-problogs:not(.hidden)) #btn-notificaciones {
     animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes campanaDesliza {
-    from { transform: translateX(56px); } /* escritorio: hamburguesa 40px + gap 16px */
+    from { transform: translateX(var(--iconos-derecha, 0px)); }
     to   { transform: translateX(0); }
-}
-@media (max-width: 768px) {
-    @keyframes campanaDesliza {
-        from { transform: translateX(42px); } /* móvil: gap 8px (medido) */
-        to   { transform: translateX(0); }
-    }
 }
 
 /* ==============================================
@@ -153,17 +148,12 @@ picture {
     }
 }
 /* La campana se desliza de vuelta a la derecha mientras se oculta */
-#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando) #btn-notificaciones {
+#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando) #btn-notificaciones {
     animation: campanaRegresa 0.26s ease-in;
 }
 @keyframes campanaRegresa {
     from { transform: translateX(0); }
-    to   { transform: translateX(56px); } /* escritorio */
-}
-@media (max-width: 768px) {
-    @keyframes campanaRegresa {
-        to { transform: translateX(42px); } /* móvil */
-    }
+    to   { transform: translateX(var(--iconos-derecha, 0px)); }
 }
 
 /* ==============================================
@@ -197,6 +187,28 @@ picture {
         opacity: 0;
         transform: translateX(18px) scale(0.6) rotate(90deg);
     }
+}
+
+/* ==============================================
+   ICONO PROBLOGS / CAVENTS
+   Muestra el icono de la sección activa: cuadrícula
+   (Cavents) o documento (Problogs). Mismo patrón de
+   aparición/ocultado que los demás iconos del header.
+   ============================================== */
+#btn-problogs .icono-problogs-icon {
+    display: none;
+}
+#btn-problogs.modo-problogs .icono-cavents {
+    display: none;
+}
+#btn-problogs.modo-problogs .icono-problogs-icon {
+    display: block;
+}
+#btn-problogs:not(.hidden) {
+    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#btn-problogs.ocultando {
+    animation: hamburguesaOculta 0.26s ease-in forwards;
 }
 
 /* ==============================================

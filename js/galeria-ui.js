@@ -99,10 +99,11 @@ function visibilidadIconoHeader(btn, mostrar) {
     if (!btn) return;
     if (mostrar) {
         // Si el OTRO icono se está ocultando, diferir la aparición ~300ms
-        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando');
+        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando');
         if (ocultandose && ocultandose !== btn) {
             clearTimeout(btn._mostrarTimer);
             btn._mostrarTimer = setTimeout(() => {
+                sincronizarIconosDerecha();
                 btn.classList.remove('ocultando', 'hidden');
             }, 300);
             return;
@@ -117,8 +118,23 @@ function visibilidadIconoHeader(btn, mostrar) {
         btn._ocultarTimer = setTimeout(() => {
             btn.classList.remove('ocultando');
             btn.classList.add('hidden');
+            sincronizarIconosDerecha();
         }, 280); // 0.26s de animación + margen
     }
+}
+
+// Calcula cuánto se desplaza la campana: iconos condicionales visibles
+// (problogs, "+", hamburguesa) × (ancho del icono + gap del header).
+function sincronizarIconosDerecha() {
+    const header = document.getElementById('main-header');
+    if (!header) return;
+    const gap = parseFloat(getComputedStyle(header).gap) || 8;
+    const count = ['btn-problogs', 'btn-crear-cavent', 'btn-configuracion']
+        .filter(id => {
+            const el = document.getElementById(id);
+            return el && !el.classList.contains('hidden'); // visibles o en .ocultando
+        }).length;
+    header.style.setProperty('--iconos-derecha', (count * (40 + gap)) + 'px');
 }
 
 // El icono se convierte en flecha de volver cuando su sub-sección está activa
@@ -131,20 +147,32 @@ function actualizarModoFlecha(btn, esFlecha, labelNormal, labelFlecha) {
 function actualizarVisibilidadIconosHeader(section) {
     const ham = document.getElementById('btn-configuracion');
     const plus = document.getElementById('btn-crear-cavent');
+    const problogs = document.getElementById('btn-problogs');
     const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
-    // El "+" solo en el carrusel de Cavents (no en Explorar/grid) y en el panel Crear
+    // El "+" en el carrusel de Cavents, el panel Crear y Problogs
     const enCarrusel = !!section && section.id === 'galeria-publica' && galeriaModo === 1;
     const enPanelCrear = !!section && section.id === 'panel-artista';
-    const mostrarPlus = enCarrusel || enPanelCrear;
+    const enProblogs = !!section && section.id === 'problogs';
+    const mostrarPlus = enCarrusel || enPanelCrear || enProblogs;
+    // El icono Problogs/Cavents solo en el carrusel (Cavents) y en Problogs
+    const mostrarProblogs = enCarrusel || enProblogs;
     // Modo flecha: en Mi Cuenta (hamburguesa) y en el panel Crear (+)
     actualizarModoFlecha(ham, !!section && section.id === 'mi-cuenta', 'Menú', 'Volver');
     actualizarModoFlecha(plus, !!section && section.id === 'panel-artista', 'Crear Cavent', 'Volver');
+    // El icono Problogs/Cavents muestra el icono de la sección activa
+    if (problogs) {
+        problogs.classList.toggle('modo-problogs', !!enProblogs);
+        problogs.setAttribute('aria-label', enProblogs ? 'Problogs' : 'Cavents');
+    }
     // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
     if (!mostrarHam) visibilidadIconoHeader(ham, false);
     if (!mostrarPlus) visibilidadIconoHeader(plus, false);
+    if (!mostrarProblogs) visibilidadIconoHeader(problogs, false);
     // Pasada 2: mostrar (ya con los ocultados marcados → se secuencian)
     if (mostrarHam) visibilidadIconoHeader(ham, true);
     if (mostrarPlus) visibilidadIconoHeader(plus, true);
+    if (mostrarProblogs) visibilidadIconoHeader(problogs, true);
+    sincronizarIconosDerecha();
 }
 // Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
 export { actualizarVisibilidadIconosHeader };
@@ -162,7 +190,8 @@ export function abrirMiCuentaDesdeIcono() {
 }
 
 export function abrirCrearDesdeIcono() {
-    iconoAnterior = { seccion: 'galeria-publica', modoGrid: galeriaModo === 2 };
+    const actual = encontrarSeccionActual();
+    iconoAnterior = { seccion: actual ? actual.id : 'galeria-publica', modoGrid: galeriaModo === 2 };
     togglePanel('crear');
 }
 
@@ -175,6 +204,8 @@ export function volverDesdeIcono() {
     } else if (prev.seccion === 'galeria-publica') {
         if (prev.modoGrid) toggleExplorar();
         else toggleGaleria(obtenerGaleriaContainer());
+    } else if (prev.seccion === 'problogs') {
+        toggleProblogs();
     }
 }
 
