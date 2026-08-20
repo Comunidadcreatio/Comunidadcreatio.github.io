@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=3cac708192';
 import { artistaActual } from './auth.js?v=3517742095';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=f1ecb334f1';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader } from './galeria-ui.js?v=16c6fb4927';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=aff4fd8220';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
@@ -704,7 +704,6 @@ export function setupChat() {
     if (fab) fab.addEventListener('click', abrirChatGlobal);
     const cerrarBtn = document.getElementById('chat-cerrar');
     if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarChat);
-    document.getElementById('chat-volver').addEventListener('click', volverDirectorio);
     document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
     setupDragEliminar();
     setupImagenBtn();
@@ -714,11 +713,23 @@ export function setupChat() {
     if (replyCancel) replyCancel.addEventListener('click', cancelarRespuesta);
     setupKeyboardHandling();
 
-    // Icono de conversaciones (header, solo en la sección Chat): abre la lista
+    // Icono de conversaciones del header: abre la lista, o "vuelve atrás" si ya
+    // estamos en la lista o en una sala (el icono se convierte en flecha).
     const convBtn = document.getElementById('btn-conversaciones');
-    if (convBtn) convBtn.addEventListener('click', abrirConversaciones);
-    const convVolver = document.getElementById('chat-conv-volver');
-    if (convVolver) convVolver.addEventListener('click', volverDeConversaciones);
+    if (convBtn) convBtn.addEventListener('click', () => {
+        const salaVisible = !document.getElementById('chat-sala').classList.contains('hidden');
+        const listaVisible = !document.getElementById('chat-conversaciones').classList.contains('hidden');
+        if (!salaVisible && !listaVisible) {
+            abrirConversaciones();
+            return;
+        }
+        if (salaVisible) {
+            if (vistaAnterior === 'conversaciones') volverALaLista();
+            else volverDirectorio();
+        } else {
+            volverDeConversaciones();
+        }
+    });
     // Salas con candado (Jurado 1 / Jurado 2): cerradas por ahora
     document.querySelectorAll('.chat-sala-fab.cerrada').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -768,6 +779,7 @@ function abrirChat() {
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-conversaciones').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
+    actualizarFlechaConversaciones(false); // en el directorio el icono es el original
     chatAbierto = true;
     cargarDirectorio();
     refrescarChatNoLeidos(); // badges al abrir el chat
@@ -794,6 +806,7 @@ function cerrarChat() {
     detenerPoll();
     canalActivo = null;
     window._canalChatActivo = null;
+    actualizarFlechaConversaciones(false);
     setFabVisible(false);
     actualizarEstadoNavButtons();
 }
@@ -809,6 +822,7 @@ function volverDirectorio() {
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-conversaciones').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
+    actualizarFlechaConversaciones(false);
     setFabVisible(true); // de vuelta al directorio
     cargarDirectorio(); // refresca conversaciones recientes
 }
@@ -831,14 +845,36 @@ function abrirConversaciones() {
     document.getElementById('chat-sala').classList.add('hidden');
     document.getElementById('chat-directorio').classList.add('hidden');
     document.getElementById('chat-conversaciones').classList.remove('hidden');
+    actualizarFlechaConversaciones(true); // el icono pasa a flecha de volver
     refrescarConversaciones(); // lista fresca de chats privados
-    setFabVisible(true); // las salas siguen visibles en esta vista
+    setFabVisible(false); // las salas (Global/Jurado) solo se muestran en el directorio
+}
+
+// Vuelve a la lista de conversaciones (desde una sala abierta desde ahí).
+function volverALaLista() {
+    detenerPoll();
+    canalActivo = null;
+    window._canalChatActivo = null;
+    cancelarRespuesta();
+    cerrarMenusFlotantes();
+    const typ = document.getElementById('chat-typing');
+    if (typ) typ.classList.add('hidden');
+    document.getElementById('chat-sala').classList.add('hidden');
+    document.getElementById('chat-directorio').classList.add('hidden');
+    document.getElementById('chat-conversaciones').classList.remove('hidden');
+    actualizarFlechaConversaciones(true); // seguimos en la lista → flecha
+    setFabVisible(false); // las salas solo se muestran en el directorio
 }
 
 // Vuelve del listado de conversaciones al directorio.
 function volverDeConversaciones() {
+    detenerPoll();
+    canalActivo = null;
+    window._canalChatActivo = null;
     document.getElementById('chat-conversaciones').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
+    actualizarFlechaConversaciones(false);
+    setFabVisible(true); // las salas vuelven a mostrarse en el directorio
     cargarDirectorio();
 }
 
@@ -856,6 +892,13 @@ async function refrescarConversaciones() {
 }
 
 let noLeidos = {}; // canal -> nº de mensajes sin leer (viene de GET /chat/no-leidos)
+let vistaAnterior = 'directorio'; // vista previa a una sala: 'directorio' | 'conversaciones'
+
+// La flecha del icono de conversaciones: original (bocadillos) en el directorio,
+// flecha de volver en la lista de conversaciones y en las salas.
+function actualizarFlechaConversaciones(esFlecha) {
+    actualizarModoFlecha(document.getElementById('btn-conversaciones'), !!esFlecha, 'Conversaciones', 'Volver');
+}
 let ultimosPueblos = {}; // último directorio recibido (para volver al grid desde un pueblo)
 
 // ---- Estado de las funciones nuevas ----
@@ -1121,6 +1164,9 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     window._canalChatActivo = canal; // lo usa push.js para no mostrar banner si ya estás leyendo aquí
     lastId = 0;
     setFabVisible(false); // al entrar a una sala (global o privada) se oculta
+    // Recordar de dónde se abrió la sala para que la flecha del header vuelva atrás
+    vistaAnterior = document.getElementById('chat-conversaciones').classList.contains('hidden') ? 'directorio' : 'conversaciones';
+    actualizarFlechaConversaciones(true); // el icono del header pasa a flecha
 
     // Estado del canal privado (para ✓✓, typing y el menú ⋯)
     canalEsPriv = canal !== 'global';

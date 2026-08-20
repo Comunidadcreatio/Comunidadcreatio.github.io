@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.472';
+        var currentVer = '1.0.473';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e6e7032174">
+    <link rel="stylesheet" href="css/style.css?v=9f806d7462">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -209,9 +209,13 @@
         <!-- Icono de conversaciones: solo visible en la sección Chat. Al
              presionarlo muestra la lista de chats privados del artista. -->
         <button id="btn-conversaciones" class="header-icon hidden" aria-label="Conversaciones">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="icono-original" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path>
                 <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
+            </svg>
+            <svg class="icono-flecha" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
         </button>
         <!-- Icono Problogs/Cavents: alterna entre ambas secciones y muestra el
@@ -901,20 +905,11 @@
                 </div>
                 <!-- Vista conversaciones: lista de chats privados (nueva forma) -->
                 <div id="chat-conversaciones" class="hidden">
-                    <div class="chat-conv-list-header">
-                        <button id="chat-conv-volver" class="chat-volver-btn" aria-label="Volver al directorio">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <span class="chat-conv-list-titulo">Conversaciones</span>
-                    </div>
                     <div id="chat-conversaciones-lista" class="chat-conversaciones-lista"></div>
                 </div>
                 <!-- Vista sala: mensajes de un canal (global o privado) -->
                 <div id="chat-sala" class="hidden">
                     <div class="chat-sala-header">
-                        <button id="chat-volver" class="chat-volver-btn" aria-label="Volver al directorio">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
                         <span id="chat-sala-avatar" class="chat-sala-avatar"></span>
                         <div id="chat-sala-titulo" class="chat-sala-titulo"></div>
                         <button id="chat-sala-menu-btn" class="chat-sala-menu-btn" aria-label="Opciones de conversación" style="display:none">⋮</button>
@@ -1032,7 +1027,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=6521351ea3" type="module"></script>
+    <script src="js/main.js?v=2b78bc630c" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

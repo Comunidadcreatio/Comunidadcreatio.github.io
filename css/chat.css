@@ -1335,20 +1335,6 @@ body.teclado-abierto .chat-enviar-btn {
     display: flex;
     flex-direction: column;
 }
-.chat-conv-list-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px 6px;
-}
-.chat-conv-list-titulo {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--color-text, #111);
-}
-[data-theme="dark"] .chat-conv-list-titulo {
-    color: #f0f0f0;
-}
 .chat-conversaciones-lista {
     display: flex;
     flex-direction: column;

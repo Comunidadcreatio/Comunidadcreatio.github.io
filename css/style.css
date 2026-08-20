@@ -1,13 +1,13 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=a46cc1b2c2');
+@import url('header.css?v=a5c73c341b');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=9981b072f3');
 
 /* Chat global + privado */
-@import url('chat.css?v=b7fafd9ce1');
+@import url('chat.css?v=25de70682f');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -1523,8 +1523,7 @@ input, select, textarea {
 .obra-metricas-bar,
 .chat-pueblo,
 #chat-accordion,
-.form-section,
-.chat-cluster {
+.form-section {
     background: transparent;
 }
 [data-theme="dark"] .obra-metricas-bar,

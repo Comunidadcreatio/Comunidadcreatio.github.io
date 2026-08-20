@@ -180,7 +180,7 @@ function actualizarVisibilidadIconosHeader(section) {
     sincronizarIconosDerecha();
 }
 // Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
-export { actualizarVisibilidadIconosHeader };
+export { actualizarVisibilidadIconosHeader, actualizarModoFlecha };
 
 // ============================================
 // FLECHA DE VOLVER: al activar un icono del header

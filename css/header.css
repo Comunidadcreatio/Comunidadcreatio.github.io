@@ -231,20 +231,24 @@ picture {
    usuario regresa a la sección anterior.
    ============================================== */
 #btn-crear-cavent .icono-flecha,
-#btn-configuracion .icono-flecha {
+#btn-configuracion .icono-flecha,
+#btn-conversaciones .icono-flecha {
     display: none;
 }
 #btn-crear-cavent.modo-flecha .icono-original,
-#btn-configuracion.modo-flecha .icono-original {
+#btn-configuracion.modo-flecha .icono-original,
+#btn-conversaciones.modo-flecha .icono-original {
     display: none;
 }
 #btn-crear-cavent.modo-flecha .icono-flecha,
-#btn-configuracion.modo-flecha .icono-flecha {
+#btn-configuracion.modo-flecha .icono-flecha,
+#btn-conversaciones.modo-flecha .icono-flecha {
     display: block;
 }
 /* La flecha aparece con una rotación/entrada sutil */
 #btn-crear-cavent.modo-flecha .icono-flecha,
-#btn-configuracion.modo-flecha .icono-flecha {
+#btn-configuracion.modo-flecha .icono-flecha,
+#btn-conversaciones.modo-flecha .icono-flecha {
     animation: flechaAparece 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes flechaAparece {
