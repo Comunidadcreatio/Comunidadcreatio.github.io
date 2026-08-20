@@ -1,13 +1,13 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=4eb026300e');
+@import url('header.css?v=a46cc1b2c2');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=9981b072f3');
 
 /* Chat global + privado */
-@import url('chat.css?v=8d40669df2');
+@import url('chat.css?v=b7fafd9ce1');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */

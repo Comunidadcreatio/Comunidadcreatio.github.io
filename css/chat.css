@@ -673,7 +673,7 @@ body.teclado-abierto .chat-enviar-btn {
     bottom: calc(60px + env(safe-area-inset-bottom, 16px));
     z-index: 999;
     display: flex;
-    justify-content: flex-end; /* la fila de círculos queda pegada a la derecha */
+    justify-content: center; /* las salas (Jurado 1 | Global | Jurado 2) quedan centradas */
     align-items: center;
     gap: 10px;
     /* Padding superior alto: el degradado ocupa mucha altura y se nota más */
@@ -699,18 +699,13 @@ body.teclado-abierto .chat-enviar-btn {
 .chat-cluster-convs {
     display: flex;
     align-items: center;
-    gap: 10px;
-    /* Scroll horizontal: cuando hay muchas conversaciones, la fila se desliza
-       libremente a la izquierda/derecha. El scrollbar se oculta. */
+    justify-content: center;
+    gap: 14px;
+    /* Solo 3 salas fijas (Jurado 1 | Global | Jurado 2): sin scroll horizontal */
     max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    overflow: visible;
     /* Padding para que los badges (no leídos) y los nombres no se recorten */
     padding: 6px 0 2px;
-    /* Solo gestos horizontales sobre la fila de círculos */
-    touch-action: pan-x;
 }
 /* Envoltorio de cada círculo/FAB + su nombre debajo */
 .chat-conv-wrap {
@@ -721,9 +716,9 @@ body.teclado-abierto .chat-enviar-btn {
     flex-shrink: 0;
     pointer-events: auto;
 }
-/* Aire al borde derecho solo para el wrap del FAB (el nombre queda centrado) */
+/* Al estar las salas centradas, el wrap del FAB no necesita aire extra */
 .chat-fab-wrap {
-    margin-right: 5px;
+    margin: 0;
 }
 .chat-conv-nombre {
     max-width: 76px;
@@ -870,6 +865,20 @@ body.teclado-abierto .chat-enviar-btn {
 .chat-fab svg {
     width: 24px;
     height: 24px;
+}
+/* Salas con candado (Jurado 1 / Jurado 2): cerradas por ahora */
+.chat-sala-fab.cerrada {
+    background: var(--color-gray-300, #cbd5e1);
+    color: #64748b;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+.chat-sala-fab.cerrada:hover {
+    transform: none;
+}
+[data-theme="dark"] .chat-sala-fab.cerrada {
+    background: #2a2a2a;
+    color: #8a8a8a;
 }
 [data-theme="dark"] .chat-cluster {
     /* Degradado vertical negro marcado: nace en el nav y se pierde muy por
@@ -1310,4 +1319,141 @@ body.teclado-abierto .chat-enviar-btn {
     background: #1e1e1e;
     border-color: #3a3a3a;
     color: #f0f0f0;
+}
+
+/* ==============================================
+   VISTA CONVERSACIONES (lista de chats privados)
+   Reemplaza los círculos de avatares del cluster: ahora la lista se abre
+   desde el icono de conversaciones del header (solo en la sección Chat).
+   ============================================== */
+#chat-conversaciones {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0 200px; /* los últimos ítems quedan por encima de las salas */
+    display: flex;
+    flex-direction: column;
+}
+.chat-conv-list-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 6px;
+}
+.chat-conv-list-titulo {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text, #111);
+}
+[data-theme="dark"] .chat-conv-list-titulo {
+    color: #f0f0f0;
+}
+.chat-conversaciones-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 12px 16px;
+}
+.chat-conv-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 8px;
+    border: none;
+    background: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: background-color 0.15s;
+}
+.chat-conv-item:hover {
+    background: var(--color-gray-100, #f3f4f6);
+}
+[data-theme="dark"] .chat-conv-item:hover {
+    background: #1f1f1f;
+}
+.chat-conv-item-avatar {
+    position: relative; /* para el punto de presencia .chat-conv-dot */
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+}
+.chat-conv-item-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: var(--color-gray-200, #e0e0e0);
+}
+.chat-conv-item-inicial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary, #c0392b);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+}
+.chat-conv-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.chat-conv-item-nombre {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text, #111);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+[data-theme="dark"] .chat-conv-item-nombre {
+    color: #f0f0f0;
+}
+.chat-conv-item-preview {
+    font-size: 12px;
+    color: var(--color-text-muted, #888);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chat-conv-item-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.chat-conv-item-hora {
+    font-size: 11px;
+    color: var(--color-text-muted, #888);
+}
+.chat-conv-item-badge {
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #e53935;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 19px;
+    text-align: center;
+    box-sizing: border-box;
+    display: inline-block;
+}
+.chat-conv-vacio {
+    text-align: center;
+    color: var(--color-text-muted, #888);
+    font-size: 13px;
+    padding: 32px 16px;
 }

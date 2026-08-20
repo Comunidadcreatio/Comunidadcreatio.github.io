@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=3cac708192';
 import { artistaActual } from './auth.js?v=3517742095';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=f1ecb334f1';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader } from './galeria-ui.js?v=18ac6f9597';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader } from './galeria-ui.js?v=16c6fb4927';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
@@ -714,6 +714,22 @@ export function setupChat() {
     if (replyCancel) replyCancel.addEventListener('click', cancelarRespuesta);
     setupKeyboardHandling();
 
+    // Icono de conversaciones (header, solo en la sección Chat): abre la lista
+    const convBtn = document.getElementById('btn-conversaciones');
+    if (convBtn) convBtn.addEventListener('click', abrirConversaciones);
+    const convVolver = document.getElementById('chat-conv-volver');
+    if (convVolver) convVolver.addEventListener('click', volverDeConversaciones);
+    // Salas con candado (Jurado 1 / Jurado 2): cerradas por ahora
+    document.querySelectorAll('.chat-sala-fab.cerrada').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const wrap = btn.closest('.chat-sala-wrap');
+            const sala = wrap ? wrap.dataset.sala : '';
+            mostrarToast(sala === 'jurado1'
+                ? 'Sala de Jurado 1: próximamente'
+                : 'Sala de Jurado 2: próximamente');
+        });
+    });
+
     // Abrir una conversación desde una notificación push (evento de js/push.js)
     window.addEventListener('chat-abrir-canal', (e) => {
         const detail = (e && e.detail) || {};
@@ -748,6 +764,10 @@ function abrirChat() {
     if (actual && actual !== seccion) actual.classList.add('hidden');
     seccion.classList.remove('hidden');
     actualizarVisibilidadIconosHeader(seccion); // el chat no pasa por mostrarSeccion
+    // Siempre arranca en el directorio (sala y conversaciones cerradas)
+    document.getElementById('chat-sala').classList.add('hidden');
+    document.getElementById('chat-conversaciones').classList.add('hidden');
+    document.getElementById('chat-directorio').classList.remove('hidden');
     chatAbierto = true;
     cargarDirectorio();
     refrescarChatNoLeidos(); // badges al abrir el chat
@@ -787,9 +807,52 @@ function volverDirectorio() {
     if (typ) typ.classList.add('hidden');
     cerrarMenusFlotantes();
     document.getElementById('chat-sala').classList.add('hidden');
+    document.getElementById('chat-conversaciones').classList.add('hidden');
     document.getElementById('chat-directorio').classList.remove('hidden');
     setFabVisible(true); // de vuelta al directorio
     cargarDirectorio(); // refresca conversaciones recientes
+}
+
+// Abre la lista de conversaciones privadas (icono del header, sección Chat).
+function abrirConversaciones() {
+    if (!artistaActual) {
+        window.location.href = 'auth.html';
+        return;
+    }
+    const seccion = document.getElementById('chat-global');
+    if (seccion && seccion.classList.contains('hidden')) abrirChat();
+    detenerPoll();
+    canalActivo = null;
+    window._canalChatActivo = null;
+    cancelarRespuesta();
+    cerrarMenusFlotantes();
+    const typ = document.getElementById('chat-typing');
+    if (typ) typ.classList.add('hidden');
+    document.getElementById('chat-sala').classList.add('hidden');
+    document.getElementById('chat-directorio').classList.add('hidden');
+    document.getElementById('chat-conversaciones').classList.remove('hidden');
+    refrescarConversaciones(); // lista fresca de chats privados
+    setFabVisible(true); // las salas siguen visibles en esta vista
+}
+
+// Vuelve del listado de conversaciones al directorio.
+function volverDeConversaciones() {
+    document.getElementById('chat-conversaciones').classList.add('hidden');
+    document.getElementById('chat-directorio').classList.remove('hidden');
+    cargarDirectorio();
+}
+
+// GET /chat/conversaciones → renderiza la lista (el cluster ya no se toca).
+async function refrescarConversaciones() {
+    const cont = document.getElementById('chat-conversaciones-lista');
+    if (!cont) return;
+    try {
+        const convRes = await apiRequest('/chat/conversaciones');
+        renderConversaciones(convRes && convRes.success ? convRes.conversaciones : []);
+    } catch (e) {
+        debugLog.error('conversaciones:', e);
+        cont.innerHTML = '<div class="chat-conv-vacio">No se pudieron cargar las conversaciones.</div>';
+    }
 }
 
 let noLeidos = {}; // canal -> nº de mensajes sin leer (viene de GET /chat/no-leidos)
@@ -838,10 +901,10 @@ function aplicarNoLeidos() {
         fabBadge.classList.toggle('hidden', n === 0);
     }
 
-    document.querySelectorAll('.chat-conv-circle').forEach(circle => {
-        const badge = circle.querySelector('.chat-circle-badge');
+    document.querySelectorAll('.chat-conv-item').forEach(item => {
+        const badge = item.querySelector('.chat-conv-item-badge');
         if (!badge) return;
-        const n = noLeidos[circle.dataset.canal] || 0;
+        const n = noLeidos[item.dataset.canal] || 0;
         badge.textContent = n > 99 ? '99+' : String(n);
         badge.classList.toggle('hidden', n === 0);
     });
@@ -994,47 +1057,52 @@ function renderUsuariosPueblo(ciudad) {
     panel.appendChild(lista);
 }
 
-// Las conversaciones se muestran como círculos (avatares) junto al círculo
-// de la sala global. El orden se invierte: la más reciente queda pegada al
-// círculo de la sala global (la última en agregarse).
+// Las conversaciones ya NO se muestran como círculos en el cluster: se listan
+// en la vista "Conversaciones" (se abre desde el icono del header, visible solo
+// en la sección Chat). La más reciente queda arriba.
 function renderConversaciones(convs) {
-    const cont = document.getElementById('chat-cluster-convs');
+    const cont = document.getElementById('chat-conversaciones-lista');
     if (!cont) return;
-    // Conservar el FAB de la sala global: solo se eliminan los círculos de conversación
-    cont.querySelectorAll('.chat-conv-wrap:not(.chat-fab-wrap)').forEach(w => w.remove());
-    if (!convs || !convs.length) return;
-    const ordenadas = [...convs].reverse(); // newest queda a la derecha, junto al FAB
-    const fab = cont.querySelector('.chat-fab');
-    const fabWrap = fab ? fab.closest('.chat-conv-wrap') : null;
+    cont.innerHTML = '';
+    if (!convs || !convs.length) {
+        cont.innerHTML = '<div class="chat-conv-vacio">Aún no tienes conversaciones. Inicia un chat desde el directorio.</div>';
+        aplicarNoLeidos();
+        return;
+    }
+    const ordenadas = [...convs].sort((a, b) =>
+        new Date((b.ultimo && b.ultimo.created_at) || 0) - new Date((a.ultimo && a.ultimo.created_at) || 0)
+    ); // la más reciente arriba
+    const frag = document.createDocumentFragment();
     ordenadas.forEach(c => {
-        const wrap = document.createElement('div');
-        wrap.className = 'chat-conv-wrap';
-        const circle = document.createElement('button');
-        circle.type = 'button';
-        circle.className = 'chat-conv-circle';
-        circle.setAttribute('aria-label', `Chat con ${c.otro_nombre}`);
-        circle.dataset.canal = c.canal;
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'chat-conv-item';
+        item.dataset.canal = c.canal;
+        item.setAttribute('aria-label', `Chat con ${c.otro_nombre}`);
         const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
         const online = esOnline(c);
-        circle.innerHTML = (c.otro_foto
+        const avatar = c.otro_foto
             ? `<img src="${safeImgUrl(c.otro_foto)}" alt="">`
-            : inicial) + `<span class="chat-conv-dot${online ? ' online' : ''}"></span>`;
-        const badge = document.createElement('span');
-        badge.className = 'chat-circle-badge hidden';
-        circle.appendChild(badge);
-        circle.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto, c.ultima_actividad));
-        const nombre = document.createElement('span');
-        nombre.className = 'chat-conv-nombre';
-        nombre.textContent = c.otro_nombre || 'Conversación';
-        wrap.appendChild(circle);
-        wrap.appendChild(nombre);
-        // Insertar antes del FAB para que la sala global quede en el extremo derecho
-        if (fabWrap) cont.insertBefore(wrap, fabWrap);
-        else cont.appendChild(wrap);
+            : `<span class="chat-conv-item-inicial">${inicial}</span>`;
+        const preview = c.ultimo && c.ultimo.contenido
+            ? escapeHtml(c.ultimo.contenido)
+            : 'Sin mensajes todavía';
+        const hora = c.ultimo && c.ultimo.created_at ? formatHora(c.ultimo.created_at) : '';
+        item.innerHTML =
+            `<span class="chat-conv-item-avatar">${avatar}<span class="chat-conv-dot${online ? ' online' : ''}"></span></span>` +
+            `<span class="chat-conv-item-info">` +
+            `<span class="chat-conv-item-nombre">${escapeHtml(c.otro_nombre || 'Conversación')}</span>` +
+            `<span class="chat-conv-item-preview">${preview}</span>` +
+            `</span>` +
+            `<span class="chat-conv-item-meta">` +
+            `<span class="chat-conv-item-hora">${hora}</span>` +
+            `<span class="chat-conv-item-badge hidden"></span>` +
+            `</span>`;
+        item.addEventListener('click', () => abrirSala(c.canal, c.otro_nombre, c.otro_foto, c.ultima_actividad));
+        frag.appendChild(item);
     });
-    // Iniciar el scroll al final: se ven el FAB y las conversaciones más recientes
-    requestAnimationFrame(() => { cont.scrollLeft = cont.scrollWidth; });
-    aplicarNoLeidos(); // badges sobre los círculos recién renderizados
+    cont.appendChild(frag);
+    aplicarNoLeidos(); // badges sobre la lista recién renderizada
 }
 
 function abrirPrivado(u) {
@@ -1066,6 +1134,7 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     if (menuBtn) menuBtn.style.display = canalEsPriv ? '' : 'none';
 
     document.getElementById('chat-directorio').classList.add('hidden');
+    document.getElementById('chat-conversaciones').classList.add('hidden');
     document.getElementById('chat-sala').classList.remove('hidden');
 
     // Avatar del otro usuario (después de la flecha de volver), con punto de presencia
