@@ -1101,7 +1101,8 @@ input, select, textarea {
 #perfil-usuario.section-exiting,
 #resultados-busqueda.section-exiting,
 #pagina-blanca.section-exiting,
-#problogs.section-exiting {
+#problogs.section-exiting,
+#chat-global.section-exiting {
     animation: sectionExit 0.25s ease-in forwards;
 }
 

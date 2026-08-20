@@ -73,7 +73,11 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     if (sectionSaliente) {
         sectionSaliente.classList.remove('section-entering');
         sectionSaliente.classList.add('section-exiting');
-        sectionSaliente.addEventListener('animationend', function onExit() {
+        sectionSaliente.addEventListener('animationend', function onExit(e) {
+            // Solo la animación de salida (sectionExit) debe disparar el cambio:
+            // un animationend de OTRA animación (p.ej. chatSlideUp al reabrir el
+            // chat) no debe ocultar la sección entrante.
+            if (e && e.animationName && e.animationName !== 'sectionExit') return;
             sectionSaliente.removeEventListener('animationend', onExit);
             sectionSaliente.classList.remove('section-exiting');
             sectionSaliente.classList.add('hidden');
@@ -402,9 +406,9 @@ export async function toggleGaleria(galeriaContainer) {
             actualizarEstadoNavButtons();
         });
     } else {
-        // Ocultar galería
-        galeriaModo = 0;
-        switchSection(galeria, document.getElementById('pagina-blanca'));
+        // Ya visible en carrusel: REFRESCAR el contenido (mismo patrón que la
+        // lupa), nunca ocultar la sección al re-presionar el icono.
+        await triggerRefreshGrid();
     }
 }
 
@@ -1019,8 +1023,9 @@ export function togglePerfil() {
         activarTabCavents();
         switchSection(encontrarSeccionActual(), perfilUsuario);
     } else {
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
-        if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        switchSection(perfilUsuario, paginaBlanca);
+        // Ya visible el perfil propio: REFRESCAR los datos (mismo patrón que la
+        // lupa), nunca ocultar la sección al re-presionar el icono.
+        actualizarPerfilUI();
+        if (window.actualizarEstadisticas) window.actualizarEstadisticas();
     }
 }

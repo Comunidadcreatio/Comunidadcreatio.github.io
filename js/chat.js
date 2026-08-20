@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=3cac708192';
 import { artistaActual } from './auth.js?v=3517742095';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=f1ecb334f1';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=aff4fd8220';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=b222d5de9e';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
@@ -696,8 +696,9 @@ export function setupChat() {
     if (!btn || !seccion) return;
 
     btn.addEventListener('click', () => {
-        if (seccion.classList.contains('hidden')) abrirChat();
-        else cerrarChat();
+        // Siempre abre/refresca el chat (directorio), como hace la lupa con
+        // Explorar: nunca oculta la sección al re-presionar el icono.
+        abrirChat();
     });
     // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
     const fab = document.getElementById('btn-chat-global-fab');
