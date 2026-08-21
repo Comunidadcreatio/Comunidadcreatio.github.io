@@ -103,7 +103,7 @@ function visibilidadIconoHeader(btn, mostrar) {
     if (!btn) return;
     if (mostrar) {
         // Si el OTRO icono se está ocultando, diferir la aparición ~300ms
-        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando');
+        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando, #btn-notificaciones.ocultando');
         if (ocultandose && ocultandose !== btn) {
             clearTimeout(btn._mostrarTimer);
             btn._mostrarTimer = setTimeout(() => {
@@ -325,6 +325,7 @@ function salirDeModoGrid(onComplete) {
         gridExiting = false;
         galeriaContainerLocal.classList.remove('modo-grid');
         cards.forEach(c => c.classList.remove('modo-grid-exit'));
+        ptrReparent(galeriaContainerLocal); // a carrusel: el indicador vuelve al contenedor
         if (onComplete) onComplete();
     };
 
@@ -397,6 +398,7 @@ export async function toggleGaleria(galeriaContainer) {
             galeriaContainerLocal.innerHTML = '';
             setupPullToRefresh(galeriaContainerLocal);
         }
+        ptrReparent(galeriaContainerLocal); // a carrusel: indicador en el contenedor
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
@@ -453,6 +455,7 @@ async function activarExplorar() {
             galeriaContainerLocal.classList.add('modo-grid');
             setupPullToRefresh(galeriaContainerLocal);
         }
+        ptrReparent(galeriaContainerLocal); // a Explorar: indicador en la sección (encima de etiquetas)
         const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
@@ -483,6 +486,7 @@ async function activarExplorar() {
         if (galeriaContainerLocal) {
             galeriaContainerLocal.classList.add('modo-grid');
             setupPullToRefresh(galeriaContainerLocal);
+            ptrReparent(galeriaContainerLocal); // a Explorar: indicador en la sección
         }
         actualizarEstadoNavButtons();
         // Esperar al siguiente frame para que el CSS de la transición se aplique
@@ -644,12 +648,13 @@ async function ejecutarRefreshGrid(container) {
     // En Explorar, el círculo queda ENCIMA de las etiquetas: etiquetas Y grid
     // se asientan juntos en 56px durante la carga (aunque el arrastre haya
     // llegado más lejos) y vuelven juntos en finalizarRefresh — como uno solo,
-    // sin chocar entre sí. El refresco desde la lupa del nav hace lo mismo.
+    // bajando suavemente, sin chocar entre sí. El refresco desde la lupa del
+    // nav hace lo mismo.
     if (document.body.classList.contains('search-abierto')) {
         const tags = document.getElementById('tags-carrusel');
         if (tags) ptrSyncTags(56, true);
         if (container.style.paddingTop !== '56px') {
-            container.style.transition = 'padding-top 0.18s ease-out';
+            container.style.transition = 'padding-top 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
             container.style.paddingTop = '56px';
         }
     }
@@ -705,7 +710,7 @@ function finalizarRefresh(container) {
 // restaura en finalizarRefresh al ocultar el indicador.
 async function dispararRefresh(container) {
     const enExplorar = document.body.classList.contains('search-abierto');
-    container.style.transition = 'padding-top 0.18s ease-out';
+    container.style.transition = 'padding-top 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
     container.style.paddingTop = enExplorar ? '56px' : '';
     container.style.userSelect = '';
     setPtrProgress(1); // anillo completo antes de entrar en carga
@@ -758,17 +763,26 @@ export async function triggerRefreshGrid() {
     await ejecutarRefreshGrid(container); // bloquea scroll durante la carga y lo restaura
 }
 
-function createPTRIndicator(container) {
-    // El indicador vive en la SECCIÓN (#galeria-publica), no dentro del grid:
-    // así, en Explorar, el círculo sale FIJO bajo el header, POR ENCIMA de las
-    // etiquetas (CSS: #galeria-publica > .pull-refresh-indicator).
+// El indicador vive donde corresponde según el modo:
+// - Explorar (grid): en la SECCIÓN (#galeria-publica), fijo bajo el header,
+//   POR ENCIMA de las etiquetas (CSS: #galeria-publica > .pull-refresh-indicator).
+// - Carrusel: DENTRO del contenedor (sticky en su top), ocupando su espacio
+//   para NO superponerse al cavent de abajo.
+function ptrReparent(container) {
+    if (!ptrIndicator) return;
+    const enGrid = container.classList.contains('modo-grid');
     const seccion = document.getElementById('galeria-publica');
-    const padre = seccion || container;
+    const destino = enGrid ? seccion : container;
+    if (ptrIndicator.parentNode !== destino) {
+        destino.insertBefore(ptrIndicator, destino.firstChild);
+    }
+}
+
+function createPTRIndicator(container) {
     if (ptrIndicator) {
-        // Re-insertar si fue destruido por innerHTML (ya no ocurre, pero por robustez)
-        if (!ptrIndicator.parentNode) {
-            padre.insertBefore(ptrIndicator, padre.firstChild);
-        }
+        // Re-insertar si fue destruido por innerHTML (carrusel)
+        if (!ptrIndicator.parentNode) ptrReparent(container);
+        else ptrReparent(container); // asegurar el padre según el modo
         return;
     }
     ptrIndicator = document.createElement('div');
@@ -780,7 +794,7 @@ function createPTRIndicator(container) {
                 '<circle class="ptr-arc" cx="18" cy="18" r="15.5"></circle>' +
             '</svg>' +
         '</div>';
-    padre.insertBefore(ptrIndicator, padre.firstChild);
+    ptrReparent(container);
 }
 
 // Durante el arrastre PTR, las etiquetas de Explorar se deslizan hacia abajo
@@ -790,9 +804,9 @@ function ptrSyncTags(px, suave) {
     const tags = document.getElementById('tags-carrusel');
     if (!tags) return;
     if (suave) {
-        tags.style.transition = 'transform 0.18s ease-out';
+        tags.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
         clearTimeout(tags._ptrTransTimer);
-        tags._ptrTransTimer = setTimeout(() => { tags.style.transition = ''; }, 250);
+        tags._ptrTransTimer = setTimeout(() => { tags.style.transition = ''; }, 400);
     }
     tags.style.transform = 'translateY(' + px + 'px)';
 }
@@ -810,16 +824,15 @@ function ptrResetTags(suave) {
 }
 
 function ensurePTRInContainer(container) {
-    if (ptrIndicator && !ptrIndicator.parentNode) {
-        const seccion = document.getElementById('galeria-publica');
-        (seccion || container).insertBefore(ptrIndicator, (seccion || container).firstChild);
-    }
+    if (ptrIndicator) ptrReparent(container);
 }
 
 export function setupPullToRefresh(container) {
     if (!container) return;
-    // El indicador se recrea siempre (innerHTML lo destruye)
+    // El indicador se recrea siempre (innerHTML lo destruye) y se ubica
+    // según el modo (grid → sección, carrusel → contenedor)
     createPTRIndicator(container);
+    ptrReparent(container);
 
     // Setup idempotente: limpiar listeners previos y volver a añadir
     if (container._ptrCleanup) container._ptrCleanup();
