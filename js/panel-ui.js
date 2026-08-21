@@ -7,6 +7,7 @@ import { token, artistaActual } from './auth.js?v=30e2869c22';
 import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5c6';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
+import { abrirEditorImagen } from './image-editor.js?v=e05a0e5688';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -150,6 +151,27 @@ function actualizarCarrusel() {
             const imgEl = document.createElement('img');
             imgEl.src = img.src;
             slide.appendChild(imgEl);
+
+            // Botón editar imagen (brillo, contraste, saturación, ambiente,
+            // sombras, calidez, zonas brillantes) — solo si hay archivo real
+            if (img.file) {
+                const btnEdit = document.createElement('button');
+                btnEdit.type = 'button';
+                btnEdit.className = 'btn-editar-slide';
+                btnEdit.setAttribute('aria-label', 'Editar imagen');
+                btnEdit.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
+                btnEdit.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirEditorImagen(imagenesData[i], (blob) => {
+                        const file = new File([blob], 'imagen-editada.jpg', { type: 'image/jpeg' });
+                        const url = URL.createObjectURL(blob);
+                        if (imagenesData[i]._objUrl) URL.revokeObjectURL(imagenesData[i]._objUrl);
+                        imagenesData[i] = { ...imagenesData[i], src: url, file, _objUrl: url };
+                        actualizarCarrusel();
+                    });
+                });
+                slide.appendChild(btnEdit);
+            }
 
             // Botón eliminar
             const btnDel = document.createElement('button');

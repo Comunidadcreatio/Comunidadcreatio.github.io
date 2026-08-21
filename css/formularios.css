@@ -787,6 +787,28 @@ form *,
     justify-content: center;
 }
 
+/* Botón "Editar imagen" del carrusel (abre el editor de ajustes) */
+.carrusel-slide .btn-editar-slide {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(26, 26, 26, 0.75);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+.carrusel-slide .btn-editar-slide:hover {
+    background: rgba(26, 26, 26, 0.95);
+}
+
 
 /* --- Botones de acción del formulario --- */
 #btn-guardar,
