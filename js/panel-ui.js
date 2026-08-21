@@ -7,7 +7,6 @@ import { token, artistaActual } from './auth.js?v=30e2869c22';
 import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5c6';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
-import { activarCuadroInline, activarEdicionInline, hayModoActivo } from './inline-image-tools.js?v=60c7c9c35b';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -128,21 +127,6 @@ let imagenesData = []; // [{src, file, slot}] — datos de imágenes en el carru
 let currentSlide = 0;
 let aspectRatio = '4/5';
 
-// Marca visualmente un botón de herramienta como "modo activo" (verde = guardar).
-// Además del fondo verde, cambia el icono: el icono "normal" se oculta y se
-// muestra el de GUARDAR (check) mediante la clase .modo-activo.
-function marcarBotonModo(btn, activo) {
-    if (!btn) return;
-    btn.classList.toggle('modo-activo', !!activo);
-    if (activo) {
-        btn.style.background = 'rgba(46,125,50,0.95)';
-        btn.setAttribute('aria-label', 'Guardar cambios');
-    } else {
-        btn.style.background = '';
-        btn.setAttribute('aria-label', btn.dataset.labelNormal || 'Editar imagen');
-    }
-}
-
 function actualizarCarrusel() {
     const track = document.getElementById('carrusel-track');
     const dots = document.getElementById('carrusel-dots');
@@ -167,72 +151,6 @@ function actualizarCarrusel() {
             imgEl.src = img.src;
             slide.appendChild(imgEl);
 
-            // Botones Cuadrar / Editar — SIEMPRE visibles (también en cavents
-            // ya subidos: las imágenes por URL se cargan con crossOrigin).
-            // Al pulsar se activa el modo INLINE sobre la propia imagen; al
-            // volver a pulsar el mismo botón se GUARDAN los cambios.
-            let controlActivo = null;
-
-            const guardarCambios = (blob) => {
-                const file = new File([blob], 'imagen-ajustada.jpg', { type: 'image/jpeg' });
-                const url = URL.createObjectURL(blob);
-                if (imagenesData[i]._objUrl) URL.revokeObjectURL(imagenesData[i]._objUrl);
-                imagenesData[i] = { ...imagenesData[i], src: url, file, _objUrl: url };
-                actualizarCarrusel();
-            };
-
-            // Encuadre manual inline: acercar/rotar/mover con los dedos en el sitio
-            const btnCuadrar = document.createElement('button');
-            btnCuadrar.type = 'button';
-            btnCuadrar.className = 'btn-editar-slide btn-cuadrar-slide';
-            btnCuadrar.dataset.labelNormal = 'Cuadrar imagen';
-            btnCuadrar.setAttribute('aria-label', 'Cuadrar imagen');
-            btnCuadrar.innerHTML = '<span class="icon-normal"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></span><span class="icon-check"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
-            btnCuadrar.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (controlActivo && controlActivo._tipo === 'cuadrar') {
-                    controlActivo.guardar();
-                    marcarBotonModo(btnCuadrar, false);
-                    return;
-                }
-                if (controlActivo) controlActivo.cancelar();
-                marcarBotonModo(btnEdit, false);
-                marcarBotonModo(btnCuadrar, true);
-                controlActivo = activarCuadroInline(
-                    { slide, imgEl, imagen: imagenesData[i] },
-                    guardarCambios,
-                    () => marcarBotonModo(btnCuadrar, false)
-                );
-                controlActivo._tipo = 'cuadrar';
-            });
-            slide.appendChild(btnCuadrar);
-
-            // Editar inline: deslizar arriba/abajo = herramienta, izquierda/derecha = valor
-            const btnEdit = document.createElement('button');
-            btnEdit.type = 'button';
-            btnEdit.className = 'btn-editar-slide';
-            btnEdit.dataset.labelNormal = 'Editar imagen';
-            btnEdit.setAttribute('aria-label', 'Editar imagen');
-            btnEdit.innerHTML = '<span class="icon-normal"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span><span class="icon-check"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
-            btnEdit.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (controlActivo && controlActivo._tipo === 'editar') {
-                    controlActivo.guardar();
-                    marcarBotonModo(btnEdit, false);
-                    return;
-                }
-                if (controlActivo) controlActivo.cancelar();
-                marcarBotonModo(btnCuadrar, false);
-                marcarBotonModo(btnEdit, true);
-                controlActivo = activarEdicionInline(
-                    { slide, imgEl, imagen: imagenesData[i] },
-                    guardarCambios,
-                    () => marcarBotonModo(btnEdit, false)
-                );
-                controlActivo._tipo = 'editar';
-            });
-            slide.appendChild(btnEdit);
-
             // Botón eliminar
             const btnDel = document.createElement('button');
             btnDel.type = 'button';
@@ -240,7 +158,6 @@ function actualizarCarrusel() {
             btnDel.textContent = '✕';
             btnDel.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (controlActivo) { controlActivo.cancelar(); controlActivo = null; }
                 eliminarImagen(i);
             });
             slide.appendChild(btnDel);
@@ -459,7 +376,6 @@ export function setupImagePreviews() {
 
         viewport.addEventListener('touchstart', (e) => {
             if (imagenesData.length <= 1) return;
-            if (hayModoActivo()) return; // no cambiar de slide mientras se edita/encuadra
             startX = e.touches[0].clientX;
             isDragging = true;
             track.style.transition = 'none';
@@ -467,7 +383,6 @@ export function setupImagePreviews() {
 
         viewport.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            if (hayModoActivo()) return;
             const diff = e.touches[0].clientX - startX;
             const percent = (diff / viewport.offsetWidth) * 100;
             track.style.transform = `translateX(${-currentSlide * 100 + percent}%)`;
@@ -477,7 +392,6 @@ export function setupImagePreviews() {
             if (!isDragging) return;
             isDragging = false;
             track.style.transition = ''; // restaurar transición CSS
-            if (hayModoActivo()) return;
             if (imagenesData.length <= 1) return;
             const diff = startX - e.changedTouches[0].clientX;
             if (Math.abs(diff) > 40) {

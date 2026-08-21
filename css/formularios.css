@@ -787,52 +787,6 @@ form *,
     justify-content: center;
 }
 
-/* Botones "Editar imagen" y "Cuadrar" del carrusel: esquina INFERIOR IZQUIERDA,
-   justo al lado del botón "+" (que está en bottom:10px; left:10px, 36px) */
-.carrusel-slide .btn-editar-slide {
-    position: absolute;
-    bottom: 14px;
-    left: 56px;
-    background: rgba(26, 26, 26, 0.75);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-}
-.carrusel-slide .btn-editar-slide:hover {
-    background: rgba(26, 26, 26, 0.95);
-}
-/* Icono de guardar (check): oculto por defecto; se muestra cuando el botón
-   está en "modo activo" (primera pulsación = activar herramienta, segunda = guardar) */
-.carrusel-slide .btn-editar-slide .icon-normal {
-    display: flex;
-}
-.carrusel-slide .btn-editar-slide .icon-check {
-    display: none;
-}
-.carrusel-slide .btn-editar-slide.modo-activo .icon-normal {
-    display: none;
-}
-.carrusel-slide .btn-editar-slide.modo-activo .icon-check {
-    display: flex;
-}
-/* Encuadre manual: al lado del botón editar */
-.carrusel-slide .btn-cuadrar-slide {
-    left: 92px;
-}
-/* Slide en modo de edición/encuadre inline */
-.carrusel-slide.inline-modo {
-    outline: 2px solid #2e7d32;
-    outline-offset: -2px;
-}
-
 
 /* --- Botones de acción del formulario --- */
 #btn-guardar,
@@ -1133,7 +1087,7 @@ form,
     #modal-registro input,
     #modal-registro select,
     #modal-registro button,
-    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab):not(.btn-editar-slide) {
+    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab) {
         width: 100%;
         box-sizing: border-box;
         padding: 14px 12px; /* Mejor área táctil */
