@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.480';
+        var currentVer = '1.0.481';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -68,7 +68,7 @@
                    script-src 'self' 'unsafe-inline'; 
                    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
                    font-src 'self' https://fonts.gstatic.com; 
-                   img-src 'self' data: https://res.cloudinary.com; 
+                   img-src 'self' data: blob: https://res.cloudinary.com; 
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
