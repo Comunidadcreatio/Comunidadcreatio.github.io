@@ -217,13 +217,18 @@ export async function desbloquearConBiometria() {
     const plugin = obtenerPluginBiometrico();
     if (plugin) {
         try {
-            const res = await plugin.verifyIdentity({
+            // El plugin nativo RESUELVE si el usuario se autenticó y RECHAZA
+            // si falló o canceló (devuelve void, no { verified }).
+            // useFallback:true permite patrón/PIN/contraseña además de huella/rostro.
+            await plugin.verifyIdentity({
                 reason: 'Para iniciar sesión en Creatio',
                 title: 'Verificación de identidad',
                 subtitle: 'Usa tu huella, patrón o PIN',
-                description: 'Confirma tu identidad para continuar'
+                description: 'Confirma tu identidad para continuar',
+                useFallback: true,
+                maxAttempts: 3
             });
-            return !!(res && res.verified);
+            return true;
         } catch (e) {
             return false;
         }

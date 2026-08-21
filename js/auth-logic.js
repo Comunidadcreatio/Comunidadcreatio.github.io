@@ -9,7 +9,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=1953a4f15e';
+} from './biometric-login.js?v=a675f4d997';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -1100,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnBio.addEventListener('click', async () => {
             const ok = await desbloquearConBiometria();
             if (!ok) {
-                showWarning('No se pudo verificar tu identidad con la biometría del dispositivo.');
+                showWarning('No se pudo verificar tu identidad (verificación cancelada o sin huella/patrón/PIN configurado en el dispositivo).');
                 return;
             }
             const creds = await obtenerCredencialesRecordadas();
