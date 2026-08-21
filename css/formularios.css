@@ -813,6 +813,11 @@ form *,
 .carrusel-slide .btn-cuadrar-slide {
     left: 92px;
 }
+/* Slide en modo de edición/encuadre inline */
+.carrusel-slide.inline-modo {
+    outline: 2px solid #2e7d32;
+    outline-offset: -2px;
+}
 
 
 /* --- Botones de acción del formulario --- */
