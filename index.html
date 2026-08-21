@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.474';
+        var currentVer = '1.0.475';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=8933d7f9e3">
+    <link rel="stylesheet" href="css/style.css?v=82157b9e26">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=38816a1421">
@@ -205,6 +205,14 @@
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
             <span id="notif-badge" class="notif-badge hidden">0</span>
+        </button>
+        <!-- Icono lupa de Explorar: solo visible en la sección Explorar (grid).
+             Al presionarlo abre el buscador (igual que al tocar el input). -->
+        <button id="btn-lupa-explorar" class="header-icon hidden" aria-label="Buscar artista">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
         </button>
         <!-- Icono de conversaciones: solo visible en la sección Chat. Al
              presionarlo muestra la lista de chats privados del artista. -->
@@ -1027,7 +1035,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=7dfca76cb6" type="module"></script>
+    <script src="js/main.js?v=88a0a4e86f" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

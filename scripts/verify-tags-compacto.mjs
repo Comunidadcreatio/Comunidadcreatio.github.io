@@ -104,7 +104,9 @@ const estadoFiltrado = await evalJs(`JSON.stringify({
 console.log('antes:', JSON.stringify(antes), '→ después:', JSON.stringify(despues), '(altura constante:', antes.h === despues.h, ')');
 console.log('tras fade in:', estadoFiltrado);
 
-console.log('\n=== Buscador en modo B: resultados debajo de la barra ===');
+console.log('\n=== Buscador en modo B: resultados debajo de la barra (lupa del header) ===');
+await evalJs(`document.getElementById('btn-lupa-explorar').click()`);
+await sleep(400);
 const inputRect = await evalJs(`(() => { const el = document.getElementById('search-input'); const r = el.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`);
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: inputRect.x, y: inputRect.y, radiusX: 2, radiusY: 2, force: 1, id: 1 }] });
@@ -113,13 +115,11 @@ await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 await sleep(600);
 console.log(await evalJs(`(() => {
     const res = document.getElementById('search-results-dropdown');
-    const t = document.getElementById('tags-carrusel');
     const r = res.getBoundingClientRect();
-    const tr = t.getBoundingClientRect();
     return JSON.stringify({
         resultsTop: Math.round(r.y),
-        barraBottom: Math.round(tr.bottom),
-        resultadosDebajo: Math.round(r.y) >= Math.round(tr.bottom)
+        panelVisible: !document.getElementById('search-panel').classList.contains('hidden'),
+        modoBusqueda: document.getElementById('search-panel').classList.contains('modo-busqueda')
     });
 })()`));
 

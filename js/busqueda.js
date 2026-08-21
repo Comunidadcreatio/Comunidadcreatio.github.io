@@ -5,7 +5,7 @@
 import { apiRequest } from './config.js?v=3cac708192';
 import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=f1ecb334f1';
 import { showWarning, showError } from './notificaciones.js?v=53cd86fdba';
-import { triggerRefreshGrid } from './galeria-ui.js?v=b222d5de9e';
+import { triggerRefreshGrid } from './galeria-ui.js?v=ff4efaaaee';
 
 /**
  * Configura el buscador de artistas.
@@ -14,7 +14,8 @@ import { triggerRefreshGrid } from './galeria-ui.js?v=b222d5de9e';
  * @param {Function} abrirExplorarFn - función para mostrar la sección Explorar junto al buscador
  */
 export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, abrirExplorarFn) {
-    const lupaBtn = document.getElementById('btn-buscar');
+    const navLupa = document.getElementById('btn-buscar');            // nav: abre Explorar (sin buscador)
+    const headerLupa = document.getElementById('btn-lupa-explorar');  // header: abre el buscador (modo B)
     const panel = document.getElementById('search-panel');
     const cerrarBtn = document.getElementById('search-close');
     const searchInput = document.getElementById('search-input');
@@ -25,37 +26,57 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         return;
     }
 
-    // Cerrar la sección por completo (toque fuera, resultado, lupa de nuevo)
+    // Cierra SOLO el buscador (panel): Explorar sigue abierto con sus
+    // etiquetas y grid. La clase search-abierto (Explorar) la gestiona
+    // activarExplorar / actualizarVisibilidadIconosHeader.
     const cerrarPanel = () => {
         if (panel) panel.classList.add('hidden');
         if (panel) panel.classList.remove('modo-busqueda');
-        document.body.classList.remove('search-abierto');
         document.body.classList.remove('search-escribiendo');
         searchInput.value = '';
         if (actualizarBordeNeon) actualizarBordeNeon();
         resultados.innerHTML = '';
+        if (searchInput && document.activeElement === searchInput) searchInput.blur();
     };
 
-    // Abrir la sección desde la lupa (estado A): sin flecha <, grid visible.
-    // Si el buscador YA está abierto, la lupa activa el círculo de refresco
-    // del grid (pull-to-refresh) en lugar de cerrar.
-    const abrirPanel = async () => {
+    // Lupa del NAV: abre Explorar (grid + etiquetas) SIN el buscador.
+    // Si Explorar ya está abierto, refresca el grid (patrón del icono Cavents).
+    const abrirExplorar = async () => {
         if (panel && !panel.classList.contains('hidden')) {
-            try { await triggerRefreshGrid(); } catch (e) { debugLog.warn('Refresh desde lupa:', e); }
+            cerrarPanel(); // el buscador abierto se cierra, vuelve a Explorar
             return;
         }
-        // Buscador y grid sincronizados: se prepara el grid y cuando está
-        // listo aparecen ambos juntos (sin 'primero uno y luego el otro').
+        if (document.body.classList.contains('search-abierto')) {
+            try { await triggerRefreshGrid(); } catch (e) { debugLog.warn('Refresh desde lupa nav:', e); }
+            return;
+        }
         let ok = true;
         if (abrirExplorarFn) ok = await abrirExplorarFn();
         if (ok === false) return; // (p.ej. confirmarDescartarCambios canceló)
-        if (panel) panel.classList.remove('hidden');
-        document.body.classList.add('search-abierto');
-        if (panel) panel.classList.remove('modo-busqueda');
+        // activarExplorar ya añade search-abierto y muestra la lupa del header
         document.body.classList.remove('search-escribiendo');
-        // Sin autofocus: el teclado NO se despliega automáticamente al abrir
     };
-    if (lupaBtn) lupaBtn.addEventListener('click', abrirPanel);
+    if (navLupa) navLupa.addEventListener('click', abrirExplorar);
+
+    // Lupa del HEADER: abre el buscador en modo B (flecha <, velo, resultados),
+    // tal cual al tocar el input. Si ya está abierto, refresca el grid.
+    const abrirBusqueda = async () => {
+        if (panel && !panel.classList.contains('hidden')) {
+            try { await triggerRefreshGrid(); } catch (e) { debugLog.warn('Refresh desde lupa header:', e); }
+            return;
+        }
+        // Por seguridad: asegurar Explorar abierto (la lupa solo es visible ahí)
+        if (!document.body.classList.contains('search-abierto')) {
+            if (abrirExplorarFn) await abrirExplorarFn();
+        }
+        if (panel) panel.classList.remove('hidden');
+        if (panel) panel.classList.add('modo-busqueda');
+        document.body.classList.add('search-escribiendo');
+        // Sin autofocus programático retardado: enfocar ahora abre el teclado
+        // igual que al tocar el input (modo B completo).
+        searchInput.focus();
+    };
+    if (headerLupa) headerLupa.addEventListener('click', abrirBusqueda);
 
     // Al tocar el input se entra al "modo búsqueda" (estado B):
     // el grid queda semitransparente, aparecen los resultados
@@ -70,16 +91,9 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     };
     searchInput.addEventListener('focus', entrarModoBusqueda);
 
-    // La flecha < vuelve al grid (NO cierra la sección): salida suave
+    // La flecha < cierra el buscador y vuelve a Explorar (etiquetas + grid)
     const volverAlGrid = () => {
-        if (panel) panel.classList.remove('modo-busqueda');
-        document.body.classList.remove('search-escribiendo');
-        resultados.classList.add('resultados-saliendo');   // fade-out
-        clearTimeout(timeoutResultados);
-        timeoutResultados = setTimeout(() => {
-            resultados.classList.remove('resultados-saliendo');
-            resultados.innerHTML = '';
-        }, 200);
+        cerrarPanel();
     };
     if (cerrarBtn) cerrarBtn.addEventListener('click', volverAlGrid);
 
@@ -90,7 +104,8 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     document.addEventListener('click', (e) => {
         if (!panel || panel.classList.contains('hidden')) return;
         if (panel.contains(e.target)) return;
-        if (lupaBtn && lupaBtn.contains(e.target)) return;
+        if (navLupa && navLupa.contains(e.target)) return;
+        if (headerLupa && headerLupa.contains(e.target)) return;
         for (const id of botonesModo) {
             const el = document.getElementById(id);
             if (el && el.contains(e.target)) return;

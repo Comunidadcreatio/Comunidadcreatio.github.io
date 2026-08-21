@@ -1,7 +1,8 @@
-// Verifica el carrusel de etiquetas con el buscador:
-// - Modo A (buscador abierto): etiquetas visibles entre barra y grid.
-// - Modo B (input enfocado): el VELO las tapa (siguen visibles, no display:none),
-//   los resultados aparecen DEBAJO de las etiquetas y el grid queda bajo el velo.
+// Verifica el carrusel de etiquetas con el nuevo flujo de Explorar:
+// - Lupa del nav: Explorar (grid + etiquetas) SIN buscador.
+// - Lupa del header: abre el buscador en modo B (velo + resultados debajo).
+// - Flecha <: cierra el buscador y deja Explorar intacto.
+// - Click en chip: filtra sin cerrar el buscador.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -53,7 +54,7 @@ await send('Page.navigate', { url: process.argv[2] || 'http://127.0.0.1:8099/' }
 
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(400); }
 await sleep(800);
-// Abrir Explorar (grid) desde la lupa
+// Abrir Explorar (grid) desde la lupa del NAV
 await evalJs(`document.getElementById('btn-buscar').click()`);
 let ready = false;
 for (let i = 0; i < 40; i++) {
@@ -77,11 +78,11 @@ const estado = () => evalJs(`(() => {
         modoBusqueda: panel.classList.contains('modo-busqueda'),
         searchEscribiendo: document.body.classList.contains('search-escribiendo'),
         searchAbierto: document.body.classList.contains('search-abierto'),
+        panelHidden: panel.classList.contains('hidden'),
         conEtiquetas: document.body.classList.contains('search-con-etiquetas'),
         tagsDisplay: getComputedStyle(tags).display,
         tagsRect: { y: Math.round(t.y), h: Math.round(t.height) },
         gridTop: Math.round(g.y),
-        gridDisplay: getComputedStyle(grid).display,
         veilOpacity: veil.opacity,
         veilZ: veil.zIndex,
         tagsZ: getComputedStyle(tags).zIndex,
@@ -90,18 +91,12 @@ const estado = () => evalJs(`(() => {
     });
 })()`);
 
-console.log('\n=== MODO A (buscador abierto, sin escribir) ===');
+console.log('\n=== EXPLORAR (nav) SIN buscador: etiquetas + grid arriba ===');
 console.log(await estado());
 
-console.log('\n=== MODO B (toque real sobre el input → velo + etiquetas tapadas) ===');
-const inputRect = await evalJs(`(() => { const el = document.getElementById('search-input'); const r = el.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`);
-console.log('input coords:', JSON.stringify(inputRect));
-await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
-await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: inputRect.x, y: inputRect.y, radiusX: 2, radiusY: 2, force: 1, id: 1 }] });
-await sleep(60);
-await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-await sleep(600);
-console.log('activeElement:', await evalJs(`document.activeElement ? document.activeElement.id : 'none'`));
+console.log('\n=== LUPA HEADER → buscador en modo B (velo + input enfocado) ===');
+await evalJs(`document.getElementById('btn-lupa-explorar').click()`);
+await sleep(400);
 console.log(await estado());
 
 // Verificar qué elemento está encima de una etiqueta (debe ser el velo/section, no la etiqueta)
@@ -114,24 +109,29 @@ const hit = await evalJs(`(() => {
 })()`);
 console.log('elementFromPoint sobre chip (modo B):', hit);
 
-console.log('\n=== Volver al grid (flecha <) ===');
+console.log('\n=== Flecha < → cierra buscador, Explorar intacto ===');
 await evalJs(`document.getElementById('search-close').click()`);
-await sleep(500);
+await sleep(400);
 console.log(await estado());
 
-console.log('\n=== Click en un chip (filtro sin cerrar el buscador) ===');
+console.log('\n=== Click en un chip (filtro sin abrir el buscador) ===');
 await evalJs(`(() => { const chip = document.querySelector('.tag-chip'); if (chip) chip.click(); return 'ok'; })()`);
 await sleep(400);
 console.log(await evalJs(`JSON.stringify({
     searchAbierto: document.body.classList.contains('search-abierto'),
+    panelHidden: document.getElementById('search-panel').classList.contains('hidden'),
     chipActiva: !!document.querySelector('.tag-chip.activa'),
     cardsVisibles: document.querySelectorAll('#galeria-container .obra-card').length
 })`));
 
-console.log('\n=== Cerrar buscador (lupa) ===');
-await evalJs(`document.getElementById('btn-buscar').click()`);
-await sleep(400);
-console.log(await estado());
+console.log('\n=== Salir de Explorar (Chat) → todo limpio ===');
+await evalJs(`document.getElementById('btn-chat-global').click()`);
+await sleep(900);
+console.log(await evalJs(`JSON.stringify({
+    searchAbierto: document.body.classList.contains('search-abierto'),
+    panelHidden: document.getElementById('search-panel').classList.contains('hidden'),
+    lupaHeaderOculta: document.getElementById('btn-lupa-explorar').classList.contains('hidden')
+})`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}

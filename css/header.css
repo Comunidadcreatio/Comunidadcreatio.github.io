@@ -520,7 +520,7 @@ picture {
 }
 /* Con el carrusel de etiquetas visible, los resultados bajan para no taparlo */
 body.search-con-etiquetas .search-panel-results {
-    top: calc(68px + var(--tags-carrusel-h)); /* barra 68px + etiquetas */
+    top: 68px; /* justo debajo de la barra del buscador (las etiquetas quedan detrás del panel) */
 }
 
 /* ==============================================
@@ -631,7 +631,7 @@ body.search-escribiendo #toggle-panel {
 .tags-carrusel {
     display: none;
     position: fixed;
-    top: calc(132px + var(--status-bar-height, 24px));
+    top: calc(64px + var(--status-bar-height, 24px)); /* bajo el header: Explorar ya no muestra el buscador arriba */
     left: 0;
     right: 0;
     z-index: 900;
@@ -652,7 +652,7 @@ body.search-abierto .tags-carrusel:not(.hidden) {
 }
 @media (max-width: 768px) {
     .tags-carrusel {
-        top: calc(128px + var(--status-bar-height, 24px));
+        top: calc(60px + var(--status-bar-height, 24px));
     }
 }
 .tags-carrusel::-webkit-scrollbar {
@@ -720,14 +720,15 @@ body.search-abierto .tags-carrusel:not(.hidden) {
 /* En modo búsqueda (estado B) el carrusel YA NO se oculta: queda visible y el
    velo de opacidad (z 1000) lo tapa como al grid (z 900 < 1000). */
 
-/* El grid baja más cuando el carrusel de etiquetas está visible,
-   para que los chips no se solapen con la primera fila de cavents. */
+/* El grid baja cuando el carrusel de etiquetas está visible, para que los
+   chips no se solapen con la primera fila de cavents. Explorar ya no muestra
+   el buscador arriba: el grid queda justo bajo el header + etiquetas. */
 body.search-abierto.search-con-etiquetas #galeria-container {
-    top: calc(132px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+    top: calc(64px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
 }
 @media (max-width: 768px) {
     body.search-abierto.search-con-etiquetas #galeria-container {
-        top: calc(128px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+        top: calc(60px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
     }
 }
 /* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid
