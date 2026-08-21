@@ -281,6 +281,10 @@ async function agregarImagen(file, dataUrl) {
         actualizarCarrusel();
     } catch (e) {
         debugLog.error('No se pudo recortar la imagen, se usa la original:', e);
+        // Avisar al usuario: la imagen no se pudo normalizar (p.ej. HEIC de
+        // iPhone, formato no soportado o archivo corrupto) y se adjuntará el
+        // archivo original, que puede fallar al subir por su tamaño/formato.
+        showWarning('Esta imagen no se pudo procesar (formato no compatible). Se usará el archivo original: se recomienda JPG o PNG para mejor calidad y menor peso.');
         const slot = getNextFreeSlot();
         imagenesData.push({ src: dataUrl, file: file, slot: slot });
         currentSlide = imagenesData.length - 1;
