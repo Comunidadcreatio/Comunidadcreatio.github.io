@@ -808,6 +808,10 @@ form *,
 .carrusel-slide .btn-editar-slide:hover {
     background: rgba(26, 26, 26, 0.95);
 }
+/* Encuadre manual: junto al botón editar */
+.carrusel-slide .btn-cuadrar-slide {
+    left: 44px;
+}
 
 
 /* --- Botones de acción del formulario --- */

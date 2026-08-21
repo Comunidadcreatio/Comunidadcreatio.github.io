@@ -8,6 +8,7 @@ import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
 import { abrirEditorImagen } from './image-editor.js?v=e05a0e5688';
+import { abrirCuadroImagen } from './image-framing.js?v=767aaf7430';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -155,6 +156,24 @@ function actualizarCarrusel() {
             // Botón editar imagen (brillo, contraste, saturación, ambiente,
             // sombras, calidez, zonas brillantes) — solo si hay archivo real
             if (img.file) {
+                // Encuadre manual: acercar/mover con los dedos dentro del marco
+                const btnCuadrar = document.createElement('button');
+                btnCuadrar.type = 'button';
+                btnCuadrar.className = 'btn-editar-slide btn-cuadrar-slide';
+                btnCuadrar.setAttribute('aria-label', 'Cuadrar imagen');
+                btnCuadrar.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+                btnCuadrar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirCuadroImagen(imagenesData[i], aspectRatio, (blob) => {
+                        const file = new File([blob], 'imagen-cuadrada.jpg', { type: 'image/jpeg' });
+                        const url = URL.createObjectURL(blob);
+                        if (imagenesData[i]._objUrl) URL.revokeObjectURL(imagenesData[i]._objUrl);
+                        imagenesData[i] = { ...imagenesData[i], src: url, file, _objUrl: url };
+                        actualizarCarrusel();
+                    });
+                });
+                slide.appendChild(btnCuadrar);
+
                 const btnEdit = document.createElement('button');
                 btnEdit.type = 'button';
                 btnEdit.className = 'btn-editar-slide';
