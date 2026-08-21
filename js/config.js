@@ -31,7 +31,10 @@ export async function apiRequest(endpoint, options = {}) {
             }
         });
 
-        if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta')) {
+        // NOTA: un 401 en el LOGIN significa credenciales INCORRECTAS (el
+        // backend responde con su propio mensaje), no una sesión expirada:
+        // ese caso se deja pasar para que se muestre el error real.
+        if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta') && !endpoint.endsWith('/api/artistas/login')) {
             debugLog.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
             localStorage.removeItem(ARTISTA_KEY);
             try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) {}

@@ -1,10 +1,15 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=3517742095';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=3cac708192';
+import { login, register } from './auth.js?v=5de8c64b23';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=f4fc5dd620';
 import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js?v=53cd86fdba';
 import { mostrarErrores, debounce, debugLog } from './utils.js?v=f1ecb334f1';
 import { setupDarkModeToggle } from './theme.js?v=4207440b17'; // v67
+import {
+    biometriaDisponible, biometriaRegistrada, hayCredencialesRecordadas,
+    guardarCredencialesRecordadas, borrarCredencialesRecordadas,
+    obtenerCredencialesRecordadas, desbloquearConBiometria
+} from './biometric-login.js?v=2a384f1481';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -852,6 +857,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await login(email, password);
                 if (result.success) {
                     setButtonLoading(submitBtn, false);
+                    // "Recordarme": guardar credenciales cifradas (+ biometría si se pidió)
+                    const recordarme = document.getElementById('login-recordarme')?.checked;
+                    if (recordarme) {
+                        const activarBio = document.getElementById('login-biometria')?.checked;
+                        const res = await guardarCredencialesRecordadas(email, password, activarBio);
+                        if (!res.success) showWarning(res.error);
+                    } else {
+                        borrarCredencialesRecordadas();
+                    }
                     showSuccess('¡Inicio de sesión exitoso!');
                     setTimeout(() => {
                         window.location.href = 'index.html';
@@ -1028,6 +1042,67 @@ document.addEventListener('DOMContentLoaded', function() {
         if (nextBtn) nextBtn.addEventListener('click', () => {
             const idx = (currentSlide + 1) % slides.length;
             goTo(idx);
+        });
+    }
+});
+
+// ============================================
+// INICIO DE SESIÓN BIOMÉTRICO (huella/patrón/PIN)
+// ============================================
+
+// Muestra/oculta la opción "Iniciar sesión con huella, patrón o PIN" según:
+//  - WebAuthn disponible en el dispositivo, y
+//  - existan credenciales recordadas con biometría registrada.
+function actualizarUIbiometrica() {
+    const filaBio = document.getElementById('login-biometria-row');
+    if (filaBio) {
+        const chkRecordarme = document.getElementById('login-recordarme');
+        filaBio.style.display = (biometriaDisponible() && chkRecordarme && chkRecordarme.checked) ? 'flex' : 'none';
+    }
+    const wrapper = document.getElementById('login-biometrico-wrapper');
+    if (wrapper) {
+        const mostrar = biometriaDisponible() && hayCredencialesRecordadas() && biometriaRegistrada();
+        wrapper.classList.toggle('hidden', !mostrar);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarUIbiometrica();
+
+    // Al marcar "Recordarme" se muestra la opción de biometría
+    const chkRecordarme = document.getElementById('login-recordarme');
+    if (chkRecordarme) {
+        chkRecordarme.addEventListener('change', () => {
+            const filaBio = document.getElementById('login-biometria-row');
+            if (filaBio) filaBio.style.display = (chkRecordarme.checked && biometriaDisponible()) ? 'flex' : 'none';
+        });
+    }
+
+    // Botón "Iniciar sesión con huella, patrón o PIN"
+    const btnBio = document.getElementById('btn-login-biometrico');
+    if (btnBio) {
+        btnBio.addEventListener('click', async () => {
+            const ok = await desbloquearConBiometria();
+            if (!ok) {
+                showWarning('No se pudo verificar tu identidad con la biometría del dispositivo.');
+                return;
+            }
+            const creds = await obtenerCredencialesRecordadas();
+            if (!creds) {
+                showWarning('No hay credenciales guardadas en este dispositivo. Inicia sesión con tu contraseña.');
+                return;
+            }
+            setButtonLoading(btnBio, true);
+            const result = await login(creds.email, creds.password);
+            setButtonLoading(btnBio, false);
+            if (result.success) {
+                showSuccess('¡Inicio de sesión exitoso!');
+                setTimeout(() => { window.location.href = 'index.html'; }, 800);
+            } else {
+                borrarCredencialesRecordadas();
+                actualizarUIbiometrica();
+                mostrarErrores(result);
+            }
         });
     }
 });
