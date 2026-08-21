@@ -22,6 +22,8 @@ const IDENTIDAD_KEY = 'creatio_remembered_user'; // { nombre, foto } avatar+nomb
 const OLVIDO_EXPLICITO_KEY = 'creatio_olvido_explicito'; // '1' si el usuario cerró sesión a propósito
 
 import { login } from './auth.js?v=30e2869c22';
+// Registra el plugin nativo de biometría en el runtime de Capacitor (APK)
+import './capacitor-native-biometric.js?v=1';
 
 // ---------- Utilidades base64 ----------
 function b64url(bytes) {
@@ -83,14 +85,40 @@ async function descifrar(enc) {
 
 // ---------- API pública ----------
 
-// ¿El navegador/WebView soporta WebAuthn?
+// Plugin NATIVO de biometría (solo en el APK): el WebView de Capacitor NO
+// expone WebAuthn en muchos dispositivos, así que en la app nativa usamos
+// @capgo/capacitor-native-biometric a través del puente global (sin bundler).
+function obtenerPluginBiometrico() {
+    try {
+        if (window.Capacitor && window.Capacitor.isNativePlatform &&
+            window.Capacitor.isNativePlatform() &&
+            window.Capacitor.Plugins && window.Capacitor.Plugins.NativeBiometric) {
+            return window.Capacitor.Plugins.NativeBiometric;
+        }
+    } catch (e) {}
+    return null;
+}
+
+// ¿Estamos en el APK (plataforma nativa)?
+export function esPlataformaNativa() {
+    return !!obtenerPluginBiometrico();
+}
+
+// ¿La biometría del sistema está disponible?
+//  - APK: el plugin nativo (siempre que el dispositivo tenga desbloqueo por
+//    huella, rostro, patrón o PIN).
+//  - Web: WebAuthn (Chrome/WebView que lo soporte).
 export function biometriaDisponible() {
+    if (obtenerPluginBiometrico()) return true;
     return typeof window !== 'undefined' && !!window.PublicKeyCredential &&
         typeof navigator !== 'undefined' && !!navigator.credentials;
 }
 
 // ¿Hay una credencial biométrica registrada?
+//  - APK: el plugin nativo pide la biometría directamente (siempre disponible).
+//  - Web: hace falta una credencial WebAuthn registrada.
 export function biometriaRegistrada() {
+    if (obtenerPluginBiometrico()) return true;
     try { return !!localStorage.getItem(BIO_CRED_KEY); } catch (e) { return false; }
 }
 
@@ -110,10 +138,14 @@ export async function guardarSesionEnDispositivo(email, password, nombre, foto) 
         try { localStorage.removeItem(CREDS_KEY); } catch (_) {}
         return { success: false, error: 'No se pudo guardar la sesión en este dispositivo.' };
     }
-    // La biometría es la llave de reingreso: se registra (pide verificación una vez).
-    const reg = await registrarBiometria(nombre || email);
-    if (!reg.success) {
-        return { success: true, bioWarning: reg.error };
+    // La biometría es la llave de reingreso:
+    //  - APK: el plugin nativo la pide directamente (sin registración previa).
+    //  - Web: se registra una credencial WebAuthn (pide verificación una vez).
+    if (!obtenerPluginBiometrico()) {
+        const reg = await registrarBiometria(nombre || email);
+        if (!reg.success) {
+            return { success: true, bioWarning: reg.error };
+        }
     }
     return { success: true };
 }
@@ -179,7 +211,23 @@ export async function registrarBiometria(userName) {
 
 // Pide la verificación del sistema (huella/patrón/PIN). Resuelve true si el
 // usuario se autenticó con el método de seguridad del dispositivo.
+//  - APK: plugin nativo (diálogo del sistema).
+//  - Web: WebAuthn (autenticador de plataforma).
 export async function desbloquearConBiometria() {
+    const plugin = obtenerPluginBiometrico();
+    if (plugin) {
+        try {
+            const res = await plugin.verifyIdentity({
+                reason: 'Para iniciar sesión en Creatio',
+                title: 'Verificación de identidad',
+                subtitle: 'Usa tu huella, patrón o PIN',
+                description: 'Confirma tu identidad para continuar'
+            });
+            return !!(res && res.verified);
+        } catch (e) {
+            return false;
+        }
+    }
     if (!biometriaDisponible()) return false;
     try {
         const stored = JSON.parse(localStorage.getItem(BIO_CRED_KEY) || 'null');
