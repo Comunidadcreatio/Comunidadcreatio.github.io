@@ -487,13 +487,16 @@ picture {
    PANEL DE BÚSQUEDA (se abre desde el icono de la lupa)
    ============================================== */
 /* Fila superior: flecha (igual que chat) + input de búsqueda.
-   El panel cubre el header, así que se respeta la barra de estado. */
+   SÓLIDA (fondo del tema) para ocultar por completo el logo y la lupa del
+   header cuando el buscador se despliega desde allí. Respeta la barra de
+   estado (safe-area) y deja el input en la misma franja vertical de la lupa. */
 .search-panel-top {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: calc(12px + var(--status-bar-height, 24px)) 16px 6px;
     flex-shrink: 0;
+    background: var(--color-bg);
 }
 .search-panel-top .search-input-wrapper {
     flex: 1;
@@ -529,18 +532,13 @@ picture {
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(68px + var(--status-bar-height, 24px)); /* debajo de la barra del buscador */
+    top: calc(60px + var(--status-bar-height, 24px)); /* JUSTO debajo de la barra del buscador, sin hueco */
     max-height: 40vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 4px 0;
-}
-/* Con etiquetas presentes, los resultados caen DEBAJO de ellas (las etiquetas
-   se quedan inmóviles en su sitio y no se tapan con la barra del buscador) */
-body.search-con-etiquetas .search-panel-results {
-    top: calc(72px + var(--status-bar-height, 24px) + var(--tags-carrusel-h));
 }
 
 /* ==============================================
@@ -787,12 +785,14 @@ body.search-escribiendo #galeria-publica::before {
     bottom: auto;
     height: auto;
     max-height: calc(100vh - 60px);
+    /* Sólido hasta ~100px (tapa el header completo: logo + lupa) y luego
+       se funde con Explorar. Paradas en px para no depender de la altura. */
     background: linear-gradient(to bottom,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.98) 22%,
-        rgba(255, 255, 255, 0.85) 40%,
-        rgba(255, 255, 255, 0.4) 68%,
-        rgba(255, 255, 255, 0) 88%);
+        rgba(255, 255, 255, 1) 0px,
+        rgba(255, 255, 255, 1) 100px,
+        rgba(255, 255, 255, 0.9) 135px,
+        rgba(255, 255, 255, 0.5) 180px,
+        rgba(255, 255, 255, 0) 240px);
     z-index: 1100;
     /* Se despliega desde el header con un deslizamiento hacia abajo */
     animation: searchPanelIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -803,11 +803,11 @@ body.search-escribiendo #galeria-publica::before {
 }
 [data-theme="dark"] #search-panel {
     background: linear-gradient(to bottom,
-        rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.98) 22%,
-        rgba(0, 0, 0, 0.85) 40%,
-        rgba(0, 0, 0, 0.4) 68%,
-        rgba(0, 0, 0, 0) 88%);
+        rgba(0, 0, 0, 1) 0px,
+        rgba(0, 0, 0, 1) 100px,
+        rgba(0, 0, 0, 0.9) 135px,
+        rgba(0, 0, 0, 0.5) 180px,
+        rgba(0, 0, 0, 0) 240px);
 }
 @media (max-width: 768px) {
     #search-panel {

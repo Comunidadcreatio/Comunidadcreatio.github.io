@@ -641,15 +641,13 @@ async function ejecutarRefreshGrid(container) {
     setPtrProgress(0.75); // arco de 270° girando durante la carga
     ptrBloquearScroll(container, true); // sin scroll nativo ni rubber-band durante la carga
     ptrAfirmarArriba(container); // el grid queda fijo arriba mientras carga
-    // En Explorar, el círculo queda ENCIMA de las etiquetas: etiquetas y grid
-    // se mantienen abajo (56px) durante la carga — como uno solo — y ambos
-    // vuelven juntos en finalizarRefresh (sin chocar entre sí).
+    // En Explorar, el círculo queda ENCIMA de las etiquetas: etiquetas Y grid
+    // se asientan juntos en 56px durante la carga (aunque el arrastre haya
+    // llegado más lejos) y vuelven juntos en finalizarRefresh — como uno solo,
+    // sin chocar entre sí. El refresco desde la lupa del nav hace lo mismo.
     if (document.body.classList.contains('search-abierto')) {
         const tags = document.getElementById('tags-carrusel');
-        if (tags) {
-            const actual = tags.style.transform ? (parseFloat(tags.style.transform.replace(/[^\d.-]/g, '')) || 0) : 0;
-            if (actual < 56) tags.style.transform = 'translateY(56px)';
-        }
+        if (tags) ptrSyncTags(56, true);
         if (container.style.paddingTop !== '56px') {
             container.style.transition = 'padding-top 0.18s ease-out';
             container.style.paddingTop = '56px';
@@ -675,10 +673,10 @@ async function ejecutarRefreshGrid(container) {
 
 // Confirmación: anillo completo con pop y desvanecido, grid asentado
 function finalizarRefresh(container) {
-    container.style.transition = 'padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    container.style.transition = 'padding-top 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
     container.style.paddingTop = ''; // restaura el padding CSS (0 en flex, 6px en grid)
     container.style.userSelect = '';
-    ptrResetTags(true); // las etiquetas vuelven a su sitio con transición suave
+    ptrResetTags(true); // las etiquetas vuelven a su sitio con la misma transición
     if (ptrAssertRaf) { cancelAnimationFrame(ptrAssertRaf); ptrAssertRaf = null; }
     ptrBloquearScroll(container, false); // el grid vuelve a ser scrolleable
     container.scrollTop = 0; // el grid siempre queda arriba tras refrescar
@@ -687,10 +685,12 @@ function finalizarRefresh(container) {
     clearTimeout(ptrDoneTimer);
     ptrDoneTimer = setTimeout(() => {
         if (!ptrPulling && !ptrRefreshing) {
-            // Restaurar el scroll-snap solo al ocultar el indicador: si se
+            // Restaurar el scroll-snap y la transición CSS del grid (opacity
+            // del filtrado por etiquetas) solo al ocultar el indicador: si se
             // restaurara antes, el snap (carrusel) anclaría a la posición de
             // la primera tarjeta desplazada por el indicador visible.
             container.style.scrollSnapType = '';
+            container.style.transition = '';
             setPtrState();
         }
     }, 600);
@@ -721,6 +721,8 @@ function revertirPtr(container) {
     ptrResetTags(true); // las etiquetas vuelven a su sitio con transición suave
     ptrBloquearScroll(container, false);
     ocultarPtr(220);
+    clearTimeout(container._ptrTransReset);
+    container._ptrTransReset = setTimeout(() => { container.style.transition = ''; }, 400);
     ptrPullDist = 0;
     ptrMaxPull = 0;
 }
@@ -739,6 +741,8 @@ function cancelarPtr(container) {
     ptrResetTags(true);
     ptrBloquearScroll(container, false);
     ocultarPtr(220);
+    clearTimeout(container._ptrTransReset);
+    container._ptrTransReset = setTimeout(() => { container.style.transition = ''; }, 400);
     ptrPullDist = 0;
     ptrMaxPull = 0;
 }
@@ -781,9 +785,16 @@ function createPTRIndicator(container) {
 
 // Durante el arrastre PTR, las etiquetas de Explorar se deslizan hacia abajo
 // junto al grid (mismo desplazamiento) para que el círculo quede encima.
-function ptrSyncTags(px) {
+// Con suave=true se anima el cambio (asentarse en 56px o volver al reposo).
+function ptrSyncTags(px, suave) {
     const tags = document.getElementById('tags-carrusel');
-    if (tags) tags.style.transform = 'translateY(' + px + 'px)';
+    if (!tags) return;
+    if (suave) {
+        tags.style.transition = 'transform 0.18s ease-out';
+        clearTimeout(tags._ptrTransTimer);
+        tags._ptrTransTimer = setTimeout(() => { tags.style.transition = ''; }, 250);
+    }
+    tags.style.transform = 'translateY(' + px + 'px)';
 }
 
 // Restaura la posición de las etiquetas (opcional: con transición suave)
@@ -791,8 +802,9 @@ function ptrResetTags(suave) {
     const tags = document.getElementById('tags-carrusel');
     if (!tags || !tags.style.transform) return;
     if (suave) {
-        tags.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
-        setTimeout(() => { tags.style.transition = ''; }, 400);
+        tags.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+        clearTimeout(tags._ptrTransTimer);
+        tags._ptrTransTimer = setTimeout(() => { tags.style.transition = ''; }, 400);
     }
     tags.style.transform = '';
 }
