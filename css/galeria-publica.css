@@ -40,11 +40,11 @@ html, body {
     display: none;
 }
 
-/* Transición suave al filtrar por etiquetas (fade) y al abrir/cerrar el
-   buscador (top: el grid baja/sube junto a las etiquetas).
+/* Transición suave al filtrar por etiquetas: el grid se desvanece (fade out),
+   se re-renderiza con las tarjetas filtradas y vuelve a aparecer (fade in).
    La clase .grid-filtrando la pone/quito filtrarGridPorEtiqueta (galeria.js). */
 #galeria-container {
-    transition: opacity 0.18s ease, top 0.25s ease;
+    transition: opacity 0.18s ease;
 }
 #galeria-container.grid-filtrando {
     opacity: 0;

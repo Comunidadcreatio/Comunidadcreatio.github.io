@@ -174,34 +174,35 @@ function actualizarVisibilidadIconosHeader(section) {
         problogs.classList.toggle('modo-problogs', !!enProblogs);
         problogs.setAttribute('aria-label', enProblogs ? 'Problogs' : 'Cavents');
     }
-    // Al salir de Explorar se cierra el buscador y se quitan sus clases
-    // (etiquetas y grid vuelven a su posición normal). La sección Explorar
-    // (galeria-publica) las gestiona busqueda.js / activarExplorar.
     // Al salir de Explorar se cierra el buscador y se quitan sus clases:
     // - al cambiar a OTRA sección, o
     // - al pasar del grid (Explorar) al carrusel de Cavents (galeriaModo 1),
     //   para que las etiquetas NO aparezcan en Cavents.
     const esExplorar = !!section && section.id === 'galeria-publica' && galeriaModo === 2;
     if (!esExplorar) {
-        document.body.classList.remove('search-abierto', 'search-escribiendo', 'search-panel-abierto');
+        document.body.classList.remove('search-abierto', 'search-escribiendo');
         const panelBusqueda = document.getElementById('search-panel');
         if (panelBusqueda) {
             panelBusqueda.classList.add('hidden');
             panelBusqueda.classList.remove('modo-busqueda');
         }
     }
+    // La campana de notificaciones se oculta en Explorar (solo queda la lupa)
+    const notif = document.getElementById('btn-notificaciones');
     // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
     if (!mostrarHam) visibilidadIconoHeader(ham, false);
     if (!mostrarPlus) visibilidadIconoHeader(plus, false);
     if (!mostrarProblogs) visibilidadIconoHeader(problogs, false);
     if (!mostrarConversaciones) visibilidadIconoHeader(conversaciones, false);
     if (!mostrarLupa) visibilidadIconoHeader(lupaExplorar, false);
+    if (esExplorar) visibilidadIconoHeader(notif, false);
     // Pasada 2: mostrar (ya con los ocultados marcados → se secuencian)
     if (mostrarHam) visibilidadIconoHeader(ham, true);
     if (mostrarPlus) visibilidadIconoHeader(plus, true);
     if (mostrarProblogs) visibilidadIconoHeader(problogs, true);
     if (mostrarConversaciones) visibilidadIconoHeader(conversaciones, true);
     if (mostrarLupa) visibilidadIconoHeader(lupaExplorar, true);
+    if (!esExplorar) visibilidadIconoHeader(notif, true);
     sincronizarIconosDerecha();
 }
 // Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
@@ -640,13 +641,18 @@ async function ejecutarRefreshGrid(container) {
     setPtrProgress(0.75); // arco de 270° girando durante la carga
     ptrBloquearScroll(container, true); // sin scroll nativo ni rubber-band durante la carga
     ptrAfirmarArriba(container); // el grid queda fijo arriba mientras carga
-    // En Explorar, el círculo queda ENCIMA de las etiquetas: empujarlas abajo
-    // si el gesto no lo hizo ya (refresco programático desde la lupa del nav).
+    // En Explorar, el círculo queda ENCIMA de las etiquetas: etiquetas y grid
+    // se mantienen abajo (56px) durante la carga — como uno solo — y ambos
+    // vuelven juntos en finalizarRefresh (sin chocar entre sí).
     if (document.body.classList.contains('search-abierto')) {
         const tags = document.getElementById('tags-carrusel');
         if (tags) {
             const actual = tags.style.transform ? (parseFloat(tags.style.transform.replace(/[^\d.-]/g, '')) || 0) : 0;
             if (actual < 56) tags.style.transform = 'translateY(56px)';
+        }
+        if (container.style.paddingTop !== '56px') {
+            container.style.transition = 'padding-top 0.18s ease-out';
+            container.style.paddingTop = '56px';
         }
     }
     try {
@@ -693,11 +699,14 @@ function finalizarRefresh(container) {
 
 // Arrastre que superó el umbral: el grid vuelve a su posición normal y el
 // círculo queda arriba — en el sitio del que salió — girando sin hueco encima.
+// En Explorar, etiquetas Y grid se mantienen abajo (56px) mientras carga,
+// para que el círculo (fijo arriba) no choque con ellas.
 // El scroll-snap (carrusel) se mantiene desactivado durante la carga y se
 // restaura en finalizarRefresh al ocultar el indicador.
 async function dispararRefresh(container) {
+    const enExplorar = document.body.classList.contains('search-abierto');
     container.style.transition = 'padding-top 0.18s ease-out';
-    container.style.paddingTop = '';
+    container.style.paddingTop = enExplorar ? '56px' : '';
     container.style.userSelect = '';
     setPtrProgress(1); // anillo completo antes de entrar en carga
     await ejecutarRefreshGrid(container);

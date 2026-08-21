@@ -5,7 +5,7 @@
 import { apiRequest } from './config.js?v=3cac708192';
 import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=f1ecb334f1';
 import { showWarning, showError } from './notificaciones.js?v=53cd86fdba';
-import { triggerRefreshGrid } from './galeria-ui.js?v=85f0be7ca9';
+import { triggerRefreshGrid } from './galeria-ui.js?v=9cc48f808e';
 
 /**
  * Configura el buscador de artistas.
@@ -32,7 +32,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     const cerrarPanel = () => {
         if (panel) panel.classList.add('hidden');
         if (panel) panel.classList.remove('modo-busqueda');
-        document.body.classList.remove('search-escribiendo', 'search-panel-abierto');
+        document.body.classList.remove('search-escribiendo');
         searchInput.value = '';
         if (actualizarBordeNeon) actualizarBordeNeon();
         resultados.innerHTML = '';
@@ -54,7 +54,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         if (abrirExplorarFn) ok = await abrirExplorarFn();
         if (ok === false) return; // (p.ej. confirmarDescartarCambios canceló)
         // activarExplorar ya añade search-abierto y muestra la lupa del header
-        document.body.classList.remove('search-escribiendo', 'search-panel-abierto');
+        document.body.classList.remove('search-escribiendo');
     };
     if (navLupa) navLupa.addEventListener('click', abrirExplorar);
 
@@ -71,7 +71,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
         }
         if (panel) panel.classList.remove('hidden');
         if (panel) panel.classList.add('modo-busqueda');
-        document.body.classList.add('search-escribiendo', 'search-panel-abierto');
+        document.body.classList.add('search-escribiendo');
         // Sin autofocus programático retardado: enfocar ahora abre el teclado
         // igual que al tocar el input (modo B completo).
         searchInput.focus();

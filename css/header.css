@@ -229,7 +229,12 @@ picture {
    Visible solo en la sección Explorar (grid).
    Mismo patrón de aparición/ocultado que los demás
    iconos condicionales del header (pop elástico).
+   En Explorar la campana se oculta, así que la lupa
+   empuja el grupo de iconos a la derecha (margin-left:auto).
    ============================================== */
+#btn-lupa-explorar {
+    margin-left: auto;
+}
 #btn-lupa-explorar:not(.hidden) {
     animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -481,12 +486,13 @@ picture {
 /* ==============================================
    PANEL DE BÚSQUEDA (se abre desde el icono de la lupa)
    ============================================== */
-/* Fila superior: flecha (igual que chat) + input de búsqueda */
+/* Fila superior: flecha (igual que chat) + input de búsqueda.
+   El panel cubre el header, así que se respeta la barra de estado. */
 .search-panel-top {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px 6px;
+    padding: calc(12px + var(--status-bar-height, 24px)) 16px 6px;
     flex-shrink: 0;
 }
 .search-panel-top .search-input-wrapper {
@@ -523,7 +529,7 @@ picture {
     position: absolute;
     left: 0;
     right: 0;
-    top: 68px; /* justo debajo de la barra del buscador */
+    top: calc(68px + var(--status-bar-height, 24px)); /* debajo de la barra del buscador */
     max-height: 40vh;
     overflow-y: auto;
     display: flex;
@@ -531,10 +537,10 @@ picture {
     gap: 2px;
     padding: 4px 0;
 }
-/* Con el buscador abierto, las etiquetas quedan debajo de su barra y los
-   resultados bajan para no taparlas */
+/* Con etiquetas presentes, los resultados caen DEBAJO de ellas (las etiquetas
+   se quedan inmóviles en su sitio y no se tapan con la barra del buscador) */
 body.search-con-etiquetas .search-panel-results {
-    top: calc(68px + var(--tags-carrusel-h)); /* barra 68px + etiquetas */
+    top: calc(72px + var(--status-bar-height, 24px) + var(--tags-carrusel-h));
 }
 
 /* ==============================================
@@ -558,13 +564,6 @@ body.search-con-etiquetas .search-panel-results {
     padding: 4px 6px;
     opacity: 1;
     transform: translateX(0);
-}
-#search-panel.modo-busqueda {
-    /* B: SIN relleno — los perfiles se ven directamente sobre el grid */
-    background: transparent;
-}
-[data-theme="dark"] #search-panel.modo-busqueda {
-    background: transparent;
 }
 body.search-escribiendo #galeria-container {
     pointer-events: none;       /* B: el grid no recibe toques (la capa lo cubre) */
@@ -648,7 +647,10 @@ body.search-escribiendo #toggle-panel {
 .tags-carrusel {
     display: none;
     position: fixed;
-    top: calc(132px + var(--status-bar-height, 24px)); /* con el buscador abierto: debajo de su barra */
+    /* Explorar: etiquetas INMÓVILES bajo el header, con el mismo aire que
+       dejan abajo con el grid (--explorar-air). No se mueven al abrir el
+       buscador ni al aparecer los resultados. */
+    top: calc(64px + var(--explorar-air) + var(--status-bar-height, 24px));
     left: 0;
     right: 0;
     z-index: 900;
@@ -662,12 +664,6 @@ body.search-escribiendo #toggle-panel {
     scrollbar-width: none;
     -ms-overflow-style: none;
     touch-action: pan-x;
-    transition: top 0.25s ease; /* al abrir/cerrar el buscador bajan/suben suaves */
-}
-/* Explorar SIN buscador: etiquetas justo bajo el header, con el mismo aire
-   que dejan abajo con el grid (--explorar-air) */
-body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
-    top: calc(64px + var(--explorar-air) + var(--status-bar-height, 24px));
 }
 /* Solo visible cuando el buscador está abierto y hay etiquetas */
 body.search-abierto .tags-carrusel:not(.hidden) {
@@ -675,9 +671,6 @@ body.search-abierto .tags-carrusel:not(.hidden) {
 }
 @media (max-width: 768px) {
     .tags-carrusel {
-        top: calc(128px + var(--status-bar-height, 24px));
-    }
-    body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
         top: calc(60px + var(--explorar-air) + var(--status-bar-height, 24px));
     }
 }
@@ -747,20 +740,13 @@ body.search-abierto .tags-carrusel:not(.hidden) {
    velo de opacidad (z 1000) lo tapa como al grid (z 900 < 1000). */
 
 /* El grid baja cuando el carrusel de etiquetas está visible, para que los
-   chips no se solapen con la primera fila de cavents.
-   - Con el buscador abierto: header + barra + etiquetas.
-   - Explorar sin buscador: header + etiquetas. */
-body.search-panel-abierto.search-con-etiquetas #galeria-container {
-    top: calc(132px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
-}
-body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
+   chips no se solapen con la primera fila de cavents. Explorar: grid justo
+   bajo el header + etiquetas (todo INMÓVIL al abrir el buscador). */
+body.search-abierto.search-con-etiquetas #galeria-container {
     top: calc(64px + var(--explorar-air) + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
 }
 @media (max-width: 768px) {
-    body.search-panel-abierto.search-con-etiquetas #galeria-container {
-        top: calc(128px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
-    }
-    body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
+    body.search-abierto.search-con-etiquetas #galeria-container {
         top: calc(60px + var(--explorar-air) + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
     }
 }
@@ -787,41 +773,46 @@ body.search-escribiendo #galeria-publica::before {
     opacity: 1;                             /* fade in al tocar el input */
     pointer-events: auto;                   /* bloquea toques al grid */
 }
-/* El panel de búsqueda es una barra compacta justo debajo del header (no
-   fullscreen), para que la sección Explorar se vea debajo. Vive fuera del
+/* El panel de búsqueda se DESPLIEGA desde el header (donde está la lupa):
+   arranca en el borde superior (top 0) y tapa el header (logo + iconos)
+   con un degradado sólido arriba → transparente abajo, fundiéndose con
+   Explorar. Las etiquetas y el grid NO se mueven al abrirlo. Vive fuera del
    header a propósito: el backdrop-filter del header rompía el containing
-   block del position:fixed y lo mostraba encima del header.
-   Sin relleno sólido: degradado INVERSO al de otras secciones (sólido
-   arriba → transparente abajo) para fundirse con Explorar como una sola
-   sección. */
+   block del position:fixed y lo mostraba encima del header. */
 #search-panel {
     position: fixed;
-    top: calc(64px + var(--status-bar-height, 24px));
+    top: 0;                                 /* desde la posición de la lupa (header) */
     left: 0;
     right: 0;
     bottom: auto;
     height: auto;
-    max-height: calc(100vh - var(--status-bar-height, 24px) - 64px - 60px);
+    max-height: calc(100vh - 60px);
     background: linear-gradient(to bottom,
         rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.95) 30%,
-        rgba(255, 255, 255, 0.65) 55%,
-        rgba(255, 255, 255, 0.25) 78%,
-        rgba(255, 255, 255, 0) 92%);
+        rgba(255, 255, 255, 0.98) 22%,
+        rgba(255, 255, 255, 0.85) 40%,
+        rgba(255, 255, 255, 0.4) 68%,
+        rgba(255, 255, 255, 0) 88%);
     z-index: 1100;
+    /* Se despliega desde el header con un deslizamiento hacia abajo */
+    animation: searchPanelIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes searchPanelIn {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
 }
 [data-theme="dark"] #search-panel {
     background: linear-gradient(to bottom,
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.95) 30%,
-        rgba(0, 0, 0, 0.65) 55%,
-        rgba(0, 0, 0, 0.25) 78%,
-        rgba(0, 0, 0, 0) 92%);
+        rgba(0, 0, 0, 0.98) 22%,
+        rgba(0, 0, 0, 0.85) 40%,
+        rgba(0, 0, 0, 0.4) 68%,
+        rgba(0, 0, 0, 0) 88%);
 }
 @media (max-width: 768px) {
     #search-panel {
-        top: calc(60px + var(--status-bar-height, 24px));
-        max-height: calc(100vh - var(--status-bar-height, 24px) - 60px - 60px);
+        top: 0;
+        max-height: calc(100vh - 60px);
     }
 }
 
