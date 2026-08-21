@@ -178,7 +178,7 @@ function actualizarVisibilidadIconosHeader(section) {
     // (etiquetas y grid vuelven a su posición normal). La sección Explorar
     // (galeria-publica) las gestiona busqueda.js / activarExplorar.
     if (!section || section.id !== 'galeria-publica') {
-        document.body.classList.remove('search-abierto', 'search-escribiendo');
+        document.body.classList.remove('search-abierto', 'search-escribiendo', 'search-panel-abierto');
         const panelBusqueda = document.getElementById('search-panel');
         if (panelBusqueda) {
             panelBusqueda.classList.add('hidden');

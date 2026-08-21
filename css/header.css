@@ -518,9 +518,10 @@ picture {
     gap: 2px;
     padding: 4px 0;
 }
-/* Con el carrusel de etiquetas visible, los resultados bajan para no taparlo */
+/* Con el buscador abierto, las etiquetas quedan debajo de su barra y los
+   resultados bajan para no taparlas */
 body.search-con-etiquetas .search-panel-results {
-    top: 68px; /* justo debajo de la barra del buscador (las etiquetas quedan detrás del panel) */
+    top: calc(68px + var(--tags-carrusel-h)); /* barra 68px + etiquetas */
 }
 
 /* ==============================================
@@ -631,7 +632,7 @@ body.search-escribiendo #toggle-panel {
 .tags-carrusel {
     display: none;
     position: fixed;
-    top: calc(64px + var(--status-bar-height, 24px)); /* bajo el header: Explorar ya no muestra el buscador arriba */
+    top: calc(132px + var(--status-bar-height, 24px)); /* con el buscador abierto: debajo de su barra */
     left: 0;
     right: 0;
     z-index: 900;
@@ -645,6 +646,11 @@ body.search-escribiendo #toggle-panel {
     scrollbar-width: none;
     -ms-overflow-style: none;
     touch-action: pan-x;
+    transition: top 0.25s ease; /* al abrir/cerrar el buscador bajan/suben suaves */
+}
+/* Explorar SIN buscador: etiquetas justo bajo el header */
+body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
+    top: calc(64px + var(--status-bar-height, 24px));
 }
 /* Solo visible cuando el buscador está abierto y hay etiquetas */
 body.search-abierto .tags-carrusel:not(.hidden) {
@@ -652,6 +658,9 @@ body.search-abierto .tags-carrusel:not(.hidden) {
 }
 @media (max-width: 768px) {
     .tags-carrusel {
+        top: calc(128px + var(--status-bar-height, 24px));
+    }
+    body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
         top: calc(60px + var(--status-bar-height, 24px));
     }
 }
@@ -721,13 +730,20 @@ body.search-abierto .tags-carrusel:not(.hidden) {
    velo de opacidad (z 1000) lo tapa como al grid (z 900 < 1000). */
 
 /* El grid baja cuando el carrusel de etiquetas está visible, para que los
-   chips no se solapen con la primera fila de cavents. Explorar ya no muestra
-   el buscador arriba: el grid queda justo bajo el header + etiquetas. */
-body.search-abierto.search-con-etiquetas #galeria-container {
+   chips no se solapen con la primera fila de cavents.
+   - Con el buscador abierto: header + barra + etiquetas.
+   - Explorar sin buscador: header + etiquetas. */
+body.search-panel-abierto.search-con-etiquetas #galeria-container {
+    top: calc(132px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+}
+body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
     top: calc(64px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
 }
 @media (max-width: 768px) {
-    body.search-abierto.search-con-etiquetas #galeria-container {
+    body.search-panel-abierto.search-con-etiquetas #galeria-container {
+        top: calc(128px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+    }
+    body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
         top: calc(60px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
     }
 }

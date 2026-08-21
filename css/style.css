@@ -1,10 +1,10 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=963cb19331');
+@import url('header.css?v=877180e03e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=9981b072f3');
+@import url('galeria-publica.css?v=405346e6eb');
 
 /* Chat global + privado */
 @import url('chat.css?v=25de70682f');
@@ -1129,9 +1129,13 @@ input, select, textarea {
         box-sizing: border-box;
     }
 
-    /* Explorar (grid) sin buscador arriba: el grid queda justo bajo el header */
-    body.search-abierto #galeria-container {
+    /* Explorar: grid justo bajo el header (sin buscador) */
+    body.search-abierto:not(.search-panel-abierto) #galeria-container {
         top: calc(64px + var(--status-bar-height, 24px));
+    }
+    /* Con el buscador abierto, el grid baja debajo de la barra (header 64px + barra 68px) */
+    body.search-panel-abierto #galeria-container {
+        top: calc(132px + var(--status-bar-height, 24px));
     }
 
     #galeria-publica,
@@ -1175,9 +1179,13 @@ input, select, textarea {
         padding-top: calc(60px + var(--status-bar-height, 24px));
     }
 
-    /* Explorar (grid) sin buscador arriba (móvil): grid justo bajo el header */
-    body.search-abierto #galeria-container {
+    /* Explorar (móvil): grid justo bajo el header (sin buscador) */
+    body.search-abierto:not(.search-panel-abierto) #galeria-container {
         top: calc(60px + var(--status-bar-height, 24px));
+    }
+    /* Con el buscador abierto (móvil): grid debajo de la barra */
+    body.search-panel-abierto #galeria-container {
+        top: calc(128px + var(--status-bar-height, 24px));
     }
 
     .notif-panel {
