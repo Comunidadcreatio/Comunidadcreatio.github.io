@@ -9,7 +9,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=a675f4d997';
+} from './biometric-login.js?v=8630c4e062';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -857,9 +857,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await login(email, password);
                 if (result.success) {
                     setButtonLoading(submitBtn, false);
-                    // ¿Guardar el inicio de sesión en este dispositivo? (solo se
-                    // pregunta si aún no hay una sesión guardada).
-                    if (!haySesionGuardada()) {
+                    // ¿Guardar el inicio de sesión en este dispositivo?
+                    // Se pregunta cuando NO hay sesión guardada o cuando la
+                    // sesión guardada pertenece a OTRA cuenta (para no
+                    // sobrescribirla en silencio).
+                    const identGuardada = obtenerIdentidadUsuario();
+                    const mismaCuenta = !!identGuardada && identGuardada.email === email;
+                    if (!haySesionGuardada() || !mismaCuenta) {
                         const guardar = await showConfirmChoice(
                             '¿Deseas guardar tu inicio de sesión en este dispositivo?',
                             'Sí', 'No'
@@ -875,16 +879,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                 try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
                             }
                         } else {
-                            // "No": solo sesión normal (se borra cualquier guardado previo)
-                            borrarSesionGuardada();
+                            // "No": no guardar ESTA cuenta. Si había otra cuenta
+                            // guardada, se conserva (el avatar seguirá mostrándola).
+                            if (!haySesionGuardada()) borrarSesionGuardada();
                             try { localStorage.removeItem('creatio_auth_token_persist'); } catch (e) {}
                         }
                     } else {
-                        // Ya había sesión guardada: refrescar credenciales e identidad
-                        const ident = obtenerIdentidadUsuario();
+                        // La misma cuenta ya estaba guardada: refrescar en silencio
                         await guardarSesionEnDispositivo(email, password,
-                            (ident && ident.nombre) || email.split('@')[0],
-                            (ident && ident.foto) || '');
+                            identGuardada.nombre || email.split('@')[0],
+                            identGuardada.foto || '');
                         if (result.token) {
                             try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
                         }

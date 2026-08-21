@@ -133,7 +133,7 @@ export async function guardarSesionEnDispositivo(email, password, nombre, foto) 
     try {
         const enc = await cifrar(JSON.stringify({ email, password }));
         localStorage.setItem(CREDS_KEY, JSON.stringify(enc));
-        localStorage.setItem(IDENTIDAD_KEY, JSON.stringify({ nombre: nombre || email.split('@')[0], foto: foto || '' }));
+        localStorage.setItem(IDENTIDAD_KEY, JSON.stringify({ nombre: nombre || email.split('@')[0], foto: foto || '', email }));
     } catch (e) {
         try { localStorage.removeItem(CREDS_KEY); } catch (_) {}
         return { success: false, error: 'No se pudo guardar la sesión en este dispositivo.' };
