@@ -1,5 +1,5 @@
 // js/auth.js
-import { ARTISTA_KEY, AUTH_TOKEN_KEY, apiRequest } from './config.js?v=3cac708192';
+import { ARTISTA_KEY, AUTH_TOKEN_KEY, AUTH_TOKEN_PERSIST_KEY, apiRequest } from './config.js?v=25d77e47b8';
 import { debugLog } from './utils.js?v=f1ecb334f1';
 
 // Timestamp de última actividad del usuario (compartido con main.js y perfil.js)
@@ -71,6 +71,14 @@ export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
     localStorage.removeItem('DEBUG');
     try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) { /* silencioso */ }
+    // Cerrar sesión EXPLÍCITAMENTE: se olvida la sesión persistente y se marca
+    // que NO debe reanudarse automáticamente al reabrir (las credenciales
+    // recordadas + biometría se conservan para que el usuario pueda entrar
+    // de nuevo con huella/patrón/PIN o contraseña desde la página de login).
+    try {
+        localStorage.removeItem(AUTH_TOKEN_PERSIST_KEY);
+        localStorage.setItem('creatio_olvido_explicito', '1');
+    } catch (e) { /* silencioso */ }
     token = false;
     artistaActual = null;
     document.dispatchEvent(new Event('userLogout'));

@@ -1,15 +1,15 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=5de8c64b23';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=f4fc5dd620';
+import { login, register } from './auth.js?v=056fec7bdd';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=25d77e47b8';
 import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js?v=53cd86fdba';
 import { mostrarErrores, debounce, debugLog } from './utils.js?v=f1ecb334f1';
 import { setupDarkModeToggle } from './theme.js?v=4207440b17'; // v67
 import {
     biometriaDisponible, biometriaRegistrada, hayCredencialesRecordadas,
     guardarCredencialesRecordadas, borrarCredencialesRecordadas,
-    obtenerCredencialesRecordadas, desbloquearConBiometria
-} from './biometric-login.js?v=2a384f1481';
+    obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
+} from './biometric-login.js?v=ba921f8c24';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -858,14 +858,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.success) {
                     setButtonLoading(submitBtn, false);
                     // "Recordarme": guardar credenciales cifradas (+ biometría si se pidió)
+                    // y PERSISTIR el token para que la sesión sobreviva al cerrar la app.
                     const recordarme = document.getElementById('login-recordarme')?.checked;
                     if (recordarme) {
                         const activarBio = document.getElementById('login-biometria')?.checked;
                         const res = await guardarCredencialesRecordadas(email, password, activarBio);
                         if (!res.success) showWarning(res.error);
+                        if (result.token) {
+                            try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
+                        }
                     } else {
                         borrarCredencialesRecordadas();
+                        try { localStorage.removeItem('creatio_auth_token_persist'); } catch (e) {}
                     }
+                    limpiarOlvidoExplicito();
                     showSuccess('¡Inicio de sesión exitoso!');
                     setTimeout(() => {
                         window.location.href = 'index.html';
@@ -1096,6 +1102,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await login(creds.email, creds.password);
             setButtonLoading(btnBio, false);
             if (result.success) {
+                // Renovar la sesión persistente (recordarme) tras entrar con biometría
+                if (result.token) {
+                    try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
+                }
+                limpiarOlvidoExplicito();
                 showSuccess('¡Inicio de sesión exitoso!');
                 setTimeout(() => { window.location.href = 'index.html'; }, 800);
             } else {

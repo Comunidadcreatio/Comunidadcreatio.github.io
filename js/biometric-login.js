@@ -16,6 +16,9 @@
 const CREDS_KEY = 'creatio_remembered_creds';   // { iv, data } AES-GCM cifrado
 const BIO_KEY = 'creatio_bio_key';              // clave AES-GCM (base64)
 const BIO_CRED_KEY = 'creatio_bio_cred';        // { rawId } credencial WebAuthn
+const OLVIDO_EXPLICITO_KEY = 'creatio_olvido_explicito'; // '1' si el usuario cerró sesión a propósito
+
+import { login } from './auth.js?v=056fec7bdd';
 
 // ---------- Utilidades base64 ----------
 function b64url(bytes) {
@@ -184,4 +187,39 @@ export async function desbloquearConBiometria() {
 // Elimina SOLO la biometría registrada (mantiene las credenciales recordadas).
 export function borrarBiometria() {
     try { localStorage.removeItem(BIO_CRED_KEY); } catch (e) {}
+}
+
+// ---------- Reanudación de sesión al reabrir la app ----------
+
+// ¿El usuario cerró sesión explícitamente? (no reanudar automáticamente)
+export function huboOlvidoExplicito() {
+    try { return localStorage.getItem(OLVIDO_EXPLICITO_KEY) === '1'; } catch (e) { return false; }
+}
+
+export function limpiarOlvidoExplicito() {
+    try { localStorage.removeItem(OLVIDO_EXPLICITO_KEY); } catch (e) {}
+}
+
+// Intenta reanudar la sesión de forma silenciosa con las credenciales
+// recordadas (la sesión del backend caducó al reabrir la app). Devuelve true
+// si el usuario quedó autenticado. NO se usa si hubo un cierre de sesión
+// explícito (respetar la decisión del usuario).
+export async function intentarReanudarSesionRecordada() {
+    if (huboOlvidoExplicito()) return false;
+    if (!hayCredencialesRecordadas()) return false;
+    try {
+        const creds = await obtenerCredencialesRecordadas();
+        if (!creds) return false;
+        const result = await login(creds.email, creds.password);
+        if (result.success) {
+            if (result.token) {
+                try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
+            }
+            limpiarOlvidoExplicito();
+            return true;
+        }
+        return false;
+    } catch (e) {
+        return false;
+    }
 }

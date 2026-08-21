@@ -4,14 +4,29 @@ import { debugLog } from './utils.js?v=f1ecb334f1';
 export const API_BASE_URL = 'https://backend-fundacion-atpe.onrender.com';
 export const ARTISTA_KEY = 'artistaData';
 export const AUTH_TOKEN_KEY = 'creatio_auth_token';
+// Token persistente cuando el usuario marca "Recordarme": vive en localStorage
+// (sobrevive al cierre de la pestaña/WebView) y se usa como respaldo al abrir
+// la app de nuevo, mientras el JWT siga siendo válido en el backend.
+export const AUTH_TOKEN_PERSIST_KEY = 'creatio_auth_token_persist';
 
 // Token de sesión para navegador (fallback al cookie HttpOnly).
 // Chrome bloquea la cookie de terceros (frontend en vercel.app/github.io →
 // API en onrender.com es cross-site), así que en navegador enviamos
 // Authorization: Bearer con el token en sessionStorage (se borra al cerrar
 // la pestaña; el APK Android sigue usando la cookie).
+// Con "Recordarme" también existe el token persistente en localStorage: si la
+// sesión de la pestaña se perdió, se usa ese (y se migra a sessionStorage).
 export function getAuthToken() {
-    try { return sessionStorage.getItem(AUTH_TOKEN_KEY) || ''; } catch (e) { return ''; }
+    try {
+        const ses = sessionStorage.getItem(AUTH_TOKEN_KEY);
+        if (ses) return ses;
+        const persist = localStorage.getItem(AUTH_TOKEN_PERSIST_KEY);
+        if (persist) {
+            try { sessionStorage.setItem(AUTH_TOKEN_KEY, persist); } catch (e) {}
+            return persist;
+        }
+        return '';
+    } catch (e) { return ''; }
 }
 
 // NOTA: El token JWT ya no se guarda en localStorage.
