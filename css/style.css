@@ -4,14 +4,14 @@
 @import url('header.css?v=b5f4394d9e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=1cba724a4a');
+@import url('galeria-publica.css?v=b7fcbaa10f');
 
 /* Chat global + privado */
 @import url('chat.css?v=25de70682f');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=7365282861');
+@import url('panel-artista.css?v=afc9c82dac');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=ab0b7c97d0');
@@ -566,19 +566,21 @@ input, select, textarea {
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Estado activo (azul): SVG con relleno azul cielo, indicador visible */
+/* Estado activo: SOLO la barrita indicadora (color neutro ink, sin azul).
+   El icono mantiene su color normal al estar activo — se elimina el
+   efecto azul que aparecía al presionar Cavents/Problogs. */
 .toggle-nav-btn.nav-btn-active {
-    color: #5BA0D9;
+    color: inherit;
 }
 
 .toggle-nav-btn.nav-btn-active svg {
-    fill: #5BA0D9;
-    stroke: none;
+    fill: none;
+    stroke: currentColor;
 }
 
 .toggle-nav-btn.nav-btn-active::after {
     transform: translateX(-50%) scaleX(1);
-    background: #5BA0D9;
+    background: var(--color-ink);
 }
 
 /* Estado grid (amarillo): SVG con relleno amarillo, indicador amarillo */

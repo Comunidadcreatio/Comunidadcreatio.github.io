@@ -201,12 +201,18 @@ html, body {
     flex: 1;                        /* Ocupa todo el espacio entre fila artista y barra métricas */
     overflow: hidden;
     min-height: 0;
+    /* La imagen se muestra con su ASPECTO REAL (4:5 o 1:1 según lo subido),
+       centrada en la tarjeta, no estirada al espacio disponible */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .obra-carousel-viewport {
     width: 100%;
-    height: 100%;                   /* Llena el espacio vertical del carrusel */
-    aspect-ratio: auto;             /* Quita ratio fijo, usa el espacio disponible */
+    height: auto;                   /* La altura la define el aspect-ratio real de la imagen */
+    aspect-ratio: 4 / 5;            /* Fallback mientras carga; JS lo ajusta al ratio real */
+    max-height: 100%;
     overflow: hidden;
     border-radius: 0;
     background: var(--color-gray-100);
@@ -428,8 +434,9 @@ html, body {
 
     .obra-carousel-viewport {
         border-radius: 0;
-        height: 100%;
-        aspect-ratio: auto;
+        height: auto;               /* respeta el aspect-ratio real de la imagen */
+        aspect-ratio: 4 / 5;        /* fallback; JS lo ajusta al ratio real */
+        max-height: 100%;
     }
 
     .obra-artista-row {

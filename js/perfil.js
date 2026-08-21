@@ -8,7 +8,7 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=d86e42a5e7';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=a4a9fb01dd';
+import { setupViewTracking } from './galeria.js?v=bf9c7eced3';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -579,6 +579,19 @@ function renderizarGridObras(obras, container) {
                 window.abrirObraDesdePerfil(obra.id);
             }
         });
+
+        // La tarjeta debe tener el MISMO aspecto que la imagen subida (4:5 o
+        // 1:1 según cómo la recortó el usuario al crearla). El ratio no viaja
+        // en el backend, así que se detecta de la primera imagen real.
+        if (primeraImg) {
+            const probe = new Image();
+            probe.onload = () => {
+                const w = probe.naturalWidth, h = probe.naturalHeight;
+                if (w && h) card.style.aspectRatio = String(w / h);
+            };
+            probe.src = primeraImg;
+            if (probe.complete && probe.naturalWidth) probe.onload();
+        }
 
         grid.appendChild(card);
     });

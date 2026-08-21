@@ -1039,13 +1039,18 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
     width: 100%;
+    /* Cada tarjeta conserva su propia altura (aspect-ratio real de la imagen
+       4:5 o 1:1): sin stretch a la tarjeta más alta de la fila. */
+    align-items: start;
 }
 
 .perfil-obra-card {
     position: relative;
     cursor: pointer;
     overflow: hidden;
-    aspect-ratio: 9 / 16;
+    /* Fallback mientras carga la imagen; JS lo ajusta al ratio real de la
+       primera imagen (4:5 o 1:1 según cómo la subió el usuario). */
+    aspect-ratio: 4 / 5;
     background: var(--color-gray-100);
 }
 

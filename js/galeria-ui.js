@@ -2,10 +2,10 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a4a9fb01dd';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=6b8d501b48';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=bf9c7eced3';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=137a32b43c';
 import { artistaActual, token } from './auth.js?v=30e2869c22';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=752ad4dcf0';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=e4d3759661';
 import { confirmarDescartarCambios } from './panel-ui.js?v=2f5f9fb29f';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
@@ -43,6 +43,21 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     if (isTransitioning) return;
     if (!sectionEntrante) return;
     if (sectionSaliente === sectionEntrante) return;
+
+    // Al salir de Explorar (grid + etiquetas) hacia OTRA sección, ocultar las
+    // etiquetas INMEDIATAMENTE, igual que el grid: quitar search-abierto al
+    // iniciar la transición. Antes se quitaba al terminar (en mostrarSeccion)
+    // y las etiquetas (fixed bajo el header) quedaban visibles unos segundos,
+    // bajándose y cortadas sobre la sección nueva.
+    if (document.body.classList.contains('search-abierto') &&
+        sectionSaliente && sectionSaliente.id === 'galeria-publica') {
+        document.body.classList.remove('search-abierto', 'search-escribiendo');
+        const tags = document.getElementById('tags-carrusel');
+        if (tags) {
+            tags.classList.add('hidden');
+            tags.style.transform = ''; // limpiar un translateY residual del PTR
+        }
+    }
 
     isTransitioning = true;
 
@@ -489,6 +504,12 @@ async function activarExplorar() {
             ptrReparent(galeriaContainerLocal); // a Explorar: indicador en la sección
         }
         actualizarEstadoNavButtons();
+        // Las etiquetas dependen de las obras YA cargadas (obrasGrid) y de que
+        // search-abierto esté activo: renderizarlas SIEMPRE al entrar en
+        // Explorar, también desde el carrusel (antes solo se hacía al mostrar
+        // la galería desde otra sección y a veces quedaban ocultas).
+        resetEtiquetas();
+        renderEtiquetasCarrusel();
         // Esperar al siguiente frame para que el CSS de la transición se aplique
         requestAnimationFrame(() => {
             requestAnimationFrame(() => { gridEntering = false; });
