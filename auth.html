@@ -17,7 +17,7 @@
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="stylesheet" href="css/style.css?v=042e068c74">
-    <link rel="stylesheet" href="css/auth.css?v=b763274cd5">
+    <link rel="stylesheet" href="css/auth.css?v=f093298a12">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -138,23 +138,17 @@
                                 <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" required data-required="true">
                                 <button type="button" class="toggle-password" data-target="login-pass" aria-label="Mostrar contraseña"></button>
                             </div>
-                            <p class="forgot-password" style="margin:0 0 8px 0;">
+                            <p class="forgot-password" style="margin:0 0 12px 0;">
                                 <a href="#" id="btn-olvide-contrasena">¿Olvidaste tu contraseña?</a>
                             </p>
-                            <label class="recordarme-row" style="display:flex;align-items:center;gap:8px;margin:0 0 6px 0;cursor:pointer;font-size:13px;">
-                                <input type="checkbox" id="login-recordarme" style="width:16px;height:16px;margin:0;accent-color:var(--color-ink, #1a1a1a);">
-                                <span>Recordarme en este dispositivo</span>
-                            </label>
-                            <label class="recordarme-row" id="login-biometria-row" style="display:none;align-items:center;gap:8px;margin:0 0 12px 0;cursor:pointer;font-size:13px;">
-                                <input type="checkbox" id="login-biometria" style="width:16px;height:16px;margin:0;accent-color:var(--color-ink, #1a1a1a);">
-                                <span>Iniciar sesión con huella, patrón o PIN</span>
-                            </label>
                             <button type="submit" style="margin-bottom:6px;">Entrar</button>
                         </form>
-                        <!-- Botón de inicio biométrico (visible si hay credenciales recordadas + biometría registrada) -->
-                        <div id="login-biometrico-wrapper" class="hidden" style="text-align:center;margin-top:10px;">
-                            <button type="button" id="btn-login-biometrico" class="secondary-btn" style="width:100%;margin:0 0 6px 0;">
-                                Iniciar sesión con huella, patrón o PIN
+                        <!-- Reingreso con sesión guardada: avatar + nombre, entra con huella/patrón/PIN -->
+                        <div id="login-biometrico-wrapper" class="hidden" style="text-align:center;margin-top:12px;">
+                            <div class="auth-biometrico-divider"><span>o continúa con tu sesión guardada</span></div>
+                            <button type="button" id="btn-login-biometrico" class="btn-login-biometrico" aria-label="Iniciar sesión con huella, patrón o PIN">
+                                <img id="login-bio-avatar" src="iconos/avatar-default.svg" alt="" class="login-bio-avatar">
+                                <span id="login-bio-nombre" class="login-bio-nombre">Usuario</span>
                             </button>
                         </div>
                         <button id="btn-volver-landing" class="secondary-btn" style="margin-top:0;">← Volver</button>
@@ -330,7 +324,7 @@
     <!-- Ciudades y banderas compartidas (registro + chat) -->
     <script src="js/ciudades.js?v=b803270665"></script>
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=5374362fba"></script>
+    <script type="module" src="js/auth-logic.js?v=6ea266eeb9"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>

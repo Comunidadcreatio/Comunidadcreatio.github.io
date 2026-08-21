@@ -1,15 +1,15 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=056fec7bdd';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=25d77e47b8';
-import { showSuccess, showError, showWarning, setButtonLoading } from './notificaciones.js?v=53cd86fdba';
-import { mostrarErrores, debounce, debugLog } from './utils.js?v=f1ecb334f1';
+import { login, register } from './auth.js?v=30e2869c22';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=2e0c2e7288';
+import { showSuccess, showError, showWarning, showInfo, setButtonLoading, showConfirmChoice } from './notificaciones.js?v=d2867c8ca0';
+import { mostrarErrores, debounce, debugLog } from './utils.js?v=d86e42a5e7';
 import { setupDarkModeToggle } from './theme.js?v=4207440b17'; // v67
 import {
-    biometriaDisponible, biometriaRegistrada, hayCredencialesRecordadas,
-    guardarCredencialesRecordadas, borrarCredencialesRecordadas,
+    biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
+    guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=ba921f8c24';
+} from './biometric-login.js?v=8d68ee9302';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -857,19 +857,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await login(email, password);
                 if (result.success) {
                     setButtonLoading(submitBtn, false);
-                    // "Recordarme": guardar credenciales cifradas (+ biometría si se pidió)
-                    // y PERSISTIR el token para que la sesión sobreviva al cerrar la app.
-                    const recordarme = document.getElementById('login-recordarme')?.checked;
-                    if (recordarme) {
-                        const activarBio = document.getElementById('login-biometria')?.checked;
-                        const res = await guardarCredencialesRecordadas(email, password, activarBio);
-                        if (!res.success) showWarning(res.error);
+                    // ¿Guardar el inicio de sesión en este dispositivo? (solo se
+                    // pregunta si aún no hay una sesión guardada).
+                    if (!haySesionGuardada()) {
+                        const guardar = await showConfirmChoice(
+                            '¿Deseas guardar tu inicio de sesión en este dispositivo?',
+                            'Sí', 'No'
+                        );
+                        if (guardar) {
+                            const nombre = (result.artista && result.artista.nombre_artista) || email.split('@')[0];
+                            const foto = (result.artista && result.artista.foto_perfil) || '';
+                            const res = await guardarSesionEnDispositivo(email, password, nombre, foto);
+                            if (!res.success) showWarning(res.error);
+                            else if (res.bioWarning) showInfo(res.bioWarning);
+                            // Persistir el token: la sesión sobrevive al cerrar la app
+                            if (result.token) {
+                                try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
+                            }
+                        } else {
+                            // "No": solo sesión normal (se borra cualquier guardado previo)
+                            borrarSesionGuardada();
+                            try { localStorage.removeItem('creatio_auth_token_persist'); } catch (e) {}
+                        }
+                    } else {
+                        // Ya había sesión guardada: refrescar credenciales e identidad
+                        const ident = obtenerIdentidadUsuario();
+                        await guardarSesionEnDispositivo(email, password,
+                            (ident && ident.nombre) || email.split('@')[0],
+                            (ident && ident.foto) || '');
                         if (result.token) {
                             try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
                         }
-                    } else {
-                        borrarCredencialesRecordadas();
-                        try { localStorage.removeItem('creatio_auth_token_persist'); } catch (e) {}
                     }
                     limpiarOlvidoExplicito();
                     showSuccess('¡Inicio de sesión exitoso!');
@@ -1053,38 +1071,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// INICIO DE SESIÓN BIOMÉTRICO (huella/patrón/PIN)
+// REINGRESO CON SESIÓN GUARDADA (avatar + nombre)
 // ============================================
 
-// Muestra/oculta la opción "Iniciar sesión con huella, patrón o PIN" según:
-//  - WebAuthn disponible en el dispositivo, y
-//  - existan credenciales recordadas con biometría registrada.
+// Muestra debajo del formulario el avatar + nombre del usuario con sesión
+// guardada. Al pulsarlo se pide la verificación del sistema (huella/patrón/PIN)
+// y se reingresa automáticamente. Requiere: WebAuthn disponible + sesión
+// guardada + biometría registrada.
 function actualizarUIbiometrica() {
-    const filaBio = document.getElementById('login-biometria-row');
-    if (filaBio) {
-        const chkRecordarme = document.getElementById('login-recordarme');
-        filaBio.style.display = (biometriaDisponible() && chkRecordarme && chkRecordarme.checked) ? 'flex' : 'none';
-    }
     const wrapper = document.getElementById('login-biometrico-wrapper');
-    if (wrapper) {
-        const mostrar = biometriaDisponible() && hayCredencialesRecordadas() && biometriaRegistrada();
-        wrapper.classList.toggle('hidden', !mostrar);
-    }
+    if (!wrapper) return;
+    const ident = obtenerIdentidadUsuario();
+    const mostrar = biometriaDisponible() && haySesionGuardada() && biometriaRegistrada() && ident;
+    wrapper.classList.toggle('hidden', !mostrar);
+    if (!mostrar) return;
+    const img = document.getElementById('login-bio-avatar');
+    if (img) img.src = (ident.foto && ident.foto.startsWith('http')) ? ident.foto : 'iconos/avatar-default.svg';
+    const nombre = document.getElementById('login-bio-nombre');
+    if (nombre) nombre.textContent = ident.nombre;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     actualizarUIbiometrica();
 
-    // Al marcar "Recordarme" se muestra la opción de biometría
-    const chkRecordarme = document.getElementById('login-recordarme');
-    if (chkRecordarme) {
-        chkRecordarme.addEventListener('change', () => {
-            const filaBio = document.getElementById('login-biometria-row');
-            if (filaBio) filaBio.style.display = (chkRecordarme.checked && biometriaDisponible()) ? 'flex' : 'none';
-        });
-    }
-
-    // Botón "Iniciar sesión con huella, patrón o PIN"
+    // Botón avatar + nombre: entra con huella/patrón/PIN
     const btnBio = document.getElementById('btn-login-biometrico');
     if (btnBio) {
         btnBio.addEventListener('click', async () => {
@@ -1102,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await login(creds.email, creds.password);
             setButtonLoading(btnBio, false);
             if (result.success) {
-                // Renovar la sesión persistente (recordarme) tras entrar con biometría
+                // Renovar la sesión persistente tras reingresar con biometría
                 if (result.token) {
                     try { localStorage.setItem('creatio_auth_token_persist', result.token); } catch (e) {}
                 }
@@ -1110,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showSuccess('¡Inicio de sesión exitoso!');
                 setTimeout(() => { window.location.href = 'index.html'; }, 800);
             } else {
-                borrarCredencialesRecordadas();
+                borrarSesionGuardada();
                 actualizarUIbiometrica();
                 mostrarErrores(result);
             }

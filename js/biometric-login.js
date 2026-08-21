@@ -1,24 +1,27 @@
 // js/biometric-login.js
-// "Recordarme en este dispositivo" + inicio de sesión con los métodos de
-// seguridad del sistema Android (huella, patrón o PIN) vía WebAuthn.
+// Guardar el inicio de sesión en este dispositivo + reingreso con los métodos
+// de seguridad del sistema Android (huella, patrón o PIN) vía WebAuthn.
 //
 // Cómo funciona:
-//  - Al iniciar sesión con "recordarme", las credenciales se guardan
-//    CIFRADAS (AES-GCM) en localStorage (nunca en texto plano).
-//  - Si el usuario activa la biometría, se registra una credencial WebAuthn
-//    del autenticador de plataforma (Android Keystore / huella / patrón / PIN).
-//  - Para iniciar sesión, la app pide la verificación del sistema (el SO
-//    muestra el diálogo de huella/patrón/PIN); al confirmar, se descifran las
-//    credenciales guardadas y se hace el login normal contra el backend.
+//  - Al iniciar sesión, la app pregunta "¿Guardar tu sesión en este
+//    dispositivo?"; con "Sí" se guardan las credenciales CIFRADAS (AES-GCM)
+//    en localStorage (nunca en texto plano) junto con la identidad
+//    (avatar + nombre) para mostrarla en la página de login.
+//  - Se registra una credencial WebAuthn del autenticador de plataforma
+//    (Android Keystore / huella / patrón / PIN).
+//  - Para REINGRESAR tras cerrar sesión, la app muestra el avatar + nombre;
+//    al pulsarlo pide la verificación del sistema (diálogo de huella/patrón/
+//    PIN) y, al confirmar, descifra las credenciales y hace el login normal.
 //  - WebAuthn funciona en el WebView de Capacitor (Android) y en Chrome
 //    (Android/escritorio) sin necesidad de plugins nativos.
 
 const CREDS_KEY = 'creatio_remembered_creds';   // { iv, data } AES-GCM cifrado
 const BIO_KEY = 'creatio_bio_key';              // clave AES-GCM (base64)
 const BIO_CRED_KEY = 'creatio_bio_cred';        // { rawId } credencial WebAuthn
+const IDENTIDAD_KEY = 'creatio_remembered_user'; // { nombre, foto } avatar+nombre en el login
 const OLVIDO_EXPLICITO_KEY = 'creatio_olvido_explicito'; // '1' si el usuario cerró sesión a propósito
 
-import { login } from './auth.js?v=056fec7bdd';
+import { login } from './auth.js?v=30e2869c22';
 
 // ---------- Utilidades base64 ----------
 function b64url(bytes) {
@@ -91,26 +94,36 @@ export function biometriaRegistrada() {
     try { return !!localStorage.getItem(BIO_CRED_KEY); } catch (e) { return false; }
 }
 
-// ¿Hay credenciales recordadas en este dispositivo?
-export function hayCredencialesRecordadas() {
+// ¿Hay una sesión guardada en este dispositivo?
+export function haySesionGuardada() {
     try { return !!localStorage.getItem(CREDS_KEY); } catch (e) { return false; }
 }
 
-// Guarda (o borra) las credenciales recordadas. Si activarBio es true y
-// WebAuthn está disponible, registra la biometría del sistema.
-export async function guardarCredencialesRecordadas(email, password, activarBio) {
+// Guarda la sesión en este dispositivo (tras responder "Sí"):
+// credenciales cifradas + identidad (avatar+nombre) + biometría del sistema.
+export async function guardarSesionEnDispositivo(email, password, nombre, foto) {
     try {
         const enc = await cifrar(JSON.stringify({ email, password }));
         localStorage.setItem(CREDS_KEY, JSON.stringify(enc));
+        localStorage.setItem(IDENTIDAD_KEY, JSON.stringify({ nombre: nombre || email.split('@')[0], foto: foto || '' }));
     } catch (e) {
         try { localStorage.removeItem(CREDS_KEY); } catch (_) {}
-        return { success: false, error: 'No se pudo guardar las credenciales en este dispositivo.' };
+        return { success: false, error: 'No se pudo guardar la sesión en este dispositivo.' };
     }
-    if (activarBio) {
-        const reg = await registrarBiometria(email);
-        if (!reg.success) return reg;
+    // La biometría es la llave de reingreso: se registra (pide verificación una vez).
+    const reg = await registrarBiometria(nombre || email);
+    if (!reg.success) {
+        return { success: true, bioWarning: reg.error };
     }
     return { success: true };
+}
+
+// Identidad (avatar + nombre) para mostrar en la página de login.
+export function obtenerIdentidadUsuario() {
+    try {
+        const raw = localStorage.getItem(IDENTIDAD_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
 }
 
 export async function obtenerCredencialesRecordadas() {
@@ -126,9 +139,11 @@ export async function obtenerCredencialesRecordadas() {
     }
 }
 
-export function borrarCredencialesRecordadas() {
+// Borra la sesión guardada (credenciales + biometría + identidad).
+export function borrarSesionGuardada() {
     try { localStorage.removeItem(CREDS_KEY); } catch (e) {}
     try { localStorage.removeItem(BIO_CRED_KEY); } catch (e) {}
+    try { localStorage.removeItem(IDENTIDAD_KEY); } catch (e) {}
 }
 
 // Registra la biometría del sistema (pide verificación una vez: huella/patrón/PIN).
@@ -206,7 +221,7 @@ export function limpiarOlvidoExplicito() {
 // explícito (respetar la decisión del usuario).
 export async function intentarReanudarSesionRecordada() {
     if (huboOlvidoExplicito()) return false;
-    if (!hayCredencialesRecordadas()) return false;
+    if (!haySesionGuardada()) return false;
     try {
         const creds = await obtenerCredencialesRecordadas();
         if (!creds) return false;

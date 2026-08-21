@@ -184,3 +184,52 @@ export function showConfirm(message) {
         document.body.appendChild(overlay);
     });
 }
+
+/**
+ * Modal de confirmación con ETIQUETAS personalizadas (p.ej. "Sí" / "No").
+ * Devuelve una Promise que resuelve a true (okLabel) o false (cancelLabel).
+ */
+export function showConfirmChoice(message, okLabel = 'Aceptar', cancelLabel = 'Cancelar') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'confirm-overlay';
+        overlay.innerHTML = `
+            <div class="confirm-dialog">
+                <p class="confirm-message"></p>
+                <div class="confirm-actions">
+                    <button class="confirm-btn confirm-btn-cancel"></button>
+                    <button class="confirm-btn confirm-btn-ok"></button>
+                </div>
+            </div>
+        `;
+        overlay.querySelector('.confirm-message').textContent = message;
+        overlay.querySelector('.confirm-btn-cancel').textContent = cancelLabel;
+        overlay.querySelector('.confirm-btn-ok').textContent = okLabel;
+
+        const cleanup = () => {
+            overlay.classList.add('confirm-closing');
+            setTimeout(() => overlay.remove(), 200);
+        };
+
+        overlay.querySelector('.confirm-btn-ok').addEventListener('click', () => {
+            cleanup();
+            resolve(true);
+        });
+        overlay.querySelector('.confirm-btn-cancel').addEventListener('click', () => {
+            cleanup();
+            resolve(false);
+        });
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) { cleanup(); resolve(false); }
+        });
+        document.addEventListener('keydown', function onEsc(e) {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', onEsc);
+                cleanup();
+                resolve(false);
+            }
+        });
+
+        document.body.appendChild(overlay);
+    });
+}
