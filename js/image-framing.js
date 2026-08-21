@@ -1,8 +1,10 @@
 // js/image-framing.js
 // Encuadre MANUAL de la imagen dentro del marco 4:5 o 1:1:
-// el usuario acerca/aleja con dos dedos (pinch) y mueve con uno (pan) hasta
-// dejar la imagen en la posición que más le guste. Al aplicar, se renderiza
-// la región visible a resolución completa (1080px de alto).
+//  - Pinch con DOS dedos: acercar/alejar (escala).
+//  - Giro con DOS dedos: rotar la imagen (presión/rotación).
+//  - Un dedo: mover (pan).
+// La imagen SIEMPRE cubre el marco (la escala mínima se adapta al ángulo).
+// Al aplicar, se renderiza la región visible a resolución completa (1080px).
 
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
@@ -14,6 +16,14 @@ function cargarImagen(origen) {
         img.onerror = () => reject(new Error('No se pudo cargar la imagen'));
         img.src = url;
     });
+}
+
+// Dimensiones de la caja (bounding box) de la imagen rotada, en unidades de
+// ancho/alto de la imagen original (sin escala).
+function cajaRotada(iw, ih, r) {
+    const cos = Math.abs(Math.cos(r));
+    const sin = Math.abs(Math.sin(r));
+    return { bw: iw * cos + ih * sin, bh: iw * sin + ih * cos };
 }
 
 /**
@@ -37,7 +47,7 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
         .img-cuadro-hint{padding:6px 16px 0;font-size:11px;color:var(--color-gray-500,#737373);text-align:center;}
         .img-cuadro-viewport-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#141414;padding:14px;overflow:hidden;}
         .img-cuadro-viewport{position:relative;overflow:hidden;border-radius:10px;touch-action:none;box-shadow:0 0 0 1px rgba(255,255,255,0.15);}
-        .img-cuadro-viewport img{position:absolute;top:0;left:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none;pointer-events:none;max-width:none;max-height:none;}
+        .img-cuadro-viewport img{position:absolute;top:0;left:0;transform-origin:center;user-select:none;-webkit-user-drag:none;pointer-events:none;max-width:none;max-height:none;}
         .img-cuadro-foot{display:flex;gap:10px;padding:10px 16px 14px;border-top:1px solid var(--color-gray-200,#e8e8e8);}
         .img-cuadro-btn{flex:1;padding:10px;border-radius:12px;border:1px solid var(--color-gray-300,#d4d4d4);background:transparent;color:var(--color-ink,#1a1a1a);font-weight:700;font-family:inherit;cursor:pointer;font-size:14px;}
         .img-cuadro-btn.primary{background:var(--color-ink,#1a1a1a);color:var(--color-white,#fff);border-color:var(--color-ink,#1a1a1a);}
@@ -48,7 +58,7 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
                 <span>Cuadrar imagen</span>
                 <button type="button" class="img-cuadro-close" aria-label="Cerrar">✕</button>
             </div>
-            <div class="img-cuadro-hint">Acerca con dos dedos y desliza con uno para encuadrar (${aspect === '1/1' ? '1:1' : '4:5'})</div>
+            <div class="img-cuadro-hint">Acerca/rota con dos dedos y desliza con uno para encuadrar (${aspect === '1/1' ? '1:1' : '4:5'})</div>
             <div class="img-cuadro-viewport-wrap">
                 <div class="img-cuadro-viewport">
                     <img alt="" draggable="false">
@@ -78,22 +88,31 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
     const releerDims = () => { dims = { vw: viewport.offsetWidth, vh: viewport.offsetHeight }; };
     window.addEventListener('resize', () => { releerDims(); aplicarTransformacion(true); });
 
-    // Estado del encuadre
+    // Estado del encuadre: centro de la imagen (cx, cy) en el marco, escala s,
+    // rotación r (radianes) alrededor del centro.
     let img = null;
     let iw = 0, ih = 0;
-    let s = 1, tx = 0, ty = 0;
-    const MIN_S = 1; // escala mínima = cubrir (se calcula al cargar)
+    let s = 1, cx = 0, cy = 0, r = 0;
+    const MAX_ZOOM = 6;
 
     function setTransform() {
-        imgEl.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + s + ')';
+        imgEl.style.transform =
+            'translate(' + (cx - iw / 2) + 'px, ' + (cy - ih / 2) + 'px) ' +
+            'rotate(' + (r * 180 / Math.PI) + 'deg) scale(' + s + ')';
     }
 
-    // Limita la posición para que la imagen SIEMPRE cubra el viewport
+    // Escala mínima para que la imagen (rotada) SIEMPRE cubra el marco
+    function escalaMinima() {
+        const caja = cajaRotada(iw, ih, r);
+        return Math.max(dims.vw / caja.bw, dims.vh / caja.bh);
+    }
+
     function clampPos() {
-        const maxX = (iw * s - dims.vw) / 2;
-        const maxY = (ih * s - dims.vh) / 2;
-        tx = clamp(tx, -maxX, maxX);
-        ty = clamp(ty, -maxY, maxY);
+        const caja = cajaRotada(iw, ih, r);
+        const maxX = (caja.bw * s) / 2;
+        const maxY = (caja.bh * s) / 2;
+        cx = clamp(cx, dims.vw - maxX, maxX);
+        cy = clamp(cy, dims.vh - maxY, maxY);
     }
     function aplicarTransformacion(soloClamp) {
         if (!soloClamp) clampPos();
@@ -101,14 +120,14 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
     }
 
     function centrar() {
-        const s0 = Math.max(dims.vw / iw, dims.vh / ih);
-        s = s0;
-        tx = (dims.vw - iw * s0) / 2;
-        ty = (dims.vh - ih * s0) / 2;
+        r = 0;
+        s = escalaMinima();
+        cx = dims.vw / 2;
+        cy = dims.vh / 2;
         setTransform();
     }
 
-    // Gestos táctiles
+    // Gestos táctiles: 1 dedo = mover, 2 dedos = acercar/rotar
     const dedos = new Map();
     let pinchBase = null, panBase = null;
 
@@ -117,12 +136,17 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
         for (const t of e.changedTouches) dedos.set(t.identifier, { x: t.clientX, y: t.clientY });
         if (dedos.size === 2) {
             const pts = [...dedos.values()];
-            const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-            pinchBase = { dist, s, tx, ty, midX: (pts[0].x + pts[1].x) / 2, midY: (pts[0].y + pts[1].y) / 2 };
+            pinchBase = {
+                dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
+                ang: Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x),
+                s, r, cx, cy,
+                midX: (pts[0].x + pts[1].x) / 2,
+                midY: (pts[0].y + pts[1].y) / 2
+            };
             panBase = null;
         } else if (dedos.size === 1) {
             const p = [...dedos.values()][0];
-            panBase = { x: p.x, y: p.y, tx, ty };
+            panBase = { x: p.x, y: p.y, cx, cy };
             pinchBase = null;
         }
     }, { passive: false });
@@ -135,17 +159,19 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
         if (dedos.size === 2 && pinchBase) {
             const pts = [...dedos.values()];
             const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+            const ang = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x);
             const midX = (pts[0].x + pts[1].x) / 2;
             const midY = (pts[0].y + pts[1].y) / 2;
-            const s0 = Math.max(dims.vw / iw, dims.vh / ih);
-            s = clamp(pinchBase.s * (dist / pinchBase.dist), s0, s0 * 6);
-            tx = pinchBase.tx + (midX - pinchBase.midX);
-            ty = pinchBase.ty + (midY - pinchBase.midY);
+            const sMin = escalaMinima();
+            s = clamp(pinchBase.s * (dist / pinchBase.dist), sMin, sMin * MAX_ZOOM);
+            r = pinchBase.r + (ang - pinchBase.ang); // rotación con el giro
+            cx = pinchBase.cx + (midX - pinchBase.midX);
+            cy = pinchBase.cy + (midY - pinchBase.midY);
             aplicarTransformacion();
         } else if (dedos.size === 1 && panBase) {
             const p = [...dedos.values()][0];
-            tx = panBase.tx + (p.x - panBase.x);
-            ty = panBase.ty + (p.y - panBase.y);
+            cx = panBase.cx + (p.x - panBase.x);
+            cy = panBase.cy + (p.y - panBase.y);
             aplicarTransformacion();
         }
     }, { passive: false });
@@ -161,21 +187,21 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
     // Soporte ratón (escritorio): arrastrar para mover, rueda para zoom
     let mouseBase = null;
     viewport.addEventListener('mousedown', (e) => {
-        mouseBase = { x: e.clientX, y: e.clientY, tx, ty };
+        mouseBase = { x: e.clientX, y: e.clientY, cx, cy };
         e.preventDefault();
     });
     window.addEventListener('mousemove', (e) => {
         if (!mouseBase) return;
-        tx = mouseBase.tx + (e.clientX - mouseBase.x);
-        ty = mouseBase.ty + (e.clientY - mouseBase.y);
+        cx = mouseBase.cx + (e.clientX - mouseBase.x);
+        cy = mouseBase.cy + (e.clientY - mouseBase.y);
         aplicarTransformacion();
     });
     window.addEventListener('mouseup', () => { mouseBase = null; });
     viewport.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const s0 = Math.max(dims.vw / iw, dims.vh / ih);
+        const sMin = escalaMinima();
         const factor = e.deltaY < 0 ? 1.12 : 0.89;
-        s = clamp(s * factor, s0, s0 * 6);
+        s = clamp(s * factor, sMin, sMin * MAX_ZOOM);
         aplicarTransformacion();
     }, { passive: false });
 
@@ -197,7 +223,7 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
         viewport.innerHTML = '<p style="color:#fff;text-align:center;padding:20px;">No se pudo cargar esta imagen para encuadrarla.</p>';
     });
 
-    // Aplicar: renderizar la región visible a resolución completa
+    // Aplicar: renderizar la región visible a resolución completa (con rotación)
     btnAplicar.addEventListener('click', () => {
         if (!img || btnAplicar.disabled) return;
         btnAplicar.disabled = true;
@@ -212,12 +238,17 @@ export function abrirCuadroImagen(imagen, aspect, onAplicar) {
                 const ctx = canvas.getContext('2d');
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, outW, outH);
-                // Región visible en píxeles de la imagen original
-                const sx = (0 - tx) / s;
-                const sy = (0 - ty) / s;
-                const sw = dims.vw / s;
-                const sh = dims.vh / s;
-                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+                // Mapear la vista (marco) al lienzo de salida: la imagen rotada
+                // y escalada se dibuja de modo que el centro de la imagen caiga
+                // en su posición (cx, cy) dentro del marco.
+                const k = outW / dims.vw;
+                const m = new DOMMatrix()
+                    .translate(cx * k, cy * k)
+                    .rotate(r * 180 / Math.PI)
+                    .scale(s * k, s * k)
+                    .translate(-iw / 2, -ih / 2);
+                ctx.setTransform(m);
+                ctx.drawImage(img, 0, 0);
                 canvas.toBlob((blob) => {
                     if (blob) onAplicar(blob);
                     cerrar();

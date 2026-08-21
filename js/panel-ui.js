@@ -8,7 +8,7 @@ import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
 import { abrirEditorImagen } from './image-editor.js?v=e05a0e5688';
-import { abrirCuadroImagen } from './image-framing.js?v=767aaf7430';
+import { abrirCuadroImagen } from './image-framing.js?v=dad422c2c2';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
