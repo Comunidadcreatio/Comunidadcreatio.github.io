@@ -7,7 +7,7 @@ import { token, artistaActual } from './auth.js?v=30e2869c22';
 import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5c6';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
-import { activarCuadroInline, activarEdicionInline, hayModoActivo } from './inline-image-tools.js?v=31d7d57231';
+import { activarCuadroInline, activarEdicionInline, hayModoActivo } from './inline-image-tools.js?v=60c7c9c35b';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -128,9 +128,12 @@ let imagenesData = []; // [{src, file, slot}] — datos de imágenes en el carru
 let currentSlide = 0;
 let aspectRatio = '4/5';
 
-// Marca visualmente un botón de herramienta como "modo activo" (verde = guardar)
+// Marca visualmente un botón de herramienta como "modo activo" (verde = guardar).
+// Además del fondo verde, cambia el icono: el icono "normal" se oculta y se
+// muestra el de GUARDAR (check) mediante la clase .modo-activo.
 function marcarBotonModo(btn, activo) {
     if (!btn) return;
+    btn.classList.toggle('modo-activo', !!activo);
     if (activo) {
         btn.style.background = 'rgba(46,125,50,0.95)';
         btn.setAttribute('aria-label', 'Guardar cambios');
@@ -184,7 +187,7 @@ function actualizarCarrusel() {
             btnCuadrar.className = 'btn-editar-slide btn-cuadrar-slide';
             btnCuadrar.dataset.labelNormal = 'Cuadrar imagen';
             btnCuadrar.setAttribute('aria-label', 'Cuadrar imagen');
-            btnCuadrar.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+            btnCuadrar.innerHTML = '<span class="icon-normal"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></span><span class="icon-check"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
             btnCuadrar.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (controlActivo && controlActivo._tipo === 'cuadrar') {
@@ -210,7 +213,7 @@ function actualizarCarrusel() {
             btnEdit.className = 'btn-editar-slide';
             btnEdit.dataset.labelNormal = 'Editar imagen';
             btnEdit.setAttribute('aria-label', 'Editar imagen');
-            btnEdit.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
+            btnEdit.innerHTML = '<span class="icon-normal"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span><span class="icon-check"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
             btnEdit.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (controlActivo && controlActivo._tipo === 'editar') {

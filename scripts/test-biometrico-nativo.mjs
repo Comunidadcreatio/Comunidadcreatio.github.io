@@ -32,7 +32,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           registerPlugin: (name, impl) => { window.__reg = name; },
           Plugins: {
               NativeBiometric: {
-                  verifyIdentity: async () => { window.__verifyLlamado++; return { verified: true }; }
+                  // El plugin real RESUELVE con void si se autentica (y RECHAZA si no)
+                  verifyIdentity: async (opts) => {
+                      window.__verifyLlamado++;
+                      window.__verifyOpciones = opts;
+                      if (window.__rechazarVerify) throw new Error('USER_CANCEL');
+                  }
               }
           }
       };
@@ -96,13 +101,32 @@ await sleep(500);
 console.log('avatar visible:', await evalJs(`!document.getElementById('login-biometrico-wrapper').classList.contains('hidden')`));
 console.log('nombre:', await evalJs(`document.getElementById('login-bio-nombre').textContent`));
 
-console.log('\n=== 4) Pulsar avatar → plugin verifyIdentity → login ===');
+console.log('\n=== 4) Pulsar avatar → plugin verifyIdentity (resuelve void) → login ===');
 await evalJs(`document.getElementById('btn-login-biometrico').click()`);
 await sleep(3000);
 console.log(await evalJs(`JSON.stringify({
     verifyLlamado: window.__verifyLlamado,
+    useFallback: window.__verifyOpciones ? window.__verifyOpciones.useFallback : null,
+    maxAttempts: window.__verifyOpciones ? window.__verifyOpciones.maxAttempts : null,
     path: location.pathname,
     artista: JSON.parse(localStorage.getItem('artistaData') || 'null')?.nombre_artista || null
+})`));
+
+console.log('\n=== 5) Si verifyIdentity RECHAZA → mensaje (sin login) ===');
+await evalJs(`(() => { localStorage.removeItem('artistaData'); sessionStorage.clear(); localStorage.setItem('creatio_olvido_explicito', '1'); return 'ok'; })()`);
+await send('Page.navigate', { url: 'http://localhost:8099/auth.html' });
+for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('btn-mostrar-login')`)) break; await sleep(300); }
+await sleep(1200);
+await evalJs(`document.getElementById('btn-mostrar-login').click()`);
+await sleep(500);
+// Activar el rechazo DESPUÉS de la recarga (el flag se reinicia con el documento nuevo)
+await evalJs(`window.__rechazarVerify = true`);
+await evalJs(`document.getElementById('btn-login-biometrico').click()`);
+await sleep(2000);
+console.log(await evalJs(`JSON.stringify({
+    toast: [...document.querySelectorAll('.notification .notification-message')].map(n => n.textContent.slice(0, 55)),
+    sigueEnAuth: location.pathname.includes('auth'),
+    sinLogin: !localStorage.getItem('artistaData')
 })`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

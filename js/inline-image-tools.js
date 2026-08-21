@@ -111,8 +111,8 @@ function crearChipCancelar(slide, onCancelar) {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'inline-cancel-chip';
-    chip.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);' +
-        'background:rgba(26,26,26,0.85);color:#fff;border:none;border-radius:16px;' +
+    chip.style.cssText = 'position:absolute;bottom:16px;left:128px;' +
+        'background:rgba(220,53,69,0.85);color:#fff;border:none;border-radius:16px;' +
         'padding:5px 12px;font:600 11px "Nunito",sans-serif;cursor:pointer;z-index:9;' +
         'display:flex;align-items:center;gap:5px;';
     chip.innerHTML = '✕ Cancelar';
@@ -256,15 +256,17 @@ export function activarCuadroInline(scope, onGuardar, onCancelar) {
     function renderFinal() {
         if (!img) return null;
         const outH = 1080;
-        const ratio = dims.vh / dims.vw; // misma proporción del slide
-        const outW = Math.round(outH * ratio);
+        // Escala UNIFORME: el marco (retrato 4:5 o 1:1) se mapea al lienzo de
+        // salida con la misma razón — ancho = alto × (vw/vh). Antes se usaba
+        // vh/vw (invertida) y el resultado salía "paisaje" distorsionado.
+        const k = outH / dims.vh;
+        const outW = Math.round(dims.vw * k);
         const canvas = document.createElement('canvas');
         canvas.width = outW;
         canvas.height = outH;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, outW, outH);
-        const k = outW / dims.vw;
         const m = new DOMMatrix()
             .translate(cx * k, cy * k)
             .rotate(r * 180 / Math.PI)

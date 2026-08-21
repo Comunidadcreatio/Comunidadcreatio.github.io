@@ -809,6 +809,20 @@ form *,
 .carrusel-slide .btn-editar-slide:hover {
     background: rgba(26, 26, 26, 0.95);
 }
+/* Icono de guardar (check): oculto por defecto; se muestra cuando el botón
+   está en "modo activo" (primera pulsación = activar herramienta, segunda = guardar) */
+.carrusel-slide .btn-editar-slide .icon-normal {
+    display: flex;
+}
+.carrusel-slide .btn-editar-slide .icon-check {
+    display: none;
+}
+.carrusel-slide .btn-editar-slide.modo-activo .icon-normal {
+    display: none;
+}
+.carrusel-slide .btn-editar-slide.modo-activo .icon-check {
+    display: flex;
+}
 /* Encuadre manual: al lado del botón editar */
 .carrusel-slide .btn-cuadrar-slide {
     left: 92px;
