@@ -117,9 +117,9 @@ picture {
     }
 }
 /* La campana se desliza a la izquierda para cederle el espacio a cualquiera
-   de los iconos condicionales (hamburguesa, "+" o Problogs/Cavents).
+   de los iconos condicionales (hamburguesa, "+", Problogs/Cavents, lupa).
    La distancia la calcula JS (--iconos-derecha = iconos visibles × ancho+gap). */
-#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-problogs:not(.hidden), #btn-conversaciones:not(.hidden)) #btn-notificaciones {
+#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-problogs:not(.hidden), #btn-conversaciones:not(.hidden), #btn-lupa-explorar:not(.hidden)) #btn-notificaciones {
     animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes campanaDesliza {
@@ -148,7 +148,7 @@ picture {
     }
 }
 /* La campana se desliza de vuelta a la derecha mientras se oculta */
-#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando) #btn-notificaciones {
+#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando) #btn-notificaciones {
     animation: campanaRegresa 0.26s ease-in;
 }
 @keyframes campanaRegresa {
@@ -221,6 +221,19 @@ picture {
     animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 #btn-conversaciones.ocultando {
+    animation: hamburguesaOculta 0.26s ease-in forwards;
+}
+
+/* ==============================================
+   LUPA DE EXPLORAR
+   Visible solo en la sección Explorar (grid).
+   Mismo patrón de aparición/ocultado que los demás
+   iconos condicionales del header (pop elástico).
+   ============================================== */
+#btn-lupa-explorar:not(.hidden) {
+    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#btn-lupa-explorar.ocultando {
     animation: hamburguesaOculta 0.26s ease-in forwards;
 }
 
@@ -628,6 +641,9 @@ body.search-escribiendo #toggle-panel {
    grid sin números mágicos repetidos. Chips 30px + padding 8px + aire 3px. */
 :root {
     --tags-carrusel-h: 41px;
+    /* Aire extra entre el header y las etiquetas en Explorar (sin buscador),
+       para que respiren igual que con el grid de abajo. */
+    --explorar-air: 6px;
 }
 .tags-carrusel {
     display: none;
@@ -648,9 +664,10 @@ body.search-escribiendo #toggle-panel {
     touch-action: pan-x;
     transition: top 0.25s ease; /* al abrir/cerrar el buscador bajan/suben suaves */
 }
-/* Explorar SIN buscador: etiquetas justo bajo el header */
+/* Explorar SIN buscador: etiquetas justo bajo el header, con el mismo aire
+   que dejan abajo con el grid (--explorar-air) */
 body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
-    top: calc(64px + var(--status-bar-height, 24px));
+    top: calc(64px + var(--explorar-air) + var(--status-bar-height, 24px));
 }
 /* Solo visible cuando el buscador está abierto y hay etiquetas */
 body.search-abierto .tags-carrusel:not(.hidden) {
@@ -661,7 +678,7 @@ body.search-abierto .tags-carrusel:not(.hidden) {
         top: calc(128px + var(--status-bar-height, 24px));
     }
     body.search-abierto:not(.search-panel-abierto) .tags-carrusel:not(.hidden) {
-        top: calc(60px + var(--status-bar-height, 24px));
+        top: calc(60px + var(--explorar-air) + var(--status-bar-height, 24px));
     }
 }
 .tags-carrusel::-webkit-scrollbar {
@@ -737,14 +754,14 @@ body.search-panel-abierto.search-con-etiquetas #galeria-container {
     top: calc(132px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
 }
 body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
-    top: calc(64px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+    top: calc(64px + var(--explorar-air) + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
 }
 @media (max-width: 768px) {
     body.search-panel-abierto.search-con-etiquetas #galeria-container {
         top: calc(128px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
     }
     body.search-abierto.search-con-etiquetas:not(.search-panel-abierto) #galeria-container {
-        top: calc(60px + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
+        top: calc(60px + var(--explorar-air) + var(--tags-carrusel-h) + var(--status-bar-height, 24px));
     }
 }
 /* CAPA DE OPACIDAD: aparece con FADE al tocar el input, POR ENCIMA del grid

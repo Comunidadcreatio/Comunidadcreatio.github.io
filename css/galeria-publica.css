@@ -680,6 +680,25 @@ html, body {
     flex-shrink: 0;
 }
 
+/* En Explorar (grid) el indicador vive en la SECCIÓN (JS lo inserta en
+   #galeria-publica) y queda FIJO bajo el header: el círculo de refresco sale
+   POR ENCIMA de las etiquetas (z 950 > etiquetas 900, < velo 1000). Las
+   etiquetas y el grid se deslizan hacia abajo durante el arrastre (JS
+   sincroniza el translateY de #tags-carrusel con el padding del grid). */
+#galeria-publica > .pull-refresh-indicator {
+    position: fixed;
+    top: calc(64px + var(--status-bar-height, 24px));
+    left: 0;
+    right: 0;
+    height: 56px;
+    z-index: 950;
+}
+@media (max-width: 768px) {
+    #galeria-publica > .pull-refresh-indicator {
+        top: calc(60px + var(--status-bar-height, 24px));
+    }
+}
+
 .pull-refresh-indicator.visible {
     display: flex;
 }

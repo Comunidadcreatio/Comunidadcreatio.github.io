@@ -177,7 +177,12 @@ function actualizarVisibilidadIconosHeader(section) {
     // Al salir de Explorar se cierra el buscador y se quitan sus clases
     // (etiquetas y grid vuelven a su posición normal). La sección Explorar
     // (galeria-publica) las gestiona busqueda.js / activarExplorar.
-    if (!section || section.id !== 'galeria-publica') {
+    // Al salir de Explorar se cierra el buscador y se quitan sus clases:
+    // - al cambiar a OTRA sección, o
+    // - al pasar del grid (Explorar) al carrusel de Cavents (galeriaModo 1),
+    //   para que las etiquetas NO aparezcan en Cavents.
+    const esExplorar = !!section && section.id === 'galeria-publica' && galeriaModo === 2;
+    if (!esExplorar) {
         document.body.classList.remove('search-abierto', 'search-escribiendo', 'search-panel-abierto');
         const panelBusqueda = document.getElementById('search-panel');
         if (panelBusqueda) {
@@ -635,6 +640,15 @@ async function ejecutarRefreshGrid(container) {
     setPtrProgress(0.75); // arco de 270° girando durante la carga
     ptrBloquearScroll(container, true); // sin scroll nativo ni rubber-band durante la carga
     ptrAfirmarArriba(container); // el grid queda fijo arriba mientras carga
+    // En Explorar, el círculo queda ENCIMA de las etiquetas: empujarlas abajo
+    // si el gesto no lo hizo ya (refresco programático desde la lupa del nav).
+    if (document.body.classList.contains('search-abierto')) {
+        const tags = document.getElementById('tags-carrusel');
+        if (tags) {
+            const actual = tags.style.transform ? (parseFloat(tags.style.transform.replace(/[^\d.-]/g, '')) || 0) : 0;
+            if (actual < 56) tags.style.transform = 'translateY(56px)';
+        }
+    }
     try {
         const obras = await cargarGaleria(container);
         const shuffled = shuffleArray(obras);
@@ -658,6 +672,7 @@ function finalizarRefresh(container) {
     container.style.transition = 'padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
     container.style.paddingTop = ''; // restaura el padding CSS (0 en flex, 6px en grid)
     container.style.userSelect = '';
+    ptrResetTags(true); // las etiquetas vuelven a su sitio con transición suave
     if (ptrAssertRaf) { cancelAnimationFrame(ptrAssertRaf); ptrAssertRaf = null; }
     ptrBloquearScroll(container, false); // el grid vuelve a ser scrolleable
     container.scrollTop = 0; // el grid siempre queda arriba tras refrescar
@@ -694,6 +709,7 @@ function revertirPtr(container) {
     container.style.paddingTop = '';
     container.style.scrollSnapType = '';
     container.style.userSelect = '';
+    ptrResetTags(true); // las etiquetas vuelven a su sitio con transición suave
     ptrBloquearScroll(container, false);
     ocultarPtr(220);
     ptrPullDist = 0;
@@ -711,6 +727,7 @@ function cancelarPtr(container) {
     container.style.paddingTop = '';
     container.style.scrollSnapType = '';
     container.style.userSelect = '';
+    ptrResetTags(true);
     ptrBloquearScroll(container, false);
     ocultarPtr(220);
     ptrPullDist = 0;
@@ -729,10 +746,15 @@ export async function triggerRefreshGrid() {
 }
 
 function createPTRIndicator(container) {
+    // El indicador vive en la SECCIÓN (#galeria-publica), no dentro del grid:
+    // así, en Explorar, el círculo sale FIJO bajo el header, POR ENCIMA de las
+    // etiquetas (CSS: #galeria-publica > .pull-refresh-indicator).
+    const seccion = document.getElementById('galeria-publica');
+    const padre = seccion || container;
     if (ptrIndicator) {
-        // Re-insertar si fue destruido por innerHTML
+        // Re-insertar si fue destruido por innerHTML (ya no ocurre, pero por robustez)
         if (!ptrIndicator.parentNode) {
-            container.insertBefore(ptrIndicator, container.firstChild);
+            padre.insertBefore(ptrIndicator, padre.firstChild);
         }
         return;
     }
@@ -745,12 +767,31 @@ function createPTRIndicator(container) {
                 '<circle class="ptr-arc" cx="18" cy="18" r="15.5"></circle>' +
             '</svg>' +
         '</div>';
-    container.insertBefore(ptrIndicator, container.firstChild);
+    padre.insertBefore(ptrIndicator, padre.firstChild);
+}
+
+// Durante el arrastre PTR, las etiquetas de Explorar se deslizan hacia abajo
+// junto al grid (mismo desplazamiento) para que el círculo quede encima.
+function ptrSyncTags(px) {
+    const tags = document.getElementById('tags-carrusel');
+    if (tags) tags.style.transform = 'translateY(' + px + 'px)';
+}
+
+// Restaura la posición de las etiquetas (opcional: con transición suave)
+function ptrResetTags(suave) {
+    const tags = document.getElementById('tags-carrusel');
+    if (!tags || !tags.style.transform) return;
+    if (suave) {
+        tags.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)';
+        setTimeout(() => { tags.style.transition = ''; }, 400);
+    }
+    tags.style.transform = '';
 }
 
 function ensurePTRInContainer(container) {
     if (ptrIndicator && !ptrIndicator.parentNode) {
-        container.insertBefore(ptrIndicator, container.firstChild);
+        const seccion = document.getElementById('galeria-publica');
+        (seccion || container).insertBefore(ptrIndicator, (seccion || container).firstChild);
     }
 }
 
@@ -802,6 +843,7 @@ export function setupPullToRefresh(container) {
             ptrTouchRaf = requestAnimationFrame(() => {
                 const damped = Math.min(dist * 0.45, 90);
                 container.style.paddingTop = damped + 'px';
+                ptrSyncTags(damped); // las etiquetas bajan junto al grid
                 mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
                 setPtrProgress(progress);
@@ -859,6 +901,7 @@ export function setupPullToRefresh(container) {
             ptrMouseRaf = requestAnimationFrame(() => {
                 const damped = Math.min(dist * 0.45, 90);
                 container.style.paddingTop = damped + 'px';
+                ptrSyncTags(damped); // las etiquetas bajan junto al grid
                 mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
                 setPtrProgress(progress);
