@@ -120,11 +120,15 @@
    COMPATIBILIDAD CON MODO GRID
    ============================================== */
 #galeria-container.modo-grid > .skeleton-galeria {
-    grid-column: 1 / -1;                /* Ocupa todo el ancho del grid */
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    display: block;                     /* multi-column como el grid real (masonry) */
+    columns: 3;
+    column-gap: 24px;
     padding: 20px 0;
+}
+#galeria-container.modo-grid .skeleton-card {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: 24px;
 }
 
 /* Evitar que el skeleton herede animaciones de las tarjetas reales */

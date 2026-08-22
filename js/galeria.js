@@ -308,21 +308,20 @@ function crearObraCard(obra) {
     // Inicializar carrusel después de agregar al DOM
     requestAnimationFrame(() => initCarrusel(card));
 
-    // El carrusel (vista normal) muestra la imagen con su MISMO aspecto real
-    // (4:5 o 1:1 según cómo la recortó el usuario al subirla), centrada en la
-    // tarjeta. En modo grid (Explorar) se mantiene el 4:5 uniforme del CSS.
-    const enGrid = gridContainerEl && gridContainerEl.classList.contains('modo-grid');
-    if (!enGrid) {
-        const primera = card.querySelector('.obra-carousel-slide img');
-        const viewport = card.querySelector('.obra-carousel-viewport');
-        if (primera && viewport) {
-            const aplicarRatio = () => {
-                const w = primera.naturalWidth, h = primera.naturalHeight;
-                if (w && h) viewport.style.aspectRatio = String(w / h);
-            };
-            if (primera.complete && primera.naturalWidth) aplicarRatio();
-            else primera.addEventListener('load', aplicarRatio, { once: true });
-        }
+    // El viewport muestra la imagen con su MISMO aspecto real (4:5 o 1:1 según
+    // cómo la recortó el autor al subirla), tanto en el carrusel como en el
+    // modo grid: así las tarjetas del grid (masonry) tienen alturas variadas
+    // en lugar de una cuadrícula uniforme. El CSS usa 4/5 como fallback
+    // mientras la imagen carga.
+    const primera = card.querySelector('.obra-carousel-slide img');
+    const viewport = card.querySelector('.obra-carousel-viewport');
+    if (primera && viewport) {
+        const aplicarRatio = () => {
+            const w = primera.naturalWidth, h = primera.naturalHeight;
+            if (w && h) viewport.style.aspectRatio = String(w / h);
+        };
+        if (primera.complete && primera.naturalWidth) aplicarRatio();
+        else primera.addEventListener('load', aplicarRatio, { once: true });
     }
 
     return card;
