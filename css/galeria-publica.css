@@ -291,14 +291,13 @@ html, body {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 /* Animación del estado cuando el cavent se muestra en pantalla:
-   aparece con un "pop" elástico (la agrega el IntersectionObserver) */
+   se DESPLIEGA desde la derecha hacia la izquierda (sin rebote) */
 .obra-estado-badge.estado-anim {
-    animation: estadoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: estadoEntra 0.5s ease-out;
 }
-@keyframes estadoPop {
-    0%   { opacity: 0; transform: scale(0.4); }
-    55%  { opacity: 1; transform: scale(1.15); }
-    100% { opacity: 1; transform: scale(1); }
+@keyframes estadoEntra {
+    from { opacity: 0; transform: translateX(28px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 .obra-meta-lado {
     display: inline-flex;
@@ -334,12 +333,13 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Ítem con icono explicativo (Certificado, Conservación): el icono se muestra
-   al lado del valor y al tocar/hover despliega la palabra por ~2.5s */
+/* Ítem con icono explicativo (Certificado, Conservación): el icono va a la
+   IZQUIERDA del valor y al tocar/hover despliega la palabra hacia la DERECHA,
+   entre el icono y la información, por ~2.5s */
 .obra-meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     position: relative;
     flex-shrink: 0;
 }
@@ -347,8 +347,8 @@ html, body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: rgba(128, 128, 128, 0.22);
     color: var(--color-text-muted);
@@ -357,10 +357,11 @@ html, body {
     flex-shrink: 0;
 }
 .obra-meta-tooltip {
+    /* Se despliega a la DERECHA del icono, centrado verticalmente */
     position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%) translateY(3px);
+    left: calc(100% + 7px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
     background: rgba(20, 20, 20, 0.92);
     color: #fff;
     font-family: 'Nunito', sans-serif;
@@ -376,13 +377,14 @@ html, body {
     z-index: 30;
 }
 .obra-meta-tooltip::after {
+    /* Flecha apuntando hacia el icono (izquierda del tooltip) */
     content: '';
     position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
     border: 5px solid transparent;
-    border-top-color: rgba(20, 20, 20, 0.92);
+    border-right-color: rgba(20, 20, 20, 0.92);
 }
 /* Visible al tocar (JS añade .mostrando ~2.5s) y al hover en escritorio */
 .obra-meta-ico.mostrando .obra-meta-tooltip,
@@ -390,7 +392,7 @@ html, body {
 .obra-meta-ico:focus .obra-meta-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(-50%) translateX(0);
 }
 
 /* ==============================================

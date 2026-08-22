@@ -136,19 +136,26 @@ console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar2 = card.querySelector('.obra-meta-bar-2');
     const marcos = card.querySelector('.obra-meta-marcos');
-    const cons = card.querySelector('.obra-meta-conservacion');
+    const consItem = card.querySelector('.obra-meta-item');
     const firma = card.querySelector('.obra-meta-firma');
+    // Texto del item sin el label del tooltip ni el icono
+    const consTexto = (() => {
+        if (!consItem) return null;
+        const clon = consItem.cloneNode(true);
+        const ico = clon.querySelector('.obra-meta-ico');
+        if (ico) ico.remove();
+        return clon.textContent.trim();
+    })();
     const mR = marcos.getBoundingClientRect();
     const fR = firma.getBoundingClientRect();
-    const consR = cons.getBoundingClientRect();
     return JSON.stringify({
         existe: !!bar2,
         marcos: marcos.textContent,
-        conservacion: cons.textContent,
+        conservacion: consTexto,
         firma: firma.textContent,
-        sinParentesis: [marcos, cons, firma].every(s => s && !s.textContent.includes('(')),
-        firmaADerecha: fR.left > mR.right && fR.left > consR.right,
-        separadores: getComputedStyle(cons, '::before').content !== 'none'
+        sinParentesis: consTexto && !consTexto.includes('(') && !firma.textContent.includes('('),
+        firmaADerecha: fR.left > mR.right,
+        separadores: getComputedStyle(consItem, '::before').content !== 'none'
     });
 })()`));
 
@@ -157,26 +164,32 @@ console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar3 = card.querySelector('.obra-meta-bar-3');
     const badge = card.querySelector('.obra-estado-badge');
-    const cert = card.querySelector('.obra-meta-certificado');
+    const certItem = bar3.querySelector('.obra-meta-item');
     const proc = card.querySelector('.obra-meta-procedencia');
     const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
     const bar3R = bar3.getBoundingClientRect();
     const metricas = card.querySelector('.obra-metricas-bar').getBoundingClientRect();
     const badgeR = badge.getBoundingClientRect();
-    const certR = cert.getBoundingClientRect();
     const procR = proc.getBoundingClientRect();
+    const certTexto = (() => {
+        if (!certItem) return null;
+        const clon = certItem.cloneNode(true);
+        const ico = clon.querySelector('.obra-meta-ico');
+        if (ico) ico.remove();
+        return clon.textContent.trim();
+    })();
     return JSON.stringify({
         existe: !!bar3,
         estado: badge.textContent,
         colorFondo: getComputedStyle(badge).backgroundColor,
         borderCurvo: getComputedStyle(badge).borderRadius !== '0px',
-        certificado: cert.textContent,
+        certificado: certTexto,
         procedencia: proc.textContent,
-        sinParentesis: !cert.textContent.includes('(') && !proc.textContent.includes('('),
+        sinParentesis: certTexto && !certTexto.includes('(') && !proc.textContent.includes('('),
         debajoDelCarrusel: bar3R.top >= carr.bottom - 2,
         encimaDeMetricas: bar3R.bottom <= metricas.top + 2,
-        badgeDerecha: badgeR.left > certR.right && badgeR.left > procR.right,
-        certProcIzquierda: certR.left < badgeR.left && procR.left < badgeR.left
+        badgeDerecha: badgeR.left > procR.right,
+        certProcIzquierda: procR.left < badgeR.left
     });
 })()`));
 
@@ -187,31 +200,45 @@ console.log(await evalJs(`(() => {
     return JSON.stringify({ badges: estados, coloresDistintos: new Set(estados.map(e => e.color)).size > 1 });
 })()`));
 
-console.log('\n=== 3e) Animación del estado al mostrar el cavent ===');
+console.log('\n=== 3e) Animación del estado: deslizamiento derecha → izquierda ===');
 console.log(await evalJs(`(() => {
-    // La 1ª tarjeta está visible: el IntersectionObserver debe haber añadido
-    // la clase estado-anim al badge (disparada con retraso real de observer).
     const badge = document.querySelector('.obra-card .obra-estado-badge');
     return JSON.stringify({
         animado: badge && badge.classList.contains('estado-anim'),
-        animacion: badge ? getComputedStyle(badge).animationName : null
+        animacion: badge ? getComputedStyle(badge).animationName : null,
+        sinRebote: badge ? !getComputedStyle(badge).animationName.includes('Pop') : null
     });
 })()`));
 
-console.log('\n=== 3f) Icono + tooltip temporal en Certificado y Conservación ===');
+console.log('\n=== 3f) Iconos DIFERENTES, a la IZQUIERDA, tooltip a la DERECHA ===');
 console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const icos = [...card.querySelectorAll('.obra-meta-ico')];
-    // Simular toque en el icono de certificado → tooltip visible ~2.5s
     const icoCert = icos.find(i => i.dataset.metaLabel === 'Certificado');
     const icoCons = icos.find(i => i.dataset.metaLabel === 'Conservación');
-    const antes = icoCert ? getComputedStyle(icoCert.querySelector('.obra-meta-tooltip')).visibility : null;
-    if (icoCert) icoCert.click();
-    const durante = icoCert ? getComputedStyle(icoCert.querySelector('.obra-meta-tooltip')).visibility : null;
+    // Iconos distintos: comparar el SVG de cada uno
+    const svgCert = icoCert.querySelector('svg');
+    const svgCons = icoCons.querySelector('svg');
+    const iconosDistintos = svgCert.innerHTML !== svgCons.innerHTML;
+    // Icono a la IZQUIERDA del texto del item
+    const itemCert = icoCert.parentElement;
+    const icoR = icoCert.getBoundingClientRect();
+    const textR = itemCert.lastChild.nodeType === 3 ? (() => { const r = document.createRange(); r.selectNodeContents(itemCert.lastChild); return r.getBoundingClientRect(); })() : icoCert.getBoundingClientRect();
+    // Tooltip a la derecha del icono al tocar (medir antes y después del click)
+    const tip = icoCert.querySelector('.obra-meta-tooltip');
+    const antes = getComputedStyle(tip).visibility;
+    icoCert.click();
+    const durante = getComputedStyle(tip).visibility;
+    const tipR = tip.getBoundingClientRect();
+    const tooltipDerecha = tipR.left >= icoR.right - 2;
     return JSON.stringify({
         iconos: icos.map(i => i.dataset.metaLabel),
-        tooltipCertificado: icoCert ? icoCert.querySelector('.obra-meta-tooltip').textContent : null,
-        tooltipConservacion: icoCons ? icoCons.querySelector('.obra-meta-tooltip').textContent : null,
+        iconosDistintos,
+        certificadoEsMedalla: svgCert.innerHTML.includes('M15.48 12.83'),
+        conservacionEsEscudo: svgCons.innerHTML.includes('M12 22s8-4 8-10'),
+        iconoIzquierdaDelTexto: icoR.left < textR.left,
+        tooltipText: tip.textContent,
+        tooltipDerecha,
         visibleAlTocar: antes === 'hidden' && durante === 'visible'
     });
 })()`));

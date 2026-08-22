@@ -254,12 +254,19 @@ function colorDeEstado(estado) {
     return '#607d8b';                                                            // gris azulado por defecto
 }
 
-// Icono con tooltip temporal para explicar una opción: al tocar (o pasar el
-// cursor) se despliega la palabra (p.ej. "Certificado"/"Conservación") por
-// unos segundos y luego se oculta. El manejador delegado está abajo.
+// Icono con tooltip temporal para explicar una opción: el icono va a la
+// IZQUIERDA del texto y al tocar (o pasar el cursor) se despliega la palabra
+// (p.ej. "Certificado"/"Conservación") hacia la DERECHA, entre el icono y la
+// información, por unos segundos y luego se oculta.
+// Cada opción tiene un icono distinto relacionado con su significado:
+//   - Certificado → medalla (reconocimiento/autenticidad)
+//   - Conservación → escudo (cuidado/protección de la obra)
 function iconoMeta(label) {
-    const ICONO_INFO = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-    return `<span class="obra-meta-ico" data-meta-label="${escapeHtml(label)}" role="button" tabindex="0" aria-label="${escapeHtml(label)}">${ICONO_INFO}<span class="obra-meta-tooltip">${escapeHtml(label)}</span></span>`;
+    const esCertificado = /certificado/i.test(label);
+    const ICONO = esCertificado
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.48 12.83 17 22l-5-3-5 3 1.52-9.17"/></svg>' // medalla
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>'; // escudo con check
+    return `<span class="obra-meta-ico" data-meta-label="${escapeHtml(label)}" role="button" tabindex="0" aria-label="${escapeHtml(label)}">${ICONO}<span class="obra-meta-tooltip">${escapeHtml(label)}</span></span>`;
 }
 
 // Muestra el tooltip del icono (p.ej. "Certificado") durante ~2.5s y lo oculta.
@@ -352,7 +359,7 @@ function crearObraCard(obra) {
         <div class="obra-meta-bar obra-meta-bar-2">
             <span class="obra-meta-lado">
                 ${marcos ? `<span class="obra-meta-marcos">${escapeHtml(marcos)}</span>` : ''}
-                ${conservacion ? `<span class="obra-meta-item">${escapeHtml(conservacion)}${iconoMeta('Conservación')}</span>` : ''}
+                ${conservacion ? `<span class="obra-meta-item">${iconoMeta('Conservación')}${escapeHtml(conservacion)}</span>` : ''}
             </span>
             <span class="obra-meta-lado obra-meta-lado-der">
                 ${firma ? `<span class="obra-meta-firma">${escapeHtml(firma)}</span>` : ''}
@@ -370,7 +377,7 @@ function crearObraCard(obra) {
     const metaBar3HTML = (estado || certificado || procedencia) ? `
         <div class="obra-meta-bar obra-meta-bar-3">
             <span class="obra-meta-lado">
-                ${certificado ? `<span class="obra-meta-item">${escapeHtml(certificado)}${iconoMeta('Certificado')}</span>` : ''}
+                ${certificado ? `<span class="obra-meta-item">${iconoMeta('Certificado')}${escapeHtml(certificado)}</span>` : ''}
                 ${procedencia ? `<span class="obra-meta-procedencia">${escapeHtml(procedencia)}</span>` : ''}
             </span>
             ${estado ? `<span class="obra-estado-badge" style="background:${estadoColor}">${escapeHtml(estado)}</span>` : ''}
