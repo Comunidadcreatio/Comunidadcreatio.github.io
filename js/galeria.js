@@ -293,6 +293,20 @@ function crearObraCard(obra) {
             </span>
         </div>` : '';
 
+    // Segunda franja, debajo de la anterior: marcos • conservación • firma
+    // (también solo la parte fuera de los paréntesis de cada opción).
+    const marcos = String(obra.marcos || '').split('(')[0].trim();
+    const conservacion = String(obra.conservacion || '').split('(')[0].trim();
+    const firma = String(obra.firma || '').split('(')[0].trim();
+    const metaBar2HTML = (marcos || conservacion || firma) ? `
+        <div class="obra-meta-bar obra-meta-bar-2">
+            <span class="obra-meta-lado">
+                ${marcos ? `<span class="obra-meta-marcos">${escapeHtml(marcos)}</span>` : ''}
+                ${conservacion ? `<span class="obra-meta-conservacion">${escapeHtml(conservacion)}</span>` : ''}
+                ${firma ? `<span class="obra-meta-firma">${escapeHtml(firma)}</span>` : ''}
+            </span>
+        </div>` : '';
+
     card.innerHTML = `
         <div class="obra-card-inner">
             <!-- Header: avatar + nombre artista | título marquee | precio -->
@@ -307,8 +321,9 @@ function crearObraCard(obra) {
                 <span class="obra-precio-top">$${precio}</span>
             </div>
 
-            <!-- Año (derecha) y dimensiones (izquierda), justo encima de las imágenes -->
+            <!-- Franja 1 (técnica/dimensiones/soporte/año) + Franja 2 (marcos/conservación/firma) -->
             ${metaBarHTML}
+            ${metaBar2HTML}
 
             <!-- Carrusel de imágenes (incluye overlay para modo grid) -->
             ${carruselHTML}
@@ -538,15 +553,13 @@ export async function abrirDetalleCavent(obraId, cardElement) {
             return;
         }
 
-        // Poblar campos (técnica y soporte ya NO van en el modal: se muestran
-        // en la franja de la tarjeta, encima del carrusel)
-        document.getElementById('detalle-marcos').textContent = o.marcos || '—';
+        // Poblar campos (técnica, soporte, marcos, firma y conservación ya NO
+        // van en el modal: se muestran en las franjas de la tarjeta, encima
+        // del carrusel)
         document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
         document.getElementById('detalle-procedencia').textContent = o.procedencia || '—';
         document.getElementById('detalle-certificado').textContent = o.certificado || '—';
-        document.getElementById('detalle-firma').textContent = o.firma || '—';
-        document.getElementById('detalle-conservacion').textContent = o.conservacion || '—';
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);

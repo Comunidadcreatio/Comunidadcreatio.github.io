@@ -257,6 +257,12 @@ html, body {
     font-weight: 600;
     color: var(--color-text-muted);
 }
+/* Segunda franja (marcos • conservación • firma): pegada debajo de la primera */
+.obra-meta-bar-2 {
+    padding-top: 0;
+    padding-bottom: 6px;
+    justify-content: flex-start;
+}
 .obra-meta-lado {
     display: inline-flex;
     align-items: center;

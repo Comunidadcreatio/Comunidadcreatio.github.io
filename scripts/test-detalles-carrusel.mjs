@@ -43,9 +43,9 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           { id: 1, titulo: 'Retrato al óleo', artista: 'T', artista_user_id: 1,
             imagen_url: img45, imagen_url_1: img11, etiquetas: 'Óleo, Retrato',
             ano: 2024, ancho: 80, alto: 100,
-            descripcion_tecnica: 'Óleo', soporte: 'Lienzo (Algodón, lino, Mezcla)', marcos: 'No',
+            descripcion_tecnica: 'Óleo', soporte: 'Lienzo (Algodón, lino, Mezcla)', marcos: 'Clásico (Dorado, Negro)',
             estado_obra: 'Disponible', descripcion_artistica: 'Texto',
-            procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
+            procedencia: '—', certificado: '—', firma: 'Manuscrita (Borde inferior)', conservacion: 'Excelente (Clima controlado)',
             likes_count: 2, views_count: 5, comments_count: 1, precio: '100',
             foto_artista: '' },
           { id: 2, titulo: 'Paisaje', artista: 'T', artista_user_id: 1,
@@ -135,7 +135,30 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 2) Modal ver detalles: SIN Etiquetas / Año / Dimensiones / Técnica / Soporte ===');
+console.log('\n=== 3b) Segunda franja: marcos • conservación • firma (sin paréntesis) ===');
+console.log(await evalJs(`(() => {
+    const card = document.querySelector('.obra-card');
+    const bar2 = card.querySelector('.obra-meta-bar-2');
+    const bar1 = card.querySelector('.obra-meta-bar');
+    const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
+    const b1 = bar1.getBoundingClientRect();
+    const b2 = bar2.getBoundingClientRect();
+    const marcos = card.querySelector('.obra-meta-marcos');
+    const cons = card.querySelector('.obra-meta-conservacion');
+    const firma = card.querySelector('.obra-meta-firma');
+    return JSON.stringify({
+        existe: !!bar2,
+        marcos: marcos ? marcos.textContent : null,
+        conservacion: cons ? cons.textContent : null,
+        firma: firma ? firma.textContent : null,
+        sinParentesis: [marcos, cons, firma].every(s => s && !s.textContent.includes('(')),
+        debajoDeLaPrimera: b2.top >= b1.bottom - 2,
+        encimaDelCarrusel: b2.bottom <= carr.top + 2,
+        separadores: getComputedStyle(cons, '::before').content !== 'none' && getComputedStyle(firma, '::before').content !== 'none'
+    });
+})()`));
+
+console.log('\n=== 2) Modal ver detalles: SIN Etiquetas / Año / Dimensiones / Técnica / Soporte / Marcos / Firma / Conservación ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
 console.log(await evalJs(`JSON.stringify({
@@ -144,9 +167,13 @@ console.log(await evalJs(`JSON.stringify({
     sinDimensiones: !document.getElementById('detalle-dimensiones'),
     sinTecnica: !document.getElementById('detalle-tecnica'),
     sinSoporte: !document.getElementById('detalle-soporte'),
+    sinMarcos: !document.getElementById('detalle-marcos'),
+    sinFirma: !document.getElementById('detalle-firma'),
+    sinConservacion: !document.getElementById('detalle-conservacion'),
     modalVisible: !document.getElementById('modal-detalles-cavent').classList.contains('hidden'),
-    marcos: document.getElementById('detalle-marcos').textContent,
-    estado: document.getElementById('detalle-estado').textContent
+    estado: document.getElementById('detalle-estado').textContent,
+    procedencia: document.getElementById('detalle-procedencia').textContent,
+    certificado: document.getElementById('detalle-certificado').textContent
 })`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
