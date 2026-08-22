@@ -115,6 +115,9 @@ console.log(await evalJs(`(() => {
     const anioR = anio.getBoundingClientRect();
     const tecR = tecnica.getBoundingClientRect();
     const sopR = soporte.getBoundingClientRect();
+    // Separador "•": pseudo-elemento ::before del 2º elemento de cada lado
+    const sepDim = getComputedStyle(dim, '::before').content;
+    const sepAnio = getComputedStyle(anio, '::before').content;
     return JSON.stringify({
         existe: !!bar,
         tecnica: tecnica.textContent,
@@ -126,19 +129,24 @@ console.log(await evalJs(`(() => {
         tecnicaAlLadoDeDimensiones: Math.abs(tecR.left - dimR.left) < 2 || tecR.right <= dimR.left + 2,
         soporteAlLadoDelAnio: sopR.right <= anioR.left + 2,
         ladoIzq: tecR.left < anioR.left,
-        ladoDer: sopR.left > dimR.right
+        ladoDer: sopR.left > dimR.right,
+        separadorDimensiones: sepDim !== 'none',
+        separadorAnio: sepAnio !== 'none'
     });
 })()`));
 
-console.log('\n=== 2) Modal ver detalles: SIN Etiquetas / Año / Dimensiones ===');
+console.log('\n=== 2) Modal ver detalles: SIN Etiquetas / Año / Dimensiones / Técnica / Soporte ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
 console.log(await evalJs(`JSON.stringify({
     sinEtiquetas: !document.getElementById('detalle-etiquetas'),
     sinAno: !document.getElementById('detalle-ano'),
     sinDimensiones: !document.getElementById('detalle-dimensiones'),
+    sinTecnica: !document.getElementById('detalle-tecnica'),
+    sinSoporte: !document.getElementById('detalle-soporte'),
     modalVisible: !document.getElementById('modal-detalles-cavent').classList.contains('hidden'),
-    tecnica: document.getElementById('detalle-tecnica').textContent
+    marcos: document.getElementById('detalle-marcos').textContent,
+    estado: document.getElementById('detalle-estado').textContent
 })`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

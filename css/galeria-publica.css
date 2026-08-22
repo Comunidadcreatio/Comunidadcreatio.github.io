@@ -272,6 +272,13 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+/* Separador puntual entre los campos de cada lado:
+   "Óleo • 80 × 100 cm" | "Lienzo • 2024" */
+.obra-meta-lado > span + span::before {
+    content: '•';
+    margin-right: 6px;
+    opacity: 0.55;
+}
 .obra-meta-tecnica,
 .obra-meta-soporte {
     flex-shrink: 0;

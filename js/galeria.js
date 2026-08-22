@@ -538,9 +538,8 @@ export async function abrirDetalleCavent(obraId, cardElement) {
             return;
         }
 
-        // Poblar campos
-        document.getElementById('detalle-tecnica').textContent = o.descripcion_tecnica || o.tecnica || '—';
-        document.getElementById('detalle-soporte').textContent = o.soporte || '—';
+        // Poblar campos (técnica y soporte ya NO van en el modal: se muestran
+        // en la franja de la tarjeta, encima del carrusel)
         document.getElementById('detalle-marcos').textContent = o.marcos || '—';
         document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
