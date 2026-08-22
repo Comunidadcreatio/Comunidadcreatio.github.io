@@ -198,6 +198,24 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
+console.log('\n=== 3f) Icono + tooltip temporal en Certificado y Conservación ===');
+console.log(await evalJs(`(() => {
+    const card = document.querySelector('.obra-card');
+    const icos = [...card.querySelectorAll('.obra-meta-ico')];
+    // Simular toque en el icono de certificado → tooltip visible ~2.5s
+    const icoCert = icos.find(i => i.dataset.metaLabel === 'Certificado');
+    const icoCons = icos.find(i => i.dataset.metaLabel === 'Conservación');
+    const antes = icoCert ? getComputedStyle(icoCert.querySelector('.obra-meta-tooltip')).visibility : null;
+    if (icoCert) icoCert.click();
+    const durante = icoCert ? getComputedStyle(icoCert.querySelector('.obra-meta-tooltip')).visibility : null;
+    return JSON.stringify({
+        iconos: icos.map(i => i.dataset.metaLabel),
+        tooltipCertificado: icoCert ? icoCert.querySelector('.obra-meta-tooltip').textContent : null,
+        tooltipConservacion: icoCons ? icoCons.querySelector('.obra-meta-tooltip').textContent : null,
+        visibleAlTocar: antes === 'hidden' && durante === 'visible'
+    });
+})()`));
+
 console.log('\n=== 2) Modal: abarca el área de imagen, descripción centrada, botón Comprar Obra ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
@@ -215,6 +233,7 @@ console.log(await evalJs(`(() => {
         descCentrada: dcs.textAlign === 'justify',
         botonExiste: !!btn,
         botonTexto: btn ? btn.textContent.trim() : null,
+        botonVisibleDisponible: btn && !btn.classList.contains('hidden'),
         botonAbajoDerecha: (() => {
             const br = btn.getBoundingClientRect();
             const cr2 = content.getBoundingClientRect();
@@ -222,6 +241,25 @@ console.log(await evalJs(`(() => {
         })(),
         abarcaSoloImagen: Math.abs(cr.top - carr.top) < 4 && Math.abs(cr.bottom - carr.bottom) < 4,
         fondoTranslucido: getComputedStyle(content).backgroundColor.includes('0.35')
+    });
+})()`));
+
+console.log('\n=== 2b) Botón Comprar Obra OCULTO con estado "Vendido" ===');
+console.log(await evalJs(`(async () => {
+    // Cerrar modal y abrir la 2ª tarjeta (estado Vendido)
+    document.getElementById('modal-detalles-cavent').classList.add('hidden');
+    const cards = document.querySelectorAll('.obra-card');
+    if (cards.length < 2) return JSON.stringify({ skip: true });
+    cards[1].scrollIntoView({ block: 'center' });
+    await new Promise(r => setTimeout(r, 600));
+    const toggle2 = cards[1].querySelector('.btn-detalles-toggle');
+    toggle2.click();
+    await new Promise(r => setTimeout(r, 1500));
+    const btn = document.getElementById('btn-comprar-obra');
+    const badge2 = cards[1].querySelector('.obra-estado-badge');
+    return JSON.stringify({
+        estadoTarjeta2: badge2 ? badge2.textContent : null,
+        botonOcultoVendido: btn && btn.classList.contains('hidden')
     });
 })()`));
 

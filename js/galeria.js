@@ -254,6 +254,36 @@ function colorDeEstado(estado) {
     return '#607d8b';                                                            // gris azulado por defecto
 }
 
+// Icono con tooltip temporal para explicar una opción: al tocar (o pasar el
+// cursor) se despliega la palabra (p.ej. "Certificado"/"Conservación") por
+// unos segundos y luego se oculta. El manejador delegado está abajo.
+function iconoMeta(label) {
+    const ICONO_INFO = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+    return `<span class="obra-meta-ico" data-meta-label="${escapeHtml(label)}" role="button" tabindex="0" aria-label="${escapeHtml(label)}">${ICONO_INFO}<span class="obra-meta-tooltip">${escapeHtml(label)}</span></span>`;
+}
+
+// Muestra el tooltip del icono (p.ej. "Certificado") durante ~2.5s y lo oculta.
+// Delegado: funciona para cualquier tarjeta, incluso re-renderizadas.
+document.addEventListener('click', (e) => {
+    const ico = e.target.closest('.obra-meta-ico');
+    if (!ico) return;
+    e.stopPropagation();
+    if (ico.dataset.timer) clearTimeout(Number(ico.dataset.timer));
+    ico.classList.add('mostrando');
+    ico.dataset.timer = String(setTimeout(() => {
+        ico.classList.remove('mostrando');
+        delete ico.dataset.timer;
+    }, 2500));
+});
+
+// ¿El estado permite COMPRAR la obra? Solo los estados "Disponible" muestran
+// el botón Comprar Obra. Reservado, Vendido, No disponible, En préstamo,
+// Solo exhibición, Retirado e Inactivo NO lo muestran.
+function estadoPermiteCompra(estado) {
+    const e = String(estado || '').toLowerCase();
+    return e.includes('disponible');
+}
+
 function crearObraCard(obra) {
     const vistas = obra.likes_count !== undefined ? obra.likes_count : 0;
     // NOTA: likes_count es para "me gusta", views_count para vistas, comments_count para comentarios
@@ -266,6 +296,9 @@ function crearObraCard(obra) {
     if (obra.id !== undefined && obra.id !== null) {
         card.dataset.obraId = obra.id;
     }
+    // Guardar el estado en la tarjeta: el modal lo usa para decidir si se
+    // muestra el botón "Comprar Obra".
+    card.dataset.estado = String(obra.estado_obra || obra.estado || obra.status || '').trim();
 
     const nombreArtista = escapeHtml(obra.artista || 'Artista');
     const inicial = nombreArtista.charAt(0).toUpperCase();
@@ -319,7 +352,7 @@ function crearObraCard(obra) {
         <div class="obra-meta-bar obra-meta-bar-2">
             <span class="obra-meta-lado">
                 ${marcos ? `<span class="obra-meta-marcos">${escapeHtml(marcos)}</span>` : ''}
-                ${conservacion ? `<span class="obra-meta-conservacion">${escapeHtml(conservacion)}</span>` : ''}
+                ${conservacion ? `<span class="obra-meta-item">${escapeHtml(conservacion)}${iconoMeta('Conservación')}</span>` : ''}
             </span>
             <span class="obra-meta-lado obra-meta-lado-der">
                 ${firma ? `<span class="obra-meta-firma">${escapeHtml(firma)}</span>` : ''}
@@ -337,7 +370,7 @@ function crearObraCard(obra) {
     const metaBar3HTML = (estado || certificado || procedencia) ? `
         <div class="obra-meta-bar obra-meta-bar-3">
             <span class="obra-meta-lado">
-                ${certificado ? `<span class="obra-meta-certificado">${escapeHtml(certificado)}</span>` : ''}
+                ${certificado ? `<span class="obra-meta-item">${escapeHtml(certificado)}${iconoMeta('Certificado')}</span>` : ''}
                 ${procedencia ? `<span class="obra-meta-procedencia">${escapeHtml(procedencia)}</span>` : ''}
             </span>
             ${estado ? `<span class="obra-estado-badge" style="background:${estadoColor}">${escapeHtml(estado)}</span>` : ''}
@@ -586,6 +619,9 @@ export async function abrirDetalleCavent(obraId, cardElement) {
     }
 
     modal.classList.remove('hidden');
+    // El botón Comprar Obra se oculta hasta saber el estado real de la obra
+    const btnComprar = document.getElementById('btn-comprar-obra');
+    if (btnComprar) btnComprar.classList.add('hidden');
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
@@ -599,6 +635,14 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         // en las franjas de la tarjeta del cavent). Aquí solo queda la
         // descripción.
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
+
+        // Mostrar "Comprar Obra" SOLO si el estado permite la venta
+        // (Disponible). El estado puede venir de la API o del dataset de la
+        // tarjeta (cardElement.dataset.estado).
+        const estadoReal = String(o.estado_obra || o.estado || o.status || (cardElement && cardElement.dataset.estado) || '').trim();
+        if (btnComprar) {
+            btnComprar.classList.toggle('hidden', !estadoPermiteCompra(estadoReal));
+        }
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);

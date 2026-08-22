@@ -4,7 +4,7 @@
 @import url('header.css?v=b5f4394d9e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=b888bfb1e5');
+@import url('galeria-publica.css?v=bbf7cf282a');
 
 /* Chat global + privado */
 @import url('chat.css?v=25de70682f');
@@ -934,6 +934,10 @@ input, select, textarea {
 }
 .btn-comprar-obra:active {
     transform: scale(0.96);
+}
+/* Oculto cuando el estado de la obra no permite la compra (JS) */
+.btn-comprar-obra.hidden {
+    display: none;
 }
 /* Like animado */
 .metrica-like.liked svg {
