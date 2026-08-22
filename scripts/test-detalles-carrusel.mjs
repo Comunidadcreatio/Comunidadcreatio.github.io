@@ -231,6 +231,9 @@ console.log(await evalJs(`(() => {
     const durante = getComputedStyle(tip).visibility;
     const tipR = tip.getBoundingClientRect();
     const tooltipDerecha = tipR.left >= icoR.right - 2;
+    // El click en el icono NO debe abrir el modal de descripción (el tooltip
+    // quedaría tapado). Antes de la corrección, el modal se abría encima.
+    const modalAbierto = !document.getElementById('modal-detalles-cavent').classList.contains('hidden');
     return JSON.stringify({
         iconos: icos.map(i => i.dataset.metaLabel),
         iconosDistintos,
@@ -239,7 +242,8 @@ console.log(await evalJs(`(() => {
         iconoIzquierdaDelTexto: icoR.left < textR.left,
         tooltipText: tip.textContent,
         tooltipDerecha,
-        visibleAlTocar: antes === 'hidden' && durante === 'visible'
+        visibleAlTocar: antes === 'hidden' && durante === 'visible',
+        noAbreModal: !modalAbierto
     });
 })()`));
 

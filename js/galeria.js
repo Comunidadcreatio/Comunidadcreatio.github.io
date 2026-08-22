@@ -504,6 +504,9 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                 if (e.target.closest('.obra-carousel-dot')) return;
                 if (e.target.closest('.btn-ver-detalles')) return;
                 if (e.target.closest('.metrica-item')) return;
+                // El icono explicativo (Certificado/Conservación) muestra su
+                // tooltip: no debe abrir el modal de descripción encima
+                if (e.target.closest('.obra-meta-ico')) return;
                 onDetalle(obra.id);
             });
         }
