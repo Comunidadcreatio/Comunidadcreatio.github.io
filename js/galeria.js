@@ -238,6 +238,20 @@ function initCarrusel(card) {
     });
 }
 
+// Color del rectángulo de estado según el valor que eligió el autor.
+function colorDeEstado(estado) {
+    const e = String(estado || '').toLowerCase();
+    if (e.includes('disponible')) return '#2e7d32';      // verde
+    if (e.includes('reservado')) return '#e67e22';       // naranja
+    if (e.includes('vendido')) return '#c0392b';         // rojo
+    if (e.includes('préstamo') || e.includes('prestamo')) return '#2980b9'; // azul
+    if (e.includes('exhibición') || e.includes('exhibicion')) return '#8e44ad'; // morado
+    if (e.includes('retirado')) return '#7f8c8d';        // gris
+    if (e.includes('inactivo')) return '#95a5a6';        // gris claro
+    if (e.includes('no disponible')) return '#95a5a6';   // gris claro
+    return '#607d8b';                                    // gris azulado por defecto
+}
+
 function crearObraCard(obra) {
     const vistas = obra.likes_count !== undefined ? obra.likes_count : 0;
     // NOTA: likes_count es para "me gusta", views_count para vistas, comments_count para comentarios
@@ -274,9 +288,10 @@ function crearObraCard(obra) {
     `;
     const carruselHTML = crearCarruselHTML(obra, gridOverlayHTML);
 
-    // Franja justo encima del carrusel: IZQUIERDA = técnica + dimensiones;
-    // DERECHA = soporte + año. El soporte solo muestra la parte fuera de los
-    // paréntesis (ej. "Lienzo (Algodón, lino, Mezcla)" → "Lienzo").
+    // Franja justo encima del carrusel: IZQUIERDA = técnica + año;
+    // DERECHA = soporte + dimensiones (año y dimensiones intercambiados).
+    // El soporte solo muestra la parte fuera de los paréntesis
+    // (ej. "Lienzo (Algodón, lino, Mezcla)" → "Lienzo").
     const tecnica = (obra.descripcion_tecnica || obra.tecnica || '').trim();
     const soporte = String(obra.soporte || '').split('(')[0].trim();
     const dimensiones = (obra.ancho && obra.alto) ? `${escapeHtml(String(obra.ancho))} × ${escapeHtml(String(obra.alto))} cm` : '';
@@ -285,16 +300,16 @@ function crearObraCard(obra) {
         <div class="obra-meta-bar">
             <span class="obra-meta-lado">
                 ${tecnica ? `<span class="obra-meta-tecnica">${escapeHtml(tecnica)}</span>` : ''}
-                ${dimensiones ? `<span class="obra-meta-dimensiones">${dimensiones}</span>` : ''}
+                ${anio ? `<span class="obra-meta-ano">${anio}</span>` : ''}
             </span>
             <span class="obra-meta-lado obra-meta-lado-der">
                 ${soporte ? `<span class="obra-meta-soporte">${escapeHtml(soporte)}</span>` : ''}
-                ${anio ? `<span class="obra-meta-ano">${anio}</span>` : ''}
+                ${dimensiones ? `<span class="obra-meta-dimensiones">${dimensiones}</span>` : ''}
             </span>
         </div>` : '';
 
-    // Segunda franja, debajo de la anterior: marcos • conservación • firma
-    // (también solo la parte fuera de los paréntesis de cada opción).
+    // Segunda franja, debajo de la anterior: marcos • conservación (izquierda)
+    // y firma (derecha) — solo la parte fuera de los paréntesis de cada opción.
     const marcos = String(obra.marcos || '').split('(')[0].trim();
     const conservacion = String(obra.conservacion || '').split('(')[0].trim();
     const firma = String(obra.firma || '').split('(')[0].trim();
@@ -303,8 +318,26 @@ function crearObraCard(obra) {
             <span class="obra-meta-lado">
                 ${marcos ? `<span class="obra-meta-marcos">${escapeHtml(marcos)}</span>` : ''}
                 ${conservacion ? `<span class="obra-meta-conservacion">${escapeHtml(conservacion)}</span>` : ''}
+            </span>
+            <span class="obra-meta-lado obra-meta-lado-der">
                 ${firma ? `<span class="obra-meta-firma">${escapeHtml(firma)}</span>` : ''}
             </span>
+        </div>` : '';
+
+    // Franja inferior (entre el carrusel y las métricas): IZQUIERDA =
+    // certificado • procedencia; DERECHA = estado como rectángulo curvo de
+    // color según el estado que eligió el autor.
+    const estado = (obra.estado_obra || obra.estado || '').trim();
+    const certificado = String(obra.certificado || '').split('(')[0].trim();
+    const procedencia = String(obra.procedencia || '').split('(')[0].trim();
+    const estadoColor = colorDeEstado(estado);
+    const metaBar3HTML = (estado || certificado || procedencia) ? `
+        <div class="obra-meta-bar obra-meta-bar-3">
+            <span class="obra-meta-lado">
+                ${certificado ? `<span class="obra-meta-certificado">${escapeHtml(certificado)}</span>` : ''}
+                ${procedencia ? `<span class="obra-meta-procedencia">${escapeHtml(procedencia)}</span>` : ''}
+            </span>
+            ${estado ? `<span class="obra-estado-badge" style="background:${estadoColor}">${escapeHtml(estado)}</span>` : ''}
         </div>` : '';
 
     card.innerHTML = `
@@ -321,12 +354,15 @@ function crearObraCard(obra) {
                 <span class="obra-precio-top">$${precio}</span>
             </div>
 
-            <!-- Franja 1 (técnica/dimensiones/soporte/año) + Franja 2 (marcos/conservación/firma) -->
+            <!-- Franja 1 (técnica/año/soporte/dimensiones) + Franja 2 (marcos/conservación/firma) -->
             ${metaBarHTML}
             ${metaBar2HTML}
 
             <!-- Carrusel de imágenes (incluye overlay para modo grid) -->
             ${carruselHTML}
+
+            <!-- Franja 3: estado (rectángulo de color, derecha) + certificado/procedencia (izquierda) -->
+            ${metaBar3HTML}
 
             <!-- Barra inferior sólida: métricas + botón ver detalles -->
             <div class="obra-metricas-bar">
@@ -553,13 +589,11 @@ export async function abrirDetalleCavent(obraId, cardElement) {
             return;
         }
 
-        // Poblar campos (técnica, soporte, marcos, firma y conservación ya NO
-        // van en el modal: se muestran en las franjas de la tarjeta, encima
-        // del carrusel)
-        document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
+        // Poblar campos (técnica, soporte, marcos, firma, conservación,
+        // estado, procedencia y certificado ya NO van en el modal: se muestran
+        // en las franjas de la tarjeta del cavent). Aquí solo queda la
+        // descripción.
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
-        document.getElementById('detalle-procedencia').textContent = o.procedencia || '—';
-        document.getElementById('detalle-certificado').textContent = o.certificado || '—';
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);

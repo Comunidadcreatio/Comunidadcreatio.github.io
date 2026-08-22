@@ -44,8 +44,8 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             imagen_url: img45, imagen_url_1: img11, etiquetas: 'Óleo, Retrato',
             ano: 2024, ancho: 80, alto: 100,
             descripcion_tecnica: 'Óleo', soporte: 'Lienzo (Algodón, lino, Mezcla)', marcos: 'Clásico (Dorado, Negro)',
-            estado_obra: 'Disponible', descripcion_artistica: 'Texto',
-            procedencia: '—', certificado: '—', firma: 'Manuscrita (Borde inferior)', conservacion: 'Excelente (Clima controlado)',
+            estado_obra: 'Disponible (en venta)', descripcion_artistica: 'Texto',
+            procedencia: 'Colección privada (Madrid)', certificado: 'Certificado de autenticidad (Archivo)', firma: 'Manuscrita (Borde inferior)', conservacion: 'Excelente (Clima controlado)',
             likes_count: 2, views_count: 5, comments_count: 1, precio: '100',
             foto_artista: '' },
           { id: 2, titulo: 'Paisaje', artista: 'T', artista_user_id: 1,
@@ -101,12 +101,10 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 3) Franja técnica/soporte/año/dimensiones encima del carrusel ===');
+console.log('\n=== 3) Franja 1: técnica+año (izq) | soporte+dimensiones (der, intercambiados) ===');
 console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar = card.querySelector('.obra-meta-bar');
-    const barR = bar.getBoundingClientRect();
-    const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
     const dim = card.querySelector('.obra-meta-dimensiones');
     const anio = card.querySelector('.obra-meta-ano');
     const tecnica = card.querySelector('.obra-meta-tecnica');
@@ -115,50 +113,74 @@ console.log(await evalJs(`(() => {
     const anioR = anio.getBoundingClientRect();
     const tecR = tecnica.getBoundingClientRect();
     const sopR = soporte.getBoundingClientRect();
-    // Separador "•": pseudo-elemento ::before del 2º elemento de cada lado
-    const sepDim = getComputedStyle(dim, '::before').content;
     const sepAnio = getComputedStyle(anio, '::before').content;
+    const sepDim = getComputedStyle(dim, '::before').content;
     return JSON.stringify({
         existe: !!bar,
         tecnica: tecnica.textContent,
+        anio: anio.textContent,
         soporte: soporte.textContent,
         soporteSinParentesis: !soporte.textContent.includes('('),
         dimensiones: dim.textContent,
-        anio: anio.textContent,
-        encimaDelCarrusel: barR.bottom <= carr.top + 2,
-        tecnicaAlLadoDeDimensiones: Math.abs(tecR.left - dimR.left) < 2 || tecR.right <= dimR.left + 2,
-        soporteAlLadoDelAnio: sopR.right <= anioR.left + 2,
-        ladoIzq: tecR.left < anioR.left,
-        ladoDer: sopR.left > dimR.right,
-        separadorDimensiones: sepDim !== 'none',
-        separadorAnio: sepAnio !== 'none'
+        anioEnIzquierda: anioR.left < dimR.left,
+        dimensionesEnDerecha: dimR.left > anioR.left,
+        tecnicaIzq: tecR.left < anioR.left,
+        ladoDerCompleto: sopR.left > anioR.right && dimR.left > sopR.right,
+        separadorAnio: sepAnio !== 'none',
+        separadorDim: sepDim !== 'none'
     });
 })()`));
 
-console.log('\n=== 3b) Segunda franja: marcos • conservación • firma (sin paréntesis) ===');
+console.log('\n=== 3b) Franja 2: marcos • conservación (izq) | FIRMA (derecha) ===');
 console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar2 = card.querySelector('.obra-meta-bar-2');
-    const bar1 = card.querySelector('.obra-meta-bar');
-    const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
-    const b1 = bar1.getBoundingClientRect();
-    const b2 = bar2.getBoundingClientRect();
     const marcos = card.querySelector('.obra-meta-marcos');
     const cons = card.querySelector('.obra-meta-conservacion');
     const firma = card.querySelector('.obra-meta-firma');
+    const mR = marcos.getBoundingClientRect();
+    const fR = firma.getBoundingClientRect();
+    const consR = cons.getBoundingClientRect();
     return JSON.stringify({
         existe: !!bar2,
-        marcos: marcos ? marcos.textContent : null,
-        conservacion: cons ? cons.textContent : null,
-        firma: firma ? firma.textContent : null,
+        marcos: marcos.textContent,
+        conservacion: cons.textContent,
+        firma: firma.textContent,
         sinParentesis: [marcos, cons, firma].every(s => s && !s.textContent.includes('(')),
-        debajoDeLaPrimera: b2.top >= b1.bottom - 2,
-        encimaDelCarrusel: b2.bottom <= carr.top + 2,
-        separadores: getComputedStyle(cons, '::before').content !== 'none' && getComputedStyle(firma, '::before').content !== 'none'
+        firmaADerecha: fR.left > mR.right && fR.left > consR.right,
+        separadores: getComputedStyle(cons, '::before').content !== 'none'
     });
 })()`));
 
-console.log('\n=== 2) Modal ver detalles: SIN Etiquetas / Año / Dimensiones / Técnica / Soporte / Marcos / Firma / Conservación ===');
+console.log('\n=== 3c) Franja 3 (debajo del carrusel): estado (badge color, derecha) + certificado/procedencia (izquierda) ===');
+console.log(await evalJs(`(() => {
+    const card = document.querySelector('.obra-card');
+    const bar3 = card.querySelector('.obra-meta-bar-3');
+    const badge = card.querySelector('.obra-estado-badge');
+    const cert = card.querySelector('.obra-meta-certificado');
+    const proc = card.querySelector('.obra-meta-procedencia');
+    const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
+    const bar3R = bar3.getBoundingClientRect();
+    const metricas = card.querySelector('.obra-metricas-bar').getBoundingClientRect();
+    const badgeR = badge.getBoundingClientRect();
+    const certR = cert.getBoundingClientRect();
+    const procR = proc.getBoundingClientRect();
+    return JSON.stringify({
+        existe: !!bar3,
+        estado: badge.textContent,
+        colorFondo: getComputedStyle(badge).backgroundColor,
+        borderCurvo: getComputedStyle(badge).borderRadius !== '0px',
+        certificado: cert.textContent,
+        procedencia: proc.textContent,
+        sinParentesis: !cert.textContent.includes('(') && !proc.textContent.includes('('),
+        debajoDelCarrusel: bar3R.top >= carr.bottom - 2,
+        encimaDeMetricas: bar3R.bottom <= metricas.top + 2,
+        badgeDerecha: badgeR.left > certR.right && badgeR.left > procR.right,
+        certProcIzquierda: certR.left < badgeR.left && procR.left < badgeR.left
+    });
+})()`));
+
+console.log('\n=== 2) Modal ver detalles: solo Descripción ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
 console.log(await evalJs(`JSON.stringify({
@@ -170,10 +192,11 @@ console.log(await evalJs(`JSON.stringify({
     sinMarcos: !document.getElementById('detalle-marcos'),
     sinFirma: !document.getElementById('detalle-firma'),
     sinConservacion: !document.getElementById('detalle-conservacion'),
+    sinEstado: !document.getElementById('detalle-estado'),
+    sinProcedencia: !document.getElementById('detalle-procedencia'),
+    sinCertificado: !document.getElementById('detalle-certificado'),
     modalVisible: !document.getElementById('modal-detalles-cavent').classList.contains('hidden'),
-    estado: document.getElementById('detalle-estado').textContent,
-    procedencia: document.getElementById('detalle-procedencia').textContent,
-    certificado: document.getElementById('detalle-certificado').textContent
+    descripcion: document.getElementById('detalle-descripcion').textContent
 })`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

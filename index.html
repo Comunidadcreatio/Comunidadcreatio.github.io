@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.503';
+        var currentVer = '1.0.504';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e77758b435">
+    <link rel="stylesheet" href="css/style.css?v=83a0f899c1">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
@@ -1001,25 +1001,11 @@
         <div class="modal-cavent-detalle-bg"></div>
         <div class="modal-cavent-detalle">
             <div class="detalle-scroll">
-                <!-- Grid de detalles en secciones -->
-                <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">Detalles Técnicos</h3>
-                    <div class="detalle-grid">
-                        <div class="detalle-campo"><span class="detalle-label">Estado</span><span class="detalle-valor" id="detalle-estado"></span></div>
-                    </div>
-                </div>
-
+                <!-- Estado, procedencia y certificado ya no van en el modal:
+                     se muestran en la franja inferior de la tarjeta del cavent. -->
                 <div class="detalle-seccion">
                     <h3 class="detalle-seccion-titulo">Descripción</h3>
                     <p class="detalle-valor detalle-descripcion" id="detalle-descripcion"></p>
-                </div>
-
-                <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">Procedencia y Autenticidad</h3>
-                    <div class="detalle-grid">
-                        <div class="detalle-campo"><span class="detalle-label">Procedencia</span><span class="detalle-valor" id="detalle-procedencia"></span></div>
-                        <div class="detalle-campo"><span class="detalle-label">Certificado</span><span class="detalle-valor" id="detalle-certificado"></span></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1027,7 +1013,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=a2bd9014bc" type="module"></script>
+    <script src="js/main.js?v=6aceb738d7" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
