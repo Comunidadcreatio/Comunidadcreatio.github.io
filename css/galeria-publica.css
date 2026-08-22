@@ -216,6 +216,8 @@ html, body {
     overflow: hidden;
     border-radius: 0;
     background: var(--color-gray-100);
+    /* Ancla los dots (absolutos) a la propia imagen, esquina inferior izquierda */
+    position: relative;
 }
 
 .obra-carousel-track {
@@ -241,15 +243,41 @@ html, body {
 }
 
 /* ==============================================
-   DOTS DEL CARRUSEL (centrados arriba, más pequeños)
+   FRANJA AÑO / DIMENSIONES — justo encima del carrusel
+   (dimensiones a la izquierda, año a la derecha, paralelos)
+   ============================================== */
+.obra-meta-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.obra-meta-dimensiones {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.obra-meta-ano {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ==============================================
+   DOTS DEL CARRUSEL (esquina inferior izquierda, dentro del contenedor)
    ============================================== */
 .obra-carousel-dots {
     position: absolute;
-    top: 8px;
-    left: 0;
-    right: 0;
+    bottom: 8px;
+    left: 8px;
+    right: auto;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 6px;
     z-index: 5;
     pointer-events: none;
@@ -657,6 +685,10 @@ html, body {
 
 /* ---- En grid ocultamos la fila de artista; usamos el overlay sobre la imagen ---- */
 #galeria-container.modo-grid .obra-artista-row {
+    display: none;
+}
+/* La franja año/dimensiones solo aplica al carrusel (Cavents), no al grid */
+#galeria-container.modo-grid .obra-meta-bar {
     display: none;
 }
 

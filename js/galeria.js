@@ -121,9 +121,10 @@ function crearCarruselHTML(obra, overlayHTML = '') {
                 <div class="obra-carousel-track" style="transform: translateX(0%);">
                     ${slides}
                 </div>
-            </div>
-            <div class="obra-carousel-dots">
-                ${dots}
+                <!-- Dots DENTRO del área de la imagen (esquina inferior izquierda) -->
+                <div class="obra-carousel-dots">
+                    ${dots}
+                </div>
             </div>
             ${overlayHTML}
         </div>
@@ -273,6 +274,17 @@ function crearObraCard(obra) {
     `;
     const carruselHTML = crearCarruselHTML(obra, gridOverlayHTML);
 
+    // Año y dimensiones: se muestran en la tarjeta, justo encima del carrusel
+    // (año arriba-derecha, dimensiones arriba-izquierda, paralelos). Ya no van
+    // en el modal "ver detalles".
+    const dimensiones = (obra.ancho && obra.alto) ? `${escapeHtml(String(obra.ancho))} × ${escapeHtml(String(obra.alto))} cm` : '';
+    const anio = obra.ano ? escapeHtml(String(obra.ano)) : '';
+    const metaBarHTML = (dimensiones || anio) ? `
+        <div class="obra-meta-bar">
+            <span class="obra-meta-dimensiones">${dimensiones}</span>
+            <span class="obra-meta-ano">${anio}</span>
+        </div>` : '';
+
     card.innerHTML = `
         <div class="obra-card-inner">
             <!-- Header: avatar + nombre artista | título marquee | precio -->
@@ -286,6 +298,9 @@ function crearObraCard(obra) {
                 </div>
                 <span class="obra-precio-top">$${precio}</span>
             </div>
+
+            <!-- Año (derecha) y dimensiones (izquierda), justo encima de las imágenes -->
+            ${metaBarHTML}
 
             <!-- Carrusel de imágenes (incluye overlay para modo grid) -->
             ${carruselHTML}
@@ -507,14 +522,11 @@ export async function abrirDetalleCavent(obraId, cardElement) {
     }
 
     modal.classList.remove('hidden');
-    // Limpiar campos mientras carga
-    document.getElementById('detalle-ano').textContent = 'Cargando...';
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
         const o = data && (data.obra || data.id) ? (data.obra || data) : null;
         if (!o || !o.id) {
-            document.getElementById('detalle-ano').textContent = 'Error al cargar.';
             return;
         }
 
@@ -522,19 +534,15 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         document.getElementById('detalle-tecnica').textContent = o.descripcion_tecnica || o.tecnica || '—';
         document.getElementById('detalle-soporte').textContent = o.soporte || '—';
         document.getElementById('detalle-marcos').textContent = o.marcos || '—';
-        document.getElementById('detalle-dimensiones').textContent = (o.ancho && o.alto) ? `${o.ancho} × ${o.alto} cm` : '—';
-        document.getElementById('detalle-ano').textContent = o.ano || '—';
         document.getElementById('detalle-estado').textContent = o.estado_obra || o.estado || '—';
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
         document.getElementById('detalle-procedencia').textContent = o.procedencia || '—';
         document.getElementById('detalle-certificado').textContent = o.certificado || '—';
         document.getElementById('detalle-firma').textContent = o.firma || '—';
         document.getElementById('detalle-conservacion').textContent = o.conservacion || '—';
-        document.getElementById('detalle-etiquetas').textContent = o.etiquetas || '—';
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);
-        document.getElementById('detalle-ano').textContent = 'Error de conexión.';
     }
 }
 
