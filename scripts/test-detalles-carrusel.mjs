@@ -43,7 +43,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           { id: 1, titulo: 'Retrato al óleo', artista: 'T', artista_user_id: 1,
             imagen_url: img45, imagen_url_1: img11, etiquetas: 'Óleo, Retrato',
             ano: 2024, ancho: 80, alto: 100,
-            descripcion_tecnica: 'Óleo', soporte: 'Lienzo', marcos: 'No',
+            descripcion_tecnica: 'Óleo', soporte: 'Lienzo (Algodón, lino, Mezcla)', marcos: 'No',
             estado_obra: 'Disponible', descripcion_artistica: 'Texto',
             procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
             likes_count: 2, views_count: 5, comments_count: 1, precio: '100',
@@ -101,7 +101,7 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 3) Franja año/dimensiones encima del carrusel ===');
+console.log('\n=== 3) Franja técnica/soporte/año/dimensiones encima del carrusel ===');
 console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar = card.querySelector('.obra-meta-bar');
@@ -109,15 +109,24 @@ console.log(await evalJs(`(() => {
     const carr = card.querySelector('.obra-carousel').getBoundingClientRect();
     const dim = card.querySelector('.obra-meta-dimensiones');
     const anio = card.querySelector('.obra-meta-ano');
+    const tecnica = card.querySelector('.obra-meta-tecnica');
+    const soporte = card.querySelector('.obra-meta-soporte');
     const dimR = dim.getBoundingClientRect();
     const anioR = anio.getBoundingClientRect();
+    const tecR = tecnica.getBoundingClientRect();
+    const sopR = soporte.getBoundingClientRect();
     return JSON.stringify({
         existe: !!bar,
+        tecnica: tecnica.textContent,
+        soporte: soporte.textContent,
+        soporteSinParentesis: !soporte.textContent.includes('('),
         dimensiones: dim.textContent,
         anio: anio.textContent,
         encimaDelCarrusel: barR.bottom <= carr.top + 2,
-        dimIzquierda: dimR.left < anioR.left,
-        anioDerecha: anioR.right > dimR.right
+        tecnicaAlLadoDeDimensiones: Math.abs(tecR.left - dimR.left) < 2 || tecR.right <= dimR.left + 2,
+        soporteAlLadoDelAnio: sopR.right <= anioR.left + 2,
+        ladoIzq: tecR.left < anioR.left,
+        ladoDer: sopR.left > dimR.right
     });
 })()`));
 

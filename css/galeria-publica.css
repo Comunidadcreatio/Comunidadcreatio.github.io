@@ -243,8 +243,8 @@ html, body {
 }
 
 /* ==============================================
-   FRANJA AÑO / DIMENSIONES — justo encima del carrusel
-   (dimensiones a la izquierda, año a la derecha, paralelos)
+   FRANJA TÉCNICA/SOPORTE/AÑO/DIMENSIONES — justo encima del carrusel
+   (izquierda: técnica + dimensiones; derecha: soporte + año, paralelos)
    ============================================== */
 .obra-meta-bar {
     display: flex;
@@ -257,11 +257,27 @@ html, body {
     font-weight: 600;
     color: var(--color-text-muted);
 }
-.obra-meta-dimensiones {
-    text-align: left;
+.obra-meta-lado {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.obra-meta-lado-der {
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+.obra-meta-lado > span {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.obra-meta-tecnica,
+.obra-meta-soporte {
+    flex-shrink: 0;
+}
+.obra-meta-dimensiones {
+    text-align: left;
 }
 .obra-meta-ano {
     text-align: right;

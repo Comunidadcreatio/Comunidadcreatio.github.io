@@ -274,15 +274,23 @@ function crearObraCard(obra) {
     `;
     const carruselHTML = crearCarruselHTML(obra, gridOverlayHTML);
 
-    // Año y dimensiones: se muestran en la tarjeta, justo encima del carrusel
-    // (año arriba-derecha, dimensiones arriba-izquierda, paralelos). Ya no van
-    // en el modal "ver detalles".
+    // Franja justo encima del carrusel: IZQUIERDA = técnica + dimensiones;
+    // DERECHA = soporte + año. El soporte solo muestra la parte fuera de los
+    // paréntesis (ej. "Lienzo (Algodón, lino, Mezcla)" → "Lienzo").
+    const tecnica = (obra.descripcion_tecnica || obra.tecnica || '').trim();
+    const soporte = String(obra.soporte || '').split('(')[0].trim();
     const dimensiones = (obra.ancho && obra.alto) ? `${escapeHtml(String(obra.ancho))} × ${escapeHtml(String(obra.alto))} cm` : '';
     const anio = obra.ano ? escapeHtml(String(obra.ano)) : '';
-    const metaBarHTML = (dimensiones || anio) ? `
+    const metaBarHTML = (tecnica || soporte || dimensiones || anio) ? `
         <div class="obra-meta-bar">
-            <span class="obra-meta-dimensiones">${dimensiones}</span>
-            <span class="obra-meta-ano">${anio}</span>
+            <span class="obra-meta-lado">
+                ${tecnica ? `<span class="obra-meta-tecnica">${escapeHtml(tecnica)}</span>` : ''}
+                ${dimensiones ? `<span class="obra-meta-dimensiones">${dimensiones}</span>` : ''}
+            </span>
+            <span class="obra-meta-lado obra-meta-lado-der">
+                ${soporte ? `<span class="obra-meta-soporte">${escapeHtml(soporte)}</span>` : ''}
+                ${anio ? `<span class="obra-meta-ano">${anio}</span>` : ''}
+            </span>
         </div>` : '';
 
     card.innerHTML = `
