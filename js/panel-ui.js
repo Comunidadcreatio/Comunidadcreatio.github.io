@@ -223,9 +223,9 @@ function dispararInput(index) {
 }
 
 // Recorta una imagen (centrada) al ratio indicado ('4/5' o '1/1') con canvas.
-// Devuelve { file, dataURL } con la imagen ya normalizada (JPEG, alto 1080).
-// Así el archivo que se guarda SIEMPRE queda en 4:5 o 1:1 y el grid/carrusel
-// solo muestran esos formatos.
+// Devuelve { file, dataURL } con la imagen ya normalizada (JPEG, ancho 1080).
+// Así el archivo que se guarda SIEMPRE queda en 4:5 (1080×1350) o 1:1
+// (1080×1080) y el grid/carrusel solo muestran esos formatos.
 function cropearImagen(file, aspect) {
     return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(file);
@@ -243,8 +243,8 @@ function cropearImagen(file, aspect) {
                     // Más alta que el target → recortar arriba/abajo
                     sw = iw; sh = Math.round(iw / target); sx = 0; sy = Math.round((ih - sh) / 2);
                 }
-                const outH = 1080; // calidad suficiente (Cloudinary limita ancho a 1080)
-                const outW = Math.round(outH * target);
+                const outW = 1080; // ancho fijo (Cloudinary limita ancho a 1080)
+                const outH = Math.round(outW / target); // 4:5 → 1350, 1:1 → 1080
                 const canvas = document.createElement('canvas');
                 canvas.width = outW;
                 canvas.height = outH;
