@@ -210,29 +210,34 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 3f) Iconos DIFERENTES, a la IZQUIERDA, tooltip a la DERECHA ===');
-console.log(await evalJs(`(() => {
+console.log('\n=== 3f) Iconos DIFERENTES, a la IZQUIERDA, etiqueta se despliega EN EL FLUJO empujando ===');
+console.log(await evalJs(`(async () => {
     const card = document.querySelector('.obra-card');
     const icos = [...card.querySelectorAll('.obra-meta-ico')];
     const icoCert = icos.find(i => i.dataset.metaLabel === 'Certificado');
     const icoCons = icos.find(i => i.dataset.metaLabel === 'Conservación');
-    // Iconos distintos: comparar el SVG de cada uno
     const svgCert = icoCert.querySelector('svg');
     const svgCons = icoCons.querySelector('svg');
     const iconosDistintos = svgCert.innerHTML !== svgCons.innerHTML;
-    // Icono a la IZQUIERDA del texto del item
     const itemCert = icoCert.parentElement;
     const icoR = icoCert.getBoundingClientRect();
-    const textR = itemCert.lastChild.nodeType === 3 ? (() => { const r = document.createRange(); r.selectNodeContents(itemCert.lastChild); return r.getBoundingClientRect(); })() : icoCert.getBoundingClientRect();
-    // Tooltip a la derecha del icono al tocar (medir antes y después del click)
-    const tip = icoCert.querySelector('.obra-meta-tooltip');
-    const antes = getComputedStyle(tip).visibility;
+    const textoSpan = itemCert.querySelector('.obra-meta-texto');
+    const textR = textoSpan.getBoundingClientRect();
+    const tip = itemCert.querySelector('.obra-meta-tooltip');
+    const maxWidthAntes = getComputedStyle(tip).maxWidth;
+    const procAntes = (() => {
+        const p = card.querySelector('.obra-meta-procedencia');
+        return p ? p.getBoundingClientRect().left : null;
+    })();
     icoCert.click();
-    const durante = getComputedStyle(tip).visibility;
-    const tipR = tip.getBoundingClientRect();
-    const tooltipDerecha = tipR.left >= icoR.right - 2;
-    // El click en el icono NO debe abrir el modal de descripción (el tooltip
-    // quedaría tapado). Antes de la corrección, el modal se abría encima.
+    await new Promise(r => setTimeout(r, 450)); // esperar la transición 0.3s
+    const maxWidthDurante = getComputedStyle(tip).maxWidth;
+    const procDurante = (() => {
+        const p = card.querySelector('.obra-meta-procedencia');
+        return p ? p.getBoundingClientRect().left : null;
+    })();
+    const expande = maxWidthAntes === '0px' && maxWidthDurante !== '0px' && maxWidthDurante !== 'none';
+    const empuja = procAntes !== null && procDurante !== null && procDurante > procAntes + 2;
     const modalAbierto = !document.getElementById('modal-detalles-cavent').classList.contains('hidden');
     return JSON.stringify({
         iconos: icos.map(i => i.dataset.metaLabel),
@@ -240,9 +245,9 @@ console.log(await evalJs(`(() => {
         certificadoEsMedalla: svgCert.innerHTML.includes('M15.48 12.83'),
         conservacionEsEscudo: svgCons.innerHTML.includes('M12 22s8-4 8-10'),
         iconoIzquierdaDelTexto: icoR.left < textR.left,
-        tooltipText: tip.textContent,
-        tooltipDerecha,
-        visibleAlTocar: antes === 'hidden' && durante === 'visible',
+        maxWidthAntes, maxWidthDurante,
+        expande,
+        empuja,
         noAbreModal: !modalAbierto
     });
 })()`));

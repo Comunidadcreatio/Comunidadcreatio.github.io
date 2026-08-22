@@ -334,14 +334,15 @@ html, body {
 }
 
 /* Ítem con icono explicativo (Certificado, Conservación): el icono va a la
-   IZQUIERDA del valor y al tocar/hover despliega la palabra hacia la DERECHA,
-   entre el icono y la información, por ~2.5s */
+   IZQUIERDA del valor. Al tocar/hover, la etiqueta se despliega EN EL FLUJO
+   (empujando la información vecina) por ~2.5s y luego se pliega. */
 .obra-meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 0;
     position: relative;
     flex-shrink: 0;
+    min-width: 0;
 }
 .obra-meta-ico {
     display: inline-flex;
@@ -355,44 +356,39 @@ html, body {
     cursor: pointer;
     position: relative;
     flex-shrink: 0;
+    margin-right: 5px;
 }
+/* Etiqueta EN EL FLUJO: plegada (ancho 0) por defecto; al activarse el icono
+   hermano se expande y EMPUJA al texto y a los demás items hacia la derecha */
 .obra-meta-tooltip {
-    /* Se despliega a la DERECHA del icono, centrado verticalmente */
-    position: absolute;
-    left: calc(100% + 7px);
-    top: 50%;
-    transform: translateY(-50%) translateX(-4px);
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
     background: rgba(20, 20, 20, 0.92);
     color: #fff;
     font-family: 'Nunito', sans-serif;
     font-size: 11px;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 0;
     border-radius: 8px;
-    white-space: nowrap;
     pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+    transition: max-width 0.3s ease, opacity 0.22s ease, padding 0.3s ease;
     z-index: 30;
 }
-.obra-meta-tooltip::after {
-    /* Flecha apuntando hacia el icono (izquierda del tooltip) */
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    transform: translateY(-50%);
-    border: 5px solid transparent;
-    border-right-color: rgba(20, 20, 20, 0.92);
-}
-/* Visible al tocar (JS añade .mostrando ~2.5s) y al hover en escritorio */
-.obra-meta-ico.mostrando .obra-meta-tooltip,
-.obra-meta-ico:hover .obra-meta-tooltip,
-.obra-meta-ico:focus .obra-meta-tooltip {
+/* Al tocar (JS añade .mostrando al icono) o al hover: expandir la etiqueta */
+.obra-meta-ico.mostrando + .obra-meta-tooltip,
+.obra-meta-ico:hover + .obra-meta-tooltip,
+.obra-meta-ico:focus + .obra-meta-tooltip {
+    max-width: 160px;
     opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) translateX(0);
+    padding: 3px 9px;
+    margin-right: 5px;
+}
+.obra-meta-texto {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==============================================
