@@ -12,7 +12,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.504';
+        var currentVer = '1.0.505';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -72,7 +72,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=83a0f899c1">
+    <link rel="stylesheet" href="css/style.css?v=f3eeaa0934">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
@@ -996,24 +996,21 @@
  </div>
 
 
-    <!-- Modal de detalles completos del Cavent (fullscreen) -->
+    <!-- Modal de descripción del Cavent: solo abarca el área de la imagen,
+         fondo translúcido para ver la obra detrás -->
     <div id="modal-detalles-cavent" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-cavent-detalle-bg"></div>
         <div class="modal-cavent-detalle">
             <div class="detalle-scroll">
-                <!-- Estado, procedencia y certificado ya no van en el modal:
-                     se muestran en la franja inferior de la tarjeta del cavent. -->
-                <div class="detalle-seccion">
-                    <h3 class="detalle-seccion-titulo">Descripción</h3>
-                    <p class="detalle-valor detalle-descripcion" id="detalle-descripcion"></p>
-                </div>
+                <p class="detalle-valor detalle-descripcion" id="detalle-descripcion"></p>
             </div>
+            <button type="button" class="btn-comprar-obra" id="btn-comprar-obra">Comprar Obra</button>
         </div>
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=6aceb738d7" type="module"></script>
+    <script src="js/main.js?v=5d557ae450" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

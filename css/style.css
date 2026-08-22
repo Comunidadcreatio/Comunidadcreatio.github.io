@@ -4,7 +4,7 @@
 @import url('header.css?v=b5f4394d9e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=6906a5b816');
+@import url('galeria-publica.css?v=b888bfb1e5');
 
 /* Chat global + privado */
 @import url('chat.css?v=25de70682f');
@@ -879,72 +879,61 @@ input, select, textarea {
 }
 
 /* ==============================================
-   MODAL DE DETALLES DEL CAVENT (FULLSCREEN)
+   MODAL DE DESCRIPCIÓN DEL CAVENT
+   Abarca SOLO el área de la imagen (top/bottom los fija JS desde el
+   carrusel). Fondo translúcido para ver ligeramente la obra detrás.
    ============================================== */
 .modal-cavent-detalle {
     position: fixed;
-    top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
     z-index: 1001;
     display: flex;
     flex-direction: column;
-    background: rgba(10,10,10,0.92);
-    color: #e5e5e5;
+    /* Menos opacidad: se ve la imagen de la obra a través del fondo */
+    background: rgba(10, 10, 10, 0.35);
+    color: #fff;
 }
 .detalle-scroll {
     flex: 1;
     overflow-y: auto;
-    padding: 16px 20px 20px;
-}
-.detalle-seccion {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.detalle-seccion:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-.detalle-seccion-titulo {
-    margin: 0 0 12px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
 }
 .detalle-descripcion {
     line-height: 1.6;
     font-style: italic;
-    color: rgba(255,255,255,0.8);
+    text-align: justify;
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 92%;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
-.detalle-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 20px;
-    padding-bottom: 20px;
+/* Botón Comprar Obra: esquina inferior derecha del área de la imagen */
+.btn-comprar-obra {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    z-index: 10;
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 22px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s ease, background 0.2s ease;
 }
-.detalle-campo {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+.btn-comprar-obra:hover {
+    background: #256a29;
+    transform: scale(1.04);
 }
-.detalle-campo-full {
-    grid-column: 1 / -1;
-}
-.detalle-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.6px;
-}
-.detalle-valor {
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.9);
-    line-height: 1.4;
+.btn-comprar-obra:active {
+    transform: scale(0.96);
 }
 /* Like animado */
 .metrica-like.liked svg {

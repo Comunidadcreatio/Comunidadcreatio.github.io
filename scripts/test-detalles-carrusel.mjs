@@ -180,24 +180,50 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 2) Modal ver detalles: solo Descripción ===');
+console.log('\n=== 3d) Colores de estado DIFERENTES por opción ===');
+console.log(await evalJs(`(() => {
+    const badges = [...document.querySelectorAll('.obra-estado-badge')];
+    const estados = badges.map(b => ({ texto: b.textContent, color: getComputedStyle(b).backgroundColor }));
+    return JSON.stringify({ badges: estados, coloresDistintos: new Set(estados.map(e => e.color)).size > 1 });
+})()`));
+
+console.log('\n=== 3e) Animación del estado al mostrar el cavent ===');
+console.log(await evalJs(`(() => {
+    // La 1ª tarjeta está visible: el IntersectionObserver debe haber añadido
+    // la clase estado-anim al badge (disparada con retraso real de observer).
+    const badge = document.querySelector('.obra-card .obra-estado-badge');
+    return JSON.stringify({
+        animado: badge && badge.classList.contains('estado-anim'),
+        animacion: badge ? getComputedStyle(badge).animationName : null
+    });
+})()`));
+
+console.log('\n=== 2) Modal: abarca el área de imagen, descripción centrada, botón Comprar Obra ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
-console.log(await evalJs(`JSON.stringify({
-    sinEtiquetas: !document.getElementById('detalle-etiquetas'),
-    sinAno: !document.getElementById('detalle-ano'),
-    sinDimensiones: !document.getElementById('detalle-dimensiones'),
-    sinTecnica: !document.getElementById('detalle-tecnica'),
-    sinSoporte: !document.getElementById('detalle-soporte'),
-    sinMarcos: !document.getElementById('detalle-marcos'),
-    sinFirma: !document.getElementById('detalle-firma'),
-    sinConservacion: !document.getElementById('detalle-conservacion'),
-    sinEstado: !document.getElementById('detalle-estado'),
-    sinProcedencia: !document.getElementById('detalle-procedencia'),
-    sinCertificado: !document.getElementById('detalle-certificado'),
-    modalVisible: !document.getElementById('modal-detalles-cavent').classList.contains('hidden'),
-    descripcion: document.getElementById('detalle-descripcion').textContent
-})`));
+console.log(await evalJs(`(() => {
+    const modal = document.getElementById('modal-detalles-cavent');
+    const content = modal.querySelector('.modal-cavent-detalle');
+    const desc = document.getElementById('detalle-descripcion');
+    const btn = document.getElementById('btn-comprar-obra');
+    const cr = content.getBoundingClientRect();
+    const carr = document.querySelector('.obra-card .obra-carousel').getBoundingClientRect();
+    const dcs = getComputedStyle(desc);
+    return JSON.stringify({
+        modalVisible: !modal.classList.contains('hidden'),
+        descripcion: desc.textContent,
+        descCentrada: dcs.textAlign === 'justify',
+        botonExiste: !!btn,
+        botonTexto: btn ? btn.textContent.trim() : null,
+        botonAbajoDerecha: (() => {
+            const br = btn.getBoundingClientRect();
+            const cr2 = content.getBoundingClientRect();
+            return br.bottom <= cr2.bottom + 4 && br.right >= cr2.right - 60;
+        })(),
+        abarcaSoloImagen: Math.abs(cr.top - carr.top) < 4 && Math.abs(cr.bottom - carr.bottom) < 4,
+        fondoTranslucido: getComputedStyle(content).backgroundColor.includes('0.35')
+    });
+})()`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}

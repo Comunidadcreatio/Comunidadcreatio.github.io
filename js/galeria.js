@@ -238,18 +238,20 @@ function initCarrusel(card) {
     });
 }
 
-// Color del rectángulo de estado según el valor que eligió el autor.
+// Color del rectángulo de estado — UN color distinto por cada opción que el
+// autor puede elegir (campo estado_obra/estado/status del backend).
 function colorDeEstado(estado) {
     const e = String(estado || '').toLowerCase();
-    if (e.includes('disponible')) return '#2e7d32';      // verde
-    if (e.includes('reservado')) return '#e67e22';       // naranja
-    if (e.includes('vendido')) return '#c0392b';         // rojo
-    if (e.includes('préstamo') || e.includes('prestamo')) return '#2980b9'; // azul
-    if (e.includes('exhibición') || e.includes('exhibicion')) return '#8e44ad'; // morado
-    if (e.includes('retirado')) return '#7f8c8d';        // gris
-    if (e.includes('inactivo')) return '#95a5a6';        // gris claro
-    if (e.includes('no disponible')) return '#95a5a6';   // gris claro
-    return '#607d8b';                                    // gris azulado por defecto
+    if (e.includes('disponible') && e.includes('venta')) return '#2e7d32';       // verde
+    if (e.includes('disponible')) return '#27ae60';                              // verde claro
+    if (e.includes('reservado')) return '#e67e22';                               // naranja
+    if (e.includes('vendido')) return '#c0392b';                                 // rojo
+    if (e.includes('no disponible')) return '#7f8c8d';                           // gris
+    if (e.includes('préstamo') || e.includes('prestamo')) return '#2980b9';      // azul
+    if (e.includes('exhibición') || e.includes('exhibicion')) return '#8e44ad';  // morado
+    if (e.includes('retirado')) return '#6d4c41';                                // marrón
+    if (e.includes('inactivo')) return '#95a5a6';                                // gris claro
+    return '#607d8b';                                                            // gris azulado por defecto
 }
 
 function crearObraCard(obra) {
@@ -327,7 +329,8 @@ function crearObraCard(obra) {
     // Franja inferior (entre el carrusel y las métricas): IZQUIERDA =
     // certificado • procedencia; DERECHA = estado como rectángulo curvo de
     // color según el estado que eligió el autor.
-    const estado = (obra.estado_obra || obra.estado || '').trim();
+    // El backend puede devolver el estado como estado_obra, estado o status.
+    const estado = String(obra.estado_obra || obra.estado || obra.status || '').trim();
     const certificado = String(obra.certificado || '').split('(')[0].trim();
     const procedencia = String(obra.procedencia || '').split('(')[0].trim();
     const estadoColor = colorDeEstado(estado);
@@ -492,6 +495,13 @@ export function setupViewTracking(container, obras) {
             const obraId = parseInt(entry.target.dataset.obraId);
             if (!obraId) return;
             if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                // Animación del rectángulo de estado: solo cuando el cavent
+                // se muestra en pantalla (una sola vez por tarjeta).
+                const badge = entry.target.querySelector('.obra-estado-badge');
+                if (badge && !badge.dataset.animado) {
+                    badge.dataset.animado = '1';
+                    badge.classList.add('estado-anim');
+                }
                 // Visible >50% → iniciar timer de 2.5s
                 if (!VIEW_TIMERS.has(obraId) && !window._vistasRegistradas.has(obraId)) {
                     const timer = setTimeout(() => {
@@ -560,22 +570,17 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         btn.setAttribute('title', 'Ver detalles');
     });
 
-    // Alinear bordes del modal con la card: top = debajo de la fila artista/título/precio
+    // Alinear el modal SOLO con el contenedor de imágenes del carrusel
+    // (no con toda la tarjeta): top/bottom se toman del .obra-carousel.
     const modalContent = modal.querySelector('.modal-cavent-detalle');
     if (cardElement && modalContent) {
-        const artistaRow = cardElement.querySelector('.obra-artista-row');
-        const metricsBar = cardElement.querySelector('.obra-metricas-bar');
-        if (artistaRow) {
-            const topRect = artistaRow.getBoundingClientRect();
-            const marginBottom = parseFloat(getComputedStyle(artistaRow).marginBottom) || 0;
-            modalContent.style.top = (topRect.bottom + marginBottom) + 'px';
+        const carousel = cardElement.querySelector('.obra-carousel');
+        if (carousel) {
+            const rect = carousel.getBoundingClientRect();
+            modalContent.style.top = rect.top + 'px';
+            modalContent.style.bottom = (window.innerHeight - rect.bottom) + 'px';
         } else {
             modalContent.style.top = '';
-        }
-        if (metricsBar) {
-            const rect = metricsBar.getBoundingClientRect();
-            modalContent.style.bottom = (window.innerHeight - rect.top) + 'px';
-        } else {
             modalContent.style.bottom = '';
         }
     }
