@@ -104,5 +104,19 @@ console.log(await evalJs(`JSON.stringify({
     columnCount: getComputedStyle(document.getElementById('galeria-container')).columnCount
 })`));
 
+console.log('\n=== 5) Esquinas RECTAS y sin aire lateral ===');
+console.log(await evalJs(`(() => {
+    const c = document.getElementById('galeria-container');
+    const img = document.querySelector('#galeria-container .obra-carousel-slide img');
+    const overlay = document.querySelector('#galeria-container .obra-grid-overlay');
+    const cs = getComputedStyle(c);
+    return JSON.stringify({
+        paddingLateral: cs.paddingLeft,
+        borderRadiusImg: img ? getComputedStyle(img).borderRadius : '(sin img)',
+        borderRadiusOverlay: overlay ? getComputedStyle(overlay).borderRadius : '(sin overlay)',
+        esquinasRectas: (!img || getComputedStyle(img).borderRadius === '0px') && (!overlay || getComputedStyle(overlay).borderRadius === '0px')
+    });
+})()`));
+
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}

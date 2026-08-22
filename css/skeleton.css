@@ -129,6 +129,7 @@
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
     margin-bottom: 24px;
+    border-radius: 0;                   /* esquinas rectas, igual que el grid real */
 }
 
 /* Evitar que el skeleton herede animaciones de las tarjetas reales */

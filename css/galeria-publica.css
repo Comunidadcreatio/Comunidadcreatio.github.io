@@ -558,7 +558,7 @@ html, body {
     display: block;                  /* multi-column: las tarjetas fluyen en columnas */
     columns: 3;
     column-gap: 6px;
-    padding: 6px 8px 12px;
+    padding: 6px 0 12px;
     overflow-y: auto;
     scroll-snap-type: none;
     animation: gridContainerEnter 0.4s ease-out;
@@ -652,7 +652,7 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 0; /* esquinas RECTAS en el grid de Explorar */
 }
 
 /* ---- En grid ocultamos la fila de artista; usamos el overlay sobre la imagen ---- */
@@ -836,7 +836,7 @@ html, body {
     box-sizing: border-box;
     pointer-events: none;
     z-index: 10;
-    border-radius: 8px; /* igual que la imagen */
+    border-radius: 0; /* esquinas rectas, igual que la imagen del grid */
     /* S3: degradado oscuro sutil en la base para legibilidad de vistas/precio */
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.5) 100%);
 }
@@ -896,7 +896,7 @@ html, body {
 @media (max-width: 768px) {
     #galeria-container.modo-grid {
         gap: 6px;
-        padding: 6px 8px 12px;
+        padding: 6px 0 12px;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
@@ -916,7 +916,7 @@ html, body {
 @media (max-width: 480px) {
     #galeria-container.modo-grid {
         gap: 6px;
-        padding: 6px 8px 12px;
+        padding: 6px 0 12px;
     }
 
     #galeria-container.modo-grid .obra-artista-row {
