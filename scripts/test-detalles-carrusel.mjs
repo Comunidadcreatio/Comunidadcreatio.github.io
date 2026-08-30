@@ -52,7 +52,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             imagen_url: img11, etiquetas: 'Paisaje',
             ano: 2023, ancho: 50, alto: 50,
             descripcion_tecnica: 'Acuarela', soporte: 'Papel', marcos: 'No',
-            estado_obra: 'Vendido', descripcion_artistica: 'Texto2',
+            estado_obra: 'No disponible temporalmente', descripcion_artistica: 'Texto2',
             procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
             likes_count: 0, views_count: 3, comments_count: 0, precio: 'N/A',
             foto_artista: '' }
@@ -159,7 +159,7 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 3c) Franja 3 (debajo del carrusel): estado (badge color, derecha) + certificado/procedencia (izquierda) ===');
+console.log('\n=== 3c) Franja 3: estado SIN paréntesis + outline color + certificado/procedencia ===');
 console.log(await evalJs(`(() => {
     const card = document.querySelector('.obra-card');
     const bar3 = card.querySelector('.obra-meta-bar-3');
@@ -178,11 +178,15 @@ console.log(await evalJs(`(() => {
         if (ico) ico.remove();
         return clon.textContent.trim();
     })();
+    const cs = getComputedStyle(badge);
     return JSON.stringify({
         existe: !!bar3,
         estado: badge.textContent,
-        colorFondo: getComputedStyle(badge).backgroundColor,
-        borderCurvo: getComputedStyle(badge).borderRadius !== '0px',
+        sinParentesisEnEstado: !badge.textContent.includes('('),
+        colorTexto: cs.color,
+        colorBorde: cs.borderColor,
+        fondoTransparente: cs.backgroundColor === 'rgba(0, 0, 0, 0)',
+        bordeCurvo: cs.borderRadius !== '0px',
         certificado: certTexto,
         procedencia: proc.textContent,
         sinParentesis: certTexto && !certTexto.includes('(') && !proc.textContent.includes('('),
@@ -272,7 +276,7 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 2b) Botón Comprar Obra en la BARRA junto a la lupa + estilo outline ámbar ===');
+console.log('\n=== 2b) Botón Comprar Obra: visible con "Disponible", NO con "No disponible" ===');
 console.log(await evalJs(`(async () => {
     // Cerrar modal
     document.getElementById('modal-detalles-cavent').classList.add('hidden');
@@ -286,6 +290,7 @@ console.log(await evalJs(`(async () => {
     const animado = btn1.classList.contains('comprar-anim');
     const animationName = getComputedStyle(btn1).animationName;
     const cs = getComputedStyle(btn1);
+    const badge1 = cards[0].querySelector('.obra-estado-badge');
     const badge2 = cards[1].querySelector('.obra-estado-badge');
     return JSON.stringify({
         botonEnBarra: !!btn1 && !!btn1.closest('.obra-metricas-izq'),
@@ -297,8 +302,10 @@ console.log(await evalJs(`(async () => {
         colorTextoAmbar: cs.color === 'rgb(245, 197, 66)', colorReal: cs.color, theme: document.documentElement.dataset.theme,
         animado,
         animationName,
-        botonVendidoNoExiste: !btn2,
-        estadoTarjeta2: badge2 ? badge2.textContent : null
+        estadoTarjeta1: badge1 ? badge1.textContent : null,
+        botonConDisponible: !!btn1,
+        estadoTarjeta2: badge2 ? badge2.textContent : null,
+        botonNoDisponibleNoExiste: !btn2
     });
 })()`));
 

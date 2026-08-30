@@ -274,21 +274,29 @@ html, body {
     border-top: 1px solid rgba(128, 128, 128, 0.18);
 }
 
-/* Rectángulo curvo relleno de color para el estado */
+/* Rectángulo de estado — MISMO aspecto outline que el botón Comprar:
+   fondo transparente, borde y texto del color de la opción (el color lo
+   pone JS inline), sin relleno sólido. Al hover se rellena con su color. */
 .obra-estado-badge {
     flex-shrink: 0;
     max-width: 55%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #fff;
+    background: transparent;
     font-family: 'Nunito', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 5px 14px;
+    border: 1.5px solid;
+    border-radius: 24px;
     text-align: center;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    cursor: default;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.obra-estado-badge:hover {
+    background: currentColor;
+    color: #1a1a1a !important;
 }
 /* Animación del estado cuando el cavent se muestra en pantalla:
    se DESPLIEGA desde la derecha hacia la izquierda (sin rebote) */

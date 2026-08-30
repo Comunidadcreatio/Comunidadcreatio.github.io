@@ -238,15 +238,23 @@ function initCarrusel(card) {
     });
 }
 
+// Texto limpio de una opción: solo la parte FUERA de los paréntesis.
+// "Disponible (en venta)" → "Disponible"; "No disponible temporalmente" → igual.
+function textoLimpio(valor) {
+    return String(valor || '').split('(')[0].trim();
+}
+
 // Color del rectángulo de estado — UN color distinto por cada opción que el
 // autor puede elegir (campo estado_obra/estado/status del backend).
+// IMPORTANTE: "no disponible" se chequea ANTES que "disponible" (si no,
+// "No disponible temporalmente" caería en el verde de "disponible").
 function colorDeEstado(estado) {
     const e = String(estado || '').toLowerCase();
+    if (e.includes('no disponible')) return '#7f8c8d';                           // gris
     if (e.includes('disponible') && e.includes('venta')) return '#2e7d32';       // verde
     if (e.includes('disponible')) return '#27ae60';                              // verde claro
     if (e.includes('reservado')) return '#e67e22';                               // naranja
     if (e.includes('vendido')) return '#c0392b';                                 // rojo
-    if (e.includes('no disponible')) return '#7f8c8d';                           // gris
     if (e.includes('préstamo') || e.includes('prestamo')) return '#2980b9';      // azul
     if (e.includes('exhibición') || e.includes('exhibicion')) return '#8e44ad';  // morado
     if (e.includes('retirado')) return '#6d4c41';                                // marrón
@@ -284,11 +292,12 @@ document.addEventListener('click', (e) => {
 });
 
 // ¿El estado permite COMPRAR la obra? Solo los estados "Disponible" muestran
-// el botón Comprar Obra. Reservado, Vendido, No disponible, En préstamo,
-// Solo exhibición, Retirado e Inactivo NO lo muestran.
+// el botón Comprar Obra. "No disponible temporalmente" NO debe mostrarlo
+// (aunque contenga la palabra "disponible"), igual que Reservado, Vendido,
+// En préstamo, Solo exhibición, Retirado e Inactivo.
 function estadoPermiteCompra(estado) {
-    const e = String(estado || '').toLowerCase();
-    return e.includes('disponible');
+    const limpio = textoLimpio(estado).toLowerCase();
+    return limpio === 'disponible';
 }
 
 function crearObraCard(obra) {
@@ -374,13 +383,17 @@ function crearObraCard(obra) {
     const certificado = String(obra.certificado || '').split('(')[0].trim();
     const procedencia = String(obra.procedencia || '').split('(')[0].trim();
     const estadoColor = colorDeEstado(estado);
+    // El badge muestra el estado SIN los paréntesis ("Disponible (en venta)" →
+    // "Disponible") con el MISMO aspecto outline del botón Comprar: borde y
+    // texto del color según la opción, fondo transparente.
+    const estadoLimpio = textoLimpio(estado);
     const metaBar3HTML = (estado || certificado || procedencia) ? `
         <div class="obra-meta-bar obra-meta-bar-3">
             <span class="obra-meta-lado">
                 ${certificado ? `<span class="obra-meta-item">${iconoMeta('Certificado')}<span class="obra-meta-tooltip">Certificado</span><span class="obra-meta-texto">${escapeHtml(certificado)}</span></span>` : ''}
                 ${procedencia ? `<span class="obra-meta-procedencia">${escapeHtml(procedencia)}</span>` : ''}
             </span>
-            ${estado ? `<span class="obra-estado-badge" style="background:${estadoColor}">${escapeHtml(estado)}</span>` : ''}
+            ${estado ? `<span class="obra-estado-badge" style="border-color:${estadoColor};color:${estadoColor}">${escapeHtml(estadoLimpio)}</span>` : ''}
         </div>` : '';
 
     card.innerHTML = `
