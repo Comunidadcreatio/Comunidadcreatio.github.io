@@ -272,7 +272,7 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 2b) Botón Comprar Obra en la BARRA junto a la lupa + animación ===');
+console.log('\n=== 2b) Botón Comprar Obra en la BARRA junto a la lupa + estilo outline ámbar ===');
 console.log(await evalJs(`(async () => {
     // Cerrar modal
     document.getElementById('modal-detalles-cavent').classList.add('hidden');
@@ -285,11 +285,16 @@ console.log(await evalJs(`(async () => {
     const juntoALupa = btn1R.left >= lupaR.right - 4 && btn1R.left < lupaR.right + 80;
     const animado = btn1.classList.contains('comprar-anim');
     const animationName = getComputedStyle(btn1).animationName;
-    // La 2ª tarjeta (Vendido): su botón NO debe existir (no se renderiza)
+    const cs = getComputedStyle(btn1);
     const badge2 = cards[1].querySelector('.obra-estado-badge');
     return JSON.stringify({
         botonEnBarra: !!btn1 && !!btn1.closest('.obra-metricas-izq'),
         juntoALupa,
+        texto: btn1.textContent.trim(),
+        tieneIconoCarrito: !!btn1.querySelector('svg'),
+        noEsVerde: cs.backgroundColor === 'rgba(0, 0, 0, 0)' && !cs.backgroundColor.includes('46, 125, 50'),
+        bordeAmbar: cs.borderColor === 'rgb(245, 197, 66)',
+        colorTextoAmbar: cs.color === 'rgb(245, 197, 66)', colorReal: cs.color, theme: document.documentElement.dataset.theme,
         animado,
         animationName,
         botonVendidoNoExiste: !btn2,

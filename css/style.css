@@ -911,27 +911,31 @@ input, select, textarea {
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
 /* Botón Comprar Obra: en la barra inferior de la tarjeta, junto a la lupa.
-   Solo se muestra si el estado permite la venta. Al aparecer el cavent en
-   pantalla (scroll) entra con una animación suave profesional. */
+   Estilo OUTLINE ámbar (acento de la app), sin relleno verde: borde y texto
+   en color dorado, con icono de carrito. Al aparecer el cavent en pantalla
+   (scroll) entra con una animación suave profesional. */
 .btn-comprar-obra {
-    background: #2e7d32;
-    color: #fff;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: #F5C542;
+    border: 1.5px solid #F5C542;
     border-radius: 24px;
-    padding: 9px 18px;
+    padding: 8px 16px;
     font-family: 'Nunito', sans-serif;
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
 }
 .btn-comprar-obra:hover {
-    background: #256a29;
+    background: #F5C542;
+    color: #1a1a1a;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 14px rgba(245, 197, 66, 0.4);
 }
 .btn-comprar-obra:active {
     transform: scale(0.95);
@@ -949,6 +953,15 @@ input, select, textarea {
 /* Oculto cuando el estado de la obra no permite la compra (no se renderiza) */
 .btn-comprar-obra.hidden {
     display: none;
+}
+/* En modo oscuro la regla global [data-theme="dark"] button { color: ink }
+   pisa el color ámbar del botón: se restaura el color del outline */
+[data-theme="dark"] .btn-comprar-obra {
+    color: #F5C542;
+}
+[data-theme="dark"] .btn-comprar-obra:hover {
+    background: #F5C542;
+    color: #1a1a1a;
 }
 /* Like animado */
 .metrica-like.liked svg {
