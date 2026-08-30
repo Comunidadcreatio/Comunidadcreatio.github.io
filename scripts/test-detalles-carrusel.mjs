@@ -55,6 +55,22 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             estado_obra: 'No disponible temporalmente', descripcion_artistica: 'Texto2',
             procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
             likes_count: 0, views_count: 3, comments_count: 0, precio: 'N/A',
+            foto_artista: '' },
+          { id: 3, titulo: 'Prestada', artista: 'T', artista_user_id: 1,
+            imagen_url: img45, etiquetas: 'Arte',
+            ano: 2022, ancho: 60, alto: 75,
+            descripcion_tecnica: 'Mixta', soporte: 'Madera', marcos: 'No',
+            estado_obra: 'En préstamo (fuera de galería)', descripcion_artistica: 'Texto3',
+            procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
+            likes_count: 0, views_count: 3, comments_count: 0, precio: 'N/A',
+            foto_artista: '' },
+          { id: 4, titulo: 'Vendida', artista: 'T', artista_user_id: 1,
+            imagen_url: img11, etiquetas: 'Arte',
+            ano: 2021, ancho: 40, alto: 40,
+            descripcion_tecnica: 'Óleo', soporte: 'Lienzo', marcos: 'No',
+            estado_obra: 'Vendido', descripcion_artistica: 'Texto4',
+            procedencia: '—', certificado: '—', firma: '—', conservacion: 'Buena',
+            likes_count: 0, views_count: 3, comments_count: 0, precio: 'N/A',
             foto_artista: '' }
       ];
       const realFetch = window.fetch.bind(window);
@@ -276,18 +292,18 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== 2b) Botón Comprar Obra: visible con "Disponible", NO con "No disponible" ===');
+console.log('\n=== 2b) Botón de acción según estado: Comprar / Notificarme / Contactar / Ver más ===');
 console.log(await evalJs(`(async () => {
     // Cerrar modal
     document.getElementById('modal-detalles-cavent').classList.add('hidden');
     const cards = document.querySelectorAll('.obra-card');
-    const btn1 = cards[0].querySelector('.btn-comprar-obra');
-    const btn2 = cards[1].querySelector('.btn-comprar-obra');
+    const btn1 = cards[0].querySelector('.btn-accion-obra');
+    const btn2 = cards[1].querySelector('.btn-accion-obra');
     const lupa = cards[0].querySelector('.btn-ver-detalles');
     const lupaR = lupa.getBoundingClientRect();
     const btn1R = btn1.getBoundingClientRect();
-    const juntoALupa = btn1R.left >= lupaR.right - 4 && btn1R.left < lupaR.right + 80;
-    const animado = btn1.classList.contains('comprar-anim');
+    const juntoALupa = btn1R.left >= lupaR.right - 4 && btn1R.left < lupaR.right + 120;
+    const animado = btn1.classList.contains('accion-anim');
     const animationName = getComputedStyle(btn1).animationName;
     const cs = getComputedStyle(btn1);
     const badge1 = cards[0].querySelector('.obra-estado-badge');
@@ -295,17 +311,19 @@ console.log(await evalJs(`(async () => {
     return JSON.stringify({
         botonEnBarra: !!btn1 && !!btn1.closest('.obra-metricas-izq'),
         juntoALupa,
-        texto: btn1.textContent.trim(),
-        tieneIconoCarrito: !!btn1.querySelector('svg'),
-        noEsVerde: cs.backgroundColor === 'rgba(0, 0, 0, 0)' && !cs.backgroundColor.includes('46, 125, 50'),
-        bordeAmbar: cs.borderColor === 'rgb(245, 197, 66)',
-        colorTextoAmbar: cs.color === 'rgb(245, 197, 66)', colorReal: cs.color, theme: document.documentElement.dataset.theme,
+        texto1: btn1.textContent.trim(),
+        clase1: btn1.className,
+        tieneIcono: !!btn1.querySelector('svg'),
+        colorOutline: cs.backgroundColor === 'rgba(0, 0, 0, 0)',
         animado,
         animationName,
         estadoTarjeta1: badge1 ? badge1.textContent : null,
-        botonConDisponible: !!btn1,
+        boton1EsComprar: btn1.textContent.includes('Comprar'),
         estadoTarjeta2: badge2 ? badge2.textContent : null,
-        botonNoDisponibleNoExiste: !btn2
+        boton2EsNotificar: !!btn2 && btn2.textContent.includes('Notificarme'),
+        // Obras 3 y 4: Contactar (préstamo) y Ver más (vendido)
+        boton3EsContactar: (() => { const b = document.querySelectorAll('.obra-card')[2]?.querySelector('.btn-accion-obra'); return !!b && b.textContent.includes('Contactar'); })(),
+        boton4EsVerMas: (() => { const b = document.querySelectorAll('.obra-card')[3]?.querySelector('.btn-accion-obra'); return !!b && b.textContent.includes('Ver más'); })()
     });
 })()`));
 

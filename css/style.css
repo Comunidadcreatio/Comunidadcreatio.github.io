@@ -910,17 +910,16 @@ input, select, textarea {
     max-width: 92%;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
-/* Botón Comprar Obra: en la barra inferior de la tarjeta, junto a la lupa.
-   Estilo OUTLINE ámbar (acento de la app), sin relleno verde: borde y texto
-   en color dorado, con icono de carrito. Al aparecer el cavent en pantalla
+/* Botón de acción según estado (Comprar / Notificarme / Contactar / Ver más):
+   en la barra inferior de la tarjeta, junto a la lupa. Estilo OUTLINE con el
+   color propio de cada acción, sin relleno. Al aparecer el cavent en pantalla
    (scroll) entra con una animación suave profesional. */
-.btn-comprar-obra {
+.btn-accion-obra {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     background: transparent;
-    color: #F5C542;
-    border: 1.5px solid #F5C542;
+    border: 1.5px solid;
     border-radius: 24px;
     padding: 8px 16px;
     font-family: 'Nunito', sans-serif;
@@ -931,18 +930,52 @@ input, select, textarea {
     white-space: nowrap;
     transition: background 0.2s ease, color 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
 }
-.btn-comprar-obra:hover {
+.btn-accion-obra:hover {
+    transform: translateY(-1px);
+}
+.btn-accion-obra:active {
+    transform: scale(0.95);
+}
+/* Colores por acción (outline): texto/borde del color, hover rellena */
+.btn-accion-comprar {
+    color: #F5C542;
+    border-color: #F5C542;
+}
+.btn-accion-comprar:hover {
     background: #F5C542;
     color: #1a1a1a;
-    transform: translateY(-1px);
     box-shadow: 0 4px 14px rgba(245, 197, 66, 0.4);
 }
-.btn-comprar-obra:active {
-    transform: scale(0.95);
+.btn-accion-notificar {
+    color: #5BA0D9;
+    border-color: #5BA0D9;
+}
+.btn-accion-notificar:hover {
+    background: #5BA0D9;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(91, 160, 217, 0.4);
+}
+.btn-accion-contactar {
+    color: #16a085;
+    border-color: #16a085;
+}
+.btn-accion-contactar:hover {
+    background: #16a085;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(22, 160, 133, 0.4);
+}
+.btn-accion-artista {
+    color: #8e44ad;
+    border-color: #8e44ad;
+}
+.btn-accion-artista:hover {
+    background: #8e44ad;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(142, 68, 173, 0.4);
 }
 /* Animación de entrada: aparece deslizándose desde la izquierda con fade,
    ligero rebote sutil (curva elástica suave) — la agrega el IntersectionObserver */
-.btn-comprar-obra.comprar-anim {
+.btn-accion-obra.accion-anim {
     animation: comprarEntra 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes comprarEntra {
@@ -950,19 +983,20 @@ input, select, textarea {
     60%  { opacity: 1; transform: translateX(3px) scale(1.02); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
-/* Oculto cuando el estado de la obra no permite la compra (no se renderiza) */
-.btn-comprar-obra.hidden {
+/* Oculto cuando el estado no merece botón (no se renderiza) */
+.btn-accion-obra.hidden {
     display: none;
 }
 /* En modo oscuro la regla global [data-theme="dark"] button { color: ink }
-   pisa el color ámbar del botón: se restaura el color del outline */
-[data-theme="dark"] .btn-comprar-obra {
-    color: #F5C542;
-}
-[data-theme="dark"] .btn-comprar-obra:hover {
-    background: #F5C542;
-    color: #1a1a1a;
-}
+   pisa el color del outline: se restaura el color de cada acción */
+[data-theme="dark"] .btn-accion-comprar { color: #F5C542; }
+[data-theme="dark"] .btn-accion-comprar:hover { background: #F5C542; color: #1a1a1a; }
+[data-theme="dark"] .btn-accion-notificar { color: #5BA0D9; }
+[data-theme="dark"] .btn-accion-notificar:hover { background: #5BA0D9; color: #fff; }
+[data-theme="dark"] .btn-accion-contactar { color: #16a085; }
+[data-theme="dark"] .btn-accion-contactar:hover { background: #16a085; color: #fff; }
+[data-theme="dark"] .btn-accion-artista { color: #8e44ad; }
+[data-theme="dark"] .btn-accion-artista:hover { background: #8e44ad; color: #fff; }
 /* Like animado */
 .metrica-like.liked svg {
     fill: #ef4444;

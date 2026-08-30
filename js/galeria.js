@@ -291,13 +291,25 @@ document.addEventListener('click', (e) => {
     }, 2500));
 });
 
-// ¿El estado permite COMPRAR la obra? Solo los estados "Disponible" muestran
-// el botón Comprar Obra. "No disponible temporalmente" NO debe mostrarlo
-// (aunque contenga la palabra "disponible"), igual que Reservado, Vendido,
-// En préstamo, Solo exhibición, Retirado e Inactivo.
-function estadoPermiteCompra(estado) {
+// Botón de acción según el estado de la obra. Devuelve { texto, clase, icono }
+// o null si el estado no merece botón.
+//   - Disponible             → Comprar (ámbar)
+//   - Reservado / No dispon. → Notificarme (azul)
+//   - En préstamo / Exhibic. → Contactar (celeste)
+//   - Vendido / Retirado     → Ver más del artista (morado)
+//   - Inactivo               → sin botón
+function accionParaEstado(estado) {
     const limpio = textoLimpio(estado).toLowerCase();
-    return limpio === 'disponible';
+    const ICONO_CARRITO = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.5"/><circle cx="20" cy="21" r="1.5"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+    const ICONO_CAMPANA = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+    const ICONO_SOBRE = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+    const ICONO_PALETA = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19a7 7 0 1 1 0-14c3.5 0 6.5 2.5 6.5 5 0 2-1.5 3-3 3h-2c-1.5 0-2.5 1-2.5 2.5S11 19 12 19z"/><circle cx="9" cy="9" r="0.5" fill="currentColor"/><circle cx="15" cy="9" r="0.5" fill="currentColor"/><circle cx="12" cy="6.5" r="0.5" fill="currentColor"/></svg>';
+
+    if (limpio === 'disponible') return { texto: 'Comprar', clase: 'btn-accion-comprar', icono: ICONO_CARRITO };
+    if (limpio === 'reservado' || limpio.startsWith('no disponible')) return { texto: 'Notificarme', clase: 'btn-accion-notificar', icono: ICONO_CAMPANA };
+    if (limpio.includes('préstamo') || limpio.includes('prestamo') || limpio.includes('exhibición') || limpio.includes('exhibicion')) return { texto: 'Contactar', clase: 'btn-accion-contactar', icono: ICONO_SOBRE };
+    if (limpio === 'vendido' || limpio.includes('retirado')) return { texto: 'Ver más del artista', clase: 'btn-accion-artista', icono: ICONO_PALETA };
+    return null; // Inactivo y cualquier otro estado: sin botón
 }
 
 function crearObraCard(obra) {
@@ -420,16 +432,16 @@ function crearObraCard(obra) {
             <!-- Franja 3: estado (rectángulo de color, derecha) + certificado/procedencia (izquierda) -->
             ${metaBar3HTML}
 
-            <!-- Barra inferior sólida: botón comprar + lupa (izq) | métricas (der) -->
+            <!-- Barra inferior sólida: botón de acción + lupa (izq) | métricas (der) -->
             <div class="obra-metricas-bar">
                 <div class="obra-metricas-izq">
                     <button class="btn-ver-detalles btn-detalles-toggle" aria-label="Ver detalles" title="Ver detalles">
                         <svg class="icon-lupa" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     </button>
-                    <!-- Comprar Obra: solo si el estado permite la venta; anima al
-                         aparecer el cavent en pantalla (IntersectionObserver) -->
-                    ${estadoPermiteCompra(estado) ? '<button type="button" class="btn-comprar-obra"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.5"/><circle cx="20" cy="21" r="1.5"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Comprar</span></button>' : ''}
+                    <!-- Botón de acción según el estado (Comprar/Notificarme/Contactar/
+                         Ver más); anima al aparecer el cavent en pantalla -->
+                    ${(() => { const a = accionParaEstado(estado); return a ? `<button type="button" class="btn-accion-obra ${a.clase}">${a.icono}<span>${a.texto}</span></button>` : ''; })()}
                 </div>
                 <div class="metrica-right">
                     <span class="metrica-item metrica-vistas">${ICON_OJO} <span>${viewsCount}</span></span>
@@ -525,8 +537,8 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                 // El icono explicativo (Certificado/Conservación) muestra su
                 // tooltip: no debe abrir el modal de descripción encima
                 if (e.target.closest('.obra-meta-ico')) return;
-                // El botón Comprar Obra tiene su propia acción
-                if (e.target.closest('.btn-comprar-obra')) return;
+                // El botón de acción tiene su propia acción (comprar/contactar…)
+                if (e.target.closest('.btn-accion-obra')) return;
                 onDetalle(obra.id);
             });
         }
@@ -565,12 +577,13 @@ export function setupViewTracking(container, obras) {
                     badge.dataset.animado = '1';
                     badge.classList.add('estado-anim');
                 }
-                // Animación del botón "Comprar Obra": entra con un desliz
-                // suave cuando el cavent aparece al hacer scroll (una vez).
-                const btnComprar = entry.target.querySelector('.btn-comprar-obra');
-                if (btnComprar && !btnComprar.dataset.animado) {
-                    btnComprar.dataset.animado = '1';
-                    btnComprar.classList.add('comprar-anim');
+                // Animación del botón de acción (Comprar/Notificarme/...):
+                // entra con un desliz suave cuando el cavent aparece al hacer
+                // scroll (una vez).
+                const btnAccion = entry.target.querySelector('.btn-accion-obra');
+                if (btnAccion && !btnAccion.dataset.animado) {
+                    btnAccion.dataset.animado = '1';
+                    btnAccion.classList.add('accion-anim');
                 }
                 // Visible >50% → iniciar timer de 2.5s
                 if (!VIEW_TIMERS.has(obraId) && !window._vistasRegistradas.has(obraId)) {
