@@ -252,14 +252,13 @@ console.log(await evalJs(`(async () => {
     });
 })()`));
 
-console.log('\n=== 2) Modal: abarca el área de imagen, descripción centrada, botón Comprar Obra ===');
+console.log('\n=== 2) Modal: abarca el área de imagen, descripción centrada, SIN botón (ya no va en el modal) ===');
 await evalJs(`document.querySelector('.btn-detalles-toggle').click()`);
 await sleep(1500);
 console.log(await evalJs(`(() => {
     const modal = document.getElementById('modal-detalles-cavent');
     const content = modal.querySelector('.modal-cavent-detalle');
     const desc = document.getElementById('detalle-descripcion');
-    const btn = document.getElementById('btn-comprar-obra');
     const cr = content.getBoundingClientRect();
     const carr = document.querySelector('.obra-card .obra-carousel').getBoundingClientRect();
     const dcs = getComputedStyle(desc);
@@ -267,35 +266,34 @@ console.log(await evalJs(`(() => {
         modalVisible: !modal.classList.contains('hidden'),
         descripcion: desc.textContent,
         descCentrada: dcs.textAlign === 'justify',
-        botonExiste: !!btn,
-        botonTexto: btn ? btn.textContent.trim() : null,
-        botonVisibleDisponible: btn && !btn.classList.contains('hidden'),
-        botonAbajoDerecha: (() => {
-            const br = btn.getBoundingClientRect();
-            const cr2 = content.getBoundingClientRect();
-            return br.bottom <= cr2.bottom + 4 && br.right >= cr2.right - 60;
-        })(),
+        sinBotonEnModal: !modal.querySelector('.btn-comprar-obra'),
         abarcaSoloImagen: Math.abs(cr.top - carr.top) < 4 && Math.abs(cr.bottom - carr.bottom) < 4,
         fondoTranslucido: getComputedStyle(content).backgroundColor.includes('0.35')
     });
 })()`));
 
-console.log('\n=== 2b) Botón Comprar Obra OCULTO con estado "Vendido" ===');
+console.log('\n=== 2b) Botón Comprar Obra en la BARRA junto a la lupa + animación ===');
 console.log(await evalJs(`(async () => {
-    // Cerrar modal y abrir la 2ª tarjeta (estado Vendido)
+    // Cerrar modal
     document.getElementById('modal-detalles-cavent').classList.add('hidden');
     const cards = document.querySelectorAll('.obra-card');
-    if (cards.length < 2) return JSON.stringify({ skip: true });
-    cards[1].scrollIntoView({ block: 'center' });
-    await new Promise(r => setTimeout(r, 600));
-    const toggle2 = cards[1].querySelector('.btn-detalles-toggle');
-    toggle2.click();
-    await new Promise(r => setTimeout(r, 1500));
-    const btn = document.getElementById('btn-comprar-obra');
+    const btn1 = cards[0].querySelector('.btn-comprar-obra');
+    const btn2 = cards[1].querySelector('.btn-comprar-obra');
+    const lupa = cards[0].querySelector('.btn-ver-detalles');
+    const lupaR = lupa.getBoundingClientRect();
+    const btn1R = btn1.getBoundingClientRect();
+    const juntoALupa = btn1R.left >= lupaR.right - 4 && btn1R.left < lupaR.right + 80;
+    const animado = btn1.classList.contains('comprar-anim');
+    const animationName = getComputedStyle(btn1).animationName;
+    // La 2ª tarjeta (Vendido): su botón NO debe existir (no se renderiza)
     const badge2 = cards[1].querySelector('.obra-estado-badge');
     return JSON.stringify({
-        estadoTarjeta2: badge2 ? badge2.textContent : null,
-        botonOcultoVendido: btn && btn.classList.contains('hidden')
+        botonEnBarra: !!btn1 && !!btn1.closest('.obra-metricas-izq'),
+        juntoALupa,
+        animado,
+        animationName,
+        botonVendidoNoExiste: !btn2,
+        estadoTarjeta2: badge2 ? badge2.textContent : null
     });
 })()`));
 

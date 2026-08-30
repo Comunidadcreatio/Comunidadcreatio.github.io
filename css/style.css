@@ -4,7 +4,7 @@
 @import url('header.css?v=b5f4394d9e');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=de8524c2d8');
+@import url('galeria-publica.css?v=be9584af0d');
 
 /* Chat global + privado */
 @import url('chat.css?v=25de70682f');
@@ -910,32 +910,43 @@ input, select, textarea {
     max-width: 92%;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
-/* Botón Comprar Obra: esquina inferior derecha del área de la imagen */
+/* Botón Comprar Obra: en la barra inferior de la tarjeta, junto a la lupa.
+   Solo se muestra si el estado permite la venta. Al aparecer el cavent en
+   pantalla (scroll) entra con una animación suave profesional. */
 .btn-comprar-obra {
-    position: absolute;
-    right: 14px;
-    bottom: 14px;
-    z-index: 10;
     background: #2e7d32;
     color: #fff;
     border: none;
     border-radius: 24px;
-    padding: 10px 22px;
+    padding: 9px 18px;
     font-family: 'Nunito', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
+    line-height: 1;
     cursor: pointer;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
-    transition: transform 0.15s ease, background 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-comprar-obra:hover {
     background: #256a29;
-    transform: scale(1.04);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 .btn-comprar-obra:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
-/* Oculto cuando el estado de la obra no permite la compra (JS) */
+/* Animación de entrada: aparece deslizándose desde la izquierda con fade,
+   ligero rebote sutil (curva elástica suave) — la agrega el IntersectionObserver */
+.btn-comprar-obra.comprar-anim {
+    animation: comprarEntra 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes comprarEntra {
+    0%   { opacity: 0; transform: translateX(-18px) scale(0.9); }
+    60%  { opacity: 1; transform: translateX(3px) scale(1.02); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+/* Oculto cuando el estado de la obra no permite la compra (no se renderiza) */
 .btn-comprar-obra.hidden {
     display: none;
 }

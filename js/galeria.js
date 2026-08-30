@@ -407,12 +407,17 @@ function crearObraCard(obra) {
             <!-- Franja 3: estado (rectángulo de color, derecha) + certificado/procedencia (izquierda) -->
             ${metaBar3HTML}
 
-            <!-- Barra inferior sólida: métricas + botón ver detalles -->
+            <!-- Barra inferior sólida: botón comprar + lupa (izq) | métricas (der) -->
             <div class="obra-metricas-bar">
-                <button class="btn-ver-detalles btn-detalles-toggle" aria-label="Ver detalles" title="Ver detalles">
-                    <svg class="icon-lupa" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                </button>
+                <div class="obra-metricas-izq">
+                    <button class="btn-ver-detalles btn-detalles-toggle" aria-label="Ver detalles" title="Ver detalles">
+                        <svg class="icon-lupa" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <svg class="icon-volver" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </button>
+                    <!-- Comprar Obra: solo si el estado permite la venta; anima al
+                         aparecer el cavent en pantalla (IntersectionObserver) -->
+                    ${estadoPermiteCompra(estado) ? '<button type="button" class="btn-comprar-obra">Comprar Obra</button>' : ''}
+                </div>
                 <div class="metrica-right">
                     <span class="metrica-item metrica-vistas">${ICON_OJO} <span>${viewsCount}</span></span>
                     <span class="metrica-item metrica-comentario">${ICON_COMENTARIO} <span>${commentsCount}</span></span>
@@ -507,6 +512,8 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                 // El icono explicativo (Certificado/Conservación) muestra su
                 // tooltip: no debe abrir el modal de descripción encima
                 if (e.target.closest('.obra-meta-ico')) return;
+                // El botón Comprar Obra tiene su propia acción
+                if (e.target.closest('.btn-comprar-obra')) return;
                 onDetalle(obra.id);
             });
         }
@@ -544,6 +551,13 @@ export function setupViewTracking(container, obras) {
                 if (badge && !badge.dataset.animado) {
                     badge.dataset.animado = '1';
                     badge.classList.add('estado-anim');
+                }
+                // Animación del botón "Comprar Obra": entra con un desliz
+                // suave cuando el cavent aparece al hacer scroll (una vez).
+                const btnComprar = entry.target.querySelector('.btn-comprar-obra');
+                if (btnComprar && !btnComprar.dataset.animado) {
+                    btnComprar.dataset.animado = '1';
+                    btnComprar.classList.add('comprar-anim');
                 }
                 // Visible >50% → iniciar timer de 2.5s
                 if (!VIEW_TIMERS.has(obraId) && !window._vistasRegistradas.has(obraId)) {
@@ -629,9 +643,6 @@ export async function abrirDetalleCavent(obraId, cardElement) {
     }
 
     modal.classList.remove('hidden');
-    // El botón Comprar Obra se oculta hasta saber el estado real de la obra
-    const btnComprar = document.getElementById('btn-comprar-obra');
-    if (btnComprar) btnComprar.classList.add('hidden');
 
     try {
         const data = await apiRequest(`/obras/${obraId}`);
@@ -645,14 +656,6 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         // en las franjas de la tarjeta del cavent). Aquí solo queda la
         // descripción.
         document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
-
-        // Mostrar "Comprar Obra" SOLO si el estado permite la venta
-        // (Disponible). El estado puede venir de la API o del dataset de la
-        // tarjeta (cardElement.dataset.estado).
-        const estadoReal = String(o.estado_obra || o.estado || o.status || (cardElement && cardElement.dataset.estado) || '').trim();
-        if (btnComprar) {
-            btnComprar.classList.toggle('hidden', !estadoPermiteCompra(estadoReal));
-        }
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);

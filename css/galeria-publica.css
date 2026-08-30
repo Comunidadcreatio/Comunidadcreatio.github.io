@@ -454,6 +454,15 @@ html, body {
     background: var(--color-ink);   /* Fondo sólido, color del tema */
 }
 
+/* Lado izquierdo de la barra: lupa + botón Comprar Obra juntos */
+.obra-metricas-izq {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
 .metrica-right {
     display: flex;
     flex-direction: row;
