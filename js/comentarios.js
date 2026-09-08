@@ -14,6 +14,8 @@ function init() {
     input     = document.getElementById('comentarios-input');
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
+    // Conectar el ajuste del cajón cuando el teclado se abre (una sola vez)
+    setupKeyboardDrawer();
 }
 
 export function abrirComentarios(obraId, cardEl) {
@@ -34,11 +36,48 @@ export function abrirComentarios(obraId, cardEl) {
     cargarComentarios(obraId);
 }
 
+// ============================================
+// TECLADO: cuando se escribe un comentario, el cajón se ajusta a la altura
+// visible REAL (visualViewport) para quedar pegado al teclado SIN hueco y sin
+// empujar el resto de la página. Reutiliza la clase global teclado-abierto
+// (chat.css ya oculta el nav con ella); aquí se ajusta el propio cajón.
+// ============================================
+let keyboardListenerConectado = false;
+function setupKeyboardDrawer() {
+    if (!window.visualViewport || keyboardListenerConectado) return;
+    keyboardListenerConectado = true;
+    const ajustar = () => {
+        if (!drawer || !lista) return;
+        const cajonVisible = drawer.classList.contains('visible');
+        const vv = window.visualViewport;
+        if (!vv || !vv.height) return;
+        const keyboardOpen = cajonVisible && vv.height < window.innerHeight * 0.85;
+        // La clase global teclado-abierto oculta el nav (regla de chat.css) y
+        // sirve de bandera para las reglas propias del cajón en CSS.
+        document.body.classList.toggle('teclado-abierto', keyboardOpen);
+        if (keyboardOpen) {
+            // Altura del teclado = layout - visual real: el cajón sube pegado
+            // al teclado (bottom dinámico) en vez de dejar la franja reservada
+            // al nav (que ya no está visible).
+            const teclado = Math.max(0, window.innerHeight - vv.height);
+            drawer.style.bottom = teclado + 'px';
+        } else {
+            drawer.style.bottom = '';
+        }
+    };
+    window.visualViewport.addEventListener('resize', ajustar);
+    window.visualViewport.addEventListener('scroll', ajustar);
+    window.addEventListener('resize', ajustar);
+    ajustar();
+}
+
 function cerrarComentarios() {
     if (!drawer) return;
     // Limpiar estilos inline del swipe
     drawer.style.transform = '';
     drawer.style.transition = '';
+    drawer.style.bottom = '';
+    document.body.classList.remove('teclado-abierto');
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {
         drawer.removeEventListener('transitionend', ocultar);

@@ -1307,6 +1307,17 @@ html, body {
     color: var(--color-gray-500);
     margin-top: 4px;
 }
+/* Teclado abierto (clase global teclado-abierto que también usa el chat):
+   el nav (#toggle-panel) queda oculto por chat.css; aquí quitamos la franja
+   de 60px que reservaba el input para el nav, para que el cajón quede pegado
+   al teclado (JS pone drawer.style.bottom = altura del teclado) SIN hueco y
+   sin empujar el contenido superior. */
+body.teclado-abierto .comentarios-input-area {
+    margin-bottom: 0;
+}
+body.teclado-abierto .comentarios-drawer {
+    overscroll-behavior: contain;
+}
 /* Área de input */
 .comentarios-input-area {
     display: flex;

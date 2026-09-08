@@ -108,10 +108,42 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== Cerrar comentarios ===');
+console.log('\n=== Simular teclado abierto: sin hueco, cajón pegado ===');
+console.log(await evalJs(`(() => {
+    // Simula lo que hace setupKeyboardDrawer al detectar el teclado:
+    // 1) clase teclado-abierto en body (oculta nav vía chat.css)
+    // 2) bottom dinámico = altura del teclado (p.ej. 280px)
+    document.body.classList.add('teclado-abierto');
+    const drawer = document.getElementById('comentarios-drawer');
+    drawer.style.bottom = '280px';
+    // Recalcular
+    const input = document.getElementById('comentarios-input');
+    const nav = document.getElementById('toggle-panel');
+    const ir = input.getBoundingClientRect();
+    const dr = drawer.getBoundingClientRect();
+    const nv = nav.getBoundingClientRect();
+    const navOculto = nv.height === 0 || getComputedStyle(nav).display === 'none';
+    // El área de input ya NO reserva 60px para el nav (margin-bottom 0 con teclado)
+    const area = document.querySelector('.comentarios-input-area');
+    const marginBottom = getComputedStyle(area).marginBottom;
+    // El input queda a 280px del fondo (pegado al teclado) con su aire de 12px
+    const fondo = window.innerHeight;
+    return JSON.stringify({
+        navOculto,
+        marginBottomConTeclado: marginBottom,
+        inputBottomDesdeFondo: Math.round(fondo - ir.bottom),
+        cajonPegadoAlTeclado: Math.abs(dr.bottom - (fondo - 280)) < 2,
+        inputConAire: (fondo - 280) - ir.bottom >= 10 && (fondo - 280) - ir.bottom <= 20
+    });
+})()`));
+
+console.log('\n=== Cerrar comentarios (limpia teclado-abierto) ===');
 await evalJs(`document.getElementById('comentarios-close').click()`);
 await sleep(800);
-console.log(await evalJs(`JSON.stringify({ oculto: document.getElementById('comentarios-drawer').classList.contains('hidden') })`));
+console.log(await evalJs(`JSON.stringify({
+    oculto: document.getElementById('comentarios-drawer').classList.contains('hidden'),
+    tecladoLimpio: !document.body.classList.contains('teclado-abierto')
+})`));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}
