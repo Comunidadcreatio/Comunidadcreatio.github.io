@@ -1,19 +1,17 @@
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
 import { apiRequest } from './config.js?v=2e0c2e7288';
-import { artistaActual } from './auth.js?v=b2e08c086d';
 import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, avatar, btnEnviar, btnCerrar;
+let drawer, lista, input, btnEnviar, btnCerrar;
 
 function init() {
     if (drawer) return;
     drawer    = document.getElementById('comentarios-drawer');
     lista     = document.getElementById('comentarios-lista');
     input     = document.getElementById('comentarios-input');
-    avatar    = document.getElementById('comentarios-avatar');
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
 }
@@ -22,15 +20,6 @@ export function abrirComentarios(obraId, cardEl) {
     init();
     obraIdActual = obraId;
     cardActual   = cardEl;
-
-    // Avatar del usuario actual
-    const foto = artistaActual?.foto_perfil || '';
-    if (foto) {
-        avatar.src = foto;
-        avatar.style.display = 'block';
-    } else {
-        avatar.style.display = 'none';
-    }
 
     input.value = '';
     lista.innerHTML = '<div class="comentarios-loading">Cargando comentarios...</div>';

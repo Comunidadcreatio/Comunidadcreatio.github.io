@@ -98,6 +98,7 @@ console.log(await evalJs(`(() => {
     const ir = input.getBoundingClientRect();
     const nv = nav.getBoundingClientRect();
     return JSON.stringify({
+        sinAvatar: !document.getElementById('comentarios-avatar'),
         drawerBottomEnPantalla: Math.abs(dr.bottom - window.innerHeight) < 2,
         inputBottomSobreNav: ir.bottom <= nv.top + 2 && ir.bottom > nv.top - 60,
         huecoEntreInputYNav: Math.round(nv.top - ir.bottom),
