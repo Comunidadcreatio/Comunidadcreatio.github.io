@@ -89,6 +89,24 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
+console.log('\n=== Geometría continuidad (sin hueco) ===');
+console.log(await evalJs(`(() => {
+    const drawer = document.getElementById('comentarios-drawer');
+    const input = document.getElementById('comentarios-input');
+    const nav = document.getElementById('toggle-panel');
+    const dr = drawer.getBoundingClientRect();
+    const ir = input.getBoundingClientRect();
+    const nv = nav.getBoundingClientRect();
+    return JSON.stringify({
+        drawerBottomEnPantalla: Math.abs(dr.bottom - window.innerHeight) < 2,
+        inputBottomSobreNav: ir.bottom <= nv.top + 2 && ir.bottom > nv.top - 60,
+        huecoEntreInputYNav: Math.round(nv.top - ir.bottom),
+        drawer: { top: Math.round(dr.top), bottom: Math.round(dr.bottom) },
+        input: { top: Math.round(ir.top), bottom: Math.round(ir.bottom) },
+        nav: { top: Math.round(nv.top), bottom: Math.round(nv.bottom) }
+    });
+})()`));
+
 console.log('\n=== Cerrar comentarios ===');
 await evalJs(`document.getElementById('comentarios-close').click()`);
 await sleep(800);
