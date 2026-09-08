@@ -890,8 +890,9 @@ input, select, textarea {
     z-index: 1001;
     display: flex;
     flex-direction: column;
-    /* Menos opacidad: se ve la imagen de la obra a través del fondo */
-    background: rgba(10, 10, 10, 0.35);
+    /* Oscurecido SOLO sobre la imagen (el panel lo posiciona JS sobre el
+       carrusel). Translúcido pero suficiente para leer la descripción. */
+    background: rgba(10, 10, 10, 0.6);
     color: #fff;
 }
 .detalle-scroll {
@@ -1013,6 +1014,11 @@ input, select, textarea {
 /* Permitir interacción con header/nav cuando el modal está abierto */
 #modal-detalles-cavent {
     pointer-events: none;
+    /* El oscurecido NO abarca toda la pantalla: se quita el fondo del modal
+       genérico (.modal pone rgba(0,0,0,0.5) en todo el viewport). El área
+       oscura queda SOLO en .modal-cavent-detalle, que JS posiciona sobre el
+       rectángulo de la imagen del carrusel. */
+    background: transparent;
 }
 #modal-detalles-cavent > * {
     pointer-events: auto;
