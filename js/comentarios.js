@@ -33,96 +33,92 @@ export function abrirComentarios(obraId, cardEl) {
     drawer.offsetHeight;
     drawer.classList.add('visible');
 
+    // Si el teclado sigue abierto al reabrir (cierre del cajón sin cerrar el
+    // teclado), volver a levantar el cajón de inmediato.
+    ajustarTecladoDrawer();
+
     cargarComentarios(obraId);
 }
 
 // ============================================
-// TECLADO: cuando se escribe un comentario, el cajón se ajusta a la altura
-// visible REAL (visualViewport) para quedar pegado al teclado SIN hueco y sin
-// empujar el resto de la página. Reutiliza la clase global teclado-abierto
-// (chat.css ya oculta el nav con ella); aquí se ajusta el propio cajón.
-//
-// Para que se vea PROFESIONAL (sin salto ni destello del fondo detrás):
-//   - Al abrir el teclado: el cajón se reposiciona AL INSTANTE (bottom fijo,
-//     sin transición) para que NUNCA quede un hueco entre cajón y teclado, y
-//     el contenido (área del input) se desliza suavemente con transform desde
-//     su posición anterior — igual que hace el chat con su formulario.
-//   - Al cerrar el teclado: el cajón vuelve a bottom:0 con una transición
-//     suave ANTES de quitar la clase teclado-abierto (el nav reaparece cuando
-//     el cajón ya está abajo, sin destello).
+// TECLADO: cuando se escribe un comentario, el teclado "empuja" el cajón:
+// su borde inferior sube con una transición SUAVE (y baja igual al cerrarse);
+// el header queda fijo arriba y la lista se encoge progresivamente. La franja
+// que el cajón libera al subir es EXACTAMENTE donde está el teclado físico,
+// así que nunca se ve el fondo de la página. Si el evento llega cuando el
+// teclado ya se cerró del todo, el cajón vuelve al instante (nada que revelar).
 // ============================================
 let keyboardListenerConectado = false;
+// Estado del ajuste del teclado a nivel de módulo para poder resetearlo
+// también desde cerrarComentarios (si se cierra el cajón con el teclado aún
+// abierto, al reabrir debe volver a levantarlo).
+let tecladoBottomActual = 0;   // último bottom aplicado (px); 0 = apoyado abajo
+let tecladoTransTimer = null;  // limpia la transición inline al terminar el movimiento
+function resetEstadoTeclado() {
+    tecladoBottomActual = 0;
+    if (tecladoTransTimer) { clearTimeout(tecladoTransTimer); tecladoTransTimer = null; }
+}
+function limpiarTransicionTeclado() {
+    if (tecladoTransTimer) { clearTimeout(tecladoTransTimer); tecladoTransTimer = null; }
+    if (drawer) drawer.style.transition = '';
+}
+function ajustarTecladoDrawer() {
+    if (!drawer || !lista) return;
+    const cajonVisible = drawer.classList.contains('visible');
+    const vv = window.visualViewport;
+    if (!vv || !vv.height) return;
+    const keyboardOpen = cajonVisible && vv.height < window.innerHeight * 0.85;
+    const teclado = Math.max(0, window.innerHeight - vv.height);
+
+    if (keyboardOpen) {
+        document.body.classList.add('teclado-abierto');
+        if (Math.abs(teclado - tecladoBottomActual) < 2) return;
+        tecladoBottomActual = teclado;
+        // Subida suave: la transición de bottom hace que el cajón se encoja
+        // progresivamente (el teclado tapa la franja que va liberando).
+        drawer.style.transition = 'bottom 0.28s cubic-bezier(0.22, 1, 0.36, 1)';
+        drawer.style.bottom = teclado + 'px';
+        if (tecladoTransTimer) clearTimeout(tecladoTransTimer);
+        tecladoTransTimer = setTimeout(limpiarTransicionTeclado, 320);
+    } else if (teclado <= 2 && tecladoBottomActual !== 0) {
+        // Teclado CERRADO del todo: restaurar al instante. No transición:
+        // si el evento llegó cuando el teclado ya se fue, una animación
+        // lenta dejaría visible la página entre el borde y 900.
+        resetEstadoTeclado();
+        document.body.classList.remove('teclado-abierto');
+        drawer.style.transition = '';
+        drawer.style.bottom = '';
+    } else if (tecladoBottomActual !== 0 && teclado < tecladoBottomActual) {
+        // Teclado cerrándose a medias: seguir bajando con transición suave
+        // (el teclado aún cubre la franja liberada).
+        tecladoBottomActual = teclado;
+        drawer.style.transition = 'bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
+        drawer.style.bottom = (teclado || '') + 'px';
+        if (tecladoTransTimer) clearTimeout(tecladoTransTimer);
+        tecladoTransTimer = setTimeout(() => {
+            document.body.classList.remove('teclado-abierto');
+            limpiarTransicionTeclado();
+        }, 340);
+    }
+}
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
     keyboardListenerConectado = true;
-    let bottomActual = null;      // último bottom aplicado (px) o null = bottom:0
-    let cierreTimer = null;
-    const inputArea = () => drawer && drawer.querySelector('.comentarios-input-area');
-    const ajustar = () => {
-        if (!drawer || !lista) return;
-        const cajonVisible = drawer.classList.contains('visible');
-        const vv = window.visualViewport;
-        if (!vv || !vv.height) return;
-        const keyboardOpen = cajonVisible && vv.height < window.innerHeight * 0.85;
-        document.body.classList.toggle('teclado-abierto', keyboardOpen);
-
-        if (keyboardOpen) {
-            if (cierreTimer) { clearTimeout(cierreTimer); cierreTimer = null; }
-            const teclado = Math.max(0, window.innerHeight - vv.height);
-            if (bottomActual === teclado) return;
-
-            // 1) Reposicionar el cajón AL INSTANTE (sin transición): nunca se
-            //    ve el fondo detrás ni un hueco entre el cajón y el teclado.
-            const area = inputArea();
-            const antes = area ? area.getBoundingClientRect().top : 0;
-            drawer.style.transition = 'none';
-            drawer.style.bottom = teclado + 'px';
-            bottomActual = teclado;
-            void drawer.offsetHeight; // forzar reflow
-            drawer.style.transition = '';
-
-            // 2) Deslizar el contenido desde su posición anterior a la nueva
-            //    con transform (no afecta el layout, solo se ve el barrido).
-            if (area) {
-                const despues = area.getBoundingClientRect().top;
-                const delta = despues - antes;
-                if (Math.abs(delta) > 2) {
-                    area.style.transition = 'none';
-                    area.style.transform = 'translateY(' + (-delta) + 'px)';
-                    void area.offsetHeight;
-                    area.style.transition = 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)';
-                    area.style.transform = 'translateY(0)';
-                }
-            }
-        } else {
-            if (bottomActual === null) return;
-            // Cerrar teclado: volver a bottom:0 con transición suave
-            drawer.style.transition = 'bottom 0.32s cubic-bezier(0.22, 1, 0.36, 1)';
-            drawer.style.bottom = '';
-            bottomActual = null;
-            // Quitar la clase (y reaparecer el nav) CUANDO el cajón ya bajó
-            if (cierreTimer) clearTimeout(cierreTimer);
-            cierreTimer = setTimeout(() => {
-                document.body.classList.remove('teclado-abierto');
-                drawer.style.transition = '';
-                const area = inputArea();
-                if (area) { area.style.transform = ''; area.style.transition = ''; }
-                cierreTimer = null;
-            }, 350);
-        }
-    };
-    window.visualViewport.addEventListener('resize', ajustar);
-    window.visualViewport.addEventListener('scroll', ajustar);
-    window.addEventListener('resize', ajustar);
-    ajustar();
+    window.visualViewport.addEventListener('resize', ajustarTecladoDrawer);
+    window.visualViewport.addEventListener('scroll', ajustarTecladoDrawer);
+    window.addEventListener('resize', ajustarTecladoDrawer);
+    ajustarTecladoDrawer();
 }
 
 function cerrarComentarios() {
     if (!drawer) return;
-    // Limpiar estilos inline del swipe
+    // Limpiar estilos inline del swipe/teclado y resetear el estado del teclado
+    // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta
+    // de nuevo porque tecladoBottomActual vuelve a 0).
     drawer.style.transform = '';
     drawer.style.transition = '';
     drawer.style.bottom = '';
+    resetEstadoTeclado();
     document.body.classList.remove('teclado-abierto');
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {
