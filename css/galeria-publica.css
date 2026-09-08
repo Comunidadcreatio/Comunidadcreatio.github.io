@@ -1192,10 +1192,14 @@ html, body {
    ============================================== */
 .comentarios-drawer {
     position: fixed;
-    bottom: 0;
     left: 0;
     right: 0;
     top: 20vh;
+    /* El cajón se asienta JUSTO ENCIMA del nav principal: el nav (#toggle-panel,
+       z-index 998) vive FUERA de .app-container (z-index 1, stacking context),
+       por lo que siempre queda por delante y tapaba el input. Al terminar el
+       drawer en la altura del nav, el área de escribir queda visible encima. */
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     z-index: 2000;
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
@@ -1203,7 +1207,7 @@ html, body {
     border-radius: 20px 20px 0 0;
     display: flex;
     flex-direction: column;
-    transform: translateY(100%);
+    transform: translateY(calc(100% + 60px + env(safe-area-inset-bottom, 0px)));
     transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
     box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
 }
