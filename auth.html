@@ -176,7 +176,18 @@
                 <div class="step" data-step="1">
                     <p class="reg-step-label">Paso 1 de 5</p>
                     <h2 class="reg-step-title">¿Cómo te llamas?</h2>
-                    <p class="reg-step-subtitle">Queremos saber quién está detrás de cada obra, perfil y pieza artística.</p>
+                    <p class="reg-step-subtitle">Cuéntanos tu rol en la comunidad. Todos pueden explorar; solo los artistas publican Cavents.</p>
+                    <!-- Rol del usuario: artista, coleccionista, comprador, curador o galería -->
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <select id="reg-rol" required data-required="true">
+                            <option value="" disabled selected>¿Cómo participarás?</option>
+                            <option value="artista">🎨 Soy artista</option>
+                            <option value="coleccionista">🖼️ Coleccionista de arte</option>
+                            <option value="comprador">🛒 Comprador de obras</option>
+                            <option value="curador">🏛️ Curador(a) de arte</option>
+                            <option value="galeria">🏬 Represento una galería</option>
+                        </select>
+                    </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group">
                             <input type="text" id="reg-nombres" placeholder="Nombres" autocomplete="given-name" required data-required="true">
@@ -324,7 +335,7 @@
     <!-- Ciudades y banderas compartidas (registro + chat) -->
     <script src="js/ciudades.js?v=b803270665"></script>
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=46718643fa"></script>
+    <script type="module" src="js/auth-logic.js?v=f26e4fff02"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>

@@ -1,8 +1,8 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js?v=2e0c2e7288';
-import { artistaActual } from './auth.js?v=30e2869c22';
+import { artistaActual } from './auth.js?v=b2e08c086d';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=d86e42a5e7';
-import { abrirComentarios } from './comentarios.js?v=d7dbb35f45';
+import { abrirComentarios } from './comentarios.js?v=9532b23b21';
 
 // Estado compartido del grid (para el carrusel de etiquetas y re-render)
 let obrasGrid = [];

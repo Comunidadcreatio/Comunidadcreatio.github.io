@@ -2,11 +2,11 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=be1395442a';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=0b644b8009';
-import { artistaActual, token } from './auth.js?v=30e2869c22';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=28e2fd8095';
-import { confirmarDescartarCambios } from './panel-ui.js?v=54a0002e59';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=4bb9a5aba5';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=78a9b80d1b';
+import { artistaActual, token, esArtista } from './auth.js?v=b2e08c086d';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=110ec97ce3';
+import { confirmarDescartarCambios } from './panel-ui.js?v=eb6c878bdb';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -174,11 +174,13 @@ function actualizarVisibilidadIconosHeader(section) {
     const mostrarConversaciones = !!section && section.id === 'chat-global';
     // Lupa de Explorar: solo en el grid (galeriaModo === 2), abre el buscador
     const mostrarLupa = !!section && section.id === 'galeria-publica' && galeriaModo === 2;
-    // El "+" en el carrusel de Cavents, el panel Crear y Problogs
+    // El "+" en el carrusel de Cavents, el panel Crear y Problogs — SOLO para
+    // artistas (compradores/coleccionistas/curadores/galerías no crean Cavents)
     const enCarrusel = !!section && section.id === 'galeria-publica' && galeriaModo === 1;
     const enPanelCrear = !!section && section.id === 'panel-artista';
     const enProblogs = !!section && section.id === 'problogs';
-    const mostrarPlus = enCarrusel || enPanelCrear || enProblogs;
+    const soyArtista = esArtista();
+    const mostrarPlus = soyArtista && (enCarrusel || enPanelCrear || enProblogs);
     // El icono Problogs/Cavents solo en el carrusel (Cavents) y en Problogs
     const mostrarProblogs = enCarrusel || enProblogs;
     // Modo flecha: en Mi Cuenta (hamburguesa) y en el panel Crear (+)
@@ -236,6 +238,8 @@ export function abrirMiCuentaDesdeIcono() {
 }
 
 export function abrirCrearDesdeIcono() {
+    // Solo los artistas crean Cavents
+    if (!esArtista()) return;
     const actual = encontrarSeccionActual();
     iconoAnterior = { seccion: actual ? actual.id : 'galeria-publica', modoGrid: galeriaModo === 2 };
     togglePanel('crear');

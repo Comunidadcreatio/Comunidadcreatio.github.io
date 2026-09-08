@@ -1,6 +1,6 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=30e2869c22';
+import { login, register } from './auth.js?v=b2e08c086d';
 import { ARTISTA_KEY, apiRequest } from './config.js?v=2e0c2e7288';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading, showConfirmChoice } from './notificaciones.js?v=d2867c8ca0';
 import { mostrarErrores, debounce, debugLog } from './utils.js?v=d86e42a5e7';
@@ -9,7 +9,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=8630c4e062';
+} from './biometric-login.js?v=5f3b6ee225';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -798,6 +798,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // El nombre de usuario se adapta al rol: para no-artistas es el nombre
+    // público con el que aparecerán en la comunidad (no un "nombre artístico").
+    const regRol = document.getElementById('reg-rol');
+    if (regRol && regNombreArtista) {
+        const paso5 = regNombreArtista.closest('.step');
+        const subtituloPaso5 = paso5 ? paso5.querySelector('.reg-step-subtitle') : null;
+        const actualizarEtiquetaRol = () => {
+            const rol = regRol.value;
+            const esArtista = rol === 'artista';
+            regNombreArtista.placeholder = esArtista ? 'Nombre artístico / de usuario' : 'Nombre público (cómo te verán)';
+            if (subtituloPaso5) {
+                subtituloPaso5.textContent = esArtista
+                    ? 'Elige tu nombre artístico y una contraseña segura.'
+                    : 'Elige tu nombre público y una contraseña segura.';
+            }
+        };
+        regRol.addEventListener('change', actualizarEtiquetaRol);
+        actualizarEtiquetaRol();
+    }
+
     // Medidor de fortaleza de contraseña en tiempo real
     const regPass = document.getElementById('reg-pass');
     if (regPass) {
@@ -945,6 +965,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const dia = document.getElementById('reg-dia').value;
             const mes = document.getElementById('reg-mes').value;
             const ano = document.getElementById('reg-ano').value;
+            // Rol elegido en el registro (artista por defecto si no hay selector)
+            const rolSel = document.getElementById('reg-rol');
+            const rol = rolSel ? rolSel.value : 'artista';
             
             if (!dia || !mes || !ano) {
                 showWarning("Todos los campos de fecha son obligatorios.");
@@ -972,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setButtonLoading(submitBtn, true);
             try {
                 const result = await register(
-                    nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero
+                    nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero, rol
                 );
 
                 if (result.success) {

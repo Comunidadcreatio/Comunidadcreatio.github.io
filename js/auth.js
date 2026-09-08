@@ -20,6 +20,58 @@ export let artistaActual = (() => {
     }
 })();
 
+// ============================================
+// ROL DEL USUARIO (artista | comprador | coleccionista | curador | galeria)
+// El backend aún no guarda el rol: se elige en el registro y se recuerda por
+// email en el dispositivo (creatio_rol_<email>). Si el backend algún día
+// devuelve data.artista.rol, ese valor tiene prioridad. Por defecto todos son
+// tratados como 'artista' (comportamiento actual: no rompe a nadie).
+// ============================================
+export const ROLES = {
+    artista: 'artista',
+    comprador: 'comprador',
+    coleccionista: 'coleccionista',
+    curador: 'curador',
+    galeria: 'galeria'
+};
+
+export function rolKey(email) {
+    return 'creatio_rol_' + String(email || '').trim().toLowerCase();
+}
+
+function rolGuardadoLocal(email) {
+    try {
+        return localStorage.getItem(rolKey(email)) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Devuelve el rol efectivo del usuario actual: prioridad al rol del backend
+// (artistaActual.rol), luego al guardado local por email, luego 'artista'.
+export function obtenerRolUsuario() {
+    if (artistaActual) {
+        if (artistaActual.rol && artistaActual.rol !== 'artista') return artistaActual.rol;
+        const local = rolGuardadoLocal(artistaActual.email);
+        if (local && local !== 'artista') return local;
+    }
+    return 'artista';
+}
+
+export function esArtista() {
+    return obtenerRolUsuario() === 'artista';
+}
+
+function guardarRolEnSesionLocal() {
+    try {
+        const rol = obtenerRolUsuario();
+        if (artistaActual && artistaActual.rol !== rol) {
+            artistaActual = { ...artistaActual, rol };
+            localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+        }
+    } catch (e) { /* silencioso */ }
+}
+
 export async function login(email, password) {
     try {
         const data = await apiRequest('/api/artistas/login', {
@@ -29,12 +81,18 @@ export async function login(email, password) {
         if (data.success) {
             token = true;
             artistaActual = data.artista;
+            // Si el backend no devuelve rol, usar el rol local recordado por email
+            if (!artistaActual.rol) {
+                const local = rolGuardadoLocal(artistaActual.email);
+                if (local) artistaActual = { ...artistaActual, rol: local };
+            }
             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
+            guardarRolEnSesionLocal();
             // Token para navegador (fallback a la cookie): sessionStorage, se borra al cerrar la pestaña
             if (data.token) {
                 try { sessionStorage.setItem(AUTH_TOKEN_KEY, data.token); } catch (e) { /* silencioso */ }
             }
-            return { success: true, artista: data.artista, token: data.token };
+            return { success: true, artista: artistaActual, token: data.token };
         } else {
             return { success: false, error: data.error };
         }
@@ -44,7 +102,7 @@ export async function login(email, password) {
     }
 }
 
-export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero) {
+export async function register(nombre_artista, nombre_real, email, password, telefono, pais, ciudad, fecha_nacimiento, genero, rol = 'artista') {
     try {
         const data = await apiRequest('/api/artistas/registro', {
             method: 'POST',
@@ -57,9 +115,14 @@ export async function register(nombre_artista, nombre_real, email, password, tel
                 pais,
                 ciudad,
                 fecha_nacimiento,
-                genero
+                genero,
+                rol
             })
         });
+        if (data && data.success) {
+            // Recordar el rol elegido por email (el backend puede ignorarlo hoy)
+            try { localStorage.setItem(rolKey(email), rol); } catch (e) { /* silencioso */ }
+        }
         return data;
     } catch (error) {
         debugLog.error("Error en registro:", error);

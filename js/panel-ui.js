@@ -3,7 +3,7 @@
 // accordions del formulario y progress indicator.
 
 import { ARTISTA_KEY, apiRequest } from './config.js?v=2e0c2e7288';
-import { token, artistaActual } from './auth.js?v=30e2869c22';
+import { token, artistaActual } from './auth.js?v=b2e08c086d';
 import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5c6';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
