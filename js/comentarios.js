@@ -41,28 +41,74 @@ export function abrirComentarios(obraId, cardEl) {
 // visible REAL (visualViewport) para quedar pegado al teclado SIN hueco y sin
 // empujar el resto de la página. Reutiliza la clase global teclado-abierto
 // (chat.css ya oculta el nav con ella); aquí se ajusta el propio cajón.
+//
+// Para que se vea PROFESIONAL (sin salto ni destello del fondo detrás):
+//   - Al abrir el teclado: el cajón se reposiciona AL INSTANTE (bottom fijo,
+//     sin transición) para que NUNCA quede un hueco entre cajón y teclado, y
+//     el contenido (área del input) se desliza suavemente con transform desde
+//     su posición anterior — igual que hace el chat con su formulario.
+//   - Al cerrar el teclado: el cajón vuelve a bottom:0 con una transición
+//     suave ANTES de quitar la clase teclado-abierto (el nav reaparece cuando
+//     el cajón ya está abajo, sin destello).
 // ============================================
 let keyboardListenerConectado = false;
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
     keyboardListenerConectado = true;
+    let bottomActual = null;      // último bottom aplicado (px) o null = bottom:0
+    let cierreTimer = null;
+    const inputArea = () => drawer && drawer.querySelector('.comentarios-input-area');
     const ajustar = () => {
         if (!drawer || !lista) return;
         const cajonVisible = drawer.classList.contains('visible');
         const vv = window.visualViewport;
         if (!vv || !vv.height) return;
         const keyboardOpen = cajonVisible && vv.height < window.innerHeight * 0.85;
-        // La clase global teclado-abierto oculta el nav (regla de chat.css) y
-        // sirve de bandera para las reglas propias del cajón en CSS.
         document.body.classList.toggle('teclado-abierto', keyboardOpen);
+
         if (keyboardOpen) {
-            // Altura del teclado = layout - visual real: el cajón sube pegado
-            // al teclado (bottom dinámico) en vez de dejar la franja reservada
-            // al nav (que ya no está visible).
+            if (cierreTimer) { clearTimeout(cierreTimer); cierreTimer = null; }
             const teclado = Math.max(0, window.innerHeight - vv.height);
+            if (bottomActual === teclado) return;
+
+            // 1) Reposicionar el cajón AL INSTANTE (sin transición): nunca se
+            //    ve el fondo detrás ni un hueco entre el cajón y el teclado.
+            const area = inputArea();
+            const antes = area ? area.getBoundingClientRect().top : 0;
+            drawer.style.transition = 'none';
             drawer.style.bottom = teclado + 'px';
+            bottomActual = teclado;
+            void drawer.offsetHeight; // forzar reflow
+            drawer.style.transition = '';
+
+            // 2) Deslizar el contenido desde su posición anterior a la nueva
+            //    con transform (no afecta el layout, solo se ve el barrido).
+            if (area) {
+                const despues = area.getBoundingClientRect().top;
+                const delta = despues - antes;
+                if (Math.abs(delta) > 2) {
+                    area.style.transition = 'none';
+                    area.style.transform = 'translateY(' + (-delta) + 'px)';
+                    void area.offsetHeight;
+                    area.style.transition = 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)';
+                    area.style.transform = 'translateY(0)';
+                }
+            }
         } else {
+            if (bottomActual === null) return;
+            // Cerrar teclado: volver a bottom:0 con transición suave
+            drawer.style.transition = 'bottom 0.32s cubic-bezier(0.22, 1, 0.36, 1)';
             drawer.style.bottom = '';
+            bottomActual = null;
+            // Quitar la clase (y reaparecer el nav) CUANDO el cajón ya bajó
+            if (cierreTimer) clearTimeout(cierreTimer);
+            cierreTimer = setTimeout(() => {
+                document.body.classList.remove('teclado-abierto');
+                drawer.style.transition = '';
+                const area = inputArea();
+                if (area) { area.style.transform = ''; area.style.transition = ''; }
+                cierreTimer = null;
+            }, 350);
         }
     };
     window.visualViewport.addEventListener('resize', ajustar);

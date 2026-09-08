@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=2e0c2e7288';
 import { artistaActual } from './auth.js?v=b2e08c086d';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=ae0cd63380';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=1a55fa22f6';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
