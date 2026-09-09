@@ -41,19 +41,30 @@ export function abrirComentarios(obraId, cardEl) {
 }
 
 // ============================================
-// TECLADO: cuando se escribe un comentario, el teclado "empuja" el cajón:
-// su borde inferior sube con una transición SUAVE (y baja igual al cerrarse);
-// el header queda fijo arriba y la lista se encoge progresivamente. La franja
-// que el cajón libera al subir es EXACTAMENTE donde está el teclado físico,
-// así que nunca se ve el fondo de la página. Si el evento llega cuando el
-// teclado ya se cerró del todo, el cajón vuelve al instante (nada que revelar).
+// TECLADO: el teclado "empuja" el cajón siguiéndolo 1:1. Cada evento de
+// visualViewport fija drawer.style.bottom AL VALOR EXACTO del teclado, SIN
+// transición CSS por evento: si se transicionara, cada evento reiniciaría la
+// animación y el cajón se quedaría por detrás del teclado real (input oculto
+// tras el teclado o franjas de fondo al cerrar = parpadeos). La suavidad la da
+// el PROPIO teclado, que manda eventos continuos mientras se despliega/recoge
+// (igual que hace el chat).
+//
+// El umbral es pequeño (~36px) porque el cajón es fijo y no hay scroll de
+// página que altere el visualViewport: conviene engancharse en cuanto el
+// teclado empieza a subir, antes de que tape la base del input.
+//
+// Solo cuando el navegador avisa TARDE (un único salto grande y aislado, sin
+// ráfaga de eventos) se usa una transición corta para que el movimiento se vea
+// fluido; en ráfaga (teclado animando) siempre se sigue 1:1 sin transición.
 // ============================================
+const TECLADO_UMBRAL = 36; // px de teclado para considerarlo "abierto"
 let keyboardListenerConectado = false;
 // Estado del ajuste del teclado a nivel de módulo para poder resetearlo
 // también desde cerrarComentarios (si se cierra el cajón con el teclado aún
 // abierto, al reabrir debe volver a levantarlo).
 let tecladoBottomActual = 0;   // último bottom aplicado (px); 0 = apoyado abajo
-let tecladoTransTimer = null;  // limpia la transición inline al terminar el movimiento
+let tecladoTransTimer = null;  // limpia la transición inline tras un salto aislado
+let tecladoUltimoEvento = 0;   // timestamp del último evento (detectar ráfaga)
 function resetEstadoTeclado() {
     tecladoBottomActual = 0;
     if (tecladoTransTimer) { clearTimeout(tecladoTransTimer); tecladoTransTimer = null; }
@@ -67,38 +78,43 @@ function ajustarTecladoDrawer() {
     const cajonVisible = drawer.classList.contains('visible');
     const vv = window.visualViewport;
     if (!vv || !vv.height) return;
-    const keyboardOpen = cajonVisible && vv.height < window.innerHeight * 0.85;
     const teclado = Math.max(0, window.innerHeight - vv.height);
+    const keyboardOpen = cajonVisible && teclado > TECLADO_UMBRAL;
+    const ahora = performance.now();
+    const desdeUltimo = ahora - tecladoUltimoEvento;
+    tecladoUltimoEvento = ahora;
 
     if (keyboardOpen) {
         document.body.classList.add('teclado-abierto');
         if (Math.abs(teclado - tecladoBottomActual) < 2) return;
-        tecladoBottomActual = teclado;
-        // Subida suave: la transición de bottom hace que el cajón se encoja
-        // progresivamente (el teclado tapa la franja que va liberando).
-        drawer.style.transition = 'bottom 0.28s cubic-bezier(0.22, 1, 0.36, 1)';
+        const saltoAislado = desdeUltimo > 120 && Math.abs(teclado - tecladoBottomActual) > 40;
+        // Ráfaga (teclado animando): seguimiento exacto, sin transición, para
+        // no desfasarse del teclado. Salto aislado: transición corta y fluida.
+        drawer.style.transition = saltoAislado
+            ? 'bottom 0.22s cubic-bezier(0.22, 1, 0.36, 1)'
+            : 'none';
         drawer.style.bottom = teclado + 'px';
+        tecladoBottomActual = teclado;
         if (tecladoTransTimer) clearTimeout(tecladoTransTimer);
-        tecladoTransTimer = setTimeout(limpiarTransicionTeclado, 320);
+        tecladoTransTimer = setTimeout(limpiarTransicionTeclado, 260);
     } else if (teclado <= 2 && tecladoBottomActual !== 0) {
-        // Teclado CERRADO del todo: restaurar al instante. No transición:
-        // si el evento llegó cuando el teclado ya se fue, una animación
-        // lenta dejaría visible la página entre el borde y 900.
+        // Teclado CERRADO del todo: restaurar al instante (el teclado ya se
+        // fue: si el cajón tardara en bajar se vería la página bajo su borde).
         resetEstadoTeclado();
         document.body.classList.remove('teclado-abierto');
         drawer.style.transition = '';
         drawer.style.bottom = '';
     } else if (tecladoBottomActual !== 0 && teclado < tecladoBottomActual) {
-        // Teclado cerrándose a medias: seguir bajando con transición suave
-        // (el teclado aún cubre la franja liberada).
+        // Teclado cerrándose: bajar 1:1 siguiendo los eventos (sin transición;
+        // la suavidad la da el propio teclado al recogerse).
         tecladoBottomActual = teclado;
-        drawer.style.transition = 'bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
-        drawer.style.bottom = (teclado || '') + 'px';
+        drawer.style.transition = 'none';
+        drawer.style.bottom = teclado > 2 ? teclado + 'px' : '';
         if (tecladoTransTimer) clearTimeout(tecladoTransTimer);
-        tecladoTransTimer = setTimeout(() => {
+        if (teclado <= 2) {
             document.body.classList.remove('teclado-abierto');
-            limpiarTransicionTeclado();
-        }, 340);
+            drawer.style.transition = '';
+        }
     }
 }
 function setupKeyboardDrawer() {

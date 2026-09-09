@@ -1202,9 +1202,11 @@ html, body {
        queda justo encima de la barra, sin separación. */
     bottom: 0;
     z-index: 2000;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* Fondo SÓLIDO (sin backdrop-filter): al mover/redimensionar el cajón con
+       el teclado, el blur obliga al WebView a re-renderizar lo que hay detrás
+       en cada frame y produce parpadeo. Con 0.98 de opacidad el blur era casi
+       imperceptible, así que se elimina por estabilidad visual. */
+    background: #ffffff;
     border-radius: 20px 20px 0 0;
     display: flex;
     flex-direction: column;
@@ -1458,7 +1460,7 @@ body.teclado-abierto .comentarios-drawer {
 /* Modo oscuro: superficie del cajón y franjas translúcidas oscuras
    (el texto ya se invierte solo con las variables --color-ink/grises) */
 [data-theme="dark"] .comentarios-drawer {
-    background: rgba(18, 18, 18, 0.98);
+    background: #121212;
     box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
 }
 [data-theme="dark"] .comentarios-drawer-header {
