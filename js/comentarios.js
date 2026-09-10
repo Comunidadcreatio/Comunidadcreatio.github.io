@@ -42,54 +42,74 @@ export function abrirComentarios(obraId, cardEl) {
 
 // ============================================
 // TECLADO: el cajón NUNCA cambia de posición. Su fondo sigue llegando siempre
-// al borde inferior de la pantalla (detrás del teclado) y lo único que se mueve
-// es su CONTENIDO, empujado con padding-bottom. Por eso, aunque el teclado lo
-// anime el sistema con su propia velocidad/easing y nuestros eventos lleguen a
-// saltos, es IMPOSIBLE que se vea la página entre el cajón y el teclado.
+// al borde inferior de la pantalla (detrás del teclado), así que aunque el
+// sistema anime el teclado a su velocidad y nuestros eventos lleguen a saltos,
+// es IMPOSIBLE que se vea la página entre el cajón y el teclado.
 //
-// El padding se calcula MIDIENDO dónde quedaría el borde inferior del área del
-// input sin padding y subiendo solo lo necesario para que quede por encima del
-// teclado (nunca por debajo de su sitio normal, donde ya deja hueco para el nav).
-// El valor se aplica con interpolación por requestAnimationFrame: movimiento
-// continuo y suave, sin transiciones CSS que se reinicien en cada evento.
+// La lista de comentarios tampoco se reordena: lo ÚNICO que se desplaza es el
+// ÁREA DEL INPUT, que sube con un transform (se anima en la GPU, fluido) justo
+// por encima del teclado.
+//
+// La subida se calcula MIDIENDO la posición real del área y descontando los
+// transforms de CSS (el suyo propio y el de apertura/cierre del cajón), así la
+// medición vale incluso si el teclado se abre mientras el cajón se desliza y
+// aunque el WebView ya haya reacomodado el cajón.
+// Durante el gesto del teclado solo se avanza en su dirección (subir al abrir,
+// bajar al cerrar): los valores transitorios del visualViewport provocaban un
+// rebote (subía de más y volvía). Al asentarse se corrige con el valor exacto.
 // ============================================
-const TECLADO_UMBRAL = 36;     // px de teclado para considerarlo "abierto"
-const SUAVIZADO_PADDING = 0.4; // factor de interpolación por frame (~5 frames)
+const TECLADO_UMBRAL = 12;     // px de teclado para considerarlo "abierto"
+const LIFT_TRANSICION = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+const GESTO_MS = 160;          // eventos más seguidos = mismo gesto del teclado
 let keyboardListenerConectado = false;
 // Estado a nivel de módulo para poder resetearlo también desde cerrarComentarios
 // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta otra vez).
 let alturaLayoutBase = 0;      // mayor alto de layout visto (detectar resize-content)
-let paddingObjetivo = 0;       // padding-bottom deseado (px)
-let paddingActual = 0;         // padding-bottom aplicado (animado)
-let rafPadding = null;         // id del requestAnimationFrame en curso
+let liftObjetivo = 0;          // px que debe subir el área del input
+let ultimoEventoTeclado = 0;   // timestamp del último evento (detectar gesto)
+let timerAsentado = null;      // corrección final al asentarse el teclado
 let tecladoAbiertoAhora = false;
+
+// Desplazamiento vertical que aporta el transform de CSS de un elemento
+// (0 si no tiene). Se usa para medir la posición "natural" del input sin que
+// interfieran las animaciones de transform.
+function transformY(el) {
+    if (!el || !el.style) return 0;
+    const t = getComputedStyle(el).transform;
+    if (!t || t === 'none') return 0;
+    try {
+        if (typeof DOMMatrixReadOnly === 'function') return new DOMMatrixReadOnly(t).m42 || 0;
+    } catch (e) { /* fallback abajo */ }
+    const m = t.match(/matrix(?:3d)?\(([^)]+)\)/);
+    if (!m) return 0;
+    const v = m[1].split(',').map(Number);
+    return v.length === 16 ? (v[13] || 0) : (v.length === 6 ? (v[5] || 0) : 0);
+}
+function areaInput() {
+    return drawer ? drawer.querySelector('.comentarios-input-area') : null;
+}
 function resetEstadoTeclado() {
-    paddingObjetivo = 0;
-    paddingActual = 0;
+    liftObjetivo = 0;
     tecladoAbiertoAhora = false;
-    if (rafPadding !== null) { cancelAnimationFrame(rafPadding); rafPadding = null; }
-    if (drawer) drawer.style.paddingBottom = '';
+    if (timerAsentado) { clearTimeout(timerAsentado); timerAsentado = null; }
+    const area = areaInput();
+    if (area) { area.style.transition = ''; area.style.transform = ''; }
 }
-function aplicarPaddingTeclado() {
-    if (!drawer) return;
-    drawer.style.paddingBottom = paddingActual > 0.5 ? paddingActual + 'px' : '';
+function aplicarLift(animar) {
+    const area = areaInput();
+    if (!area) return;
+    area.style.transition = animar ? LIFT_TRANSICION : 'none';
+    area.style.transform = liftObjetivo > 0.5 ? 'translateY(' + (-liftObjetivo) + 'px)' : '';
 }
-function animarPaddingTeclado() {
-    const diff = paddingObjetivo - paddingActual;
-    if (Math.abs(diff) < 0.5) {
-        paddingActual = paddingObjetivo;
-        aplicarPaddingTeclado();
-        rafPadding = null;
-        // Cuando ya volvió a su sitio y el teclado no está abierto, el nav puede
-        // reaparecer (no antes: si no, asomaría mientras el contenido aún sube).
-        if (!tecladoAbiertoAhora && paddingObjetivo <= 0.5) {
-            document.body.classList.remove('teclado-abierto');
-        }
-        return;
-    }
-    paddingActual += diff * SUAVIZADO_PADDING;
-    aplicarPaddingTeclado();
-    rafPadding = requestAnimationFrame(animarPaddingTeclado);
+// Cuánto hay que subir el área del input para que quede por encima del teclado.
+function liftNecesario() {
+    const vv = window.visualViewport;
+    const area = areaInput();
+    if (!vv || !area || !drawer || !tecladoAbiertoAhora) return 0;
+    const keyboardTop = vv.height + (vv.offsetTop || 0);
+    // Posición natural (sin su propio lift ni el transform del cajón).
+    const natural = area.getBoundingClientRect().bottom - transformY(area) - transformY(drawer);
+    return Math.max(0, Math.round(natural - keyboardTop));
 }
 function ajustarTecladoDrawer() {
     if (!drawer || !lista) return;
@@ -103,25 +123,40 @@ function ajustarTecladoDrawer() {
     const keyboardTop = vv.height + (vv.offsetTop || 0);
     const teclado = Math.max(0, window.innerHeight - keyboardTop);
     // Si el layout se redujo (interactive-widget=resizes-content) el navegador ya
-    // deja el cajón encima del teclado; igualmente el cálculo de abajo da 0.
+    // deja el cajón encima del teclado; la medición de abajo dará 0.
     const layoutReducido = alturaLayoutBase - window.innerHeight > 40;
     tecladoAbiertoAhora = cajonVisible && (teclado > TECLADO_UMBRAL || layoutReducido);
+    if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
 
-    if (!tecladoAbiertoAhora) {
-        paddingObjetivo = 0;
-    } else {
-        document.body.classList.add('teclado-abierto');
-        const area = drawer.querySelector('.comentarios-input-area');
-        if (!area) return;
-        // Posición natural del borde inferior del área del input con padding 0,
-        // en coordenadas del layout. Se usan offsetTop/offsetHeight (y no
-        // getBoundingClientRect) porque NO se ven afectados por el transform de
-        // apertura/cierre del cajón: así la medición es correcta incluso si el
-        // teclado se abre mientras el cajón todavía se está deslizando.
-        const naturalInputBottom = drawer.offsetTop + area.offsetTop + area.offsetHeight + paddingActual;
-        paddingObjetivo = Math.max(0, Math.round(naturalInputBottom - keyboardTop));
+    const ahora = performance.now();
+    const enGesto = (ahora - ultimoEventoTeclado) < GESTO_MS;
+    ultimoEventoTeclado = ahora;
+
+    let nuevo = liftNecesario();
+    if (enGesto) {
+        // Nunca invertir la dirección durante el gesto: al abrir solo sube, al
+        // cerrar solo baja. Evita el rebote por valores transitorios.
+        nuevo = tecladoAbiertoAhora ? Math.max(nuevo, liftObjetivo) : Math.min(nuevo, liftObjetivo);
     }
-    if (rafPadding === null) rafPadding = requestAnimationFrame(animarPaddingTeclado);
+    if (Math.abs(nuevo - liftObjetivo) > 0.5) {
+        liftObjetivo = nuevo;
+        aplicarLift(true);
+    }
+
+    // Al asentarse el teclado: corregir con el valor exacto y, si ya está
+    // cerrado y el input volvió a su sitio, devolver el nav.
+    if (timerAsentado) clearTimeout(timerAsentado);
+    timerAsentado = setTimeout(() => {
+        timerAsentado = null;
+        const exacto = liftNecesario();
+        if (Math.abs(exacto - liftObjetivo) > 1) {
+            liftObjetivo = exacto;
+            aplicarLift(true);
+        }
+        if (!tecladoAbiertoAhora && liftObjetivo <= 0.5) {
+            document.body.classList.remove('teclado-abierto');
+        }
+    }, GESTO_MS + 40);
 }
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
@@ -134,9 +169,9 @@ function setupKeyboardDrawer() {
 
 function cerrarComentarios() {
     if (!drawer) return;
-    // Limpiar estilos inline del swipe/teclado y resetear el estado del teclado
-    // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta
-    // de nuevo porque tecladoBottomActual vuelve a 0).
+    // Limpiar estilos inline del swipe y del ajuste del teclado (el input vuelve
+    // a su sitio y, al reabrir con el teclado aún abierto, se vuelve a levantar
+    // porque el estado queda reseteado).
     drawer.style.transform = '';
     drawer.style.transition = '';
     drawer.style.bottom = '';

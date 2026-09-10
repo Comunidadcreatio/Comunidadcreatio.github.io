@@ -57,38 +57,51 @@ await sleep(2000);
 await evalJs(`document.querySelector('.metrica-comentario').click()`);
 await sleep(1400);
 
-// Mide la SUAVIDAD del movimiento real: se cambia la altura del teclado y se
-// muestrea, frame a frame, el padding-bottom que aplica el cajón (el cajón en
-// sí no se mueve nunca; lo que se desplaza es su contenido).
+// Mide la SUAVIDAD y la AUSENCIA DE REBOTE del movimiento real: se simula el
+// teclado subiendo en pasos (como hace el sistema) y se muestrea, frame a
+// frame, cuánto ha subido el área del input (transform, en la GPU).
 const serie = await evalJs(`(async () => {
     const vv = window.visualViewport;
     let h = vv.height;
     Object.defineProperty(vv, 'height', { configurable: true, get: () => h });
-    const drawer = document.getElementById('comentarios-drawer');
+    const setVv = (x) => { h = x; window.dispatchEvent(new Event('resize')); };
+    const area = document.querySelector('.comentarios-input-area');
     const puntos = [];
-    const registra = () => puntos.push(Math.round(parseFloat(drawer.style.paddingBottom) || 0));
-    registra(); // reposo (0)
-    h = 620;
-    window.dispatchEvent(new Event('resize'));
+    const liftActual = () => {
+        const tr = getComputedStyle(area).transform;
+        if (!tr || tr === 'none') return 0;
+        const m = tr.match(/matrix\\(([^)]+)\\)/);
+        return m ? Math.round(-parseFloat(m[1].split(',')[5])) : 0;
+    };
+    puntos.push(liftActual()); // reposo (0)
+    // Teclado subiendo en pasos como el sistema (ráfaga de eventos)
+    for (const x of [860, 800, 750, 700, 660, 620]) {
+        setVv(x);
+        await new Promise(r => requestAnimationFrame(r));
+    }
     await new Promise(res => { const t0 = performance.now(); (function tick() {
-        registra();
-        if (performance.now() - t0 < 420) requestAnimationFrame(tick); else res();
+        puntos.push(liftActual());
+        if (performance.now() - t0 < 500) requestAnimationFrame(tick); else res();
     })(); });
     return puntos.join(',');
 })()`);
-console.log('padding-bottom a lo largo del tiempo (px, 0 -> ~220):');
+console.log('subida del input a lo largo del tiempo (px, 0 -> ~220):');
 console.log(serie);
 
-// Análisis: ¿hay valores intermedios (interpolación suave) o solo salta?
 const vals = serie.split(',').map(Number);
-const unicos = [...new Set(vals)];
-console.log('valores distintos:', unicos.length > 20 ? unicos.slice(0, 20).join(', ') + '...' : unicos.join(', '));
-const intermedios = vals.filter(v => v > 0 && v < 215);
-const finalOk = vals[vals.length - 1] >= 200 && vals[vals.length - 1] <= 230;
-console.log(intermedios.length >= 5
-    ? '✓ EL CONTENIDO SUBE SUAVE: ' + intermedios.length + ' muestras intermedias (p.ej. ' + intermedios.slice(0, 6).join(',') + '...)'
-    : '✗ SALTA: sin valores intermedios (0 -> 220 directo)');
-console.log(finalOk ? `  ✓ converge al valor correcto (${vals[vals.length - 1]}px)` : `  ✗ valor final inesperado: ${vals[vals.length - 1]}px`);
+const final = vals[vals.length - 1];
+const intermedios = vals.filter(v => v > 0 && v < final - 5);
+// Rebote = haber subido por encima del valor final y volver a bajar
+const maxVals = Math.max(...vals);
+const rebote = maxVals - final;
+console.log(intermedios.length >= 3
+    ? '✓ SUBE SUAVE: ' + intermedios.length + ' muestras intermedias'
+    : '✗ SALTA: sin muestras intermedias (0 -> ' + final + ' directo)');
+console.log(final >= 200 && final <= 230 ? `  ✓ valor final correcto (${final}px)` : `  ✗ valor final inesperado: ${final}px`);
+console.log(rebote <= 4
+    ? `  ✓ sin rebote: máximo ${maxVals} vs final ${final}`
+    : `  ✗ REBOTA: subió hasta ${maxVals} y bajó a ${final} (${rebote}px de más)`);
+const okAll = intermedios.length >= 3 && final >= 200 && final <= 230 && rebote <= 4;
 console.log('EXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}
-process.exit((intermedios.length >= 5 && finalOk) ? 0 : 1);
+process.exit(okAll ? 0 : 1);

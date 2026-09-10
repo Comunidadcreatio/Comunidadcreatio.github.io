@@ -108,35 +108,43 @@ console.log(await evalJs(`(() => {
     });
 })()`));
 
-console.log('\n=== Simular teclado abierto: cajón inmóvil, fondo cubre, input arriba ===');
+console.log('\n=== Simular teclado abierto: cajón y lista inmóviles, input arriba ===');
 console.log(await evalJs(`(() => {
     // Nuevo modelo: el cajón NO se mueve (su fondo llega siempre al borde
-    // inferior de la pantalla); el contenido se sube con padding-bottom.
+    // inferior de la pantalla) y la lista tampoco: solo sube el ÁREA del input
+    // con un transform.
     document.body.classList.add('teclado-abierto');
     const drawer = document.getElementById('comentarios-drawer');
+    const area = document.querySelector('.comentarios-input-area');
+    const lista = document.getElementById('comentarios-lista');
+    const listaAntes = lista.getBoundingClientRect();
+    const cajonAntes = drawer.getBoundingClientRect();
     const teclado = 280;
-    drawer.style.paddingBottom = '220px'; // 280 - 60 del espacio del nav
+    area.style.transform = 'translateY(-220px)'; // 280 - 60 del espacio del nav
     const input = document.getElementById('comentarios-input');
     const nav = document.getElementById('toggle-panel');
     const ir = input.getBoundingClientRect();
     const dr = drawer.getBoundingClientRect();
     const nv = nav.getBoundingClientRect();
+    const listaDespues = lista.getBoundingClientRect();
     const navOculto = nv.height === 0 || getComputedStyle(nav).display === 'none';
-    const area = document.querySelector('.comentarios-input-area');
     const marginBottom = getComputedStyle(area).marginBottom;
     const fondo = window.innerHeight;
     return JSON.stringify({
         navOculto,
         marginBottomNav: marginBottom,           // conserva su espacio para el nav
         fondoDelCajonCubre: dr.bottom >= (fondo - teclado),
+        cajonInmovil: Math.abs(dr.top - cajonAntes.top) < 1,
+        listaInmovil: Math.abs(listaDespues.top - listaAntes.top) < 1
+                      && Math.abs(listaDespues.bottom - listaAntes.bottom) < 1,
         inputSobreElTeclado: ir.bottom <= (fondo - teclado) + 1,
         inputConAire: (fondo - teclado) - ir.bottom >= 8 && (fondo - teclado) - ir.bottom <= 20,
-        paddingAplicado: drawer.style.paddingBottom
+        transformAplicado: area.style.transform
     });
 })()`));
 await evalJs(`(() => {
-    const d = document.getElementById('comentarios-drawer');
-    d.style.paddingBottom = '';
+    const area = document.querySelector('.comentarios-input-area');
+    area.style.transform = '';
     document.body.classList.remove('teclado-abierto');
 })()`);
 

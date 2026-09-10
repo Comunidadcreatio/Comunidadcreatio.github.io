@@ -1316,10 +1316,10 @@ html, body {
 }
 /* Teclado abierto (clase global teclado-abierto que también usa el chat):
    el nav (#toggle-panel) queda oculto por chat.css. El cajón NO cambia de
-   posición: su fondo sigue llegando al borde inferior de la pantalla, así que
-   nunca se ve la página detrás aunque el teclado y nuestra animación vayan a
-   distinta velocidad. JS desplaza solo el contenido con padding-bottom (medido
-   sobre el borde del input, que conserva su margen para el nav). */
+   posición (su fondo sigue llegando al borde inferior de la pantalla, así que
+   nunca se ve la página detrás) y la lista de comentarios tampoco se reordena:
+   lo ÚNICO que se desplaza es el área del input, que sube por encima del
+   teclado con un transform (GPU). */
 body.teclado-abierto .comentarios-drawer {
     overscroll-behavior: contain;
 }
@@ -1334,8 +1334,12 @@ body.teclado-abierto .comentarios-drawer {
        debajo del campo que el que hay arriba. */
     margin-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid rgba(0,0,0,0.08);
-    background: rgba(0,0,0,0.03);
+    /* Fondo SÓLIDO: al subir con el teclado esta franja se superpone a la lista
+       de comentarios y debe taparla limpiamente (antes era un tinte translúcido
+       que dejaba traslucir el texto de debajo). */
+    background: #f7f7f7;
     flex-shrink: 0;
+    will-change: transform;   /* la sube el teclado: se anima en la GPU */
 }
 .comentarios-input {
     flex: 1;
@@ -1466,7 +1470,7 @@ body.teclado-abierto .comentarios-drawer {
 }
 [data-theme="dark"] .comentarios-input-area {
     border-top-color: rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
+    background: #1a1a1a;
 }
 
 /* ==============================================

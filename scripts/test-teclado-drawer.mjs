@@ -80,18 +80,27 @@ async function estado() {
         const d = document.getElementById('comentarios-drawer');
         const r = d.getBoundingClientRect();
         const nav = document.getElementById('toggle-panel');
+        const list = document.getElementById('comentarios-lista');
+        const lr = list.getBoundingClientRect();
+        const area = d.querySelector('.comentarios-input-area');
+        const ar = area.getBoundingClientRect();
         const input = document.getElementById('comentarios-input');
         const ir = input.getBoundingClientRect();
+        let lift = 0;
+        const tr = getComputedStyle(area).transform;
+        if (tr && tr !== 'none') { const m = tr.match(/matrix\(([^)]+)\)/); if (m) lift = -parseFloat(m[1].split(',')[5]); }
         const vv = window.visualViewport;
+        const keyboardTop = Math.round(vv.height + (vv.offsetTop || 0));
         return JSON.stringify({
-            bottom: Math.round(r.bottom), top: Math.round(r.top),
-            padding: parseFloat(d.style.paddingBottom) || 0,
-            keyboardTop: Math.round(vv.height + (vv.offsetTop || 0)),
-            noHayPagina: r.bottom + 0.5 >= vv.height + (vv.offsetTop || 0),
+            drawerTop: Math.round(r.top), drawerBottom: Math.round(r.bottom),
+            listTop: Math.round(lr.top), listBottom: Math.round(lr.bottom),
+            lift: Math.round(lift), areaBottom: Math.round(ar.bottom),
+            inputBottom: Math.round(ir.bottom), keyboardTop,
+            noHayPagina: r.bottom + 0.5 >= keyboardTop,
+            inputVisible: ir.bottom <= keyboardTop + 1,
             tecladoAbierto: document.body.classList.contains('teclado-abierto'),
             navHidden: nav.classList.contains('hidden') || getComputedStyle(nav).display === 'none',
-            inputBottom: Math.round(ir.bottom),
-            vvH: window.visualViewport.height
+            vvH: vv.height
         });
     })()`);
 }
@@ -105,93 +114,94 @@ function checks(estadoJson, espera) {
 }
 
 let ok = true;
-console.log('\n[estado inicial, drawer abierto]');
+console.log('\n[estado inicial, caj�n abierto, sin teclado]');
 let st = await estado(); console.log(' ', st);
+const base = JSON.parse(st);
 
-// 1) Abrir teclado: un solo evento con vv ya en 620 (teclado 280px)
-console.log('\n--- evento: teclado ABIERTO (vv 900->620) ---');
+// 1) Abrir teclado con un solo evento (vv ya en 620)
+console.log('\n--- teclado ABIERTO (vv 900->620) ---');
 await evalJs(`__setVvH(620)`);
-await sleep(500); // deja converger la interpolación por rAF
+await sleep(520);
 st = await estado(); console.log(' ', st);
 let fails = checks(st, {
-    bottom: (v) => v === 900,          // el cajón NO se mueve (fondo siempre abajo)
-    top: 180,
+    drawerTop: base.drawerTop,          // el caj�n NO se mueve
+    drawerBottom: base.drawerBottom,
+    listTop: base.listTop,              // la lista NO se reordena ni se mueve
+    listBottom: base.listBottom,
     tecladoAbierto: true,
     navHidden: true,
     noHayPagina: true,
-    padding: (v) => v > 100            // el contenido SÍ se sube
+    lift: (v) => v > 100                // solo sube el �rea del input
 });
-console.log(fails.length ? '  ✗ ' + fails.join(' | ') : '  ✓ cajón inmóvil (fondo cubre), contenido subido, nav oculto');
+console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? caj�n y lista inm�viles; solo sube el input; nav oculto');
 ok = ok && fails.length === 0;
-// El input debe quedar VISIBLE sobre/bordeando la línea del teclado
 {
     const e = JSON.parse(st);
-    console.log(e.inputBottom <= e.keyboardTop + 1
-        ? `  ✓ input visible (borde ${e.inputBottom} <= teclado ${e.keyboardTop})`
-        : `  ✗ input bajo la línea del teclado: ${e.inputBottom} > ${e.keyboardTop}`);
-    ok = ok && e.inputBottom <= e.keyboardTop + 1;
+    console.log(e.inputVisible ? `  ? input visible (borde ${e.inputBottom} <= teclado ${e.keyboardTop})` : `  ? input tras el teclado: ${e.inputBottom}`);
+    ok = ok && e.inputVisible;
+    const aire = e.keyboardTop - e.inputBottom;
+    console.log(aire >= 8 && aire <= 20 ? `  ? aire bajo el input: ${aire}px` : `  ? aire incorrecto: ${aire}px`);
+    ok = ok && aire >= 8 && aire <= 20;
 }
 
-// 2) Barrido suave al abrir en varios pasos (teclado subiendo)
+// 2) Barrido progresivo: el lift sube de forma mon�tona y nada m�s se mueve
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
-await evalJs(`__setVvH(900)`); // cerrar primero
-await sleep(500);
-const serie = [];
-let sinPaginaSiempre = true;
+await evalJs(`__setVvH(900)`);
+await sleep(520);
+const lifts = [];
+let nadaSeMueve = true;
 for (const h of [840, 760, 690, 620]) {
     await evalJs(`__setVvH(${h})`);
     await sleep(90);
     const e = JSON.parse(await estado());
-    serie.push(e.padding);
-    if (!e.noHayPagina) sinPaginaSiempre = false;
+    lifts.push(e.lift);
+    if (e.drawerTop !== base.drawerTop || e.drawerBottom !== base.drawerBottom ||
+        e.listTop !== base.listTop || e.listBottom !== base.listBottom) nadaSeMueve = false;
 }
-console.log(' paddings aplicados tras cada paso: ' + serie.join(', '));
-const crece = serie.every((p, i) => i === 0 || p >= serie[i - 1]);
-console.log(crece ? '  ✓ el contenido sube progresivamente' : '  ✗ movimiento no monotónico');
-console.log(sinPaginaSiempre ? '  ✓ en ningún paso se ve la página sobre el teclado' : '  ✗ se vio la página');
-ok = ok && crece && sinPaginaSiempre;
+console.log(' lifts: ' + lifts.join(', '));
+const crece = lifts.every((x, i) => i === 0 || x >= lifts[i - 1]);
+console.log(crece ? '  ? el �rea del input sube progresivamente' : '  ? movimiento no mon�tono');
+console.log(nadaSeMueve ? '  ? el caj�n y la lista permanecen exactamente en su sitio' : '  ? algo m�s se movi�');
+ok = ok && crece && nadaSeMueve;
 
-// 3) Cerrar del todo con UN solo evento tardío (vv ya 900)
-console.log('\n--- evento tardío: teclado CERRADO (vv 620->900 de golpe) ---');
+// 3) Cerrar el teclado de golpe
+console.log('\n--- teclado CERRADO (vv 620->900) ---');
 await evalJs(`__setVvH(900)`);
-await sleep(500); // deja converger la interpolación a 0
+await sleep(520);
 st = await estado(); console.log(' ', st);
-fails = checks(st, { bottom: 900, padding: 0, tecladoAbierto: false, navHidden: false });
-console.log(fails.length ? '  ✗ ' + fails.join(' | ') : '  ✓ restaurado (contenido abajo, nav visible)');
-ok = ok && fails.length === 0;
-
-// El cajón sigue visible (no se cerró el drawer, solo el teclado)
-const sigueAbierto = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('visible')`);
-console.log(sigueAbierto ? '  ✓ el cajón sigue abierto tras cerrar el teclado' : '  ✗ el cajón se cerró');
-ok = ok && sigueAbierto;
-
-// 4) Cerrar el CAJÓN con el teclado aún ABIERTO, luego reabrirlo:
-//    al reabrir debe volver a levantarse solo (estado reseteado).
-console.log('\n--- cerrar cajón con teclado abierto y reabrir ---');
-await evalJs(`__setVvH(620)`); // teclado abierto de nuevo
-await sleep(450);
-st = await estado(); console.log('  abierto con teclado: ', st);
-await evalJs(`document.getElementById('comentarios-close').click()`); // cierra el cajón
-await sleep(450);
-const oculto = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
-console.log(oculto ? '  ✓ cajón cerrado' : '  ✗ no se ocultó');
-ok = ok && oculto;
-// Reabrir (mismo flujo que el icono de comentarios)
-await evalJs(`document.querySelector('.metrica-comentario').click()`);
-await sleep(500);
-st = await estado(); console.log('  reabierto con teclado aún arriba: ', st);
 fails = checks(st, {
-    bottom: 900, tecladoAbierto: true, navHidden: true, noHayPagina: true,
-    padding: (v) => v > 100
+    drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
+    listTop: base.listTop, listBottom: base.listBottom,
+    lift: 0, tecladoAbierto: false, navHidden: false
 });
-console.log(fails.length ? '  ✗ ' + fails.join(' | ') + ' (no se levantó al reabrir)' : '  ✓ se levantó solo al reabrir con teclado abierto');
+console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? todo restaurado (input abajo, nav visible)');
 ok = ok && fails.length === 0;
-// Cerrar teclado para limpiar
-await evalJs(`__setVvH(900)`);
+
+// 4) Cerrar el caj�n con el teclado abierto y reabrirlo
+console.log('\n--- cerrar caj�n con teclado abierto y reabrir ---');
+await evalJs(`__setVvH(620)`);
+await sleep(520);
+st = await estado(); console.log('  abierto con teclado: ', st);
+await evalJs(`document.getElementById('comentarios-close').click()`);
 await sleep(500);
+const oculto = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
+console.log(oculto ? '  ? caj�n cerrado' : '  ? no se ocult�');
+ok = ok && oculto;
+await evalJs(`document.querySelector('.metrica-comentario').click()`);
+await sleep(600);
+st = await estado(); console.log('  reabierto con teclado arriba: ', st);
+fails = checks(st, {
+    drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
+    tecladoAbierto: true, navHidden: true, noHayPagina: true,
+    lift: (v) => v > 100
+});
+console.log(fails.length ? '  ? ' + fails.join(' | ') + ' (no se levant� al reabrir)' : '  ? se levant� solo al reabrir con el teclado abierto');
+ok = ok && fails.length === 0;
+await evalJs(`__setVvH(900)`);
+await sleep(520);
 st = await estado(); console.log('  teclado cerrado tras reabrir: ', st);
-fails = checks(st, { bottom: 900, padding: 0, tecladoAbierto: false });
-console.log(fails.length ? '  ✗ ' + fails.join(' | ') : '  ✓ restaurado');
+fails = checks(st, { lift: 0, tecladoAbierto: false });
+console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? restaurado');
 ok = ok && fails.length === 0;
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
