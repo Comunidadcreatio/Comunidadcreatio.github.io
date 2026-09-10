@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl, veloEl;
+let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl, fondoEl;
 
 function init() {
     if (drawer) return;
@@ -16,7 +16,7 @@ function init() {
     btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
     versionEl = document.getElementById('comentarios-version');
-    veloEl    = document.getElementById('velo-teclado');
+    fondoEl   = document.getElementById('fondo-cajon');
     // Mostrar la versión en el cajón (para poder comprobar qué build se está
     // probando en el dispositivo).
     if (versionEl) {
@@ -161,7 +161,7 @@ function resetEstadoTeclado() {
     if (area) { area.style.transition = ''; area.style.transform = ''; }
     compensarPanCajon(0, false);
     compensarPagina(0, false);
-    if (veloEl) veloEl.classList.add('hidden');
+    if (fondoEl) fondoEl.classList.add('hidden');
     ocultarNavTeclado(false);
 }
 function aplicarLift(animar) {
@@ -184,17 +184,17 @@ function liftNecesario() {
     return Math.max(0, Math.round(natural - keyboardTop));
 }
 // El navegador desplaza el viewport VISUAL (visualViewport.offsetTop) para
-// "mostrar" el input enfocado. Ese desplazamiento mueve TODO en pantalla (de ahí
-// que el cajón y los comentarios parecieran subir). Lo compensamos bajando el
-// cajón lo mismo que el viewport se desplaza: en pantalla vuelve a su sitio y
-// solo se mueve el área del input.
+// "mostrar" el input enfocado. Ese desplazamiento mueve TODO en pantalla, y era
+// lo que hacía que la sección de comentarios subiera y volviera. Lo compensamos
+// en el cajón con el MISMO valor y SIN transición (aplicado en el mismo evento,
+// antes del repintado): en pantalla el cajón no se mueve nada.
 function compensarPanCajon(pan, activo) {
     if (!drawer) return;
     const objetivo = activo && pan > 1 ? 'translateY(' + Math.round(pan) + 'px)' : '';
     if (drawer.style.transform !== objetivo) {
-        // Mientras se escribe, la compensación debe seguir al viewport de cerca.
-        drawer.style.transition = activo ? 'transform 0.1s linear' : '';
+        drawer.style.transition = 'none';   // instantáneo: sin movimiento perceptible
         drawer.style.transform = objetivo;
+        void drawer.offsetHeight;
     }
 }
 // El mismo desplazamiento del viewport mueve lo que hay DETRÁS del cajón (el
@@ -252,12 +252,12 @@ function ajustarTecladoDrawer() {
     // que queda detrás (el cavent, la cabecera...): en pantalla nada se mueve.
     compensarPanCajon(pan, tecladoAbiertoAhora);
     compensarPagina(pan, tecladoAbiertoAhora);
-    // Si además hay desplazamiento, se cubre la franja superior con el fondo del
-    // cajón: así lo de detrás no puede verse moverse bajo ninguna circunstancia.
-    if (veloEl) {
-        const mostrarVelo = tecladoAbiertoAhora && pan > 4;
-        if (veloEl.classList.contains('hidden') === mostrarVelo) {
-            veloEl.classList.toggle('hidden', !mostrarVelo);
+    // Rectángulo del mismo tono del cajón, detrás de él: mientras se escribe,
+    // cualquier destello o desajuste momentáneo queda de ese color y no se nota.
+    if (fondoEl) {
+        const mostrarFondo = tecladoAbiertoAhora && cajonVisible;
+        if (fondoEl.classList.contains('hidden') === mostrarFondo) {
+            fondoEl.classList.toggle('hidden', !mostrarFondo);
         }
     }
 

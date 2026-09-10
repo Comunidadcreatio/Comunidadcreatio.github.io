@@ -104,9 +104,9 @@ async function estado() {
         const hr = header ? header.getBoundingClientRect() : null;
         const main = document.getElementById('main-content');
         const mr = main ? main.getBoundingClientRect() : null;
-        const velo = document.getElementById('velo-teclado');
+        const velo = document.getElementById('fondo-cajon');
         return JSON.stringify({
-            veloVisible: velo ? !velo.classList.contains('hidden') : null,
+            fondoVisible: velo ? !velo.classList.contains('hidden') : null,
             drawerTop: Math.round(r.top), drawerBottom: Math.round(r.bottom),
             drawerScreenTop: Math.round(r.top - off),
             listTop: Math.round(lr.top), listBottom: Math.round(lr.bottom),
@@ -149,6 +149,7 @@ let fails = checks(st, {
     tecladoAbierto: true,
     navHidden: true,
     noHayPagina: true,
+    fondoVisible: true,
     lift: (v) => v > 100
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK cajon y lista inmoviles; solo sube el input; nav oculto');
@@ -174,10 +175,10 @@ fails = checks(st, {
     tecladoAbierto: true,
     navHidden: true,
     inputVisible: true,
-    veloVisible: true,          // con desplazamiento, se cubre la franja superior
+    fondoVisible: true,          // el rectangulo del tono del cajon esta puesto
     lift: (v) => v > 100
 });
-console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado y velo puesto: nada de detras puede verse moverse');
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado y fondo del tono del cajon puesto');
 ok = ok && fails.length === 0;
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
 await evalJs(`__setVv(900, 0)`);
@@ -205,7 +206,7 @@ st = await estado(); console.log(' ', st);
 fails = checks(st, {
     drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
     listTop: base.listTop, listBottom: base.listBottom,
-    lift: 0, tecladoAbierto: false, navHidden: false, veloVisible: false
+    lift: 0, tecladoAbierto: false, navHidden: false, fondoVisible: false
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK todo restaurado (input abajo, nav visible)');
 ok = ok && fails.length === 0;

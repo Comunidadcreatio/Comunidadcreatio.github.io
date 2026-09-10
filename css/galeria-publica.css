@@ -1228,22 +1228,22 @@ html, body {
 .comentarios-drawer.hidden {
     display: none;
 }
-/* Velo superior mientras se escribe: cubre la franja por encima del cajón con
-   su mismo fondo, de modo que no se vea el contenido de detrás si el navegador
-   desplaza el viewport al abrir el teclado. Queda por encima del contenido
-   (cabecera incluida) y por debajo del cajón. */
-.velo-teclado {
+/* Rectángulo del mismo tono que el cajón, detrás de él y cubriendo su misma
+   zona (de la cabecera al borde inferior). Mientras se escribe, cualquier
+   destello o desajuste momentáneo de la página al desplegarse el teclado queda
+   de este color y no se percibe. El cajón va por delante (z-index mayor). */
+.fondo-cajon {
     position: fixed;
-    top: 0;
+    top: var(--cajon-top, 20vh);
     left: 0;
     right: 0;
-    height: var(--cajon-top, 20vh);
-    z-index: 1500;
+    bottom: 0;
+    z-index: 1900;
     background: #ffffff;
     pointer-events: none;
 }
-.velo-teclado.hidden { display: none; }
-[data-theme="dark"] .velo-teclado { background: #121212; }
+.fondo-cajon.hidden { display: none; }
+[data-theme="dark"] .fondo-cajon { background: #121212; }
 /* Header */
 .comentarios-drawer-header {
     display: flex;
