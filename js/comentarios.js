@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, btnCerrar;
+let drawer, lista, input, btnEnviar, btnCerrar, nav;
 
 function init() {
     if (drawer) return;
@@ -14,6 +14,7 @@ function init() {
     input     = document.getElementById('comentarios-input');
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
+    nav       = document.getElementById('toggle-panel');
     // Conectar el ajuste del cajón cuando el teclado se abre (una sola vez)
     setupKeyboardDrawer();
 }
@@ -32,6 +33,10 @@ export function abrirComentarios(obraId, cardEl) {
     // Forzar reflow antes de la animación
     drawer.offsetHeight;
     drawer.classList.add('visible');
+
+    // Fijar la geometría del cajón (top y alto en píxeles, sobre la pantalla
+    // completa) para que el navegador NO pueda reacomodarlo al abrir el teclado.
+    pinCajonTeclado();
 
     // Si el teclado sigue abierto al reabrir (cierre del cajón sin cerrar el
     // teclado), volver a levantar el cajón de inmediato.
@@ -89,6 +94,36 @@ function transformY(el) {
 function areaInput() {
     return drawer ? drawer.querySelector('.comentarios-input-area') : null;
 }
+// Fija la geometría del cajón en píxeles sobre la ALTURA COMPLETA de la
+// pantalla (top = 20% y alto = 80% de esa altura). Así, aunque el WebView
+// redimensione el layout al abrir el teclado (interactive-widget=resizes-content
+// o WebViews que lo ignoran), el navegador YA NO puede reacomodar el cajón: su
+// caja, su fondo y la lista de comentarios se quedan exactamente donde estaban.
+function pinCajonTeclado() {
+    if (!drawer) return;
+    const alto = alturaLayoutBase || window.innerHeight || 0;
+    if (!alto) return;
+    const top = Math.round(alto * 0.2);
+    const h = Math.round(alto * 0.8);
+    if (drawer.style.top === top + 'px' && drawer.style.height === h + 'px' && drawer.style.bottom === 'auto') return;
+    drawer.style.top = top + 'px';
+    drawer.style.height = h + 'px';
+    drawer.style.bottom = 'auto';
+}
+function despinCajonTeclado() {
+    if (!drawer) return;
+    drawer.style.top = '';
+    drawer.style.height = '';
+    drawer.style.bottom = '';
+}
+// Mientras el teclado está abierto el nav no debe verse (taparía la zona del
+// input y el WebView puede reacomodarlo encima del teclado). Se oculta con
+// estilo INLINE para que no lo pueda revivir ninguna regla CSS.
+function ocultarNavTeclado(ocultar) {
+    if (!nav) return;
+    const valor = ocultar ? 'none' : '';
+    if (nav.style.display !== valor) nav.style.display = valor;
+}
 function resetEstadoTeclado() {
     liftObjetivo = 0;
     tecladoAbiertoAhora = false;
@@ -96,6 +131,7 @@ function resetEstadoTeclado() {
     if (timerAsentado) { clearTimeout(timerAsentado); timerAsentado = null; }
     const area = areaInput();
     if (area) { area.style.transition = ''; area.style.transform = ''; }
+    ocultarNavTeclado(false);
 }
 function aplicarLift(animar) {
     const area = areaInput();
@@ -117,7 +153,11 @@ function ajustarTecladoDrawer() {
     if (!drawer || !lista) return;
     const vv = window.visualViewport;
     if (!vv || !vv.height) return;
-    if (window.innerHeight > alturaLayoutBase) alturaLayoutBase = window.innerHeight;
+    // Referencia de la altura COMPLETA de la pantalla (se refresca siempre que
+    // el layout no esté reducido; así sigue valiendo tras una rotación).
+    if (!alturaLayoutBase || window.innerHeight >= alturaLayoutBase - 40) {
+        alturaLayoutBase = window.innerHeight || alturaLayoutBase;
+    }
 
     const cajonVisible = drawer.classList.contains('visible');
     // Borde superior del teclado en coordenadas del layout (offsetTop cubre el
@@ -132,10 +172,15 @@ function ajustarTecladoDrawer() {
     tecladoAbiertoAhora = cajonVisible && (teclado > TECLADO_UMBRAL || layoutReducido);
     if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
 
+    // Nav fuera de la vista mientras se escribe (inline: a prueba de CSS) y
+    // geometría del cajón reafirmada para que el navegador no lo reacomode.
+    ocultarNavTeclado(tecladoAbiertoAhora);
+    pinCajonTeclado();
+
     // Con el teclado abierto, impedir que el navegador desplace la página para
     // "mostrar" el input enfocado: el cajón está fijo y no necesita scroll, y
     // ese desplazamiento movería lo que hay detrás (cabecera, contenido).
-    if (tecladoAbiertoAhora && layoutReducido === false) {
+    if (tecladoAbiertoAhora) {
         const sy = window.scrollY || window.pageYOffset || 0;
         if (scrollBloqueado === null) scrollBloqueado = sy;
         else if (Math.abs(sy - scrollBloqueado) > 1) window.scrollTo(0, scrollBloqueado);

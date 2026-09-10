@@ -85,33 +85,35 @@ const setup = await evalJs(`(() => {
             lift: Math.round(lift),
             areaBottom: Math.round(ar.bottom),
             keyboardTop: Math.round(vv2.height + (vv2.offsetTop || 0)),
+            drawerTop: Math.round(d.getBoundingClientRect().top),
             drawerBottom: Math.round(d.getBoundingClientRect().bottom),
+            pinTop: d.style.top || '(css)', pinHeight: d.style.height || '(css)', pinBottom: d.style.bottom || '(css)',
+            navDisplay: getComputedStyle(document.getElementById('toggle-panel')).display,
             clase: document.body.classList.contains('teclado-abierto')
         });
     };
-    window.__resetDrawer = () => { d.style.bottom = ''; area.style.transition = ''; area.style.transform = ''; };
+    window.__resetDrawer = () => { area.style.transition = ''; area.style.transform = ''; };
     return 'ok';
 })()`);
 console.log('setup:', setup);
 
-async function correr(nombre, { vvH, offsetTop, simularLiftNavegador, innerH }, esperado) {
+// INVARIANTE NUEVA: el cajón se fija en píxeles sobre la altura completa
+// (180..900), así que ni el layout reducido ni el WebView pueden moverlo; el
+// lift es siempre (borde natural del área) - (borde del teclado).
+async function correr(nombre, { vvH, offsetTop, innerH }, esperado) {
     await evalJs(`__resetDrawer()`);
-    if (simularLiftNavegador) {
-        // Simula que el WebView ya reacomodó el cajón encima del teclado: se
-        // mueve su caja de LAYOUT (bottom), no un transform, como haría el
-        // navegador al redimensionar/reposicionar elementos fijos.
-        await evalJs(`document.getElementById('comentarios-drawer').style.bottom = '${simularLiftNavegador}px'`);
-    }
     if (innerH) await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => ${innerH} })`);
     await evalJs(`__setVv(${vvH}, ${offsetTop})`);
     await sleep(420); // deja pasar el gesto + la corrección de asentado
     const o = JSON.parse(await evalJs(`__estado()`));
     const keyboardTop = vvH + offsetTop;
-    const sinPagina = o.drawerBottom >= keyboardTop;      // el fondo del cajón cubre hasta el teclado
-    const inputArriba = o.areaBottom <= keyboardTop + 1;  // el área no queda tras el teclado
-    const ok = o.lift === esperado.lift && o.clase === esperado.clase && sinPagina && inputArriba;
-    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} areaBottom=${o.areaBottom} (teclado en ${keyboardTop}) navOculto=${o.clase} fondoCubre=${sinPagina}`);
-    if (!ok) console.log(`      esperado lift=${esperado.lift} navOculto=${esperado.clase}`);
+    const sinPagina = o.drawerBottom >= keyboardTop;          // el fondo del cajón cubre hasta el teclado
+    const inputArriba = o.areaBottom <= keyboardTop + 1;      // el área no queda tras el teclado
+    const cajonFijo = o.drawerTop === 180 && o.drawerBottom === 900;
+    const ok = o.lift === esperado.lift && o.clase === esperado.clase &&
+               sinPagina && inputArriba && cajonFijo && o.navDisplay === (esperado.clase ? 'none' : 'flex');
+    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} área=${o.areaBottom} teclado=${keyboardTop} cajón=${o.drawerTop}..${o.drawerBottom} nav=${o.navDisplay} pin=${o.pinTop}/${o.pinHeight}/${o.pinBottom}`);
+    if (!ok) console.log(`      esperado lift=${esperado.lift} nav=${esperado.clase ? 'none' : 'flex'} cajón=180..900`);
     return ok;
 }
 
@@ -119,14 +121,13 @@ console.log('\n=== modos de WebView ===');
 let ok = true;
 // A) overlay simple: área natural 840, teclado en 620 -> sube 220
 ok = (await correr('A overlay simple', { vvH: 620, offsetTop: 0 }, { lift: 220, clase: true })) && ok;
-// B) auto-lift: el WebView ya dejó el cajón subido (área natural 560) -> 0
-ok = (await correr('B auto-lift (navegador ya sube)', { vvH: 620, offsetTop: 0, simularLiftNavegador: 280 }, { lift: 0, clase: true })) && ok;
-// C) overlay + offsetTop: teclado en 720 -> sube 120 (no 220)
-ok = (await correr('C overlay con offsetTop=100', { vvH: 620, offsetTop: 100 }, { lift: 120, clase: true })) && ok;
-// D) resizes-content: layout reducido (área natural 560), teclado 620 -> 0
-ok = (await correr('D resizes-content', { vvH: 620, offsetTop: 0, simularLiftNavegador: 280, innerH: 620 }, { lift: 0, clase: true })) && ok;
-// E) teclado más bajo que el espacio del nav: área natural 840, teclado 860 -> 0
-ok = (await correr('E teclado bajo (40px)', { vvH: 860, offsetTop: 0 }, { lift: 0, clase: true })) && ok;
+// B) overlay + offsetTop: teclado en 720 -> sube 120 (no 220)
+ok = (await correr('B overlay con offsetTop=100', { vvH: 620, offsetTop: 100 }, { lift: 120, clase: true })) && ok;
+// C) resizes-content: el layout se reduce; el cajón SIGUE clavado en 180..900
+//    y el lift se calcula igual (220) -> nada se mueve salvo el input.
+ok = (await correr('C resizes-content (layout 620)', { vvH: 620, offsetTop: 0, innerH: 620 }, { lift: 220, clase: true })) && ok;
+// D) teclado más bajo que el espacio del nav: área natural 840, teclado 860 -> 0
+ok = (await correr('D teclado bajo (40px)', { vvH: 860, offsetTop: 0 }, { lift: 0, clase: true })) && ok;
 
 // Cerrar teclado
 await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => 900 })`);
