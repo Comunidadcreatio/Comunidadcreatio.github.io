@@ -38,6 +38,10 @@ export function abrirComentarios(obraId, cardEl) {
     // completa) para que el navegador NO pueda reacomodarlo al abrir el teclado.
     pinCajonTeclado();
 
+    // DIAGNÓSTICO TEMPORAL
+    diagVisible(true);
+    actualizarDiagTeclado(true);
+
     // Si el teclado sigue abierto al reabrir (cierre del cajón sin cerrar el
     // teclado), volver a levantar el cajón de inmediato.
     ajustarTecladoDrawer();
@@ -93,6 +97,52 @@ function transformY(el) {
 }
 function areaInput() {
     return drawer ? drawer.querySelector('.comentarios-input-area') : null;
+}
+// ---------------------------------------------------------------------------
+// DIAGNÓSTICO TEMPORAL (se elimina en la próxima versión): muestra en vivo los
+// números reales del dispositivo dentro del cajón mientras se escribe.
+// ---------------------------------------------------------------------------
+let diagEl = null, diagUltimo = 0, diagHistLift = [], diagHistTop = [], diagVersion = '?';
+function diagVisible(mostrar) {
+    if (!diagEl) diagEl = document.getElementById('diag-teclado');
+    if (!diagEl) return;
+    diagEl.classList.toggle('hidden', !mostrar);
+    if (mostrar && diagVersion === '?') {
+        fetch('version.json', { cache: 'no-store' })
+            .then(r => r.json())
+            .then(v => { diagVersion = v.version || '?'; })
+            .catch(() => { diagVersion = 'err'; });
+    }
+}
+function actualizarDiagTeclado(forzar) {
+    if (!diagEl) diagEl = document.getElementById('diag-teclado');
+    if (!diagEl || diagEl.classList.contains('hidden')) return;
+    const ahora = performance.now();
+    if (!forzar && ahora - diagUltimo < 120) return;
+    diagUltimo = ahora;
+    const vv = window.visualViewport || {};
+    const r = drawer ? drawer.getBoundingClientRect() : null;
+    const lr = lista ? lista.getBoundingClientRect() : null;
+    const nr = nav ? nav.getBoundingClientRect() : null;
+    const ir = input ? input.getBoundingClientRect() : null;
+    const kTop = Math.round((vv.height || 0) + (vv.offsetTop || 0));
+    diagHistLift.push(Math.round(liftObjetivo));
+    diagHistTop.push(kTop);
+    if (diagHistLift.length > 10) { diagHistLift.shift(); diagHistTop.shift(); }
+    diagEl.textContent =
+        'v' + diagVersion + '  teclado-diag\n' +
+        'ih=' + window.innerHeight + ' vv=' + Math.round(vv.height || 0) + ' off=' + Math.round(vv.offsetTop || 0) +
+        ' sy=' + Math.round(window.scrollY || 0) + ' kTop=' + kTop + '\n' +
+        'cajon=' + (r ? Math.round(r.top) + '..' + Math.round(r.bottom) : '?') +
+        ' pin=' + (drawer ? (drawer.style.top || 'css') + '/' + (drawer.style.height || 'css') + '/' + (drawer.style.bottom || 'css') : '?') + '\n' +
+        'lista=' + (lr ? Math.round(lr.top) + '..' + Math.round(lr.bottom) : '?') +
+        ' input=' + (ir ? Math.round(ir.bottom) : '?') + ' lift=' + Math.round(liftObjetivo) + '\n' +
+        'nav disp=' + (nav ? getComputedStyle(nav).display : '?') +
+        ' rect=' + (nr ? Math.round(nr.top) + '..' + Math.round(nr.bottom) : '?') + '\n' +
+        'clase=' + (document.body.classList.contains('teclado-abierto') ? 'SI' : 'no') +
+        ' abierto=' + (tecladoAbiertoAhora ? 'SI' : 'no') + '\n' +
+        'lift: ' + diagHistLift.join(',') + '\n' +
+        'kTop: ' + diagHistTop.join(',');
 }
 // Fija la geometría del cajón en píxeles sobre la ALTURA COMPLETA de la
 // pantalla (top = 20% y alto = 80% de esa altura). Así, aunque el WebView
@@ -216,7 +266,9 @@ function ajustarTecladoDrawer() {
         if (!tecladoAbiertoAhora && liftObjetivo <= 0.5) {
             document.body.classList.remove('teclado-abierto');
         }
+        actualizarDiagTeclado(true);   // DIAGNÓSTICO TEMPORAL
     }, GESTO_MS + 40);
+    actualizarDiagTeclado(false);      // DIAGNÓSTICO TEMPORAL
 }
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
@@ -236,6 +288,7 @@ function cerrarComentarios() {
     drawer.style.transition = '';
     drawer.style.bottom = '';
     resetEstadoTeclado();
+    diagVisible(false);   // DIAGNÓSTICO TEMPORAL
     document.body.classList.remove('teclado-abierto');
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {
