@@ -15,6 +15,11 @@ function init() {
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
+    // Altura de teclado recordada de la sesión anterior (para la pre-subida).
+    try { altoTecladoMem = parseInt(localStorage.getItem(ALTO_TECLADO_KEY) || '0', 10) || 0; } catch (e) {}
+    // Pre-subir el input al enfocar: evita que el navegador desplace el viewport.
+    input?.addEventListener('focus', preLiftEnFoco);
+    input?.addEventListener('blur', () => { preLiftHecho = false; });
     // Conectar el ajuste del cajón cuando el teclado se abre (una sola vez)
     setupKeyboardDrawer();
 }
@@ -70,6 +75,7 @@ export function abrirComentarios(obraId, cardEl) {
 const TECLADO_UMBRAL = 12;     // px de teclado para considerarlo "abierto"
 const LIFT_TRANSICION = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
 const GESTO_MS = 160;          // eventos más seguidos = mismo gesto del teclado
+const ALTO_TECLADO_KEY = 'creatio_alto_teclado'; // altura recordada del teclado
 let keyboardListenerConectado = false;
 // Estado a nivel de módulo para poder resetearlo también desde cerrarComentarios
 // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta otra vez).
@@ -79,6 +85,8 @@ let ultimoEventoTeclado = 0;   // timestamp del último evento (detectar gesto)
 let timerAsentado = null;      // corrección final al asentarse el teclado
 let tecladoAbiertoAhora = false;
 let scrollBloqueado = null;    // scroll de página fijado mientras el teclado está abierto
+let altoTecladoMem = 0;        // altura del teclado recordada (para pre-subir al enfocar)
+let preLiftHecho = false;      // ya se pre-subió el input en este foco
 
 // Desplazamiento vertical que aporta el transform de CSS de un elemento
 // (0 si no tiene). Se usa para medir la posición "natural" del input sin que
@@ -134,13 +142,17 @@ function actualizarDiagTeclado(forzar) {
         'ih=' + window.innerHeight + ' vv=' + Math.round(vv.height || 0) + ' off=' + Math.round(vv.offsetTop || 0) +
         ' sy=' + Math.round(window.scrollY || 0) + ' kTop=' + kTop + '\n' +
         'cajon=' + (r ? Math.round(r.top) + '..' + Math.round(r.bottom) : '?') +
-        ' pin=' + (drawer ? (drawer.style.top || 'css') + '/' + (drawer.style.height || 'css') + '/' + (drawer.style.bottom || 'css') : '?') + '\n' +
+        ' pantalla=' + (r ? Math.round(r.top - (vv.offsetTop || 0)) + '..' + Math.round(r.bottom - (vv.offsetTop || 0)) : '?') +
+        ' pan=' + Math.round(transformY(drawer)) + '\n' +
         'lista=' + (lr ? Math.round(lr.top) + '..' + Math.round(lr.bottom) : '?') +
-        ' input=' + (ir ? Math.round(ir.bottom) : '?') + ' lift=' + Math.round(liftObjetivo) + '\n' +
+        ' input=' + (ir ? Math.round(ir.bottom) : '?') +
+        ' inputPantalla=' + (ir ? Math.round(ir.bottom - (vv.offsetTop || 0)) : '?') +
+        ' lift=' + Math.round(liftObjetivo) + '\n' +
         'nav disp=' + (nav ? getComputedStyle(nav).display : '?') +
         ' rect=' + (nr ? Math.round(nr.top) + '..' + Math.round(nr.bottom) : '?') + '\n' +
         'clase=' + (document.body.classList.contains('teclado-abierto') ? 'SI' : 'no') +
-        ' abierto=' + (tecladoAbiertoAhora ? 'SI' : 'no') + '\n' +
+        ' abierto=' + (tecladoAbiertoAhora ? 'SI' : 'no') +
+        ' altoTeclado=' + Math.round((window.innerHeight - (vv.height || 0))) + '\n' +
         'lift: ' + diagHistLift.join(',') + '\n' +
         'kTop: ' + diagHistTop.join(',');
 }
@@ -178,10 +190,36 @@ function resetEstadoTeclado() {
     liftObjetivo = 0;
     tecladoAbiertoAhora = false;
     scrollBloqueado = null;
+    preLiftHecho = false;
     if (timerAsentado) { clearTimeout(timerAsentado); timerAsentado = null; }
     const area = areaInput();
     if (area) { area.style.transition = ''; area.style.transform = ''; }
+    compensarPanCajon(0, false);
     ocultarNavTeclado(false);
+}
+// Pre-sube el área del input EN CUANTO se enfoca (antes de que aparezca el
+// teclado), usando la altura recordada del teclado. Así el input ya está por
+// encima de donde saldrá el teclado y el navegador NO necesita desplazar el
+// viewport visual (que era lo que movía el cajón y los comentarios), ni hay
+// corrección posterior (nada de rebote).
+function preLiftEnFoco() {
+    if (!drawer || !drawer.classList.contains('visible')) return;
+    if (tecladoAbiertoAhora) return;
+    const area = areaInput();
+    if (!area) return;
+    const altoVentana = window.innerHeight || 0;
+    const altoTeclado = altoTecladoMem || Math.round(altoVentana * 0.35);
+    const natural = area.getBoundingClientRect().bottom - transformY(area) - transformY(drawer);
+    const objetivo = Math.max(0, Math.round(natural - Math.max(80, altoVentana - altoTeclado)));
+    if (objetivo <= liftObjetivo) return;
+    liftObjetivo = objetivo;
+    preLiftHecho = true;
+    // Instantáneo (sin transición): debe estar aplicado antes de que el
+    // navegador decida si tiene que desplazar el viewport.
+    area.style.transition = 'none';
+    area.style.transform = 'translateY(' + (-objetivo) + 'px)';
+    void area.offsetHeight;
+    area.style.transition = LIFT_TRANSICION;
 }
 function aplicarLift(animar) {
     const area = areaInput();
@@ -194,10 +232,27 @@ function liftNecesario() {
     const vv = window.visualViewport;
     const area = areaInput();
     if (!vv || !area || !drawer || !tecladoAbiertoAhora) return 0;
-    const keyboardTop = vv.height + (vv.offsetTop || 0);
-    // Posición natural (sin su propio lift ni el transform del cajón).
+    // El borde del teclado EN PANTALLA es vv.height: el desplazamiento del
+    // viewport visual (vv.offsetTop) lo compensamos moviendo el cajón (ver
+    // compensarPanCajon), así que aquí no se tiene en cuenta.
+    const keyboardTop = vv.height;
+    // Posición natural (sin su propio lift ni los transforms del cajón).
     const natural = area.getBoundingClientRect().bottom - transformY(area) - transformY(drawer);
     return Math.max(0, Math.round(natural - keyboardTop));
+}
+// El navegador desplaza el viewport VISUAL (visualViewport.offsetTop) para
+// "mostrar" el input enfocado. Ese desplazamiento mueve TODO en pantalla (de ahí
+// que el cajón y los comentarios parecieran subir). Lo compensamos bajando el
+// cajón lo mismo que el viewport se desplaza: en pantalla vuelve a su sitio y
+// solo se mueve el área del input.
+function compensarPanCajon(pan, activo) {
+    if (!drawer) return;
+    const objetivo = activo && pan > 1 ? 'translateY(' + Math.round(pan) + 'px)' : '';
+    if (drawer.style.transform !== objetivo) {
+        // Mientras se escribe, la compensación debe seguir al viewport de cerca.
+        drawer.style.transition = activo ? 'transform 0.1s linear' : '';
+        drawer.style.transform = objetivo;
+    }
 }
 function ajustarTecladoDrawer() {
     if (!drawer || !lista) return;
@@ -210,17 +265,28 @@ function ajustarTecladoDrawer() {
     }
 
     const cajonVisible = drawer.classList.contains('visible');
-    // Borde superior del teclado en coordenadas del layout (offsetTop cubre el
-    // desplazamiento del viewport que algunos WebView hacen al enfocar).
-    const keyboardTop = vv.height + (vv.offsetTop || 0);
-    const teclado = Math.max(0, window.innerHeight - keyboardTop);
+    const pan = Math.max(0, vv.offsetTop || 0);
+    // Altura real del teclado = lo que le falta al viewport visible para llegar
+    // al fondo de la pantalla. NO depende del desplazamiento del viewport (si se
+    // usara vv.height + offsetTop, con un desplazamiento grande la resta daría
+    // casi cero y el teclado no se detectaría).
+    const altoTeclado = Math.max(0, Math.round(window.innerHeight - vv.height));
     // Salvaguarda: si algún WebView SÍ redujera el layout al abrir el teclado
     // (interactive-widget=resizes-content), el navegador ya deja el cajón encima
     // del teclado y la medición de abajo dará 0. Con resizes-visual (lo que
     // usamos) el layout no se toca y el lift lo hacemos nosotros.
     const layoutReducido = alturaLayoutBase - window.innerHeight > 40;
-    tecladoAbiertoAhora = cajonVisible && (teclado > TECLADO_UMBRAL || layoutReducido);
-    if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
+    tecladoAbiertoAhora = cajonVisible && (altoTeclado > TECLADO_UMBRAL || layoutReducido);
+    if (tecladoAbiertoAhora) {
+        document.body.classList.add('teclado-abierto');
+        // Recordar la altura del teclado para pre-subir el input al enfocar y
+        // que el navegador no tenga que desplazar el viewport.
+        if (altoTeclado > 120) {
+            altoTecladoMem = altoTeclado;
+            try { localStorage.setItem(ALTO_TECLADO_KEY, String(altoTeclado)); } catch (e) {}
+        }
+    }
+    compensarPanCajon(pan, tecladoAbiertoAhora);
 
     // Nav fuera de la vista mientras se escribe (inline: a prueba de CSS) y
     // geometría del cajón reafirmada para que el navegador no lo reacomode.
@@ -455,6 +521,9 @@ let swipeStartY = 0;
 let swipePulling = false;
 
 drawer?.addEventListener('touchstart', (e) => {
+    // Con el teclado abierto el transform del cajón lo usa la compensación del
+    // viewport, así que no se permite el gesto de arrastre.
+    if (tecladoAbiertoAhora) return;
     // Solo si la lista está arriba del todo
     if (lista.scrollTop <= 0) {
         swipeStartY = e.touches[0].clientY;
@@ -463,7 +532,7 @@ drawer?.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
 drawer?.addEventListener('touchmove', (e) => {
-    if (!swipePulling) return;
+    if (!swipePulling || tecladoAbiertoAhora) return;
     const dist = e.touches[0].clientY - swipeStartY;
     if (dist > 5) {
         // Resistencia suave
@@ -476,6 +545,7 @@ drawer?.addEventListener('touchmove', (e) => {
 drawer?.addEventListener('touchend', () => {
     if (!swipePulling) return;
     swipePulling = false;
+    if (tecladoAbiertoAhora) { compensarPanCajon(Math.max(0, (window.visualViewport?.offsetTop) || 0), true); return; }
     const match = drawer.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
     const dist = match ? parseFloat(match[1]) : 0;
     if (dist > 80) {

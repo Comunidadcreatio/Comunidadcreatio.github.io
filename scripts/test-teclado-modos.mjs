@@ -79,50 +79,68 @@ const setup = await evalJs(`(() => {
             const m = tr.match(/matrix\\(([^)]+)\\)/);
             if (m) lift = -parseFloat(m[1].split(',')[5]);
         }
+        const dtr = getComputedStyle(d).transform;
+        let pan = 0;
+        if (dtr && dtr !== 'none') {
+            const m2 = dtr.match(/matrix\\(([^)]+)\\)/);
+            if (m2) pan = parseFloat(m2[1].split(',')[5]);
+        }
         const ar = area.getBoundingClientRect();
+        const dr = d.getBoundingClientRect();
         const vv2 = window.visualViewport;
+        const off = vv2.offsetTop || 0;
         return JSON.stringify({
             lift: Math.round(lift),
+            panCajon: Math.round(pan),
             areaBottom: Math.round(ar.bottom),
-            keyboardTop: Math.round(vv2.height + (vv2.offsetTop || 0)),
-            drawerTop: Math.round(d.getBoundingClientRect().top),
-            drawerBottom: Math.round(d.getBoundingClientRect().bottom),
+            areaScreenBottom: Math.round(ar.bottom - off),
+            keyboardTop: Math.round(vv2.height + off),
+            keyboardScreenTop: Math.round(vv2.height),
+            drawerTop: Math.round(dr.top),
+            drawerBottom: Math.round(dr.bottom),
+            drawerScreenTop: Math.round(dr.top - off),
             pinTop: d.style.top || '(css)', pinHeight: d.style.height || '(css)', pinBottom: d.style.bottom || '(css)',
             navDisplay: getComputedStyle(document.getElementById('toggle-panel')).display,
             clase: document.body.classList.contains('teclado-abierto')
         });
     };
-    window.__resetDrawer = () => { area.style.transition = ''; area.style.transform = ''; };
+    window.__resetDrawer = () => { area.style.transition = ''; area.style.transform = ''; d.style.transition = ''; d.style.transform = ''; };
+    window.__cerrar = () => { h = 900; off = 0; window.dispatchEvent(new Event('resize')); };
     return 'ok';
 })()`);
 console.log('setup:', setup);
 
-// INVARIANTE NUEVA: el cajón se fija en píxeles sobre la altura completa
-// (180..900), así que ni el layout reducido ni el WebView pueden moverlo; el
-// lift es siempre (borde natural del área) - (borde del teclado).
+// INVARIANTES:
+//  - el cajón queda clavado EN PANTALLA en 180..900 (rect.top - offsetTop), así
+//    que el desplazamiento del viewport visual se compensa y no lo mueve;
+//  - el área del input queda justo por encima del teclado EN PANTALLA;
+//  - el nav está en display:none.
 async function correr(nombre, { vvH, offsetTop, innerH }, esperado) {
+    // Cerrar el teclado primero (el estado vuelve a reposo, como entre gestos reales)
+    await evalJs(`__cerrar()`);
+    await sleep(360);
     await evalJs(`__resetDrawer()`);
     if (innerH) await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => ${innerH} })`);
     await evalJs(`__setVv(${vvH}, ${offsetTop})`);
     await sleep(420); // deja pasar el gesto + la corrección de asentado
     const o = JSON.parse(await evalJs(`__estado()`));
-    const keyboardTop = vvH + offsetTop;
-    const sinPagina = o.drawerBottom >= keyboardTop;          // el fondo del cajón cubre hasta el teclado
-    const inputArriba = o.areaBottom <= keyboardTop + 1;      // el área no queda tras el teclado
-    const cajonFijo = o.drawerTop === 180 && o.drawerBottom === 900;
+    const inputArriba = o.areaScreenBottom <= o.keyboardScreenTop + 1;   // visible en pantalla
+    const cajonFijo = o.drawerScreenTop === 180 && o.drawerBottom - (o.keyboardTop - o.keyboardScreenTop) === 900;
     const ok = o.lift === esperado.lift && o.clase === esperado.clase &&
-               sinPagina && inputArriba && cajonFijo && o.navDisplay === (esperado.clase ? 'none' : 'flex');
-    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} área=${o.areaBottom} teclado=${keyboardTop} cajón=${o.drawerTop}..${o.drawerBottom} nav=${o.navDisplay} pin=${o.pinTop}/${o.pinHeight}/${o.pinBottom}`);
-    if (!ok) console.log(`      esperado lift=${esperado.lift} nav=${esperado.clase ? 'none' : 'flex'} cajón=180..900`);
+               inputArriba && cajonFijo && o.navDisplay === (esperado.clase ? 'none' : 'flex');
+    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} áreaPantalla=${o.areaScreenBottom} tecladoPantalla=${o.keyboardScreenTop} cajónPantalla=${o.drawerScreenTop}..${o.drawerBottom - (o.keyboardTop - o.keyboardScreenTop)} panCajón=${o.panCajon} nav=${o.navDisplay}`);
+    if (!ok) console.log(`      esperado lift=${esperado.lift} nav=${esperado.clase ? 'none' : 'flex'} cajón en pantalla 180..900`);
     return ok;
 }
 
 console.log('\n=== modos de WebView ===');
 let ok = true;
-// A) overlay simple: área natural 840, teclado en 620 -> sube 220
+// A) overlay simple: área natural 840, teclado en pantalla 620 -> sube 220
 ok = (await correr('A overlay simple', { vvH: 620, offsetTop: 0 }, { lift: 220, clase: true })) && ok;
-// B) overlay + offsetTop: teclado en 720 -> sube 120 (no 220)
-ok = (await correr('B overlay con offsetTop=100', { vvH: 620, offsetTop: 100 }, { lift: 120, clase: true })) && ok;
+// B) CASO REAL DEL DISPOSITIVO: el navegador desplaza el viewport visual 288px
+//    (medido: ih=853 vv=551 off=288). El cajón lo compensa y sigue clavado en
+//    pantalla; el lift se calcula sobre la línea del teclado en pantalla.
+ok = (await correr('B desplazamiento viewport (off=288)', { vvH: 620, offsetTop: 288 }, { lift: 220, clase: true })) && ok;
 // C) resizes-content: el layout se reduce; el cajón SIGUE clavado en 180..900
 //    y el lift se calcula igual (220) -> nada se mueve salvo el input.
 ok = (await correr('C resizes-content (layout 620)', { vvH: 620, offsetTop: 0, innerH: 620 }, { lift: 220, clase: true })) && ok;
