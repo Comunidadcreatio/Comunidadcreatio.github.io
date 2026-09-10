@@ -94,9 +94,7 @@ async function estado() {
         const ar = area.getBoundingClientRect();
         const input = document.getElementById('comentarios-input');
         const ir = input.getBoundingClientRect();
-        let lift = 0;
-        const tr = getComputedStyle(area).transform;
-        if (tr && tr !== 'none') { const m = tr.match(/matrix\\(([^)]+)\\)/); if (m) lift = -parseFloat(m[1].split(',')[5]); }
+        const pad = Math.round(parseFloat(d.style.paddingBottom) || 0);
         const vv = window.visualViewport;
         const off = vv.offsetTop || 0;
         const keyboardTop = Math.round(vv.height + off);
@@ -113,7 +111,8 @@ async function estado() {
             listScreenTop: Math.round(lr.top - off), listScreenBottom: Math.round(lr.bottom - off),
             headerScreenTop: hr ? Math.round(hr.top - off) : null,
             mainScreenTop: mr ? Math.round(mr.top - off) : null,
-            lift: Math.round(lift), areaBottom: Math.round(ar.bottom),
+            pad, areaTop: Math.round(ar.top), areaBottom: Math.round(ar.bottom),
+            sinSolape: lr.bottom <= ar.top + 1,   // la lista NO queda bajo el input
             inputBottom: Math.round(ir.bottom), keyboardTop,
             noHayPagina: r.bottom + 0.5 >= keyboardTop,
             inputVisible: ir.bottom - off <= vv.height + 1,
@@ -145,12 +144,12 @@ let fails = checks(st, {
     drawerTop: base.drawerTop,
     drawerBottom: base.drawerBottom,
     listTop: base.listTop,
-    listBottom: base.listBottom,
     tecladoAbierto: true,
     navHidden: true,
     noHayPagina: true,
     fondoVisible: true,
-    lift: (v) => v > 100
+    pad: (v) => v > 100,
+    sinSolape: true
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK cajon y lista inmoviles; solo sube el input; nav oculto');
 ok = ok && fails.length === 0;
@@ -176,25 +175,29 @@ fails = checks(st, {
     navHidden: true,
     inputVisible: true,
     fondoVisible: true,          // el rectangulo del tono del cajon esta puesto
-    lift: (v) => v > 100
+    pad: (v) => v > 100,
+    sinSolape: true
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado y fondo del tono del cajon puesto');
 ok = ok && fails.length === 0;
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
 await evalJs(`__setVv(900, 0)`);
 await sleep(520);
-const lifts = [];
+const pads = [];
 let nadaSeMueve = true;
 for (const h of [840, 760, 690, 620]) {
     await evalJs(`__setVv(${h}, 0)`);
     await sleep(90);
     const e = JSON.parse(await estado());
-    lifts.push(e.lift);
+    pads.push(e.pad);
     if (e.drawerScreenTop !== base.drawerTop || e.drawerBottom !== base.drawerBottom ||
-        e.listTop !== base.listTop || e.listBottom !== base.listBottom) nadaSeMueve = false;
+        e.listTop !== base.listTop) {
+        nadaSeMueve = false;
+        console.log(`      (paso vv=${h}) cajon ${e.drawerScreenTop}..${e.drawerBottom} (base ${base.drawerTop}..${base.drawerBottom}) lista ${e.listTop}`);
+    }
 }
-console.log(' lifts: ' + lifts.join(', '));
-const crece = lifts.every((x, i) => i === 0 || x >= lifts[i - 1]);
+console.log(' pads: ' + pads.join(', '));
+const crece = pads.every((x, i) => i === 0 || x >= pads[i - 1]);
 console.log(crece ? '  OK el area del input sube progresivamente' : '  FALLO movimiento no monotono');
 console.log(nadaSeMueve ? '  OK el cajon y la lista permanecen en su sitio' : '  FALLO algo mas se movio');
 ok = ok && crece && nadaSeMueve;
@@ -205,8 +208,8 @@ await sleep(520);
 st = await estado(); console.log(' ', st);
 fails = checks(st, {
     drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
-    listTop: base.listTop, listBottom: base.listBottom,
-    lift: 0, tecladoAbierto: false, navHidden: false, fondoVisible: false
+    listTop: base.listTop,
+    pad: 0, tecladoAbierto: false, navHidden: false, fondoVisible: false
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK todo restaurado (input abajo, nav visible)');
 ok = ok && fails.length === 0;
@@ -241,6 +244,43 @@ await sleep(700);
 const cerrado = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
 console.log(cerrado ? '  OK el arrastre si cierra el cajon' : '  FALLO el arrastre no cierra');
 ok = ok && cerrado;
+
+// 6) CON EL TECLADO ABIERTO: deslizar hacia abajo debe cerrar la sección.
+console.log('\n--- deslizar hacia abajo con el TECLADO ABIERTO debe cerrar ---');
+await evalJs(`document.querySelector('.metrica-comentario').click()`);
+await sleep(600);
+await evalJs(`__setVv(620, 0)`);   // teclado abierto
+await sleep(520);
+let e = JSON.parse(await estado());
+console.log(e.tecladoAbierto ? '  OK teclado abierto y seccion levantada' : '  FALLO el teclado no se detecto');
+ok = ok && e.tecladoAbierto;
+await evalJs(`(() => {
+    const d = document.getElementById('comentarios-drawer');
+    const mkTouch = (y) => new Touch({ identifier: 1, target: d, clientX: 20, clientY: y });
+    const ev = (type, touches) => new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches, targetTouches: touches });
+    d.dispatchEvent(ev('touchstart', [mkTouch(300)]));
+    d.dispatchEvent(ev('touchmove', [mkTouch(500)]));
+    d.dispatchEvent(ev('touchend', []));
+    return 'ok';
+})()`);
+await sleep(700);
+const cerradoConTeclado = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
+console.log(cerradoConTeclado ? '  OK el arrastre cierra la seccion CON el teclado abierto' : '  FALLO no cierra con el teclado abierto');
+ok = ok && cerradoConTeclado;
+
+// 7) CON EL TECLADO ABIERTO: la flecha de cerrar debe funcionar.
+console.log('\n--- flecha de cerrar con el TECLADO ABIERTO ---');
+await evalJs(`document.querySelector('.metrica-comentario').click()`);
+await sleep(600);
+await evalJs(`__setVv(620, 0)`);
+await sleep(520);
+await evalJs(`document.getElementById('comentarios-close').click()`);
+await sleep(700);
+const cerradoConFlecha = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
+console.log(cerradoConFlecha ? '  OK la flecha cierra la seccion CON el teclado abierto' : '  FALLO la flecha no cierra con el teclado abierto');
+ok = ok && cerradoConFlecha;
+await evalJs(`__setVv(900, 0)`);
+await sleep(300);
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(ok ? '\nRESULTADO: OK' : '\nRESULTADO: PROBLEMAS');

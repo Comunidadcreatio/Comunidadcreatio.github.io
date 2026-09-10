@@ -65,14 +65,9 @@ const serie = await evalJs(`(async () => {
     let h = vv.height;
     Object.defineProperty(vv, 'height', { configurable: true, get: () => h });
     const setVv = (x) => { h = x; window.dispatchEvent(new Event('resize')); };
-    const area = document.querySelector('.comentarios-input-area');
+    const drawer = document.getElementById('comentarios-drawer');
     const puntos = [];
-    const liftActual = () => {
-        const tr = getComputedStyle(area).transform;
-        if (!tr || tr === 'none') return 0;
-        const m = tr.match(/matrix\\(([^)]+)\\)/);
-        return m ? Math.round(-parseFloat(m[1].split(',')[5])) : 0;
-    };
+    const liftActual = () => Math.round(parseFloat(drawer.style.paddingBottom) || 0);
     puntos.push(liftActual()); // reposo (0)
     // Teclado subiendo en pasos como el sistema (ráfaga de eventos)
     for (const x of [860, 800, 750, 700, 660, 620]) {
@@ -85,7 +80,7 @@ const serie = await evalJs(`(async () => {
     })(); });
     return puntos.join(',');
 })()`);
-console.log('subida del input a lo largo del tiempo (px, 0 -> ~220):');
+console.log('espacio del teclado (padding-bottom) a lo largo del tiempo (px, 0 -> ~220):');
 console.log(serie);
 
 const vals = serie.split(',').map(Number);

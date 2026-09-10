@@ -120,7 +120,7 @@ console.log(await evalJs(`(() => {
     const listaAntes = lista.getBoundingClientRect();
     const cajonAntes = drawer.getBoundingClientRect();
     const teclado = 280;
-    area.style.transform = 'translateY(-220px)'; // 280 - 60 del espacio del nav
+    drawer.style.paddingBottom = '220px'; // 280 - 60 del espacio del nav
     const input = document.getElementById('comentarios-input');
     const nav = document.getElementById('toggle-panel');
     const ir = input.getBoundingClientRect();
@@ -135,16 +135,15 @@ console.log(await evalJs(`(() => {
         marginBottomNav: marginBottom,           // conserva su espacio para el nav
         fondoDelCajonCubre: dr.bottom >= (fondo - teclado),
         cajonInmovil: Math.abs(dr.top - cajonAntes.top) < 1,
-        listaInmovil: Math.abs(listaDespues.top - listaAntes.top) < 1
-                      && Math.abs(listaDespues.bottom - listaAntes.bottom) < 1,
+        listaInmovil: Math.abs(listaDespues.top - listaAntes.top) < 1,   // se encoge desde abajo: su tope no se mueve
+        listaSinSolape: listaDespues.bottom <= area.getBoundingClientRect().top + 1,
         inputSobreElTeclado: ir.bottom <= (fondo - teclado) + 1,
         inputConAire: (fondo - teclado) - ir.bottom >= 8 && (fondo - teclado) - ir.bottom <= 20,
-        transformAplicado: area.style.transform
+        paddingAplicado: drawer.style.paddingBottom
     });
 })()`));
 await evalJs(`(() => {
-    const area = document.querySelector('.comentarios-input-area');
-    area.style.transform = '';
+    drawer.style.paddingBottom = '';
     document.body.classList.remove('teclado-abierto');
 })()`);
 

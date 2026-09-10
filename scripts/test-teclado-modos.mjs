@@ -73,12 +73,7 @@ const setup = await evalJs(`(() => {
     const d = document.getElementById('comentarios-drawer');
     const area = d.querySelector('.comentarios-input-area');
     window.__estado = () => {
-        const tr = getComputedStyle(area).transform;
-        let lift = 0;
-        if (tr && tr !== 'none') {
-            const m = tr.match(/matrix\\(([^)]+)\\)/);
-            if (m) lift = -parseFloat(m[1].split(',')[5]);
-        }
+        const lift = Math.round(parseFloat(d.style.paddingBottom) || 0);
         const dtr = getComputedStyle(d).transform;
         let pan = 0;
         if (dtr && dtr !== 'none') {

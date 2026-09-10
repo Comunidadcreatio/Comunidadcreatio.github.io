@@ -1205,6 +1205,9 @@ html, body {
        queda justo encima de la barra, sin separación. */
     bottom: 0;
     z-index: 2000;
+    /* El alto se fija en píxeles desde JS: con border-box el espacio del teclado
+       (padding-bottom) se reserva DENTRO de esa altura, sin agrandar el cajón. */
+    box-sizing: border-box;
     /* Fondo SÓLIDO (sin backdrop-filter): al mover/redimensionar el cajón con
        el teclado, el blur obliga al WebView a re-renderizar lo que hay detrás
        en cada frame y produce parpadeo. Con 0.98 de opacidad el blur era casi
@@ -1343,9 +1346,9 @@ html, body {
 /* Teclado abierto (clase global teclado-abierto que también usa el chat):
    el nav (#toggle-panel) queda oculto por chat.css. El cajón NO cambia de
    posición (su fondo sigue llegando al borde inferior de la pantalla, así que
-   nunca se ve la página detrás) y la lista de comentarios tampoco se reordena:
-   lo ÚNICO que se desplaza es el área del input, que sube por encima del
-   teclado con un transform (GPU). */
+   nunca se ve la página detrás). El espacio del teclado se reserva con
+   padding-bottom del cajón: la LISTA se encoge (queda entera visible y
+   utilizable) y el input queda justo encima del teclado. */
 body.teclado-abierto .comentarios-drawer {
     overscroll-behavior: contain;
 }
@@ -1360,12 +1363,8 @@ body.teclado-abierto .comentarios-drawer {
        debajo del campo que el que hay arriba. */
     margin-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid rgba(0,0,0,0.08);
-    /* Fondo SÓLIDO: al subir con el teclado esta franja se superpone a la lista
-       de comentarios y debe taparla limpiamente (antes era un tinte translúcido
-       que dejaba traslucir el texto de debajo). */
-    background: #f7f7f7;
+    background: rgba(0,0,0,0.03);
     flex-shrink: 0;
-    will-change: transform;   /* la sube el teclado: se anima en la GPU */
 }
 .comentarios-input {
     flex: 1;
@@ -1496,7 +1495,7 @@ body.teclado-abierto .comentarios-drawer {
 }
 [data-theme="dark"] .comentarios-input-area {
     border-top-color: rgba(255, 255, 255, 0.08);
-    background: #1a1a1a;
+    background: rgba(255, 255, 255, 0.03);
 }
 
 /* ==============================================
