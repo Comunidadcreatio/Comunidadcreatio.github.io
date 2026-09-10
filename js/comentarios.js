@@ -15,11 +15,6 @@ function init() {
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
-    // Altura de teclado recordada de la sesión anterior (para la pre-subida).
-    try { altoTecladoMem = parseInt(localStorage.getItem(ALTO_TECLADO_KEY) || '0', 10) || 0; } catch (e) {}
-    // Pre-subir el input al enfocar: evita que el navegador desplace el viewport.
-    input?.addEventListener('focus', preLiftEnFoco);
-    input?.addEventListener('blur', () => { preLiftHecho = false; });
     // Conectar el ajuste del cajón cuando el teclado se abre (una sola vez)
     setupKeyboardDrawer();
 }
@@ -42,10 +37,6 @@ export function abrirComentarios(obraId, cardEl) {
     // Fijar la geometría del cajón (top y alto en píxeles, sobre la pantalla
     // completa) para que el navegador NO pueda reacomodarlo al abrir el teclado.
     pinCajonTeclado();
-
-    // DIAGNÓSTICO TEMPORAL
-    diagVisible(true);
-    actualizarDiagTeclado(true);
 
     // Si el teclado sigue abierto al reabrir (cierre del cajón sin cerrar el
     // teclado), volver a levantar el cajón de inmediato.
@@ -75,7 +66,6 @@ export function abrirComentarios(obraId, cardEl) {
 const TECLADO_UMBRAL = 12;     // px de teclado para considerarlo "abierto"
 const LIFT_TRANSICION = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
 const GESTO_MS = 160;          // eventos más seguidos = mismo gesto del teclado
-const ALTO_TECLADO_KEY = 'creatio_alto_teclado'; // altura recordada del teclado
 let keyboardListenerConectado = false;
 // Estado a nivel de módulo para poder resetearlo también desde cerrarComentarios
 // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta otra vez).
@@ -85,8 +75,6 @@ let ultimoEventoTeclado = 0;   // timestamp del último evento (detectar gesto)
 let timerAsentado = null;      // corrección final al asentarse el teclado
 let tecladoAbiertoAhora = false;
 let scrollBloqueado = null;    // scroll de página fijado mientras el teclado está abierto
-let altoTecladoMem = 0;        // altura del teclado recordada (para pre-subir al enfocar)
-let preLiftHecho = false;      // ya se pre-subió el input en este foco
 
 // Desplazamiento vertical que aporta el transform de CSS de un elemento
 // (0 si no tiene). Se usa para medir la posición "natural" del input sin que
@@ -105,56 +93,6 @@ function transformY(el) {
 }
 function areaInput() {
     return drawer ? drawer.querySelector('.comentarios-input-area') : null;
-}
-// ---------------------------------------------------------------------------
-// DIAGNÓSTICO TEMPORAL (se elimina en la próxima versión): muestra en vivo los
-// números reales del dispositivo dentro del cajón mientras se escribe.
-// ---------------------------------------------------------------------------
-let diagEl = null, diagUltimo = 0, diagHistLift = [], diagHistTop = [], diagVersion = '?';
-function diagVisible(mostrar) {
-    if (!diagEl) diagEl = document.getElementById('diag-teclado');
-    if (!diagEl) return;
-    diagEl.classList.toggle('hidden', !mostrar);
-    if (mostrar && diagVersion === '?') {
-        fetch('version.json', { cache: 'no-store' })
-            .then(r => r.json())
-            .then(v => { diagVersion = v.version || '?'; })
-            .catch(() => { diagVersion = 'err'; });
-    }
-}
-function actualizarDiagTeclado(forzar) {
-    if (!diagEl) diagEl = document.getElementById('diag-teclado');
-    if (!diagEl || diagEl.classList.contains('hidden')) return;
-    const ahora = performance.now();
-    if (!forzar && ahora - diagUltimo < 120) return;
-    diagUltimo = ahora;
-    const vv = window.visualViewport || {};
-    const r = drawer ? drawer.getBoundingClientRect() : null;
-    const lr = lista ? lista.getBoundingClientRect() : null;
-    const nr = nav ? nav.getBoundingClientRect() : null;
-    const ir = input ? input.getBoundingClientRect() : null;
-    const kTop = Math.round((vv.height || 0) + (vv.offsetTop || 0));
-    diagHistLift.push(Math.round(liftObjetivo));
-    diagHistTop.push(kTop);
-    if (diagHistLift.length > 10) { diagHistLift.shift(); diagHistTop.shift(); }
-    diagEl.textContent =
-        'v' + diagVersion + '  teclado-diag\n' +
-        'ih=' + window.innerHeight + ' vv=' + Math.round(vv.height || 0) + ' off=' + Math.round(vv.offsetTop || 0) +
-        ' sy=' + Math.round(window.scrollY || 0) + ' kTop=' + kTop + '\n' +
-        'cajon=' + (r ? Math.round(r.top) + '..' + Math.round(r.bottom) : '?') +
-        ' pantalla=' + (r ? Math.round(r.top - (vv.offsetTop || 0)) + '..' + Math.round(r.bottom - (vv.offsetTop || 0)) : '?') +
-        ' pan=' + Math.round(transformY(drawer)) + '\n' +
-        'lista=' + (lr ? Math.round(lr.top) + '..' + Math.round(lr.bottom) : '?') +
-        ' input=' + (ir ? Math.round(ir.bottom) : '?') +
-        ' inputPantalla=' + (ir ? Math.round(ir.bottom - (vv.offsetTop || 0)) : '?') +
-        ' lift=' + Math.round(liftObjetivo) + '\n' +
-        'nav disp=' + (nav ? getComputedStyle(nav).display : '?') +
-        ' rect=' + (nr ? Math.round(nr.top) + '..' + Math.round(nr.bottom) : '?') + '\n' +
-        'clase=' + (document.body.classList.contains('teclado-abierto') ? 'SI' : 'no') +
-        ' abierto=' + (tecladoAbiertoAhora ? 'SI' : 'no') +
-        ' altoTeclado=' + Math.round((window.innerHeight - (vv.height || 0))) + '\n' +
-        'lift: ' + diagHistLift.join(',') + '\n' +
-        'kTop: ' + diagHistTop.join(',');
 }
 // Fija la geometría del cajón en píxeles sobre la ALTURA COMPLETA de la
 // pantalla (top = 20% y alto = 80% de esa altura). Así, aunque el WebView
@@ -190,18 +128,13 @@ function resetEstadoTeclado() {
     liftObjetivo = 0;
     tecladoAbiertoAhora = false;
     scrollBloqueado = null;
-    preLiftHecho = false;
     if (timerAsentado) { clearTimeout(timerAsentado); timerAsentado = null; }
     const area = areaInput();
     if (area) { area.style.transition = ''; area.style.transform = ''; }
     compensarPanCajon(0, false);
+    compensarPagina(0, false);
     ocultarNavTeclado(false);
 }
-// Pre-subida al enfocar: NO se usa. Movía el input justo al recibir el foco y
-// en algunos WebView eso interfiere con el propio foco (el teclado se abría y se
-// cerraba al instante). El desplazamiento del viewport se compensa en el cajón,
-// que no toca el foco. Se deja la función desactivada por si hiciera falta.
-function preLiftEnFoco() { /* desactivado a propósito */ }
 function aplicarLift(animar) {
     const area = areaInput();
     if (!area) return;
@@ -235,6 +168,33 @@ function compensarPanCajon(pan, activo) {
         drawer.style.transform = objetivo;
     }
 }
+// El mismo desplazamiento del viewport mueve lo que hay DETRÁS del cajón (el
+// cavent de la galería, la cabecera...). Se compensa igual en esos elementos
+// (todos menos el cajón y sus contenedores, que se compensan aparte) para que en
+// pantalla no se mueva nada salvo el área del input.
+let panCompensado = -1, panActivoCompensado = null;
+const panOriginales = new Map();
+function compensarPagina(pan, activo) {
+    const redondeado = Math.round(pan);
+    if (redondeado === panCompensado && activo === panActivoCompensado) return;
+    panCompensado = redondeado;
+    panActivoCompensado = activo;
+    const els = [];
+    document.querySelectorAll('.app-container > *').forEach(el => { if (el !== drawer) els.push(el); });
+    document.querySelectorAll('body > *').forEach(el => {
+        if (el === drawer || el.contains(drawer)) return;   // el cajón y sus contenedores
+        const tag = el.tagName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'LINK') return;
+        els.push(el);
+    });
+    const aplicar = activo && redondeado > 1;
+    for (const el of els) {
+        if (!panOriginales.has(el)) panOriginales.set(el, el.style.transform || '');
+        const orig = panOriginales.get(el);
+        const objetivo = aplicar ? (orig ? orig + ' ' : '') + 'translateY(' + redondeado + 'px)' : orig;
+        if (el.style.transform !== objetivo) el.style.transform = objetivo;
+    }
+}
 function ajustarTecladoDrawer() {
     if (!drawer || !lista) return;
     const vv = window.visualViewport;
@@ -258,16 +218,11 @@ function ajustarTecladoDrawer() {
     // usamos) el layout no se toca y el lift lo hacemos nosotros.
     const layoutReducido = alturaLayoutBase - window.innerHeight > 40;
     tecladoAbiertoAhora = cajonVisible && (altoTeclado > TECLADO_UMBRAL || layoutReducido);
-    if (tecladoAbiertoAhora) {
-        document.body.classList.add('teclado-abierto');
-        // Recordar la altura del teclado para pre-subir el input al enfocar y
-        // que el navegador no tenga que desplazar el viewport.
-        if (altoTeclado > 120) {
-            altoTecladoMem = altoTeclado;
-            try { localStorage.setItem(ALTO_TECLADO_KEY, String(altoTeclado)); } catch (e) {}
-        }
-    }
+    if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
+    // El desplazamiento del viewport se compensa tanto en el cajón como en lo
+    // que queda detrás (el cavent, la cabecera...): en pantalla nada se mueve.
     compensarPanCajon(pan, tecladoAbiertoAhora);
+    compensarPagina(pan, tecladoAbiertoAhora);
 
     // Nav fuera de la vista mientras se escribe (inline: a prueba de CSS) y
     // geometría del cajón reafirmada para que el navegador no lo reacomode.
@@ -313,9 +268,7 @@ function ajustarTecladoDrawer() {
         if (!tecladoAbiertoAhora && liftObjetivo <= 0.5) {
             document.body.classList.remove('teclado-abierto');
         }
-        actualizarDiagTeclado(true);   // DIAGNÓSTICO TEMPORAL
     }, GESTO_MS + 40);
-    actualizarDiagTeclado(false);      // DIAGNÓSTICO TEMPORAL
 }
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
@@ -335,7 +288,6 @@ function cerrarComentarios() {
     drawer.style.transition = '';
     drawer.style.bottom = '';
     resetEstadoTeclado();
-    diagVisible(false);   // DIAGNÓSTICO TEMPORAL
     document.body.classList.remove('teclado-abierto');
     drawer.classList.remove('visible');
     drawer.addEventListener('transitionend', function ocultar() {

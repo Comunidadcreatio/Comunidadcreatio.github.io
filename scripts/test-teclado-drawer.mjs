@@ -99,11 +99,17 @@ async function estado() {
         const vv = window.visualViewport;
         const off = vv.offsetTop || 0;
         const keyboardTop = Math.round(vv.height + off);
+        const header = document.getElementById('main-header');
+        const hr = header ? header.getBoundingClientRect() : null;
+        const main = document.getElementById('main-content');
+        const mr = main ? main.getBoundingClientRect() : null;
         return JSON.stringify({
             drawerTop: Math.round(r.top), drawerBottom: Math.round(r.bottom),
             drawerScreenTop: Math.round(r.top - off),
             listTop: Math.round(lr.top), listBottom: Math.round(lr.bottom),
             listScreenTop: Math.round(lr.top - off), listScreenBottom: Math.round(lr.bottom - off),
+            headerScreenTop: hr ? Math.round(hr.top - off) : null,
+            mainScreenTop: mr ? Math.round(mr.top - off) : null,
             lift: Math.round(lift), areaBottom: Math.round(ar.bottom),
             inputBottom: Math.round(ir.bottom), keyboardTop,
             noHayPagina: r.bottom + 0.5 >= keyboardTop,
@@ -160,12 +166,14 @@ st = await estado(); console.log(' ', st);
 fails = checks(st, {
     drawerScreenTop: base.drawerTop,
     listScreenTop: base.listTop,
+    headerScreenTop: base.headerScreenTop,   // la cabecera de detras NO sube
+    mainScreenTop: base.mainScreenTop,       // el contenido de detras NO sube
     tecladoAbierto: true,
     navHidden: true,
     inputVisible: true,
     lift: (v) => v > 100
 });
-console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado: en pantalla el cajon no se mueve y el input queda visible');
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado: en pantalla ni el cajon ni la pagina de detras se mueven');
 ok = ok && fails.length === 0;
 
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
