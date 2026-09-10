@@ -8,7 +8,7 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=d86e42a5e7';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=3738b2457f';
+import { setupViewTracking } from './galeria.js?v=1eef7a0c76';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 

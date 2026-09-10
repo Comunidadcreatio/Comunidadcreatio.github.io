@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, btnCerrar, nav;
+let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl, veloEl;
 
 function init() {
     if (drawer) return;
@@ -15,12 +15,16 @@ function init() {
     btnEnviar = document.getElementById('comentarios-enviar');
     btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
-    // Altura del teclado recordada (para pre-subir el input al enfocar).
-    try { altoTecladoMem = parseInt(localStorage.getItem(ALTO_TECLADO_KEY) || '0', 10) || 0; } catch (e) {}
-    // Al recibir el foco, subir YA el input por encima de donde saldrá el
-    // teclado: así el navegador no necesita desplazar el viewport visual (que es
-    // lo que empujaba hacia arriba el cavent y todo lo de detrás).
-    input?.addEventListener('focus', preLiftEnFoco);
+    versionEl = document.getElementById('comentarios-version');
+    veloEl    = document.getElementById('velo-teclado');
+    // Mostrar la versión en el cajón (para poder comprobar qué build se está
+    // probando en el dispositivo).
+    if (versionEl) {
+        fetch('version.json', { cache: 'no-store' })
+            .then(r => r.json())
+            .then(v => { versionEl.textContent = 'v' + (v.version || '?'); })
+            .catch(() => { versionEl.textContent = ''; });
+    }
     // Conectar el ajuste del cajón cuando el teclado se abre (una sola vez)
     setupKeyboardDrawer();
 }
@@ -72,7 +76,6 @@ export function abrirComentarios(obraId, cardEl) {
 const TECLADO_UMBRAL = 12;     // px de teclado para considerarlo "abierto"
 const LIFT_TRANSICION = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
 const GESTO_MS = 160;          // eventos más seguidos = mismo gesto del teclado
-const ALTO_TECLADO_KEY = 'creatio_alto_teclado'; // altura recordada del teclado
 let keyboardListenerConectado = false;
 // Estado a nivel de módulo para poder resetearlo también desde cerrarComentarios
 // (si se cierra el cajón con el teclado aún abierto, al reabrir se levanta otra vez).
@@ -82,7 +85,6 @@ let ultimoEventoTeclado = 0;   // timestamp del último evento (detectar gesto)
 let timerAsentado = null;      // corrección final al asentarse el teclado
 let tecladoAbiertoAhora = false;
 let scrollBloqueado = null;    // scroll de página fijado mientras el teclado está abierto
-let altoTecladoMem = 0;        // altura del teclado recordada (para la pre-subida)
 
 // Desplazamiento vertical que aporta el transform de CSS de un elemento
 // (0 si no tiene). Se usa para medir la posición "natural" del input sin que
@@ -117,6 +119,8 @@ function pinCajonTeclado() {
     drawer.style.top = top + 'px';
     drawer.style.height = h + 'px';
     drawer.style.bottom = 'auto';
+    // El velo superior debe llegar exactamente hasta el borde del cajón.
+    document.documentElement.style.setProperty('--cajon-top', top + 'px');
 }
 function despinCajonTeclado() {
     if (!drawer) return;
@@ -132,29 +136,10 @@ function ocultarNavTeclado(ocultar) {
     const valor = ocultar ? 'none' : '';
     if (nav.style.display !== valor) nav.style.display = valor;
 }
-// Pre-sube el área del input EN CUANTO recibe el foco, usando la altura de
-// teclado medida antes. Con el input ya por encima de donde va a salir el
-// teclado, el navegador NO desplaza el viewport visual (que era lo que empujaba
-// hacia arriba el cavent y todo lo de detrás) y tampoco hay corrección posterior.
-// Debe aplicarse al instante (sin transición): el navegador decide el
-// desplazamiento justo después del foco.
-function preLiftEnFoco() {
-    if (!drawer || !drawer.classList.contains('visible')) return;
-    if (tecladoAbiertoAhora) return;
-    const area = areaInput();
-    if (!area) return;
-    const altoVentana = window.innerHeight || 0;
-    if (!altoVentana) return;
-    const altoTeclado = altoTecladoMem || Math.round(altoVentana * 0.35);
-    const natural = area.getBoundingClientRect().bottom - transformY(area) - transformY(drawer);
-    const objetivo = Math.max(0, Math.round(natural - Math.max(60, altoVentana - altoTeclado)));
-    if (objetivo <= liftObjetivo) return;
-    liftObjetivo = objetivo;
-    area.style.transition = 'none';
-    area.style.transform = 'translateY(' + (-objetivo) + 'px)';
-    void area.offsetHeight;
-    area.style.transition = LIFT_TRANSICION;
-}
+// Pre-subida al enfocar: DESCARTADA. Mover el input justo al recibir el foco
+// hace que en el WebView del dispositivo el campo pierda el foco y el teclado no
+// llegue a abrirse. El desplazamiento del viewport se compensa moviendo el cajón
+// y la página (que no tocan el foco).
 function resetEstadoTeclado() {
     liftObjetivo = 0;
     tecladoAbiertoAhora = false;
@@ -164,6 +149,7 @@ function resetEstadoTeclado() {
     if (area) { area.style.transition = ''; area.style.transform = ''; }
     compensarPanCajon(0, false);
     compensarPagina(0, false);
+    if (veloEl) veloEl.classList.add('hidden');
     ocultarNavTeclado(false);
 }
 function aplicarLift(animar) {
@@ -249,19 +235,19 @@ function ajustarTecladoDrawer() {
     // usamos) el layout no se toca y el lift lo hacemos nosotros.
     const layoutReducido = alturaLayoutBase - window.innerHeight > 40;
     tecladoAbiertoAhora = cajonVisible && (altoTeclado > TECLADO_UMBRAL || layoutReducido);
-    if (tecladoAbiertoAhora) {
-        document.body.classList.add('teclado-abierto');
-        // Recordar la altura real del teclado para que la próxima pre-subida
-        // al enfocar sea exacta (y no haya que corregir después).
-        if (altoTeclado > 120 && Math.abs(altoTeclado - altoTecladoMem) > 4) {
-            altoTecladoMem = altoTeclado;
-            try { localStorage.setItem(ALTO_TECLADO_KEY, String(altoTeclado)); } catch (e) {}
-        }
-    }
+    if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
     // El desplazamiento del viewport se compensa tanto en el cajón como en lo
     // que queda detrás (el cavent, la cabecera...): en pantalla nada se mueve.
     compensarPanCajon(pan, tecladoAbiertoAhora);
     compensarPagina(pan, tecladoAbiertoAhora);
+    // Si además hay desplazamiento, se cubre la franja superior con el fondo del
+    // cajón: así lo de detrás no puede verse moverse bajo ninguna circunstancia.
+    if (veloEl) {
+        const mostrarVelo = tecladoAbiertoAhora && pan > 4;
+        if (veloEl.classList.contains('hidden') === mostrarVelo) {
+            veloEl.classList.toggle('hidden', !mostrarVelo);
+        }
+    }
 
     // Nav fuera de la vista mientras se escribe (inline: a prueba de CSS) y
     // geometría del cajón reafirmada para que el navegador no lo reacomode.

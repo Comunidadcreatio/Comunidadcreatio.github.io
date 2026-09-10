@@ -1225,6 +1225,22 @@ html, body {
 .comentarios-drawer.hidden {
     display: none;
 }
+/* Velo superior mientras se escribe: cubre la franja por encima del cajón con
+   su mismo fondo, de modo que no se vea el contenido de detrás si el navegador
+   desplaza el viewport al abrir el teclado. Queda por encima del contenido
+   (cabecera incluida) y por debajo del cajón. */
+.velo-teclado {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--cajon-top, 20vh);
+    z-index: 1500;
+    background: #ffffff;
+    pointer-events: none;
+}
+.velo-teclado.hidden { display: none; }
+[data-theme="dark"] .velo-teclado { background: #121212; }
 /* Header */
 .comentarios-drawer-header {
     display: flex;
@@ -1239,6 +1255,13 @@ html, body {
     font-size: 1.1rem;
     color: var(--color-ink);
     font-weight: 600;
+}
+/* Versión de la app (para comprobar qué build se está usando) */
+.comentarios-version {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--color-gray-500);
+    opacity: 0.8;
 }
 .comentarios-close {
     background: none;

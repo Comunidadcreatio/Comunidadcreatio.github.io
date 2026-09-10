@@ -104,7 +104,9 @@ async function estado() {
         const hr = header ? header.getBoundingClientRect() : null;
         const main = document.getElementById('main-content');
         const mr = main ? main.getBoundingClientRect() : null;
+        const velo = document.getElementById('velo-teclado');
         return JSON.stringify({
+            veloVisible: velo ? !velo.classList.contains('hidden') : null,
             drawerTop: Math.round(r.top), drawerBottom: Math.round(r.bottom),
             drawerScreenTop: Math.round(r.top - off),
             listTop: Math.round(lr.top), listBottom: Math.round(lr.bottom),
@@ -134,23 +136,6 @@ let ok = true;
 console.log('\n[estado inicial, cajon abierto, sin teclado]');
 let st = await estado(); console.log(' ', st);
 const base = JSON.parse(st);
-
-// 0) PRE-SUBIDA AL ENFOCAR: el input debe subir ya al recibir el foco, sin
-//    ningún evento de teclado, para que el navegador no tenga que desplazar el
-//    viewport (que es lo que empujaba hacia arriba el cavent del fondo).
-console.log('\n--- pre-subida al enfocar (sin eventos de teclado) ---');
-await evalJs(`document.getElementById('comentarios-input').focus()`);
-await sleep(120);
-{
-    const e = JSON.parse(await estado());
-    console.log(e.lift > 100 ? `  OK el input sube al enfocar (lift=${e.lift}) sin teclado` : `  FALLO no se pre-subio (lift=${e.lift})`);
-    ok = ok && e.lift > 100;
-    const sinDesplazamiento = e.drawerTop === base.drawerTop && e.listTop === base.listTop;
-    console.log(sinDesplazamiento ? '  OK el cajon y la lista no se movieron' : '  FALLO algo mas se movio');
-    ok = ok && sinDesplazamiento;
-}
-await evalJs(`document.getElementById('comentarios-input').blur()`);
-await sleep(120);
 
 console.log('\n--- teclado ABIERTO (vv 900->620) ---');
 await evalJs(`__setVv(620, 0)`);
@@ -189,11 +174,11 @@ fails = checks(st, {
     tecladoAbierto: true,
     navHidden: true,
     inputVisible: true,
+    veloVisible: true,          // con desplazamiento, se cubre la franja superior
     lift: (v) => v > 100
 });
-console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado: en pantalla ni el cajon ni la pagina de detras se mueven');
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado y velo puesto: nada de detras puede verse moverse');
 ok = ok && fails.length === 0;
-
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
 await evalJs(`__setVv(900, 0)`);
 await sleep(520);
@@ -220,7 +205,7 @@ st = await estado(); console.log(' ', st);
 fails = checks(st, {
     drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
     listTop: base.listTop, listBottom: base.listBottom,
-    lift: 0, tecladoAbierto: false, navHidden: false
+    lift: 0, tecladoAbierto: false, navHidden: false, veloVisible: false
 });
 console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK todo restaurado (input abajo, nav visible)');
 ok = ok && fails.length === 0;
