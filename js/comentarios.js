@@ -69,6 +69,7 @@ let liftObjetivo = 0;          // px que debe subir el área del input
 let ultimoEventoTeclado = 0;   // timestamp del último evento (detectar gesto)
 let timerAsentado = null;      // corrección final al asentarse el teclado
 let tecladoAbiertoAhora = false;
+let scrollBloqueado = null;    // scroll de página fijado mientras el teclado está abierto
 
 // Desplazamiento vertical que aporta el transform de CSS de un elemento
 // (0 si no tiene). Se usa para medir la posición "natural" del input sin que
@@ -91,6 +92,7 @@ function areaInput() {
 function resetEstadoTeclado() {
     liftObjetivo = 0;
     tecladoAbiertoAhora = false;
+    scrollBloqueado = null;
     if (timerAsentado) { clearTimeout(timerAsentado); timerAsentado = null; }
     const area = areaInput();
     if (area) { area.style.transition = ''; area.style.transform = ''; }
@@ -122,11 +124,24 @@ function ajustarTecladoDrawer() {
     // desplazamiento del viewport que algunos WebView hacen al enfocar).
     const keyboardTop = vv.height + (vv.offsetTop || 0);
     const teclado = Math.max(0, window.innerHeight - keyboardTop);
-    // Si el layout se redujo (interactive-widget=resizes-content) el navegador ya
-    // deja el cajón encima del teclado; la medición de abajo dará 0.
+    // Salvaguarda: si algún WebView SÍ redujera el layout al abrir el teclado
+    // (interactive-widget=resizes-content), el navegador ya deja el cajón encima
+    // del teclado y la medición de abajo dará 0. Con resizes-visual (lo que
+    // usamos) el layout no se toca y el lift lo hacemos nosotros.
     const layoutReducido = alturaLayoutBase - window.innerHeight > 40;
     tecladoAbiertoAhora = cajonVisible && (teclado > TECLADO_UMBRAL || layoutReducido);
     if (tecladoAbiertoAhora) document.body.classList.add('teclado-abierto');
+
+    // Con el teclado abierto, impedir que el navegador desplace la página para
+    // "mostrar" el input enfocado: el cajón está fijo y no necesita scroll, y
+    // ese desplazamiento movería lo que hay detrás (cabecera, contenido).
+    if (tecladoAbiertoAhora && layoutReducido === false) {
+        const sy = window.scrollY || window.pageYOffset || 0;
+        if (scrollBloqueado === null) scrollBloqueado = sy;
+        else if (Math.abs(sy - scrollBloqueado) > 1) window.scrollTo(0, scrollBloqueado);
+    } else {
+        scrollBloqueado = null;
+    }
 
     const ahora = performance.now();
     const enGesto = (ahora - ultimoEventoTeclado) < GESTO_MS;

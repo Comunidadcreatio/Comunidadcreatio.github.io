@@ -3,7 +3,7 @@
 // Se muestra entre el buscador y el grid: cada etiqueta en un chip de color
 // con un contador de apariciones. Selección MÚLTIPLE (AND): cada etiqueta
 // activa muestra una "x"; el grid se filtra en vivo con las seleccionadas.
-import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=a11c4f90f4';
+import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=7b9857ce8f';
 import { escapeHtml, normalizarTexto } from './utils.js?v=d86e42a5e7';
 
 // Paleta de colores para los chips (cada etiqueta un color distinto)
