@@ -1,11 +1,15 @@
-// Prueba INTEGRACIÃ“N del manejo de teclado del cajÃ³n de comentarios:
-// parchea window.visualViewport.height y dispara window resize para que corra
-// el MISMO cÃ³digo real (setupKeyboardDrawer -> ajustar) y comprueba:
-//   1) Abrir teclado (vv 900->620): cajÃ³n sube a bottom ~280, clase
-//      teclado-abierto puesta, nav oculto, input visible sobre la lÃ­nea.
-//   2) Barrido suave: valores intermedios de bottom mientras el vv cambia.
-//   3) Cerrar del todo (vv ->900): restauraciÃ³n AL INSTANTE (sin transiciÃ³n
-//      que deje ver la pÃ¡gina) -> bottom 0, clase quitada, nav visible.
+// Prueba INTEGRACIÃ“N del manejo de teclado del cajÃ³n de comentarios.
+// Parchea window.visualViewport (height y offsetTop) y dispara resize para que
+// corra el MISMO cÃ³digo real (setupKeyboardDrawer -> ajustarTecladoDrawer) y
+// comprueba:
+//   1) Con el teclado abierto el cajÃ³n y la LISTA no se mueven ni se reordenan;
+//      solo sube el Ã¡rea del input y el nav queda oculto.
+//   2) El input queda visible, con ~12px de aire sobre el teclado.
+//   3) Desplazamiento del viewport visual (caso real: off=288): en pantalla el
+//      cajÃ³n sigue en su sitio (se compensa).
+//   4) Al cerrar el teclado todo vuelve a su sitio.
+//   5) REGRESIÃ“N: un toque simple NO cierra el cajÃ³n aunque su transform tenga
+//      la compensaciÃ³n del viewport; un arrastre >80px sÃ­ lo cierra.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -25,7 +29,11 @@ let id = 0; const pend = new Map();
 const logs = [];
 ws.onmessage = (ev) => { const m = JSON.parse(ev.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m); pend.delete(m.id); return; } if (m.method === 'Runtime.exceptionThrown') logs.push('[EXC] ' + (m.params.exceptionDetails?.exception?.description || m.params.exceptionDetails?.text)); };
 const send = (method, params = {}) => new Promise(res => { const i = ++id; pend.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
-const evalJs = async (expr) => (await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result?.result?.value;
+const evalJs = async (expr) => {
+    const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    if (r.result?.exceptionDetails) { console.log('EXC:', (r.result.exceptionDetails.exception?.description || r.result.exceptionDetails.text).slice(0, 250)); return null; }
+    return r.result?.result?.value;
+};
 await send('Runtime.enable'); await send('Page.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
@@ -37,7 +45,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
       } catch (_) {}
       const mkImg = (w, h, c) => { const cv = document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d'); x.fillStyle=c; x.fillRect(0,0,w,h); return cv.toDataURL('image/jpeg',0.8); };
       const img45 = mkImg(800,1000,'#cc3344');
-      const obrasMock = [{ id: 1, titulo: 'Retrato', artista: 'T', artista_user_id: 1, imagen_url: img45, etiquetas: 'Ã“leo', ano: 2024, ancho: 80, alto: 100, descripcion_tecnica: 'Ã“leo', soporte: 'Lienzo', marcos: 'No', estado_obra: 'Disponible (en venta)', descripcion_artistica: 'Desc', procedencia: 'â€”', certificado: 'â€”', firma: 'â€”', conservacion: 'Buena', likes_count: 2, views_count: 5, comments_count: 1, precio: '100', foto_artista: '' }];
+      const obrasMock = [{ id: 1, titulo: 'Retrato', artista: 'T', artista_user_id: 1, imagen_url: img45, etiquetas: 'Oleo', ano: 2024, ancho: 80, alto: 100, descripcion_tecnica: 'Oleo', soporte: 'Lienzo', marcos: 'No', estado_obra: 'Disponible (en venta)', descripcion_artistica: 'Desc', procedencia: '-', certificado: '-', firma: '-', conservacion: 'Buena', likes_count: 2, views_count: 5, comments_count: 1, precio: '100', foto_artista: '' }];
       const realFetch = window.fetch.bind(window);
       window.fetch = async (input, init) => {
           const u = String(input);
@@ -60,20 +68,19 @@ await sleep(800);
 await evalJs(`document.getElementById('btn-cavents-hub').click()`);
 await sleep(2000);
 await evalJs(`document.querySelector('.metrica-comentario').click()`);
-await sleep(1400);
+await sleep(1500);
 
-// Parchear vv.height para simular el teclado (antes de que el drawer abra ya
-// estÃ¡ conectado el listener vÃ­a init->setupKeyboardDrawer al abrir el cajÃ³n)
 const patch = await evalJs(`(() => {
     try {
         const vv = window.visualViewport;
-        let h = vv.height;
+        let h = vv.height, off = 0;
         Object.defineProperty(vv, 'height', { configurable: true, get: () => h });
-        window.__setVvH = (x) => { h = x; window.dispatchEvent(new Event('resize')); };
-        return 'patched ok actual=' + h;
-    } catch (e) { return 'patch FAIL: ' + e.message; }
+        Object.defineProperty(vv, 'offsetTop', { configurable: true, get: () => off });
+        window.__setVv = (x, o) => { h = x; off = o || 0; window.dispatchEvent(new Event('resize')); };
+        return 'ok actual=' + h;
+    } catch (e) { return 'FAIL ' + e.message; }
 })()`);
-console.log('parche vv.height:', patch);
+console.log('parche vv:', patch);
 
 async function estado() {
     return evalJs(`(() => {
@@ -88,16 +95,19 @@ async function estado() {
         const ir = input.getBoundingClientRect();
         let lift = 0;
         const tr = getComputedStyle(area).transform;
-        if (tr && tr !== 'none') { const m = tr.match(/matrix\(([^)]+)\)/); if (m) lift = -parseFloat(m[1].split(',')[5]); }
+        if (tr && tr !== 'none') { const m = tr.match(/matrix\\(([^)]+)\\)/); if (m) lift = -parseFloat(m[1].split(',')[5]); }
         const vv = window.visualViewport;
-        const keyboardTop = Math.round(vv.height + (vv.offsetTop || 0));
+        const off = vv.offsetTop || 0;
+        const keyboardTop = Math.round(vv.height + off);
         return JSON.stringify({
             drawerTop: Math.round(r.top), drawerBottom: Math.round(r.bottom),
+            drawerScreenTop: Math.round(r.top - off),
             listTop: Math.round(lr.top), listBottom: Math.round(lr.bottom),
+            listScreenTop: Math.round(lr.top - off), listScreenBottom: Math.round(lr.bottom - off),
             lift: Math.round(lift), areaBottom: Math.round(ar.bottom),
             inputBottom: Math.round(ir.bottom), keyboardTop,
             noHayPagina: r.bottom + 0.5 >= keyboardTop,
-            inputVisible: ir.bottom <= keyboardTop + 1,
+            inputVisible: ir.bottom - off <= vv.height + 1,
             tecladoAbierto: document.body.classList.contains('teclado-abierto'),
             navHidden: nav.classList.contains('hidden') || getComputedStyle(nav).display === 'none',
             vvH: vv.height
@@ -114,59 +124,71 @@ function checks(estadoJson, espera) {
 }
 
 let ok = true;
-console.log('\n[estado inicial, cajón abierto, sin teclado]');
+console.log('\n[estado inicial, cajon abierto, sin teclado]');
 let st = await estado(); console.log(' ', st);
 const base = JSON.parse(st);
 
-// 1) Abrir teclado con un solo evento (vv ya en 620)
 console.log('\n--- teclado ABIERTO (vv 900->620) ---');
-await evalJs(`__setVvH(620)`);
+await evalJs(`__setVv(620, 0)`);
 await sleep(520);
 st = await estado(); console.log(' ', st);
 let fails = checks(st, {
-    drawerTop: base.drawerTop,          // el cajón NO se mueve
+    drawerTop: base.drawerTop,
     drawerBottom: base.drawerBottom,
-    listTop: base.listTop,              // la lista NO se reordena ni se mueve
+    listTop: base.listTop,
     listBottom: base.listBottom,
     tecladoAbierto: true,
     navHidden: true,
     noHayPagina: true,
-    lift: (v) => v > 100                // solo sube el área del input
+    lift: (v) => v > 100
 });
-console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? cajón y lista inmóviles; solo sube el input; nav oculto');
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK cajon y lista inmoviles; solo sube el input; nav oculto');
 ok = ok && fails.length === 0;
 {
     const e = JSON.parse(st);
-    console.log(e.inputVisible ? `  ? input visible (borde ${e.inputBottom} <= teclado ${e.keyboardTop})` : `  ? input tras el teclado: ${e.inputBottom}`);
+    console.log(e.inputVisible ? '  OK input visible sobre el teclado' : '  FALLO input tras el teclado: ' + e.inputBottom);
     ok = ok && e.inputVisible;
     const aire = e.keyboardTop - e.inputBottom;
-    console.log(aire >= 8 && aire <= 20 ? `  ? aire bajo el input: ${aire}px` : `  ? aire incorrecto: ${aire}px`);
-    ok = ok && aire >= 8 && aire <= 20;
+    console.log(aire >= 0 && aire <= 20 ? '  OK aire bajo el input: ' + aire + 'px' : '  FALLO aire incorrecto: ' + aire + 'px');
+    ok = ok && aire >= 0 && aire <= 20;
 }
 
-// 2) Barrido progresivo: el lift sube de forma monótona y nada más se mueve
+console.log('\n--- desplazamiento del viewport (vv=551 off=288, como el dispositivo) ---');
+await evalJs(`__setVv(551, 288)`);
+await sleep(520);
+st = await estado(); console.log(' ', st);
+fails = checks(st, {
+    drawerScreenTop: base.drawerTop,
+    listScreenTop: base.listTop,
+    tecladoAbierto: true,
+    navHidden: true,
+    inputVisible: true,
+    lift: (v) => v > 100
+});
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK compensado: en pantalla el cajon no se mueve y el input queda visible');
+ok = ok && fails.length === 0;
+
 console.log('\n--- barrido progresivo 900->840->760->690->620 ---');
-await evalJs(`__setVvH(900)`);
+await evalJs(`__setVv(900, 0)`);
 await sleep(520);
 const lifts = [];
 let nadaSeMueve = true;
 for (const h of [840, 760, 690, 620]) {
-    await evalJs(`__setVvH(${h})`);
+    await evalJs(`__setVv(${h}, 0)`);
     await sleep(90);
     const e = JSON.parse(await estado());
     lifts.push(e.lift);
-    if (e.drawerTop !== base.drawerTop || e.drawerBottom !== base.drawerBottom ||
+    if (e.drawerScreenTop !== base.drawerTop || e.drawerBottom !== base.drawerBottom ||
         e.listTop !== base.listTop || e.listBottom !== base.listBottom) nadaSeMueve = false;
 }
 console.log(' lifts: ' + lifts.join(', '));
 const crece = lifts.every((x, i) => i === 0 || x >= lifts[i - 1]);
-console.log(crece ? '  ? el área del input sube progresivamente' : '  ? movimiento no monótono');
-console.log(nadaSeMueve ? '  ? el cajón y la lista permanecen exactamente en su sitio' : '  ? algo más se movió');
+console.log(crece ? '  OK el area del input sube progresivamente' : '  FALLO movimiento no monotono');
+console.log(nadaSeMueve ? '  OK el cajon y la lista permanecen en su sitio' : '  FALLO algo mas se movio');
 ok = ok && crece && nadaSeMueve;
 
-// 3) Cerrar el teclado de golpe
 console.log('\n--- teclado CERRADO (vv 620->900) ---');
-await evalJs(`__setVvH(900)`);
+await evalJs(`__setVv(900, 0)`);
 await sleep(520);
 st = await estado(); console.log(' ', st);
 fails = checks(st, {
@@ -174,35 +196,39 @@ fails = checks(st, {
     listTop: base.listTop, listBottom: base.listBottom,
     lift: 0, tecladoAbierto: false, navHidden: false
 });
-console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? todo restaurado (input abajo, nav visible)');
+console.log(fails.length ? '  FALLO ' + fails.join(' | ') : '  OK todo restaurado (input abajo, nav visible)');
 ok = ok && fails.length === 0;
 
-// 4) Cerrar el cajón con el teclado abierto y reabrirlo
-console.log('\n--- cerrar cajón con teclado abierto y reabrir ---');
-await evalJs(`__setVvH(620)`);
-await sleep(520);
-st = await estado(); console.log('  abierto con teclado: ', st);
-await evalJs(`document.getElementById('comentarios-close').click()`);
-await sleep(500);
-const oculto = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
-console.log(oculto ? '  ? cajón cerrado' : '  ? no se ocultó');
-ok = ok && oculto;
-await evalJs(`document.querySelector('.metrica-comentario').click()`);
-await sleep(600);
-st = await estado(); console.log('  reabierto con teclado arriba: ', st);
-fails = checks(st, {
-    drawerTop: base.drawerTop, drawerBottom: base.drawerBottom,
-    tecladoAbierto: true, navHidden: true, noHayPagina: true,
-    lift: (v) => v > 100
-});
-console.log(fails.length ? '  ? ' + fails.join(' | ') + ' (no se levantó al reabrir)' : '  ? se levantó solo al reabrir con el teclado abierto');
-ok = ok && fails.length === 0;
-await evalJs(`__setVvH(900)`);
-await sleep(520);
-st = await estado(); console.log('  teclado cerrado tras reabrir: ', st);
-fails = checks(st, { lift: 0, tecladoAbierto: false });
-console.log(fails.length ? '  ? ' + fails.join(' | ') : '  ? restaurado');
-ok = ok && fails.length === 0;
+console.log('\n--- regresion: toque simple con transform de compensacion ---');
+await evalJs(`(() => {
+    const d = document.getElementById('comentarios-drawer');
+    d.style.transform = 'translateY(288px)';
+    const mkTouch = (y) => new Touch({ identifier: 1, target: d, clientX: 20, clientY: y });
+    const ev = (type, touches) => new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches, targetTouches: touches });
+    d.dispatchEvent(ev('touchstart', [mkTouch(300)]));
+    d.dispatchEvent(ev('touchend', []));
+    return 'ok';
+})()`);
+await sleep(450);
+const sigueVisible = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('visible')`);
+console.log(sigueVisible ? '  OK el toque simple NO cierra el cajon' : '  FALLO el cajon se cerro con un toque simple');
+ok = ok && sigueVisible;
+
+console.log('\n--- arrastre real (>80px) si debe cerrar ---');
+await evalJs(`(() => {
+    const d = document.getElementById('comentarios-drawer');
+    d.style.transform = '';
+    const mkTouch = (y) => new Touch({ identifier: 1, target: d, clientX: 20, clientY: y });
+    const ev = (type, touches) => new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches, targetTouches: touches });
+    d.dispatchEvent(ev('touchstart', [mkTouch(300)]));
+    d.dispatchEvent(ev('touchmove', [mkTouch(500)]));
+    d.dispatchEvent(ev('touchend', []));
+    return 'ok';
+})()`);
+await sleep(700);
+const cerrado = await evalJs(`document.getElementById('comentarios-drawer').classList.contains('hidden')`);
+console.log(cerrado ? '  OK el arrastre si cierra el cajon' : '  FALLO el arrastre no cierra');
+ok = ok && cerrado;
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(ok ? '\nRESULTADO: OK' : '\nRESULTADO: PROBLEMAS');

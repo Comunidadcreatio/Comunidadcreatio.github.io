@@ -197,30 +197,11 @@ function resetEstadoTeclado() {
     compensarPanCajon(0, false);
     ocultarNavTeclado(false);
 }
-// Pre-sube el área del input EN CUANTO se enfoca (antes de que aparezca el
-// teclado), usando la altura recordada del teclado. Así el input ya está por
-// encima de donde saldrá el teclado y el navegador NO necesita desplazar el
-// viewport visual (que era lo que movía el cajón y los comentarios), ni hay
-// corrección posterior (nada de rebote).
-function preLiftEnFoco() {
-    if (!drawer || !drawer.classList.contains('visible')) return;
-    if (tecladoAbiertoAhora) return;
-    const area = areaInput();
-    if (!area) return;
-    const altoVentana = window.innerHeight || 0;
-    const altoTeclado = altoTecladoMem || Math.round(altoVentana * 0.35);
-    const natural = area.getBoundingClientRect().bottom - transformY(area) - transformY(drawer);
-    const objetivo = Math.max(0, Math.round(natural - Math.max(80, altoVentana - altoTeclado)));
-    if (objetivo <= liftObjetivo) return;
-    liftObjetivo = objetivo;
-    preLiftHecho = true;
-    // Instantáneo (sin transición): debe estar aplicado antes de que el
-    // navegador decida si tiene que desplazar el viewport.
-    area.style.transition = 'none';
-    area.style.transform = 'translateY(' + (-objetivo) + 'px)';
-    void area.offsetHeight;
-    area.style.transition = LIFT_TRANSICION;
-}
+// Pre-subida al enfocar: NO se usa. Movía el input justo al recibir el foco y
+// en algunos WebView eso interfiere con el propio foco (el teclado se abría y se
+// cerraba al instante). El desplazamiento del viewport se compensa en el cajón,
+// que no toca el foco. Se deja la función desactivada por si hiciera falta.
+function preLiftEnFoco() { /* desactivado a propósito */ }
 function aplicarLift(animar) {
     const area = areaInput();
     if (!area) return;
@@ -519,6 +500,8 @@ drawer?.addEventListener('click', (e) => {
 // Swipe-down para cerrar
 let swipeStartY = 0;
 let swipePulling = false;
+let swipeDist = 0;   // recorrido real del arrastre (NO se deduce del transform:
+                     // el cajón también usa transform para compensar el viewport)
 
 drawer?.addEventListener('touchstart', (e) => {
     // Con el teclado abierto el transform del cajón lo usa la compensación del
@@ -528,6 +511,7 @@ drawer?.addEventListener('touchstart', (e) => {
     if (lista.scrollTop <= 0) {
         swipeStartY = e.touches[0].clientY;
         swipePulling = true;
+        swipeDist = 0;
     }
 }, { passive: true });
 
@@ -536,8 +520,8 @@ drawer?.addEventListener('touchmove', (e) => {
     const dist = e.touches[0].clientY - swipeStartY;
     if (dist > 5) {
         // Resistencia suave
-        const damped = Math.min(dist * 0.55, 150);
-        drawer.style.transform = `translateY(${damped}px)`;
+        swipeDist = Math.min(dist * 0.55, 150);
+        drawer.style.transform = `translateY(${swipeDist}px)`;
         drawer.style.transition = 'none';
     }
 }, { passive: true });
@@ -546,16 +530,15 @@ drawer?.addEventListener('touchend', () => {
     if (!swipePulling) return;
     swipePulling = false;
     if (tecladoAbiertoAhora) { compensarPanCajon(Math.max(0, (window.visualViewport?.offsetTop) || 0), true); return; }
-    const match = drawer.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
-    const dist = match ? parseFloat(match[1]) : 0;
-    if (dist > 80) {
+    if (swipeDist > 80) {
         drawer.style.transform = '';
         cerrarComentarios();
     } else {
-        // Volver suave a la posición original
+        // Volver suave a la posición original (toque simple: no cierra nada)
         drawer.style.transition = 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
         drawer.style.transform = '';
     }
+    swipeDist = 0;
 });
 
 // Delegación de eventos para replies y likes
