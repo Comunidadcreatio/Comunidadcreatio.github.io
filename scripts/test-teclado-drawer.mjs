@@ -37,6 +37,7 @@ const evalJs = async (expr) => {
 await send('Runtime.enable'); await send('Page.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+try { await send('Emulation.setFocusEmulationEnabled', { enabled: true }); } catch (e) {}
 await send('Page.addScriptToEvaluateOnNewDocument', {
   source: `(() => {
       try {
@@ -133,6 +134,23 @@ let ok = true;
 console.log('\n[estado inicial, cajon abierto, sin teclado]');
 let st = await estado(); console.log(' ', st);
 const base = JSON.parse(st);
+
+// 0) PRE-SUBIDA AL ENFOCAR: el input debe subir ya al recibir el foco, sin
+//    ningún evento de teclado, para que el navegador no tenga que desplazar el
+//    viewport (que es lo que empujaba hacia arriba el cavent del fondo).
+console.log('\n--- pre-subida al enfocar (sin eventos de teclado) ---');
+await evalJs(`document.getElementById('comentarios-input').focus()`);
+await sleep(120);
+{
+    const e = JSON.parse(await estado());
+    console.log(e.lift > 100 ? `  OK el input sube al enfocar (lift=${e.lift}) sin teclado` : `  FALLO no se pre-subio (lift=${e.lift})`);
+    ok = ok && e.lift > 100;
+    const sinDesplazamiento = e.drawerTop === base.drawerTop && e.listTop === base.listTop;
+    console.log(sinDesplazamiento ? '  OK el cajon y la lista no se movieron' : '  FALLO algo mas se movio');
+    ok = ok && sinDesplazamiento;
+}
+await evalJs(`document.getElementById('comentarios-input').blur()`);
+await sleep(120);
 
 console.log('\n--- teclado ABIERTO (vv 900->620) ---');
 await evalJs(`__setVv(620, 0)`);
