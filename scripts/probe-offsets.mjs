@@ -1,18 +1,19 @@
-// Sonda: tras fijar vvH a un valor, lee INLINE bottom + rect + transition para
-// ver exactamente qué aplicó ajustarTecladoDrawer en el evento siguiente.
+// Sonda: valores de layout (offsetTop/offsetHeight: NO afectados por transform)
+// frente a los de getBoundingClientRect (SÍ afectados) para el cajón y su área
+// de input, en reposo y durante el deslizamiento de apertura.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-const profileDir = mkdtempSync(join(tmpdir(), 'sonda-'));
+const profileDir = mkdtempSync(join(tmpdir(), 'probe-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
-  '--headless=new', '--disable-gpu', '--no-sandbox', '--remote-debugging-port=9293',
+  '--headless=new', '--disable-gpu', '--no-sandbox', '--remote-debugging-port=9295',
   `--user-data-dir=${profileDir}`, '--window-size=420,900', 'about:blank'
 ], { stdio: 'ignore' });
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const getJson = async (u) => (await fetch(u)).json();
-let v; for (let i = 0; i < 40; i++) { try { v = await getJson('http://127.0.0.1:9293/json/version'); break; } catch { await sleep(250); } }
-const page = await (async () => { try { return await getJson('http://127.0.0.1:9293/json/new?about:blank'); } catch { return (await fetch('http://127.0.0.1:9293/json/new?about:blank', { method: 'PUT' })).json(); } })();
+let v; for (let i = 0; i < 40; i++) { try { v = await getJson('http://127.0.0.1:9295/json/version'); break; } catch { await sleep(250); } }
+const page = await (async () => { try { return await getJson('http://127.0.0.1:9295/json/new?about:blank'); } catch { return (await fetch('http://127.0.0.1:9295/json/new?about:blank', { method: 'PUT' })).json(); } })();
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
 let id = 0; const pend = new Map();
@@ -21,7 +22,7 @@ ws.onmessage = (ev) => { const m = JSON.parse(ev.data); if (m.id && pend.has(m.i
 const send = (method, params = {}) => new Promise(res => { const i = ++id; pend.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
 const evalJs = async (expr) => {
     const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
-    if (r.result?.exceptionDetails) { console.log('EXC:', (r.result.exceptionDetails.exception?.description || r.result.exceptionDetails.text).slice(0, 400)); return null; }
+    if (r.result?.exceptionDetails) { console.log('EXC:', (r.result.exceptionDetails.exception?.description || r.result.exceptionDetails.text).slice(0, 200)); return null; }
     return r.result?.result?.value;
 };
 await send('Runtime.enable'); await send('Page.enable');
@@ -57,52 +58,42 @@ for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('togg
 await sleep(800);
 await evalJs(`document.getElementById('btn-cavents-hub').click()`);
 await sleep(2000);
+
+const medir = `(() => {
+    const d = document.getElementById('comentarios-drawer');
+    const a = d.querySelector('.comentarios-input-area');
+    const dr = d.getBoundingClientRect(), ar = a.getBoundingClientRect();
+    return JSON.stringify({
+        d_offTop: d.offsetTop, d_offH: d.offsetHeight,
+        d_rectTop: Math.round(dr.top), d_rectBottom: Math.round(dr.bottom),
+        a_offTop: a.offsetTop, a_offH: a.offsetHeight,
+        a_rectBottom: Math.round(ar.bottom),
+        pad: parseFloat(d.style.paddingBottom) || 0,
+        offsetParentD: d.offsetParent ? (d.offsetParent.tagName || 'null') : 'null',
+        offsetParentA: a.offsetParent ? (a.offsetParent.id || a.offsetParent.tagName) : 'null'
+    });
+})()`;
+
+console.log('=== durante la apertura del cajón (transform animando) ===');
 await evalJs(`document.querySelector('.metrica-comentario').click()`);
-await sleep(1400);
-
-const patch = await evalJs(`(() => {
-    const vv = window.visualViewport;
-    let h = vv.height;
-    Object.defineProperty(vv, 'height', { configurable: true, get: () => h });
-    window.__setVvH = (x) => { h = x; window.dispatchEvent(new Event('resize')); };
-    window.__getVvH = () => h;
-    return 'ok';
-})()`);
-console.log('patch:', patch);
-
-async function estado() {
-    return evalJs(`(() => {
-        const d = document.getElementById('comentarios-drawer');
-        const r = d.getBoundingClientRect();
-        return JSON.stringify({
-            vvH: window.__getVvH(),
-            inlineBottom: d.style.bottom,
-            inlineTrans: d.style.transition,
-            rectBottom: Math.round(r.bottom),
-            clase: document.body.className.match(/teclado-abierto/) ? 'SI' : 'no'
-        });
-    })()`);
+for (let i = 0; i < 6; i++) {
+    console.log(' ', await evalJs(medir));
+    await sleep(70);
 }
-
-// Estado con teclado cerrado
-console.log('reposo:', await estado());
-// Abrir de golpe (evento único grande)
-await evalJs(`__setVvH(620)`);
-console.log('inmediato tras vvH=620:', await estado());
-await sleep(120);
-console.log('+120ms:', await estado());
-await sleep(300);
-console.log('+420ms:', await estado());
-// Ráfaga realista abajo->arriba
-await evalJs(`__setVvH(900)`);
-await sleep(100);
-console.log('cerrado tras rafaga reset:', await estado());
-console.log('--- ráfaga 880,840,800,760,720,680,640,620 (sin sleeps) ---');
-for (const h of [880, 840, 800, 760, 720, 680, 640, 620]) {
-    await evalJs(`__setVvH(${h})`);
-    console.log(`  vvH=${h} ->`, await estado());
-}
-await sleep(300);
-console.log('+300ms:', await estado());
+await sleep(500);
+console.log('=== en reposo (transform 0) ===');
+console.log(' ', await evalJs(medir));
+// comprobar fórmula propuesta: natural = a_rectBottom - (d_rectTop - d_offTop) + pad
+console.log('=== fórmula vs real ===');
+console.log(await evalJs(`(() => {
+    const d = document.getElementById('comentarios-drawer');
+    const a = d.querySelector('.comentarios-input-area');
+    const dr = d.getBoundingClientRect(), ar = a.getBoundingClientRect();
+    const pad = parseFloat(d.style.paddingBottom) || 0;
+    const desplaz = dr.top - d.offsetTop;
+    const natural = ar.bottom - desplaz + pad;
+    // referencia: aplicando un padding conocido y volviendo a medir
+    return JSON.stringify({ desplazTransform: Math.round(desplaz), naturalForm: Math.round(natural), areaBottomReal: Math.round(ar.bottom), pad });
+})()`));
 console.log('EXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}

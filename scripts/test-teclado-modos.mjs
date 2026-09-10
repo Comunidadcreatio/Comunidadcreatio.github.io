@@ -1,11 +1,9 @@
-// Verifica que el ajuste del teclado del cajón suba SOLO la diferencia exacta
-// hasta el borde del teclado en los distintos comportamientos de WebView:
-//   A) overlay simple ......... hay que subir todo (280px)
-//   B) auto-lift (el navegador ya lo sube) ... no hay que subir nada (0)
-//   C) overlay con offsetTop (el WebView desplaza el viewport al enfocar)
-//      ...................... hay que subir solo 180px (antes subía 280 = bug
-//      "se va muy arriba" dejando hueco)
-//   D) resizes-content (el layout se reduce) .. no subir nada y ocultar nav
+// Verifica el ajuste del teclado del cajón con el nuevo modelo:
+//   - el CAJÓN nunca cambia de posición (su fondo llega siempre al borde
+//     inferior de la pantalla)  ->  es imposible ver la página detrás.
+//   - el CONTENIDO se sube con padding-bottom, medido sobre el borde inferior
+//     del área del input, solo lo justo para dejarlo encima del teclado.
+// Se simulan los distintos comportamientos de WebView.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -66,7 +64,6 @@ await sleep(2000);
 await evalJs(`document.querySelector('.metrica-comentario').click()`);
 await sleep(1500);
 
-// Instalar patch + stub de medición
 const setup = await evalJs(`(() => {
     const vv = window.visualViewport;
     let h = vv.height, off = vv.offsetTop || 0;
@@ -74,58 +71,74 @@ const setup = await evalJs(`(() => {
     Object.defineProperty(vv, 'offsetTop', { configurable: true, get: () => off });
     window.__setVv = (nh, no) => { h = nh; off = no || 0; window.dispatchEvent(new Event('resize')); };
     const d = document.getElementById('comentarios-drawer');
-    window.__origRect = d.getBoundingClientRect.bind(d);
-    // baseSimulada = borde inferior del cajón con bottom:0 en el modo simulado
-    window.__base = 900;
-    d.getBoundingClientRect = function () {
-        const aplicado = parseFloat(d.style.bottom) || 0;
-        const r = window.__origRect();
-        return { top: r.top, bottom: window.__base - aplicado, left: r.left, right: r.right, width: r.width, height: r.height, x: r.x, y: r.y };
+    const area = d.querySelector('.comentarios-input-area');
+    // El JS mide con offsetTop/offsetHeight (independientes del transform):
+    //   natural = drawer.offsetTop + area.offsetTop + area.offsetHeight + pad
+    // Simulamos cada modo variando el offsetTop del cajón (que equivale a cómo
+    // lo deja el WebView) y dejando que el área se encoja con el padding.
+    window.__drawerOffTop = 180;
+    Object.defineProperty(d, 'offsetTop', { configurable: true, get: () => window.__drawerOffTop });
+    window.__AREA_TOPBASE = 594;   // area.offsetTop con padding 0 (medido real)
+    window.__AREA_H = 66;
+    Object.defineProperty(area, 'offsetTop', {
+        configurable: true,
+        get: () => window.__AREA_TOPBASE - (parseFloat(d.style.paddingBottom) || 0)
+    });
+    Object.defineProperty(area, 'offsetHeight', { configurable: true, get: () => window.__AREA_H });
+    window.__estado = () => {
+        const r = d.getBoundingClientRect();
+        const pad = parseFloat(d.style.paddingBottom) || 0;
+        const natural = window.__drawerOffTop + (window.__AREA_TOPBASE - pad) + window.__AREA_H + pad;
+        return JSON.stringify({
+            padding: pad,
+            natural,
+            drawerBottom: Math.round(r.bottom),
+            inputBottom: Math.round(natural - pad),
+            clase: document.body.classList.contains('teclado-abierto')
+        });
     };
-    window.__restaurarRect = () => { d.getBoundingClientRect = window.__origRect; };
-    window.__bottom = () => d.style.bottom;
-    window.__clase = () => document.body.classList.contains('teclado-abierto');
-    window.__reset = () => { d.style.bottom = ''; d.style.transition = ''; };
     return 'ok';
 })()`);
 console.log('setup:', setup);
 
-async function correr(nombre, { vvH, offsetTop, base, innerH }, esperado) {
-    await evalJs(`__reset()`);
-    await evalJs(`__base = ${base}`);
+async function correr(nombre, { vvH, offsetTop, drawerOffTop, innerH }, esperado) {
+    await evalJs(`__drawerOffTop = ${drawerOffTop}`);
     if (innerH) await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => ${innerH} })`);
     await evalJs(`__setVv(${vvH}, ${offsetTop})`);
-    await sleep(60);
-    const st = await evalJs(`JSON.stringify({ bottom: __bottom(), clase: __clase() })`);
-    const o = JSON.parse(st);
-    const ok = o.bottom === esperado.bottom && o.clase === esperado.clase;
-    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: bottom="${o.bottom || '(0)'}" navOculto=${o.clase} | esperado bottom="${esperado.bottom || '(0)'}" navOculto=${esperado.clase}`);
+    await sleep(320); // deja converger la interpolación por rAF
+    const o = JSON.parse(await evalJs(`__estado()`));
+    const keyboardTop = vvH + offsetTop;
+    const sinPagina = o.drawerBottom >= keyboardTop; // el fondo del cajón cubre hasta el teclado
+    const inputArriba = o.inputBottom <= keyboardTop + 1;
+    const ok = o.padding === esperado.padding && o.clase === esperado.clase && sinPagina && inputArriba;
+    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: padding=${o.padding} inputBottom=${o.inputBottom} (teclado en ${keyboardTop}) navOculto=${o.clase} fondoCubre=${sinPagina}`);
+    if (!ok) console.log(`      esperado padding=${esperado.padding} navOculto=${esperado.clase}`);
     return ok;
 }
 
 console.log('\n=== modos de WebView ===');
 let ok = true;
-// A) overlay simple: keyboardTop=620, base=900 -> necesario 280
-ok = (await correr('A overlay simple', { vvH: 620, offsetTop: 0, base: 900 }, { bottom: '280px', clase: true })) && ok;
-// B) auto-lift: el navegador ya subió el cajón (base=620) -> necesario 0
-ok = (await correr('B auto-lift (navegador ya sube)', { vvH: 620, offsetTop: 0, base: 620 }, { bottom: '', clase: true })) && ok;
-// C) overlay + offsetTop: keyboardTop=720, base=900 -> necesario 180 (antes 280 = "se va muy arriba")
-ok = (await correr('C overlay con offsetTop=100', { vvH: 620, offsetTop: 100, base: 900 }, { bottom: '180px', clase: true })) && ok;
-// D) resizes-content: innerHeight 620 == vvH -> layoutReducido, base=620 -> 0
-ok = (await correr('D resizes-content', { vvH: 620, offsetTop: 0, base: 620, innerH: 620 }, { bottom: '', clase: true })) && ok;
+// A) overlay simple: natural 840, teclado en 620 -> padding 220
+ok = (await correr('A overlay simple', { vvH: 620, offsetTop: 0, drawerOffTop: 180 }, { padding: 220, clase: true })) && ok;
+// B) auto-lift: el WebView ya dejó el cajón subido (natural 560) -> padding 0
+ok = (await correr('B auto-lift (navegador ya sube)', { vvH: 620, offsetTop: 0, drawerOffTop: -100 }, { padding: 0, clase: true })) && ok;
+// C) overlay + offsetTop: teclado en 720 -> padding 120 (no 220)
+ok = (await correr('C overlay con offsetTop=100', { vvH: 620, offsetTop: 100, drawerOffTop: 180 }, { padding: 120, clase: true })) && ok;
+// D) resizes-content: layout reducido (natural 560), teclado 620 -> 0
+ok = (await correr('D resizes-content', { vvH: 620, offsetTop: 0, drawerOffTop: -100, innerH: 620 }, { padding: 0, clase: true })) && ok;
+// E) teclado más bajo que el espacio del nav: natural 840, teclado 860 -> 0
+ok = (await correr('E teclado bajo (40px)', { vvH: 860, offsetTop: 0, drawerOffTop: 180 }, { padding: 0, clase: true })) && ok;
 
-// Restaurar innerHeight y comprobar restauración al cerrar el teclado
+// Cerrar teclado
 await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => 900 })`);
-await evalJs(`__base = 900`);
 await evalJs(`__setVv(900, 0)`);
-await sleep(60);
-const cerrado = await evalJs(`JSON.stringify({ bottom: __bottom(), clase: __clase() })`);
-const oc = JSON.parse(cerrado);
-const okCierre = oc.bottom === '' && oc.clase === false;
-console.log(`  ${okCierre ? '✓' : '✗'} E teclado cerrado: bottom="${oc.bottom || '(0)'}" navOculto=${oc.clase}`);
+await sleep(320);
+const o = JSON.parse(await evalJs(`__estado()`));
+const okCierre = o.padding === 0 && o.clase === false;
+console.log(`  ${okCierre ? '✓' : '✗'} F teclado cerrado: padding=${o.padding} navOculto=${o.clase}`);
 ok = ok && okCierre;
 
-await evalJs(`__restaurarRect()`);
+await evalJs(`__drawerOffTop = 180`);
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(ok ? '\nRESULTADO: OK' : '\nRESULTADO: FALLOS');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}

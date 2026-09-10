@@ -57,31 +57,38 @@ await sleep(2000);
 await evalJs(`document.querySelector('.metrica-comentario').click()`);
 await sleep(1400);
 
+// Mide la SUAVIDAD del movimiento real: se cambia la altura del teclado y se
+// muestrea, frame a frame, el padding-bottom que aplica el cajón (el cajón en
+// sí no se mueve nunca; lo que se desplaza es su contenido).
 const serie = await evalJs(`(async () => {
+    const vv = window.visualViewport;
+    let h = vv.height;
+    Object.defineProperty(vv, 'height', { configurable: true, get: () => h });
     const drawer = document.getElementById('comentarios-drawer');
     const puntos = [];
-    const registra = () => { const r = drawer.getBoundingClientRect(); puntos.push(Math.round(r.bottom)); };
-    registra(); // reposo (900)
-    drawer.style.transition = 'bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
-    drawer.style.bottom = '280px';
-    document.body.classList.add('teclado-abierto');
+    const registra = () => puntos.push(Math.round(parseFloat(drawer.style.paddingBottom) || 0));
+    registra(); // reposo (0)
+    h = 620;
+    window.dispatchEvent(new Event('resize'));
     await new Promise(res => { const t0 = performance.now(); (function tick() {
         registra();
-        if (performance.now() - t0 < 360) requestAnimationFrame(tick); else res();
+        if (performance.now() - t0 < 420) requestAnimationFrame(tick); else res();
     })(); });
     return puntos.join(',');
 })()`);
-console.log('borde inferior a lo largo del tiempo (px, 900->620):');
+console.log('padding-bottom a lo largo del tiempo (px, 0 -> ~220):');
 console.log(serie);
 
-// Análisis: ¿hay valores intermedios o solo salta de 900 a 620?
+// Análisis: ¿hay valores intermedios (interpolación suave) o solo salta?
 const vals = serie.split(',').map(Number);
 const unicos = [...new Set(vals)];
-console.log('valores distintos:', unicos.join(', '));
-const intermedios = vals.filter(v => v < 900 && v > 620);
-console.log(intermedios.length
-    ? '✓ LA TRANSICIÓN ANIMA: ' + intermedios.length + ' muestras intermedias (p.ej. ' + intermedios.slice(0, 6).join(',') + '...)'
-    : '✗ SALTA: sin valores intermedios (900 -> 620 directo)');
+console.log('valores distintos:', unicos.length > 20 ? unicos.slice(0, 20).join(', ') + '...' : unicos.join(', '));
+const intermedios = vals.filter(v => v > 0 && v < 215);
+const finalOk = vals[vals.length - 1] >= 200 && vals[vals.length - 1] <= 230;
+console.log(intermedios.length >= 5
+    ? '✓ EL CONTENIDO SUBE SUAVE: ' + intermedios.length + ' muestras intermedias (p.ej. ' + intermedios.slice(0, 6).join(',') + '...)'
+    : '✗ SALTA: sin valores intermedios (0 -> 220 directo)');
+console.log(finalOk ? `  ✓ converge al valor correcto (${vals[vals.length - 1]}px)` : `  ✗ valor final inesperado: ${vals[vals.length - 1]}px`);
 console.log('EXCEPCIONES:', logs.length ? logs : 'ninguna');
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}
-process.exit(intermedios.length ? 0 : 1);
+process.exit((intermedios.length >= 5 && finalOk) ? 0 : 1);
