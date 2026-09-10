@@ -1194,6 +1194,9 @@ html, body {
     position: fixed;
     left: 0;
     right: 0;
+    /* Valor de respaldo: JS lo fija en píxeles JUSTO DEBAJO de la cabecera (y
+       hasta el borde inferior), de modo que al abrir el teclado no queda nada de
+       la página a la vista por encima del cajón que se pueda ver moverse. */
     top: 20vh;
     /* El cajón llega hasta el borde inferior REAL de la pantalla (bottom:0),
        y el nav principal (#toggle-panel, fuera de .app-container con z 998)

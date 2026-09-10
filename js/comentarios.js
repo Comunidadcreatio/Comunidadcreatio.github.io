@@ -104,17 +104,29 @@ function transformY(el) {
 function areaInput() {
     return drawer ? drawer.querySelector('.comentarios-input-area') : null;
 }
-// Fija la geometría del cajón en píxeles sobre la ALTURA COMPLETA de la
-// pantalla (top = 20% y alto = 80% de esa altura). Así, aunque el WebView
-// redimensione el layout al abrir el teclado (interactive-widget=resizes-content
-// o WebViews que lo ignoran), el navegador YA NO puede reacomodar el cajón: su
-// caja, su fondo y la lista de comentarios se quedan exactamente donde estaban.
+// Fija la geometría del cajón en píxeles (ver pinCajonTeclado). Al hacerlo, el
+// WebView no puede reacomodarlo aunque redimensione el layout.
+// Altura de la cabecera de la app (el cajón empieza justo debajo).
+let altoCabeceraMem = 0;
+function altoCabecera() {
+    if (!altoCabeceraMem) {
+        const h = document.getElementById('main-header');
+        altoCabeceraMem = h && h.offsetHeight ? Math.round(h.offsetHeight) : 0;
+    }
+    return altoCabeceraMem;
+}
+// Fija la geometría del cajón en píxeles: empieza JUSTO DEBAJO DE LA CABECERA y
+// llega hasta el borde inferior de la pantalla. Así, al abrir el teclado, por
+// encima del cajón no queda nada de la página que se pueda ver moverse (el velo
+// solo tiene que cubrir, si acaso, la propia cabecera).
 function pinCajonTeclado() {
     if (!drawer) return;
     const alto = alturaLayoutBase || window.innerHeight || 0;
     if (!alto) return;
-    const top = Math.round(alto * 0.2);
-    const h = Math.round(alto * 0.8);
+    const cab = altoCabecera();
+    // Salvaguardas: nunca menos de 0 ni más de la mitad de la pantalla.
+    const top = Math.max(0, Math.min(cab || Math.round(alto * 0.2), Math.round(alto * 0.5)));
+    const h = Math.max(120, alto - top);
     if (drawer.style.top === top + 'px' && drawer.style.height === h + 'px' && drawer.style.bottom === 'auto') return;
     drawer.style.top = top + 'px';
     drawer.style.height = h + 'px';

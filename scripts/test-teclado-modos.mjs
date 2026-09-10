@@ -99,6 +99,9 @@ const setup = await evalJs(`(() => {
             drawerTop: Math.round(dr.top),
             drawerBottom: Math.round(dr.bottom),
             drawerScreenTop: Math.round(dr.top - off),
+            drawerScreenBottom: Math.round(dr.bottom - off),
+            cabeceraAlto: Math.round(document.getElementById('main-header').offsetHeight),
+            innerHeight: window.innerHeight,
             pinTop: d.style.top || '(css)', pinHeight: d.style.height || '(css)', pinBottom: d.style.bottom || '(css)',
             navDisplay: getComputedStyle(document.getElementById('toggle-panel')).display,
             clase: document.body.classList.contains('teclado-abierto')
@@ -111,8 +114,9 @@ const setup = await evalJs(`(() => {
 console.log('setup:', setup);
 
 // INVARIANTES:
-//  - el cajón queda clavado EN PANTALLA en 180..900 (rect.top - offsetTop), así
-//    que el desplazamiento del viewport visual se compensa y no lo mueve;
+//  - el cajón queda clavado EN PANTALLA: empieza justo debajo de la cabecera y
+//    llega al borde inferior (900), así que el desplazamiento del viewport
+//    visual se compensa y no lo mueve;
 //  - el área del input queda justo por encima del teclado EN PANTALLA;
 //  - el nav está en display:none.
 async function correr(nombre, { vvH, offsetTop, innerH }, esperado) {
@@ -120,16 +124,18 @@ async function correr(nombre, { vvH, offsetTop, innerH }, esperado) {
     await evalJs(`__cerrar()`);
     await sleep(360);
     await evalJs(`__resetDrawer()`);
-    if (innerH) await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => ${innerH} })`);
+    await evalJs(`Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => ${innerH || 900} })`);
     await evalJs(`__setVv(${vvH}, ${offsetTop})`);
     await sleep(420); // deja pasar el gesto + la corrección de asentado
     const o = JSON.parse(await evalJs(`__estado()`));
     const inputArriba = o.areaScreenBottom <= o.keyboardScreenTop + 1;   // visible en pantalla
-    const cajonFijo = o.drawerScreenTop === 180 && o.drawerBottom - (o.keyboardTop - o.keyboardScreenTop) === 900;
+    // El cajón va de la cabecera al borde inferior de la PANTALLA (900 en el test),
+    // aunque el layout se reduzca (resizes-content): se fija en píxeles.
+    const cajonFijo = o.drawerScreenTop === o.cabeceraAlto && o.drawerScreenBottom === 900;
     const ok = o.lift === esperado.lift && o.clase === esperado.clase &&
                inputArriba && cajonFijo && o.navDisplay === (esperado.clase ? 'none' : 'flex');
-    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} áreaPantalla=${o.areaScreenBottom} tecladoPantalla=${o.keyboardScreenTop} cajónPantalla=${o.drawerScreenTop}..${o.drawerBottom - (o.keyboardTop - o.keyboardScreenTop)} panCajón=${o.panCajon} nav=${o.navDisplay}`);
-    if (!ok) console.log(`      esperado lift=${esperado.lift} nav=${esperado.clase ? 'none' : 'flex'} cajón en pantalla 180..900`);
+    console.log(`  ${ok ? '✓' : '✗'} ${nombre}: lift=${o.lift} áreaPantalla=${o.areaScreenBottom} tecladoPantalla=${o.keyboardScreenTop} cajónPantalla=${o.drawerScreenTop}..${o.drawerScreenBottom} (cabecera ${o.cabeceraAlto}) panCajón=${o.panCajon} nav=${o.navDisplay}`);
+    if (!ok) console.log(`      esperado lift=${esperado.lift} nav=${esperado.clase ? 'none' : 'flex'} cajón en pantalla ${o.cabeceraAlto}..900`);
     return ok;
 }
 
