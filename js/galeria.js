@@ -2,8 +2,8 @@
 import { API_BASE_URL, apiRequest } from './config.js?v=2e0c2e7288';
 import { artistaActual } from './auth.js?v=b2e08c086d';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=d86e42a5e7';
-import { abrirComentarios } from './comentarios.js?v=8cdeed4bd1';
-import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=5dff3ed42f';
+import { abrirComentarios } from './comentarios.js?v=51f3147cf9';
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=b9728f1acf';
 
 // ============================================================
 // El modal de descripción bloquea el scroll del fondo mientras está abierto.

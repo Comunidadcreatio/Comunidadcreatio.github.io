@@ -7,36 +7,48 @@
 // libera hasta que el último lo suelte. Sin esto, cerrar uno de los dos
 // descongelaría el fondo mientras el otro sigue abierto.
 //
-// El que scrollea de verdad es #galeria-container (position: fixed con
-// overflow-y: auto), NO el documento: por eso se ataca a ese contenedor y no a
-// `body` (bloquear body no haría nada).
+// HAY QUE BLOQUEAR TRES COSAS, y cada una tapa un caso distinto:
 //
-// El ALTO en píxeles lo fija aparte la hoja de comentarios: solo ella abre el
-// teclado, y es lo único que puede encoger el layout.
+//   1. #galeria-container — es el scroller de la galería (position: fixed con
+//      overflow-y: auto). NO es el documento.
+//   2. <html> y <body> — el DOCUMENTO también scrollea: body tiene
+//      `min-height: 100vh` + `padding-bottom: 100px`, así que es más alto que la
+//      pantalla. Y este es el caso que se escapa: cuando el modal está abierto
+//      cubre la pantalla pero NO es scrolleable, así que el navegador ENCADENA
+//      el gesto hacia arriba y acaba moviendo el documento. Bloquear solo la
+//      galería dejaba ese scroll vivo.
+//
+// Se guarda y se devuelve el valor PREVIO de cada uno, para no pisar a otros
+// módulos (por ejemplo el pull-to-refresh).
 // ============================================================
 const motivos = new Set();
-let overflowPrevio = null;
+let previos = null;      // Map<elemento, overflow previo>
 
-function contenedor() {
-    return document.getElementById('galeria-container');
+function objetivos() {
+    return [
+        document.getElementById('galeria-container'),
+        document.documentElement,
+        document.body
+    ].filter(Boolean);
 }
 
 export function bloquearFondo(motivo) {
     motivos.add(motivo);
-    const c = contenedor();
-    if (!c) return;
-    if (overflowPrevio === null) overflowPrevio = c.style.overflow || '';
-    c.style.overflow = 'hidden';
+    if (previos) return;             // ya estaba bloqueado
+    previos = new Map();
+    for (const el of objetivos()) {
+        previos.set(el, el.style.overflow || '');
+        el.style.overflow = 'hidden';
+    }
 }
 
 export function liberarFondo(motivo) {
     motivos.delete(motivo);
-    if (motivos.size > 0) return;        // todavía hay alguien que lo bloquea
-    const c = contenedor();
-    if (c && overflowPrevio !== null) {
-        c.style.overflow = overflowPrevio;
+    if (motivos.size > 0) return;    // todavía hay alguien que lo bloquea
+    if (previos) {
+        for (const [el, valor] of previos) el.style.overflow = valor;
+        previos = null;
     }
-    overflowPrevio = null;
 }
 
 export function fondoBloqueado() {
