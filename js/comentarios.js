@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl, fondoEl;
+let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl;
 
 function init() {
     if (drawer) return;
@@ -16,7 +16,6 @@ function init() {
     btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
     versionEl = document.getElementById('comentarios-version');
-    fondoEl   = document.getElementById('fondo-cajon');
     // Mostrar la versión en el cajón (para poder comprobar qué build se está
     // probando en el dispositivo).
     if (versionEl) {
@@ -60,6 +59,7 @@ function init() {
 // ============================================================
 const TECLADO_UMBRAL = 24;          // px de teclado para considerarlo abierto
 const NAV_ALTO_FALLBACK = 60;       // alto del nav si no se puede medir
+const GAP_CABECERA = 12;            // aire entre la cabecera y el cajón (subir/bajar aquí)
 
 let alturaCabeceraMem = 0;
 let alturaNavMem = 0;
@@ -102,13 +102,14 @@ function ajustarGeometria() {
     const pan = vv ? Math.max(0, Math.round(vv.offsetTop || 0)) : 0;
     const visH = vv && vv.height ? vv.height : innerH;
 
-    const top = Math.max(0, Math.round(altoCabecera() + pan));
+    // El cajón NO llega hasta la cabecera: se deja un aire para que se vea que
+    // es una hoja flotante sobre la galería.
+    const top = Math.max(0, Math.round(altoCabecera() + pan + GAP_CABECERA));
     const bordeTeclado = Math.round(innerH - pan - visH);
     const bottom = Math.max(altoNav(), bordeTeclado);
 
     drawer.style.top = top + 'px';
     drawer.style.bottom = bottom + 'px';
-    if (fondoEl) fondoEl.style.top = top + 'px';
     // El teclado tapa la franja donde vive el nav: se oculta para que no
     // aparezca en el hueco mientras el teclado se despliega. Clase PROPIA
     // (no se usa la del chat) para no interferir entre modulos.
@@ -142,7 +143,6 @@ export function abrirComentarios(obraId, cardEl) {
     drawer.style.transition = '';
 
     drawer.classList.remove('hidden');
-    if (fondoEl) fondoEl.classList.remove('hidden');
     // Geometria ANTES de mostrarlo: asi no se ve ningun salto al aparecer.
     drawer.classList.add('visible');
     ajustarGeometria();
@@ -165,7 +165,6 @@ function cerrarComentarios() {
     const ocultar = () => {
         if (!drawer.classList.contains('visible')) {
             drawer.classList.add('hidden');
-            if (fondoEl) fondoEl.classList.add('hidden');
         }
     };
     drawer.addEventListener('transitionend', ocultar, { once: true });
