@@ -1235,6 +1235,19 @@ html, body {
 .comentarios-drawer.hidden {
     display: none;
 }
+/* Capa transparente que se traga cualquier toque dirigido al fondo mientras la
+   hoja está abierta. NO pinta nada: solo bloquea. Sin ella se podría scrollear
+   la galería por la franja que queda a la vista, o deslizar el carrusel
+   horizontal de la tarjeta de detrás. Va por encima del contenido (1900) y por
+   debajo de la hoja (2000). */
+.cajon-bloqueo {
+    position: fixed;
+    inset: 0;
+    z-index: 1900;
+    background: transparent;
+    touch-action: none;
+}
+.cajon-bloqueo.hidden { display: none; }
 /* Header: la barrita de arrastre arriba y el título centrado debajo. Sin flecha
    de cerrar ni versión. TODA esta franja es la zona de arrastre de la hoja, así
    que `touch-action: none` impide que el navegador se quede el gesto para

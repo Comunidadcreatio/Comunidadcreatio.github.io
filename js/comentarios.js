@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, nav;
+let drawer, lista, input, btnEnviar, nav, bloqueoEl;
 
 function init() {
     if (drawer) return;
@@ -14,6 +14,7 @@ function init() {
     input     = document.getElementById('comentarios-input');
     btnEnviar = document.getElementById('comentarios-enviar');
     nav       = document.getElementById('toggle-panel');
+    bloqueoEl = document.getElementById('cajon-bloqueo');
     iniciarEscuchaTeclado();
 }
 
@@ -97,6 +98,46 @@ function actualizarAltoBase() {
     if (h > altoBase) altoBase = h;
 }
 
+// ============================================================
+// FONDO INMOVIL MIENTRAS LA HOJA ESTA ABIERTA
+// ------------------------------------------------------------
+// El que scrollea de verdad es #galeria-container (position: fixed con
+// overflow-y: auto), NO el documento: por eso bloquear `body` no serviria de
+// nada. Se ataca con dos cosas, porque cada una cubre un hueco distinto:
+//
+//   1. `overflow: hidden` en el contenedor: corta el scroll Y la inercia que ya
+//      estuviera en marcha. Conserva el scrollTop, asi que no salta al cerrar.
+//   2. Una capa transparente encima del fondo: sin ella todavia se podria
+//      arrastrar el CARRUSEL HORIZONTAL de la tarjeta que queda a la vista (es
+//      un scroll propio, dentro del contenedor, y el overflow no lo alcanza).
+//
+// Ademas se compensa el desplazamiento del viewport visual: es lo unico que
+// podia mover el fondo con la lista congelada y los toques bloqueados (lo hace
+// el navegador al enfocar el input y desplegar el teclado).
+// ============================================================
+let transformFondoPrev = null;
+
+function congelarFondo(congelar) {
+    if (bloqueoEl) bloqueoEl.classList.toggle('hidden', !congelar);
+    const cont = document.getElementById('galeria-container');
+    if (cont) cont.style.overflow = congelar ? 'hidden' : '';
+    if (!congelar) {
+        compensarFondo(0);
+        transformFondoPrev = null;
+    }
+}
+
+function compensarFondo(pan) {
+    const cont = document.getElementById('galeria-container');
+    if (!cont) return;
+    // Se guarda el transform que tuviera para devolverlo tal cual al cerrar.
+    if (transformFondoPrev === null) transformFondoPrev = cont.style.transform || '';
+    const objetivo = pan > 1
+        ? (transformFondoPrev ? transformFondoPrev + ' ' : '') + 'translateY(' + Math.round(pan) + 'px)'
+        : transformFondoPrev;
+    if (cont.style.transform !== objetivo) cont.style.transform = objetivo;
+}
+
 function ajustarGeometria() {
     if (!drawer) return;
     const innerH = window.innerHeight || 0;
@@ -134,6 +175,10 @@ function ajustarGeometria() {
         topAplicado = Math.round(topPantalla + pan);
         drawer.style.top = topAplicado + 'px';
     }
+    // El fondo no debe moverse ni un pixel: se le compensa el mismo pan que a la
+    // hoja. Solo mientras la hoja esta abierta.
+    compensarFondo(drawer.classList.contains('visible') ? pan : 0);
+
     // El teclado tapa la franja donde vive el nav: se oculta para que no
     // aparezca en el hueco mientras el teclado se despliega. Clase PROPIA
     // (no se usa la del chat) para no interferir entre modulos, y solo se toca
@@ -167,6 +212,9 @@ export function abrirComentarios(obraId, cardEl) {
     input.value = '';
     lista.innerHTML = '<div class="comentarios-loading">Cargando comentarios...</div>';
 
+    // El fondo queda inmovil desde el primer momento.
+    congelarFondo(true);
+
     // Limpiar restos del arrastre de cierre.
     drawer.style.transform = '';
     drawer.style.transition = '';
@@ -194,6 +242,8 @@ function cerrarComentarios() {
     // que se abre, la hoja vuelve a su sitio por defecto.
     posUsuario = null;
     gesto = null;
+    // Se libera el fondo: vuelve a scrollear y se devuelve su transform original.
+    congelarFondo(false);
     // Bajar el teclado: sin esto el cajon se cierra pero el teclado se queda,
     // y al reabrir aparece en un estado intermedio.
     if (input && document.activeElement === input) input.blur();
