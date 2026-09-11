@@ -935,9 +935,21 @@ body.creando-problogs #panel-artista {
     margin-top: 0;
     margin-left: -24px;   /* se sale del padding lateral del main */
     margin-right: -24px;
-    padding-top: 0;
+    /* Un pelo de aire arriba: sin él la etiqueta «Título» queda pegada al borde
+       del header y su parte de arriba se ve tapada. */
+    padding-top: 10px;
     padding-left: 36px;   /* el aire del paso 2 de Cavents */
     padding-right: 36px;
+}
+
+/* El marco del contenido vuelve al aire que tenía antes (casi a sangre), pero
+   solo en el móvil: en escritorio el panel va centrado y el marco lo acompaña,
+   como los demás campos. */
+@media (max-width: 768px) {
+    body.creando-problogs #crear-problogs-contenido .problog-campo-contenido {
+        margin-left: -33px;
+        margin-right: -33px;
+    }
 }
 
 /* En escritorio el panel de Cavents va centrado con 700px de ancho: el de
@@ -954,11 +966,13 @@ body.creando-problogs #panel-artista {
 
 /* `#panel-artista form` mete 24px arriba y 20px a los lados a todos los
    formularios del panel; aquí solo sobra el de arriba (y el de los lados, que
-   ya lo pone el panel). */
+   ya lo pone el panel). El overflow va visible porque el marco del contenido se
+   sale un poco a los lados y, con el oculto que trae, le cortaba la etiqueta. */
 body.creando-problogs #panel-artista #problog-form {
     padding-top: 0;
     padding-left: 0;
     padding-right: 0;
+    overflow: visible;
 }
 
 /* ============================================================

@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.566';
+        var currentVer = '1.0.567';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -80,7 +80,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=5f2e775853">
+    <link rel="stylesheet" href="css/problogs.css?v=8c97e03f27">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -718,7 +718,7 @@
                         <input type="text" id="problog-titulo" maxlength="200" autocomplete="off">
                     </div>
 
-                    <div class="problog-campo">
+                    <div class="problog-campo problog-campo-contenido">
                         <span class="problog-etiqueta-campo">Contenido</span>
                         <!-- Dentro del marco: las herramientas de formato (dos filas
                              de siete), una línea y el campo donde se escribe. Los
