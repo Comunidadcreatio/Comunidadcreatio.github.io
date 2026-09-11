@@ -206,9 +206,11 @@ function ajustarAltoContenido() {
 // no es un valor fijo, así que se mide en vivo. Si no se ajusta, o el último
 // campo (Etiquetas) queda detrás de las barras, o sobra un vacío grande.
 //
-// Con el teclado abierto las barras quedan por detrás de él, así que no hay que
-// reservar su sitio: por eso ahí el hueco baja a casi nada y no se ve el vacío
-// al llegar abajo.
+// Con el teclado abierto las barras y el nav quedan POR DETRÁS del teclado, así
+// que no hay que reservarles nada: ahí el hueco baja al mínimo y el contenido
+// termina justo donde se escribe (que es lo que se ve al bajar). La clase
+// `problog-teclado` en el body sirve para quitar también los otros rellenos
+// inferiores (el del formulario y el del main) mientras el teclado está abierto.
 function ajustarHuecoInferior() {
     const cont = document.getElementById('crear-problogs-contenido');
     if (!cont) return;
@@ -216,10 +218,16 @@ function ajustarHuecoInferior() {
     const reserva = alto(document.getElementById('toggle-panel'))
         + alto(document.getElementById('crear-tabs'))
         + alto(document.getElementById('problog-nav-bar'));
+
+    // La ventana visible se encoge con el teclado. Se comparan las dos medidas
+    // (innerHeight y clientHeight) porque según el navegador encoge una u otra.
     const vv = window.visualViewport;
-    const teclado = !!(vv && (window.innerHeight - vv.height) > TECLADO_UMBRAL);
-    const aire = teclado ? 12 : 14;
-    cont.style.paddingBottom = Math.round((teclado ? 0 : reserva) + aire) + 'px';
+    const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+    const visual = vv ? vv.height : layout;
+    const teclado = (layout - visual) > TECLADO_UMBRAL;
+
+    document.body.classList.toggle('problog-teclado', teclado);
+    cont.style.paddingBottom = Math.round((teclado ? 0 : reserva) + (teclado ? 8 : 14)) + 'px';
 }
 
 // Escribe donde está el cursor y deja el foco dentro.

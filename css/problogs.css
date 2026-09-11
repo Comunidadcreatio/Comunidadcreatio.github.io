@@ -998,6 +998,19 @@ body.creando-problogs #crear-problogs-contenido {
     padding-bottom: 150px;
 }
 
+/* --- Con el teclado abierto ---
+   Las barras y el nav quedan por detrás del teclado, así que no hay que
+   reservarles sitio: se quitan también los otros rellenos de abajo (el del
+   formulario y el del main) para que el contenido termine justo donde se
+   escribe y al bajar no se vea un vacío. */
+body.creando-problogs.problog-teclado #main-content {
+    padding-bottom: 0;
+}
+
+body.creando-problogs.problog-teclado #panel-artista #problog-form {
+    padding-bottom: 0;
+}
+
 /* El marco del contenido vuelve al aire que tenía antes (casi a sangre), pero
    solo en el móvil: en escritorio el panel va centrado y el marco lo acompaña,
    como los demás campos. Su etiqueta se queda alineada con las otras
