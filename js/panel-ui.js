@@ -1033,6 +1033,25 @@ function setupStepNavigation() {
         formulario.style.top = progressBottom + 'px';
     }
 
+    // El fondo ÚNICO de las barras de abajo: va desde la barra de crear hasta el
+    // borde inferior de las pestañas. Se mide en vivo (si se calcula con las
+    // pestañas ocultas, el alto sale 0 y queda un hueco a la vista).
+    function positionFondo() {
+        const fondo = document.getElementById('crear-fondo');
+        const togglePanel = document.getElementById('toggle-panel');
+        const tabsBar = document.getElementById('crear-tabs');
+        const problogBar = document.getElementById('problog-nav-bar');
+        if (!fondo || !togglePanel) return;
+        const fromBottom = window.innerHeight - togglePanel.getBoundingClientRect().top;
+        const altoTabs = tabsBar ? tabsBar.getBoundingClientRect().height : 0;
+        const altoBarra = Math.max(
+            stepBar ? stepBar.getBoundingClientRect().height : 0,
+            problogBar ? problogBar.getBoundingClientRect().height : 0
+        ) || 48;
+        fondo.style.bottom = fromBottom + 'px';
+        fondo.style.height = Math.round(altoTabs + altoBarra) + 'px';
+    }
+
     function positionAll() {
         try {
             positionProgressBar();
@@ -1040,6 +1059,7 @@ function setupStepNavigation() {
             positionTabs();
             positionCarrusel();
             positionFormulario();
+            positionFondo();
         } catch(e) {
             debugLog.error('positionAll error:', e);
         }
