@@ -777,6 +777,12 @@
     border-top: 1px solid var(--color-gray-300);
 }
 
+/* El cuerpo contiene los flotantes (imagen al lado del texto): con flow-root el
+   contenedor crece con ellos en vez de dejarlos salirse. */
+.problog-lectura-cuerpo {
+    display: flow-root;
+}
+
 .problog-lectura-figura {
     margin: 0 0 22px;
 }
@@ -787,6 +793,57 @@
     display: block;
     border-radius: 12px;
     background: var(--color-gray-100);
+}
+
+/* --- Imágenes en fila (`:fila:`) ---
+   Dos por fila: la marca la pone el icono «En fila» sobre las imágenes que
+   vienen detrás. */
+.problog-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 22px;
+    align-items: flex-start;
+}
+
+.problog-fila .problog-lectura-figura {
+    flex: 0 0 calc(50% - 5px);
+    max-width: calc(50% - 5px);
+    margin: 0;
+}
+
+.problog-fila .problog-lectura-figura img {
+    width: 100%;
+    height: auto;
+}
+
+/* --- Imagen al lado del texto (`:lado:`) ---
+   La imagen flota a la izquierda y el texto la rodea. */
+.problog-lectura-figura.problog-figura-flotante {
+    float: left;
+    width: 45%;
+    max-width: 45%;
+    margin: 4px 16px 10px 0;
+}
+
+.problog-lectura-figura.problog-figura-flotante img {
+    width: 100%;
+    height: auto;
+}
+
+.problog-lectura-figura.problog-figura-flotante figcaption {
+    font-size: 12px;
+    text-align: left;
+}
+
+/* Lo que va después de un flotante y no es texto no debe montarse encima. */
+.problog-lectura-cuerpo h3,
+.problog-lectura-cuerpo h4,
+.problog-lectura-cuerpo h5,
+.problog-lectura-cuerpo hr,
+.problog-lectura-cuerpo .problog-fila,
+.problog-lectura-cuerpo .problog-lectura-figura:not(.problog-figura-flotante) {
+    clear: both;
 }
 
 .problog-lectura-figura figcaption {

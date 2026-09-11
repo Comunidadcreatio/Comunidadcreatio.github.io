@@ -273,17 +273,17 @@ function prefijarLineas(prefijo, reemplaza) {
     ajustarAltoContenido();
 }
 
-// Regla horizontal: se coloca en su propia línea, con una línea en blanco antes
-// y después para que se lea como un bloque aparte (y se vea de extremo a
-// extremo al publicarla).
-function insertarRegla() {
+// Marcas que van en su propia línea (`---` y `:fila:`): se colocan con una línea
+// en blanco antes y después, y el cursor queda debajo listo para seguir (para
+// «En fila», ahí van las imágenes que van juntas).
+function insertarMarcaBloque(marca) {
     if (!contenidoEl) return;
     const { ini, fin } = seleccionActual();
     const valor = contenidoEl.value;
     const antes = valor.slice(0, ini).replace(/\n+$/, '');
     const despues = valor.slice(fin).replace(/^\n+/, '');
-    contenidoEl.value = (antes ? antes + '\n\n' : '') + '---' + (despues ? '\n\n' + despues : '');
-    const pos = (antes ? antes.length + 2 : 0) + 3;
+    contenidoEl.value = (antes ? antes + '\n\n' : '') + marca + '\n\n' + despues;
+    const pos = (antes ? antes.length + 2 : 0) + marca.length + 1;
     contenidoEl.focus();
     try { contenidoEl.setSelectionRange(pos, pos); } catch (e) { /* da igual */ }
     actualizarContador();
@@ -292,7 +292,11 @@ function insertarRegla() {
 
 function aplicarFormato(tipo) {
     if (!contenidoEl) return;
-    if (tipo === 'regla') { insertarRegla(); return; }
+    if (tipo === 'regla') { insertarMarcaBloque('---'); return; }
+    if (tipo === 'fila') { insertarMarcaBloque(':fila:'); return; }
+    // «Al lado» va pegado: la imagen que se añada justo después flotará y el
+    // texto que venga detrás la rodeará.
+    if (tipo === 'lado') { insertarEnContenido(':lado: '); return; }
     const pref = PREFIJOS[tipo];
     if (pref) { prefijarLineas(pref.marca, pref.reemplaza); return; }
     const env = ENVUELTOS[tipo];
@@ -853,6 +857,8 @@ function sinFormato(texto) {
     return String(texto || '')
         .replace(/<image>[\s\S]*?<\/image>/gi, ' ')
         .replace(/^\s*(#{1,4}|[-*+]|\d+[.)]|>)\s+/gm, '')
+        .replace(/:(?:izq|centro|der|just|fila|lado):/gi, ' ')
+        .replace(/^\s*-{3,}\s*$/gm, ' ')
         .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
         .replace(/[*_`]/g, '')
         .replace(/\s+/g, ' ')
@@ -869,20 +875,70 @@ function pintarLectura(p, conAcciones) {
     const propias = (conAcciones === undefined) ? modoMias : !!conAcciones;
     const imagenes = p.imagenes || [];
     const autor = p.nombre_artista || 'Artista';
-    const bloquesHTML = (p.bloques || []).map((b) => {
-        if (b.tipo === 'texto') {
-            // Dentro va el HTML que genera renderMarkdown() a partir de las
-            // marcas ligeras; el texto del autor ya viene escapado.
-            return `<div class="problog-lectura-texto">${renderMarkdown(b.contenido)}</div>`;
-        }
+
+    // Una imagen suelta. `clase` añade la maquetación (en fila o flotante).
+    const figura = (b, clase) => {
         const url = imagenes[b.slot];
         if (!url) return '';   // el backend ya filtra estos, pero por si acaso
         return `
-            <figure class="problog-lectura-figura">
+            <figure class="problog-lectura-figura${clase ? ' ' + clase : ''}">
                 <img src="${safeImgUrl(cloudinaryUrl(url, 1080))}" alt="" loading="lazy">
                 ${b.pie ? `<figcaption>${renderText(b.pie)}</figcaption>` : ''}
             </figure>`;
-    }).join('');
+    };
+
+    // Los bloques se recorren en orden porque hay dos marcas que afectan a los
+    // que vienen detrás: `:fila:` (las imágenes van una al lado de otra) y
+    // `:lado:` (la imagen flota y el texto la rodea).
+    const bloques = p.bloques || [];
+    const html = [];
+    let i = 0;
+    while (i < bloques.length) {
+        const b = bloques[i];
+        if (b.tipo !== 'texto') {
+            html.push(figura(b));
+            i++;
+            continue;
+        }
+        const marca = String(b.contenido || '').trim().toLowerCase();
+        if (marca === ':fila:') {
+            const grupo = [];
+            let j = i + 1;
+            while (j < bloques.length && bloques[j].tipo === 'imagen') { grupo.push(bloques[j]); j++; }
+            const dibujadas = grupo.map((g) => figura(g)).filter(Boolean);
+            // Con una sola imagen no hay fila que hacer: se pinta normal.
+            if (dibujadas.length > 1) {
+                html.push('<div class="problog-fila">' + dibujadas.join('') + '</div>');
+                i = j;
+                continue;
+            }
+            if (dibujadas.length === 1) {
+                html.push(dibujadas[0]);
+                i = j;
+                continue;
+            }
+            i++;   // sin imágenes detrás, la marca no pinta nada
+            continue;
+        }
+        if (marca === ':lado:') {
+            const siguiente = bloques[i + 1];
+            if (siguiente && siguiente.tipo === 'imagen') {
+                const dibujada = figura(siguiente, 'problog-figura-flotante');
+                if (dibujada) {
+                    html.push(dibujada);
+                    i += 2;
+                    continue;
+                }
+            }
+            i++;   // sin imagen detrás, la marca no pinta nada
+            continue;
+        }
+        // Dentro va el HTML que genera renderMarkdown() a partir de las marcas
+        // ligeras; el texto del autor ya viene escapado.
+        html.push(`<div class="problog-lectura-texto">${renderMarkdown(b.contenido)}</div>`);
+        i++;
+    }
+    const bloquesHTML = html.join('');
 
     // En la vista de lectura también se puede editar/eliminar si es propia.
     const acciones = propias
