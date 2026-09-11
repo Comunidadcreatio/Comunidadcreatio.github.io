@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.564';
+        var currentVer = '1.0.565';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -80,7 +80,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=535298af70">
+    <link rel="stylesheet" href="css/problogs.css?v=fd72db8a44">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -719,12 +719,12 @@
                     </div>
 
                     <div class="problog-campo">
-                        <!-- El marco lleva dentro su título, las herramientas de
-                             formato y el campo donde se escribe. Los iconos escriben
-                             marcas sobre lo seleccionado; las imágenes siguen entrando
-                             como etiquetas <image>nombre.jpg</image>. -->
+                        <span class="problog-etiqueta-campo">Contenido</span>
+                        <!-- Dentro del marco: las herramientas de formato (dos filas
+                             de siete), una línea y el campo donde se escribe. Los
+                             iconos escriben marcas sobre lo seleccionado; las imágenes
+                             siguen entrando como etiquetas <image>nombre.jpg</image>. -->
                         <div id="problog-marco" class="problog-marco">
-                        <span class="problog-marco-titulo">Contenido</span>
                         <div id="problog-anadir" class="problog-anadir">
                             <button type="button" id="problog-add-imagen" class="problog-anadir-btn" title="Añadir imagen" aria-label="Añadir imagen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><circle cx="8.5" cy="9.5" r="1.5"/><polyline points="21 16 16 11 5 20"/></svg><span class="problog-anadir-nombre">Imagen</span></button>
                             <button type="button" class="problog-anadir-btn" data-formato="fila" title="En fila: dos bloques uno al lado del otro (imágenes, párrafos o mezcla)" aria-label="En fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="8" height="12" rx="1.5"/><rect x="13.5" y="6" width="8" height="12" rx="1.5"/></svg><span class="problog-anadir-nombre">En fila</span></button>
@@ -747,9 +747,7 @@
                     </div>
 
                     <div class="problog-campo">
-                        <label for="problog-etiquetas">Etiquetas</label>
-                        <input type="text" id="problog-etiquetas" maxlength="500" autocomplete="off" placeholder="proceso, óleo, paisaje">
-                        <p class="problog-ayuda">Separadas por comas.</p>
+                        <input type="text" id="problog-etiquetas" maxlength="500" autocomplete="off" placeholder="Etiquetas (separadas por coma)" aria-label="Etiquetas (separadas por coma)">
                     </div>
                 </form>
             </div>

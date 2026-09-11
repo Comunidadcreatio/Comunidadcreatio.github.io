@@ -109,8 +109,9 @@
 
 /* --- Marco del contenido ---
    Rectángulo sin relleno y con un borde fino, como la línea del título. Dentro
-   van, de arriba abajo: el título centrado, las herramientas de formato y el
-   campo editable (donde las imágenes se colocan como <image>nombre.jpg</image>). */
+   van las herramientas de formato (dos filas de siete), una línea separadora y
+   el campo editable (donde las imágenes se colocan como <image>nombre.jpg</image>).
+   El título «Contenido» va fuera, encima del marco. */
 #crear-problogs-contenido .problog-marco {
     display: flex;
     flex-direction: column;
@@ -119,16 +120,6 @@
     border: 1px solid var(--color-gray-300);
     border-radius: 10px;
     background: transparent;
-}
-
-#crear-problogs-contenido .problog-marco-titulo {
-    display: block;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--color-gray-500);
 }
 
 /* Etiquetas: la misma línea de campo que usa Cavents (solo el borde de abajo),
@@ -315,22 +306,26 @@
     outline: none;
 }
 
-/* --- Botones de añadir --- */
+/* --- Botones de añadir ---
+   Rejilla de SIETE columnas: con 14 herramientas salen dos filas de siete (que
+   es como se quiere que se vea en el móvil). Debajo va la línea que separa las
+   herramientas del sitio donde se escribe. */
 #crear-problogs-contenido .problog-anadir {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-start;   /* los iconos, alineados con la etiqueta */
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    max-width: 540px;   /* en pantallas anchas no se estiran sin sentido */
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
 /* Iconos de añadir y de formato: cuadrados pequeños, sin relleno y con borde
    fino, con el nombre debajo. */
 #crear-problogs-contenido #problog-form .problog-anadir-btn {
-    width: auto;
-    min-width: 46px;
-    max-width: 64px;
-    padding: 5px 4px 4px;
-    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 5px 2px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -858,6 +853,11 @@
 
 [data-theme="dark"] #crear-problogs-contenido .problog-bloque-cab {
     background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+/* La línea que separa las herramientas del sitio donde se escribe. */
+[data-theme="dark"] #crear-problogs-contenido .problog-anadir {
     border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
