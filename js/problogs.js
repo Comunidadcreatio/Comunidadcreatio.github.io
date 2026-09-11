@@ -3,7 +3,8 @@
 // PROBLOGS: publicaciones de blog del artista sobre su proceso creativo.
 // ------------------------------------------------------------
 // Cuatro partes:
-//   1. EDITOR de bloques (párrafo / imagen) que el autor ordena.
+//   1. EDITOR: el marco es un campo editable donde el autor escribe seguido y
+//      las imágenes entran como etiquetas <image>nombre.jpg</image>.
 //   2. FEED de publicaciones en la sección #problogs, con filtro Todas / Mías.
 //   3. VISTA DE LECTURA de una publicación completa.
 //   4. EDICIÓN y BORRADO de las propias.
@@ -12,11 +13,14 @@
 // normaliza entidades) y toda imagen por safeImgUrl()/cloudinaryUrl(), según la
 // regla del README. El texto es PLANO a propósito: el formato (negritas,
 // enlaces) es lo que abriría la puerta a inyección de HTML. El justificado es
-// solo CSS.
+// solo CSS. La etiqueta <image> NO es HTML: es una marca de texto que se parte
+// en bloques antes de salir y que, al pintarse, se sustituye por la imagen.
 //
 // Las imágenes usan el MISMO esquema de slots que los Cavents (imagen_0..4), y
 // el backend las devuelve como array POSICIONAL de 5: el índice ES el slot, así
-// que cada bloque resuelve su imagen con imagenes[slot] sin ambigüedad.
+// que cada bloque resuelve su imagen con imagenes[slot] sin ambigüedad. Por eso
+// las imágenes ya guardadas conservan su slot aunque el autor las mueva de
+// sitio en el texto: no hay que volver a subirlas.
 //
 // El filtro "Mías" no es un adorno: los borradores NO aparecen en el feed
 // público, así que sin una lista propia una publicación guardada como borrador
@@ -37,13 +41,15 @@ import { artistaActual } from './auth.js?v=f2799071b6';
 
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
-const MAX_PIE = 300;
 
-let form, tituloEl, bloquesEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
+let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
-// bloques: [{ tipo:'texto', contenido } | { tipo:'imagen', slot, pie, file?, previewUrl?, url? }]
-let bloques = [];
+// Imágenes del contenido en curso, por el nombre que aparece en la etiqueta:
+//   locales   -> { file, previewUrl }  (elegidas y todavía sin subir)
+//   guardadas -> { slot, url, pie }    (ya en el servidor, al editar)
+let imagenesLocales = new Map();
+let imagenesGuardadas = new Map();
 let observandoSeccion = false;
 let feedCargado = false;
 let guardando = false;
@@ -57,7 +63,6 @@ let observadorFeed = null;
 
 // Estado de edición
 let editandoId = null;        // null = creando; si no, id de la publicación
-let slotsEliminados = [];     // slots cuya imagen existente hay que borrar en el servidor
 let modoMias = false;         // false = feed público; true = mis publicaciones
 let publicacionAbierta = null;
 
@@ -71,156 +76,197 @@ function fechaCorta(iso) {
     return d.toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-// Primer slot libre de 0 a MAX-1 que no esté ocupado por otro bloque de imagen.
-function slotLibre() {
-    const usados = new Set(bloques.filter((b) => b.tipo === 'imagen').map((b) => b.slot));
-    for (let i = 0; i < MAX_IMAGENES; i++) {
-        if (!usados.has(i)) return i;
+// ============================================================
+// CONTENIDO: TEXTO CON ETIQUETAS DE IMAGEN
+// ------------------------------------------------------------
+// El marco es un campo editable de verdad: el autor escribe seguido y, al
+// añadir una imagen, se inserta su etiqueta <image>nombre.jpg</image> justo
+// donde tenía el cursor. Al guardar, ese texto se parte en los bloques que
+// entiende el servidor (texto / imagen); en la vista previa y en la lectura,
+// cada etiqueta se ve como la imagen de verdad.
+// ============================================================
+const RE_IMAGEN = /<image>\s*([^<>\n]+?)\s*<\/image>/gi;
+
+// Parte el texto en tramos: { tipo:'texto', contenido } | { tipo:'imagen', nombre }
+function analizarContenido(texto) {
+    const tramos = [];
+    const t = String(texto || '');
+    let ultimo = 0;
+    RE_IMAGEN.lastIndex = 0;
+    let m;
+    while ((m = RE_IMAGEN.exec(t)) !== null) {
+        const antes = t.slice(ultimo, m.index);
+        if (antes.trim()) tramos.push({ tipo: 'texto', contenido: antes });
+        tramos.push({ tipo: 'imagen', nombre: m[1] });
+        ultimo = m.index + m[0].length;
     }
-    return -1;
+    const resto = t.slice(ultimo);
+    if (resto.trim()) tramos.push({ tipo: 'texto', contenido: resto });
+    return tramos;
+}
+
+// Nombre de archivo de una imagen ya guardada, sacado de su URL.
+function nombreDeUrl(url) {
+    const limpio = String(url || '').split('?')[0].split('#')[0];
+    const partes = limpio.split('/');
+    return partes[partes.length - 1] || 'imagen.jpg';
+}
+
+// El nombre es lo que identifica la etiqueta, así que no puede repetirse.
+function nombreUnico(nombre) {
+    const base = String(nombre || '').trim().replace(/[<>/\\]/g, '') || 'imagen.jpg';
+    const usado = (n) => imagenesLocales.has(n) || imagenesGuardadas.has(n);
+    if (!usado(base)) return base;
+    const punto = base.lastIndexOf('.');
+    const raiz = punto > 0 ? base.slice(0, punto) : base;
+    const ext = punto > 0 ? base.slice(punto) : '';
+    let i = 2;
+    while (usado(raiz + '-' + i + ext)) i++;
+    return raiz + '-' + i + ext;
 }
 
 function contarImagenes() {
-    return bloques.filter((b) => b.tipo === 'imagen').length;
+    return analizarContenido(contenidoEl ? contenidoEl.value : '')
+        .filter((t) => t.tipo === 'imagen').length;
 }
 
 function actualizarContador() {
-    if (contadorEl) {
-        contadorEl.textContent = contarImagenes() + ' / ' + MAX_IMAGENES + ' imágenes';
-    }
-    if (addImagenBtn) {
-        addImagenBtn.disabled = contarImagenes() >= MAX_IMAGENES;
-    }
+    const n = contarImagenes();
+    if (contadorEl) contadorEl.textContent = n + ' / ' + MAX_IMAGENES + ' imágenes';
+    if (addImagenBtn) addImagenBtn.disabled = n >= MAX_IMAGENES;
 }
 
-// ============================================================
-// EDITOR: pintar los bloques
-// Se re-pinta la lista entera en cada cambio: con un máximo de 100 bloques es
-// barato, y evita tener que sincronizar el DOM a mano bloque por bloque (que es
-// de donde salen los estados inconsistentes). Los valores se recogen del DOM
-// ANTES de repintar, para no perder lo que el usuario escribió.
-// ============================================================
-function recogerDelDom() {
-    if (!bloquesEl) return;
-    bloquesEl.querySelectorAll('.problog-bloque').forEach((el) => {
-        const i = parseInt(el.dataset.indice, 10);
-        if (isNaN(i) || !bloques[i]) return;
-        if (bloques[i].tipo === 'texto') {
-            const ta = el.querySelector('.problog-bloque-texto');
-            if (ta) bloques[i].contenido = ta.value;
-        } else {
-            const pie = el.querySelector('.problog-bloque-pie');
-            if (pie) bloques[i].pie = pie.value;
-        }
-    });
+// El marco crece con lo que se escribe, sin scroll propio.
+function ajustarAltoContenido() {
+    if (!contenidoEl) return;
+    contenidoEl.style.height = 'auto';
+    contenidoEl.style.height = Math.max(160, contenidoEl.scrollHeight) + 'px';
 }
 
-function pintarBloques() {
-    if (!bloquesEl) return;
-    if (bloques.length === 0) {
-        bloquesEl.innerHTML = '<p class="problog-vacio">Añade un párrafo o una imagen para empezar.</p>';
-        actualizarContador();
+// Escribe donde está el cursor y deja el foco dentro.
+function insertarEnContenido(texto) {
+    if (!contenidoEl) return;
+    const ini = typeof contenidoEl.selectionStart === 'number'
+        ? contenidoEl.selectionStart : contenidoEl.value.length;
+    const fin = typeof contenidoEl.selectionEnd === 'number' ? contenidoEl.selectionEnd : ini;
+    contenidoEl.value = contenidoEl.value.slice(0, ini) + texto + contenidoEl.value.slice(fin);
+    const pos = ini + texto.length;
+    try { contenidoEl.setSelectionRange(pos, pos); } catch (e) { /* da igual */ }
+    contenidoEl.focus();
+    actualizarContador();
+    ajustarAltoContenido();
+}
+
+// Icono de párrafo: separa en dos párrafos donde esté el cursor.
+function anadirTexto() {
+    if (!contenidoEl) return;
+    const pos = typeof contenidoEl.selectionStart === 'number'
+        ? contenidoEl.selectionStart : contenidoEl.value.length;
+    const antes = contenidoEl.value.slice(0, pos);
+    insertarEnContenido((antes === '' || /\n\s*\n$/.test(antes)) ? '' : '\n\n');
+}
+
+// Icono de imagen: se elige el archivo y se inserta su etiqueta en el texto. El
+// archivo se sube al publicar (o al guardar los cambios).
+function anadirImagen() {
+    if (!contenidoEl || !archivoEl) return;
+    if (contarImagenes() >= MAX_IMAGENES) {
+        showError('Máximo ' + MAX_IMAGENES + ' imágenes por publicación.');
         return;
     }
-
-    bloquesEl.innerHTML = bloques.map((b, i) => {
-        const acciones = `
-            <div class="problog-bloque-acciones">
-                <button type="button" class="problog-btn-icono" data-accion="subir" data-indice="${i}" title="Subir" aria-label="Subir"${i === 0 ? ' disabled' : ''}>▲</button>
-                <button type="button" class="problog-btn-icono" data-accion="bajar" data-indice="${i}" title="Bajar" aria-label="Bajar"${i === bloques.length - 1 ? ' disabled' : ''}>▼</button>
-                <button type="button" class="problog-btn-icono problog-btn-borrar" data-accion="borrar" data-indice="${i}" title="Borrar" aria-label="Borrar">✕</button>
-            </div>`;
-
-        if (b.tipo === 'texto') {
-            return `
-                <div class="problog-bloque" data-indice="${i}" data-tipo="texto">
-                    <div class="problog-bloque-cab">
-                        <span class="problog-bloque-tipo">Párrafo</span>
-                        ${acciones}
-                    </div>
-                    <textarea class="problog-bloque-texto" maxlength="${MAX_TEXTO}" placeholder="Escribe aquí…">${escapeHtml(b.contenido || '')}</textarea>
-                </div>`;
-        }
-
-        const slot = b.slot;
-        const vista = b.previewUrl || b.url || '';
-        const idFile = 'problog-file-' + slot;
-        return `
-            <div class="problog-bloque" data-indice="${i}" data-tipo="imagen" data-slot="${slot}">
-                <div class="problog-bloque-cab">
-                    <span class="problog-bloque-tipo">Imagen ${slot + 1}</span>
-                    ${acciones}
-                </div>
-                <div class="problog-bloque-imagen">
-                    ${vista
-                        ? `<img class="problog-preview" src="${safeImgUrl(vista)}" alt="">`
-                        : '<div class="problog-preview problog-preview-vacia">Sin imagen</div>'}
-                    <input type="file" id="${idFile}" class="problog-file" accept="image/*" data-slot="${slot}">
-                    <label for="${idFile}" class="problog-file-label">${vista ? 'Cambiar imagen' : 'Elegir imagen'}</label>
-                </div>
-                <input type="text" class="problog-bloque-pie" maxlength="${MAX_PIE}" placeholder="Pie de foto (opcional)" value="${escapeHtml(b.pie || '')}">
-            </div>`;
-    }).join('');
-
-    actualizarContador();
+    archivoEl.value = '';   // permite volver a elegir el mismo archivo
+    archivoEl.click();
 }
 
-function anadirTexto(contenido) {
-    recogerDelDom();
-    bloques.push({ tipo: 'texto', contenido: contenido || '' });
-    pintarBloques();
-    const areas = bloquesEl.querySelectorAll('.problog-bloque-texto');
-    const ultima = areas[areas.length - 1];
-    if (ultima) ultima.focus();
-}
-
-function anadirImagen() {
-    recogerDelDom();
-    const slot = slotLibre();
-    if (slot === -1) return;
-    bloques.push({ tipo: 'imagen', slot: slot, pie: '' });
-    pintarBloques();
-}
-
-function moverBloque(i, delta) {
-    recogerDelDom();
-    const j = i + delta;
-    if (j < 0 || j >= bloques.length) return;
-    const tmp = bloques[i];
-    bloques[i] = bloques[j];
-    bloques[j] = tmp;
-    pintarBloques();
-}
-
-function borrarBloque(i) {
-    recogerDelDom();
-    const b = bloques[i];
-    if (b) {
-        if (b.previewUrl) URL.revokeObjectURL(b.previewUrl);
-        // Si era una imagen que YA estaba en el servidor, hay que pedir su
-        // borrado: si no, quedaría huérfana en Cloudinary.
-        if (b.tipo === 'imagen' && b.url && !b.file) {
-            if (slotsEliminados.indexOf(b.slot) === -1) slotsEliminados.push(b.slot);
-        }
+function alElegirImagen() {
+    const file = archivoEl && archivoEl.files && archivoEl.files[0];
+    if (!file) return;
+    if (contarImagenes() >= MAX_IMAGENES) {
+        showError('Máximo ' + MAX_IMAGENES + ' imágenes por publicación.');
+        return;
     }
-    bloques.splice(i, 1);
-    pintarBloques();
+    const nombre = nombreUnico(file.name);
+    imagenesLocales.set(nombre, { file: file, previewUrl: URL.createObjectURL(file) });
+    insertarEnContenido('<image>' + nombre + '</image>');
 }
 
 function limpiarEditor() {
-    bloques.forEach((b) => { if (b.previewUrl) URL.revokeObjectURL(b.previewUrl); });
-    bloques = [];
+    imagenesLocales.forEach((img) => { if (img.previewUrl) URL.revokeObjectURL(img.previewUrl); });
+    imagenesLocales = new Map();
+    imagenesGuardadas = new Map();
     editandoId = null;
-    slotsEliminados = [];
+    if (contenidoEl) contenidoEl.value = '';
     if (tituloEl) tituloEl.value = '';
     if (etiquetasEl) etiquetasEl.value = '';
     const publicado = document.querySelector('input[name="problog-estado"][value="publicado"]');
     if (publicado) publicado.checked = true;
     if (guardarBtn) guardarBtn.textContent = 'Crear Problog';
-    // El editor arranca VACÍO: el contenido se añade con los iconos de párrafo
-    // e imagen, dentro del marco. Antes se creaba un párrafo solo.
-    pintarBloques();
+    actualizarContador();
+    ajustarAltoContenido();
 }
+
+// Del texto a los bloques que entiende el servidor, más los archivos a subir y
+// los slots de imágenes guardadas que han dejado de usarse.
+function construirDesdeTexto() {
+    const tramos = analizarContenido(contenidoEl ? contenidoEl.value : '');
+    const salida = [];
+    const archivos = [];              // { slot, file }
+    const urls = [];                  // slot -> url (local o guardada)
+    const usados = new Set();
+    const vistos = new Set();
+    const usadosAlFinal = new Set();
+
+    // Primero se reservan los slots de las imágenes que ya estaban guardadas:
+    // conservan el suyo, así no hay que volver a subirlas aunque el autor las
+    // mueva de sitio en el texto.
+    tramos.forEach((t) => {
+        if (t.tipo !== 'imagen') return;
+        const g = imagenesGuardadas.get(t.nombre);
+        if (g) usados.add(g.slot);
+    });
+
+    let cursor = 0;
+    const siguienteLibre = () => {
+        while (cursor < MAX_IMAGENES && usados.has(cursor)) cursor++;
+        if (cursor >= MAX_IMAGENES) return -1;
+        usados.add(cursor);
+        return cursor;
+    };
+
+    tramos.forEach((t) => {
+        if (t.tipo === 'texto') {
+            salida.push({ tipo: 'texto', contenido: t.contenido });
+            return;
+        }
+        // Una etiqueta repetida es una sola imagen.
+        if (vistos.has(t.nombre)) return;
+        vistos.add(t.nombre);
+        const guardada = imagenesGuardadas.get(t.nombre);
+        if (guardada) {
+            usadosAlFinal.add(guardada.slot);
+            salida.push({ tipo: 'imagen', slot: guardada.slot, pie: guardada.pie || '' });
+            urls[guardada.slot] = guardada.url;
+            return;
+        }
+        const local = imagenesLocales.get(t.nombre);
+        if (!local) return;   // etiqueta sin archivo: se ignora
+        const slot = siguienteLibre();
+        if (slot === -1) return;   // ya hay 5 imágenes
+        usadosAlFinal.add(slot);
+        salida.push({ tipo: 'imagen', slot: slot, pie: '' });
+        archivos.push({ slot: slot, file: local.file });
+        urls[slot] = local.previewUrl;
+    });
+
+    // Imágenes guardadas que ya no están en el texto: el servidor las borra.
+    const eliminar = [];
+    imagenesGuardadas.forEach((g) => {
+        if (!usadosAlFinal.has(g.slot)) eliminar.push(g.slot);
+    });
+
+    return { bloques: salida, archivos: archivos, eliminar: eliminar, urls: urls };
+}
+
 
 // ============================================================
 // GUARDAR (crear o actualizar)
@@ -228,7 +274,6 @@ function limpiarEditor() {
 async function guardar(e) {
     if (e) e.preventDefault();
     if (guardando) return;
-    recogerDelDom();
 
     const titulo = (tituloEl && tituloEl.value || '').trim();
     if (!titulo) {
@@ -237,21 +282,10 @@ async function guardar(e) {
         return;
     }
 
-    // Solo se envían bloques con contenido real: los párrafos vacíos y las
-    // imágenes sin archivo NI url previa se descartan antes de salir. Se hace
-    // así a propósito (y no bloqueando el guardado) para que sea coherente: un
-    // bloque vacío es visible en el editor y simplemente no se publica.
-    const limpios = [];
-    for (const b of bloques) {
-        if (b.tipo === 'texto') {
-            if ((b.contenido || '').trim()) limpios.push({ tipo: 'texto', contenido: b.contenido });
-        } else if (b.tipo === 'imagen' && (b.file || b.url)) {
-            // `url` = imagen que ya estaba guardada (modo edición) y se conserva.
-            limpios.push({ tipo: 'imagen', slot: b.slot, pie: (b.pie || '').trim() });
-        }
-    }
+    // El texto del marco se convierte en los bloques que espera el servidor.
+    const { bloques: limpios, archivos, eliminar } = construirDesdeTexto();
     if (limpios.length === 0) {
-        showError('Añade al menos un párrafo o una imagen.');
+        showError('Escribe algo o añade una imagen.');
         return;
     }
 
@@ -263,15 +297,13 @@ async function guardar(e) {
     formData.append('estado', estadoSel ? estadoSel.value : 'publicado');
     const esEdicion = !!editandoId;
     if (esEdicion) {
-        // Slots cuya imagen previa el autor quitó o reemplazó: el servidor la borra.
-        formData.append('imagenes_a_eliminar', JSON.stringify(slotsEliminados));
+        // Slots cuyas imágenes guardadas ya no están en el texto: el servidor
+        // las borra (si no, quedarían huérfanas en Cloudinary).
+        formData.append('imagenes_a_eliminar', JSON.stringify(eliminar));
     }
-    // Los archivos van por slot, igual que en un Cavent.
-    limpios.forEach((b) => {
-        if (b.tipo !== 'imagen') return;
-        const original = bloques.find((x) => x.tipo === 'imagen' && x.slot === b.slot);
-        if (original && original.file) formData.append('imagen_' + b.slot, original.file);
-    });
+    // Los archivos nuevos van por slot, igual que en un Cavent. Las imágenes que
+    // ya estaban guardadas no se reenvían: conservan su slot.
+    archivos.forEach((a) => formData.append('imagen_' + a.slot, a.file));
 
     const url = esEdicion ? API_BASE_URL + '/problogs/' + editandoId : API_BASE_URL + '/problogs';
 
@@ -314,9 +346,11 @@ async function guardar(e) {
 // ============================================================
 function cargarParaEditar(p) {
     if (!p || !p.id) return;
-    bloques.forEach((b) => { if (b.previewUrl) URL.revokeObjectURL(b.previewUrl); });
+    // Se sueltan las imágenes locales de la edición anterior.
+    imagenesLocales.forEach((img) => { if (img.previewUrl) URL.revokeObjectURL(img.previewUrl); });
+    imagenesLocales = new Map();
+    imagenesGuardadas = new Map();
     editandoId = p.id;
-    slotsEliminados = [];
 
     if (tituloEl) tituloEl.value = p.titulo || '';
     if (etiquetasEl) etiquetasEl.value = p.etiquetas || '';
@@ -324,15 +358,26 @@ function cargarParaEditar(p) {
     const radio = document.querySelector('input[name="problog-estado"][value="' + valor + '"]');
     if (radio) radio.checked = true;
 
+    // Los bloques vuelven al editor como texto: cada imagen, con su etiqueta y
+    // el nombre de archivo sacado de su URL, para que al guardar conserve su slot.
     const imagenes = p.imagenes || [];
-    bloques = (p.bloques || []).map((b) => {
-        if (b.tipo === 'texto') return { tipo: 'texto', contenido: b.contenido || '' };
-        return { tipo: 'imagen', slot: b.slot, pie: b.pie || '', url: imagenes[b.slot] || '' };
+    const partes = [];
+    (p.bloques || []).forEach((b) => {
+        if (b.tipo === 'texto') {
+            if ((b.contenido || '').trim()) partes.push(b.contenido);
+            return;
+        }
+        const url = imagenes[b.slot] || '';
+        if (!url) return;
+        const nombre = nombreUnico(nombreDeUrl(url));
+        imagenesGuardadas.set(nombre, { slot: b.slot, url: url, pie: b.pie || '' });
+        partes.push('<image>' + nombre + '</image>');
     });
-    if (bloques.length === 0) bloques.push({ tipo: 'texto', contenido: '' });
+    if (contenidoEl) contenidoEl.value = partes.join('\n\n');
 
     if (guardarBtn) guardarBtn.textContent = 'Guardar cambios';
-    pintarBloques();
+    actualizarContador();
+    ajustarAltoContenido();
 
     // Abre el panel de creación en la pestaña Problogs, dejando preparada la
     // flecha de volver para regresar a Problogs al terminar.
@@ -640,27 +685,17 @@ function cerrarLectura() {
 // que guardar antes. Las imágenes se resuelven con su vista previa local
 // mientras siguen sin subirse.
 function abrirVistaPrevia() {
-    recogerDelDom();
-
-    const imagenes = [];
-    bloques.forEach((b) => {
-        if (b.tipo !== 'imagen') return;
-        const url = b.previewUrl || b.url || '';
-        if (url) imagenes[b.slot] = url;
-    });
-
-    // Se descartan los bloques vacíos igual que al guardar, para no enseñar un
-    // hueco que no se va a publicar.
-    const publicables = bloques.filter((b) => (b.tipo === 'texto'
-        ? !!(b.contenido || '').trim()
-        : !!(b.previewUrl || b.url)));
+    // Mismo camino que al guardar: el texto se parte en bloques y cada etiqueta
+    // <image>…</image> se convierte en la imagen de verdad (la local, mientras
+    // sigue sin subirse).
+    const { bloques: publicables, urls } = construirDesdeTexto();
 
     const titulo = (tituloEl && tituloEl.value || '').trim();
     const publicacion = {
         id: 'vista-previa',
         titulo: titulo || 'Sin título',
         bloques: publicables,
-        imagenes: imagenes,
+        imagenes: urls,
         nombre_artista: (artistaActual && artistaActual.nombre_artista) || 'Artista',
         created_at: new Date().toISOString(),
         likes_count: 0,
@@ -834,7 +869,8 @@ export function setupProblogs() {
     if (!form) return;   // la sección no está en esta página
 
     tituloEl = document.getElementById('problog-titulo');
-    bloquesEl = document.getElementById('problog-bloques');
+    contenidoEl = document.getElementById('problog-contenido');
+    archivoEl = document.getElementById('problog-file');
     etiquetasEl = document.getElementById('problog-etiquetas');
     addTextoBtn = document.getElementById('problog-add-texto');
     addImagenBtn = document.getElementById('problog-add-imagen');
@@ -866,36 +902,13 @@ export function setupProblogs() {
     });
     conectarObservadorFeed();
 
-    // Delegación: un solo listener para todos los botones de los bloques.
-    bloquesEl?.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-accion]');
-        if (!btn) return;
-        const i = parseInt(btn.dataset.indice, 10);
-        if (isNaN(i)) return;
-        if (btn.dataset.accion === 'subir') moverBloque(i, -1);
-        else if (btn.dataset.accion === 'bajar') moverBloque(i, 1);
-        else if (btn.dataset.accion === 'borrar') borrarBloque(i);
+    // El marco es un campo editable: al escribir se refrescan el contador y el
+    // alto, y el archivo elegido con el icono de imagen se inserta como etiqueta.
+    contenidoEl?.addEventListener('input', () => {
+        actualizarContador();
+        ajustarAltoContenido();
     });
-
-    // Al elegir un archivo se guarda el File en su bloque y se muestra la vista
-    // previa local (sin subirlo todavía: se sube al publicar).
-    bloquesEl?.addEventListener('change', (e) => {
-        const input = e.target.closest('.problog-file');
-        if (!input || !input.files || !input.files[0]) return;
-        const slot = parseInt(input.dataset.slot, 10);
-        const b = bloques.find((x) => x.tipo === 'imagen' && x.slot === slot);
-        if (!b) return;
-        if (b.previewUrl) URL.revokeObjectURL(b.previewUrl);
-        b.file = input.files[0];
-        b.previewUrl = URL.createObjectURL(b.file);
-        // Si se reemplaza una imagen que ya estaba en el servidor, hay que pedir
-        // el borrado de la vieja (el backend guardará la nueva en ese slot).
-        if (b.url) {
-            b.url = '';
-            if (slotsEliminados.indexOf(slot) === -1) slotsEliminados.push(slot);
-        }
-        pintarBloques();
-    });
+    archivoEl?.addEventListener('change', alElegirImagen);
 
     // El feed se abre con el icono del header. Se OBSERVA la clase de la sección
     // en vez de engancharse a ese botón: así funciona sin depender de quién la
@@ -913,10 +926,10 @@ export function setupProblogs() {
     feedEl?.addEventListener('click', (e) => manejarAcciones(e, false));
     detalleEl?.addEventListener('click', (e) => manejarAcciones(e, false));
 
-    // Al entrar en la pestaña Problogs, el editor arranca con un párrafo listo —
-    // pero solo si NO se está editando algo (si no, borraría lo cargado).
+    // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
+    // NO se está editando algo y no hay nada escrito (si no, se perdería).
     document.getElementById('tab-problogs')?.addEventListener('click', () => {
-        if (!editandoId && bloques.length === 0) limpiarEditor();
+        if (!editandoId && !(contenidoEl && contenidoEl.value.trim())) limpiarEditor();
     });
 
     limpiarEditor();

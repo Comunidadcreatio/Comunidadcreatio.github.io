@@ -108,28 +108,38 @@
 }
 
 /* --- Marco del contenido ---
-   Rectángulo sin relleno y con un borde fino, como la línea del título. Es
-   donde se escribe: dentro van los párrafos y las imágenes. */
-#crear-problogs-contenido .problog-bloques {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 150px;
-    padding: 10px;
+   Rectángulo sin relleno y con un borde fino, como la línea del título. Dentro
+   está el campo editable: el autor escribe seguido y las imágenes se colocan
+   como etiquetas <image>nombre.jpg</image>. */
+#crear-problogs-contenido .problog-marco {
+    padding: 10px 12px;
     border: 1px solid var(--color-gray-300);
     border-radius: 10px;
     background: transparent;
 }
 
-/* Dentro del marco, la invitación a empezar va centrada y sin su propio borde
-   (el borde lo pone ya el marco). */
-#crear-problogs-contenido .problog-bloques .problog-vacio {
-    margin: auto;
-    padding: 0 14px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--color-gray-500);
+/* El campo ocupa el marco entero y crece con lo que se escribe (el alto lo
+   ajusta el JS), así que no lleva caja ni scroll propios. */
+#crear-problogs-contenido .problog-contenido {
+    display: block;
+    width: 100%;
+    min-height: 160px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
     border: none;
+    outline: none;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: none;
+    overflow: hidden;
+}
+
+#crear-problogs-contenido .problog-contenido::placeholder {
+    color: var(--color-gray-500);
 }
 
 #crear-problogs-contenido .problog-bloque {
@@ -694,7 +704,7 @@
 
 [data-theme="dark"] #crear-problogs-contenido #problog-titulo,
 [data-theme="dark"] #crear-problogs-contenido #problog-etiquetas,
-[data-theme="dark"] #crear-problogs-contenido .problog-bloques,
+[data-theme="dark"] #crear-problogs-contenido .problog-marco,
 [data-theme="dark"] #crear-problogs-contenido #problog-bloques .problog-btn-icono,
 [data-theme="dark"] #crear-problogs-contenido #problog-form .problog-file-label {
     border-color: rgba(255, 255, 255, 0.18);
@@ -787,13 +797,21 @@ body.creando-problogs #panel-artista #problog-form {
    (las reglas de #obra-step-bar en formularios.css la incluyen). Solo se ve
    mientras se está creando un Problog.
    ------------------------------------------------------------
-   Sin fondo: la de Cavents usa --color-white, que en tema oscuro es #0a0a0a y
-   se veía como una franja negra sobre el contenido. Así queda solo la línea
-   superior y los botones, flotando sobre la página.
+   Translúcida con desenfoque, como las otras barras de la app (el pie del auth
+   y la cabecera): la de Cavents usa --color-white, que en tema oscuro es
+   #0a0a0a y se veía como una franja negra opaca.
    ============================================================ */
 #problog-nav-bar {
     display: none;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+[data-theme="dark"] #problog-nav-bar {
+    background: rgba(10, 10, 10, 0.20);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 body.creando-problogs #problog-nav-bar {
