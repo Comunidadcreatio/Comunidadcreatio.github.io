@@ -11,10 +11,15 @@
 //
 // SEGURIDAD: todo el texto del usuario pasa por renderText() (escapa y
 // normaliza entidades) y toda imagen por safeImgUrl()/cloudinaryUrl(), según la
-// regla del README. El texto es PLANO a propósito: el formato (negritas,
-// enlaces) es lo que abriría la puerta a inyección de HTML. El justificado es
-// solo CSS. La etiqueta <image> NO es HTML: es una marca de texto que se parte
-// en bloques antes de salir y que, al pintarse, se sustituye por la imagen.
+// regla del README. El justificado es solo CSS.
+//
+// Hay DOS marcas de texto, y ninguna es HTML del usuario:
+//   - <image>nombre.jpg</image>  ->  se parte en bloques antes de salir y, al
+//     pintarse, se sustituye por la imagen de verdad.
+//   - Un subconjunto de Markdown (negrita, cursiva, código, títulos, listas,
+//     citas y enlaces): renderMarkdown() ESCAPA primero el texto y solo después
+//     cambia las marcas por etiquetas nuestras. Por eso escribir <script> sale
+//     como texto y un enlace con javascript: no se convierte en enlace.
 //
 // Las imágenes usan el MISMO esquema de slots que los Cavents (imagen_0..4), y
 // el backend las devuelve como array POSICIONAL de 5: el índice ES el slot, así
@@ -188,6 +193,94 @@ function alElegirImagen() {
     const nombre = nombreUnico(file.name);
     imagenesLocales.set(nombre, { file: file, previewUrl: URL.createObjectURL(file) });
     insertarEnContenido('<image>' + nombre + '</image>');
+}
+
+// ============================================================
+// FORMATO LIGERO: LOS ICONOS DE MARKDOWN
+// ------------------------------------------------------------
+// Cada icono escribe sus marcas sobre lo que esté seleccionado (o en el punto
+// del cursor). Son las mismas marcas que luego interpreta renderMarkdown().
+// ============================================================
+const ENVUELTOS = {
+    negrita: { antes: '**', despues: '**' },
+    cursiva: { antes: '*', despues: '*' },
+    enlace: { antes: '[', despues: '](url)' }
+};
+const PREFIJOS = {
+    titulo: { marca: '# ', reemplaza: [] },
+    lista: { marca: '- ', reemplaza: ['* ', '+ ', '1. '] },
+    'lista-numerada': { marca: '1. ', reemplaza: ['- ', '* ', '+ '] },
+    cita: { marca: '> ', reemplaza: [] }
+};
+
+function seleccionActual() {
+    const v = contenidoEl ? contenidoEl.value : '';
+    const ini = (contenidoEl && typeof contenidoEl.selectionStart === 'number')
+        ? contenidoEl.selectionStart : v.length;
+    const fin = (contenidoEl && typeof contenidoEl.selectionEnd === 'number')
+        ? contenidoEl.selectionEnd : ini;
+    return { ini: Math.min(ini, fin), fin: Math.max(ini, fin) };
+}
+
+// Pone las marcas alrededor de la selección y deja el cursor dentro.
+function envolverSeleccion(antes, despues) {
+    if (!contenidoEl) return;
+    const { ini, fin } = seleccionActual();
+    const elegido = contenidoEl.value.slice(ini, fin);
+    contenidoEl.value = contenidoEl.value.slice(0, ini) + antes + elegido + despues
+        + contenidoEl.value.slice(fin);
+    const dentro = ini + antes.length;
+    contenidoEl.focus();
+    try {
+        if (despues === '](url)') {
+            // En un enlace se selecciona la palabra «url» para escribirla encima.
+            contenidoEl.setSelectionRange(dentro + elegido.length + 2, dentro + elegido.length + 5);
+        } else if (elegido) {
+            contenidoEl.setSelectionRange(dentro, dentro + elegido.length);
+        } else {
+            contenidoEl.setSelectionRange(dentro, dentro);
+        }
+    } catch (e) { /* da igual */ }
+    actualizarContador();
+    ajustarAltoContenido();
+}
+
+// Pone (o quita) un prefijo al principio de las líneas tocadas por la selección.
+// `reemplaza` son los prefijos del mismo tipo que se quitan antes (pasar de una
+// lista con viñetas a una numerada cambia la marca, no la pone delante).
+function prefijarLineas(prefijo, reemplaza) {
+    if (!contenidoEl) return;
+    const { ini, fin } = seleccionActual();
+    const valor = contenidoEl.value;
+    const desde = valor.lastIndexOf('\n', ini - 1) + 1;
+    let hasta = valor.indexOf('\n', fin);
+    if (hasta === -1) hasta = valor.length;
+
+    const lineas = valor.slice(desde, hasta).split('\n');
+    // Si todas ya lo llevan, el icono lo quita (así se puede alternar).
+    const todas = lineas.every((l) => l.startsWith(prefijo));
+    const otras = reemplaza || [];
+    const nuevas = lineas.map((l) => {
+        if (todas) return l.slice(prefijo.length);
+        let base = l;
+        otras.forEach((p) => { if (base.startsWith(p)) base = base.slice(p.length); });
+        return base.startsWith(prefijo) ? base : prefijo + base;
+    });
+    const bloque = nuevas.join('\n');
+
+    contenidoEl.value = valor.slice(0, desde) + bloque + valor.slice(hasta);
+    contenidoEl.focus();
+    try { contenidoEl.setSelectionRange(desde, desde + bloque.length); } catch (e) { /* da igual */ }
+    actualizarContador();
+    ajustarAltoContenido();
+}
+
+function aplicarFormato(tipo) {
+    if (!contenidoEl) return;
+    const pref = PREFIJOS[tipo];
+    if (pref) { prefijarLineas(pref.marca, pref.reemplaza); return; }
+    const env = ENVUELTOS[tipo];
+    if (env) envolverSeleccion(env.antes, env.despues);
 }
 
 function limpiarEditor() {
@@ -477,11 +570,11 @@ function tarjetaProblog(p, conAcciones) {
         ? `<img class="problog-card-avatar" src="${safeImgUrl(p.foto_artista)}" alt="">`
         : `<span class="problog-card-avatar problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
 
-    // Extracto: el primer bloque de texto.
+    // Extracto: el primer bloque de texto, sin las marcas de formato.
     let extracto = '';
     const primerTexto = (p.bloques || []).find((b) => b.tipo === 'texto');
     if (primerTexto) {
-        const t = String(primerTexto.contenido || '').replace(/\s+/g, ' ').trim();
+        const t = sinFormato(primerTexto.contenido);
         extracto = t.length > 160 ? t.slice(0, 160) + '…' : t;
     }
 
@@ -607,6 +700,106 @@ function cambiarFiltro(mias) {
 }
 
 // ============================================================
+// FORMATO LIGERO: INTERPRETAR LAS MARCAS
+// ------------------------------------------------------------
+// Subconjunto pequeño y SEGURO: **negrita**, *cursiva*, `código`, títulos (#),
+// listas (- y 1.), citas (>) y enlaces ([texto](https://…)).
+//
+// La clave de seguridad: el texto se escapa ANTES (renderText, igual que en el
+// resto de la app) y solo después se cambian las marcas por etiquetas nuestras.
+// Así lo único que puede llegar al DOM son estas etiquetas: si alguien escribe
+// <script>, sale como texto.
+// ============================================================
+function renderLinea(html) {
+    // El código se aparta para que sus asteriscos no se interpreten.
+    const codigos = [];
+    let t = html.replace(/`([^`]+)`/g, (m, c) => {
+        codigos.push(c);
+        return '\u0000' + (codigos.length - 1) + '\u0000';
+    });
+
+    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    t = t.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    t = t.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    t = t.replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
+    // Enlaces: solo http(s). Cualquier otro esquema se deja como texto.
+    t = t.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (m, texto, url) => {
+        if (!/^https?:\/\//i.test(url.replace(/&amp;/g, '&'))) return m;
+        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + texto + '</a>';
+    });
+
+    return t.replace(/\u0000(\d+)\u0000/g, (m, i) => '<code>' + codigos[Number(i)] + '</code>');
+}
+
+function renderMarkdown(texto) {
+    const lineas = renderText(texto).split('\n');
+    const salida = [];
+    let parrafo = [];
+    let lista = null;      // 'ul' | 'ol'
+    let cita = false;
+
+    const cerrarParrafo = () => {
+        if (parrafo.length) { salida.push('<p>' + parrafo.join('<br>') + '</p>'); parrafo = []; }
+    };
+    const cerrarLista = () => { if (lista) { salida.push('</' + lista + '>'); lista = null; } };
+    const cerrarCita = () => { if (cita) { salida.push('</blockquote>'); cita = false; } };
+    const cerrarTodo = () => { cerrarParrafo(); cerrarLista(); cerrarCita(); };
+
+    lineas.forEach((linea) => {
+        if (!linea.trim()) { cerrarTodo(); return; }   // línea en blanco: separa bloques
+
+        const titulo = linea.match(/^\s{0,3}(#{1,3})\s+(.*)$/);
+        if (titulo) {
+            cerrarTodo();
+            const nivel = titulo[1].length + 2;   // # -> h3, ## -> h4, ### -> h5
+            salida.push('<h' + nivel + '>' + renderLinea(titulo[2].trim()) + '</h' + nivel + '>');
+            return;
+        }
+
+        const vineta = linea.match(/^\s*[-*+]\s+(.*)$/);
+        if (vineta) {
+            cerrarParrafo(); cerrarCita();
+            if (lista !== 'ul') { cerrarLista(); salida.push('<ul>'); lista = 'ul'; }
+            salida.push('<li>' + renderLinea(vineta[1]) + '</li>');
+            return;
+        }
+
+        const numerada = linea.match(/^\s*\d+[.)]\s+(.*)$/);
+        if (numerada) {
+            cerrarParrafo(); cerrarCita();
+            if (lista !== 'ol') { cerrarLista(); salida.push('<ol>'); lista = 'ol'; }
+            salida.push('<li>' + renderLinea(numerada[1]) + '</li>');
+            return;
+        }
+
+        const citaLinea = linea.match(/^\s*(?:&gt;|>)\s?(.*)$/);
+        if (citaLinea) {
+            cerrarParrafo(); cerrarLista();
+            if (!cita) { salida.push('<blockquote>'); cita = true; }
+            salida.push('<p>' + renderLinea(citaLinea[1]) + '</p>');
+            return;
+        }
+
+        cerrarLista(); cerrarCita();
+        parrafo.push(renderLinea(linea));
+    });
+
+    cerrarTodo();
+    return salida.join('');
+}
+
+// El mismo texto, pero sin marcas: para el extracto de la tarjeta del feed.
+function sinFormato(texto) {
+    return String(texto || '')
+        .replace(/<image>[\s\S]*?<\/image>/gi, ' ')
+        .replace(/^\s*(#{1,4}|[-*+]|\d+[.)]|>)\s+/gm, '')
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/[*_`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+// ============================================================
 // VISTA DE LECTURA
 // ============================================================
 // `conAcciones` decide si se pintan los botones de editar/eliminar. Por defecto
@@ -618,9 +811,9 @@ function pintarLectura(p, conAcciones) {
     const autor = p.nombre_artista || 'Artista';
     const bloquesHTML = (p.bloques || []).map((b) => {
         if (b.tipo === 'texto') {
-            // pre-wrap + justificado: respeta los párrafos tal como los escribió
-            // el autor, sin interpretar nada como HTML.
-            return `<p class="problog-lectura-texto">${renderText(b.contenido)}</p>`;
+            // Dentro va el HTML que genera renderMarkdown() a partir de las
+            // marcas ligeras; el texto del autor ya viene escapado.
+            return `<div class="problog-lectura-texto">${renderMarkdown(b.contenido)}</div>`;
         }
         const url = imagenes[b.slot];
         if (!url) return '';   // el backend ya filtra estos, pero por si acaso
@@ -909,6 +1102,12 @@ export function setupProblogs() {
         ajustarAltoContenido();
     });
     archivoEl?.addEventListener('change', alElegirImagen);
+
+    // Los iconos de formato: un solo listener delegado para todos.
+    document.getElementById('problog-anadir')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-formato]');
+        if (btn) aplicarFormato(btn.dataset.formato);
+    });
 
     // El feed se abre con el icono del header. Se OBSERVA la clase de la sección
     // en vez de engancharse a ese botón: así funciona sin depender de quién la

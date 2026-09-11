@@ -312,6 +312,11 @@
     cursor: default;
 }
 
+/* Las letras B / I / H de los iconos de formato van con la tipografía de la app. */
+#crear-problogs-contenido .problog-anadir-btn svg text {
+    font-family: inherit;
+}
+
 #crear-problogs-contenido .problog-contador {
     margin: 0;
     font-size: 11px;
@@ -652,8 +657,10 @@
 }
 
 /* El texto del blog: JUSTIFICADO, con guionado y respetando los párrafos y
-   saltos de línea tal como los escribió el autor (white-space: pre-wrap). Es
-   texto plano: aquí no se interpreta nada como HTML. */
+   saltos de línea tal como los escribió el autor. Aquí dentro va el HTML que
+   genera renderMarkdown() a partir de las marcas ligeras (**negrita**, ## , - ,
+   > , [texto](url)): son etiquetas nuestras, nunca HTML del usuario (su texto
+   se escapa antes). */
 .problog-lectura-texto {
     margin: 0 0 20px;
     font-size: 16px;
@@ -663,9 +670,72 @@
     text-justify: inter-word;
     hyphens: auto;
     -webkit-hyphens: auto;
-    white-space: pre-wrap;
     overflow-wrap: break-word;
 }
+
+/* El pre-wrap va en los párrafos y no en el contenedor: si no, los saltos de
+   línea que hay entre las etiquetas del HTML se verían como huecos. */
+.problog-lectura-texto p {
+    margin: 0 0 16px;
+    white-space: pre-wrap;
+}
+
+.problog-lectura-texto > :last-child {
+    margin-bottom: 0;
+}
+
+.problog-lectura-texto h3,
+.problog-lectura-texto h4,
+.problog-lectura-texto h5 {
+    margin: 0 0 12px;
+    line-height: 1.3;
+    font-weight: 700;
+    text-align: left;
+    hyphens: none;
+    color: var(--color-ink);
+}
+
+.problog-lectura-texto h3 { font-size: 1.35rem; }
+.problog-lectura-texto h4 { font-size: 1.15rem; }
+.problog-lectura-texto h5 { font-size: 1rem; }
+
+.problog-lectura-texto ul,
+.problog-lectura-texto ol {
+    margin: 0 0 16px;
+    padding-left: 24px;
+    text-align: left;
+}
+
+.problog-lectura-texto li {
+    margin-bottom: 6px;
+    white-space: pre-wrap;
+}
+
+.problog-lectura-texto blockquote {
+    margin: 0 0 16px;
+    padding: 4px 0 4px 14px;
+    border-left: 3px solid var(--color-gray-300);
+    color: var(--color-gray-500);
+    font-style: italic;
+    text-align: left;
+}
+
+.problog-lectura-texto code {
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--color-gray-100);
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.9em;
+}
+
+.problog-lectura-texto a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.problog-lectura-texto strong { font-weight: 700; }
+.problog-lectura-texto em { font-style: italic; }
 
 .problog-lectura-figura {
     margin: 0 0 22px;
@@ -720,6 +790,14 @@
 
 [data-theme="dark"] .problog-lectura-cab {
     border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .problog-lectura-texto blockquote {
+    border-left-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .problog-lectura-texto code {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] #problogs .problogs-filtro,
