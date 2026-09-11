@@ -49,10 +49,14 @@ function init() {
 // ============================================================
 const TECLADO_UMBRAL = 24;          // px de teclado para considerarlo abierto
 const NAV_ALTO_FALLBACK = 60;       // alto del nav si no se puede medir
-const GAP_CABECERA = 28;            // aire entre la cabecera y el cajón (subir/bajar aquí)
+const FRACCION_ALTO = 0.5;          // la hoja arranca en la MITAD de la pantalla
+const MIN_ALTO_CAJON = 220;         // alto minimo util cuando el teclado empuja
+const GAP_CABECERA = 12;            // suelo: nunca sube por encima de la cabecera
 
 let alturaCabeceraMem = 0;
 let alturaNavMem = 0;
+let altoBase = 0;                   // alto real de la pantalla (el teclado no lo encoge)
+let anchoBase = 0;                   // para detectar rotacion
 let escuchandoTeclado = false;
 let swipeActivo = false;
 let swipeStartY = 0;
@@ -74,17 +78,22 @@ function altoNav() {
     return alturaNavMem || NAV_ALTO_FALLBACK;
 }
 
+// Alto de referencia de la pantalla. El teclado puede encoger el layout, asi que
+// se guarda el MAYOR alto visto: la "mitad de la pantalla" no debe bailar al
+// abrir el teclado. Un cambio de ancho delata una rotacion y se reinicia.
+function actualizarAltoBase() {
+    const h = window.innerHeight || 0;
+    const w = window.innerWidth || 0;
+    if (!h) return;
+    if (Math.abs(w - anchoBase) > 40) { anchoBase = w; altoBase = h; return; }
+    if (h > altoBase) altoBase = h;
+}
+
 function ajustarGeometria() {
     if (!drawer) return;
     const innerH = window.innerHeight || 0;
     if (!innerH) return;
-
-    // Si el cajon no esta abierto no se toca nada (el estado del teclado es
-    // competencia del chat, que usa su propia clase).
-    if (!drawer.classList.contains('visible')) {
-        document.body.classList.remove('cajon-teclado');
-        return;
-    }
+    actualizarAltoBase();
 
     const vv = window.visualViewport;
     // El sistema desplaza el viewport visual para "mostrar" el input enfocado.
@@ -92,18 +101,35 @@ function ajustarGeometria() {
     const pan = vv ? Math.max(0, Math.round(vv.offsetTop || 0)) : 0;
     const visH = vv && vv.height ? vv.height : innerH;
 
-    // El cajón NO llega hasta la cabecera: se deja un aire para que se vea que
-    // es una hoja flotante sobre la galería.
-    const top = Math.max(0, Math.round(altoCabecera() + pan + GAP_CABECERA));
+    // Borde INFERIOR de la hoja: el teclado si esta abierto; si no, encima del nav.
     const bordeTeclado = Math.round(innerH - pan - visH);
     const bottom = Math.max(altoNav(), bordeTeclado);
+    // Posicion REAL (en pantalla) de ese borde inferior. Se usa para el limite de
+    // altura util: con el layout encogido el borde no esta en el teclado sino
+    // sobre el nav, y medir sobre el teclado dejaria la hoja demasiado corta.
+    const bordeInferiorPantalla = innerH - pan - bottom;
+
+    // La hoja arranca en la MITAD de la pantalla. El tope inferior de esa mitad
+    // es la cabecera (nunca por encima suya), y por arriba se sube solo lo justo
+    // para conservar un alto utilizable cuando el teclado empuja.
+    const suelo = altoCabecera() + GAP_CABECERA;
+    const mitad = Math.round(altoBase * FRACCION_ALTO);
+    const limiteTeclado = Math.round(bordeInferiorPantalla - MIN_ALTO_CAJON);
+    const topPantalla = Math.max(0, Math.min(Math.max(mitad, suelo), Math.max(suelo, limiteTeclado)));
+
+    const top = Math.round(topPantalla + pan);
 
     drawer.style.top = top + 'px';
     drawer.style.bottom = bottom + 'px';
     // El teclado tapa la franja donde vive el nav: se oculta para que no
     // aparezca en el hueco mientras el teclado se despliega. Clase PROPIA
-    // (no se usa la del chat) para no interferir entre modulos.
-    document.body.classList.toggle('cajon-teclado', bordeTeclado > TECLADO_UMBRAL);
+    // (no se usa la del chat) para no interferir entre modulos, y solo se toca
+    // si el cajon esta abierto.
+    if (drawer.classList.contains('visible')) {
+        document.body.classList.toggle('cajon-teclado', bordeTeclado > TECLADO_UMBRAL);
+    } else {
+        document.body.classList.remove('cajon-teclado');
+    }
 }
 
 function iniciarEscuchaTeclado() {
@@ -133,10 +159,17 @@ export function abrirComentarios(obraId, cardEl) {
     drawer.style.transition = '';
 
     drawer.classList.remove('hidden');
-    // Geometria ANTES de mostrarlo: asi no se ve ningun salto al aparecer.
-    drawer.classList.add('visible');
+    // 1) Geometria con el cajon aun NO visible: arranca ya en su sitio, asi no
+    //    se ve ningun salto de posicion.
     ajustarGeometria();
-    drawer.offsetHeight;   // reflow para que la animacion de entrada corra
+    // 2) REFLOW OBLIGATORIO. El cajon venia de display:none, asi que su estado
+    //    inicial (transform: translateY(100%), opacity: 0) solo existe a partir
+    //    de este momento. Si no se fuerza AQUI el recalculo, el navegador aplica
+    //    el estado inicial y el final en el mismo frame: no hay nada que
+    //    interpolar y la hoja aparece DE GOLPE, sin animacion.
+    drawer.offsetHeight;
+    // 3) Ahora si: arranca la transicion de entrada.
+    drawer.classList.add('visible');
 
     cargarComentarios(obraId);
 }
@@ -152,14 +185,15 @@ function cerrarComentarios() {
     drawer.style.transition = '';
     drawer.classList.remove('visible');
 
-    const ocultar = () => {
+    // Un unico temporizador, mas largo que la transicion mas lenta (transform
+    // 0.42s). NO se usa transitionend: con dos propiedades animandose dispara
+    // con la primera que acaba (la opacidad, a los 0.3s) y ocultaria el cajon
+    // cortando el deslizamiento por la mitad.
+    setTimeout(() => {
         if (!drawer.classList.contains('visible')) {
             drawer.classList.add('hidden');
         }
-    };
-    drawer.addEventListener('transitionend', ocultar, { once: true });
-    // Respaldo por si transitionend no dispara.
-    setTimeout(ocultar, 400);
+    }, 500);
 
     obraIdActual = null;
     cardActual = null;
