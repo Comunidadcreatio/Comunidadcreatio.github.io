@@ -727,3 +727,41 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   5. LA SECCIÓN DE CREAR, A SANGRE Y PEGADA AL HEADER
+   ------------------------------------------------------------
+   El hueco de arriba: al crear un Problog se ocultan las barras fijas de
+   Cavents (body.creando-problogs), pero el panel seguía reservando el sitio
+   que les deja (136px de padding + 32px de margen) y el formulario añadía
+   24px más. Casi 200px de agujero entre el header y la sección; sin barras
+   que tapar, no hacen falta.
+
+   El aire lateral eran 64px por lado: 24 del `main` (su padding lateral es
+   24px tanto en móvil como en escritorio), 20 del panel y 20 del formulario.
+   Se descartan los tres, así que la sección ocupa el ancho completo.
+
+   Todo va bajo body.creando-problogs para no tocar el formulario de Cavents,
+   que sí necesita su hueco superior para la barra de pasos.
+   ============================================================ */
+body.creando-problogs #panel-artista {
+    max-width: none;
+    /* `width: auto` (y no 100%) para que los márgenes negativos ensanchen la
+       caja hasta el ancho completo; con width:100% se quedaría corta por la
+       derecha. */
+    width: auto;
+    margin-top: 0;
+    margin-left: -24px;   /* se sale del padding lateral del main */
+    margin-right: -24px;
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* `#panel-artista form` mete 24px arriba y 20px a los lados a todos los
+   formularios del panel; el del problog va a sangre. */
+body.creando-problogs #panel-artista #problog-form {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
