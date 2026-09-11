@@ -109,13 +109,47 @@
 
 /* --- Marco del contenido ---
    Rectángulo sin relleno y con un borde fino, como la línea del título. Dentro
-   está el campo editable: el autor escribe seguido y las imágenes se colocan
-   como etiquetas <image>nombre.jpg</image>. */
+   van, de arriba abajo: el título centrado, las herramientas de formato y el
+   campo editable (donde las imágenes se colocan como <image>nombre.jpg</image>). */
 #crear-problogs-contenido .problog-marco {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     padding: 10px 12px;
     border: 1px solid var(--color-gray-300);
     border-radius: 10px;
     background: transparent;
+}
+
+#crear-problogs-contenido .problog-marco-titulo {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-gray-500);
+}
+
+/* Etiquetas: la misma línea de campo que usa Cavents (solo el borde de abajo),
+   justo debajo del marco donde se escribe. */
+#crear-problogs-contenido .problog-campo #problog-etiquetas {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 0;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+}
+
+#crear-problogs-contenido .problog-campo #problog-etiquetas:focus {
+    border-bottom-color: var(--color-ink);
 }
 
 /* El campo ocupa el marco entero y crece con lo que se escribe (el alto lo
@@ -336,29 +370,6 @@
 /* Las letras B / I / H de los iconos de formato van con la tipografía de la app. */
 #crear-problogs-contenido .problog-anadir-btn svg text {
     font-family: inherit;
-}
-
-#crear-problogs-contenido .problog-contador {
-    margin: 0;
-    font-size: 11px;
-    color: var(--color-gray-500);
-    text-align: right;
-}
-
-/* --- Estado (publicado / borrador) --- */
-#crear-problogs-contenido .problog-estados {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-}
-
-#crear-problogs-contenido .problog-estados label {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 14px;
-    color: var(--color-ink);
-    cursor: pointer;
 }
 
 /* --- Acciones finales --- */
@@ -949,25 +960,12 @@ body.creando-problogs #panel-artista #problog-form {
 /* ============================================================
    6. BARRA INFERIOR DE PROBLOGS
    ------------------------------------------------------------
-   Ocupa el mismo sitio que la barra de pasos de Cavents y comparte su aspecto
-   (las reglas de #obra-step-bar en formularios.css la incluyen). Solo se ve
-   mientras se está creando un Problog.
-   ------------------------------------------------------------
-   Translúcida con desenfoque, como las otras barras de la app (el pie del auth
-   y la cabecera): la de Cavents usa --color-white, que en tema oscuro es
-   #0a0a0a y se veía como una franja negra opaca.
+   Ocupa el mismo sitio que la barra de pasos de Cavents y comparte sus reglas
+   (incluido el fondo translúcido con desenfoque, que ahora está en
+   formularios.css para las dos). Solo se ve creando un Problog.
    ============================================================ */
 #problog-nav-bar {
     display: none;
-    background: rgba(255, 255, 255, 0.20);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-}
-
-[data-theme="dark"] #problog-nav-bar {
-    background: rgba(10, 10, 10, 0.20);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 }
 
 body.creando-problogs #problog-nav-bar {

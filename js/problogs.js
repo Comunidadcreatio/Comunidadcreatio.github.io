@@ -47,7 +47,7 @@ import { artistaActual } from './auth.js?v=f2799071b6';
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
 
-let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
+let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, guardarBtn, limpiarBtn, vistaPreviaBtn;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
 // Imágenes del contenido en curso, por el nombre que aparece en la etiqueta:
@@ -135,9 +135,10 @@ function contarImagenes() {
         .filter((t) => t.tipo === 'imagen').length;
 }
 
+// El número de imágenes ya no se enseña (se quitó el contador), pero sigue
+// haciendo falta para no pasar del máximo: el icono se desactiva al llegar.
 function actualizarContador() {
     const n = contarImagenes();
-    if (contadorEl) contadorEl.textContent = n + ' / ' + MAX_IMAGENES + ' imágenes';
     if (addImagenBtn) addImagenBtn.disabled = n >= MAX_IMAGENES;
 }
 
@@ -1196,7 +1197,6 @@ export function setupProblogs() {
     archivoEl = document.getElementById('problog-file');
     etiquetasEl = document.getElementById('problog-etiquetas');
     addImagenBtn = document.getElementById('problog-add-imagen');
-    contadorEl = document.getElementById('problog-contador-imagenes');
     // Guardar y limpiar viven en la barra inferior (antes los tenía el propio
     // formulario, junto al final).
     guardarBtn = document.getElementById('problog-nav-publicar');
