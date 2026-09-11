@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.543';
+        var currentVer = '1.0.544';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -76,7 +76,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=b4359843a0">
+    <link rel="stylesheet" href="css/style.css?v=058a7a064b">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
@@ -304,6 +304,7 @@
     <!-- Cajón de comentarios -->
     <div id="comentarios-drawer" class="comentarios-drawer hidden">
         <div class="comentarios-drawer-header">
+            <span class="comentarios-asidero" aria-hidden="true"></span>
             <h3>Comentarios</h3>
         </div>
         <div class="comentarios-lista" id="comentarios-lista"></div>
@@ -1011,7 +1012,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=ed94beb938" type="module"></script>
+    <script src="js/main.js?v=5899acf4b4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

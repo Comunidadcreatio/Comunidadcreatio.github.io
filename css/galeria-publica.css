@@ -1235,14 +1235,29 @@ html, body {
 .comentarios-drawer.hidden {
     display: none;
 }
-/* Header: solo el título, centrado. Sin flecha de cerrar ni versión. */
+/* Header: la barrita de arrastre arriba y el título centrado debajo. Sin flecha
+   de cerrar ni versión. TODA esta franja es la zona de arrastre de la hoja, así
+   que `touch-action: none` impide que el navegador se quede el gesto para
+   hacer scroll y el arrastre funcione siempre. */
 .comentarios-drawer-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 16px 20px 12px;
+    gap: 8px;
+    padding: 10px 20px 12px;
     border-bottom: 1px solid rgba(0,0,0,0.08);
     flex-shrink: 0;
+    touch-action: none;
+    cursor: grab;
+}
+.comentarios-asidero {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.18);
+}
+[data-theme="dark"] .comentarios-asidero {
+    background: rgba(255,255,255,0.22);
 }
 .comentarios-drawer-header h3 {
     margin: 0;

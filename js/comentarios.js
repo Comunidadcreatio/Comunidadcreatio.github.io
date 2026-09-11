@@ -49,17 +49,25 @@ function init() {
 // ============================================================
 const TECLADO_UMBRAL = 24;          // px de teclado para considerarlo abierto
 const NAV_ALTO_FALLBACK = 60;       // alto del nav si no se puede medir
-const FRACCION_ALTO = 0.5;          // la hoja arranca en la MITAD de la pantalla
+const FRACCION_ALTO = 0.5;          // altura por defecto: la MITAD de la pantalla
 const MIN_ALTO_CAJON = 220;         // alto minimo util cuando el teclado empuja
 const GAP_CABECERA = 12;            // suelo: nunca sube por encima de la cabecera
+const UMBRAL_CIERRE = 80;           // px arrastrando la LISTA para cerrar
+const RESISTENCIA = 0.55;           // la hoja acompana al dedo algo menos que el
+const EXCESO_ARRASTRE = 90;         // px que se puede pasar por debajo del limite
 
 let alturaCabeceraMem = 0;
 let alturaNavMem = 0;
 let altoBase = 0;                   // alto real de la pantalla (el teclado no lo encoge)
-let anchoBase = 0;                   // para detectar rotacion
+let anchoBase = 0;                  // para detectar rotacion
 let escuchandoTeclado = false;
-let swipeActivo = false;
-let swipeStartY = 0;
+// Gesto en curso: { tipo: 'mover' | 'cerrar' | 'esperar', startY, startTopPantalla }
+let gesto = null;
+let topAplicado = 0;                // top actual en px (coords de layout)
+let posUsuario = null;              // altura elegida por el usuario (coords de PANTALLA)
+let panActual = 0;                  // desplazamiento del viewport visual
+let rangoTopMin = 0;                // limite superior (lo mas alto posible)
+let rangoTopMax = 0;                // limite inferior (conservando el alto minimo)
 let swipeDist = 0;
 
 function altoCabecera() {
@@ -100,6 +108,7 @@ function ajustarGeometria() {
     // Se descuenta para que el cajon quede quieto en pantalla.
     const pan = vv ? Math.max(0, Math.round(vv.offsetTop || 0)) : 0;
     const visH = vv && vv.height ? vv.height : innerH;
+    panActual = pan;
 
     // Borde INFERIOR de la hoja: el teclado si esta abierto; si no, encima del nav.
     const bordeTeclado = Math.round(innerH - pan - visH);
@@ -109,18 +118,22 @@ function ajustarGeometria() {
     // sobre el nav, y medir sobre el teclado dejaria la hoja demasiado corta.
     const bordeInferiorPantalla = innerH - pan - bottom;
 
-    // La hoja arranca en la MITAD de la pantalla. El tope inferior de esa mitad
-    // es la cabecera (nunca por encima suya), y por arriba se sube solo lo justo
-    // para conservar un alto utilizable cuando el teclado empuja.
-    const suelo = altoCabecera() + GAP_CABECERA;
-    const mitad = Math.round(altoBase * FRACCION_ALTO);
-    const limiteTeclado = Math.round(bordeInferiorPantalla - MIN_ALTO_CAJON);
-    const topPantalla = Math.max(0, Math.min(Math.max(mitad, suelo), Math.max(suelo, limiteTeclado)));
+    // Limites verticales entre los que el usuario puede colocar la hoja:
+    //   arriba: no puede pasar por encima de la cabecera.
+    //   abajo:  debe conservar el alto minimo utilizable.
+    rangoTopMin = altoCabecera() + GAP_CABECERA;
+    rangoTopMax = Math.max(rangoTopMin, Math.round(bordeInferiorPantalla - MIN_ALTO_CAJON));
 
-    const top = Math.round(topPantalla + pan);
-
-    drawer.style.top = top + 'px';
     drawer.style.bottom = bottom + 'px';
+
+    // Mientras el dedo esta moviendo la hoja, manda el dedo: no se recoloca.
+    if (!(gesto && gesto.tipo === 'mover')) {
+        const porDefecto = Math.round(altoBase * FRACCION_ALTO);
+        const deseado = (posUsuario === null) ? porDefecto : posUsuario;
+        const topPantalla = Math.min(Math.max(deseado, rangoTopMin), rangoTopMax);
+        topAplicado = Math.round(topPantalla + pan);
+        drawer.style.top = topAplicado + 'px';
+    }
     // El teclado tapa la franja donde vive el nav: se oculta para que no
     // aparezca en el hueco mientras el teclado se despliega. Clase PROPIA
     // (no se usa la del chat) para no interferir entre modulos, y solo se toca
@@ -177,6 +190,10 @@ export function abrirComentarios(obraId, cardEl) {
 function cerrarComentarios() {
     if (!drawer) return;
     document.body.classList.remove('cajon-teclado');
+    // La altura elegida a mano no se arrastra a la proxima apertura: cada vez
+    // que se abre, la hoja vuelve a su sitio por defecto.
+    posUsuario = null;
+    gesto = null;
     // Bajar el teclado: sin esto el cajon se cierra pero el teclado se queda,
     // y al reabrir aparece en un estado intermedio.
     if (input && document.activeElement === input) input.blur();
@@ -339,41 +356,114 @@ drawer?.addEventListener('click', (e) => {
     if (e.target === drawer) cerrarComentarios();
 });
 
-// Arrastrar hacia abajo para cerrar. Solo se inicia si la lista esta arriba del
-// todo, para no robarle el scroll a los comentarios. El `transform` se usa
-// unicamente para seguir el dedo.
+// ============================================================
+// GESTOS VERTICALES
+// ------------------------------------------------------------
+// Hay DOS gestos y se decide por DONDE empieza el toque:
+//
+//   - En la CABECERA (la barrita de arriba): MUEVE la hoja y la deja a la
+//     altura que el usuario quiera. Si se arrastra mas abajo del limite, se
+//     cierra. Esto funciona SIEMPRE, sin importar el scroll de la lista.
+//
+//   - En la LISTA: si la lista esta arriba del todo, la hoja sigue al dedo y se
+//     cierra al pasar el umbral. Si la lista esta a medio scrollear, el gesto es
+//     para la lista... PERO si dentro del MISMO gesto la lista llega arriba, la
+//     hoja toma el relevo sin tener que levantar el dedo (traspaso). Antes habia
+//     que soltar, volver a subir y arrastrar otra vez.
+// ============================================================
+function esCabecera(nodo) {
+    return !!(nodo && nodo.closest && nodo.closest('.comentarios-drawer-header'));
+}
+
 drawer?.addEventListener('touchstart', (e) => {
-    swipeActivo = lista.scrollTop <= 0;
-    if (swipeActivo) {
-        swipeStartY = e.touches[0].clientY;
-        swipeDist = 0;
+    if (!drawer.classList.contains('visible')) return;
+    const y = e.touches[0].clientY;
+
+    if (esCabecera(e.target)) {
+        // Referencia en coords de PANTALLA: el pan del viewport no interviene.
+        gesto = { tipo: 'mover', startY: y, startTopPantalla: topAplicado - panActual };
+        drawer.style.transition = 'none';
+        return;
+    }
+
+    swipeDist = 0;
+    if (lista.scrollTop <= 0) {
+        gesto = { tipo: 'cerrar', startY: y };
+    } else {
+        // La lista scrollea. Se queda a la espera de si llega arriba.
+        gesto = { tipo: 'esperar', startY: y };
     }
 }, { passive: true });
 
 drawer?.addEventListener('touchmove', (e) => {
-    if (!swipeActivo) return;
-    const dist = e.touches[0].clientY - swipeStartY;
-    if (dist > 6) {
-        // Resistencia suave: el cajon acompana al dedo pero menos que el.
-        swipeDist = Math.min(dist * 0.55, 140);
+    if (!gesto) return;
+    const y = e.touches[0].clientY;
+
+    if (gesto.tipo === 'esperar') {
+        if ((y - gesto.startY) > 0 && lista.scrollTop <= 0) {
+            // La lista ya esta arriba y el dedo sigue bajando: la hoja toma el
+            // relevo DESDE AQUI. Se reinicia la referencia de Y para que la hoja
+            // no de un salto con todo el recorrido acumulado del scroll.
+            gesto = { tipo: 'cerrar', startY: y };
+            swipeDist = 0;
+        } else {
+            return;
+        }
+    }
+
+    if (gesto.tipo === 'mover') {
+        const dy = y - gesto.startY;
+        // Se permite pasarse un poco por abajo: ese exceso es la intencion de
+        // cerrar, y se resuelve al soltar.
+        const topPantalla = Math.min(
+            Math.max(gesto.startTopPantalla + dy, rangoTopMin),
+            rangoTopMax + EXCESO_ARRASTRE
+        );
+        topAplicado = Math.round(topPantalla + panActual);
+        drawer.style.top = topAplicado + 'px';
+        return;
+    }
+
+    // tipo 'cerrar'
+    const dy = y - gesto.startY;
+    if (dy > 6) {
+        // Resistencia suave: la hoja acompana al dedo pero menos que el.
+        swipeDist = Math.min(dy * RESISTENCIA, 160);
         drawer.style.transition = 'none';
         drawer.style.transform = 'translateY(' + Math.round(swipeDist) + 'px)';
     }
 }, { passive: true });
 
 drawer?.addEventListener('touchend', () => {
-    if (!swipeActivo) return;
-    swipeActivo = false;
-    if (swipeDist > 80) {
+    if (!gesto) return;
+    const tipo = gesto.tipo;
+    gesto = null;
+
+    if (tipo === 'mover') {
         drawer.style.transition = '';
-        swipeDist = 0;
-        cerrarComentarios();
+        if ((topAplicado - panActual) > rangoTopMax + EXCESO_ARRASTRE / 2) {
+            cerrarComentarios();          // se arrastro claramente hacia abajo
+            return;
+        }
+        // Se guarda la eleccion en coords de PANTALLA, para que sobreviva a los
+        // cambios de viewport (teclado, pan) y se reaplique al cerrarlo.
+        posUsuario = Math.min(Math.max(topAplicado - panActual, rangoTopMin), rangoTopMax);
+        ajustarGeometria();
         return;
     }
-    // No llego al umbral: vuelve a su sitio. Un toque simple no cierra nada.
-    drawer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
-    drawer.style.transform = '';
-    swipeDist = 0;
+
+    if (tipo === 'cerrar') {
+        if (swipeDist > UMBRAL_CIERRE) {
+            drawer.style.transition = '';
+            swipeDist = 0;
+            cerrarComentarios();
+            return;
+        }
+        // No llego al umbral: vuelve a su sitio. Un toque simple no cierra nada.
+        drawer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+        drawer.style.transform = '';
+        swipeDist = 0;
+    }
 });
 
 // Delegación de eventos para replies y likes
