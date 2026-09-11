@@ -5,7 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 
 let obraIdActual = null;
 let cardActual = null;
-let drawer, lista, input, btnEnviar, btnCerrar, nav, versionEl;
+let drawer, lista, input, btnEnviar, nav;
 
 function init() {
     if (drawer) return;
@@ -13,17 +13,7 @@ function init() {
     lista     = document.getElementById('comentarios-lista');
     input     = document.getElementById('comentarios-input');
     btnEnviar = document.getElementById('comentarios-enviar');
-    btnCerrar = document.getElementById('comentarios-close');
     nav       = document.getElementById('toggle-panel');
-    versionEl = document.getElementById('comentarios-version');
-    // Mostrar la versión en el cajón (para poder comprobar qué build se está
-    // probando en el dispositivo).
-    if (versionEl) {
-        fetch('version.json', { cache: 'no-store' })
-            .then(r => r.json())
-            .then(v => { versionEl.textContent = 'v' + (v.version || '?'); })
-            .catch(() => { versionEl.textContent = ''; });
-    }
     iniciarEscuchaTeclado();
 }
 
@@ -59,7 +49,7 @@ function init() {
 // ============================================================
 const TECLADO_UMBRAL = 24;          // px de teclado para considerarlo abierto
 const NAV_ALTO_FALLBACK = 60;       // alto del nav si no se puede medir
-const GAP_CABECERA = 12;            // aire entre la cabecera y el cajón (subir/bajar aquí)
+const GAP_CABECERA = 28;            // aire entre la cabecera y el cajón (subir/bajar aquí)
 
 let alturaCabeceraMem = 0;
 let alturaNavMem = 0;
@@ -300,8 +290,6 @@ function timeAgoShort(dateStr) {
 
 // Event listeners — se ejecutan al cargar el módulo (DOM ya está listo)
 init();
-
-btnCerrar?.addEventListener('click', cerrarComentarios);
 
 btnEnviar?.addEventListener('click', () => enviarComentario());
 

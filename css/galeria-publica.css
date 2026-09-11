@@ -1211,7 +1211,14 @@ html, body {
     display: flex;
     flex-direction: column;
     transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    opacity: 0;
+    /* Apertura/cierre en capa propia (solo transform + opacity, nada de layout)
+       con una curva de desaceleración larga: entra rápido y se asienta suave en
+       vez de frenar en seco. El desvanecido hace que el contenido aparezca
+       acompañando al movimiento en lugar de saltar. */
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.3s ease-out;
+    will-change: transform;
     /* Sombra corta: antes era 0 -8px 32px, que proyectaba una banda oscura de
        ~40px por encima de la hoja (sobre la cabecera) y se veía como una manta
        negra. Una elevación sutil basta para que la hoja se lea como flotante. */
@@ -1223,15 +1230,16 @@ html, body {
 }
 .comentarios-drawer.visible {
     transform: translateY(0);
+    opacity: 1;
 }
 .comentarios-drawer.hidden {
     display: none;
 }
-/* Header */
+/* Header: solo el título, centrado. Sin flecha de cerrar ni versión. */
 .comentarios-drawer-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
     padding: 16px 20px 12px;
     border-bottom: 1px solid rgba(0,0,0,0.08);
     flex-shrink: 0;
@@ -1241,27 +1249,7 @@ html, body {
     font-size: 1.1rem;
     color: var(--color-ink);
     font-weight: 600;
-}
-/* Versión de la app (para comprobar qué build se está usando) */
-.comentarios-version {
-    margin-left: auto;
-    font-size: 10px;
-    color: var(--color-gray-500);
-    opacity: 0.8;
-}
-.comentarios-close {
-    background: none;
-    border: none;
-    color: var(--color-ink);
-    width: 32px;
-    height: 32px;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 1;
+    text-align: center;
 }
 /* Lista de comentarios */
 .comentarios-lista {
