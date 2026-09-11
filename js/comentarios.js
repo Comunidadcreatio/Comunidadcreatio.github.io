@@ -2,6 +2,8 @@
 // Drawer de comentarios — se desliza desde la parte inferior.
 import { apiRequest } from './config.js?v=2e0c2e7288';
 import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
+// === DIAGNOSTICO TEMPORAL (quitar junto con js/diag-teclado.js) ===
+import { DIAG_ON, diagTick, diagFrame } from './diag-teclado.js?v=05d834301d';
 
 let obraIdActual = null;
 let cardActual = null;
@@ -91,6 +93,37 @@ let tecladoAbiertoAhora = false;
 let scrollBloqueado = null;    // scroll de página fijado mientras el teclado está abierto
 let swipePulling = false;      // arrastre para cerrar en curso (declarado aquí porque
                                // la compensación del viewport lo consulta)
+
+// === DIAGNOSTICO TEMPORAL (quitar junto con js/diag-teclado.js) ===
+// Retrato de los valores reales del dispositivo en este instante.
+function diagSnapshot() {
+    const vv = window.visualViewport;
+    const area = areaInput();
+    const r = drawer ? drawer.getBoundingClientRect() : null;
+    const ra = area ? area.getBoundingClientRect() : null;
+    const innerH = window.innerHeight || 0;
+    const visH = vv && vv.height ? Math.round(vv.height) : innerH;
+    return {
+        ih: innerH,
+        vh: visH,
+        ot: vv && vv.offsetTop ? Math.round(vv.offsetTop) : 0,
+        ol: vv && vv.offsetLeft ? Math.round(vv.offsetLeft) : 0,
+        sc: vv && vv.scale ? Math.round(vv.scale * 100) / 100 : 1,
+        kb: Math.max(0, Math.round(innerH - visH)),
+        base: alturaLayoutBase,
+        red: alturaLayoutBase - innerH > 40,
+        ab: tecladoAbiertoAhora,
+        po: Math.round(padObjetivo),
+        pa: Math.round(padActual),
+        dtop: drawer ? drawer.style.top : '',
+        dh: drawer ? drawer.style.height : '',
+        rt: r ? Math.round(r.top) : 0,
+        rb: r ? Math.round(r.bottom) : 0,
+        ib: ra ? Math.round(ra.bottom) : 0,
+        sy: Math.round(window.scrollY || 0)
+    };
+}
+// === FIN DIAGNOSTICO TEMPORAL ===
 
 // Desplazamiento vertical que aporta el transform de CSS de un elemento
 // (0 si no tiene).
@@ -197,6 +230,7 @@ function buclePanTeclado() {
             compensarPagina(pan, true);
         }
     }
+    if (DIAG_ON) diagFrame(diagSnapshot());                  // DIAGNOSTICO TEMPORAL
     rafPan = requestAnimationFrame(buclePanTeclado);
 }
 function aplicarPad() {
@@ -324,7 +358,10 @@ function ajustarTecladoDrawer() {
         if (!tecladoAbiertoAhora && padObjetivo <= 0.5) {
             document.body.classList.remove('teclado-abierto');
         }
+        if (DIAG_ON) diagTick('asentado', diagSnapshot());   // DIAGNOSTICO TEMPORAL
     }, GESTO_MS + 40);
+
+    if (DIAG_ON) diagTick('viewport', diagSnapshot());       // DIAGNOSTICO TEMPORAL
 }
 function setupKeyboardDrawer() {
     if (!window.visualViewport || keyboardListenerConectado) return;
@@ -499,6 +536,11 @@ input?.addEventListener('keydown', (e) => {
         enviarComentario();
     }
 });
+
+// === DIAGNOSTICO TEMPORAL: marcar el instante del foco y del blur ===
+input?.addEventListener('focus', () => { if (DIAG_ON) diagTick('focus', diagSnapshot()); });
+input?.addEventListener('blur',  () => { if (DIAG_ON) diagTick('blur',  diagSnapshot()); });
+// === FIN DIAGNOSTICO TEMPORAL ===
 
 // Cerrar al hacer clic en el fondo oscuro
 drawer?.addEventListener('click', (e) => {
