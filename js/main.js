@@ -41,6 +41,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=eb6c878bdb';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=f7ef6cf0ac';
+import { setupProblogs } from './problogs.js?v=1674ba8d82';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=3c1dfe4a1f';
 import { setupPush } from './push.js?v=1f82b96c74';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
@@ -772,6 +773,7 @@ async function init() {
 
     iniciarSeguimientoActividad();
     setupFormAccordions();
+    setupProblogs();
 }
 
 init();
