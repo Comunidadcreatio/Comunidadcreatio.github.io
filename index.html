@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.562';
+        var currentVer = '1.0.563';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -80,7 +80,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=a6d88bcdfe">
+    <link rel="stylesheet" href="css/problogs.css?v=f3aaaef29e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -726,8 +726,7 @@
                              etiquetas <image>nombre.jpg</image>. -->
                         <div id="problog-anadir" class="problog-anadir">
                             <button type="button" id="problog-add-imagen" class="problog-anadir-btn" title="Añadir imagen" aria-label="Añadir imagen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><circle cx="8.5" cy="9.5" r="1.5"/><polyline points="21 16 16 11 5 20"/></svg><span class="problog-anadir-nombre">Imagen</span></button>
-                            <button type="button" class="problog-anadir-btn" data-formato="fila" title="Imágenes en fila (una al lado de otra)" aria-label="Imágenes en fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="8" height="12" rx="1.5"/><rect x="13.5" y="6" width="8" height="12" rx="1.5"/></svg><span class="problog-anadir-nombre">En fila</span></button>
-                            <button type="button" class="problog-anadir-btn" data-formato="lado" title="Imagen al lado del texto (el texto la rodea)" aria-label="Imagen al lado del texto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8" height="14" rx="1.5"/><line x1="13" y1="8" x2="21" y2="8"/><line x1="13" y1="12" x2="21" y2="12"/><line x1="13" y1="16" x2="18" y2="16"/></svg><span class="problog-anadir-nombre">Al lado</span></button>
+                            <button type="button" class="problog-anadir-btn" data-formato="fila" title="En fila: dos bloques uno al lado del otro (imágenes, párrafos o mezcla)" aria-label="En fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="8" height="12" rx="1.5"/><rect x="13.5" y="6" width="8" height="12" rx="1.5"/></svg><span class="problog-anadir-nombre">En fila</span></button>
                             <button type="button" class="problog-anadir-btn" data-formato="negrita" title="Negrita" aria-label="Negrita"><svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="17" font-weight="800" fill="currentColor">B</text></svg><span class="problog-anadir-nombre">Negrita</span></button>
                             <button type="button" class="problog-anadir-btn" data-formato="cursiva" title="Cursiva" aria-label="Cursiva"><svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="17" font-style="italic" fill="currentColor">I</text></svg><span class="problog-anadir-nombre">Cursiva</span></button>
                             <button type="button" class="problog-anadir-btn" data-formato="titulo" title="Título de sección" aria-label="Título de sección"><svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="17" font-weight="700" fill="currentColor">H</text></svg><span class="problog-anadir-nombre">Título</span></button>
@@ -1104,7 +1103,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=f7d50a59f2" type="module"></script>
+    <script src="js/main.js?v=59e8ee9b72" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

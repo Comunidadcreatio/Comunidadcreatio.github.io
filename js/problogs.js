@@ -294,9 +294,6 @@ function aplicarFormato(tipo) {
     if (!contenidoEl) return;
     if (tipo === 'regla') { insertarMarcaBloque('---'); return; }
     if (tipo === 'fila') { insertarMarcaBloque(':fila:'); return; }
-    // «Al lado» va pegado: la imagen que se añada justo después flotará y el
-    // texto que venga detrás la rodeará.
-    if (tipo === 'lado') { insertarEnContenido(':lado: '); return; }
     const pref = PREFIJOS[tipo];
     if (pref) { prefijarLineas(pref.marca, pref.reemplaza); return; }
     const env = ENVUELTOS[tipo];
@@ -866,6 +863,86 @@ function sinFormato(texto) {
 }
 
 // ============================================================
+// MAQUETACIÓN DEL CUERPO
+// ------------------------------------------------------------
+// Los bloques se convierten en «unidades»: cada imagen es una unidad y cada
+// párrafo de texto también. Se separan por línea en blanco, así que un párrafo
+// de varias líneas sigue siendo una sola unidad.
+//
+// La marca `:fila:` pone las dos unidades siguientes una al lado de la otra, y
+// vale para cualquier mezcla: dos párrafos, un párrafo y una imagen, una imagen
+// y un párrafo… Si lo que viene detrás son todo imágenes, se siguen agrupando
+// de dos en dos (como una galería).
+// ============================================================
+function unidadesDeCuerpo(bloques) {
+    const unidades = [];
+    bloques.forEach((b) => {
+        if (b.tipo !== 'texto') { unidades.push({ tipo: 'imagen', bloque: b }); return; }
+        String(b.contenido || '').split(/\n[ \t]*\n/).forEach((parrafo) => {
+            let texto = parrafo.trim();
+            if (!texto) return;
+            // La marca puede venir sola en su párrafo o pegada al texto.
+            const marca = texto.match(/^:(fila|lado):\s*/i);
+            if (marca) {
+                if (marca[1].toLowerCase() === 'fila') unidades.push({ tipo: 'marca-fila' });
+                texto = texto.slice(marca[0].length);
+                if (!texto) return;
+            }
+            unidades.push({ tipo: 'texto', contenido: texto });
+        });
+    });
+    return unidades;
+}
+
+function pintarCuerpo(bloques, imagenes) {
+    const figura = (b) => {
+        const url = imagenes[b.slot];
+        if (!url) return '';   // el backend ya filtra estos, pero por si acaso
+        return `
+            <figure class="problog-lectura-figura">
+                <img src="${safeImgUrl(cloudinaryUrl(url, 1080))}" alt="" loading="lazy">
+                ${b.pie ? `<figcaption>${renderText(b.pie)}</figcaption>` : ''}
+            </figure>`;
+    };
+    const dibujar = (u) => (u.tipo === 'imagen'
+        ? figura(u.bloque)
+        : `<div class="problog-lectura-texto">${renderMarkdown(u.contenido)}</div>`);
+
+    const unidades = unidadesDeCuerpo(bloques);
+    const html = [];
+    let i = 0;
+    while (i < unidades.length) {
+        const u = unidades[i];
+        if (u.tipo !== 'marca-fila') {
+            html.push(dibujar(u));
+            i++;
+            continue;
+        }
+        // La fila se lleva las dos unidades siguientes; si son todo imágenes,
+        // también las que sigan.
+        const grupo = [];
+        let soloImagenes = true;
+        let j = i + 1;
+        while (j < unidades.length && grupo.length < 2) {
+            const s = unidades[j];
+            if (s.tipo === 'marca-fila') break;
+            if (s.tipo === 'texto') soloImagenes = false;
+            grupo.push(s);
+            j++;
+        }
+        if (soloImagenes) {
+            while (j < unidades.length && unidades[j].tipo === 'imagen') { grupo.push(unidades[j]); j++; }
+        }
+        const dibujadas = grupo.map(dibujar).filter(Boolean);
+        // Con una sola unidad no hay fila que hacer: se pinta normal.
+        if (dibujadas.length > 1) html.push('<div class="problog-fila">' + dibujadas.join('') + '</div>');
+        else if (dibujadas.length === 1) html.push(dibujadas[0]);
+        i = j;
+    }
+    return html.join('');
+}
+
+// ============================================================
 // VISTA DE LECTURA
 // ============================================================
 // `conAcciones` decide si se pintan los botones de editar/eliminar. Por defecto
@@ -875,70 +952,7 @@ function pintarLectura(p, conAcciones) {
     const propias = (conAcciones === undefined) ? modoMias : !!conAcciones;
     const imagenes = p.imagenes || [];
     const autor = p.nombre_artista || 'Artista';
-
-    // Una imagen suelta. `clase` añade la maquetación (en fila o flotante).
-    const figura = (b, clase) => {
-        const url = imagenes[b.slot];
-        if (!url) return '';   // el backend ya filtra estos, pero por si acaso
-        return `
-            <figure class="problog-lectura-figura${clase ? ' ' + clase : ''}">
-                <img src="${safeImgUrl(cloudinaryUrl(url, 1080))}" alt="" loading="lazy">
-                ${b.pie ? `<figcaption>${renderText(b.pie)}</figcaption>` : ''}
-            </figure>`;
-    };
-
-    // Los bloques se recorren en orden porque hay dos marcas que afectan a los
-    // que vienen detrás: `:fila:` (las imágenes van una al lado de otra) y
-    // `:lado:` (la imagen flota y el texto la rodea).
-    const bloques = p.bloques || [];
-    const html = [];
-    let i = 0;
-    while (i < bloques.length) {
-        const b = bloques[i];
-        if (b.tipo !== 'texto') {
-            html.push(figura(b));
-            i++;
-            continue;
-        }
-        const marca = String(b.contenido || '').trim().toLowerCase();
-        if (marca === ':fila:') {
-            const grupo = [];
-            let j = i + 1;
-            while (j < bloques.length && bloques[j].tipo === 'imagen') { grupo.push(bloques[j]); j++; }
-            const dibujadas = grupo.map((g) => figura(g)).filter(Boolean);
-            // Con una sola imagen no hay fila que hacer: se pinta normal.
-            if (dibujadas.length > 1) {
-                html.push('<div class="problog-fila">' + dibujadas.join('') + '</div>');
-                i = j;
-                continue;
-            }
-            if (dibujadas.length === 1) {
-                html.push(dibujadas[0]);
-                i = j;
-                continue;
-            }
-            i++;   // sin imágenes detrás, la marca no pinta nada
-            continue;
-        }
-        if (marca === ':lado:') {
-            const siguiente = bloques[i + 1];
-            if (siguiente && siguiente.tipo === 'imagen') {
-                const dibujada = figura(siguiente, 'problog-figura-flotante');
-                if (dibujada) {
-                    html.push(dibujada);
-                    i += 2;
-                    continue;
-                }
-            }
-            i++;   // sin imagen detrás, la marca no pinta nada
-            continue;
-        }
-        // Dentro va el HTML que genera renderMarkdown() a partir de las marcas
-        // ligeras; el texto del autor ya viene escapado.
-        html.push(`<div class="problog-lectura-texto">${renderMarkdown(b.contenido)}</div>`);
-        i++;
-    }
-    const bloquesHTML = html.join('');
+    const bloquesHTML = pintarCuerpo(p.bloques || [], imagenes);
 
     // En la vista de lectura también se puede editar/eliminar si es propia.
     const acciones = propias

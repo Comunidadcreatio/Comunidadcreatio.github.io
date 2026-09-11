@@ -777,8 +777,7 @@
     border-top: 1px solid var(--color-gray-300);
 }
 
-/* El cuerpo contiene los flotantes (imagen al lado del texto): con flow-root el
-   contenedor crece con ellos en vez de dejarlos salirse. */
+/* El cuerpo agrupa los bloques del texto y las imágenes. */
 .problog-lectura-cuerpo {
     display: flow-root;
 }
@@ -795,9 +794,10 @@
     background: var(--color-gray-100);
 }
 
-/* --- Imágenes en fila (`:fila:`) ---
-   Dos por fila: la marca la pone el icono «En fila» sobre las imágenes que
-   vienen detrás. */
+/* --- En fila (`:fila:`) ---
+   La marca la pone el icono «En fila» y afecta a los dos bloques que vienen
+   detrás, sean lo que sean: dos párrafos, un párrafo y una imagen, dos imágenes…
+   Cada bloque es una columna, y de dos en dos. */
 .problog-fila {
     display: flex;
     flex-wrap: wrap;
@@ -806,44 +806,25 @@
     align-items: flex-start;
 }
 
-.problog-fila .problog-lectura-figura {
+.problog-fila > * {
     flex: 0 0 calc(50% - 5px);
     max-width: calc(50% - 5px);
+    min-width: 0;
     margin: 0;
+}
+
+.problog-fila .problog-lectura-texto,
+.problog-fila .problog-lectura-figura {
+    margin: 0;
+}
+
+.problog-fila .problog-lectura-texto > :last-child {
+    margin-bottom: 0;
 }
 
 .problog-fila .problog-lectura-figura img {
     width: 100%;
     height: auto;
-}
-
-/* --- Imagen al lado del texto (`:lado:`) ---
-   La imagen flota a la izquierda y el texto la rodea. */
-.problog-lectura-figura.problog-figura-flotante {
-    float: left;
-    width: 45%;
-    max-width: 45%;
-    margin: 4px 16px 10px 0;
-}
-
-.problog-lectura-figura.problog-figura-flotante img {
-    width: 100%;
-    height: auto;
-}
-
-.problog-lectura-figura.problog-figura-flotante figcaption {
-    font-size: 12px;
-    text-align: left;
-}
-
-/* Lo que va después de un flotante y no es texto no debe montarse encima. */
-.problog-lectura-cuerpo h3,
-.problog-lectura-cuerpo h4,
-.problog-lectura-cuerpo h5,
-.problog-lectura-cuerpo hr,
-.problog-lectura-cuerpo .problog-fila,
-.problog-lectura-cuerpo .problog-lectura-figura:not(.problog-figura-flotante) {
-    clear: both;
 }
 
 .problog-lectura-figura figcaption {
