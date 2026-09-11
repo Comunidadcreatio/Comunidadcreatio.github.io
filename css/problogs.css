@@ -36,6 +36,41 @@
     gap: 8px;
 }
 
+/* TÍTULO EN UNA SOLA LÍNEA
+   Misma franja que la barra de progreso de los Cavents: la etiqueta a la
+   izquierda y, justo al lado, el campo. El input se queda sin caja (ni borde ni
+   fondo) reducido a su línea inferior, igual que los campos del formulario de
+   Cavents, para que lo único que se vea sea la línea donde se escribe. */
+#crear-problogs-contenido .problog-campo-titulo {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 12px;
+}
+
+#crear-problogs-contenido .problog-campo-titulo > label {
+    flex-shrink: 0;
+}
+
+#crear-problogs-contenido .problog-campo-titulo #problog-titulo {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    padding: 10px 0;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Al escribir se marca la línea y engorda, como en los Cavents. */
+#crear-problogs-contenido .problog-campo-titulo #problog-titulo:focus {
+    border-bottom-color: var(--color-ink);
+    border-bottom-width: 2px;
+}
+
 #crear-problogs-contenido .problog-campo > label,
 #crear-problogs-contenido .problog-etiqueta-campo {
     font-size: 11px;
