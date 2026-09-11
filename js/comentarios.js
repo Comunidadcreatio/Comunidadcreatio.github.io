@@ -2,6 +2,9 @@
 // Drawer de comentarios — se desliza desde la parte inferior.
 import { apiRequest } from './config.js?v=2e0c2e7288';
 import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
+// Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
+// dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=5dff3ed42f';
 
 let obraIdActual = null;
 let cardActual = null;
@@ -145,17 +148,18 @@ function medirYFijarAltoGaleria(cont) {
 function congelarFondo(congelar) {
     if (bloqueoEl) bloqueoEl.classList.toggle('hidden', !congelar);
     const cont = document.getElementById('galeria-container');
-    if (cont) {
-        if (congelar) {
-            cont.style.overflow = 'hidden';
-            medirYFijarAltoGaleria(cont);
-        } else {
-            cont.style.overflow = '';
+    if (congelar) {
+        // El overflow lo lleva el bloqueo COMPARTIDO (el modal de descripcion
+        // tambien lo pide). El alto en px lo fija solo esta hoja, porque solo
+        // ella abre el teclado y es lo unico que encoge el layout.
+        bloquearFondo('comentarios');
+        if (cont) medirYFijarAltoGaleria(cont);
+    } else {
+        liberarFondo('comentarios');
+        if (cont) {
             cont.style.height = '';
             cont.style.bottom = '';
         }
-    }
-    if (!congelar) {
         compensarFondo(0);
         transformFondoPrev = null;
     }

@@ -2,7 +2,35 @@
 import { API_BASE_URL, apiRequest } from './config.js?v=2e0c2e7288';
 import { artistaActual } from './auth.js?v=b2e08c086d';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=d86e42a5e7';
-import { abrirComentarios } from './comentarios.js?v=f32c8e6c6e';
+import { abrirComentarios } from './comentarios.js?v=8cdeed4bd1';
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=5dff3ed42f';
+
+// ============================================================
+// El modal de descripción bloquea el scroll del fondo mientras está abierto.
+// ------------------------------------------------------------
+// Se OBSERVA el atributo `class` del modal en vez de tocar cada sitio que lo
+// abre o lo cierra: hoy lo hacen galeria.js y main.js, y así el bloqueo sigue
+// funcionando aunque mañana se añada otro. Antes se podía scrollear la galería
+// por detrás con la descripción abierta.
+// ============================================================
+let modalVigilado = false;
+function vigilarModalDetalles() {
+    if (modalVigilado) return;
+    const modal = document.getElementById('modal-detalles-cavent');
+    if (!modal) return;
+    modalVigilado = true;
+    const aplicar = () => {
+        if (modal.classList.contains('hidden')) liberarFondo('descripcion');
+        else bloquearFondo('descripcion');
+    };
+    new MutationObserver(aplicar).observe(modal, { attributes: true, attributeFilter: ['class'] });
+    aplicar();
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', vigilarModalDetalles);
+} else {
+    vigilarModalDetalles();
+}
 
 // Estado compartido del grid (para el carrusel de etiquetas y re-render)
 let obrasGrid = [];
@@ -262,6 +290,27 @@ function colorDeEstado(estado) {
     return '#607d8b';                                                            // gris azulado por defecto
 }
 
+// Color de TEXTO legible sobre un fondo dado. Compara el contraste real contra
+// blanco y contra negro (luminancia relativa, fórmula WCAG) y elige el mejor.
+// Hace falta porque los colores de estado van del verde claro al marrón oscuro:
+// con un único color de texto, la mitad de los títulos quedaría ilegible al
+// rellenarse el badge.
+function textoLegibleSobre(hex) {
+    const h = String(hex || '').replace('#', '');
+    if (h.length !== 6) return '#1a1a1a';
+    const canal = (v) => {
+        const c = parseInt(v, 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    const L = 0.2126 * canal(h.slice(0, 2)) + 0.7152 * canal(h.slice(2, 4)) + 0.0722 * canal(h.slice(4, 6));
+    const contraBlanco = 1.05 / (L + 0.05);
+    const contraNegro = (L + 0.05) / 0.05;
+    // El negro es PURO a propósito: con #1a1a1a, dos de los diez colores de
+    // estado (el azul #2980b9 y el gris azulado #607d8b) se quedaban en ~4.0 de
+    // contraste, por debajo del mínimo legible AA (4.5). Con #000 llegan a 5.2.
+    return contraBlanco >= contraNegro ? '#ffffff' : '#000000';
+}
+
 // Icono con etiqueta temporal para explicar una opción: el icono va a la
 // IZQUIERDA y al tocar (o pasar el cursor) se despliega la palabra
 // (p.ej. "Certificado"/"Conservación") EN EL FLUJO, empujando la información
@@ -405,7 +454,7 @@ function crearObraCard(obra) {
                 ${certificado ? `<span class="obra-meta-item">${iconoMeta('Certificado')}<span class="obra-meta-tooltip">Certificado</span><span class="obra-meta-texto">${escapeHtml(certificado)}</span></span>` : ''}
                 ${procedencia ? `<span class="obra-meta-procedencia">${escapeHtml(procedencia)}</span>` : ''}
             </span>
-            ${estado ? `<span class="obra-estado-badge" style="border-color:${estadoColor};color:${estadoColor}">${escapeHtml(estadoLimpio)}</span>` : ''}
+            ${estado ? `<span class="obra-estado-badge" style="--estado-color:${estadoColor};--estado-texto:${textoLegibleSobre(estadoColor)}">${escapeHtml(estadoLimpio)}</span>` : ''}
         </div>` : '';
 
     card.innerHTML = `

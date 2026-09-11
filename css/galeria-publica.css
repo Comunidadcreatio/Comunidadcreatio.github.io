@@ -288,15 +288,23 @@ html, body {
     font-size: 12px;
     font-weight: 700;
     padding: 5px 14px;
-    border: 1.5px solid;
+    /* El color del estado llega como VARIABLE desde JS (--estado-color). Antes
+       el borde y el texto se ponían inline y el :hover usaba `currentColor`:
+       como la MISMA regla reescribe `color`, `currentColor` se resolvía a ese
+       valor nuevo (#1a1a1a) y el relleno salía NEGRO en vez del color del
+       estado. Con una variable propia, el relleno es el color correcto. */
+    border: 1.5px solid var(--estado-color, currentColor);
+    color: var(--estado-color, inherit);
     border-radius: 24px;
     text-align: center;
     cursor: default;
     transition: background 0.2s ease, color 0.2s ease;
 }
 .obra-estado-badge:hover {
-    background: currentColor;
-    color: #1a1a1a !important;
+    background: var(--estado-color, currentColor);
+    /* Texto legible SOBRE ese relleno: JS calcula si corresponde blanco o negro
+       segun el contraste real de cada color (--estado-texto). */
+    color: var(--estado-texto, #000000) !important;
 }
 /* Animación del estado cuando el cavent se muestra en pantalla:
    se DESPLIEGA desde la derecha hacia la izquierda (sin rebote) */
