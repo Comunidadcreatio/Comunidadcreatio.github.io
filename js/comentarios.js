@@ -4,7 +4,7 @@ import { apiRequest } from './config.js?v=2e0c2e7288';
 import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
-import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=b9728f1acf';
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
 
 let obraIdActual = null;
 let cardActual = null;

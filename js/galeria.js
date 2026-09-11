@@ -2,16 +2,20 @@
 import { API_BASE_URL, apiRequest } from './config.js?v=2e0c2e7288';
 import { artistaActual } from './auth.js?v=b2e08c086d';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=d86e42a5e7';
-import { abrirComentarios } from './comentarios.js?v=51f3147cf9';
-import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=b9728f1acf';
+import { abrirComentarios } from './comentarios.js?v=78e5e9fb4d';
+import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=dd51e51820';
 
 // ============================================================
-// El modal de descripción bloquea el scroll del fondo mientras está abierto.
+// El modal de descripción no debe dejar scrollear NADA mientras está abierto.
 // ------------------------------------------------------------
 // Se OBSERVA el atributo `class` del modal en vez de tocar cada sitio que lo
 // abre o lo cierra: hoy lo hacen galeria.js y main.js, y así el bloqueo sigue
-// funcionando aunque mañana se añada otro. Antes se podía scrollear la galería
-// por detrás con la descripción abierta.
+// funcionando aunque mañana se añada otro.
+//
+// CONGELAR el contenedor NO bastaba: el modal es `pointer-events: none` a
+// propósito, así que los toques fuera de la imagen pasan a la tarjeta de detrás
+// y el dedo puede arrastrar ahí. Por eso además se BLOQUEA EL GESTO
+// (touchmove + preventDefault), que no depende de saber qué elemento scrollea.
 // ============================================================
 let modalVigilado = false;
 function vigilarModalDetalles() {
@@ -20,8 +24,14 @@ function vigilarModalDetalles() {
     if (!modal) return;
     modalVigilado = true;
     const aplicar = () => {
-        if (modal.classList.contains('hidden')) liberarFondo('descripcion');
-        else bloquearFondo('descripcion');
+        if (modal.classList.contains('hidden')) {
+            liberarFondo('descripcion');
+            desactivarGuardiaGesto();
+        } else {
+            bloquearFondo('descripcion');
+            // .detalle-scroll SÍ debe poder scrollear si la descripción es larga.
+            activarGuardiaGesto('.detalle-scroll');
+        }
     };
     new MutationObserver(aplicar).observe(modal, { attributes: true, attributeFilter: ['class'] });
     aplicar();
