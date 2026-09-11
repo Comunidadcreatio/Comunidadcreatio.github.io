@@ -116,11 +116,45 @@ function actualizarAltoBase() {
 // el navegador al enfocar el input y desplegar el teclado).
 // ============================================================
 let transformFondoPrev = null;
+let alturaGaleriaPin = 0;
+
+// Fija el ALTO del contenedor de la galería en PÍXELES mientras la hoja está
+// abierta. Hace falta porque la tarjeta mide `height: 100%` del contenedor: si
+// el teclado encoge el layout, el contenedor se encoge, la tarjeta se encoge con
+// él y con `object-fit: cover` el recorte de la imagen cambia — se vería
+// distinta de como la subió el usuario. Con el alto fijado, no cambia nada.
+//
+// Solo se MIDE cuando el layout está completo (sin teclado); si ya lo está, la
+// medida es idempotente. Tras una rotación, `actualizarAltoBase` reinicia la
+// referencia y aquí se vuelve a medir sola.
+function medirYFijarAltoGaleria(cont) {
+    const layoutCompleto = (window.innerHeight || 0) >= altoBase - 40;
+    if (layoutCompleto) {
+        const h = Math.round(cont.getBoundingClientRect().height);
+        if (h > 0) alturaGaleriaPin = h;
+    }
+    if (alturaGaleriaPin > 0) {
+        const px = alturaGaleriaPin + 'px';
+        if (cont.style.height !== px) {
+            cont.style.height = px;
+            cont.style.bottom = 'auto';
+        }
+    }
+}
 
 function congelarFondo(congelar) {
     if (bloqueoEl) bloqueoEl.classList.toggle('hidden', !congelar);
     const cont = document.getElementById('galeria-container');
-    if (cont) cont.style.overflow = congelar ? 'hidden' : '';
+    if (cont) {
+        if (congelar) {
+            cont.style.overflow = 'hidden';
+            medirYFijarAltoGaleria(cont);
+        } else {
+            cont.style.overflow = '';
+            cont.style.height = '';
+            cont.style.bottom = '';
+        }
+    }
     if (!congelar) {
         compensarFondo(0);
         transformFondoPrev = null;
@@ -184,6 +218,10 @@ function ajustarGeometria() {
     // (no se usa la del chat) para no interferir entre modulos, y solo se toca
     // si el cajon esta abierto.
     if (drawer.classList.contains('visible')) {
+        // El fondo mantiene su tamano original aunque el teclado encoja el
+        // layout: si no, la tarjeta se reescala y la imagen cambia de encuadre.
+        const contGaleria = document.getElementById('galeria-container');
+        if (contGaleria) medirYFijarAltoGaleria(contGaleria);
         document.body.classList.toggle('cajon-teclado', bordeTeclado > TECLADO_UMBRAL);
     } else {
         document.body.classList.remove('cajon-teclado');
