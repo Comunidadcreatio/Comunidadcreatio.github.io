@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.556';
+        var currentVer = '1.0.557';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -76,11 +76,11 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=5e3fc57a0e">
+    <link rel="stylesheet" href="css/style.css?v=14404fd5ea">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=22cb4ae4eb">
+    <link rel="stylesheet" href="css/problogs.css?v=c8c5168c82">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -419,6 +419,20 @@
                 </div>
             </div>
 
+            <!-- Barra inferior fija de Problogs: la misma franja que la de pasos de
+                 Cavents (nunca se ven las dos a la vez). A la izquierda la vista
+                 previa; a la derecha, limpiar y publicar. Su posición la fija
+                 panel-ui.js, igual que la de pasos. -->
+            <div id="problog-nav-bar">
+                <div class="step-nav-left">
+                    <button type="button" class="nav-btn crear-btn" id="problog-vista-previa">Vista previa</button>
+                </div>
+                <div class="step-nav-right">
+                    <button type="button" class="nav-btn limpiar-btn" id="problog-nav-limpiar" title="Limpiar campos" aria-label="Limpiar campos"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
+                    <button type="submit" class="nav-btn crear-btn" id="problog-nav-publicar" form="problog-form">Publicar problog</button>
+                </div>
+            </div>
+
             <div id="formulario-obra" role="form">
 
                 <form id="obra-form" aria-label="Formulario de obra" novalidate>
@@ -701,7 +715,7 @@
                 <form id="problog-form" novalidate>
                     <div class="problog-campo problog-campo-titulo">
                         <label for="problog-titulo">Título</label>
-                        <input type="text" id="problog-titulo" maxlength="200" autocomplete="off" placeholder="Cómo nació «Amanecer en el Táchira»">
+                        <input type="text" id="problog-titulo" maxlength="200" autocomplete="off">
                     </div>
 
                     <div class="problog-campo">
@@ -727,11 +741,6 @@
                             <label><input type="radio" name="problog-estado" value="publicado" checked> Publicado</label>
                             <label><input type="radio" name="problog-estado" value="borrador"> Borrador</label>
                         </div>
-                    </div>
-
-                    <div class="problog-acciones">
-                        <button type="submit" id="problog-guardar" class="problog-accion">Publicar</button>
-                        <button type="button" id="problog-limpiar" class="problog-accion problog-accion-suave">Limpiar</button>
                     </div>
                 </form>
             </div>
@@ -1072,7 +1081,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=4cb5915d30" type="module"></script>
+    <script src="js/main.js?v=9115042b37" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

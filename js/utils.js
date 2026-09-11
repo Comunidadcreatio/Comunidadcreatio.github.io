@@ -87,13 +87,16 @@ export function normalizarTexto(str) {
 
 /**
  * Sanea URLs para atributos src de imágenes.
- *  - Solo permite http(s) o data:image/... (bloquea javascript:, data:text/html, etc.)
+ *  - Solo permite http(s), data:image/... o blob: (bloquea javascript:,
+ *    data:text/html, etc.). `blob:` lo genera la propia página al elegir un
+ *    archivo, así que no puede venir de fuera; hace falta para las vistas
+ *    previas locales (las imágenes aún sin subir).
  *  - Neutraliza comillas dobles para no romper el atributo (no-op si el backend ya escapó).
  */
 export function safeImgUrl(url) {
     if (!url) return '';
     const u = String(url).trim();
-    if (!/^(https?:|data:image\/)/i.test(u)) return '';
+    if (!/^(https?:|data:image\/|blob:)/i.test(u)) return '';
     return u.replace(/"/g, '&quot;');
 }
 

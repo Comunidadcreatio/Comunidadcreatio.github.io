@@ -739,7 +739,8 @@
 
    El aire lateral eran 64px por lado: 24 del `main` (su padding lateral es
    24px tanto en móvil como en escritorio), 20 del panel y 20 del formulario.
-   Se descartan los tres, así que la sección ocupa el ancho completo.
+   Se descartan los tres, así que la sección ocupa el ancho completo; solo se
+   dejan 3px de respiro a cada lado para que no toque el borde de la pantalla.
 
    Todo va bajo body.creando-problogs para no tocar el formulario de Cavents,
    que sí necesita su hueco superior para la barra de pasos.
@@ -754,8 +755,8 @@ body.creando-problogs #panel-artista {
     margin-left: -24px;   /* se sale del padding lateral del main */
     margin-right: -24px;
     padding-top: 0;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 3px;    /* el respiro que pide la sección */
+    padding-right: 3px;
 }
 
 /* `#panel-artista form` mete 24px arriba y 20px a los lados a todos los
@@ -764,4 +765,87 @@ body.creando-problogs #panel-artista #problog-form {
     padding-top: 0;
     padding-left: 0;
     padding-right: 0;
+}
+
+/* ============================================================
+   6. BARRA INFERIOR DE PROBLOGS
+   ------------------------------------------------------------
+   Ocupa el mismo sitio que la barra de pasos de Cavents y comparte su aspecto
+   (las reglas de #obra-step-bar en formularios.css la incluyen). Solo se ve
+   mientras se está creando un Problog.
+   ============================================================ */
+#problog-nav-bar {
+    display: none;
+}
+
+body.creando-problogs #problog-nav-bar {
+    display: flex;
+}
+
+/* ============================================================
+   7. VISTA PREVIA
+   ------------------------------------------------------------
+   Capa a pantalla completa con la publicación tal como la verá el lector. Se
+   reutiliza el marcado de la vista de lectura, pero sin la fila de likes y
+   comentarios (aquí no hay nada que pulsar).
+   ============================================================ */
+#problog-vista-previa-capa {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;   /* por encima del nav (998) y de las barras (999) */
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.problog-vista-previa-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    padding: 8px 12px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.problog-vista-previa-etiqueta {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-gray-500);
+}
+
+.problog-vista-previa-cerrar {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1.5px solid var(--color-gray-300);
+    border-radius: 50%;
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.problog-vista-previa-cuerpo {
+    flex: 1;
+    padding: 14px 3px 48px;
+}
+
+/* Sin interacciones en la vista previa. */
+#problog-vista-previa-capa .problog-social,
+#problog-vista-previa-capa #problog-volver {
+    display: none;
+}
+
+[data-theme="dark"] .problog-vista-previa-barra,
+[data-theme="dark"] .problog-vista-previa-cerrar {
+    border-color: rgba(255, 255, 255, 0.18);
 }

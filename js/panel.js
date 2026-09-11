@@ -1,7 +1,7 @@
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
-import { debugLog } from './utils.js?v=d86e42a5e7';
+import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
+import { debugLog } from './utils.js?v=2a35db9e14';
 
 export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     const params = new URLSearchParams({ page, limit, search, sortBy, order });

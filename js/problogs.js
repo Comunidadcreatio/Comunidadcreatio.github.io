@@ -22,19 +22,24 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=d86e42a5e7';
+import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=f8298b1837';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=ba4ac5ba0d';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
-import { abrirComentarios } from './comentarios.js?v=155a6230e0';
+import { abrirComentarios } from './comentarios.js?v=f10b61e047';
+// La vista previa se muestra a pantalla completa: se congela el fondo con el
+// mismo mecanismo que el cajón de comentarios.
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
+// Solo para firmar la vista previa con el nombre del artista.
+import { artistaActual } from './auth.js?v=f2799071b6';
 
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
 const MAX_PIE = 300;
 
-let form, tituloEl, bloquesEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn;
+let form, tituloEl, bloquesEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
 // bloques: [{ tipo:'texto', contenido } | { tipo:'imagen', slot, pie, file?, previewUrl?, url? }]
@@ -211,7 +216,7 @@ function limpiarEditor() {
     if (etiquetasEl) etiquetasEl.value = '';
     const publicado = document.querySelector('input[name="problog-estado"][value="publicado"]');
     if (publicado) publicado.checked = true;
-    if (guardarBtn) guardarBtn.textContent = 'Publicar';
+    if (guardarBtn) guardarBtn.textContent = 'Publicar problog';
     // Arranca con un párrafo vacío para poder escribir de inmediato.
     bloques.push({ tipo: 'texto', contenido: '' });
     pintarBloques();
@@ -299,7 +304,7 @@ async function guardar(e) {
         guardando = false;
         if (guardarBtn) {
             guardarBtn.disabled = false;
-            guardarBtn.textContent = editandoId ? 'Guardar cambios' : 'Publicar';
+            guardarBtn.textContent = editandoId ? 'Guardar cambios' : 'Publicar problog';
         }
     }
 }
@@ -559,7 +564,11 @@ function cambiarFiltro(mias) {
 // ============================================================
 // VISTA DE LECTURA
 // ============================================================
-function pintarLectura(p) {
+// `conAcciones` decide si se pintan los botones de editar/eliminar. Por defecto
+// depende del filtro del feed; la vista previa los pide fuera aunque estés
+// editando una publicación tuya.
+function pintarLectura(p, conAcciones) {
+    const propias = (conAcciones === undefined) ? modoMias : !!conAcciones;
     const imagenes = p.imagenes || [];
     const autor = p.nombre_artista || 'Artista';
     const bloquesHTML = (p.bloques || []).map((b) => {
@@ -578,7 +587,7 @@ function pintarLectura(p) {
     }).join('');
 
     // En la vista de lectura también se puede editar/eliminar si es propia.
-    const acciones = modoMias
+    const acciones = propias
         ? `<div class="problog-lectura-acciones">
                <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
                <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
@@ -621,6 +630,70 @@ function cerrarLectura() {
     detalleEl.innerHTML = '';
     feedEl.classList.remove('hidden');
     publicacionAbierta = null;
+}
+
+// ============================================================
+// VISTA PREVIA DEL EDITOR
+// ============================================================
+// Reúne lo que hay ahora mismo en el editor y lo pinta con el MISMO marcado de
+// la vista de lectura: así se ve exactamente lo que se va a publicar, sin tener
+// que guardar antes. Las imágenes se resuelven con su vista previa local
+// mientras siguen sin subirse.
+function abrirVistaPrevia() {
+    recogerDelDom();
+
+    const imagenes = [];
+    bloques.forEach((b) => {
+        if (b.tipo !== 'imagen') return;
+        const url = b.previewUrl || b.url || '';
+        if (url) imagenes[b.slot] = url;
+    });
+
+    // Se descartan los bloques vacíos igual que al guardar, para no enseñar un
+    // hueco que no se va a publicar.
+    const publicables = bloques.filter((b) => (b.tipo === 'texto'
+        ? !!(b.contenido || '').trim()
+        : !!(b.previewUrl || b.url)));
+
+    const titulo = (tituloEl && tituloEl.value || '').trim();
+    const publicacion = {
+        id: 'vista-previa',
+        titulo: titulo || 'Sin título',
+        bloques: publicables,
+        imagenes: imagenes,
+        nombre_artista: (artistaActual && artistaActual.nombre_artista) || 'Artista',
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        comentarios_count: 0,
+        liked: false
+    };
+
+    cerrarVistaPrevia();
+    bloquearFondo('vista-previa');
+
+    const capa = document.createElement('div');
+    capa.id = 'problog-vista-previa-capa';
+    capa.innerHTML = `
+        <div class="problog-vista-previa-barra">
+            <span class="problog-vista-previa-etiqueta">Vista previa</span>
+            <button type="button" class="problog-vista-previa-cerrar" data-cerrar-vista-previa aria-label="Cerrar vista previa">✕</button>
+        </div>
+        <div class="problog-vista-previa-cuerpo">${pintarLectura(publicacion, false)}</div>`;
+
+    capa.addEventListener('click', (e) => {
+        if (e.target.closest('[data-cerrar-vista-previa]') || e.target.closest('#problog-volver')) {
+            cerrarVistaPrevia();
+        }
+    });
+
+    document.body.appendChild(capa);
+}
+
+function cerrarVistaPrevia() {
+    const capa = document.getElementById('problog-vista-previa-capa');
+    if (!capa) return;
+    capa.remove();
+    liberarFondo('vista-previa');
 }
 
 // ============================================================
@@ -759,8 +832,11 @@ export function setupProblogs() {
     addTextoBtn = document.getElementById('problog-add-texto');
     addImagenBtn = document.getElementById('problog-add-imagen');
     contadorEl = document.getElementById('problog-contador-imagenes');
-    guardarBtn = document.getElementById('problog-guardar');
-    limpiarBtn = document.getElementById('problog-limpiar');
+    // Guardar y limpiar viven en la barra inferior (antes los tenía el propio
+    // formulario, junto al final).
+    guardarBtn = document.getElementById('problog-nav-publicar');
+    limpiarBtn = document.getElementById('problog-nav-limpiar');
+    vistaPreviaBtn = document.getElementById('problog-vista-previa');
     feedEl = document.getElementById('problogs-feed');
     detalleEl = document.getElementById('problogs-detalle');
     seccionEl = document.getElementById('problogs');
@@ -771,6 +847,7 @@ export function setupProblogs() {
     addTextoBtn?.addEventListener('click', () => anadirTexto());
     addImagenBtn?.addEventListener('click', () => anadirImagen());
     limpiarBtn?.addEventListener('click', limpiarEditor);
+    vistaPreviaBtn?.addEventListener('click', abrirVistaPrevia);
     form.addEventListener('submit', guardar);
 
     filtroTodasBtn?.addEventListener('click', () => cambiarFiltro(false));

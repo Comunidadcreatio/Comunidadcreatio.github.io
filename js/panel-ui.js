@@ -2,11 +2,11 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=2e0c2e7288';
-import { token, artistaActual } from './auth.js?v=b2e08c086d';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=315f45d5c6';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=c088cadd1b';
+import { token, artistaActual } from './auth.js?v=f2799071b6';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=f64c4300b8';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
-import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=d86e42a5e7';
+import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=2a35db9e14';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -994,6 +994,10 @@ function setupStepNavigation() {
         const fromBottom = viewH - panelTop;
         const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
         stepBar.style.bottom = (fromBottom + tabsH) + 'px';
+        // La barra de Problogs ocupa ese mismo hueco: nunca se ven las dos a la
+        // vez (una u otra según la pestaña activa).
+        const problogBar = document.getElementById('problog-nav-bar');
+        if (problogBar) problogBar.style.bottom = (fromBottom + tabsH) + 'px';
     }
 
     // Posicionar las etiquetas Cavents/Problogs en el borde inferior, debajo

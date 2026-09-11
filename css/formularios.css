@@ -3,7 +3,9 @@
 /* ==============================================
    BARRA INFERIOR FIJA: PASOS + NAVEGACIÓN < >
    ============================================== */
-#obra-step-bar {
+/* La barra de Problogs es la misma franja, así que comparte estas reglas. */
+#obra-step-bar,
+#problog-nav-bar {
     position: fixed;
     bottom: 0; /* JS lo posiciona en vivo */
     left: 0;
@@ -32,7 +34,8 @@
     gap: 10px;
 }
 
-#obra-step-bar .nav-btn {
+#obra-step-bar .nav-btn,
+#problog-nav-bar .nav-btn {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -51,17 +54,20 @@
     line-height: 1;
 }
 
-#obra-step-bar .nav-btn:hover:not(:disabled) {
+#obra-step-bar .nav-btn:hover:not(:disabled),
+#problog-nav-bar .nav-btn:hover:not(:disabled) {
     background: var(--color-gray-100);
     border-color: var(--color-ink);
 }
 
-#obra-step-bar .nav-btn:disabled {
+#obra-step-bar .nav-btn:disabled,
+#problog-nav-bar .nav-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-#obra-step-bar .crear-btn {
+#obra-step-bar .crear-btn,
+#problog-nav-bar .crear-btn {
     height: 32px !important;
     min-height: 32px !important;
     max-height: 32px !important;
@@ -90,7 +96,8 @@
     appearance: none;
 }
 
-#obra-step-bar .crear-btn:hover {
+#obra-step-bar .crear-btn:hover,
+#problog-nav-bar .crear-btn:hover {
     background: var(--color-gray-100);
     border-color: var(--color-ink);
 }
