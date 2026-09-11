@@ -26,17 +26,14 @@
     overflow: hidden;
 }
 
-/* Fondo único de las barras de abajo. Llega hasta el borde inferior de la
-   pantalla y va por DEBAJO del nav (998) y de las barras (999), así que en el
-   caso normal lo tapa el nav (que es opaco) y, si el nav no está, no queda
-   ninguna franja sin velo abajo. */
+/* Fondo único de las barras de abajo. */
 #crear-fondo {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;          /* lo coloca panel-ui.js (siempre 0) */
-    height: 137px;      /* lo coloca panel-ui.js (nav + pestañas + barra) */
-    z-index: 997;       /* debajo del nav (998) y de las barras (999) */
+    bottom: 0;          /* lo coloca panel-ui.js */
+    height: 80px;       /* lo coloca panel-ui.js */
+    z-index: 998;       /* justo debajo de las barras (999) */
     background: rgba(255, 255, 255, 0.20);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);

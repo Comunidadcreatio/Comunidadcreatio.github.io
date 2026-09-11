@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=d8964cbf63';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=4260504904';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=f10b61e047';

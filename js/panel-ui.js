@@ -1034,31 +1034,22 @@ function setupStepNavigation() {
     }
 
     // El fondo ÚNICO de las barras de abajo: va desde la barra de crear hasta el
-    // borde inferior de la pantalla. Se mide en vivo (si se calcula con las
+    // borde inferior de las pestañas. Se mide en vivo (si se calcula con las
     // pestañas ocultas, el alto sale 0 y queda un hueco a la vista).
-    //
-    // Llega hasta abajo del todo a propósito: así tapa también la zona del nav y
-    // el área segura del móvil. En el caso normal el nav es opaco y lo tapa a él,
-    // pero si el nav está oculto (teclado, cajones) no queda ninguna franja sin
-    // velo en la parte inferior.
     function positionFondo() {
         const fondo = document.getElementById('crear-fondo');
         const togglePanel = document.getElementById('toggle-panel');
         const tabsBar = document.getElementById('crear-tabs');
         const problogBar = document.getElementById('problog-nav-bar');
         if (!fondo || !togglePanel) return;
-        const navRect = togglePanel.getBoundingClientRect();
-        // Si el nav no está (oculto, sin maquetar), su top es 0 y el cálculo
-        // saldría disparatado: se deja el velo como estaba.
-        if (!navRect.top && !navRect.height) return;
-        const fromBottom = window.innerHeight - navRect.top;
+        const fromBottom = window.innerHeight - togglePanel.getBoundingClientRect().top;
         const altoTabs = tabsBar ? tabsBar.getBoundingClientRect().height : 0;
         const altoBarra = Math.max(
             stepBar ? stepBar.getBoundingClientRect().height : 0,
             problogBar ? problogBar.getBoundingClientRect().height : 0
         ) || 48;
-        fondo.style.bottom = '0px';
-        fondo.style.height = Math.round(fromBottom + altoTabs + altoBarra) + 'px';
+        fondo.style.bottom = fromBottom + 'px';
+        fondo.style.height = Math.round(altoTabs + altoBarra) + 'px';
     }
 
     function positionAll() {
