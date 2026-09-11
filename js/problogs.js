@@ -25,7 +25,10 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=d86e42a5e7';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono } from './galeria-ui.js?v=ac29a28ca0';
+import { abrirCrearDesdeIcono, volverDesdeIcono } from './galeria-ui.js?v=785649ff42';
+// El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
+// para que construya las rutas de este recurso.
+import { abrirComentarios } from './comentarios.js?v=155a6230e0';
 
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
@@ -354,6 +357,53 @@ async function eliminarProblog(id, titulo) {
 }
 
 // ============================================================
+// LIKES Y COMENTARIOS
+// ============================================================
+const ICONO_CORAZON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+const ICONO_COMENTARIO = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>';
+
+// Fila de likes + comentarios. La misma en la tarjeta y en la vista de lectura.
+function socialHTML(p) {
+    const liked = !!p.liked;
+    // El corazón va RELLENO si ya di like, igual que queda tras pulsarlo: si no,
+    // el mismo estado se vería distinto antes y después de tocar sin motivo.
+    const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (liked ? 'currentColor' : 'none') + '"');
+    return `
+        <div class="problog-social">
+            <button type="button" class="problog-social-btn${liked ? ' liked' : ''}" data-problog-like="${p.id}" aria-pressed="${liked ? 'true' : 'false'}" title="Me gusta">
+                <span class="problog-social-icono">${corazon}</span><span class="problog-social-num">${p.likes_count || 0}</span>
+            </button>
+            <button type="button" class="problog-social-btn" data-problog-comentar="${p.id}" title="Comentarios">
+                <span class="problog-social-icono">${ICONO_COMENTARIO}</span><span class="problog-social-num">${p.comentarios_count || 0}</span>
+            </button>
+        </div>`;
+}
+
+// El servidor decide el estado final (es un toggle) y aquí se refleja en TODOS
+// los botones de esa publicación: la misma puede estar visible en la tarjeta y
+// en la vista de lectura a la vez, y no deben quedar descuadrados.
+async function alternarLike(id) {
+    try {
+        const res = await apiRequest('/problogs/' + id + '/like', { method: 'POST' });
+        if (!res || res.success === false) {
+            showError((res && res.error) || 'No se pudo dar me gusta.');
+            return;
+        }
+        document.querySelectorAll('[data-problog-like="' + id + '"]').forEach((b) => {
+            b.classList.toggle('liked', !!res.liked);
+            b.setAttribute('aria-pressed', res.liked ? 'true' : 'false');
+            const num = b.querySelector('.problog-social-num');
+            if (num) num.textContent = res.likes_count;
+            const svg = b.querySelector('svg');
+            if (svg) svg.setAttribute('fill', res.liked ? 'currentColor' : 'none');
+        });
+    } catch (err) {
+        debugLog.error('Error dando like a problog:', err);
+        showError('Error de conexión.');
+    }
+}
+
+// ============================================================
 // FEED
 // ============================================================
 function tarjetaProblog(p) {
@@ -400,6 +450,7 @@ function tarjetaProblog(p) {
                     <span class="problog-card-autor">${renderText(autor)}</span>
                     <span class="problog-card-fecha">${escapeHtml(fechaCorta(p.created_at))}</span>
                 </div>
+                ${socialHTML(p)}
                 ${accionesHTML}
             </div>
         </article>`;
@@ -471,6 +522,7 @@ function pintarLectura(p) {
             <p class="problog-lectura-meta">${renderText(autor)} · ${escapeHtml(fechaCorta(p.created_at))}</p>
             ${acciones}
         </header>
+        ${socialHTML(p)}
         <div class="problog-lectura-cuerpo">${bloquesHTML}</div>`;
 }
 
@@ -576,6 +628,20 @@ export function setupProblogs() {
 
     // Acciones de las tarjetas y de la vista de lectura (delegadas en un solo sitio).
     const manejarAcciones = (e) => {
+        const like = e.target.closest('[data-problog-like]');
+        if (like) {
+            e.stopPropagation();
+            alternarLike(parseInt(like.dataset.problogLike, 10));
+            return;
+        }
+        const comentar = e.target.closest('[data-problog-comentar]');
+        if (comentar) {
+            e.stopPropagation();
+            // Se reutiliza el cajón de comentarios pasándole el tipo de recurso.
+            abrirComentarios(parseInt(comentar.dataset.problogComentar, 10),
+                comentar.closest('.problog-card'), 'problogs');
+            return;
+        }
         const editar = e.target.closest('[data-problog-editar]');
         if (editar) {
             e.stopPropagation();

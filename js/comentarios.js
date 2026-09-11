@@ -7,6 +7,9 @@ import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
 
 let obraIdActual = null;
+// Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el
+// MISMO para los dos; solo cambia la ruta de la API.
+let tipoRecurso = 'obras';
 let cardActual = null;
 let drawer, lista, input, btnEnviar, nav, bloqueoEl;
 
@@ -245,10 +248,18 @@ function iniciarEscuchaTeclado() {
     ajustarGeometria();
 }
 
-export function abrirComentarios(obraId, cardEl) {
+// Ruta de los comentarios del recurso abierto.
+function baseComentarios() {
+    return '/' + tipoRecurso + '/' + obraIdActual + '/comentarios';
+}
+
+// `tipo` permite reutilizar el cajón para Problogs: 'obras' (por defecto, para no
+// romper la llamada que ya hace la galería) o 'problogs'.
+export function abrirComentarios(obraId, cardEl, tipo = 'obras') {
     init();
     obraIdActual = obraId;
     cardActual   = cardEl;
+    tipoRecurso  = (tipo === 'problogs') ? 'problogs' : 'obras';
     alturaCabeceraMem = 0;   // remedir: la cabecera cambia con la orientacion
 
     input.value = '';
@@ -310,7 +321,7 @@ function cerrarComentarios() {
 
 async function cargarComentarios(obraId) {
     try {
-        const data = await apiRequest(`/obras/${obraId}/comentarios`);
+        const data = await apiRequest(baseComentarios());
         const comentarios = data.comentarios || data || [];
         if (!comentarios.length) {
             lista.innerHTML = '<div class="comentarios-vacio">No hay comentarios aún. ¡Sé el primero!</div>';
@@ -373,13 +384,14 @@ async function enviarComentario(parentId = null) {
     try {
         const body = { texto };
         if (parentId) body.comentario_padre_id = parentId;
-        await apiRequest(`/obras/${obraIdActual}/comentarios`, {
+        await apiRequest(baseComentarios(), {
             method: 'POST',
             body: JSON.stringify(body)
         });
         if (!isReply) input.value = '';
         await cargarComentarios(obraIdActual);
-        actualizarContador(cardActual, 1);
+        // El contador de la tarjeta solo existe en las de obra.
+        if (tipoRecurso === 'obras') actualizarContador(cardActual, 1);
     } catch (err) {
         alert('No se pudo enviar el comentario');
     } finally {
@@ -389,7 +401,7 @@ async function enviarComentario(parentId = null) {
 
 async function likeComentario(commentId) {
     try {
-        const res = await apiRequest(`/obras/${obraIdActual}/comentarios/${commentId}/like`, { method: 'POST' });
+        const res = await apiRequest(baseComentarios() + '/' + commentId + '/like', { method: 'POST' });
         const btn = document.querySelector(`.comentario-btn-like[data-id="${commentId}"]`);
         const span = btn?.querySelector('.comentario-likes-count');
         if (btn) {

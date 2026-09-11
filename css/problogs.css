@@ -495,6 +495,39 @@
     border-color: rgba(192, 57, 43, 0.4);
 }
 
+/* Fila de likes + comentarios (misma en la tarjeta y en la vista de lectura) */
+.problog-social {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+#problogs .problog-social-btn {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--color-gray-500);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#problogs .problog-social-btn.liked {
+    color: #c0392b;
+}
+
+.problog-social-icono {
+    display: inline-flex;
+    align-items: center;
+}
+
 /* ============================================================
    3. VISTA DE LECTURA
    ============================================================ */
