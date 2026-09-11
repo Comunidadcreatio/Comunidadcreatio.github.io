@@ -12,6 +12,14 @@
 //     desplaza (adjustPan),
 //   - si el JS esta compensando de mas (doble compensacion).
 //
+// SOBRE COPIAR EL INFORME (importante en WebView):
+//   navigator.clipboard.writeText() suele RECHAZARSE en la WebView
+//   de Android, y document.execCommand('copy') devuelve false sin
+//   copiar nada. Por eso el informe se muestra tambien en un
+//   textarea SELECCIONABLE: el camino fiable es el menu nativo
+//   (mantener pulsado -> Seleccionar todo -> Copiar).
+//   Aqui NUNCA se dice "copiado" si no se pudo comprobar.
+//
 // ACTIVO solo en Android, o añadiendo ?diag=1 a la URL.
 //
 // PARA QUITARLO (cuando ya no haga falta):
@@ -26,25 +34,39 @@ export const DIAG_ON =
 const MAX_EVENTOS = 30;
 const MAX_FRAMES = 240;
 const LOG_VISIBLE = 9;
+const Z = 2147483647;   // por encima de todo lo que usa la app
 
 let panel = null;
 let cuerpoEl = null;
 let logEl = null;
 let botonEl = null;
+let overlay = null;
+let notaEl = null;
+let areaEl = null;
 let eventos = [];
 let frames = [];
 const t0 = Date.now();
 
 const CSS = [
-    '#diag-teclado{position:fixed;left:0;right:0;top:0;z-index:2147483000;',
+    '#diag-teclado{position:fixed;left:0;right:0;top:0;z-index:' + (Z - 1) + ';',
     'background:rgba(0,0,0,.85);color:#b9ffb9;',
     'font:11px/1.32 ui-monospace,Menlo,Consolas,monospace;',
     'padding:5px 7px;pointer-events:none;overflow:hidden;border-bottom:1px solid #0f0}',
     '#diag-teclado .diag-cab{white-space:pre;color:#b9ffb9}',
     '#diag-teclado .diag-log{white-space:pre-wrap;word-break:break-all;color:#ffcf6b;margin-top:3px}',
-    '#diag-teclado-btn{position:fixed;right:6px;top:4px;z-index:2147483001;',
-    'font:10px ui-monospace,monospace;background:#053;color:#dfffe0;',
-    'border:1px solid #0f0;border-radius:4px;padding:3px 7px}'
+    '#diag-teclado-btn{position:fixed;right:6px;top:4px;z-index:' + Z + ';',
+    'font:12px ui-monospace,monospace;background:#053;color:#dfffe0;',
+    'border:1px solid #0f0;border-radius:6px;padding:7px 12px}',
+    '#diag-informe{position:fixed;inset:0;z-index:' + Z + ';background:rgba(0,0,0,.94);',
+    'display:flex;flex-direction:column;padding:10px;gap:8px;box-sizing:border-box}',
+    '#diag-informe .diag-nota{color:#b9ffb9;font:12px/1.4 ui-monospace,monospace;margin:0}',
+    '#diag-informe textarea{flex:1;width:100%;box-sizing:border-box;',
+    'font:11px/1.35 ui-monospace,monospace;background:#000;color:#b9ffb9;',
+    'border:1px solid #0f0;border-radius:6px;padding:8px;resize:none;',
+    '-webkit-user-select:text;user-select:text}',
+    '#diag-informe .diag-acciones{display:flex;gap:8px}',
+    '#diag-informe button{flex:1;font:13px ui-monospace,monospace;background:#053;',
+    'color:#dfffe0;border:1px solid #0f0;border-radius:6px;padding:12px}'
 ].join('');
 
 function n(v, def) {
@@ -84,8 +106,8 @@ function crearPanel() {
     botonEl = document.createElement('button');
     botonEl.id = 'diag-teclado-btn';
     botonEl.type = 'button';
-    botonEl.textContent = 'copiar';
-    botonEl.addEventListener('click', copiar);
+    botonEl.textContent = 'informe';
+    botonEl.addEventListener('click', abrirInforme);
     document.body.appendChild(botonEl);
 }
 
@@ -161,22 +183,17 @@ function informe() {
     return l.join('\n');
 }
 
-async function copiar() {
-    const txt = informe();
-    const listo = () => {
-        if (!botonEl) return;
-        botonEl.textContent = 'copiado';
-        setTimeout(() => { if (botonEl) botonEl.textContent = 'copiar'; }, 2500);
-    };
+// Intenta copiar por JavaScript. Devuelve true SOLO si consta que copio.
+async function copiarJS(txt) {
     try {
         await navigator.clipboard.writeText(txt);
-        listo();
-        return;
-    } catch (e) { /* fallback abajo */ }
+        return true;
+    } catch (e) { /* la WebView de Android suele rechazarlo */ }
     try {
         const ta = document.createElement('textarea');
         ta.value = txt;
         ta.setAttribute('readonly', '');
+        ta.setAttribute('inputmode', 'none');
         ta.style.position = 'fixed';
         ta.style.top = '0';
         ta.style.left = '0';
@@ -184,10 +201,73 @@ async function copiar() {
         document.body.appendChild(ta);
         ta.select();
         ta.setSelectionRange(0, txt.length);
-        document.execCommand('copy');
+        const ok = document.execCommand('copy');
         ta.remove();
-        listo();
+        return ok === true;   // no mentir: si devuelve false, NO copio
     } catch (e2) {
-        if (botonEl) botonEl.textContent = 'no copio';
+        return false;
+    }
+}
+
+function notaManual() {
+    return 'El portapapeles no responde en la WebView. ' +
+        'Manten pulsado el texto de abajo y elige "Seleccionar todo" y luego "Copiar".';
+}
+
+async function accionCopiar() {
+    if (!areaEl) return;
+    const ok = await copiarJS(areaEl.value);
+    if (notaEl) {
+        notaEl.textContent = ok
+            ? 'Copiado. Pega el texto aqui en el chat.'
+            : notaManual();
+    }
+}
+
+function cerrarInforme() {
+    if (overlay) overlay.style.display = 'none';
+}
+
+function abrirInforme() {
+    try {
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'diag-informe';
+            notaEl = document.createElement('p');
+            notaEl.className = 'diag-nota';
+            areaEl = document.createElement('textarea');
+            areaEl.readOnly = true;
+            areaEl.spellcheck = false;
+            areaEl.setAttribute('inputmode', 'none');   // no abre el teclado al enfocar
+            const acciones = document.createElement('div');
+            acciones.className = 'diag-acciones';
+            const bCopiar = document.createElement('button');
+            bCopiar.type = 'button';
+            bCopiar.textContent = 'Copiar';
+            bCopiar.addEventListener('click', accionCopiar);
+            const bCerrar = document.createElement('button');
+            bCerrar.type = 'button';
+            bCerrar.textContent = 'Cerrar';
+            bCerrar.addEventListener('click', cerrarInforme);
+            acciones.appendChild(bCopiar);
+            acciones.appendChild(bCerrar);
+            overlay.appendChild(notaEl);
+            overlay.appendChild(areaEl);
+            overlay.appendChild(acciones);
+            document.body.appendChild(overlay);
+        }
+        areaEl.value = informe();
+        overlay.style.display = 'flex';
+        // Dejar el texto ya seleccionado: en Android suele aparecer la barra
+        // nativa con "Copiar" directamente.
+        try {
+            areaEl.focus();
+            areaEl.select();
+        } catch (e) { /* no critico */ }
+        accionCopiar();
+    } catch (e) {
+        // ultimo recurso: que al menos se vea algo
+        if (notaEl) notaEl.textContent = 'Error mostrando el informe: ' + e.message;
+        if (overlay) overlay.style.display = 'flex';
     }
 }

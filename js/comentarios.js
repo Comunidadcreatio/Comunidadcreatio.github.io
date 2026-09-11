@@ -3,7 +3,7 @@
 import { apiRequest } from './config.js?v=2e0c2e7288';
 import { renderText, safeImgUrl } from './utils.js?v=d86e42a5e7';
 // === DIAGNOSTICO TEMPORAL (quitar junto con js/diag-teclado.js) ===
-import { DIAG_ON, diagTick, diagFrame } from './diag-teclado.js?v=05d834301d';
+import { DIAG_ON, diagTick, diagFrame } from './diag-teclado.js?v=6953af9d51';
 
 let obraIdActual = null;
 let cardActual = null;
