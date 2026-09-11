@@ -47,7 +47,7 @@ import { artistaActual } from './auth.js?v=f2799071b6';
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
 
-let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
+let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, contadorEl, guardarBtn, limpiarBtn, vistaPreviaBtn;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
 // Imágenes del contenido en curso, por el nombre que aparece en la etiqueta:
@@ -162,15 +162,6 @@ function insertarEnContenido(texto) {
     ajustarAltoContenido();
 }
 
-// Icono de párrafo: separa en dos párrafos donde esté el cursor.
-function anadirTexto() {
-    if (!contenidoEl) return;
-    const pos = typeof contenidoEl.selectionStart === 'number'
-        ? contenidoEl.selectionStart : contenidoEl.value.length;
-    const antes = contenidoEl.value.slice(0, pos);
-    insertarEnContenido((antes === '' || /\n\s*\n$/.test(antes)) ? '' : '\n\n');
-}
-
 // Icono de imagen: se elige el archivo y se inserta su etiqueta en el texto. El
 // archivo se sube al publicar (o al guardar los cambios).
 function anadirImagen() {
@@ -206,11 +197,18 @@ const ENVUELTOS = {
     cursiva: { antes: '*', despues: '*' },
     enlace: { antes: '[', despues: '](url)' }
 };
+// Las alineaciones se quitan entre sí: poner «centro» donde había «derecha»
+// cambia la marca, no la acumula.
+const ALINEACIONES = [':izq: ', ':centro: ', ':der: ', ':just: '];
 const PREFIJOS = {
     titulo: { marca: '# ', reemplaza: [] },
     lista: { marca: '- ', reemplaza: ['* ', '+ ', '1. '] },
     'lista-numerada': { marca: '1. ', reemplaza: ['- ', '* ', '+ '] },
-    cita: { marca: '> ', reemplaza: [] }
+    cita: { marca: '> ', reemplaza: [] },
+    'alinear-izquierda': { marca: ':izq: ', reemplaza: ALINEACIONES },
+    'alinear-centro': { marca: ':centro: ', reemplaza: ALINEACIONES },
+    'alinear-derecha': { marca: ':der: ', reemplaza: ALINEACIONES },
+    'alinear-justificar': { marca: ':just: ', reemplaza: ALINEACIONES }
 };
 
 function seleccionActual() {
@@ -275,8 +273,26 @@ function prefijarLineas(prefijo, reemplaza) {
     ajustarAltoContenido();
 }
 
+// Regla horizontal: se coloca en su propia línea, con una línea en blanco antes
+// y después para que se lea como un bloque aparte (y se vea de extremo a
+// extremo al publicarla).
+function insertarRegla() {
+    if (!contenidoEl) return;
+    const { ini, fin } = seleccionActual();
+    const valor = contenidoEl.value;
+    const antes = valor.slice(0, ini).replace(/\n+$/, '');
+    const despues = valor.slice(fin).replace(/^\n+/, '');
+    contenidoEl.value = (antes ? antes + '\n\n' : '') + '---' + (despues ? '\n\n' + despues : '');
+    const pos = (antes ? antes.length + 2 : 0) + 3;
+    contenidoEl.focus();
+    try { contenidoEl.setSelectionRange(pos, pos); } catch (e) { /* da igual */ }
+    actualizarContador();
+    ajustarAltoContenido();
+}
+
 function aplicarFormato(tipo) {
     if (!contenidoEl) return;
+    if (tipo === 'regla') { insertarRegla(); return; }
     const pref = PREFIJOS[tipo];
     if (pref) { prefijarLineas(pref.marca, pref.reemplaza); return; }
     const env = ENVUELTOS[tipo];
@@ -731,57 +747,101 @@ function renderLinea(html) {
     return t.replace(/\u0000(\d+)\u0000/g, (m, i) => '<code>' + codigos[Number(i)] + '</code>');
 }
 
+// Alineación por párrafo: :izq: / :centro: / :der: / :just: al principio de la
+// línea. Sin marca, el texto va justificado (el estado normal del blog).
+const ALINEADO_CLASE = {
+    izq: 'problog-alineado-izquierda',
+    centro: 'problog-alineado-centro',
+    der: 'problog-alineado-derecha',
+    just: 'problog-alineado-justificado'
+};
+
 function renderMarkdown(texto) {
     const lineas = renderText(texto).split('\n');
     const salida = [];
     let parrafo = [];
-    let lista = null;      // 'ul' | 'ol'
+    let parrafoClase = null;
+    let lista = null;         // 'ul' | 'ol'
     let cita = false;
+    let alineacion = null;    // clase pendiente de aplicar al bloque
+
+    const conClase = (tag, clase) => '<' + tag + (clase ? ' class="' + clase + '"' : '') + '>';
 
     const cerrarParrafo = () => {
-        if (parrafo.length) { salida.push('<p>' + parrafo.join('<br>') + '</p>'); parrafo = []; }
+        if (parrafo.length) {
+            salida.push(conClase('p', parrafoClase) + parrafo.join('<br>') + '</p>');
+            parrafo = [];
+        }
+        parrafoClase = null;
     };
     const cerrarLista = () => { if (lista) { salida.push('</' + lista + '>'); lista = null; } };
     const cerrarCita = () => { if (cita) { salida.push('</blockquote>'); cita = false; } };
-    const cerrarTodo = () => { cerrarParrafo(); cerrarLista(); cerrarCita(); };
+    const cerrarTodo = () => { cerrarParrafo(); cerrarLista(); cerrarCita(); alineacion = null; };
 
-    lineas.forEach((linea) => {
+    lineas.forEach((lineaOriginal) => {
+        let linea = lineaOriginal;
         if (!linea.trim()) { cerrarTodo(); return; }   // línea en blanco: separa bloques
+
+        // Alineación del bloque.
+        let propia = false;
+        const al = linea.match(/^\s*:(izq|centro|der|just):\s?/i);
+        if (al) {
+            alineacion = ALINEADO_CLASE[al[1].toLowerCase()];
+            linea = linea.slice(al[0].length);
+            propia = linea.trim().length > 0;
+            if (!propia) return;   // la marca sola vale para lo que venga después
+        }
+
+        // Regla horizontal: --- (o *** o ___) en su propia línea.
+        if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(linea)) {
+            cerrarTodo();
+            salida.push('<hr>');
+            return;
+        }
 
         const titulo = linea.match(/^\s{0,3}(#{1,3})\s+(.*)$/);
         if (titulo) {
+            const clase = alineacion;
             cerrarTodo();
             const nivel = titulo[1].length + 2;   // # -> h3, ## -> h4, ### -> h5
-            salida.push('<h' + nivel + '>' + renderLinea(titulo[2].trim()) + '</h' + nivel + '>');
+            salida.push(conClase('h' + nivel, clase) + renderLinea(titulo[2].trim()) + '</h' + nivel + '>');
             return;
         }
 
         const vineta = linea.match(/^\s*[-*+]\s+(.*)$/);
         if (vineta) {
+            const clase = alineacion;
             cerrarParrafo(); cerrarCita();
             if (lista !== 'ul') { cerrarLista(); salida.push('<ul>'); lista = 'ul'; }
-            salida.push('<li>' + renderLinea(vineta[1]) + '</li>');
+            salida.push(conClase('li', clase) + renderLinea(vineta[1]) + '</li>');
+            if (propia) alineacion = null;
             return;
         }
 
         const numerada = linea.match(/^\s*\d+[.)]\s+(.*)$/);
         if (numerada) {
+            const clase = alineacion;
             cerrarParrafo(); cerrarCita();
             if (lista !== 'ol') { cerrarLista(); salida.push('<ol>'); lista = 'ol'; }
-            salida.push('<li>' + renderLinea(numerada[1]) + '</li>');
+            salida.push(conClase('li', clase) + renderLinea(numerada[1]) + '</li>');
+            if (propia) alineacion = null;
             return;
         }
 
         const citaLinea = linea.match(/^\s*(?:&gt;|>)\s?(.*)$/);
         if (citaLinea) {
+            const clase = alineacion;
             cerrarParrafo(); cerrarLista();
             if (!cita) { salida.push('<blockquote>'); cita = true; }
-            salida.push('<p>' + renderLinea(citaLinea[1]) + '</p>');
+            salida.push(conClase('p', clase) + renderLinea(citaLinea[1]) + '</p>');
+            if (propia) alineacion = null;
             return;
         }
 
         cerrarLista(); cerrarCita();
+        if (!parrafo.length) parrafoClase = alineacion;
         parrafo.push(renderLinea(linea));
+        if (propia) alineacion = null;
     });
 
     cerrarTodo();
@@ -1065,7 +1125,6 @@ export function setupProblogs() {
     contenidoEl = document.getElementById('problog-contenido');
     archivoEl = document.getElementById('problog-file');
     etiquetasEl = document.getElementById('problog-etiquetas');
-    addTextoBtn = document.getElementById('problog-add-texto');
     addImagenBtn = document.getElementById('problog-add-imagen');
     contadorEl = document.getElementById('problog-contador-imagenes');
     // Guardar y limpiar viven en la barra inferior (antes los tenía el propio
@@ -1080,7 +1139,6 @@ export function setupProblogs() {
     filtroMiasBtn = document.getElementById('problogs-filtro-mias');
     masBtn = document.getElementById('problogs-mas');
 
-    addTextoBtn?.addEventListener('click', () => anadirTexto());
     addImagenBtn?.addEventListener('click', () => anadirImagen());
     limpiarBtn?.addEventListener('click', limpiarEditor);
     vistaPreviaBtn?.addEventListener('click', abrirVistaPrevia);

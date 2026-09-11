@@ -41,7 +41,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=4e0d414d29';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=b85678fee0';
-import { setupProblogs, abrirProblogDesdeNotificacion } from './problogs.js?v=3d26e7165f';
+import { setupProblogs, abrirProblogDesdeNotificacion } from './problogs.js?v=0d2496806a';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=9d49dcd6a0';
 import { setupPush } from './push.js?v=90adec831d';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
