@@ -528,6 +528,23 @@
     align-items: center;
 }
 
+/* Botón "Cargar más": el scroll infinito lo dispara solo, pero se queda visible
+   como respaldo (y para que se vea que hay más contenido). */
+#problogs .problogs-mas {
+    display: block;
+    width: auto;
+    margin: 4px auto 30px;
+    padding: 11px 26px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 22px;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 /* ============================================================
    3. VISTA DE LECTURA
    ============================================================ */

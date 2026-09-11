@@ -25,7 +25,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=d86e42a5e7';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono } from './galeria-ui.js?v=785649ff42';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=785649ff42';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=155a6230e0';
@@ -35,13 +35,20 @@ const MAX_TEXTO = 20000;
 const MAX_PIE = 300;
 
 let form, tituloEl, bloquesEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn;
-let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn;
+let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
 // bloques: [{ tipo:'texto', contenido } | { tipo:'imagen', slot, pie, file?, previewUrl?, url? }]
 let bloques = [];
 let observandoSeccion = false;
 let feedCargado = false;
 let guardando = false;
+
+// Paginación del feed
+const POR_PAGINA = 10;
+let paginaFeed = 1;
+let hayMasFeed = false;
+let cargandoFeed = false;
+let observadorFeed = null;
 
 // Estado de edición
 let editandoId = null;        // null = creando; si no, id de la publicación
@@ -456,25 +463,83 @@ function tarjetaProblog(p) {
         </article>`;
 }
 
-async function cargarFeed() {
-    if (!feedEl) return;
-    feedEl.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
+// Carga una página del feed. `reemplazar` = true para la primera (o al cambiar
+// de filtro) y false para ir añadiendo al final.
+async function cargarPagina(pagina, reemplazar) {
+    if (!feedEl || cargandoFeed) return;
+    cargandoFeed = true;
+    if (masBtn && !reemplazar) masBtn.textContent = 'Cargando…';
     try {
-        const ruta = modoMias ? '/api/artistas/mis-problogs?limit=50' : '/problogs?limit=20';
-        const data = await apiRequest(ruta);
+        const base = modoMias ? '/api/artistas/mis-problogs' : '/problogs';
+        const data = await apiRequest(base + '?page=' + pagina + '&limit=' + POR_PAGINA);
         const lista = (data && data.problogs) || [];
-        if (!lista.length) {
-            feedEl.innerHTML = modoMias
-                ? '<p class="problogs-vacio">Todavía no has publicado nada.</p>'
-                : '<p class="problogs-vacio">Todavía no hay publicaciones. ¡Sé el primero en contar tu proceso!</p>';
-        } else {
-            feedEl.innerHTML = lista.map(tarjetaProblog).join('');
+        const total = (data && data.total) || 0;
+        const html = lista.map(tarjetaProblog).join('');
+
+        if (reemplazar) {
+            if (!lista.length) {
+                feedEl.innerHTML = modoMias
+                    ? '<p class="problogs-vacio">Todavía no has publicado nada.</p>'
+                    : '<p class="problogs-vacio">Todavía no hay publicaciones. ¡Sé el primero en contar tu proceso!</p>';
+            } else {
+                feedEl.innerHTML = html;
+            }
+            paginaFeed = 1;
+        } else if (html) {
+            // Se AÑADE al final en vez de re-pintar: así no se pierde el scroll
+            // ni se vuelven a cargar las imágenes ya visibles.
+            feedEl.insertAdjacentHTML('beforeend', html);
+            paginaFeed = pagina;
         }
+        // El total lo da el servidor, así que se sabe si quedan más sin probar
+        // pidiendo una página de más.
+        hayMasFeed = pagina * POR_PAGINA < total;
         feedCargado = true;
     } catch (err) {
         debugLog.error('Error cargando problogs:', err);
-        feedEl.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+        if (reemplazar) feedEl.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+        hayMasFeed = false;
+    } finally {
+        cargandoFeed = false;
+        if (masBtn) masBtn.textContent = 'Cargar más';
+        actualizarBotonMas();
     }
+}
+
+function cargarFeed() {
+    if (!feedEl) return;
+    feedEl.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
+    actualizarBotonMas();
+    return cargarPagina(1, true);
+}
+
+function actualizarBotonMas() {
+    if (masBtn) masBtn.classList.toggle('hidden', !hayMasFeed);
+}
+
+// Al acercarse al botón se carga la siguiente página sola (scroll infinito).
+// El botón sigue ahí como respaldo: si el navegador no trae IntersectionObserver,
+// el usuario puede pulsarlo. Se observa con margen para que la carga empiece
+// antes de que llegue a verse.
+function conectarObservadorFeed() {
+    if (!masBtn || observadorFeed) return;
+    if (typeof IntersectionObserver !== 'function') return;   // queda el botón
+    observadorFeed = new IntersectionObserver((entradas) => {
+        if (!entradas.some((e) => e.isIntersecting)) return;
+        if (!hayMasFeed || cargandoFeed) return;
+        if (detalleEl && !detalleEl.classList.contains('hidden')) return;  // leyendo
+        cargarPagina(paginaFeed + 1, false);
+    }, { rootMargin: '250px' });
+    observadorFeed.observe(masBtn);
+}
+
+// Abre una publicación desde una notificación: deja la sección visible (si no lo
+// estaba) y muestra su lectura.
+export function abrirProblogDesdeNotificacion(id) {
+    const num = parseInt(id, 10);
+    if (!num) return;
+    if (seccionEl && seccionEl.classList.contains('hidden')) toggleProblogs();
+    abrirLectura(num);
 }
 
 function cambiarFiltro(mias) {
@@ -573,6 +638,7 @@ export function setupProblogs() {
     seccionEl = document.getElementById('problogs');
     filtroTodasBtn = document.getElementById('problogs-filtro-todas');
     filtroMiasBtn = document.getElementById('problogs-filtro-mias');
+    masBtn = document.getElementById('problogs-mas');
 
     addTextoBtn?.addEventListener('click', () => anadirTexto());
     addImagenBtn?.addEventListener('click', () => anadirImagen());
@@ -581,6 +647,12 @@ export function setupProblogs() {
 
     filtroTodasBtn?.addEventListener('click', () => cambiarFiltro(false));
     filtroMiasBtn?.addEventListener('click', () => cambiarFiltro(true));
+
+    // Respaldo del scroll infinito: pulsar "Cargar más" a mano.
+    masBtn?.addEventListener('click', () => {
+        if (hayMasFeed && !cargandoFeed) cargarPagina(paginaFeed + 1, false);
+    });
+    conectarObservadorFeed();
 
     // Delegación: un solo listener para todos los botones de los bloques.
     bloquesEl?.addEventListener('click', (e) => {

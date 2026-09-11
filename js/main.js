@@ -41,7 +41,7 @@ import {
     setupObraFormSubmit, setupFormAccordions
 } from './panel-ui.js?v=eb6c878bdb';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=54698f111e';
-import { setupProblogs } from './problogs.js?v=802de3c5c9';
+import { setupProblogs, abrirProblogDesdeNotificacion } from './problogs.js?v=713cd77ef8';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=c527ffd220';
 import { setupPush } from './push.js?v=1f82b96c74';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
@@ -163,7 +163,7 @@ async function cargarNotificaciones() {
             const avatarHTML = n.actor_foto
                 ? `<div class="notif-avatar-wrap"><img src="${safeImgUrl(n.actor_foto)}" class="notif-avatar" alt="${renderText(n.actor_nombre)}"><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`
                 : `<div class="notif-avatar-wrap notif-avatar-default"><span class="notif-avatar-initial">${(n.actor_nombre || '?')[0].toUpperCase()}</span><span class="notif-avatar-badge">${iconos[n.tipo] || '🔔'}</span></div>`;
-            return `<div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}" data-obra="${n.obra_id || ''}">
+            return `<div class="notif-item${n.leida ? ' leida' : ''}" data-id="${n.id}" data-obra="${n.obra_id || ''}" data-problog="${n.problog_id || ''}">
                 ${avatarHTML}
                 <div class="notif-body">
                     <div class="notif-mensaje">${renderText(n.mensaje)}</div>
@@ -175,6 +175,13 @@ async function cargarNotificaciones() {
         // Click en notificación → redirige al cavent en la galería
         list.querySelectorAll('.notif-item').forEach(item => {
             item.addEventListener('click', async () => {
+                // Comentario en una publicación -> se abre su lectura.
+                const problogId = item.dataset.problog;
+                if (problogId) {
+                    document.getElementById('notif-dropdown').classList.add('hidden');
+                    abrirProblogDesdeNotificacion(problogId);
+                    return;
+                }
                 const obraId = item.dataset.obra;
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
