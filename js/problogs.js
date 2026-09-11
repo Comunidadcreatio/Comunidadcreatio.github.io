@@ -181,12 +181,13 @@ function pintarPortadas() {
             continue;
         }
         const elegida = img.nombre === portadaNombre;
+        // La imagen ocupa el cuadro entero; la elegida se distingue por el borde
+        // blanco más grueso, sin ninguna etiqueta encima.
         html += '<button type="button" class="problog-portada-cuadro' + (elegida ? ' elegida' : '') + '"' +
             ' data-portada="' + escapeHtml(img.nombre) + '"' +
             ' aria-pressed="' + (elegida ? 'true' : 'false') + '"' +
             ' title="' + (elegida ? 'Portada elegida' : 'Usar como portada') + '">' +
             '<img src="' + safeImgUrl(img.url) + '" alt="">' +
-            (elegida ? '<span class="problog-portada-marca">Portada</span>' : '') +
             '</button>';
     }
     portadasEl.innerHTML = html;

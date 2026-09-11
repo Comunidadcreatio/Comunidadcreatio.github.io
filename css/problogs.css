@@ -166,30 +166,16 @@
     display: block;
 }
 
+/* La elegida se marca con el borde blanco más grueso (los demás, 1px gris). La
+   imagen ocupa el cuadro entero, sin etiquetas encima. */
 #crear-problogs-contenido .problog-portada-cuadro.elegida {
-    border-color: var(--color-ink);
-    border-width: 2px;
+    border: 3px solid #ffffff;
 }
 
 #crear-problogs-contenido .problog-portada-cuadro.vacio {
     border-style: dashed;
     opacity: 0.45;
     cursor: default;
-}
-
-#crear-problogs-contenido .problog-portada-marca {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 2px 0;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    font-size: 8px;
-    font-weight: 700;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
 }
 
 /* El campo ocupa el marco entero y crece con lo que se escribe (el alto lo
@@ -996,6 +982,15 @@ body.creando-problogs #panel-artista {
     padding-top: 10px;
     padding-left: 36px;   /* el aire del paso 2 de Cavents */
     padding-right: 36px;
+    /* Abajo solo el hueco de las barras fijas (77px) y un poco de aire: antes
+       eran 100px aquí más otros ~76 del body, y al bajar con el teclado abierto
+       se veía un vacío grande después de Etiquetas. */
+    padding-bottom: 88px;
+}
+
+/* El body ya no reserva su propio hueco inferior: lo hace el panel. */
+body.creando-problogs {
+    padding-bottom: 0;
 }
 
 /* El marco del contenido vuelve al aire que tenía antes (casi a sangre), pero

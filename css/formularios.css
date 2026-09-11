@@ -68,7 +68,8 @@
     transition: all 0.2s ease;
     font-family: 'Nunito', sans-serif;
     border: 1.5px solid var(--color-gray-300);
-    background: var(--color-white);
+    /* Sin relleno: los botones de la barra van solo con su borde. */
+    background: transparent;
     color: var(--color-ink);
     display: flex;
     align-items: center;
@@ -97,7 +98,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-white) !important;
+    background: transparent !important;
     color: var(--color-ink) !important;
     border: 1.5px solid var(--color-gray-300) !important;
     width: auto !important;
@@ -132,7 +133,8 @@
     flex-shrink: 0;
 }
 
-#obra-step-bar .limpiar-btn {
+#obra-step-bar .limpiar-btn,
+#problog-nav-bar .limpiar-btn {
     width: 32px !important;
     height: 32px !important;
     border-radius: 50% !important;
@@ -144,7 +146,8 @@
     min-width: auto !important;
 }
 
-#obra-step-bar .limpiar-btn:hover {
+#obra-step-bar .limpiar-btn:hover,
+#problog-nav-bar .limpiar-btn:hover {
     background: var(--color-gray-100) !important;
     border-color: var(--color-ink) !important;
     color: var(--color-ink) !important;
@@ -1366,8 +1369,9 @@ form,
     border-color: var(--color-ink);
 }
 
-[data-theme="dark"] #obra-step-bar .crear-btn {
-    background: var(--color-gray-100) !important;
+[data-theme="dark"] #obra-step-bar .crear-btn,
+[data-theme="dark"] #problog-nav-bar .crear-btn {
+    background: transparent !important;
     border: 1.5px solid var(--color-border) !important;
     color: var(--color-ink) !important;
 }
