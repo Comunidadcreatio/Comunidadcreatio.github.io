@@ -1094,7 +1094,10 @@ form,
     #modal-registro input,
     #modal-registro select,
     #modal-registro button,
-    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab) {
+    /* Los botones del editor de Problogs se excluyen: son iconos cuadrados
+       (añadir párrafo/imagen y las acciones de cada bloque) y con width:100%
+       salían estirados a lo ancho. */
+    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab):not(.problog-anadir-btn):not(.problog-btn-icono) {
         width: 100%;
         box-sizing: border-box;
         padding: 14px 12px; /* Mejor área táctil */

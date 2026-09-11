@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.557';
+        var currentVer = '1.0.558';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -76,11 +76,11 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=14404fd5ea">
+    <link rel="stylesheet" href="css/style.css?v=428a61c9cb">
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=c8c5168c82">
+    <link rel="stylesheet" href="css/problogs.css?v=62e38a17af">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -429,7 +429,7 @@
                 </div>
                 <div class="step-nav-right">
                     <button type="button" class="nav-btn limpiar-btn" id="problog-nav-limpiar" title="Limpiar campos" aria-label="Limpiar campos"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
-                    <button type="submit" class="nav-btn crear-btn" id="problog-nav-publicar" form="problog-form">Publicar problog</button>
+                    <button type="submit" class="nav-btn crear-btn" id="problog-nav-publicar" form="problog-form">Crear Problog</button>
                 </div>
             </div>
 
@@ -720,12 +720,14 @@
 
                     <div class="problog-campo">
                         <span class="problog-etiqueta-campo">Contenido</span>
-                        <p class="problog-ayuda">Cuenta tu proceso en el orden que quieras: añade párrafos e imágenes donde encajen.</p>
-                        <div id="problog-bloques" class="problog-bloques"></div>
+                        <!-- Iconos de añadir, justo debajo de la etiqueta -->
                         <div class="problog-anadir">
-                            <button type="button" id="problog-add-texto" class="problog-anadir-btn">+ Párrafo</button>
-                            <button type="button" id="problog-add-imagen" class="problog-anadir-btn">+ Imagen</button>
+                            <button type="button" id="problog-add-texto" class="problog-anadir-btn" title="Añadir párrafo" aria-label="Añadir párrafo"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="13" y2="17"/></svg></button>
+                            <button type="button" id="problog-add-imagen" class="problog-anadir-btn" title="Añadir imagen" aria-label="Añadir imagen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><circle cx="8.5" cy="9.5" r="1.5"/><polyline points="21 16 16 11 5 20"/></svg></button>
                         </div>
+                        <!-- Marco donde se escribe: sin relleno y con un borde fino,
+                             igual que la línea del título. -->
+                        <div id="problog-bloques" class="problog-bloques"></div>
                         <p class="problog-contador" id="problog-contador-imagenes">0 / 5 imágenes</p>
                     </div>
 
@@ -1081,7 +1083,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=9115042b37" type="module"></script>
+    <script src="js/main.js?v=3c8ddf9ce8" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

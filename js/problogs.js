@@ -216,9 +216,9 @@ function limpiarEditor() {
     if (etiquetasEl) etiquetasEl.value = '';
     const publicado = document.querySelector('input[name="problog-estado"][value="publicado"]');
     if (publicado) publicado.checked = true;
-    if (guardarBtn) guardarBtn.textContent = 'Publicar problog';
-    // Arranca con un párrafo vacío para poder escribir de inmediato.
-    bloques.push({ tipo: 'texto', contenido: '' });
+    if (guardarBtn) guardarBtn.textContent = 'Crear Problog';
+    // El editor arranca VACÍO: el contenido se añade con los iconos de párrafo
+    // e imagen, dentro del marco. Antes se creaba un párrafo solo.
     pintarBloques();
 }
 
@@ -304,7 +304,7 @@ async function guardar(e) {
         guardando = false;
         if (guardarBtn) {
             guardarBtn.disabled = false;
-            guardarBtn.textContent = editandoId ? 'Guardar cambios' : 'Publicar problog';
+            guardarBtn.textContent = editandoId ? 'Guardar cambios' : 'Crear Problog';
         }
     }
 }
@@ -673,6 +673,13 @@ function abrirVistaPrevia() {
 
     const capa = document.createElement('div');
     capa.id = 'problog-vista-previa-capa';
+
+    // La vista previa se queda ENTRE el header y el nav: no los tapa.
+    const cabecera = document.getElementById('main-header');
+    const nav = document.getElementById('toggle-panel');
+    if (cabecera) capa.style.top = Math.round(cabecera.getBoundingClientRect().bottom) + 'px';
+    if (nav) capa.style.bottom = Math.round(window.innerHeight - nav.getBoundingClientRect().top) + 'px';
+
     capa.innerHTML = `
         <div class="problog-vista-previa-barra">
             <span class="problog-vista-previa-etiqueta">Vista previa</span>

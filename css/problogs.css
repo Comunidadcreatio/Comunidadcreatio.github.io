@@ -107,21 +107,29 @@
     line-height: 1.4;
 }
 
-/* --- Lista de bloques --- */
+/* --- Marco del contenido ---
+   Rectángulo sin relleno y con un borde fino, como la línea del título. Es
+   donde se escribe: dentro van los párrafos y las imágenes. */
 #crear-problogs-contenido .problog-bloques {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-height: 150px;
+    padding: 10px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
+    background: transparent;
 }
 
-#crear-problogs-contenido .problog-vacio {
-    margin: 0;
-    padding: 18px;
+/* Dentro del marco, la invitación a empezar va centrada y sin su propio borde
+   (el borde lo pone ya el marco). */
+#crear-problogs-contenido .problog-bloques .problog-vacio {
+    margin: auto;
+    padding: 0 14px;
     text-align: center;
     font-size: 13px;
     color: var(--color-gray-500);
-    border: 1px dashed var(--color-gray-300);
-    border-radius: 10px;
+    border: none;
 }
 
 #crear-problogs-contenido .problog-bloque {
@@ -268,20 +276,24 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: flex-start;   /* los iconos, alineados con la etiqueta */
 }
 
+/* Iconos de añadir: cuadrados, sin relleno y con borde fino (antes eran
+   botones anchos con texto). */
 #crear-problogs-contenido #problog-form .problog-anadir-btn {
-    width: auto;
-    flex: 1 1 auto;
-    min-width: 120px;
-    padding: 11px 16px;
-    border: 1px dashed var(--color-gray-300);
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gray-300);
     border-radius: 10px;
     background: transparent;
     color: var(--color-ink);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
     cursor: pointer;
 }
 
@@ -682,6 +694,7 @@
 
 [data-theme="dark"] #crear-problogs-contenido #problog-titulo,
 [data-theme="dark"] #crear-problogs-contenido #problog-etiquetas,
+[data-theme="dark"] #crear-problogs-contenido .problog-bloques,
 [data-theme="dark"] #crear-problogs-contenido #problog-bloques .problog-btn-icono,
 [data-theme="dark"] #crear-problogs-contenido #problog-form .problog-file-label {
     border-color: rgba(255, 255, 255, 0.18);
@@ -773,9 +786,14 @@ body.creando-problogs #panel-artista #problog-form {
    Ocupa el mismo sitio que la barra de pasos de Cavents y comparte su aspecto
    (las reglas de #obra-step-bar en formularios.css la incluyen). Solo se ve
    mientras se está creando un Problog.
+   ------------------------------------------------------------
+   Sin fondo: la de Cavents usa --color-white, que en tema oscuro es #0a0a0a y
+   se veía como una franja negra sobre el contenido. Así queda solo la línea
+   superior y los botones, flotando sobre la página.
    ============================================================ */
 #problog-nav-bar {
     display: none;
+    background: transparent;
 }
 
 body.creando-problogs #problog-nav-bar {
