@@ -37,25 +37,18 @@
 }
 
 /* TÍTULO EN UNA SOLA LÍNEA
-   Misma franja que la barra de progreso de los Cavents: la etiqueta a la
-   izquierda y, justo al lado, el campo. El input se queda sin caja (ni borde ni
-   fondo) reducido a su línea inferior, igual que los campos del formulario de
-   Cavents, para que lo único que se vea sea la línea donde se escribe. */
+   La etiqueta va arriba y el campo debajo, con la misma línea de campo que los
+   Cavents: sin caja (ni borde ni fondo) y reducido a su borde inferior. */
 #crear-problogs-contenido .problog-campo-titulo {
-    flex-direction: row;
-    align-items: baseline;
-    gap: 12px;
-}
-
-#crear-problogs-contenido .problog-campo-titulo > label {
-    flex-shrink: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
 }
 
 #crear-problogs-contenido .problog-campo-titulo #problog-titulo {
-    flex: 1 1 auto;
+    width: 100%;
     min-width: 0;
-    width: auto;
-    padding: 10px 0;
+    padding: 8px 0;
     margin-bottom: 0;
     border: none;
     border-bottom: 1px solid var(--color-gray-300);
@@ -65,7 +58,7 @@
     font-weight: 600;
 }
 
-/* Al escribir se marca la línea y engorda, como en los Cavents. */
+/* Al escribir se marca la línea, como en los Cavents. */
 #crear-problogs-contenido .problog-campo-titulo #problog-titulo:focus {
     border-bottom-color: var(--color-ink);
     border-bottom-width: 2px;
@@ -313,7 +306,7 @@
 #crear-problogs-contenido .problog-anadir {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 3px;
     max-width: 540px;   /* en pantallas anchas no se estiran sin sentido */
     padding-bottom: 10px;
     border-bottom: 1px solid var(--color-gray-200);
@@ -340,17 +333,17 @@
 }
 
 #crear-problogs-contenido .problog-anadir-btn svg {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
     display: block;
 }
 
 /* El nombre, pequeño y sin desbordarse del botón. */
 #crear-problogs-contenido .problog-anadir-nombre {
     max-width: 100%;
-    font-size: 8px;
+    font-size: 7px;
     line-height: 1.1;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
     color: var(--color-gray-500);
     white-space: nowrap;
     overflow: hidden;
@@ -927,10 +920,8 @@
    24px más. Casi 200px de agujero entre el header y la sección; sin barras
    que tapar, no hacen falta.
 
-   El aire lateral eran 64px por lado: 24 del `main` (su padding lateral es
-   24px tanto en móvil como en escritorio), 20 del panel y 20 del formulario.
-   Se descartan los tres, así que la sección ocupa el ancho completo; solo se
-   dejan 3px de respiro a cada lado para que no toque el borde de la pantalla.
+   El aire lateral: se deja el MISMO que el campo del paso 2 de Cavents (medido
+   en el navegador: 36px por lado), en vez de ir a sangre.
 
    Todo va bajo body.creando-problogs para no tocar el formulario de Cavents,
    que sí necesita su hueco superior para la barra de pasos.
@@ -945,12 +936,25 @@ body.creando-problogs #panel-artista {
     margin-left: -24px;   /* se sale del padding lateral del main */
     margin-right: -24px;
     padding-top: 0;
-    padding-left: 3px;    /* el respiro que pide la sección */
-    padding-right: 3px;
+    padding-left: 36px;   /* el aire del paso 2 de Cavents */
+    padding-right: 36px;
+}
+
+/* En escritorio el panel de Cavents va centrado con 700px de ancho: el de
+   Problogs hace lo mismo, así que allí no hacen falta los márgenes negativos. */
+@media (min-width: 769px) {
+    body.creando-problogs #panel-artista {
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 }
 
 /* `#panel-artista form` mete 24px arriba y 20px a los lados a todos los
-   formularios del panel; el del problog va a sangre. */
+   formularios del panel; aquí solo sobra el de arriba (y el de los lados, que
+   ya lo pone el panel). */
 body.creando-problogs #panel-artista #problog-form {
     padding-top: 0;
     padding-left: 0;
