@@ -982,15 +982,20 @@ body.creando-problogs #panel-artista {
     padding-top: 10px;
     padding-left: 36px;   /* el aire del paso 2 de Cavents */
     padding-right: 36px;
-    /* Abajo solo el hueco de las barras fijas (77px) y un poco de aire: antes
-       eran 100px aquí más otros ~76 del body, y al bajar con el teclado abierto
-       se veía un vacío grande después de Etiquetas. */
-    padding-bottom: 88px;
+    /* El hueco de abajo lo pone #crear-problogs-contenido (lo mide el JS, porque
+       depende de las barras y de si el teclado está abierto). */
+    padding-bottom: 0;
 }
 
-/* El body ya no reserva su propio hueco inferior: lo hace el panel. */
+/* El body tampoco reserva su propio hueco inferior: lo hace el editor. */
 body.creando-problogs {
     padding-bottom: 0;
+}
+
+/* Respaldo por si el JS no llegara a ajustarlo: el hueco de las barras y el nav
+   (el JS lo deja más fino, y casi a cero con el teclado abierto). */
+body.creando-problogs #crear-problogs-contenido {
+    padding-bottom: 150px;
 }
 
 /* El marco del contenido vuelve al aire que tenía antes (casi a sangre), pero

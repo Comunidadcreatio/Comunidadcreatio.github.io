@@ -47,6 +47,8 @@ import { artistaActual } from './auth.js?v=f2799071b6';
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
 const MIN_ALTO_CONTENIDO = 260;
+// A partir de cuánto se considera que la ventana visible se encogió por el teclado.
+const TECLADO_UMBRAL = 100;
 
 let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, guardarBtn, limpiarBtn, vistaPreviaBtn, portadasEl;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
@@ -198,6 +200,26 @@ function ajustarAltoContenido() {
     if (!contenidoEl) return;
     contenidoEl.style.height = 'auto';
     contenidoEl.style.height = Math.max(MIN_ALTO_CONTENIDO, contenidoEl.scrollHeight) + 'px';
+}
+
+// Hueco de abajo: lo que tapan las barras fijas (nav + pestañas + barra de crear)
+// no es un valor fijo, así que se mide en vivo. Si no se ajusta, o el último
+// campo (Etiquetas) queda detrás de las barras, o sobra un vacío grande.
+//
+// Con el teclado abierto las barras quedan por detrás de él, así que no hay que
+// reservar su sitio: por eso ahí el hueco baja a casi nada y no se ve el vacío
+// al llegar abajo.
+function ajustarHuecoInferior() {
+    const cont = document.getElementById('crear-problogs-contenido');
+    if (!cont) return;
+    const alto = (el) => (el ? el.getBoundingClientRect().height : 0);
+    const reserva = alto(document.getElementById('toggle-panel'))
+        + alto(document.getElementById('crear-tabs'))
+        + alto(document.getElementById('problog-nav-bar'));
+    const vv = window.visualViewport;
+    const teclado = !!(vv && (window.innerHeight - vv.height) > TECLADO_UMBRAL);
+    const aire = teclado ? 12 : 14;
+    cont.style.paddingBottom = Math.round((teclado ? 0 : reserva) + aire) + 'px';
 }
 
 // Escribe donde está el cursor y deja el foco dentro.
@@ -1317,6 +1339,23 @@ export function setupProblogs() {
         portadaNombre = cuadro.dataset.portada;
         pintarPortadas();
     });
+
+    // Hueco de abajo: se recalcula al cambiar lo que tapa (ventana, teclado) y al
+    // abrirse el panel, que arranca oculto y entonces las barras miden 0.
+    ajustarHuecoInferior();
+    window.addEventListener('resize', ajustarHuecoInferior);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', ajustarHuecoInferior);
+        window.visualViewport.addEventListener('scroll', ajustarHuecoInferior);
+    }
+    // El teclado no aparece de golpe: se vuelve a mirar cuando termina de abrir.
+    contenidoEl?.addEventListener('focus', () => setTimeout(ajustarHuecoInferior, 350));
+    contenidoEl?.addEventListener('blur', () => setTimeout(ajustarHuecoInferior, 350));
+    const panelArtista = document.getElementById('panel-artista');
+    if (panelArtista && typeof MutationObserver === 'function') {
+        new MutationObserver(ajustarHuecoInferior)
+            .observe(panelArtista, { attributes: true, attributeFilter: ['class'] });
+    }
 
     // El feed se abre con el icono del header. Se OBSERVA la clase de la sección
     // en vez de engancharse a ese botón: así funciona sin depender de quién la
