@@ -1048,6 +1048,16 @@ function setupStepNavigation() {
     positionAll();
     window.addEventListener('resize', positionAll);
 
+    // Las barras se colocan en vivo, pero el panel arranca oculto: entonces las
+    // pestañas miden 0 y se usaba el alto de reserva, así que quedaba un hueco
+    // entre la barra de crear y las pestañas (se veían como dos fondos
+    // separados). Al mostrarse el panel se vuelven a colocar.
+    const panelArtista = document.getElementById('panel-artista');
+    if (panelArtista && typeof MutationObserver === 'function') {
+        new MutationObserver(() => positionAll())
+            .observe(panelArtista, { attributes: true, attributeFilter: ['class'] });
+    }
+
     let currentStep = 0;
 
     // Nombres de cada paso (en orden: índice 0 = Paso 1, etc.)

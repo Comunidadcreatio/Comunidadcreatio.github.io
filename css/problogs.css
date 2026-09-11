@@ -136,12 +136,68 @@
     border-bottom-color: var(--color-ink);
 }
 
+/* --- Imagen de portada ---
+   Un cuadro por cada imagen que se puede subir (8): los que tienen imagen
+   enseñan su vista previa y el elegido lleva la marca «Portada». */
+#crear-problogs-contenido .problog-portadas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+#crear-problogs-contenido .problog-portada-cuadro {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 9px;
+    background: transparent;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#crear-problogs-contenido .problog-portada-cuadro img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+#crear-problogs-contenido .problog-portada-cuadro.elegida {
+    border-color: var(--color-ink);
+    border-width: 2px;
+}
+
+#crear-problogs-contenido .problog-portada-cuadro.vacio {
+    border-style: dashed;
+    opacity: 0.45;
+    cursor: default;
+}
+
+#crear-problogs-contenido .problog-portada-marca {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 2px 0;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
 /* El campo ocupa el marco entero y crece con lo que se escribe (el alto lo
    ajusta el JS), así que no lleva caja ni scroll propios. */
 #crear-problogs-contenido .problog-contenido {
     display: block;
     width: 100%;
-    min-height: 160px;
+    min-height: 260px;
     box-sizing: border-box;
     padding: 0;
     margin: 0;
@@ -944,11 +1000,16 @@ body.creando-problogs #panel-artista {
 
 /* El marco del contenido vuelve al aire que tenía antes (casi a sangre), pero
    solo en el móvil: en escritorio el panel va centrado y el marco lo acompaña,
-   como los demás campos. */
+   como los demás campos. Su etiqueta se queda alineada con las otras
+   («Título», «Imagen de portada»), que sí llevan el aire de Cavents. */
 @media (max-width: 768px) {
     body.creando-problogs #crear-problogs-contenido .problog-campo-contenido {
         margin-left: -33px;
         margin-right: -33px;
+    }
+
+    body.creando-problogs #crear-problogs-contenido .problog-campo-contenido > .problog-etiqueta-campo {
+        margin-left: 33px;
     }
 }
 

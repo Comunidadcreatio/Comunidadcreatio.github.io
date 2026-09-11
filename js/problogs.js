@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=ba4ac5ba0d';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=31451c9d58';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=f10b61e047';
@@ -44,10 +44,11 @@ import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
 // Solo para firmar la vista previa con el nombre del artista.
 import { artistaActual } from './auth.js?v=f2799071b6';
 
-const MAX_IMAGENES = 5;
+const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
+const MIN_ALTO_CONTENIDO = 260;
 
-let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, guardarBtn, limpiarBtn, vistaPreviaBtn;
+let form, tituloEl, contenidoEl, archivoEl, etiquetasEl, addImagenBtn, guardarBtn, limpiarBtn, vistaPreviaBtn, portadasEl;
 let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 
 // Imágenes del contenido en curso, por el nombre que aparece en la etiqueta:
@@ -55,6 +56,8 @@ let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn, masBtn;
 //   guardadas -> { slot, url, pie }    (ya en el servidor, al editar)
 let imagenesLocales = new Map();
 let imagenesGuardadas = new Map();
+// Cuál de esas imágenes va de portada (por nombre; el slot se resuelve al guardar).
+let portadaNombre = null;
 let observandoSeccion = false;
 let feedCargado = false;
 let guardando = false;
@@ -135,18 +138,65 @@ function contarImagenes() {
         .filter((t) => t.tipo === 'imagen').length;
 }
 
-// El número de imágenes ya no se enseña (se quitó el contador), pero sigue
+// El número de imágenes no se enseña (se quitó el contador), pero sigue
 // haciendo falta para no pasar del máximo: el icono se desactiva al llegar.
+// De paso se repintan los cuadros de portada, que dependen de las imágenes que
+// haya en el texto.
 function actualizarContador() {
     const n = contarImagenes();
     if (addImagenBtn) addImagenBtn.disabled = n >= MAX_IMAGENES;
+    pintarPortadas();
+}
+
+// Imágenes que hay ahora mismo en el contenido, en el orden en que aparecen.
+function imagenesDelContenido() {
+    const vistas = new Set();
+    const lista = [];
+    analizarContenido(contenidoEl ? contenidoEl.value : '').forEach((t) => {
+        if (t.tipo !== 'imagen' || vistas.has(t.nombre)) return;
+        vistas.add(t.nombre);
+        const local = imagenesLocales.get(t.nombre);
+        const guardada = imagenesGuardadas.get(t.nombre);
+        const url = (local && local.previewUrl) || (guardada && guardada.url) || '';
+        if (url) lista.push({ nombre: t.nombre, url: url });
+    });
+    return lista;
+}
+
+// Los cuadros de «Imagen de portada»: uno por cada imagen que se puede subir.
+// Los que no tienen imagen salen vacíos (para que se vea el hueco que queda) y
+// el elegido lleva la marca. Si la portada elegida desaparece del texto, se cae
+// a la primera imagen.
+function pintarPortadas() {
+    if (!portadasEl) return;
+    const lista = imagenesDelContenido();
+    if (portadaNombre && !lista.some((i) => i.nombre === portadaNombre)) portadaNombre = null;
+    if (!portadaNombre && lista.length > 0) portadaNombre = lista[0].nombre;
+
+    let html = '';
+    for (let i = 0; i < MAX_IMAGENES; i++) {
+        const img = lista[i];
+        if (!img) {
+            html += '<div class="problog-portada-cuadro vacio" aria-hidden="true"></div>';
+            continue;
+        }
+        const elegida = img.nombre === portadaNombre;
+        html += '<button type="button" class="problog-portada-cuadro' + (elegida ? ' elegida' : '') + '"' +
+            ' data-portada="' + escapeHtml(img.nombre) + '"' +
+            ' aria-pressed="' + (elegida ? 'true' : 'false') + '"' +
+            ' title="' + (elegida ? 'Portada elegida' : 'Usar como portada') + '">' +
+            '<img src="' + safeImgUrl(img.url) + '" alt="">' +
+            (elegida ? '<span class="problog-portada-marca">Portada</span>' : '') +
+            '</button>';
+    }
+    portadasEl.innerHTML = html;
 }
 
 // El marco crece con lo que se escribe, sin scroll propio.
 function ajustarAltoContenido() {
     if (!contenidoEl) return;
     contenidoEl.style.height = 'auto';
-    contenidoEl.style.height = Math.max(160, contenidoEl.scrollHeight) + 'px';
+    contenidoEl.style.height = Math.max(MIN_ALTO_CONTENIDO, contenidoEl.scrollHeight) + 'px';
 }
 
 // Escribe donde está el cursor y deja el foco dentro.
@@ -305,6 +355,7 @@ function limpiarEditor() {
     imagenesLocales.forEach((img) => { if (img.previewUrl) URL.revokeObjectURL(img.previewUrl); });
     imagenesLocales = new Map();
     imagenesGuardadas = new Map();
+    portadaNombre = null;
     editandoId = null;
     if (contenidoEl) contenidoEl.value = '';
     if (tituloEl) tituloEl.value = '';
@@ -326,6 +377,7 @@ function construirDesdeTexto() {
     const usados = new Set();
     const vistos = new Set();
     const usadosAlFinal = new Set();
+    const slotPorNombre = new Map();   // nombre de la etiqueta -> slot resuelto
 
     // Primero se reservan los slots de las imágenes que ya estaban guardadas:
     // conservan el suyo, así no hay que volver a subirlas aunque el autor las
@@ -355,6 +407,7 @@ function construirDesdeTexto() {
         const guardada = imagenesGuardadas.get(t.nombre);
         if (guardada) {
             usadosAlFinal.add(guardada.slot);
+            slotPorNombre.set(t.nombre, guardada.slot);
             salida.push({ tipo: 'imagen', slot: guardada.slot, pie: guardada.pie || '' });
             urls[guardada.slot] = guardada.url;
             return;
@@ -362,8 +415,9 @@ function construirDesdeTexto() {
         const local = imagenesLocales.get(t.nombre);
         if (!local) return;   // etiqueta sin archivo: se ignora
         const slot = siguienteLibre();
-        if (slot === -1) return;   // ya hay 5 imágenes
+        if (slot === -1) return;   // ya no quedan slots libres
         usadosAlFinal.add(slot);
+        slotPorNombre.set(t.nombre, slot);
         salida.push({ tipo: 'imagen', slot: slot, pie: '' });
         archivos.push({ slot: slot, file: local.file });
         urls[slot] = local.previewUrl;
@@ -375,7 +429,12 @@ function construirDesdeTexto() {
         if (!usadosAlFinal.has(g.slot)) eliminar.push(g.slot);
     });
 
-    return { bloques: salida, archivos: archivos, eliminar: eliminar, urls: urls };
+    // La portada viaja como slot. Si la imagen elegida ya no está (o no hay
+    // ninguna), se manda null y el servidor cae a la primera que haya.
+    const portadaSlot = (portadaNombre && slotPorNombre.has(portadaNombre))
+        ? slotPorNombre.get(portadaNombre) : null;
+
+    return { bloques: salida, archivos: archivos, eliminar: eliminar, urls: urls, portadaSlot: portadaSlot };
 }
 
 
@@ -394,7 +453,7 @@ async function guardar(e) {
     }
 
     // El texto del marco se convierte en los bloques que espera el servidor.
-    const { bloques: limpios, archivos, eliminar } = construirDesdeTexto();
+    const { bloques: limpios, archivos, eliminar, portadaSlot } = construirDesdeTexto();
     if (limpios.length === 0) {
         showError('Escribe algo o añade una imagen.');
         return;
@@ -406,6 +465,9 @@ async function guardar(e) {
     formData.append('etiquetas', (etiquetasEl && etiquetasEl.value || '').trim());
     const estadoSel = document.querySelector('input[name="problog-estado"]:checked');
     formData.append('estado', estadoSel ? estadoSel.value : 'publicado');
+    // Cuál de las imágenes va de portada (el servidor cae a la primera si no
+    // llega o si esa imagen ya no está).
+    if (portadaSlot !== null) formData.append('portada_slot', String(portadaSlot));
     const esEdicion = !!editandoId;
     if (esEdicion) {
         // Slots cuyas imágenes guardadas ya no están en el texto: el servidor
@@ -473,6 +535,7 @@ function cargarParaEditar(p) {
     // el nombre de archivo sacado de su URL, para que al guardar conserve su slot.
     const imagenes = p.imagenes || [];
     const partes = [];
+    let nombrePortada = null;
     (p.bloques || []).forEach((b) => {
         if (b.tipo === 'texto') {
             if ((b.contenido || '').trim()) partes.push(b.contenido);
@@ -482,9 +545,13 @@ function cargarParaEditar(p) {
         if (!url) return;
         const nombre = nombreUnico(nombreDeUrl(url));
         imagenesGuardadas.set(nombre, { slot: b.slot, url: url, pie: b.pie || '' });
+        if (p.portada_slot != null && Number(p.portada_slot) === b.slot) nombrePortada = nombre;
         partes.push('<image>' + nombre + '</image>');
     });
     if (contenidoEl) contenidoEl.value = partes.join('\n\n');
+    // La portada guardada se recupera por su slot; si no hay, los cuadros eligen
+    // la primera por defecto.
+    portadaNombre = nombrePortada;
 
     if (guardarBtn) guardarBtn.textContent = 'Guardar cambios';
     actualizarContador();
@@ -581,7 +648,11 @@ async function alternarLike(id) {
 function tarjetaProblog(p, conAcciones) {
     const propias = (conAcciones === undefined) ? modoMias : !!conAcciones;
     const imagenes = p.imagenes || [];
-    const portada = imagenes.find((u) => !!u) || '';
+    // La portada que eligió el autor; si no hay (o su imagen desapareció), la
+    // primera que tenga la publicación.
+    const portada = (p.portada_slot != null && imagenes[Number(p.portada_slot)])
+        ? imagenes[Number(p.portada_slot)]
+        : (imagenes.find((u) => !!u) || '');
     const autor = p.nombre_artista || 'Artista';
     const inicial = (autor || '?').trim().charAt(0).toUpperCase() || '?';
     const avatar = p.foto_artista
@@ -1197,6 +1268,7 @@ export function setupProblogs() {
     archivoEl = document.getElementById('problog-file');
     etiquetasEl = document.getElementById('problog-etiquetas');
     addImagenBtn = document.getElementById('problog-add-imagen');
+    portadasEl = document.getElementById('problog-portadas');
     // Guardar y limpiar viven en la barra inferior (antes los tenía el propio
     // formulario, junto al final).
     guardarBtn = document.getElementById('problog-nav-publicar');
@@ -1235,6 +1307,14 @@ export function setupProblogs() {
     document.getElementById('problog-anadir')?.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-formato]');
         if (btn) aplicarFormato(btn.dataset.formato);
+    });
+
+    // Elegir la portada: un solo listener para los cuadros.
+    portadasEl?.addEventListener('click', (e) => {
+        const cuadro = e.target.closest('[data-portada]');
+        if (!cuadro) return;
+        portadaNombre = cuadro.dataset.portada;
+        pintarPortadas();
     });
 
     // El feed se abre con el icono del header. Se OBSERVA la clase de la sección
