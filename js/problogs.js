@@ -2,10 +2,11 @@
 // ============================================================
 // PROBLOGS: publicaciones de blog del artista sobre su proceso creativo.
 // ------------------------------------------------------------
-// Tres partes:
+// Cuatro partes:
 //   1. EDITOR de bloques (párrafo / imagen) que el autor ordena.
-//   2. FEED de publicaciones en la sección #problogs.
+//   2. FEED de publicaciones en la sección #problogs, con filtro Todas / Mías.
 //   3. VISTA DE LECTURA de una publicación completa.
+//   4. EDICIÓN y BORRADO de las propias.
 //
 // SEGURIDAD: todo el texto del usuario pasa por renderText() (escapa y
 // normaliza entidades) y toda imagen por safeImgUrl()/cloudinaryUrl(), según la
@@ -16,23 +17,34 @@
 // Las imágenes usan el MISMO esquema de slots que los Cavents (imagen_0..4), y
 // el backend las devuelve como array POSICIONAL de 5: el índice ES el slot, así
 // que cada bloque resuelve su imagen con imagenes[slot] sin ambigüedad.
+//
+// El filtro "Mías" no es un adorno: los borradores NO aparecen en el feed
+// público, así que sin una lista propia una publicación guardada como borrador
+// quedaría imposible de encontrar y de editar.
 // ============================================================
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=d86e42a5e7';
-import { showSuccess, showError } from './notificaciones.js?v=d2867c8ca0';
+import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
+import { abrirCrearDesdeIcono, volverDesdeIcono } from './galeria-ui.js?v=ac29a28ca0';
 
 const MAX_IMAGENES = 5;
 const MAX_TEXTO = 20000;
 const MAX_PIE = 300;
 
 let form, tituloEl, bloquesEl, etiquetasEl, addTextoBtn, addImagenBtn, contadorEl, guardarBtn, limpiarBtn;
-let feedEl, detalleEl, seccionEl;
+let feedEl, detalleEl, seccionEl, filtroTodasBtn, filtroMiasBtn;
 
-// bloques: [{ tipo:'texto', contenido } | { tipo:'imagen', slot, pie, file?, previewUrl? }]
+// bloques: [{ tipo:'texto', contenido } | { tipo:'imagen', slot, pie, file?, previewUrl?, url? }]
 let bloques = [];
 let observandoSeccion = false;
 let feedCargado = false;
 let guardando = false;
+
+// Estado de edición
+let editandoId = null;        // null = creando; si no, id de la publicación
+let slotsEliminados = [];     // slots cuya imagen existente hay que borrar en el servidor
+let modoMias = false;         // false = feed público; true = mis publicaciones
+let publicacionAbierta = null;
 
 // ============================================================
 // UTILIDADES
@@ -168,7 +180,14 @@ function moverBloque(i, delta) {
 function borrarBloque(i) {
     recogerDelDom();
     const b = bloques[i];
-    if (b && b.previewUrl) URL.revokeObjectURL(b.previewUrl);
+    if (b) {
+        if (b.previewUrl) URL.revokeObjectURL(b.previewUrl);
+        // Si era una imagen que YA estaba en el servidor, hay que pedir su
+        // borrado: si no, quedaría huérfana en Cloudinary.
+        if (b.tipo === 'imagen' && b.url && !b.file) {
+            if (slotsEliminados.indexOf(b.slot) === -1) slotsEliminados.push(b.slot);
+        }
+    }
     bloques.splice(i, 1);
     pintarBloques();
 }
@@ -176,17 +195,20 @@ function borrarBloque(i) {
 function limpiarEditor() {
     bloques.forEach((b) => { if (b.previewUrl) URL.revokeObjectURL(b.previewUrl); });
     bloques = [];
+    editandoId = null;
+    slotsEliminados = [];
     if (tituloEl) tituloEl.value = '';
     if (etiquetasEl) etiquetasEl.value = '';
     const publicado = document.querySelector('input[name="problog-estado"][value="publicado"]');
     if (publicado) publicado.checked = true;
+    if (guardarBtn) guardarBtn.textContent = 'Publicar';
     // Arranca con un párrafo vacío para poder escribir de inmediato.
     bloques.push({ tipo: 'texto', contenido: '' });
     pintarBloques();
 }
 
 // ============================================================
-// GUARDAR
+// GUARDAR (crear o actualizar)
 // ============================================================
 async function guardar(e) {
     if (e) e.preventDefault();
@@ -201,14 +223,15 @@ async function guardar(e) {
     }
 
     // Solo se envían bloques con contenido real: los párrafos vacíos y las
-    // imágenes sin archivo se descartan antes de salir. Se hace así a propósito
-    // (y no bloqueando el guardado) para que sea coherente: un bloque vacío es
-    // visible en el editor y simplemente no se publica.
+    // imágenes sin archivo NI url previa se descartan antes de salir. Se hace
+    // así a propósito (y no bloqueando el guardado) para que sea coherente: un
+    // bloque vacío es visible en el editor y simplemente no se publica.
     const limpios = [];
     for (const b of bloques) {
         if (b.tipo === 'texto') {
             if ((b.contenido || '').trim()) limpios.push({ tipo: 'texto', contenido: b.contenido });
-        } else if (b.tipo === 'imagen' && b.file) {
+        } else if (b.tipo === 'imagen' && (b.file || b.url)) {
+            // `url` = imagen que ya estaba guardada (modo edición) y se conserva.
             limpios.push({ tipo: 'imagen', slot: b.slot, pie: (b.pie || '').trim() });
         }
     }
@@ -223,6 +246,11 @@ async function guardar(e) {
     formData.append('etiquetas', (etiquetasEl && etiquetasEl.value || '').trim());
     const estadoSel = document.querySelector('input[name="problog-estado"]:checked');
     formData.append('estado', estadoSel ? estadoSel.value : 'publicado');
+    const esEdicion = !!editandoId;
+    if (esEdicion) {
+        // Slots cuya imagen previa el autor quitó o reemplazó: el servidor la borra.
+        formData.append('imagenes_a_eliminar', JSON.stringify(slotsEliminados));
+    }
     // Los archivos van por slot, igual que en un Cavent.
     limpios.forEach((b) => {
         if (b.tipo !== 'imagen') return;
@@ -230,21 +258,27 @@ async function guardar(e) {
         if (original && original.file) formData.append('imagen_' + b.slot, original.file);
     });
 
+    const url = esEdicion ? API_BASE_URL + '/problogs/' + editandoId : API_BASE_URL + '/problogs';
+
     guardando = true;
     if (guardarBtn) { guardarBtn.disabled = true; guardarBtn.textContent = 'Guardando…'; }
     try {
         const token = getAuthToken();
-        const res = await fetch(API_BASE_URL + '/problogs', {
-            method: 'POST',
+        const res = await fetch(url, {
+            method: esEdicion ? 'PUT' : 'POST',
             credentials: 'include',
             headers: token ? { Authorization: 'Bearer ' + token } : {},
             body: formData
         });
         const data = await res.json().catch(() => ({}));
         if (data && data.success) {
-            showSuccess(data.message || 'Publicación guardada.');
+            showSuccess(data.message || (esEdicion ? 'Publicación actualizada.' : 'Publicación guardada.'));
             limpiarEditor();
             feedCargado = false;      // el feed se recargará al abrir la sección
+            if (esEdicion) {
+                // Al terminar de editar se vuelve a donde estaba (Problogs).
+                volverDesdeIcono();
+            }
         } else {
             showError((data && data.error) || 'No se pudo guardar la publicación.');
         }
@@ -253,7 +287,69 @@ async function guardar(e) {
         showError('Error de conexión al guardar.');
     } finally {
         guardando = false;
-        if (guardarBtn) { guardarBtn.disabled = false; guardarBtn.textContent = 'Publicar'; }
+        if (guardarBtn) {
+            guardarBtn.disabled = false;
+            guardarBtn.textContent = editandoId ? 'Guardar cambios' : 'Publicar';
+        }
+    }
+}
+
+// ============================================================
+// CARGAR UNA PUBLICACIÓN EN EL EDITOR
+// ============================================================
+function cargarParaEditar(p) {
+    if (!p || !p.id) return;
+    bloques.forEach((b) => { if (b.previewUrl) URL.revokeObjectURL(b.previewUrl); });
+    editandoId = p.id;
+    slotsEliminados = [];
+
+    if (tituloEl) tituloEl.value = p.titulo || '';
+    if (etiquetasEl) etiquetasEl.value = p.etiquetas || '';
+    const valor = (p.estado === 'borrador') ? 'borrador' : 'publicado';
+    const radio = document.querySelector('input[name="problog-estado"][value="' + valor + '"]');
+    if (radio) radio.checked = true;
+
+    const imagenes = p.imagenes || [];
+    bloques = (p.bloques || []).map((b) => {
+        if (b.tipo === 'texto') return { tipo: 'texto', contenido: b.contenido || '' };
+        return { tipo: 'imagen', slot: b.slot, pie: b.pie || '', url: imagenes[b.slot] || '' };
+    });
+    if (bloques.length === 0) bloques.push({ tipo: 'texto', contenido: '' });
+
+    if (guardarBtn) guardarBtn.textContent = 'Guardar cambios';
+    pintarBloques();
+
+    // Abre el panel de creación en la pestaña Problogs, dejando preparada la
+    // flecha de volver para regresar a Problogs al terminar.
+    abrirCrearDesdeIcono();
+    document.getElementById('tab-problogs')?.click();
+}
+
+// ============================================================
+// ELIMINAR
+// ============================================================
+async function eliminarProblog(id, titulo) {
+    const ok = await showConfirm('¿Eliminar la publicación «' + (titulo || '') + '»? No se puede deshacer.');
+    if (!ok) return;
+    try {
+        const token = getAuthToken();
+        const res = await fetch(API_BASE_URL + '/problogs/' + id, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: token ? { Authorization: 'Bearer ' + token } : {}
+        });
+        const data = await res.json().catch(() => ({}));
+        if (data && data.success) {
+            showSuccess('Publicación eliminada.');
+            feedCargado = false;
+            cerrarLectura();
+            cargarFeed();
+        } else {
+            showError((data && data.error) || 'No se pudo eliminar.');
+        }
+    } catch (err) {
+        debugLog.error('Error eliminando problog:', err);
+        showError('Error de conexión al eliminar.');
     }
 }
 
@@ -277,17 +373,34 @@ function tarjetaProblog(p) {
         extracto = t.length > 160 ? t.slice(0, 160) + '…' : t;
     }
 
+    // En "Mías" se marca el estado (los borradores no salen en el feed público)
+    // y se ofrecen las acciones.
+    const esBorrador = p.estado === 'borrador';
+    const estadoHTML = modoMias
+        ? `<span class="problog-card-estado${esBorrador ? ' problog-card-estado-borrador' : ''}">${esBorrador ? 'Borrador' : 'Publicado'}</span>`
+        : '';
+    const accionesHTML = modoMias
+        ? `<div class="problog-card-acciones">
+               <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
+               <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
+           </div>`
+        : '';
+
     return `
         <article class="problog-card" data-id="${p.id}">
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
             <div class="problog-card-cuerpo">
-                <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>
+                <div class="problog-card-cabecera">
+                    <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>
+                    ${estadoHTML}
+                </div>
                 ${extracto ? `<p class="problog-card-extracto">${renderText(extracto)}</p>` : ''}
                 <div class="problog-card-pie">
                     ${avatar}
                     <span class="problog-card-autor">${renderText(autor)}</span>
                     <span class="problog-card-fecha">${escapeHtml(fechaCorta(p.created_at))}</span>
                 </div>
+                ${accionesHTML}
             </div>
         </article>`;
 }
@@ -296,10 +409,13 @@ async function cargarFeed() {
     if (!feedEl) return;
     feedEl.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
     try {
-        const data = await apiRequest('/problogs?limit=20');
+        const ruta = modoMias ? '/api/artistas/mis-problogs?limit=50' : '/problogs?limit=20';
+        const data = await apiRequest(ruta);
         const lista = (data && data.problogs) || [];
         if (!lista.length) {
-            feedEl.innerHTML = '<p class="problogs-vacio">Todavía no hay publicaciones. ¡Sé el primero en contar tu proceso!</p>';
+            feedEl.innerHTML = modoMias
+                ? '<p class="problogs-vacio">Todavía no has publicado nada.</p>'
+                : '<p class="problogs-vacio">Todavía no hay publicaciones. ¡Sé el primero en contar tu proceso!</p>';
         } else {
             feedEl.innerHTML = lista.map(tarjetaProblog).join('');
         }
@@ -308,6 +424,15 @@ async function cargarFeed() {
         debugLog.error('Error cargando problogs:', err);
         feedEl.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
     }
+}
+
+function cambiarFiltro(mias) {
+    if (modoMias === mias) return;
+    modoMias = mias;
+    if (filtroTodasBtn) filtroTodasBtn.classList.toggle('activo', !mias);
+    if (filtroMiasBtn) filtroMiasBtn.classList.toggle('activo', mias);
+    cerrarLectura();
+    cargarFeed();
 }
 
 // ============================================================
@@ -331,11 +456,20 @@ function pintarLectura(p) {
             </figure>`;
     }).join('');
 
+    // En la vista de lectura también se puede editar/eliminar si es propia.
+    const acciones = modoMias
+        ? `<div class="problog-lectura-acciones">
+               <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
+               <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
+           </div>`
+        : '';
+
     return `
         <button type="button" class="problog-volver" id="problog-volver">← Volver</button>
         <header class="problog-lectura-cab">
             <h2 class="problog-lectura-titulo">${renderText(p.titulo)}</h2>
             <p class="problog-lectura-meta">${renderText(autor)} · ${escapeHtml(fechaCorta(p.created_at))}</p>
+            ${acciones}
         </header>
         <div class="problog-lectura-cuerpo">${bloquesHTML}</div>`;
 }
@@ -351,6 +485,7 @@ async function abrirLectura(id) {
             detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
             return;
         }
+        publicacionAbierta = data;
         detalleEl.innerHTML = pintarLectura(data);
     } catch (err) {
         debugLog.error('Error abriendo problog:', err);
@@ -363,6 +498,7 @@ function cerrarLectura() {
     detalleEl.classList.add('hidden');
     detalleEl.innerHTML = '';
     feedEl.classList.remove('hidden');
+    publicacionAbierta = null;
 }
 
 // ============================================================
@@ -383,11 +519,16 @@ export function setupProblogs() {
     feedEl = document.getElementById('problogs-feed');
     detalleEl = document.getElementById('problogs-detalle');
     seccionEl = document.getElementById('problogs');
+    filtroTodasBtn = document.getElementById('problogs-filtro-todas');
+    filtroMiasBtn = document.getElementById('problogs-filtro-mias');
 
     addTextoBtn?.addEventListener('click', () => anadirTexto());
     addImagenBtn?.addEventListener('click', () => anadirImagen());
     limpiarBtn?.addEventListener('click', limpiarEditor);
     form.addEventListener('submit', guardar);
+
+    filtroTodasBtn?.addEventListener('click', () => cambiarFiltro(false));
+    filtroMiasBtn?.addEventListener('click', () => cambiarFiltro(true));
 
     // Delegación: un solo listener para todos los botones de los bloques.
     bloquesEl?.addEventListener('click', (e) => {
@@ -411,6 +552,12 @@ export function setupProblogs() {
         if (b.previewUrl) URL.revokeObjectURL(b.previewUrl);
         b.file = input.files[0];
         b.previewUrl = URL.createObjectURL(b.file);
+        // Si se reemplaza una imagen que ya estaba en el servidor, hay que pedir
+        // el borrado de la vieja (el backend guardará la nueva en ese slot).
+        if (b.url) {
+            b.url = '';
+            if (slotsEliminados.indexOf(slot) === -1) slotsEliminados.push(slot);
+        }
         pintarBloques();
     });
 
@@ -427,18 +574,50 @@ export function setupProblogs() {
         aplicar();
     }
 
-    // Clic en una tarjeta -> vista de lectura. Delegado en el feed.
-    feedEl?.addEventListener('click', (e) => {
+    // Acciones de las tarjetas y de la vista de lectura (delegadas en un solo sitio).
+    const manejarAcciones = (e) => {
+        const editar = e.target.closest('[data-problog-editar]');
+        if (editar) {
+            e.stopPropagation();
+            const id = parseInt(editar.dataset.problogEditar, 10);
+            if (publicacionAbierta && publicacionAbierta.id === id) {
+                cargarParaEditar(publicacionAbierta);
+            } else {
+                // La tarjeta del feed no trae los bloques completos: se piden.
+                apiRequest('/problogs/' + id).then((data) => {
+                    if (data && data.id) cargarParaEditar(data);
+                    else showError('No se pudo abrir la publicación para editarla.');
+                });
+            }
+            return;
+        }
+        const eliminar = e.target.closest('[data-problog-eliminar]');
+        if (eliminar) {
+            e.stopPropagation();
+            const id = parseInt(eliminar.dataset.problogEliminar, 10);
+            const card = eliminar.closest('.problog-card');
+            const nodoTitulo = card ? card.querySelector('.problog-card-titulo') : null;
+            const titulo = (publicacionAbierta && publicacionAbierta.id === id)
+                ? publicacionAbierta.titulo
+                : (nodoTitulo ? nodoTitulo.textContent : '');
+            eliminarProblog(id, titulo);
+            return;
+        }
+        if (e.target.closest('#problog-volver')) {
+            cerrarLectura();
+            return;
+        }
+        // Clic en la tarjeta (y no en una acción) -> vista de lectura.
         const card = e.target.closest('.problog-card');
         if (card) abrirLectura(card.dataset.id);
-    });
-    detalleEl?.addEventListener('click', (e) => {
-        if (e.target.closest('#problog-volver')) cerrarLectura();
-    });
+    };
+    feedEl?.addEventListener('click', manejarAcciones);
+    detalleEl?.addEventListener('click', manejarAcciones);
 
-    // Al entrar en la pestaña Problogs, el editor arranca con un párrafo listo.
+    // Al entrar en la pestaña Problogs, el editor arranca con un párrafo listo —
+    // pero solo si NO se está editando algo (si no, borraría lo cargado).
     document.getElementById('tab-problogs')?.addEventListener('click', () => {
-        if (bloques.length === 0) limpiarEditor();
+        if (!editandoId && bloques.length === 0) limpiarEditor();
     });
 
     limpiarEditor();

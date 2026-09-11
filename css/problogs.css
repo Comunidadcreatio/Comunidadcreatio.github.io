@@ -408,6 +408,94 @@
 }
 
 /* ============================================================
+   2b. BARRA DE FILTRO (Todas / Mías) Y ACCIONES
+   ============================================================ */
+#problogs .problogs-barra {
+    display: flex;
+    gap: 8px;
+    padding: 2px 0 16px;
+}
+
+#problogs .problogs-filtro {
+    width: auto;
+    padding: 7px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-gray-500);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+#problogs .problogs-filtro.activo {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+}
+
+/* Cabecera de la tarjeta: título y, en "Mías", el estado. */
+.problog-card-cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.problog-card-cabecera .problog-card-titulo {
+    flex: 1;
+    min-width: 0;
+}
+
+/* El borrador se marca porque NO aparece en el feed público: sin esta pista el
+   autor no sabría por qué su publicación "no se ve". */
+.problog-card-estado {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+}
+
+.problog-card-estado-borrador {
+    border-color: #e67e22;
+    color: #e67e22;
+}
+
+/* Acciones de las publicaciones propias */
+.problog-card-acciones,
+.problog-lectura-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.problog-lectura-acciones {
+    margin-top: 14px;
+}
+
+#problogs .problog-card-accion {
+    width: auto;
+    padding: 7px 14px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#problogs .problog-card-accion-borrar {
+    color: #c0392b;
+    border-color: rgba(192, 57, 43, 0.4);
+}
+
+/* ============================================================
    3. VISTA DE LECTURA
    ============================================================ */
 #problogs .problogs-detalle {
@@ -518,4 +606,14 @@
 
 [data-theme="dark"] .problog-lectura-cab {
     border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] #problogs .problogs-filtro,
+[data-theme="dark"] .problog-card-estado,
+[data-theme="dark"] #problogs .problog-card-accion {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] #problogs .problogs-filtro.activo {
+    border-color: var(--color-ink);
 }
