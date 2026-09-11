@@ -475,7 +475,13 @@ async function cargarContenidoTab(tab) {
             content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
         }
     } else if (tab === 'problogs') {
-        content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Problogs — próximamente</p>';
+        // El pintado real vive en problogs.js (dueño del marcado y estilos del feed).
+        // Se avisa por evento en vez de importar, para no crear un ciclo de módulos
+        // (perfil.js -> problogs.js -> galeria-ui.js -> perfil.js).
+        content.innerHTML = '<div class="problogs-cargando">Cargando publicaciones...</div>';
+        document.dispatchEvent(new CustomEvent('perfil:problogs', {
+            detail: { contenedor: content, autorId: perfilExternoId || null }
+        }));
     } else if (tab === 'comcons') {
         content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Comcons — próximamente</p>';
     }

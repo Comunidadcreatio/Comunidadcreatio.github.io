@@ -477,7 +477,10 @@
     margin-top: 14px;
 }
 
-#problogs .problog-card-accion {
+/* Estas reglas llevan también el contenedor del perfil porque la pestaña
+   Problogs reutiliza las mismas tarjetas fuera de la sección #problogs. */
+#problogs .problog-card-accion,
+#perfil-tab-content .problog-card-accion {
     width: auto;
     padding: 7px 14px;
     border: 1px solid var(--color-gray-300);
@@ -490,7 +493,8 @@
     cursor: pointer;
 }
 
-#problogs .problog-card-accion-borrar {
+#problogs .problog-card-accion-borrar,
+#perfil-tab-content .problog-card-accion-borrar {
     color: #c0392b;
     border-color: rgba(192, 57, 43, 0.4);
 }
@@ -502,7 +506,8 @@
     margin-top: 10px;
 }
 
-#problogs .problog-social-btn {
+#problogs .problog-social-btn,
+#perfil-tab-content .problog-social-btn {
     width: auto;
     display: inline-flex;
     align-items: center;
@@ -519,7 +524,8 @@
     transition: color 0.2s ease;
 }
 
-#problogs .problog-social-btn.liked {
+#problogs .problog-social-btn.liked,
+#perfil-tab-content .problog-social-btn.liked {
     color: #c0392b;
 }
 
@@ -660,10 +666,29 @@
 
 [data-theme="dark"] #problogs .problogs-filtro,
 [data-theme="dark"] .problog-card-estado,
-[data-theme="dark"] #problogs .problog-card-accion {
+[data-theme="dark"] #problogs .problog-card-accion,
+[data-theme="dark"] #perfil-tab-content .problog-card-accion {
     border-color: rgba(255, 255, 255, 0.18);
 }
 
 [data-theme="dark"] #problogs .problogs-filtro.activo {
     border-color: var(--color-ink);
+}
+
+/* ============================================================
+   VISTA PREVIA EN LA PESTAÑA PROBLOGS DEL PERFIL
+   La pestaña reutiliza las tarjetas del feed, pero en rejilla para que
+   se vean varias publicaciones de un vistazo.
+   ============================================================ */
+.problogs-feed-perfil {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 4px 0 20px;
+}
+
+@media (max-width: 560px) {
+    .problogs-feed-perfil {
+        grid-template-columns: 1fr;
+    }
 }

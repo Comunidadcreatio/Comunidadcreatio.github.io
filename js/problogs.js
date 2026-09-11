@@ -25,7 +25,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=2e0c2e7288';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=d86e42a5e7';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=785649ff42';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=f8298b1837';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=155a6230e0';
@@ -354,6 +354,7 @@ async function eliminarProblog(id, titulo) {
             feedCargado = false;
             cerrarLectura();
             cargarFeed();
+            refrescarVistaPreviaPerfil();
         } else {
             showError((data && data.error) || 'No se pudo eliminar.');
         }
@@ -413,7 +414,11 @@ async function alternarLike(id) {
 // ============================================================
 // FEED
 // ============================================================
-function tarjetaProblog(p) {
+// `conAcciones` fuerza si la tarjeta se pinta como propia (estado + editar/borrar).
+// Por defecto lo decide el filtro del feed; la pestaña Problogs del perfil lo pasa
+// explícito, porque ahí las publicaciones son tuyas aunque el filtro sea el público.
+function tarjetaProblog(p, conAcciones) {
+    const propias = (conAcciones === undefined) ? modoMias : !!conAcciones;
     const imagenes = p.imagenes || [];
     const portada = imagenes.find((u) => !!u) || '';
     const autor = p.nombre_artista || 'Artista';
@@ -433,10 +438,10 @@ function tarjetaProblog(p) {
     // En "Mías" se marca el estado (los borradores no salen en el feed público)
     // y se ofrecen las acciones.
     const esBorrador = p.estado === 'borrador';
-    const estadoHTML = modoMias
+    const estadoHTML = propias
         ? `<span class="problog-card-estado${esBorrador ? ' problog-card-estado-borrador' : ''}">${esBorrador ? 'Borrador' : 'Publicado'}</span>`
         : '';
-    const accionesHTML = modoMias
+    const accionesHTML = propias
         ? `<div class="problog-card-acciones">
                <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
                <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
@@ -619,10 +624,133 @@ function cerrarLectura() {
 }
 
 // ============================================================
+// VISTA PREVIA EN EL PERFIL
+// ============================================================
+// Se recuerda el último contenedor pintado en el perfil para poder refrescarlo
+// tras borrar una publicación desde ahí (si no, seguiría viéndose la tarjeta).
+let contenedorPerfil = null;
+let autorPerfil = null;
+
+// Pinta la vista previa de las publicaciones dentro de la pestaña Problogs del
+// perfil. Sin `autorId` es tu propio perfil (incluye borradores); con id es el
+// perfil de otro artista (solo lo que ya está publicado y verificado).
+export async function pintarProblogsEn(contenedor, autorId) {
+    if (!contenedor) return;
+    contenedorPerfil = contenedor;
+    autorPerfil = autorId || null;
+    contenedor.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
+    try {
+        const ruta = autorPerfil
+            ? '/problogs?artista=' + encodeURIComponent(autorPerfil) + '&limit=50'
+            : '/api/artistas/mis-problogs?limit=50';
+        const data = await apiRequest(ruta);
+        // Si el contenedor ya no es el que se está viendo (se cambió de pestaña
+        // mientras cargaba), no se pisa el contenido nuevo.
+        if (contenedor !== contenedorPerfil || !contenedor.isConnected) return;
+        // apiRequest no lanza: devuelve {success:false} si algo falla, y eso no
+        // es lo mismo que "no hay publicaciones".
+        if (!data || data.success === false) {
+            contenedor.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+            return;
+        }
+        const lista = data.problogs || [];
+        if (!lista.length) {
+            contenedor.innerHTML = '<p class="problogs-vacio">' + (autorPerfil
+                ? 'Este artista todavía no ha publicado ningún problog.'
+                : 'Todavía no has publicado ningún problog.') + '</p>';
+            return;
+        }
+        contenedor.innerHTML = '<div class="problogs-feed problogs-feed-perfil">' +
+            lista.map((p) => tarjetaProblog(p, !autorPerfil)).join('') + '</div>';
+        // Un solo listener por contenedor: la pestaña se puede reabrir muchas veces.
+        if (!contenedor.dataset.problogsPerfilListo) {
+            contenedor.dataset.problogsPerfilListo = '1';
+            contenedor.addEventListener('click', (e) => manejarAcciones(e, true));
+        }
+    } catch (err) {
+        debugLog.error('Error cargando problogs del perfil:', err);
+        contenedor.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+    }
+}
+
+// Se vuelve a pedir la lista si la vista previa del perfil está a la vista.
+function refrescarVistaPreviaPerfil() {
+    if (contenedorPerfil && contenedorPerfil.isConnected) {
+        const tab = document.querySelector('.perfil-tab-btn[data-tab="problogs"]');
+        if (tab && tab.classList.contains('active')) pintarProblogsEn(contenedorPerfil, autorPerfil);
+    }
+}
+
+// Acciones de las tarjetas y de la vista de lectura (delegadas en un solo sitio).
+// `desdePerfil` = el clic viene de la vista previa del perfil, donde la lectura
+// vive en otra sección: hay que dejarla visible antes de abrirla o no se vería.
+function manejarAcciones(e, desdePerfil) {
+    const like = e.target.closest('[data-problog-like]');
+    if (like) {
+        e.stopPropagation();
+        alternarLike(parseInt(like.dataset.problogLike, 10));
+        return;
+    }
+    const comentar = e.target.closest('[data-problog-comentar]');
+    if (comentar) {
+        e.stopPropagation();
+        // Se reutiliza el cajón de comentarios pasándole el tipo de recurso.
+        abrirComentarios(parseInt(comentar.dataset.problogComentar, 10),
+            comentar.closest('.problog-card'), 'problogs');
+        return;
+    }
+    const editar = e.target.closest('[data-problog-editar]');
+    if (editar) {
+        e.stopPropagation();
+        const id = parseInt(editar.dataset.problogEditar, 10);
+        if (publicacionAbierta && publicacionAbierta.id === id) {
+            cargarParaEditar(publicacionAbierta);
+        } else {
+            // La tarjeta del feed no trae los bloques completos: se piden.
+            apiRequest('/problogs/' + id).then((data) => {
+                if (data && data.id) cargarParaEditar(data);
+                else showError('No se pudo abrir la publicación para editarla.');
+            });
+        }
+        return;
+    }
+    const eliminar = e.target.closest('[data-problog-eliminar]');
+    if (eliminar) {
+        e.stopPropagation();
+        const id = parseInt(eliminar.dataset.problogEliminar, 10);
+        const card = eliminar.closest('.problog-card');
+        const nodoTitulo = card ? card.querySelector('.problog-card-titulo') : null;
+        const titulo = (publicacionAbierta && publicacionAbierta.id === id)
+            ? publicacionAbierta.titulo
+            : (nodoTitulo ? nodoTitulo.textContent : '');
+        eliminarProblog(id, titulo);
+        return;
+    }
+    if (e.target.closest('#problog-volver')) {
+        cerrarLectura();
+        return;
+    }
+    // Clic en la tarjeta (y no en una acción) -> vista de lectura.
+    const card = e.target.closest('.problog-card');
+    if (!card) return;
+    if (desdePerfil) abrirProblogDesdeNotificacion(card.dataset.id);
+    else abrirLectura(card.dataset.id);
+}
+
+// ============================================================
 // INICIALIZACIÓN
 // ============================================================
 export function setupProblogs() {
     form = document.getElementById('problog-form');
+
+    // La pestaña Problogs del perfil avisa por evento: perfil.js no puede
+    // importarnos sin crear un ciclo de módulos. Se registra ANTES del corte de
+    // abajo a propósito, porque la vista previa no depende del editor.
+    document.addEventListener('perfil:problogs', (e) => {
+        const d = (e && e.detail) || {};
+        pintarProblogsEn(d.contenedor, d.autorId);
+    });
+
     if (!form) return;   // la sección no está en esta página
 
     tituloEl = document.getElementById('problog-titulo');
@@ -698,59 +826,8 @@ export function setupProblogs() {
         aplicar();
     }
 
-    // Acciones de las tarjetas y de la vista de lectura (delegadas en un solo sitio).
-    const manejarAcciones = (e) => {
-        const like = e.target.closest('[data-problog-like]');
-        if (like) {
-            e.stopPropagation();
-            alternarLike(parseInt(like.dataset.problogLike, 10));
-            return;
-        }
-        const comentar = e.target.closest('[data-problog-comentar]');
-        if (comentar) {
-            e.stopPropagation();
-            // Se reutiliza el cajón de comentarios pasándole el tipo de recurso.
-            abrirComentarios(parseInt(comentar.dataset.problogComentar, 10),
-                comentar.closest('.problog-card'), 'problogs');
-            return;
-        }
-        const editar = e.target.closest('[data-problog-editar]');
-        if (editar) {
-            e.stopPropagation();
-            const id = parseInt(editar.dataset.problogEditar, 10);
-            if (publicacionAbierta && publicacionAbierta.id === id) {
-                cargarParaEditar(publicacionAbierta);
-            } else {
-                // La tarjeta del feed no trae los bloques completos: se piden.
-                apiRequest('/problogs/' + id).then((data) => {
-                    if (data && data.id) cargarParaEditar(data);
-                    else showError('No se pudo abrir la publicación para editarla.');
-                });
-            }
-            return;
-        }
-        const eliminar = e.target.closest('[data-problog-eliminar]');
-        if (eliminar) {
-            e.stopPropagation();
-            const id = parseInt(eliminar.dataset.problogEliminar, 10);
-            const card = eliminar.closest('.problog-card');
-            const nodoTitulo = card ? card.querySelector('.problog-card-titulo') : null;
-            const titulo = (publicacionAbierta && publicacionAbierta.id === id)
-                ? publicacionAbierta.titulo
-                : (nodoTitulo ? nodoTitulo.textContent : '');
-            eliminarProblog(id, titulo);
-            return;
-        }
-        if (e.target.closest('#problog-volver')) {
-            cerrarLectura();
-            return;
-        }
-        // Clic en la tarjeta (y no en una acción) -> vista de lectura.
-        const card = e.target.closest('.problog-card');
-        if (card) abrirLectura(card.dataset.id);
-    };
-    feedEl?.addEventListener('click', manejarAcciones);
-    detalleEl?.addEventListener('click', manejarAcciones);
+    feedEl?.addEventListener('click', (e) => manejarAcciones(e, false));
+    detalleEl?.addEventListener('click', (e) => manejarAcciones(e, false));
 
     // Al entrar en la pestaña Problogs, el editor arranca con un párrafo listo —
     // pero solo si NO se está editando algo (si no, borraría lo cargado).
