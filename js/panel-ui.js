@@ -310,7 +310,11 @@ function eliminarImagen(index) {
 }
 
 function dispararInput(index) {
-    if (imagenesData.length >= MAX_IMAGENES) return;
+    if (imagenesData.length >= MAX_IMAGENES) {
+        // Antes se salía en silencio y el "+" parecía roto.
+        showWarning('Ya hay ' + MAX_IMAGENES + ' imágenes (el máximo). Elimina una para añadir otra.');
+        return;
+    }
     const inp = document.getElementById(`input-imagen-${index}`);
     if (inp) inp.click();
 }
@@ -370,6 +374,10 @@ async function agregarImagen(file, dataUrl) {
     const problema = errorDeImagen(file);
     if (problema) {
         showError(problema);
+        return;
+    }
+    if (imagenesData.length >= MAX_IMAGENES) {
+        showWarning('Ya hay ' + MAX_IMAGENES + ' imágenes (el máximo). Elimina una para añadir otra.');
         return;
     }
     // El archivo aún no está en imagenesData mientras se recorta: se cuenta como
@@ -472,6 +480,8 @@ export function setupImagePreviews() {
                     return;
                 }
             }
+            // Ningún hueco libre: antes el botón no hacía nada y parecía roto.
+            showWarning('Ya hay ' + MAX_IMAGENES + ' imágenes (el máximo). Elimina una para añadir otra.');
         });
     }
 

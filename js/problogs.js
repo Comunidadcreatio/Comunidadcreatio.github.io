@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=a76a9b6092';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen } from './utils.js?v=8861448e13';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=79a31a9b82';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=c7f71b241f';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=f4aaf060b8';
@@ -192,11 +192,25 @@ function contarImagenes() {
 
 // El número de imágenes no se enseña (se quitó el contador), pero sigue
 // haciendo falta para no pasar del máximo: el icono se desactiva al llegar.
-// De paso se repintan los cuadros de portada, que dependen de las imágenes que
-// haya en el texto.
+// De paso se repintan los cuadros de portada y se liberan las vistas previas de
+// las imágenes que ya no están en el texto.
 function actualizarContador() {
-    const n = contarImagenes();
-    if (addImagenBtn) addImagenBtn.disabled = n >= MAX_IMAGENES;
+    const nombres = new Set();
+    analizarContenido(contenidoEl ? contenidoEl.value : '')
+        .forEach((t) => { if (t.tipo === 'imagen') nombres.add(t.nombre); });
+    if (addImagenBtn) addImagenBtn.disabled = nombres.size >= MAX_IMAGENES;
+
+    // Al borrar la etiqueta <image> del texto, su objectURL se quedaba vivo hasta
+    // vaciar el editor: si el autor añade y quita imágenes, se acumulan blobs en
+    // memoria. Se revoca la vista previa, pero se conserva el archivo: si vuelve a
+    // escribir la etiqueta, la vista previa se recrea (ver imagenesDelContenido).
+    imagenesLocales.forEach((img, nombre) => {
+        if (!nombres.has(nombre) && img.previewUrl) {
+            URL.revokeObjectURL(img.previewUrl);
+            img.previewUrl = '';
+        }
+    });
+
     pintarPortadas();
 }
 
@@ -209,6 +223,11 @@ function imagenesDelContenido() {
         vistas.add(t.nombre);
         const local = imagenesLocales.get(t.nombre);
         const guardada = imagenesGuardadas.get(t.nombre);
+        // Si su vista previa se revocó al quitar la etiqueta, se rehace desde el
+        // archivo (que sigue en memoria) para que el cuadro se vea.
+        if (local && !local.previewUrl && local.file) {
+            local.previewUrl = URL.createObjectURL(local.file);
+        }
         const url = (local && local.previewUrl) || (guardada && guardada.url) || '';
         if (url) lista.push({ nombre: t.nombre, url: url });
     });

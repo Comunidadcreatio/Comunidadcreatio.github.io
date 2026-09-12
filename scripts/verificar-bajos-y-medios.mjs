@@ -229,6 +229,85 @@ check('una publicación de más de 20.000 caracteres se bloquea', larga === true
 check('y no se envió al servidor', postsTrasLarga === 0, `posts=${postsTrasLarga}`);
 
 // ============================================================
+// CAV-10: el "+" avisa cuando ya no hay hueco
+// ============================================================
+console.log('\n=== CAV-10: "+" con las 5 imágenes puestas ===');
+for (let i = 1; i < 5; i++) {
+    await evalJs(`(async () => {
+        const blob = await new Promise((res) => {
+            const cv = document.createElement('canvas'); cv.width = 800; cv.height = 1000;
+            const x = cv.getContext('2d'); x.fillStyle = 'hsl(' + (${i} * 60) + ',60%,50%)'; x.fillRect(0, 0, 800, 1000);
+            cv.toBlob(res, 'image/jpeg', 0.85);
+        });
+        const file = new File([blob], 'extra-${i}.jpg', { type: 'image/jpeg' });
+        const dt = new DataTransfer(); dt.items.add(file);
+        const inp = document.getElementById('input-imagen-${i}');
+        inp.files = dt.files;
+        inp.dispatchEvent(new Event('change', { bubbles: true }));
+    })()`);
+    await sleep(900);
+}
+const totalSlides = await evalJs(`document.querySelectorAll('#carrusel-track .carrusel-slide').length`);
+check('se pudieron poner 5 imágenes', totalSlides === 5, `slides=${totalSlides}`);
+// Se busca el texto exacto del aviso (otros avisos anteriores siguen en pantalla).
+const avisosAntes = await evalJs(`document.body.innerText.split('Ya hay 5 imágenes').length - 1`);
+await evalJs(`document.getElementById('btn-agregar-imagen')?.click()`);
+await sleep(700);
+const avisosDespues = await evalJs(`document.body.innerText.split('Ya hay 5 imágenes').length - 1`);
+check('el "+" avisa cuando ya no cabe ninguna más', avisosDespues > avisosAntes, `antes=${avisosAntes} despues=${avisosDespues}`);
+
+// ============================================================
+// PRO-5b: los objectURL de imágenes borradas se liberan
+// ============================================================
+console.log('\n=== PRO-5b: liberación de vistas previas del editor ===');
+await evalJs(`document.getElementById('tab-problogs')?.click()`);
+await sleep(700);
+const imagenPuesta = await evalJs(`(async () => {
+    window.__revocados = 0;
+    const orig = URL.revokeObjectURL;
+    if (!window.__spyRevoke) {
+        window.__spyRevoke = true;
+        URL.revokeObjectURL = function (u) { window.__revocados++; return orig.call(URL, u); };
+    }
+    const blob = await new Promise((res) => {
+        const cv = document.createElement('canvas'); cv.width = 800; cv.height = 1000;
+        const x = cv.getContext('2d'); x.fillStyle = '#8844aa'; x.fillRect(0, 0, 800, 1000);
+        cv.toBlob(res, 'image/jpeg', 0.85);
+    });
+    const file = new File([blob], 'previa.jpg', { type: 'image/jpeg' });
+    const dt = new DataTransfer(); dt.items.add(file);
+    const inp = document.getElementById('problog-file');
+    inp.files = dt.files;
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+    const c = document.getElementById('problog-contenido');
+    const m = c.value.match(/<image>([^<]+)<\\/image>/);
+    return m ? m[1] : '';
+})()`);
+check('la imagen se insertó en el contenido', typeof imagenPuesta === 'string' && imagenPuesta.length > 0, String(imagenPuesta));
+const antesDeBorrar = await evalJs(`window.__revocados`);
+await evalJs(`(() => {
+    const c = document.getElementById('problog-contenido');
+    c.value = 'sin imagenes';
+    c.dispatchEvent(new Event('input', { bubbles: true }));
+})()`);
+await sleep(500);
+const trasBorrar = await evalJs(`window.__revocados`);
+check('al quitar la etiqueta del texto se libera su vista previa', trasBorrar > antesDeBorrar, `antes=${antesDeBorrar} despues=${trasBorrar}`);
+// Y al volver a escribirla, la vista previa se rehace desde el archivo
+await evalJs(`(() => {
+    const c = document.getElementById('problog-contenido');
+    c.value = 'vuelve la imagen\\n\\n<image>${imagenPuesta}</image>';
+    c.dispatchEvent(new Event('input', { bubbles: true }));
+})()`);
+await sleep(900);
+const rehabilitada = await evalJs(`(() => {
+    const cuadro = document.querySelector('.problog-portada-cuadro:not(.vacio) img');
+    return JSON.stringify({ hay: !!cuadro, blob: !!cuadro && cuadro.src.startsWith('blob:'), cargada: !!cuadro && cuadro.naturalWidth > 0 });
+})()`);
+console.log('   ' + rehabilitada);
+check('al recuperar la etiqueta la vista previa vuelve a verse', JSON.parse(rehabilitada).cargada === true, rehabilitada);
+
+// ============================================================
 // INT-8: el hueco inferior se mide con el editor visible
 // ============================================================
 console.log('\n=== INT-8: hueco inferior del editor ===');
