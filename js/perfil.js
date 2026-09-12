@@ -3,12 +3,12 @@
 // visualización de perfiles externos y resultados de búsqueda.
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
-import { token, artistaActual, lastActivityTime } from './auth.js?v=f2799071b6';
+import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=7823287562';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=2a35db9e14';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=b85678fee0';
+import { setupViewTracking } from './galeria.js?v=f92d058eba';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -76,38 +76,61 @@ export function guardarFotoPerfil(dataUrl) {
 // tres contadores (Cavents / Problogs / Comcons). Sin esto, la cabecera se
 // quedaba con lo que hubiera en memoria y salían los valores por defecto
 // («Artista» y la «A» del avatar), con los contadores a 0.
+//
+// Se piden a /api/artistas/perfil (que trae los contadores). Si esa respuesta
+// viniera sin nombre o sin foto, se completa con el perfil público por id, que
+// es el mismo que alimenta el feed y ya trae ambos.
 async function refrescarDatosPropios() {
-    const id = artistaActual && artistaActual.id;
-    if (!id) return;
+    let datos = null;
     try {
         const data = await apiRequest('/api/artistas/perfil');
-        const u = data && data.success ? data.artista : null;
-        if (!u) return;
-        const src = u.foto_perfil || AVATAR_DEFAULT;
-        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
-            const img = document.getElementById(elId);
-            if (img) img.src = src;
-        });
-        document.querySelectorAll('.perfil-nombre-artista-seccion')
-            .forEach((el) => { el.textContent = u.nombre_artista || 'Artista'; });
-        if (u.nombre_real) {
-            document.querySelectorAll('.perfil-nombre-real')
-                .forEach((el) => { el.textContent = u.nombre_real; });
-        }
-        if (u.ciudad) {
-            document.querySelectorAll('.perfil-ciudad')
-                .forEach((el) => { el.textContent = u.ciudad; });
-        }
-        const ponerCuenta = (elId, valor) => {
-            const el = document.getElementById(elId);
-            if (el) el.textContent = String(valor == null ? 0 : valor);
-        };
-        ponerCuenta('stats-cavents', u.cavents);
-        ponerCuenta('stats-problogs', u.problogs);
-        ponerCuenta('stats-comcons', u.comcons);
+        if (data && data.success && data.artista) datos = data.artista;
     } catch (err) {
-        debugLog.warn('No se pudieron refrescar los datos del perfil:', err);
+        debugLog.warn('No se pudo leer mi perfil:', err);
     }
+
+    const faltaAlgo = !datos || !datos.nombre_artista || !datos.foto_perfil;
+    const id = artistaActual && artistaActual.id;
+    if (faltaAlgo && id) {
+        try {
+            const pub = await apiRequest('/api/artistas/perfil/' + encodeURIComponent(id));
+            if (pub && pub.success && pub.usuario) {
+                datos = Object.assign({}, datos || {}, pub.usuario);
+            }
+        } catch (err) {
+            debugLog.warn('No se pudo leer el perfil público:', err);
+        }
+    }
+    if (!datos) return;
+
+    // Lo mismo que se pinta se guarda en memoria: el avatar del header y demás
+    // pantallas se alimentan de ahí.
+    fusionarArtistaActual(datos);
+
+    const src = datos.foto_perfil || AVATAR_DEFAULT;
+    ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
+        const img = document.getElementById(elId);
+        if (img) img.src = src;
+    });
+    document.querySelectorAll('.perfil-avatar-img, .perfil-avatar-img-seccion')
+        .forEach((img) => { img.src = src; });
+    document.querySelectorAll('.perfil-nombre-artista-seccion')
+        .forEach((el) => { el.textContent = datos.nombre_artista || 'Artista'; });
+    if (datos.nombre_real) {
+        document.querySelectorAll('.perfil-nombre-real')
+            .forEach((el) => { el.textContent = datos.nombre_real; });
+    }
+    if (datos.ciudad) {
+        document.querySelectorAll('.perfil-ciudad')
+            .forEach((el) => { el.textContent = datos.ciudad; });
+    }
+    const ponerCuenta = (elId, valor) => {
+        const el = document.getElementById(elId);
+        if (el) el.textContent = String(valor == null ? 0 : valor);
+    };
+    ponerCuenta('stats-cavents', datos.cavents);
+    ponerCuenta('stats-problogs', datos.problogs);
+    ponerCuenta('stats-comcons', datos.comcons);
 }
 
 export function actualizarPerfilUI(verificarActividadFn = null) {

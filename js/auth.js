@@ -146,3 +146,13 @@ export function logout() {
     artistaActual = null;
     document.dispatchEvent(new Event('userLogout'));
 }
+
+// Los datos del artista en memoria pueden venir incompletos (por ejemplo, de una
+// sesión guardada hace tiempo en el dispositivo). Esto los completa con lo que
+// devuelve el servidor y los vuelve a guardar, para que el header, el perfil y
+// todo lo demás usen los mismos datos buenos.
+export function fusionarArtistaActual(datos) {
+    if (!artistaActual || !datos) return;
+    artistaActual = { ...artistaActual, ...datos };
+    try { localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual)); } catch (e) { /* silencioso */ }
+}

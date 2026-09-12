@@ -1,6 +1,6 @@
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js?v=c088cadd1b';
-import { artistaActual } from './auth.js?v=f2799071b6';
+import { artistaActual } from './auth.js?v=7823287562';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=2a35db9e14';
 import { abrirComentarios } from './comentarios.js?v=f10b61e047';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=dd51e51820';

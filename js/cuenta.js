@@ -3,7 +3,7 @@
 // eliminar cuenta y accordion de seguridad.
 
 import { ARTISTA_KEY, apiRequest } from './config.js?v=c088cadd1b';
-import { token, artistaActual, logout } from './auth.js?v=f2799071b6';
+import { token, artistaActual, logout } from './auth.js?v=7823287562';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=2a35db9e14';
 

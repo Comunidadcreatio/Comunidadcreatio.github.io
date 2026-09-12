@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=9eb0e1c320';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=9782befb28';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=f10b61e047';
@@ -42,7 +42,7 @@ import { abrirComentarios } from './comentarios.js?v=f10b61e047';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=f2799071b6';
+import { artistaActual } from './auth.js?v=7823287562';
 
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
