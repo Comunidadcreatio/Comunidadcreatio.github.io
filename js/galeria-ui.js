@@ -5,7 +5,7 @@
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=66c54beae4';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=94c3af2ff3';
 import { artistaActual, token, esArtista } from './auth.js?v=000cc3408c';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=c87b152646';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=09141324b3';
 import { confirmarDescartarCambios } from './panel-ui.js?v=8de11c2309';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
@@ -47,6 +47,13 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     // Va ANTES de los returns: aunque el destino sea la sección actual, el
     // usuario ha pedido navegar y la capa debe irse.
     cerrarOverlaysFlotantes();
+
+    // `body.creando-problogs` anula el padding inferior del body (lo reserva el
+    // editor de Problogs). Si sobrevive a la salida del panel, TODAS las
+    // secciones pierden el hueco del nav y el final del contenido queda tapado.
+    if (!sectionEntrante || sectionEntrante.id !== 'panel-artista') {
+        document.body.classList.remove('creando-problogs');
+    }
 
     if (isTransitioning) return;
     if (!sectionEntrante) return;
@@ -241,7 +248,8 @@ export { actualizarVisibilidadIconosHeader, actualizarModoFlecha };
 let iconoAnterior = null; // { seccion, modoGrid }
 
 export function abrirMiCuentaDesdeIcono() {
-    iconoAnterior = { seccion: 'perfil-usuario' };
+    // Se recuerda la subpestaña del perfil para volver a ella al salir.
+    iconoAnterior = { seccion: 'perfil-usuario', tabPerfil: tabPerfilActivo() };
     toggleMiCuenta();
 }
 
@@ -249,8 +257,25 @@ export function abrirCrearDesdeIcono() {
     // Solo los artistas crean Cavents
     if (!esArtista()) return;
     const actual = encontrarSeccionActual();
-    iconoAnterior = { seccion: actual ? actual.id : 'galeria-publica', modoGrid: galeriaModo === 2 };
+    iconoAnterior = {
+        seccion: actual ? actual.id : 'galeria-publica',
+        modoGrid: galeriaModo === 2,
+        tabPerfil: tabPerfilActivo()
+    };
     togglePanel('crear');
+    // La pestaña depende de DÓNDE se pulsa el "+": desde Problogs se crea un
+    // problog y desde el resto (galería, perfil…) un Cavent. Antes se abría la
+    // última usada, así que el "+" (que dice "Crear Cavent") podía abrir el
+    // editor de Problogs con el borrador anterior.
+    const tab = (actual && actual.id === 'problogs') ? 'tab-problogs' : 'tab-cavents';
+    document.getElementById(tab)?.click();
+}
+
+// Subpestaña activa del perfil ('cavents' | 'problogs' | 'comcons'), para poder
+// devolver al usuario donde estaba al volver de editar o de Mi Cuenta.
+function tabPerfilActivo() {
+    const activo = document.querySelector('.perfil-tab-btn.active');
+    return activo ? activo.dataset.tab : null;
 }
 
 export function volverDesdeIcono() {
@@ -259,6 +284,13 @@ export function volverDesdeIcono() {
     if (!prev) return;
     if (prev.seccion === 'perfil-usuario') {
         togglePerfil();
+        // Volver a la subpestaña donde estaba el usuario (Problogs, Blog…) en vez
+        // de caer siempre en "Mis cavents". togglePerfil ya activó Cavents de
+        // forma síncrona, así que este clic es el que manda.
+        const tab = prev.tabPerfil
+            ? document.querySelector('.perfil-tab-btn[data-tab="' + prev.tabPerfil + '"]')
+            : null;
+        if (tab && !tab.classList.contains('active')) tab.click();
     } else if (prev.seccion === 'galeria-publica') {
         if (prev.modoGrid) toggleExplorar();
         else toggleGaleria(obtenerGaleriaContainer());
@@ -289,6 +321,8 @@ export function ocultarTodasLasSecciones() {
     // Cerrar sesión / ir a la página en blanco también debe retirar las capas
     // flotantes: si no, se quedan encima de una pantalla sin contenido.
     cerrarOverlaysFlotantes();
+    // Y el modo "creando problogs", que si no deja el body sin hueco inferior.
+    document.body.classList.remove('creando-problogs');
     SECCIONES.forEach(id => {
         const el = document.getElementById(id);
         if (el) {

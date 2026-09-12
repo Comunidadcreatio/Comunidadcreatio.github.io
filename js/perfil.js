@@ -234,8 +234,16 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
 
     const fallbackCavents = statsData && (statsData.cavents != null ? statsData.cavents : statsData.total_obras_activas) != null
         ? String(statsData.cavents != null ? statsData.cavents : statsData.total_obras_activas) : '0';
-    const fallbackProblogs = (statsData && statsData.problogs != null) ? String(statsData.problogs) : '0';
-    const fallbackComcons = (statsData && statsData.comcons != null) ? String(statsData.comcons) : '0';
+    // Problogs y Comcons NO se pueden recalcular en el cliente: si la llamada no
+    // trae datos se deja el valor que ya está en pantalla (null = no escribir),
+    // porque escribir '0' borraba el contador real cuando esta llamada sin datos
+    // competía con la que sí los pide al abrir el perfil.
+    const fallbackProblogs = (statsData && statsData.problogs != null)
+        ? String(statsData.problogs)
+        : (artistaActual && artistaActual.problogs != null ? String(artistaActual.problogs) : null);
+    const fallbackComcons = (statsData && statsData.comcons != null)
+        ? String(statsData.comcons)
+        : (artistaActual && artistaActual.comcons != null ? String(artistaActual.comcons) : null);
 
     try {
         let res;
@@ -270,13 +278,14 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
             }
             statsCavents.textContent = activas;
         }
-        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
-        if (statsComcons) statsComcons.textContent = fallbackComcons;
+        // null = "no hay dato": se respeta lo que ya está pintado.
+        if (statsProblogs && fallbackProblogs !== null) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons && fallbackComcons !== null) statsComcons.textContent = fallbackComcons;
     } catch (error) {
         debugLog.error('Error al cargar estadísticas:', error);
         statsCavents.textContent = fallbackCavents;
-        if (statsProblogs) statsProblogs.textContent = fallbackProblogs;
-        if (statsComcons) statsComcons.textContent = fallbackComcons;
+        if (statsProblogs && fallbackProblogs !== null) statsProblogs.textContent = fallbackProblogs;
+        if (statsComcons && fallbackComcons !== null) statsComcons.textContent = fallbackComcons;
     }
 }
 
