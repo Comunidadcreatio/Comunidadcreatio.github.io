@@ -126,6 +126,12 @@ const MAX_IMAGENES = 5;
 let imagenesData = []; // [{src, file, slot}] — datos de imágenes en el carrusel
 let currentSlide = 0;
 let aspectRatio = '4/5';
+// Guardas del guardado:
+//  - guardandoObra: hay un POST/PUT en vuelo (evita el doble envío).
+//  - imagenesEnProceso: recortes/descargas de imagen sin terminar. Guardar con
+//    alguna en proceso crearía la obra sin esas imágenes.
+let guardandoObra = false;
+let imagenesEnProceso = 0;
 
 function actualizarCarrusel() {
     const track = document.getElementById('carrusel-track');
@@ -272,6 +278,9 @@ function cropearImagen(file, aspect) {
 
 async function agregarImagen(file, dataUrl) {
     if (imagenesData.length >= MAX_IMAGENES) return;
+    // El archivo aún no está en imagenesData mientras se recorta: se cuenta como
+    // "en proceso" para que el guardado no lo deje fuera.
+    imagenesEnProceso++;
     try {
         // Recortar al ratio seleccionado (4:5 o 1:1)
         const recortada = await cropearImagen(file, aspectRatio);
@@ -289,6 +298,8 @@ async function agregarImagen(file, dataUrl) {
         imagenesData.push({ src: dataUrl, file: file, slot: slot });
         currentSlide = imagenesData.length - 1;
         actualizarCarrusel();
+    } finally {
+        imagenesEnProceso--;
     }
 }
 
@@ -301,6 +312,9 @@ export function aplicarPreviewImagen(slot, url) {
 }
 
 export async function cargarUrlEnInput(index, url) {
+    // Se descarga y re-codifica una imagen: mientras dura, esa entrada de
+    // imagenesData todavía tiene file:null y no se subiría al guardar.
+    imagenesEnProceso++;
     try {
         const blob = await new Promise((resolve, reject) => {
             const img = new Image();
@@ -331,6 +345,8 @@ export async function cargarUrlEnInput(index, url) {
     } catch (err) {
         debugLog.error('No se pudo cargar la imagen para duplicar:', url, err);
         return false;
+    } finally {
+        imagenesEnProceso--;
     }
 }
 
@@ -471,6 +487,11 @@ export function setupObraFormSubmit() {
 
     obraForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // Doble envío: el estado de carga se ponía en #btn-guardar, que está
+        // OCULTO, así que el botón visible (#obra-step-crear) seguía activo y un
+        // segundo toque creaba una segunda obra. Esta guarda + el disabled del
+        // botón visible cierran las dos vías (toque doble y Enter).
+        if (guardandoObra) return;
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
@@ -499,9 +520,22 @@ export function setupObraFormSubmit() {
             showWarning("La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
             return;
         }
+        // Alguna imagen todavía se está recortando o copiando (p.ej. al duplicar
+        // una obra): guardar ahora la crearía sin ella. En modo edición las
+        // imágenes ya guardadas tienen file:null y eso es correcto, por eso se
+        // comprueba lo que está EN PROCESO y no los file:null.
+        if (imagenesEnProceso > 0) {
+            showWarning('Las imágenes todavía se están preparando. Espera un momento y vuelve a guardar.');
+            return;
+        }
 
+        // El estado de carga va en los DOS botones: el visible de la barra de
+        // pasos (#obra-step-crear) y el oculto del formulario (#btn-guardar).
         const btnGuardar = document.getElementById('btn-guardar');
+        const btnCrear = document.getElementById('obra-step-crear');
+        guardandoObra = true;
         setButtonLoading(btnGuardar, true);
+        setButtonLoading(btnCrear, true);
 
         const formData = new FormData();
         formData.append('titulo', titulo);
@@ -531,18 +565,26 @@ export function setupObraFormSubmit() {
                 formData.append(`imagen_${img.slot}`, img.file);
             }
         });
-        const result = await guardarObra(formData, idEdicion || null);
-        setButtonLoading(btnGuardar, false);
-        if (result.success) {
-            showSuccess("Obra guardada correctamente.");
-            invalidateCaventsCache();
-            document.getElementById('btn-guardar').textContent = 'Crear Cavent';
-            imagenesAEliminar.clear();
-            limpiarFormularioCompleto(true);
-            await refrescarTabla(document.getElementById('tabla-obras-body'));
-            if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
-        } else {
-            mostrarErrores(result);
+        try {
+            const result = await guardarObra(formData, idEdicion || null);
+            if (result.success) {
+                showSuccess("Obra guardada correctamente.");
+                invalidateCaventsCache();
+                document.getElementById('btn-guardar').textContent = 'Crear Cavent';
+                imagenesAEliminar.clear();
+                limpiarFormularioCompleto(true);
+                await refrescarTabla(document.getElementById('tabla-obras-body'));
+                if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
+            } else {
+                mostrarErrores(result);
+            }
+        } finally {
+            // Pase lo que pase (éxito, error del servidor o excepción) el
+            // formulario vuelve a quedar operable: antes, cualquier fallo dejaba
+            // los botones en estado de carga para siempre.
+            guardandoObra = false;
+            setButtonLoading(btnGuardar, false);
+            setButtonLoading(btnCrear, false);
         }
     });
 }
@@ -787,11 +829,14 @@ function setupCaventsDropdown() {
                 </div>
             `;
             
+            // Se ESPERAN (await): duplicar/editar cargan las imágenes de forma
+            // asíncrona y sin esperar el usuario podía guardar a mitad de la
+            // copia (la obra se creaba sin las imágenes que faltaban).
             item.querySelector('.cavent-item-info').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
             item.querySelector('.cavent-item-num').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
-            item.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); editarCavent(obra.id, obra.titulo); });
-            item.querySelector('.btn-dup').addEventListener('click', (e) => { e.stopPropagation(); duplicarCavent(obra.id, obra.titulo); });
-            item.querySelector('.btn-del').addEventListener('click', (e) => { e.stopPropagation(); eliminarCavent(obra.id); });
+            item.querySelector('.btn-edit').addEventListener('click', async (e) => { e.stopPropagation(); await editarCavent(obra.id, obra.titulo); });
+            item.querySelector('.btn-dup').addEventListener('click', async (e) => { e.stopPropagation(); await duplicarCavent(obra.id, obra.titulo); });
+            item.querySelector('.btn-del').addEventListener('click', async (e) => { e.stopPropagation(); await eliminarCavent(obra.id); });
             
             dropdown.appendChild(item);
         });
@@ -877,11 +922,24 @@ function setupCaventsDropdown() {
             imagenesAEliminar.clear();
             imagenesData = [];
             currentSlide = 0;
+            let falloAlguna = false;
             for (const [index, url] of imagenesDup.entries()) {
                 if (url) {
                     aplicarPreviewImagen(index, url);
-                    await cargarUrlEnInput(index, url);
+                    const copiada = await cargarUrlEnInput(index, url);
+                    if (!copiada) {
+                        // Si una imagen no se pudo copiar hay que sacarla del
+                        // carrusel: dejarla con file:null daría por buena una
+                        // imagen que no se va a subir (la obra saldría sin ella).
+                        const i = imagenesData.findIndex(im => im.src === url && !im.file);
+                        if (i >= 0) imagenesData.splice(i, 1);
+                        falloAlguna = true;
+                    }
                 }
+            }
+            if (falloAlguna) {
+                actualizarCarrusel();
+                showWarning('No se pudieron copiar todas las imágenes. Revisa el carrusel antes de guardar la copia.');
             }
             updateFormProgress();
         } catch (e) {

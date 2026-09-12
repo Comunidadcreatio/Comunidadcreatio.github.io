@@ -5,7 +5,7 @@
 import { apiRequest } from './config.js?v=c088cadd1b';
 import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=2a35db9e14';
 import { showWarning, showError } from './notificaciones.js?v=d2867c8ca0';
-import { triggerRefreshGrid } from './galeria-ui.js?v=51b378807b';
+import { triggerRefreshGrid } from './galeria-ui.js?v=d72124842a';
 
 /**
  * Configura el buscador de artistas.
