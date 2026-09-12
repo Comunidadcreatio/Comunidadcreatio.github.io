@@ -979,6 +979,41 @@
    La pestaña reutiliza las tarjetas del feed, pero en rejilla para que
    se vean varias publicaciones de un vistazo.
    ============================================================ */
+/* Sub-pestañas de esa pestaña: «Publicaciones» (lo mío) y «Blog» (lo que he
+   reblogueado de cualquier autor). */
+.problogs-subtabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 0 14px;
+}
+
+.problogs-subtab {
+    width: auto;
+    padding: 7px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-gray-500);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.problogs-subtab.activo {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+}
+
+[data-theme="dark"] .problogs-subtab {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .problogs-subtab.activo {
+    border-color: var(--color-ink);
+}
+
 .problogs-feed-perfil {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

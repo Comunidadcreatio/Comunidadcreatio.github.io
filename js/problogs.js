@@ -1246,16 +1246,75 @@ let autorPerfil = null;
 // Pinta la vista previa de las publicaciones dentro de la pestaña Problogs del
 // perfil. Sin `autorId` es tu propio perfil (incluye borradores); con id es el
 // perfil de otro artista (solo lo que ya está publicado y verificado).
+// Lista del perfil: mis publicaciones o las que he reblogueado. `esBlog` = la
+// pestaña «Blog» (publicaciones reblogueadas de cualquier autor).
+async function cargarListaPerfil(destino, esBlog) {
+    if (!destino) return;
+    destino.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
+    try {
+        const data = await apiRequest(esBlog
+            ? '/api/artistas/mis-reblogs?limit=50'
+            : '/api/artistas/mis-problogs?limit=50');
+        // Si el contenedor ya no está en pantalla (se cambió de pestaña mientras
+        // cargaba), no se pisa nada.
+        if (!destino.isConnected) return;
+        // apiRequest no lanza: devuelve {success:false} si algo falla, y eso no
+        // es lo mismo que "no hay publicaciones".
+        if (!data || data.success === false) {
+            destino.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+            return;
+        }
+        const lista = data.problogs || [];
+        if (!lista.length) {
+            destino.innerHTML = '<p class="problogs-vacio">' + (esBlog
+                ? 'Todavía no has reblogueado ninguna publicación.'
+                : 'Todavía no has publicado ningún problog.') + '</p>';
+            return;
+        }
+        // En el blog los reblogueos NO son míos, así que van sin acciones.
+        destino.innerHTML = '<div class="problogs-feed problogs-feed-perfil">' +
+            lista.map((p) => tarjetaProblog(p, !esBlog)).join('') + '</div>';
+    } catch (err) {
+        debugLog.error('Error cargando problogs del perfil:', err);
+        destino.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
+    }
+}
+
 export async function pintarProblogsEn(contenedor, autorId) {
     if (!contenedor) return;
     contenedorPerfil = contenedor;
     autorPerfil = autorId || null;
+
+    // Un solo listener por contenedor: la pestaña se puede reabrir muchas veces.
+    if (!contenedor.dataset.problogsPerfilListo) {
+        contenedor.dataset.problogsPerfilListo = '1';
+        contenedor.addEventListener('click', (e) => manejarAcciones(e, true));
+    }
+
+    // En MI perfil hay dos pestañas: mis publicaciones y lo que he reblogueado.
+    if (!autorPerfil) {
+        contenedor.innerHTML = `
+            <div class="problogs-subtabs">
+                <button type="button" class="problogs-subtab activo" data-perfil-problogs="publicaciones">Publicaciones</button>
+                <button type="button" class="problogs-subtab" data-perfil-problogs="blog">Blog</button>
+            </div>
+            <div class="problogs-perfil-lista" data-perfil-lista></div>`;
+        const destino = contenedor.querySelector('[data-perfil-lista]');
+        contenedor.querySelectorAll('[data-perfil-problogs]').forEach((b) => {
+            b.addEventListener('click', () => {
+                contenedor.querySelectorAll('[data-perfil-problogs]')
+                    .forEach((x) => x.classList.toggle('activo', x === b));
+                cargarListaPerfil(destino, b.dataset.perfilProblogs === 'blog');
+            });
+        });
+        await cargarListaPerfil(destino, false);
+        return;
+    }
+
+    // Perfil de OTRO artista: solo sus publicaciones.
     contenedor.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
     try {
-        const ruta = autorPerfil
-            ? '/problogs?artista=' + encodeURIComponent(autorPerfil) + '&limit=50'
-            : '/api/artistas/mis-problogs?limit=50';
-        const data = await apiRequest(ruta);
+        const data = await apiRequest('/problogs?artista=' + encodeURIComponent(autorPerfil) + '&limit=50');
         // Si el contenedor ya no es el que se está viendo (se cambió de pestaña
         // mientras cargaba), no se pisa el contenido nuevo.
         if (contenedor !== contenedorPerfil || !contenedor.isConnected) return;
@@ -1267,18 +1326,11 @@ export async function pintarProblogsEn(contenedor, autorId) {
         }
         const lista = data.problogs || [];
         if (!lista.length) {
-            contenedor.innerHTML = '<p class="problogs-vacio">' + (autorPerfil
-                ? 'Este artista todavía no ha publicado ningún problog.'
-                : 'Todavía no has publicado ningún problog.') + '</p>';
+            contenedor.innerHTML = '<p class="problogs-vacio">Este artista todavía no ha publicado ningún problog.</p>';
             return;
         }
         contenedor.innerHTML = '<div class="problogs-feed problogs-feed-perfil">' +
-            lista.map((p) => tarjetaProblog(p, !autorPerfil)).join('') + '</div>';
-        // Un solo listener por contenedor: la pestaña se puede reabrir muchas veces.
-        if (!contenedor.dataset.problogsPerfilListo) {
-            contenedor.dataset.problogsPerfilListo = '1';
-            contenedor.addEventListener('click', (e) => manejarAcciones(e, true));
-        }
+            lista.map((p) => tarjetaProblog(p, false)).join('') + '</div>';
     } catch (err) {
         debugLog.error('Error cargando problogs del perfil:', err);
         contenedor.innerHTML = '<p class="problogs-vacio">No se pudieron cargar las publicaciones.</p>';
