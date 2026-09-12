@@ -595,38 +595,45 @@
     color: #e67e22;
 }
 
-/* Acciones de las publicaciones propias */
-.problog-card-acciones,
-.problog-lectura-acciones {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
+/* Acciones de las publicaciones propias: iconos redondos, justo a la derecha
+   del tiempo que lleva publicada (van dentro de la fila de autoría). */
+.problog-acciones-iconos {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 
-.problog-lectura-acciones {
-    margin-top: 14px;
-}
-
-/* Estas reglas llevan también el contenedor del perfil porque la pestaña
-   Problogs reutiliza las mismas tarjetas fuera de la sección #problogs. */
-#problogs .problog-card-accion,
-#perfil-tab-content .problog-card-accion {
-    width: auto;
-    padding: 7px 14px;
+.problog-accion-icono {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--color-gray-300);
-    border-radius: 20px;
+    border-radius: 50%;
     background: transparent;
-    color: var(--color-ink);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--color-gray-500);
     cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-#problogs .problog-card-accion-borrar,
-#perfil-tab-content .problog-card-accion-borrar {
+.problog-accion-icono svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.problog-accion-icono:hover {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+}
+
+.problog-accion-icono-borrar:hover {
     color: #c0392b;
-    border-color: rgba(192, 57, 43, 0.4);
+    border-color: rgba(192, 57, 43, 0.5);
 }
 
 /* Fila de likes + comentarios (misma en la tarjeta y en la vista de lectura) */
@@ -657,6 +664,12 @@
 #problogs .problog-social-btn.liked,
 #perfil-tab-content .problog-social-btn.liked {
     color: #c0392b;
+}
+
+/* Reblogueado: se enciende en verde (el like lo hace en rojo). */
+#problogs .problog-social-btn.reblogueado,
+#perfil-tab-content .problog-social-btn.reblogueado {
+    color: #16a34a;
 }
 
 .problog-social-icono {
@@ -957,8 +970,7 @@
 }
 
 [data-theme="dark"] .problog-card-estado,
-[data-theme="dark"] #problogs .problog-card-accion,
-[data-theme="dark"] #perfil-tab-content .problog-card-accion {
+[data-theme="dark"] .problog-accion-icono {
     border-color: rgba(255, 255, 255, 0.18);
 }
 

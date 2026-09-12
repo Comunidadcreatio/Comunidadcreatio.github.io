@@ -114,6 +114,18 @@ function avatarHTML(p, clase) {
         : `<span class="${clase} problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
 }
 
+// Iconos de las acciones propias (editar y eliminar).
+const ICONO_EDITAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const ICONO_BORRAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+
+// Acciones de una publicación propia, en iconos, para ponerlas junto al tiempo.
+function accionesIconosHTML(p) {
+    return `<span class="problog-acciones-iconos">` +
+        `<button type="button" class="problog-accion-icono" data-problog-editar="${p.id}" title="Editar" aria-label="Editar">${ICONO_EDITAR}</button>` +
+        `<button type="button" class="problog-accion-icono problog-accion-icono-borrar" data-problog-eliminar="${p.id}" title="Eliminar" aria-label="Eliminar">${ICONO_BORRAR}</button>` +
+        `</span>`;
+}
+
 // ============================================================
 // CONTENIDO: TEXTO CON ETIQUETAS DE IMAGEN
 // ------------------------------------------------------------
@@ -656,10 +668,14 @@ async function eliminarProblog(id, titulo) {
 // ============================================================
 const ICONO_CORAZON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
 const ICONO_COMENTARIO = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>';
+// Rebloguear: las dos flechas en bucle.
+const ICONO_REBLOG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
 
-// Fila de likes + comentarios. La misma en la tarjeta y en la vista de lectura.
+// Fila de likes, comentarios y reblogueos. La misma en la tarjeta y en la vista
+// de lectura.
 function socialHTML(p) {
     const liked = !!p.liked;
+    const reblogueado = !!p.reblogged;
     // El corazón va RELLENO si ya di like, igual que queda tras pulsarlo: si no,
     // el mismo estado se vería distinto antes y después de tocar sin motivo.
     const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (liked ? 'currentColor' : 'none') + '"');
@@ -670,6 +686,9 @@ function socialHTML(p) {
             </button>
             <button type="button" class="problog-social-btn" data-problog-comentar="${p.id}" title="Comentarios">
                 <span class="problog-social-icono">${ICONO_COMENTARIO}</span><span class="problog-social-num">${p.comentarios_count || 0}</span>
+            </button>
+            <button type="button" class="problog-social-btn${reblogueado ? ' reblogueado' : ''}" data-problog-reblog="${p.id}" aria-pressed="${reblogueado ? 'true' : 'false'}" title="Rebloguear">
+                <span class="problog-social-icono">${ICONO_REBLOG}</span><span class="problog-social-num">${p.reblogs_count || 0}</span>
             </button>
         </div>`;
 }
@@ -694,6 +713,27 @@ async function alternarLike(id) {
         });
     } catch (err) {
         debugLog.error('Error dando like a problog:', err);
+        showError('Error de conexión.');
+    }
+}
+
+// Rebloguear: mismo mecanismo que el like (el servidor decide el estado final y
+// aquí se refleja en todos los botones de esa publicación).
+async function alternarReblog(id) {
+    try {
+        const res = await apiRequest('/problogs/' + id + '/reblog', { method: 'POST' });
+        if (!res || res.success === false) {
+            showError((res && res.error) || 'No se pudo rebloguear.');
+            return;
+        }
+        document.querySelectorAll('[data-problog-reblog="' + id + '"]').forEach((b) => {
+            b.classList.toggle('reblogueado', !!res.reblogged);
+            b.setAttribute('aria-pressed', res.reblogged ? 'true' : 'false');
+            const num = b.querySelector('.problog-social-num');
+            if (num) num.textContent = res.reblogs_count;
+        });
+    } catch (err) {
+        debugLog.error('Error reblogueando problog:', err);
         showError('Error de conexión.');
     }
 }
@@ -729,12 +769,8 @@ function tarjetaProblog(p, conAcciones) {
     const estadoHTML = propias
         ? `<span class="problog-card-estado${esBorrador ? ' problog-card-estado-borrador' : ''}">${esBorrador ? 'Borrador' : 'Publicado'}</span>`
         : '';
-    const accionesHTML = propias
-        ? `<div class="problog-card-acciones">
-               <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
-               <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
-           </div>`
-        : '';
+    // Iconos de editar/eliminar, que van junto al tiempo en la fila de autoría.
+    const accionesHTML = propias ? accionesIconosHTML(p) : '';
 
     return `
         <article class="problog-card" data-id="${p.id}">
@@ -744,6 +780,7 @@ function tarjetaProblog(p, conAcciones) {
                 ${avatar}
                 <span class="problog-card-autor">${renderText(autor)}</span>
                 <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
+                ${accionesHTML}
             </div>
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
             <div class="problog-card-cuerpo">
@@ -753,7 +790,6 @@ function tarjetaProblog(p, conAcciones) {
                 </div>
                 ${extracto ? `<p class="problog-card-extracto">${renderText(extracto)}</p>` : ''}
                 ${socialHTML(p)}
-                ${accionesHTML}
             </div>
         </article>`;
 }
@@ -769,7 +805,11 @@ async function cargarPagina(pagina, reemplazar) {
         const data = await apiRequest(base + '?page=' + pagina + '&limit=' + POR_PAGINA);
         const lista = (data && data.problogs) || [];
         const total = (data && data.total) || 0;
-        const html = lista.map(tarjetaProblog).join('');
+        // OJO: no vale `lista.map(tarjetaProblog)`, porque map le pasa el ÍNDICE
+        // como segundo argumento y acabaría decidiendo las acciones por el
+        // número de tarjeta (la primera sin acciones y el resto como propias
+        // aunque fueran de otros).
+        const html = lista.map((p) => tarjetaProblog(p)).join('');
 
         if (reemplazar) {
             if (!lista.length) {
@@ -1085,12 +1125,8 @@ function pintarLectura(p, conAcciones) {
     const bloquesHTML = pintarCuerpo(p.bloques || [], imagenes);
 
     // En la vista de lectura también se puede editar/eliminar si es propia.
-    const acciones = propias
-        ? `<div class="problog-lectura-acciones">
-               <button type="button" class="problog-card-accion" data-problog-editar="${p.id}">Editar</button>
-               <button type="button" class="problog-card-accion problog-card-accion-borrar" data-problog-eliminar="${p.id}">Eliminar</button>
-           </div>`
-        : '';
+    // Iconos de editar/eliminar, junto al tiempo en la fila de autoría.
+    const acciones = propias ? accionesIconosHTML(p) : '';
 
     return `
         <button type="button" class="problog-volver" id="problog-volver">← Volver</button>
@@ -1100,9 +1136,9 @@ function pintarLectura(p, conAcciones) {
                 ${avatarHTML(p, 'problog-lectura-avatar')}
                 <span class="problog-lectura-autor">${renderText(autor)}</span>
                 <span class="problog-lectura-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
+                ${acciones}
             </div>
             <h2 class="problog-lectura-titulo">${renderText(p.titulo)}</h2>
-            ${acciones}
         </header>
         ${socialHTML(p)}
         <div class="problog-lectura-cuerpo">${bloquesHTML}</div>`;
@@ -1159,7 +1195,9 @@ function abrirVistaPrevia() {
         created_at: new Date().toISOString(),
         likes_count: 0,
         comentarios_count: 0,
-        liked: false
+        reblogs_count: 0,
+        liked: false,
+        reblogged: false
     };
 
     cerrarVistaPrevia();
@@ -1263,6 +1301,12 @@ function manejarAcciones(e, desdePerfil) {
     if (like) {
         e.stopPropagation();
         alternarLike(parseInt(like.dataset.problogLike, 10));
+        return;
+    }
+    const reblog = e.target.closest('[data-problog-reblog]');
+    if (reblog) {
+        e.stopPropagation();
+        alternarReblog(parseInt(reblog.dataset.problogReblog, 10));
         return;
     }
     const comentar = e.target.closest('[data-problog-comentar]');
