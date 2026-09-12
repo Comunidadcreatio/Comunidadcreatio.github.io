@@ -6,7 +6,7 @@ import { cargarGaleria, mostrarGaleria } from './galeria.js?v=66c54beae4';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=94c3af2ff3';
 import { artistaActual, token, esArtista } from './auth.js?v=000cc3408c';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=09141324b3';
-import { confirmarDescartarCambios } from './panel-ui.js?v=8de11c2309';
+import { confirmarDescartarCambios } from './panel-ui.js?v=b1b58aa4e2';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid

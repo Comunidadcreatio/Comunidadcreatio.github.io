@@ -35,6 +35,41 @@ function syncAllCustomSelects() {
 // ============================================
 export const imagenesAEliminar = new Set();
 
+// Metadatos de la obra que el formulario NO muestra pero que el backend
+// sobrescribe en cada guardado (`localizacion`, `peso`, `id_personalizado`).
+// Al editar o duplicar se guardan aquí los valores que ya tenía la obra para
+// reenviarlos tal cual: si no, el PUT los dejaba en ''/0 y se perdían.
+export let metaObra = { idPersonalizado: '', localizacion: '', peso: '' };
+
+function guardarMetaObra(obra) {
+    metaObra = {
+        idPersonalizado: obra.id_personalizado != null ? String(obra.id_personalizado) : '',
+        localizacion: obra.localizacion != null ? String(obra.localizacion) : '',
+        peso: obra.peso != null ? String(obra.peso) : ''
+    };
+}
+
+function limpiarMetaObra() {
+    metaObra = { idPersonalizado: '', localizacion: '', peso: '' };
+}
+
+// Rellena un <select> con el valor guardado. Si ese valor NO está entre las
+// opciones (datos de una versión anterior, importaciones, otro cliente…), el
+// select se quedaría vacío y al guardar se perdería en silencio: se añade como
+// opción para conservarlo.
+function setSelectValue(selectEl, valor) {
+    if (!selectEl) return;
+    selectEl.value = valor;
+    if (valor && selectEl.value !== valor) {
+        const opt = document.createElement('option');
+        opt.value = valor;
+        opt.textContent = valor;
+        opt.dataset.temporal = '1';   // se quita al limpiar el formulario
+        selectEl.appendChild(opt);
+        selectEl.value = valor;
+    }
+}
+
 // FORM CHANGE TRACKING
 // ============================================
 let hayCambiosNoGuardados = false;
@@ -451,12 +486,16 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     const obraForm = document.getElementById('obra-form');
     if (!obraForm) return;
     obraForm.reset();
+    // Las opciones que se añadieron para conservar un valor guardado que no
+    // estaba en la lista no deben quedarse en el desplegable.
+    obraForm.querySelectorAll('option[data-temporal]').forEach(opt => opt.remove());
     // Resetear todos los custom selects
     document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
         sel.dispatchEvent(new Event('change', { bubbles: true }));
     });
     resetCambiosNoGuardados();
     document.getElementById('input-id-edicion').value = '';
+    limpiarMetaObra();
     document.getElementById('btn-guardar').textContent = 'Crear Cavent';
     const crearBtn = document.getElementById('obra-step-crear');
     if (crearBtn) crearBtn.textContent = 'Crear Cavent';
@@ -495,7 +534,9 @@ export function setupObraFormSubmit() {
         const titulo = document.getElementById('input-titulo').value;
         const artista = document.getElementById('input-artista').value;
         const precio = document.getElementById('input-precio').value;
-        const idPersonalizado = '';
+        // Se reenvían los metadatos que el formulario no muestra (si no, el PUT
+        // los borraría: localizacion='', peso=0, id_personalizado='').
+        const idPersonalizado = metaObra.idPersonalizado;
         const idEdicion = document.getElementById('input-id-edicion').value;
         const ano = document.getElementById('input-ano').value;
         const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
@@ -542,6 +583,10 @@ export function setupObraFormSubmit() {
         formData.append('artista', artista);
         formData.append('precio', precio);
         formData.append('id_obra', idPersonalizado);
+        // El formulario no tiene campos para estos dos, pero el backend los
+        // escribe siempre en el UPDATE: se reenvían los de la obra editada.
+        formData.append('localizacion', metaObra.localizacion);
+        formData.append('peso', metaObra.peso);
         formData.append('ano', ano);
         formData.append('descripcion_tecnica', descripcion_tecnica);
         formData.append('soporte', soporte);
@@ -851,6 +896,9 @@ function setupCaventsDropdown() {
             const data = await apiRequest('/obras/' + id);
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
             const obra = data;
+            // id personalizado / localización / peso no tienen campo en el
+            // formulario: se recuerdan para reenviarlos al guardar.
+            guardarMetaObra(obra);
             document.getElementById('input-id-edicion').value = obra.id;
             // El título también se decodifica: era el ÚNICO campo sin hacerlo y,
             // al volver a guardar, el "&" de la entidad se re-escapaba en el
@@ -863,15 +911,15 @@ function setupCaventsDropdown() {
             document.getElementById('input-ancho').value = obra.ancho || '';
             document.getElementById('input-alto').value = obra.alto || '';
             document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
-            document.getElementById('input-status').value = decodeHTMLEntities(obra.status || '');
-            document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra || '');
-            document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica || '');
-            document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte || '');
-            document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos || '');
-            document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia || '');
-            document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado || '');
-            document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
-            document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
+            setSelectValue(document.getElementById('input-status'), decodeHTMLEntities(obra.status || ''));
+            setSelectValue(document.getElementById('input-estado-obra'), decodeHTMLEntities(obra.estado_obra || ''));
+            setSelectValue(document.getElementById('input-descripcion-tecnica'), decodeHTMLEntities(obra.descripcion_tecnica || ''));
+            setSelectValue(document.getElementById('input-soporte'), decodeHTMLEntities(obra.soporte || ''));
+            setSelectValue(document.getElementById('input-marcos'), decodeHTMLEntities(obra.marcos || ''));
+            setSelectValue(document.getElementById('input-procedencia'), decodeHTMLEntities(obra.procedencia || ''));
+            setSelectValue(document.getElementById('input-certificado'), decodeHTMLEntities(obra.certificado || ''));
+            setSelectValue(document.getElementById('input-firma'), decodeHTMLEntities(obra.firma || ''));
+            setSelectValue(document.getElementById('input-conservacion'), decodeHTMLEntities(obra.conservacion || ''));
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             // Cargar imágenes
             const imagenes = [
@@ -900,6 +948,11 @@ function setupCaventsDropdown() {
             const data = await apiRequest('/obras/' + id);
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
             const obra = data;
+            // La copia conserva los metadatos de la obra original (localización y
+            // peso), pero NO el id personalizado: una copia es una obra nueva y
+            // reutilizar el código de inventario sería confuso.
+            guardarMetaObra(obra);
+            metaObra.idPersonalizado = '';
             document.getElementById('input-id-edicion').value = '';
             // Igual que al editar: el título llega escapado y debe verse (y
             // volver a guardarse) con el texto real.
@@ -910,15 +963,15 @@ function setupCaventsDropdown() {
             document.getElementById('input-ancho').value = obra.ancho || '';
             document.getElementById('input-alto').value = obra.alto || '';
             document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
-            document.getElementById('input-status').value = decodeHTMLEntities(obra.status || '');
-            document.getElementById('input-estado-obra').value = decodeHTMLEntities(obra.estado_obra || '');
-            document.getElementById('input-descripcion-tecnica').value = decodeHTMLEntities(obra.descripcion_tecnica || '');
-            document.getElementById('input-soporte').value = decodeHTMLEntities(obra.soporte || '');
-            document.getElementById('input-marcos').value = decodeHTMLEntities(obra.marcos || '');
-            document.getElementById('input-procedencia').value = decodeHTMLEntities(obra.procedencia || '');
-            document.getElementById('input-certificado').value = decodeHTMLEntities(obra.certificado || '');
-            document.getElementById('input-firma').value = decodeHTMLEntities(obra.firma || '');
-            document.getElementById('input-conservacion').value = decodeHTMLEntities(obra.conservacion || '');
+            setSelectValue(document.getElementById('input-status'), decodeHTMLEntities(obra.status || ''));
+            setSelectValue(document.getElementById('input-estado-obra'), decodeHTMLEntities(obra.estado_obra || ''));
+            setSelectValue(document.getElementById('input-descripcion-tecnica'), decodeHTMLEntities(obra.descripcion_tecnica || ''));
+            setSelectValue(document.getElementById('input-soporte'), decodeHTMLEntities(obra.soporte || ''));
+            setSelectValue(document.getElementById('input-marcos'), decodeHTMLEntities(obra.marcos || ''));
+            setSelectValue(document.getElementById('input-procedencia'), decodeHTMLEntities(obra.procedencia || ''));
+            setSelectValue(document.getElementById('input-certificado'), decodeHTMLEntities(obra.certificado || ''));
+            setSelectValue(document.getElementById('input-firma'), decodeHTMLEntities(obra.firma || ''));
+            setSelectValue(document.getElementById('input-conservacion'), decodeHTMLEntities(obra.conservacion || ''));
             document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
             syncCustomSelects();
             resetCambiosNoGuardados();

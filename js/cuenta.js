@@ -6,6 +6,7 @@ import { ARTISTA_KEY, apiRequest } from './config.js?v=ec4a7fca01';
 import { token, artistaActual, logout } from './auth.js?v=000cc3408c';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
 import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=819fea05c7';
+import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=e1dd489be4';
 
 /**
  * Muestra errores del backend en un elemento de error inline del formulario.
@@ -251,27 +252,10 @@ export function setupMiCuenta() {
                     if (strengthText) strengthText.textContent = '';
                     return;
                 }
-                // Mismo algoritmo que auth-logic.js para consistencia
-                const req = {
-                    length: val.length >= 8,
-                    lower: /[a-z]/.test(val),
-                    upper: /[A-Z]/.test(val),
-                    number: /\d/.test(val),
-                    special: /[^A-Za-z0-9]/.test(val)
-                };
-                let puntos = Object.values(req).filter(Boolean).length;
-                if (val.length >= 12) puntos++;
-                let nivel;
-                if (puntos <= 2) nivel = 1;
-                else if (puntos === 3) nivel = 2;
-                else if (puntos === 4) nivel = 3;
-                else nivel = 4;
-                if (!req.length) nivel = 1;
+                // Mismo algoritmo que el backend (js/password-strength.js)
+                const { nivel, etiqueta } = calcularFortalezaPassword(val);
                 strengthWidget.setAttribute('data-level', String(nivel));
-                if (strengthText) {
-                    const etiquetas = { 1: 'Débil', 2: 'Media', 3: 'Buena', 4: 'Fuerte' };
-                    strengthText.textContent = etiquetas[nivel] || '';
-                }
+                if (strengthText) strengthText.textContent = etiqueta;
             });
         }
 
@@ -290,17 +274,12 @@ export function setupMiCuenta() {
                 errorEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.';
                 return;
             }
-            // Verificar fortaleza mínima (mismo criterio que registro y reset)
-            const req = {
-                length: nueva.length >= 8,
-                lower: /[a-z]/.test(nueva),
-                upper: /[A-Z]/.test(nueva),
-                number: /\d/.test(nueva),
-                special: /[^A-Za-z0-9]/.test(nueva)
-            };
-            let puntos = Object.values(req).filter(Boolean).length;
-            if (nueva.length >= 12) puntos++;
-            if (!req.length || puntos < 3) {
+            // Verificar fortaleza mínima: MISMO criterio que el backend, que
+            // exige nivel >= 3 (nivel 3 = 4 puntos). Antes se validaba "puntos < 3",
+            // así que una contraseña de 3 puntos (nivel "Media", p. ej. abcdefg1)
+            // pasaba aquí y el servidor la rechazaba con 400.
+            const { nivel } = calcularFortalezaPassword(nueva);
+            if (nivel < NIVEL_MIN_PASSWORD) {
                 errorEl.textContent = 'La contraseña es muy débil. Usa mayúsculas, minúsculas, números y símbolos.';
                 return;
             }
