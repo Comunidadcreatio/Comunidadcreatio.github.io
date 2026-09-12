@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=ec4a7fca01';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities } from './utils.js?v=819fea05c7';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=ed8b4b7b54';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=a6bc5a2436';
 // El cajÃ³n de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=93773d457e';
@@ -1494,7 +1494,15 @@ export function setupProblogs() {
     masBtn = document.getElementById('problogs-mas');
 
     addImagenBtn?.addEventListener('click', () => anadirImagen());
-    limpiarBtn?.addEventListener('click', limpiarEditor);
+    limpiarBtn?.addEventListener('click', async () => {
+        // Confirmación: antes vaciaba el editor de golpe y se perdía el título,
+        // el texto y las etiquetas que ya estuvieran escritos.
+        if (!editorVacio()) {
+            const ok = await showConfirm('¿Vaciar la publicación? Se perderá lo que tengas escrito.');
+            if (!ok) return;
+        }
+        limpiarEditor();
+    });
     vistaPreviaBtn?.addEventListener('click', abrirVistaPrevia);
     form.addEventListener('submit', guardar);
 

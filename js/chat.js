@@ -6,7 +6,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=ec4a7fca01';
 import { artistaActual } from './auth.js?v=000cc3408c';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=819fea05c7';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=ed8b4b7b54';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=a6bc5a2436';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
 const POLL_MS = 12000;      // 12s entre polls

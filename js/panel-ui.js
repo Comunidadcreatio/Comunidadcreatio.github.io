@@ -53,6 +53,75 @@ function limpiarMetaObra() {
     metaObra = { idPersonalizado: '', localizacion: '', peso: '' };
 }
 
+// ============================================
+// POSICIÓN DE LAS BARRAS INFERIORES
+// ============================================
+// Cuánto hay que dejar libre en la parte de abajo: el alto del nav cuando se ve.
+// Con el teclado abierto chat.js le pone display:none al nav, su rect pasa a 0 y
+// `innerHeight - 0` mandaba las barras a innerHeight: se iban ~840px fuera de la
+// pantalla. Si el nav está oculto, las barras se pegan al borde inferior (quedan
+// detrás del teclado, igual que el propio nav).
+// A nivel de módulo porque lo usan la barra de pasos, las pestañas, el fondo y la
+// barra del desplegable de "Mis Cavents".
+function reservaInferior() {
+    const nav = document.getElementById('toggle-panel');
+    if (!nav) return 0;
+    const rect = nav.getBoundingClientRect();
+    if (rect.height === 0 || getComputedStyle(nav).display === 'none') return 0;
+    return Math.max(0, window.innerHeight - rect.top);
+}
+
+// ============================================
+// VALIDACIÓN DE OBLIGATORIOS
+// ============================================
+// El formulario es `novalidate` y el botón de guardar está en la barra de pasos
+// (se puede pulsar desde cualquier paso), así que la validación nativa del
+// navegador no protege nada: sin esto se podía guardar una obra sin título, sin
+// año, sin precio ni descripción.
+let irAlPasoFn = null;   // lo rellena setupStepNavigation (showStep)
+
+function camposObligatoriosVacios() {
+    return Array.from(document.querySelectorAll('#obra-form [data-required="true"]'))
+        .filter((el) => !String(el.value || '').trim());
+}
+
+// Nombre legible del campo (su <label>), para decirle al usuario qué falta.
+function nombreDelCampo(el) {
+    const grupo = el.closest('.form-group') || el.closest('.form-section-content');
+    const label = grupo ? grupo.querySelector('label') : null;
+    const texto = label ? label.textContent.replace(/\*/g, '').trim() : '';
+    return texto || el.id || 'campo';
+}
+
+// Lleva al paso (.form-section) que contiene el campo que falta.
+function irAlPasoDe(el) {
+    if (typeof irAlPasoFn !== 'function') return;
+    const seccion = el.closest('.form-section');
+    if (!seccion) return;
+    const pasos = Array.from(document.querySelectorAll('#obra-form .form-section'));
+    const indice = pasos.indexOf(seccion);
+    if (indice >= 0) irAlPasoFn(indice);
+}
+
+// Limpia el formulario pidiendo confirmación si hay algo que perder: cambios sin
+// guardar, o datos cargados de una obra que se está editando/duplicando.
+export async function limpiarFormularioConConfirmacion() {
+    const idEdicion = (document.getElementById('input-id-edicion') || {}).value || '';
+    const boton = document.getElementById('obra-step-crear');
+    const modoDuplicar = /Duplicar/i.test(boton ? boton.textContent : '');
+    const aviso = hayCambiosNoGuardados
+        ? '⚠️ Tienes cambios sin guardar en el formulario.\n\n¿Seguro que quieres vaciarlo?'
+        : (idEdicion || modoDuplicar
+            ? '¿Vaciar el formulario? Estás editando una obra: se perderán los datos cargados (la obra no cambia hasta que guardes).'
+            : null);
+    if (aviso) {
+        const ok = await showConfirm(aviso);
+        if (!ok) return false;
+    }
+    limpiarFormularioCompleto(true);
+    return true;
+}
+
 // Rellena un <select> con el valor guardado. Si ese valor NO está entre las
 // opciones (datos de una versión anterior, importaciones, otro cliente…), el
 // select se quedaría vacío y al guardar se perdería en silencio: se añade como
@@ -561,6 +630,15 @@ export function setupObraFormSubmit() {
             showWarning("La obra debe tener al menos una imagen. No puedes guardar sin imágenes.");
             return;
         }
+        // Obligatorios: se avisa de cuáles faltan y se lleva al paso del primero,
+        // que es lo único que el usuario puede hacer al respecto.
+        const faltantes = camposObligatoriosVacios();
+        if (faltantes.length) {
+            const nombres = faltantes.map(nombreDelCampo);
+            showWarning('Faltan campos obligatorios: ' + nombres.join(', ') + '.');
+            irAlPasoDe(faltantes[0]);
+            return;
+        }
         // Alguna imagen todavía se está recortando o copiando (p.ej. al duplicar
         // una obra): guardar ahora la crearía sin ella. En modo edición las
         // imágenes ya guardadas tienen file:null y eso es correcto, por eso se
@@ -777,8 +855,7 @@ function setupCaventsDropdown() {
     function positionBar() {
         const togglePanel = document.getElementById('toggle-panel');
         if (!togglePanel || !stepBar) return;
-        const panelTop = togglePanel.getBoundingClientRect().top;
-        const fromBottom = window.innerHeight - panelTop;
+        const fromBottom = reservaInferior();
         const stepBarH = stepBar.offsetHeight || 48;
         const tabsBar = document.getElementById('crear-tabs');
         const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
@@ -1108,9 +1185,7 @@ function setupStepNavigation() {
         const togglePanel = document.getElementById('toggle-panel');
         const tabsBar = document.getElementById('crear-tabs');
         if (!togglePanel || !stepBar) return;
-        const panelTop = togglePanel.getBoundingClientRect().top;
-        const viewH = window.innerHeight;
-        const fromBottom = viewH - panelTop;
+        const fromBottom = reservaInferior();
         const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
         stepBar.style.bottom = (fromBottom + tabsH) + 'px';
         // La barra de Problogs ocupa ese mismo hueco: nunca se ven las dos a la
@@ -1125,9 +1200,7 @@ function setupStepNavigation() {
         const togglePanel = document.getElementById('toggle-panel');
         const tabsBar = document.getElementById('crear-tabs');
         if (!togglePanel || !tabsBar) return;
-        const panelTop = togglePanel.getBoundingClientRect().top;
-        const fromBottom = window.innerHeight - panelTop;
-        tabsBar.style.bottom = fromBottom + 'px';
+        tabsBar.style.bottom = reservaInferior() + 'px';
     }
 
     // Posicionar el carrusel fijo debajo de la barra de progreso
@@ -1161,7 +1234,7 @@ function setupStepNavigation() {
         const tabsBar = document.getElementById('crear-tabs');
         const problogBar = document.getElementById('problog-nav-bar');
         if (!fondo || !togglePanel) return;
-        const fromBottom = window.innerHeight - togglePanel.getBoundingClientRect().top;
+        const fromBottom = reservaInferior();
         const altoTabs = tabsBar ? tabsBar.getBoundingClientRect().height : 0;
         const altoBarra = Math.max(
             stepBar ? stepBar.getBoundingClientRect().height : 0,
@@ -1208,6 +1281,10 @@ function setupStepNavigation() {
         'Proveniencia y Autenticidad'
     ];
     const stepNameEl = document.getElementById('obra-step-name');
+
+    // Se expone para que la validación del guardado pueda llevar al usuario al
+    // paso del primer campo obligatorio que falte.
+    irAlPasoFn = showStep;
 
     function showStep(index) {
         sections.forEach((s, i) => {
@@ -1271,10 +1348,13 @@ function setupStepNavigation() {
     // Botón limpiar campos
     const limpiarBtn = document.getElementById('obra-step-limpiar');
     if (limpiarBtn) {
-        limpiarBtn.addEventListener('click', () => {
+        limpiarBtn.addEventListener('click', async () => {
+            // Confirmación antes de vaciar: si no, un toque accidental se llevaba
+            // por delante lo escrito (o los datos de la obra que se editaba).
+            const vaciado = await limpiarFormularioConConfirmacion();
+            if (!vaciado) return;
             currentStep = 0;
             showStep(0);
-            limpiarFormularioCompleto(true);
             // Reset trigger
             const ct = document.getElementById('cavents-trigger');
             if (ct) ct.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';

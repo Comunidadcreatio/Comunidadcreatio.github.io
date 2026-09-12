@@ -119,6 +119,19 @@ const conImagen = await evalJs(`(async () => {
     return true;
 })()`);
 check('se pudo preparar el formulario con una imagen', conImagen === true);
+// El formulario ya exige los campos obligatorios (CAV-4): se rellenan para que
+// el guardado llegue al backend, que es lo que se está probando aquí.
+await evalJs(`(() => {
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    set('input-ano', '2024'); set('input-precio', '120'); set('input-ancho', '80'); set('input-alto', '100');
+    set('input-descripcion-artistica', 'Descripcion de prueba.'); set('input-etiquetas', 'arte');
+    ['input-status', 'input-estado-obra', 'input-descripcion-tecnica', 'input-soporte', 'input-marcos',
+     'input-procedencia', 'input-certificado', 'input-firma', 'input-conservacion'].forEach((id) => {
+        const sel = document.getElementById(id);
+        const opt = Array.from(sel.options).find(o => o.value);
+        if (opt) sel.value = opt.value;
+    });
+})()`);
 for (let i = 0; i < 20; i++) {
   const listo = await evalJs(`document.querySelectorAll('#carrusel-track .carrusel-slide').length > 1`);
   if (listo) break;
