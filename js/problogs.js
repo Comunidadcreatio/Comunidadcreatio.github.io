@@ -239,8 +239,27 @@ function pintarPortadas() {
 // El marco crece con lo que se escribe, sin scroll propio.
 function ajustarAltoContenido() {
     if (!contenidoEl) return;
+    // Con el panel OCULTO no se puede medir: scrollHeight vale 0 y el alto se
+    // quedaría en el mínimo (260px) con el texto cortado. Pasa al preparar una
+    // edición, que rellena el contenido antes de abrir el panel; en cuanto el
+    // panel es visible se vuelve a medir (ver el listener de animationend).
+    if (contenidoEl.offsetParent === null) return;
     contenidoEl.style.height = 'auto';
     contenidoEl.style.height = Math.max(MIN_ALTO_CONTENIDO, contenidoEl.scrollHeight) + 'px';
+}
+
+// Reintenta medir el alto hasta que el editor tenga layout. Se usa cuando el
+// contenido se rellena con el panel todavía oculto (edición): el panel se abre
+// en transición y hasta que no se pinta no hay nada que medir. En cuanto se
+// puede medir se para; si nunca llega a verse, se rinde sin tocar nada.
+function ajustarAltoContenidoCuandoSePueda(intentos = 25) {
+    if (!contenidoEl) return;
+    if (contenidoEl.offsetParent !== null) {
+        ajustarAltoContenido();
+        return;
+    }
+    if (intentos <= 0) return;
+    setTimeout(() => ajustarAltoContenidoCuandoSePueda(intentos - 1), 100);
 }
 
 // Hueco de abajo: lo que tapan las barras fijas (nav + pestañas + barra de crear)
@@ -421,6 +440,17 @@ function aplicarFormato(tipo) {
     if (pref) { prefijarLineas(pref.marca, pref.reemplaza); return; }
     const env = ENVUELTOS[tipo];
     if (env) envolverSeleccion(env.antes, env.despues);
+}
+
+// ¿El editor está completamente vacío? Solo entonces es seguro reiniciarlo:
+// mirar únicamente el contenido borraba el título y las etiquetas que el autor
+// ya había escrito pero cuyo texto todavía estaba vacío.
+function editorVacio() {
+    const titulo = (tituloEl && tituloEl.value || '').trim();
+    const etiquetas = (etiquetasEl && etiquetasEl.value || '').trim();
+    const contenido = (contenidoEl && contenidoEl.value || '').trim();
+    return !titulo && !etiquetas && !contenido
+        && imagenesLocales.size === 0 && imagenesGuardadas.size === 0;
 }
 
 function limpiarEditor() {
@@ -633,6 +663,10 @@ function cargarParaEditar(p) {
     // flecha de volver para regresar a Problogs al terminar.
     abrirCrearDesdeIcono();
     document.getElementById('tab-problogs')?.click();
+    // El panel tarda en verse (transición de sección): el alto del marco se mide
+    // en cuanto el editor tenga layout, no aquí (scrollHeight aún vale 0 y el
+    // texto quedaría cortado en el mínimo de 260px).
+    ajustarAltoContenidoCuandoSePueda();
 }
 
 // ============================================================
@@ -1519,9 +1553,13 @@ export function setupProblogs() {
     detalleEl?.addEventListener('click', (e) => manejarAcciones(e, false));
 
     // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
-    // NO se está editando algo y no hay nada escrito (si no, se perdería).
+    // NO se está editando algo y el editor está VACÍO del todo: antes bastaba
+    // con que el contenido estuviera vacío para borrar también el título y las
+    // etiquetas ya escritos.
     document.getElementById('tab-problogs')?.addEventListener('click', () => {
-        if (!editandoId && !(contenidoEl && contenidoEl.value.trim())) limpiarEditor();
+        if (!editandoId && editorVacio()) limpiarEditor();
+        // El editor acaba de hacerse visible: es el momento de medir su alto.
+        ajustarAltoContenido();
     });
 
     limpiarEditor();
