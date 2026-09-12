@@ -433,11 +433,21 @@
 /* ============================================================
    2. FEED
    ============================================================ */
+/* Las tarjetas van a sangre: sin aire a los laterales (en el móvil se salen del
+   relleno del main), sin esquinas redondeadas y sin relleno. El texto se queda
+   con su pequeño margen lateral para no tocar el borde de la pantalla. */
 #problogs .problogs-feed {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding: 4px 0 28px;
+    gap: 22px;
+    padding: 0 0 28px;
+}
+
+@media (max-width: 768px) {
+    #problogs .problogs-feed {
+        margin-left: -24px;
+        margin-right: -24px;
+    }
 }
 
 .problogs-cargando,
@@ -449,13 +459,20 @@
     color: var(--color-gray-500);
 }
 
+/* Tarjeta sin caja: ni borde, ni esquinas redondeadas, ni relleno de fondo. */
 .problog-card {
-    border: 1px solid var(--color-gray-200);
-    border-radius: 14px;
-    background: var(--color-white);
+    border: none;
+    border-radius: 0;
+    background: transparent;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Al no haber caja, una línea fina separa una publicación de la siguiente. */
+.problog-card + .problog-card {
+    border-top: 1px solid var(--color-gray-200);
+    padding-top: 22px;
 }
 
 .problog-card:active {
@@ -495,13 +512,13 @@
     color: var(--color-gray-500);
 }
 
-/* Autoría de la tarjeta: lo primero, arriba y a la izquierda (avatar + nombre +
-   tiempo), por encima de la imagen de portada. Lleva el mismo aire lateral que
-   el cuerpo; el de abajo solo hace falta cuando debajo viene la imagen, porque
-   si no, el suyo propio ya separa. */
+/* Autoría de la tarjeta: lo primero, arriba y a la izquierda. En una sola línea:
+   el avatar, el nombre y, pegado a la derecha, el tiempo que lleva publicada.
+   Lleva el mismo aire lateral que el cuerpo; el de abajo solo hace falta cuando
+   debajo viene la imagen, porque si no, el suyo propio ya separa. */
 .problog-card-autoria {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     padding: 14px 16px 0;
 }
@@ -510,20 +527,9 @@
     padding-bottom: 12px;
 }
 
-.problog-card-autoria-datos {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-}
-
-.problog-card-autoria-datos .problog-card-autor {
-    line-height: 1.2;
-}
-
-.problog-card-autoria-datos .problog-card-fecha {
-    margin-left: 0;
-    line-height: 1.2;
+/* El tiempo, a la derecha del todo: queda paralelo al nombre. */
+.problog-card-autoria .problog-card-fecha {
+    margin-left: auto;
 }
 
 .problog-card-avatar {
@@ -557,34 +563,9 @@
 }
 
 /* ============================================================
-   2b. BARRA DE FILTRO (Todas / Mías) Y ACCIONES
+   2b. ACCIONES Y CABECERA DE LA TARJETA
    ============================================================ */
-#problogs .problogs-barra {
-    display: flex;
-    gap: 8px;
-    padding: 2px 0 16px;
-}
-
-#problogs .problogs-filtro {
-    width: auto;
-    padding: 7px 16px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 20px;
-    background: transparent;
-    color: var(--color-gray-500);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-#problogs .problogs-filtro.activo {
-    color: var(--color-ink);
-    border-color: var(--color-ink);
-}
-
-/* Cabecera de la tarjeta: título y, en "Mías", el estado. */
+/* Cabecera de la tarjeta: título y, en las propias, el estado. */
 .problog-card-cabecera {
     display: flex;
     align-items: flex-start;
@@ -729,10 +710,11 @@
     border-bottom: 1px solid var(--color-gray-200);
 }
 
-/* Autoría de la lectura (y de la vista previa): arriba y a la izquierda. */
+/* Autoría de la lectura (y de la vista previa): arriba y a la izquierda, en una
+   línea, con el tiempo pegado a la derecha. */
 .problog-lectura-autoria {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     margin-bottom: 12px;
 }
@@ -745,13 +727,6 @@
     flex-shrink: 0;
 }
 
-.problog-lectura-autoria-datos {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-}
-
 .problog-lectura-autor {
     font-size: 14px;
     font-weight: 700;
@@ -760,6 +735,8 @@
 }
 
 .problog-lectura-fecha {
+    /* Pegado a la derecha: queda paralelo al nombre. */
+    margin-left: auto;
     font-size: 12px;
     line-height: 1.2;
     color: var(--color-gray-500);
@@ -979,15 +956,10 @@
     background: rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="dark"] #problogs .problogs-filtro,
 [data-theme="dark"] .problog-card-estado,
 [data-theme="dark"] #problogs .problog-card-accion,
 [data-theme="dark"] #perfil-tab-content .problog-card-accion {
     border-color: rgba(255, 255, 255, 0.18);
-}
-
-[data-theme="dark"] #problogs .problogs-filtro.activo {
-    border-color: var(--color-ink);
 }
 
 /* ============================================================

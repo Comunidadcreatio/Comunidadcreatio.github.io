@@ -742,10 +742,8 @@ function tarjetaProblog(p, conAcciones) {
                  y el tiempo que lleva publicada. -->
             <div class="problog-card-autoria${portada ? ' con-portada' : ''}">
                 ${avatar}
-                <div class="problog-card-autoria-datos">
-                    <span class="problog-card-autor">${renderText(autor)}</span>
-                    <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
-                </div>
+                <span class="problog-card-autor">${renderText(autor)}</span>
+                <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
             </div>
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
             <div class="problog-card-cuerpo">
@@ -1100,10 +1098,8 @@ function pintarLectura(p, conAcciones) {
             <!-- Autoría arriba y a la izquierda: avatar, nombre y tiempo. -->
             <div class="problog-lectura-autoria">
                 ${avatarHTML(p, 'problog-lectura-avatar')}
-                <div class="problog-lectura-autoria-datos">
-                    <span class="problog-lectura-autor">${renderText(autor)}</span>
-                    <span class="problog-lectura-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
-                </div>
+                <span class="problog-lectura-autor">${renderText(autor)}</span>
+                <span class="problog-lectura-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
             </div>
             <h2 class="problog-lectura-titulo">${renderText(p.titulo)}</h2>
             ${acciones}

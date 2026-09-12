@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.574';
+        var currentVer = '1.0.575';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -80,7 +80,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=18250a3396">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=0c854fd638">
+    <link rel="stylesheet" href="css/problogs.css?v=ae950e26bb">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -1012,10 +1012,6 @@
         <!-- SECCIÓN: PROBLOGS -->
         <section id="problogs" class="hidden" aria-label="Problogs" role="region">
             <h2 class="visually-hidden">Problogs</h2>
-            <div class="problogs-barra">
-                <button type="button" id="problogs-filtro-todas" class="problogs-filtro activo">Todas</button>
-                <button type="button" id="problogs-filtro-mias" class="problogs-filtro">Mías</button>
-            </div>
             <div id="problogs-feed" class="problogs-feed">
                 <p class="problogs-cargando">Cargando publicaciones…</p>
             </div>
@@ -1103,7 +1099,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=3c05fa7235" type="module"></script>
+    <script src="js/main.js?v=68582ce81f" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
