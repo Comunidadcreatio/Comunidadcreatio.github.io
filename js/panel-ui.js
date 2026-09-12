@@ -2,11 +2,11 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=c088cadd1b';
-import { token, artistaActual } from './auth.js?v=7823287562';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=f64c4300b8';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=ec4a7fca01';
+import { token, artistaActual } from './auth.js?v=000cc3408c';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=cfc183218e';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
-import { decodeHTMLEntities, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=2a35db9e14';
+import { decodeHTMLEntities, decodificarObra, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=819fea05c7';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -788,7 +788,9 @@ function setupCaventsDropdown() {
             if (!token) { debugLog.error('Token no disponible para cargar cavents'); return; }
             const result = await cargarMisObras(1, 50);
             if (result.success) {
-                _caventsCache.data = result.obras || [];
+                // Los títulos de la lista se pintan con innerHTML: se decodifican
+                // aquí para que no aparezcan entidades ("&#x27;") en el desplegable.
+                _caventsCache.data = (result.obras || []).map(decodificarObra);
                 _caventsCache.loaded = true;
             } else {
                 debugLog.error('Error API cavents:', result);
@@ -850,7 +852,11 @@ function setupCaventsDropdown() {
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
             const obra = data;
             document.getElementById('input-id-edicion').value = obra.id;
-            document.getElementById('input-titulo').value = obra.titulo || '';
+            // El título también se decodifica: era el ÚNICO campo sin hacerlo y,
+            // al volver a guardar, el "&" de la entidad se re-escapaba en el
+            // servidor ("Retrato &#x2F; Estudio" → "Retrato &amp;#x2F; Estudio"),
+            // de modo que el título se corrompía un poco más en cada edición.
+            document.getElementById('input-titulo').value = decodeHTMLEntities(obra.titulo || '');
             document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';
@@ -895,7 +901,9 @@ function setupCaventsDropdown() {
             if (!data || data.success === false) { showError('No se pudo cargar la obra'); return; }
             const obra = data;
             document.getElementById('input-id-edicion').value = '';
-            document.getElementById('input-titulo').value = (obra.titulo || '') + ' (copia)';
+            // Igual que al editar: el título llega escapado y debe verse (y
+            // volver a guardarse) con el texto real.
+            document.getElementById('input-titulo').value = decodeHTMLEntities(obra.titulo || '') + ' (copia)';
             document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
             document.getElementById('input-ano').value = obra.ano || '';
             document.getElementById('input-precio').value = obra.precio || '';

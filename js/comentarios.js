@@ -1,14 +1,14 @@
 // js/comentarios.js
-// Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest } from './config.js?v=c088cadd1b';
-import { renderText, safeImgUrl } from './utils.js?v=2a35db9e14';
-// Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
+// Drawer de comentarios â€” se desliza desde la parte inferior.
+import { apiRequest } from './config.js?v=ec4a7fca01';
+import { renderText, safeImgUrl, decodeHTMLEntities } from './utils.js?v=819fea05c7';
+// Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripciÃ³n: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
 import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 
 let obraIdActual = null;
-// Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el
+// Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajÃ³n es el
 // MISMO para los dos; solo cambia la ruta de la API.
 let tipoRecurso = 'obras';
 let cardActual = null;
@@ -125,15 +125,15 @@ function actualizarAltoBase() {
 let transformFondoPrev = null;
 let alturaGaleriaPin = 0;
 
-// Fija el ALTO del contenedor de la galería en PÍXELES mientras la hoja está
+// Fija el ALTO del contenedor de la galerÃ­a en PÃXELES mientras la hoja estÃ¡
 // abierta. Hace falta porque la tarjeta mide `height: 100%` del contenedor: si
 // el teclado encoge el layout, el contenedor se encoge, la tarjeta se encoge con
-// él y con `object-fit: cover` el recorte de la imagen cambia — se vería
-// distinta de como la subió el usuario. Con el alto fijado, no cambia nada.
+// Ã©l y con `object-fit: cover` el recorte de la imagen cambia â€” se verÃ­a
+// distinta de como la subiÃ³ el usuario. Con el alto fijado, no cambia nada.
 //
-// Solo se MIDE cuando el layout está completo (sin teclado); si ya lo está, la
-// medida es idempotente. Tras una rotación, `actualizarAltoBase` reinicia la
-// referencia y aquí se vuelve a medir sola.
+// Solo se MIDE cuando el layout estÃ¡ completo (sin teclado); si ya lo estÃ¡, la
+// medida es idempotente. Tras una rotaciÃ³n, `actualizarAltoBase` reinicia la
+// referencia y aquÃ­ se vuelve a medir sola.
 function medirYFijarAltoGaleria(cont) {
     const layoutCompleto = (window.innerHeight || 0) >= altoBase - 40;
     if (layoutCompleto) {
@@ -254,8 +254,8 @@ function baseComentarios() {
     return '/' + tipoRecurso + '/' + obraIdActual + '/comentarios';
 }
 
-// `tipo` permite reutilizar el cajón para Problogs: 'obras' (por defecto, para no
-// romper la llamada que ya hace la galería) o 'problogs'.
+// `tipo` permite reutilizar el cajÃ³n para Problogs: 'obras' (por defecto, para no
+// romper la llamada que ya hace la galerÃ­a) o 'problogs'.
 export function abrirComentarios(obraId, cardEl, tipo = 'obras') {
     init();
     obraIdActual = obraId;
@@ -320,7 +320,7 @@ function cerrarComentarios() {
     cardActual = null;
 }
 
-// El cajón tapa la app y congela el fondo: la navegación debe poder cerrarlo.
+// El cajÃ³n tapa la app y congela el fondo: la navegaciÃ³n debe poder cerrarlo.
 registrarOverlay('cajon-comentarios', cerrarComentarios);
 
 async function cargarComentarios(obraId) {
@@ -328,10 +328,10 @@ async function cargarComentarios(obraId) {
         const data = await apiRequest(baseComentarios());
         const comentarios = data.comentarios || data || [];
         if (!comentarios.length) {
-            lista.innerHTML = '<div class="comentarios-vacio">No hay comentarios aún. ¡Sé el primero!</div>';
+            lista.innerHTML = '<div class="comentarios-vacio">No hay comentarios aÃºn. Â¡SÃ© el primero!</div>';
             return;
         }
-        // Agrupar: raíces y replies
+        // Agrupar: raÃ­ces y replies
         const raices = comentarios.filter(c => !c.comentario_padre_id);
         const replies = comentarios.filter(c => c.comentario_padre_id);
         lista.innerHTML = raices.map(c => renderizarComentario(c, replies)).join('');
@@ -359,18 +359,18 @@ function renderizarComentario(c, todosReplies) {
         <div class="comentario-item" data-id="${c.id}">
             ${avatarHTML}
             <div class="comentario-body">
-                <div class="comentario-autor">${renderText(c.autor_nombre) || 'Usuario'}</div>
-                <div class="comentario-texto">${renderText(c.texto || c.comentario)}</div>
+                <div class="comentario-autor">${renderText(decodeHTMLEntities(c.autor_nombre)) || 'Usuario'}</div>
+                <div class="comentario-texto">${renderText(decodeHTMLEntities(c.texto || c.comentario))}</div>
                 <div class="comentario-meta">
                     <span class="comentario-fecha">${fecha}</span>
                     <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
                     <button class="comentario-btn-like" data-id="${c.id}">
-                        ♥ <span class="comentario-likes-count">${likes}</span>
+                        â™¥ <span class="comentario-likes-count">${likes}</span>
                     </button>
                 </div>
                 <div class="comentario-reply-input hidden" data-parent="${c.id}">
                     <input type="text" class="comentario-reply-field" placeholder="Escribe una respuesta..." autocomplete="off">
-                    <button class="comentario-reply-send">➤</button>
+                    <button class="comentario-reply-send">âž¤</button>
                 </div>
                 ${repliesHTML}
             </div>
@@ -447,7 +447,7 @@ function timeAgoShort(dateStr) {
     return new Date(dateStr).toLocaleDateString('es-VE');
 }
 
-// Event listeners — se ejecutan al cargar el módulo (DOM ya está listo)
+// Event listeners â€” se ejecutan al cargar el mÃ³dulo (DOM ya estÃ¡ listo)
 init();
 
 btnEnviar?.addEventListener('click', () => enviarComentario());
@@ -574,9 +574,9 @@ drawer?.addEventListener('touchend', () => {
     }
 });
 
-// Delegación de eventos para replies y likes
+// DelegaciÃ³n de eventos para replies y likes
 lista?.addEventListener('click', (e) => {
-    // Botón "Responder"
+    // BotÃ³n "Responder"
     const btnResp = e.target.closest('.comentario-btn-responder');
     if (btnResp) {
         const parentId = btnResp.dataset.id;
@@ -587,14 +587,14 @@ lista?.addEventListener('click', (e) => {
         }
         return;
     }
-    // Botón enviar reply
+    // BotÃ³n enviar reply
     const btnSend = e.target.closest('.comentario-reply-send');
     if (btnSend) {
         const parentId = btnSend.closest('.comentario-reply-input')?.dataset.parent;
         if (parentId) enviarComentario(parseInt(parentId));
         return;
     }
-    // Botón like
+    // BotÃ³n like
     const btnLike = e.target.closest('.comentario-btn-like');
     if (btnLike) {
         likeComentario(parseInt(btnLike.dataset.id));

@@ -12,12 +12,38 @@ import { showError } from './notificaciones.js?v=d2867c8ca0';
 export function decodeHTMLEntities(str) {
     if (str === null || str === undefined) return '';
     return String(str)
+        // &amp; va PRIMERO a propósito: además de lo suyo, recompone los valores
+        // que quedaron doblemente escapados ("&amp;#x2F;") por el bug que volvía
+        // a guardar el título ya escapado, así se recuperan en una sola pasada.
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
-        .replace(/&#x2F;/g, '/')
-        .replace(/&#39;/g, "'");
+        // Entidades que produce express-validator .escape() (validator 13.x):
+        .replace(/&#x2F;/gi, '/')
+        .replace(/&#x5C;/gi, '\\')
+        .replace(/&#x60;/gi, '`')
+        .replace(/&#x27;/gi, "'")
+        // Variantes de apóstrofo de otros orígenes (datos antiguos):
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'");
+}
+
+// Campos de texto de una obra que el backend guarda escapados (.escape()).
+// Se decodifican al recibir la obra del API para que TODO lo que la pinte
+// (tarjetas, franjas, modal, listas) muestre el texto real y no entidades como
+// "&#x2F;" o "&#x27;".
+const CAMPOS_TEXTO_OBRA = [
+    'titulo', 'artista', 'descripcion_tecnica', 'descripcion_artistica', 'soporte',
+    'procedencia', 'marcos', 'certificado', 'firma', 'conservacion', 'etiquetas'
+];
+
+export function decodificarObra(obra) {
+    if (!obra || typeof obra !== 'object') return obra;
+    CAMPOS_TEXTO_OBRA.forEach((campo) => {
+        if (typeof obra[campo] === 'string') obra[campo] = decodeHTMLEntities(obra[campo]);
+    });
+    return obra;
 }
 
 /**

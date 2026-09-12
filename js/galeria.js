@@ -1,8 +1,8 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js?v=c088cadd1b';
-import { artistaActual } from './auth.js?v=7823287562';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=2a35db9e14';
-import { abrirComentarios } from './comentarios.js?v=0be135e8a7';
+import { API_BASE_URL, apiRequest } from './config.js?v=ec4a7fca01';
+import { artistaActual } from './auth.js?v=000cc3408c';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=819fea05c7';
+import { abrirComentarios } from './comentarios.js?v=93773d457e';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=dd51e51820';
 import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 
@@ -102,7 +102,10 @@ export async function cargarGaleria(container) {
             return [];
         }
         container.setAttribute('aria-busy', 'false');
-        const obras = Array.isArray(data) ? data : (data?.obras ?? data?.data ?? []);
+        // Los textos vienen escapados del backend (.escape()): se decodifican
+        // aquí, en el punto de entrada, para que las tarjetas y las franjas
+        // muestren "lienzo/bastidor" y no "lienzo&#x2F;bastidor".
+        const obras = (Array.isArray(data) ? data : (data?.obras ?? data?.data ?? [])).map(decodificarObra);
         obrasGrid = obras;
         
         // Cargar likes del usuario para persistencia
@@ -760,7 +763,9 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         // estado, procedencia y certificado ya NO van en el modal: se muestran
         // en las franjas de la tarjeta del cavent). Aquí solo queda la
         // descripción.
-        document.getElementById('detalle-descripcion').textContent = o.descripcion_artistica || o.descripcion || '—';
+        // textContent NO interpreta entidades: hay que decodificar antes.
+        document.getElementById('detalle-descripcion').textContent =
+            decodeHTMLEntities(o.descripcion_artistica || o.descripcion || '—');
 
     } catch (error) {
         debugLog.error('Error al cargar detalle de obra:', error);
