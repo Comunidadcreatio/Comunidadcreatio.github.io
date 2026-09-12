@@ -1,5 +1,5 @@
 // js/config.js
-import { debugLog } from './utils.js?v=819fea05c7';
+import { debugLog } from './utils.js?v=8861448e13';
 
 export const API_BASE_URL = 'https://backend-fundacion-atpe.onrender.com';
 export const ARTISTA_KEY = 'artistaData';
@@ -33,6 +33,17 @@ export function getAuthToken() {
 // Ahora el backend lo envía como cookie HttpOnly, Secure, SameSite=Strict.
 // El navegador la adjunta automáticamente en cada request gracias a credentials: 'include'.
 
+// Cierra la sesión local porque el backend ya no la reconoce (401).
+// La usan apiRequest y también las escrituras con fetch crudo (obras y problogs
+// con FormData), que no pasan por aquí: antes un 401 ahí dejaba al usuario con un
+// error raro y la app como si siguiera dentro.
+export function cerrarSesionLocal() {
+    debugLog.warn('🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.');
+    localStorage.removeItem(ARTISTA_KEY);
+    try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) {}
+    document.dispatchEvent(new Event('userLogout'));
+}
+
 export async function apiRequest(endpoint, options = {}) {
     try {
         const authToken = getAuthToken();
@@ -50,11 +61,7 @@ export async function apiRequest(endpoint, options = {}) {
         // backend responde con su propio mensaje), no una sesión expirada:
         // ese caso se deja pasar para que se muestre el error real.
         if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta') && !endpoint.endsWith('/api/artistas/login')) {
-            debugLog.warn("🚨 Sesión expirada o cerrada remotamente. Cerrando sesión local.");
-            localStorage.removeItem(ARTISTA_KEY);
-            try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) {}
-            // Disparamos evento para que la app reaccione
-            document.dispatchEvent(new Event('userLogout'));
+            cerrarSesionLocal();
             return { success: false, error: "Sesión expirada. Por favor inicia sesión nuevamente." };
         }
 

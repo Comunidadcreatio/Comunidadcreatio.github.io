@@ -2,11 +2,11 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=ec4a7fca01';
-import { token, artistaActual } from './auth.js?v=000cc3408c';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=cfc183218e';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=a76a9b6092';
+import { token, artistaActual } from './auth.js?v=eeb4430018';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=2416c18c96';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
-import { decodeHTMLEntities, decodificarObra, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=819fea05c7';
+import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=8861448e13';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };
@@ -15,20 +15,9 @@ export function invalidateCaventsCache() {
     _caventsCache.data = [];
 }
 
-// Sincroniza los triggers de los custom selects después de poblar valores
-function syncAllCustomSelects() {
-    document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
-        const wrapper = sel.closest('.custom-select');
-        if (wrapper) {
-            const trigger = wrapper.querySelector('.custom-select-trigger');
-            const selected = sel.selectedOptions[0];
-            if (trigger && selected && selected.value) {
-                trigger.textContent = selected.textContent;
-            }
-        }
-    });
-}
+// (Aquí vivía syncAllCustomSelects, una copia del sincronizador de abajo que no
+// se llamaba nunca: el que se usa de verdad es syncCustomSelects, dentro del
+// desplegable de "Mis Cavents", que además repinta el texto del trigger.)
 
 // ============================================
 // VARIABLES DE ESTADO (PANEL)
@@ -172,7 +161,7 @@ function resetCambiosNoGuardados() {
 // ============================================
 // NOTA: La tabla HTML de "Mis Cavents" fue eliminada. Esta función ahora
 // solo invalida el cache del dropdown de cavents para forzar recarga.
-export async function refrescarTabla(tablaBody) {
+export async function refrescarTabla() {
     // Si los elementos de paginación ya no existen, solo invalidar cache
     const pageInfo = document.getElementById('page-info');
     if (!pageInfo) {
@@ -192,7 +181,6 @@ export async function refrescarTabla(tablaBody) {
         mostrarErrores(result);
         return;
     }
-    const obras = result.obras;
     totalObras = result.total;
     const totalPages = Math.ceil(totalObras / currentLimit);
     pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
@@ -201,23 +189,10 @@ export async function refrescarTabla(tablaBody) {
     if (btnPrev) btnPrev.disabled = currentPage <= 1;
     if (btnNext) btnNext.disabled = currentPage >= totalPages;
 
-    if (typeof renderizarTabla === 'function') {
-        renderizarTabla(obras, tablaBody,
-            // Editar obra ... (código legacy, los callbacks no se usan ya)
-            async (id) => {},
-            async (id) => {
-                const exito = await eliminarObra(id);
-                if (exito) {
-                    showSuccess("Obra eliminada correctamente.");
-                    invalidateCaventsCache();
-                    if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
-                } else {
-                    showError("Error al eliminar la obra.");
-                }
-            },
-            async (id) => {}
-        );
-    }
+    // NOTA: aquí había un `if (typeof renderizarTabla === 'function')` que llamaba
+    // a la tabla antigua de "Mis Cavents". Esa función ya no existe (la lista es
+    // el desplegable), así que el bloque nunca se ejecutaba: se quitó. La lista se
+    // refresca invalidando la caché (arriba) y volviéndola a pedir en loadCavents.
 }
 
 // ============================================
@@ -286,15 +261,23 @@ function actualizarCarrusel() {
     // Update count
     count.textContent = `${imagenesData.length} / ${MAX_IMAGENES}`;
 
-    // Update track position
+    // Update track position. Al quedarse sin imágenes hay que DEVOLVER el
+    // transform a 0: si no, el carrusel se quedaba desplazado y el hueco de
+    // "Agregar imagen" no se veía (se veía el fondo vacío).
     if (imagenesData.length > 0) {
         track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    } else {
+        track.style.transform = '';
     }
 
     // Update dots
     dots.querySelectorAll('.carrusel-dot').forEach((d, i) => {
         d.classList.toggle('active', i === currentSlide);
     });
+
+    // El progreso cuenta también las imágenes: hay que recalcularlo cada vez que
+    // cambian (antes se quedaba en el valor del último campo de texto tocado).
+    updateFormProgress();
 }
 
 function irASlide(index) {
@@ -382,14 +365,31 @@ function cropearImagen(file, aspect) {
 
 async function agregarImagen(file, dataUrl) {
     if (imagenesData.length >= MAX_IMAGENES) return;
+    // Validar antes de nada: sin esto un archivo que no es imagen o que pasa de
+    // los 10 MB de multer llegaba al servidor y devolvía un 500 genérico.
+    const problema = errorDeImagen(file);
+    if (problema) {
+        showError(problema);
+        return;
+    }
     // El archivo aún no está en imagenesData mientras se recorta: se cuenta como
     // "en proceso" para que el guardado no lo deje fuera.
     imagenesEnProceso++;
+    // El slot se RESERVA antes de esperar al recorte: si se eligen dos archivos a
+    // la vez, los dos esperaban al canvas y luego pedían "el primer hueco libre",
+    // que era el mismo para ambos (una de las dos imágenes se perdía).
+    const slot = getNextFreeSlot();
+    imagenesData.push({ src: dataUrl, file: null, slot: slot, original: file, recortando: true });
+    actualizarCarrusel();
     try {
         // Recortar al ratio seleccionado (4:5 o 1:1)
         const recortada = await cropearImagen(file, aspectRatio);
-        const slot = getNextFreeSlot();
-        imagenesData.push({ src: recortada.dataURL, file: recortada.file, slot: slot });
+        const entrada = imagenesData.find((i) => i.slot === slot);
+        if (!entrada) return;                     // se borró mientras se recortaba
+        entrada.src = recortada.dataURL;
+        entrada.file = recortada.file;
+        entrada.original = file;                  // para re-recortar sin degradar
+        delete entrada.recortando;
         currentSlide = imagenesData.length - 1;
         actualizarCarrusel();
     } catch (e) {
@@ -398,8 +398,13 @@ async function agregarImagen(file, dataUrl) {
         // iPhone, formato no soportado o archivo corrupto) y se adjuntará el
         // archivo original, que puede fallar al subir por su tamaño/formato.
         showWarning('Esta imagen no se pudo procesar (formato no compatible). Se usará el archivo original: se recomienda JPG o PNG para mejor calidad y menor peso.');
-        const slot = getNextFreeSlot();
-        imagenesData.push({ src: dataUrl, file: file, slot: slot });
+        const entrada = imagenesData.find((i) => i.slot === slot);
+        if (entrada) {
+            entrada.src = dataUrl;
+            entrada.file = file;
+            entrada.original = file;
+            delete entrada.recortando;
+        }
         currentSlide = imagenesData.length - 1;
         actualizarCarrusel();
     } finally {
@@ -532,11 +537,14 @@ export function setupImagePreviews() {
             this.classList.add("active");
             aspectRatio = this.dataset.ratio;
             document.getElementById("carrusel-viewport").style.aspectRatio = aspectRatio;
-            // Re-recortar las imágenes ya agregadas al nuevo ratio
-            // (solo las que tienen archivo real; las de edición por URL se respetan)
-            for (const img of imagenesData.filter(i => i.file)) {
+            // Re-recortar las imágenes ya agregadas al nuevo ratio. SIEMPRE desde
+            // el archivo ORIGINAL que eligió el usuario: antes se recortaba el
+            // resultado anterior, así que cada cambio de ratio volvía a recortar
+            // una imagen ya recortada (se perdían bordes y calidad). Las de
+            // edición descargadas del servidor no tienen original: se usa su file.
+            for (const img of imagenesData.filter(i => i.original || i.file)) {
                 try {
-                    const recortada = await cropearImagen(img.file, aspectRatio);
+                    const recortada = await cropearImagen(img.original || img.file, aspectRatio);
                     img.src = recortada.dataURL;
                     img.file = recortada.file;
                 } catch (e) {
@@ -696,7 +704,7 @@ export function setupObraFormSubmit() {
                 document.getElementById('btn-guardar').textContent = 'Crear Cavent';
                 imagenesAEliminar.clear();
                 limpiarFormularioCompleto(true);
-                await refrescarTabla(document.getElementById('tabla-obras-body'));
+                await refrescarTabla();
                 if (typeof window.actualizarEstadisticas === 'function') window.actualizarEstadisticas();
             } else {
                 mostrarErrores(result);
@@ -716,7 +724,11 @@ export function setupObraFormSubmit() {
 // ACCORDIONS DEL FORMULARIO Y PROGRESS
 // ============================================
 
-// Convierte un <select> en dropdown custom (estilo ciudad)
+// Convierte un <select> en dropdown custom (estilo ciudad).
+// ACCESIBILIDAD: el <select> original se oculta, así que el control tiene que
+// llevar los roles de un combobox y responder al teclado (flechas, Inicio/Fin,
+// Enter/Espacio y Escape). Antes solo funcionaba con toque/ratón: con teclado o
+// lector de pantalla esos 9 campos del formulario eran inalcanzables.
 function initCustomSelect(selectEl, placeholder) {
     if (!selectEl || selectEl.dataset.customReady === '1') return;
     selectEl.dataset.customReady = '1';
@@ -727,10 +739,20 @@ function initCustomSelect(selectEl, placeholder) {
     selectEl.parentNode.insertBefore(wrapper, selectEl);
     wrapper.appendChild(selectEl);
 
+    const idBase = selectEl.id || 'custom-select';
+    const dropdownId = idBase + '-lista';
+
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'custom-select-trigger';
     trigger.textContent = placeholder || 'Seleccionar';
+    // El nombre accesible sale del <label> del campo (los del formulario lo tienen).
+    const label = document.querySelector('label[for="' + idBase + '"]');
+    trigger.setAttribute('role', 'combobox');
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', dropdownId);
+    trigger.setAttribute('aria-label', label ? label.textContent.replace(/\*/g, '').trim() : (placeholder || 'Seleccionar'));
     // Si el select ya tiene un valor preseleccionado, mostrarlo
     if (selectEl.selectedOptions[0] && selectEl.selectedOptions[0].value) {
         trigger.textContent = selectEl.selectedOptions[0].textContent;
@@ -739,22 +761,65 @@ function initCustomSelect(selectEl, placeholder) {
 
     const dropdown = document.createElement('div');
     dropdown.className = 'custom-select-dropdown';
+    dropdown.id = dropdownId;
+    dropdown.setAttribute('role', 'listbox');
     wrapper.appendChild(dropdown);
+
+    let resaltado = -1;   // índice de la opción marcada con el teclado
+
+    function opciones() {
+        return Array.from(dropdown.querySelectorAll('.custom-select-option'));
+    }
+
+    function resaltar(indice) {
+        const lista = opciones();
+        if (!lista.length) return;
+        resaltado = (indice + lista.length) % lista.length;
+        lista.forEach((el, i) => el.classList.toggle('resaltada', i === resaltado));
+        trigger.setAttribute('aria-activedescendant', lista[resaltado].id);
+        lista[resaltado].scrollIntoView({ block: 'nearest' });
+    }
+
+    function abrir() {
+        buildOptions();
+        positionDropdown();
+        dropdown.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+        const marcada = opciones().findIndex((el) => el.getAttribute('aria-selected') === 'true');
+        resaltar(marcada >= 0 ? marcada : 0);
+    }
+
+    function cerrar() {
+        dropdown.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.removeAttribute('aria-activedescendant');
+    }
+
+    function elegir(indice) {
+        const lista = opciones();
+        const item = lista[indice];
+        if (!item) return;
+        const opt = Array.from(selectEl.options).find((o) => o.value === item.dataset.value);
+        selectEl.value = item.dataset.value;
+        trigger.textContent = opt ? opt.textContent : item.textContent;
+        lista.forEach((el) => el.setAttribute('aria-selected', String(el === item)));
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        cerrar();
+        trigger.focus();
+    }
 
     function buildOptions() {
         dropdown.innerHTML = '';
-        Array.from(selectEl.querySelectorAll('option')).forEach(opt => {
+        Array.from(selectEl.querySelectorAll('option')).forEach((opt, i) => {
             if (opt.disabled && !opt.value) return;
             const item = document.createElement('div');
             item.className = 'custom-select-option';
             item.textContent = opt.textContent;
             item.dataset.value = opt.value;
-            item.addEventListener('click', () => {
-                selectEl.value = opt.value;
-                trigger.textContent = opt.textContent;
-                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-                dropdown.classList.remove('open');
-            });
+            item.id = idBase + '-opcion-' + i;
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', String(selectEl.value === opt.value));
+            item.addEventListener('click', () => elegir(opciones().indexOf(item)));
             dropdown.appendChild(item);
         });
     }
@@ -769,12 +834,53 @@ function initCustomSelect(selectEl, placeholder) {
     trigger.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const isOpen = dropdown.classList.contains('open');
-        if (!isOpen) {
-            buildOptions();
-            positionDropdown();
+        if (dropdown.classList.contains('open')) cerrar();
+        else abrir();
+    });
+
+    trigger.addEventListener('keydown', (e) => {
+        const abierto = dropdown.classList.contains('open');
+        switch (e.key) {
+            case 'ArrowDown':
+            case 'ArrowUp':
+                e.preventDefault();
+                if (!abierto) abrir();
+                else resaltar(resaltado + (e.key === 'ArrowDown' ? 1 : -1));
+                break;
+            case 'Home':
+                if (abierto) { e.preventDefault(); resaltar(0); }
+                break;
+            case 'End':
+                if (abierto) { e.preventDefault(); resaltar(opciones().length - 1); }
+                break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                if (!abierto) abrir();
+                else if (resaltado >= 0) elegir(resaltado);
+                break;
+            case 'Escape':
+                if (abierto) { e.preventDefault(); e.stopPropagation(); cerrar(); }
+                break;
+            case 'Tab':
+                if (abierto) cerrar();
+                break;
+            default: {
+                // Búsqueda por letra (como un <select> nativo)
+                if (!abierto || e.key.length !== 1) break;
+                const letra = e.key.toLowerCase();
+                const lista = opciones();
+                const desde = resaltado + 1;
+                for (let i = 0; i < lista.length; i++) {
+                    const idx = (desde + i) % lista.length;
+                    if (lista[idx].textContent.toLowerCase().startsWith(letra)) {
+                        e.preventDefault();
+                        resaltar(idx);
+                        break;
+                    }
+                }
+            }
         }
-        dropdown.classList.toggle('open');
     });
 
     window.addEventListener('scroll', () => {
@@ -785,9 +891,7 @@ function initCustomSelect(selectEl, placeholder) {
     }, { passive: true });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-select')) {
-            dropdown.classList.remove('open');
-        }
+        if (!e.target.closest('.custom-select')) cerrar();
     });
 
     selectEl.addEventListener('change', () => {
@@ -940,7 +1044,7 @@ function setupCaventsDropdown() {
             item.innerHTML = `
                 <span class="cavent-item-num">#${index + 1}</span>
                 <div class="cavent-item-info">
-                    <div class="cavent-item-titulo">${obra.titulo || 'Sin título'}</div>
+                    <div class="cavent-item-titulo">${escapeHtml(obra.titulo || 'Sin título')}</div>
                     <div class="cavent-item-meta">
                         <span>${precio}</span>
                         <span class="status-badge ${statusClass}">${statusText}</span>
@@ -1385,8 +1489,11 @@ export function updateFormProgress() {
     if (!obraForm) return;
 
     const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
-    const totalFields = requiredFields.length;
-    let completedFields = 0;
+    // Se cuenta también el paso de imágenes: la obra no se puede guardar sin al
+    // menos una, así que ignorarlo dejaba el progreso mintiendo (100% sin ninguna
+    // imagen y un 0% engañoso con la imagen ya puesta).
+    const totalFields = requiredFields.length + 1;
+    let completedFields = imagenesData.length > 0 ? 1 : 0;
 
     requiredFields.forEach(field => {
         if (field.value && field.value.trim() !== '') {

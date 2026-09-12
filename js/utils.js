@@ -46,6 +46,27 @@ export function decodificarObra(obra) {
     return obra;
 }
 
+// Límite de subida del backend (multer: fileSize 10 MB en obras y problogs).
+export const MAX_IMAGEN_BYTES = 10 * 1024 * 1024;
+
+/**
+ * Valida un archivo elegido antes de usarlo como imagen.
+ * Devuelve el mensaje de error, o null si el archivo sirve.
+ * Sin esto, un archivo enorme llegaba al servidor y multer lo rechazaba con un
+ * 500 genérico ("Error interno") que no dice nada al usuario.
+ */
+export function errorDeImagen(file) {
+    if (!file) return 'No se eligió ningún archivo.';
+    if (!/^image\//.test(file.type || '')) {
+        return 'El archivo debe ser una imagen (JPG, PNG…).';
+    }
+    if (file.size > MAX_IMAGEN_BYTES) {
+        const mb = (file.size / (1024 * 1024)).toFixed(1);
+        return 'La imagen pesa ' + mb + ' MB y el máximo son 10 MB. Usa una más ligera.';
+    }
+    return null;
+}
+
 /**
  * Muestra errores de validación del backend en formato amigable.
  */

@@ -1882,8 +1882,16 @@ form,
     font-weight: 500;
 }
 
-#obra-form .custom-select-option:hover {
+#obra-form .custom-select-option:hover,
+#obra-form .custom-select-option.resaltada {
     background: var(--color-gray-100);
+}
+
+/* La opción marcada con el teclado se distingue también por el borde, porque el
+   fondo solo no basta para quien no ve bien los contrastes suaves. */
+#obra-form .custom-select-option.resaltada {
+    outline: 2px solid var(--color-accent, #d9a441);
+    outline-offset: -2px;
 }
 
 [data-theme="dark"] #obra-form .custom-select-trigger {

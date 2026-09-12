@@ -21,7 +21,7 @@ const BIO_CRED_KEY = 'creatio_bio_cred';        // { rawId } credencial WebAuthn
 const IDENTIDAD_KEY = 'creatio_remembered_user'; // { nombre, foto } avatar+nombre en el login
 const OLVIDO_EXPLICITO_KEY = 'creatio_olvido_explicito'; // '1' si el usuario cerró sesión a propósito
 
-import { login } from './auth.js?v=000cc3408c';
+import { login } from './auth.js?v=eeb4430018';
 // Registra el plugin nativo de biometría en el runtime de Capacitor (APK)
 import './capacitor-native-biometric.js?v=1';
 
