@@ -57,6 +57,10 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', email: 't@t.com', foto_perfil: '', rol: 'artista' }));
           localStorage.setItem('creatio_auth_token_persist', 'tok');
       } catch (_) {}
+      // Cuántos documentos se han cargado: sirve para comprobar que el 401 sacó al
+      // usuario de la app (auth.html puede rebotar de vuelta porque este mock
+      // vuelve a sembrar la sesión en cada documento).
+      try { sessionStorage.setItem('test_docs', String((parseInt(sessionStorage.getItem('test_docs') || '0', 10) || 0) + 1)); } catch (_) {}
       const mkImg = (w, h, c) => { const cv = document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d'); x.fillStyle=c; x.fillRect(0,0,w,h); return cv.toDataURL('image/jpeg',0.8); };
       const img45 = mkImg(800,1000,'#3366cc');
       // Título tal y como lo devuelve el backend (escapado) con HTML dentro
@@ -264,9 +268,9 @@ check('si la carga falla se dice que falló (no "no hay publicaciones")',
 // BE-8: un 401 cierra la sesión (última prueba: redirige a auth.html)
 // ============================================================
 console.log('\n=== BE-8: 401 en el guardado de una obra ===');
-// El cierre de sesión REDIRIGE a auth.html, así que la evidencia se guarda en
-// sessionStorage (sobrevive a la navegación) y se lee después.
-await evalJs(`window.__logout = 0; sessionStorage.removeItem('test_logout');
+// El cierre de sesión REDIRIGE (a auth.html, que puede rebotar), así que la
+// evidencia se guarda en sessionStorage y se lee desde el documento nuevo.
+await evalJs(`window.__logout = 0; sessionStorage.removeItem('test_logout'); sessionStorage.setItem('test_docs_base', sessionStorage.getItem('test_docs') || '1');
     document.addEventListener('userLogout', () => { window.__logout++; try { sessionStorage.setItem('test_logout', '1'); } catch (e) {} });`);
 await evalJs(`window.__post401 = true`);
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
@@ -300,13 +304,14 @@ await evalJs(`document.getElementById('obra-form').requestSubmit()`);
 await sleep(2000);
 const sesion = JSON.parse(await evalJs(`JSON.stringify({
     logout: sessionStorage.getItem('test_logout'),
-    href: location.pathname,
+    docs: parseInt(sessionStorage.getItem('test_docs') || '0', 10) || 0,
+    docsBase: parseInt(sessionStorage.getItem('test_docs_base') || '1', 10) || 1,
     intentos: parseInt(sessionStorage.getItem('test_intentos') || '0', 10) || 0
 })`));
 console.log('   ' + JSON.stringify(sesion));
 check('el guardado se intentó y recibió 401', sesion.intentos >= 1, JSON.stringify(sesion));
 check('el 401 dispara el cierre de sesión', sesion.logout === '1', JSON.stringify(sesion));
-check('y se sale a la pantalla de login', sesion.href === '/auth', sesion.href);
+check('y se saca al usuario de la app (auth.html)', sesion.docs > sesion.docsBase, JSON.stringify(sesion));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
