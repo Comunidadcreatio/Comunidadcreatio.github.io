@@ -79,11 +79,39 @@ let publicacionAbierta = null;
 // ============================================================
 // UTILIDADES
 // ============================================================
-function fechaCorta(iso) {
+// Tiempo TRANSCURRIDO desde que se publicó («hace 5 minutos», «hace 2 días»).
+function tiempoTranscurrido(iso) {
     if (!iso) return '';
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const segundos = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if (segundos < 60) return 'ahora mismo';
+    const minutos = Math.floor(segundos / 60);
+    if (minutos < 60) return 'hace ' + minutos + (minutos === 1 ? ' minuto' : ' minutos');
+    const horas = Math.floor(minutos / 60);
+    if (horas < 24) return 'hace ' + horas + (horas === 1 ? ' hora' : ' horas');
+    const dias = Math.floor(horas / 24);
+    if (dias < 7) return 'hace ' + dias + (dias === 1 ? ' día' : ' días');
+    if (dias < 30) {
+        const semanas = Math.floor(dias / 7);
+        return 'hace ' + semanas + (semanas === 1 ? ' semana' : ' semanas');
+    }
+    if (dias < 365) {
+        const meses = Math.floor(dias / 30);
+        return 'hace ' + meses + (meses === 1 ? ' mes' : ' meses');
+    }
+    const anios = Math.floor(dias / 365);
+    return 'hace ' + anios + (anios === 1 ? ' año' : ' años');
+}
+
+// Avatar del autor: su foto o, si no tiene, su inicial. La clase se pasa para
+// poder usar el mismo trozo en la tarjeta y en la vista de lectura.
+function avatarHTML(p, clase) {
+    const autor = (p && p.nombre_artista) || 'Artista';
+    const inicial = autor.trim().charAt(0).toUpperCase() || '?';
+    return (p && p.foto_artista)
+        ? `<img class="${clase}" src="${safeImgUrl(p.foto_artista)}" alt="">`
+        : `<span class="${clase} problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
 }
 
 // ============================================================
@@ -685,10 +713,7 @@ function tarjetaProblog(p, conAcciones) {
         ? imagenes[Number(p.portada_slot)]
         : (imagenes.find((u) => !!u) || '');
     const autor = p.nombre_artista || 'Artista';
-    const inicial = (autor || '?').trim().charAt(0).toUpperCase() || '?';
-    const avatar = p.foto_artista
-        ? `<img class="problog-card-avatar" src="${safeImgUrl(p.foto_artista)}" alt="">`
-        : `<span class="problog-card-avatar problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
+    const avatar = avatarHTML(p, 'problog-card-avatar');
 
     // Extracto: el primer bloque de texto, sin las marcas de formato.
     let extracto = '';
@@ -715,16 +740,20 @@ function tarjetaProblog(p, conAcciones) {
         <article class="problog-card" data-id="${p.id}">
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
             <div class="problog-card-cuerpo">
+                <!-- Autoría arriba y a la izquierda: avatar, nombre y el tiempo
+                     que lleva publicada. -->
+                <div class="problog-card-autoria">
+                    ${avatar}
+                    <div class="problog-card-autoria-datos">
+                        <span class="problog-card-autor">${renderText(autor)}</span>
+                        <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
+                    </div>
+                </div>
                 <div class="problog-card-cabecera">
                     <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>
                     ${estadoHTML}
                 </div>
                 ${extracto ? `<p class="problog-card-extracto">${renderText(extracto)}</p>` : ''}
-                <div class="problog-card-pie">
-                    ${avatar}
-                    <span class="problog-card-autor">${renderText(autor)}</span>
-                    <span class="problog-card-fecha">${escapeHtml(fechaCorta(p.created_at))}</span>
-                </div>
                 ${socialHTML(p)}
                 ${accionesHTML}
             </div>
@@ -1068,8 +1097,15 @@ function pintarLectura(p, conAcciones) {
     return `
         <button type="button" class="problog-volver" id="problog-volver">← Volver</button>
         <header class="problog-lectura-cab">
+            <!-- Autoría arriba y a la izquierda: avatar, nombre y tiempo. -->
+            <div class="problog-lectura-autoria">
+                ${avatarHTML(p, 'problog-lectura-avatar')}
+                <div class="problog-lectura-autoria-datos">
+                    <span class="problog-lectura-autor">${renderText(autor)}</span>
+                    <span class="problog-lectura-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
+                </div>
+            </div>
             <h2 class="problog-lectura-titulo">${renderText(p.titulo)}</h2>
-            <p class="problog-lectura-meta">${renderText(autor)} · ${escapeHtml(fechaCorta(p.created_at))}</p>
             ${acciones}
         </header>
         ${socialHTML(p)}
@@ -1123,6 +1159,7 @@ function abrirVistaPrevia() {
         bloques: publicables,
         imagenes: urls,
         nombre_artista: (artistaActual && artistaActual.nombre_artista) || 'Artista',
+        foto_artista: (artistaActual && (artistaActual.foto_artista || artistaActual.foto_perfil)) || null,
         created_at: new Date().toISOString(),
         likes_count: 0,
         comentarios_count: 0,
