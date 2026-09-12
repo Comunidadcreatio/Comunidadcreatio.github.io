@@ -72,6 +72,44 @@ export function guardarFotoPerfil(dataUrl) {
 // ============================================
 // ACTUALIZAR UI DEL PERFIL
 // ============================================
+// Refresca los datos de MI perfil desde el servidor: el nombre, la foto y los
+// tres contadores (Cavents / Problogs / Comcons). Sin esto, la cabecera se
+// quedaba con lo que hubiera en memoria y salían los valores por defecto
+// («Artista» y la «A» del avatar), con los contadores a 0.
+async function refrescarDatosPropios() {
+    const id = artistaActual && artistaActual.id;
+    if (!id) return;
+    try {
+        const data = await apiRequest('/api/artistas/perfil');
+        const u = data && data.success ? data.artista : null;
+        if (!u) return;
+        const src = u.foto_perfil || AVATAR_DEFAULT;
+        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
+            const img = document.getElementById(elId);
+            if (img) img.src = src;
+        });
+        document.querySelectorAll('.perfil-nombre-artista-seccion')
+            .forEach((el) => { el.textContent = u.nombre_artista || 'Artista'; });
+        if (u.nombre_real) {
+            document.querySelectorAll('.perfil-nombre-real')
+                .forEach((el) => { el.textContent = u.nombre_real; });
+        }
+        if (u.ciudad) {
+            document.querySelectorAll('.perfil-ciudad')
+                .forEach((el) => { el.textContent = u.ciudad; });
+        }
+        const ponerCuenta = (elId, valor) => {
+            const el = document.getElementById(elId);
+            if (el) el.textContent = String(valor == null ? 0 : valor);
+        };
+        ponerCuenta('stats-cavents', u.cavents);
+        ponerCuenta('stats-problogs', u.problogs);
+        ponerCuenta('stats-comcons', u.comcons);
+    } catch (err) {
+        debugLog.warn('No se pudieron refrescar los datos del perfil:', err);
+    }
+}
+
 export function actualizarPerfilUI(verificarActividadFn = null) {
     const onlineIndicator = document.getElementById('perfil-online-indicator');
     const perfilUsuario = document.getElementById('perfil-usuario');
@@ -93,6 +131,9 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         document.querySelectorAll('.perfil-ciudad').forEach(el => {
             el.textContent = ciudad ? escapeHtml(ciudad) : '';
         });
+
+        // Y se piden los datos buenos al servidor (nombre, foto y contadores).
+        refrescarDatosPropios();
     }
 
     // Mostrar indicador de estado en línea solo para perfil propio

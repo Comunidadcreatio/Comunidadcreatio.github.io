@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=4260504904';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=9eb0e1c320';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
 import { abrirComentarios } from './comentarios.js?v=f10b61e047';
@@ -763,11 +763,12 @@ function tarjetaProblog(p, conAcciones) {
         extracto = t.length > 160 ? t.slice(0, 160) + '…' : t;
     }
 
-    // En "Mías" se marca el estado (los borradores no salen en el feed público)
-    // y se ofrecen las acciones.
+    // En "Mías" se marca el estado SOLO cuando es borrador: el "Publicado" no
+    // aporta nada (todo lo que sale en el feed está publicado) y estorbaba al
+    // lado del título.
     const esBorrador = p.estado === 'borrador';
-    const estadoHTML = propias
-        ? `<span class="problog-card-estado${esBorrador ? ' problog-card-estado-borrador' : ''}">${esBorrador ? 'Borrador' : 'Publicado'}</span>`
+    const estadoHTML = (propias && esBorrador)
+        ? '<span class="problog-card-estado problog-card-estado-borrador">Borrador</span>'
         : '';
     // Iconos de editar/eliminar, que van junto al tiempo en la fila de autoría.
     const accionesHTML = propias ? accionesIconosHTML(p) : '';

@@ -5,7 +5,7 @@
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=b85678fee0';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=4d2dedd36a';
 import { artistaActual, token, esArtista } from './auth.js?v=f2799071b6';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=7fbbf3867d';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=bbd143694e';
 import { confirmarDescartarCambios } from './panel-ui.js?v=b6b174da2a';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
