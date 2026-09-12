@@ -738,17 +738,17 @@ function tarjetaProblog(p, conAcciones) {
 
     return `
         <article class="problog-card" data-id="${p.id}">
+            <!-- Autoría en lo más alto, por ENCIMA de la portada: avatar, nombre
+                 y el tiempo que lleva publicada. -->
+            <div class="problog-card-autoria${portada ? ' con-portada' : ''}">
+                ${avatar}
+                <div class="problog-card-autoria-datos">
+                    <span class="problog-card-autor">${renderText(autor)}</span>
+                    <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
+                </div>
+            </div>
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
             <div class="problog-card-cuerpo">
-                <!-- Autoría arriba y a la izquierda: avatar, nombre y el tiempo
-                     que lleva publicada. -->
-                <div class="problog-card-autoria">
-                    ${avatar}
-                    <div class="problog-card-autoria-datos">
-                        <span class="problog-card-autor">${renderText(autor)}</span>
-                        <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
-                    </div>
-                </div>
                 <div class="problog-card-cabecera">
                     <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>
                     ${estadoHTML}

@@ -495,12 +495,19 @@
     color: var(--color-gray-500);
 }
 
-/* Autoría de la tarjeta: arriba y a la izquierda (avatar + nombre + tiempo). */
+/* Autoría de la tarjeta: lo primero, arriba y a la izquierda (avatar + nombre +
+   tiempo), por encima de la imagen de portada. Lleva el mismo aire lateral que
+   el cuerpo; el de abajo solo hace falta cuando debajo viene la imagen, porque
+   si no, el suyo propio ya separa. */
 .problog-card-autoria {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    margin-bottom: 8px;
+    padding: 14px 16px 0;
+}
+
+.problog-card-autoria.con-portada {
+    padding-bottom: 12px;
 }
 
 .problog-card-autoria-datos {
