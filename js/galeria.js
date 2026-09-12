@@ -2,8 +2,9 @@
 import { API_BASE_URL, apiRequest } from './config.js?v=c088cadd1b';
 import { artistaActual } from './auth.js?v=7823287562';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto } from './utils.js?v=2a35db9e14';
-import { abrirComentarios } from './comentarios.js?v=f10b61e047';
+import { abrirComentarios } from './comentarios.js?v=0be135e8a7';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=dd51e51820';
+import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 
 // ============================================================
 // El modal de descripción no debe dejar scrollear NADA mientras está abierto.
@@ -565,11 +566,7 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                 const modal = document.getElementById('modal-detalles-cavent');
                 const modalOpen = modal && !modal.classList.contains('hidden');
                 if (modalOpen) {
-                    modal.classList.add('hidden');
-                    btnToggle.querySelector('.icon-lupa').style.display = '';
-                    btnToggle.querySelector('.icon-volver').style.display = 'none';
-                    btnToggle.setAttribute('aria-label', 'Ver detalles');
-                    btnToggle.setAttribute('title', 'Ver detalles');
+                    cerrarDetalleCavent();
                 } else {
                     abrirDetalleCavent(obra.id, card);
                     btnToggle.querySelector('.icon-lupa').style.display = 'none';
@@ -700,6 +697,29 @@ async function registrarVista(obraId, cardEl) {
         // Silencioso
     }
 }
+
+// Cierra el modal de descripción (lupa) y devuelve los botones a estado "lupa".
+// Basta con añadir .hidden: el MutationObserver de vigilarModalDetalles()
+// libera el bloqueo de fondo y desactiva la guardia de gesto.
+// Es idempotente y seguro aunque el modal no esté abierto.
+export function cerrarDetalleCavent() {
+    const modal = document.getElementById('modal-detalles-cavent');
+    if (modal) modal.classList.add('hidden');
+    document.querySelectorAll('.btn-detalles-toggle').forEach(btn => {
+        const lupa = btn.querySelector('.icon-lupa');
+        const volver = btn.querySelector('.icon-volver');
+        if (lupa) lupa.style.display = '';
+        if (volver) volver.style.display = 'none';
+        btn.setAttribute('aria-label', 'Ver detalles');
+        btn.setAttribute('title', 'Ver detalles');
+    });
+}
+
+// El modal deja la app sin scroll (overflow:hidden + guardia de gesto): si el
+// usuario navega con él abierto, hay que cerrarlo o el editor de creación
+// queda inutilizable.
+registrarOverlay('modal-detalle-cavent', cerrarDetalleCavent);
+
 export async function abrirDetalleCavent(obraId, cardElement) {
     const modal = document.getElementById('modal-detalles-cavent');
     if (!modal) return;

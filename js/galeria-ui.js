@@ -2,11 +2,12 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=f92d058eba';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=d1b1b90218';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=af0108d668';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=54d6a179d1';
 import { artistaActual, token, esArtista } from './auth.js?v=7823287562';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=dcc6373eb5';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=2a54f72e75';
 import { confirmarDescartarCambios } from './panel-ui.js?v=52b4165365';
+import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -40,6 +41,13 @@ export function encontrarSeccionActual() {
 }
 
 function switchSection(sectionSaliente, sectionEntrante, callback) {
+    // Cualquier navegación empieza cerrando las capas flotantes (vista previa
+    // de Problogs, cajón de comentarios, modal de descripción). Antes quedaban
+    // abiertas por encima de la sección nueva y con el fondo congelado.
+    // Va ANTES de los returns: aunque el destino sea la sección actual, el
+    // usuario ha pedido navegar y la capa debe irse.
+    cerrarOverlaysFlotantes();
+
     if (isTransitioning) return;
     if (!sectionEntrante) return;
     if (sectionSaliente === sectionEntrante) return;
@@ -278,6 +286,9 @@ function mostrarSeccion(section, callback) {
 }
 
 export function ocultarTodasLasSecciones() {
+    // Cerrar sesión / ir a la página en blanco también debe retirar las capas
+    // flotantes: si no, se quedan encima de una pantalla sin contenido.
+    cerrarOverlaysFlotantes();
     SECCIONES.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -409,6 +420,11 @@ export async function toggleGaleria(galeriaContainer) {
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (!galeria) return;
 
+    // El icono Cavents es navegación incluso cuando la galería YA está visible
+    // (entonces solo refresca): el usuario ha pedido ir a Cavents, así que una
+    // vista previa o el cajón de comentarios deben irse con la acción.
+    cerrarOverlaysFlotantes();
+
     if (galeria.classList.contains('hidden')) {
         // Mostrar galería en modo normal (carousel)
         galeriaModo = 1;
@@ -459,6 +475,10 @@ export async function toggleGaleria(galeriaContainer) {
 // NO alterna: si la galería ya está en grid, no hace nada.
 async function activarExplorar() {
     if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return false;
+
+    // Abrir Explorar (lupa del nav o del header) también es navegación, aunque
+    // la sección siga siendo la galería (solo cambia a modo grid).
+    cerrarOverlaysFlotantes();
 
     const galeria = document.getElementById('galeria-publica');
     const galeriaContainerLocal = obtenerGaleriaContainer();
@@ -1024,6 +1044,11 @@ export function togglePanel(view) {
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
     if (!panel || !paginaBlanca) return;
+
+    // El "+" es navegación también cuando el panel ya está abierto (entonces
+    // solo cambia de subvista): nunca debe quedar una capa flotante encima del
+    // editor, porque su bloqueo de fondo deja el formulario sin scroll.
+    cerrarOverlaysFlotantes();
 
     resetGaleriaModo();
 

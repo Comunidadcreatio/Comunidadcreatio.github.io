@@ -34,10 +34,11 @@
 import { API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=c088cadd1b';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog } from './utils.js?v=2a35db9e14';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=32e3d0efe1';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=51b378807b';
 // El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
 // para que construya las rutas de este recurso.
-import { abrirComentarios } from './comentarios.js?v=f10b61e047';
+import { abrirComentarios } from './comentarios.js?v=0be135e8a7';
+import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 // La vista previa se muestra a pantalla completa: se congela el fondo con el
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
@@ -1231,10 +1232,16 @@ function abrirVistaPrevia() {
 
 function cerrarVistaPrevia() {
     const capa = document.getElementById('problog-vista-previa-capa');
-    if (!capa) return;
-    capa.remove();
+    if (capa) capa.remove();
+    // El bloqueo se libera SIEMPRE, aunque la capa ya no esté: si se retiró por
+    // otra vía, dejar el motivo 'vista-previa' registrado congelaría el fondo
+    // para siempre (liberarFondo de un motivo ausente no hace nada).
     liberarFondo('vista-previa');
 }
+
+// Al cambiar de sección (nav, flecha del header, `+`, Chat…) la vista previa
+// debe irse con la sección: si no, queda encima de la nueva sin poder cerrarla.
+registrarOverlay('vista-previa-problogs', cerrarVistaPrevia);
 
 // ============================================================
 // VISTA PREVIA EN EL PERFIL

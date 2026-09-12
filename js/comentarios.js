@@ -5,6 +5,7 @@ import { renderText, safeImgUrl } from './utils.js?v=2a35db9e14';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
+import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 
 let obraIdActual = null;
 // Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el
@@ -318,6 +319,9 @@ function cerrarComentarios() {
     obraIdActual = null;
     cardActual = null;
 }
+
+// El cajón tapa la app y congela el fondo: la navegación debe poder cerrarlo.
+registrarOverlay('cajon-comentarios', cerrarComentarios);
 
 async function cargarComentarios(obraId) {
     try {

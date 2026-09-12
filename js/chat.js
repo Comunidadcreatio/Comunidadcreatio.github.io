@@ -6,7 +6,8 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=c088cadd1b';
 import { artistaActual } from './auth.js?v=7823287562';
 import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=2a35db9e14';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=32e3d0efe1';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=51b378807b';
+import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;
@@ -773,6 +774,9 @@ function abrirChat() {
     }
     const seccion = document.getElementById('chat-global');
     const actual = encontrarSeccionActual();
+    // El chat no pasa por switchSection: sin esto, una vista previa o el cajón
+    // de comentarios abiertos seguirían por encima del chat con el fondo fijo.
+    cerrarOverlaysFlotantes();
     if (actual && actual !== seccion) actual.classList.add('hidden');
     seccion.classList.remove('hidden');
     actualizarVisibilidadIconosHeader(seccion); // el chat no pasa por mostrarSeccion

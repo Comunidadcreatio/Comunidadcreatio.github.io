@@ -8,7 +8,8 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=2a35db9e14';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=f92d058eba';
+import { setupViewTracking } from './galeria.js?v=af0108d668';
+import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
@@ -286,6 +287,9 @@ window.actualizarEstadisticas = actualizarEstadisticas;
 // MOSTRAR RESULTADOS DE BÚSQUEDA
 // ============================================
 export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
+    // Esta sección se muestra sin pasar por switchSection: hay que retirar aquí
+    // las capas flotantes (vista previa, comentarios, modal de descripción).
+    cerrarOverlaysFlotantes();
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
     const paginaBlanca = document.getElementById('pagina-blanca');
@@ -339,6 +343,9 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             const usuario = response.usuario;
 
             // Ocultar todas las secciones
+            // (también se retiran las capas flotantes: este camino no pasa por
+            // switchSection, y una vista previa o el cajón quedarían encima)
+            cerrarOverlaysFlotantes();
             const galeria = document.getElementById('galeria-publica');
             const panel = document.getElementById('panel-artista');
             const paginaBlanca = document.getElementById('pagina-blanca');
