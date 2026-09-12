@@ -354,7 +354,9 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
 
             if (perfilUsuario) {
                 perfilUsuario.classList.remove('hidden');
-                perfilUsuario.dataset.viewing = 'external';
+                // Si el perfil es el mío, se marca como propio (y se piden los
+                // datos buenos); si no, como visita ajena.
+                marcarPerfilPropio(usuario);
             }
             if (actualizarEstadoNavFn) actualizarEstadoNavFn();
 
@@ -467,8 +469,42 @@ export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn
         document.getElementById('input-foto-perfil')?.click();
     });
 
+    // Los datos de MI perfil se refrescan en cuanto la sección se muestra, sin
+    // depender de quién la abra: hay varios caminos (el icono lateral, la lupa,
+    // el arranque) y en alguno el objeto guardado en el dispositivo viene
+    // incompleto, que es lo que dejaba «Artista» y la «A» en el avatar.
+    vigilarSeccionPerfil();
+
     // Inicializar tabs del perfil
     setupPerfilTabs();
+}
+
+// Monta (una sola vez) el observador de la sección del perfil.
+let seccionPerfilVigilada = false;
+function vigilarSeccionPerfil() {
+    if (seccionPerfilVigilada) return;
+    const seccionPerfil = document.getElementById('perfil-usuario');
+    if (!seccionPerfil || typeof MutationObserver !== 'function') return;
+    seccionPerfilVigilada = true;
+    const refrescarSiEsMio = () => {
+        if (seccionPerfil.classList.contains('hidden')) return;
+        if (seccionPerfil.dataset.viewing === 'external') return;
+        refrescarDatosPropios();
+    };
+    new MutationObserver(refrescarSiEsMio)
+        .observe(seccionPerfil, { attributes: true, attributeFilter: ['class', 'data-viewing'] });
+    refrescarSiEsMio();
+}
+
+// Cuando el perfil que se abre es el MÍO no es una visita ajena: se quita esa
+// marca (que si no se quedaba pegada de una visita anterior y hacía que la
+// cabecera no se actualizara) y se piden los datos propios.
+function marcarPerfilPropio(usuario) {
+    const perfilUsuario = document.getElementById('perfil-usuario');
+    if (!perfilUsuario) return;
+    const esPropio = artistaActual && usuario && String(artistaActual.id) === String(usuario.id);
+    perfilUsuario.dataset.viewing = esPropio ? 'own' : 'external';
+    if (esPropio) refrescarDatosPropios();
 }
 
 // ============================================
@@ -676,3 +712,14 @@ function renderizarGridObras(obras, container) {
         debugLog.error('setupViewTracking en perfil:', e);
     }
 }
+
+// Red de seguridad: el observador se monta también al cargar el módulo, para que
+// no dependa de que se llegue a llamar a setupPerfilInteracciones.
+(function arrancarVigilanciaPerfil() {
+    if (typeof document === 'undefined') return;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', vigilarSeccionPerfil);
+    } else {
+        vigilarSeccionPerfil();
+    }
+})();
