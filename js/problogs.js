@@ -35,9 +35,8 @@ import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './con
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen } from './utils.js?v=8861448e13';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
 import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=c7f71b241f';
-// El cajón de comentarios es el MISMO que el de las obras: se le pasa 'problogs'
-// para que construya las rutas de este recurso.
-import { abrirComentarios } from './comentarios.js?v=f4aaf060b8';
+// Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
+// publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
 // La vista previa se muestra a pantalla completa: se congela el fondo con el
 // mismo mecanismo que el cajón de comentarios.
@@ -1224,6 +1223,216 @@ function pintarCuerpo(bloques, imagenes) {
 // `conAcciones` decide si se pintan los botones de editar/eliminar. Por defecto
 // depende del filtro del feed; la vista previa los pide fuera aunque estés
 // editando una publicación tuya.
+// ============================================================
+// COMENTARIOS DENTRO DE LA PUBLICACIÓN
+// ------------------------------------------------------------
+// En Problogs los comentarios NO usan el cajón de Cavents: van dentro de la
+// propia publicación, justo debajo de la fila de likes/comentarios/reblogs, y
+// los comentarios de la gente aparecen ahí mismo.
+// ============================================================
+
+function bloqueComentariosHTML(p) {
+    return `
+        <section class="problog-comentarios" data-problog-comentarios="${p.id}" aria-label="Comentarios">
+            <h3 class="problog-comentarios-titulo">Comentarios <span class="problog-comentarios-cuenta" data-comentarios-cuenta>${p.comentarios_count || 0}</span></h3>
+            <form class="problog-comentario-form" data-problog-comentario-form>
+                <textarea class="problog-comentario-input" data-comentario-texto rows="2" maxlength="1000"
+                    placeholder="Escribe un comentario…" aria-label="Escribe un comentario"></textarea>
+                <div class="problog-comentario-acciones">
+                    <button type="button" class="problog-comentario-respondiendo hidden" data-comentario-respondiendo></button>
+                    <button type="submit" class="problog-comentario-enviar">Comentar</button>
+                </div>
+            </form>
+            <div class="problog-comentarios-lista" data-comentarios-lista>
+                <p class="problogs-cargando">Cargando comentarios…</p>
+            </div>
+        </section>`;
+}
+
+function comentarioHTML(c, respuestas) {
+    const autor = c.autor_nombre || 'Artista';
+    const inicial = autor.trim().charAt(0).toUpperCase() || '?';
+    const avatar = c.autor_foto
+        ? `<img class="problog-comentario-avatar" src="${safeImgUrl(c.autor_foto)}" alt="">`
+        : `<span class="problog-comentario-avatar">${escapeHtml(inicial)}</span>`;
+    const liked = !!c.liked;
+    const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (liked ? 'currentColor' : 'none') + '"');
+    const hijos = (respuestas && respuestas.length)
+        ? `<div class="problog-comentario-respuestas">${respuestas.map((r) => comentarioHTML(r, [])).join('')}</div>`
+        : '';
+    return `
+        <div class="problog-comentario" data-comentario-id="${c.id}">
+            ${avatar}
+            <div class="problog-comentario-cuerpo">
+                <div class="problog-comentario-cab">
+                    <span class="problog-comentario-autor">${renderText(autor)}</span>
+                    <span class="problog-comentario-fecha">${escapeHtml(tiempoTranscurrido(c.created_at))}</span>
+                </div>
+                <p class="problog-comentario-texto">${renderText(c.texto || c.comentario)}</p>
+                <div class="problog-comentario-fila">
+                    <button type="button" class="problog-comentario-accion${liked ? ' liked' : ''}"
+                        data-comentario-like="${c.id}" aria-pressed="${liked ? 'true' : 'false'}" title="Me gusta">
+                        <span class="problog-comentario-corazon">${corazon}</span><span data-comentario-likes>${c.likes_count || 0}</span>
+                    </button>
+                    <button type="button" class="problog-comentario-accion" data-comentario-responder="${c.id}"
+                        data-comentario-autor="${escapeHtml(autor)}">Responder</button>
+                </div>
+                ${hijos}
+            </div>
+        </div>`;
+}
+
+function seccionComentarios(id) {
+    return document.querySelector('[data-problog-comentarios="' + id + '"]');
+}
+
+function dejarDeResponder(seccion) {
+    delete seccion.dataset.comentarioPadre;
+    const chip = seccion.querySelector('[data-comentario-respondiendo]');
+    if (chip) {
+        chip.classList.add('hidden');
+        chip.textContent = '';
+    }
+}
+
+function responderA(seccion, comentarioId, autor) {
+    seccion.dataset.comentarioPadre = String(comentarioId);
+    const chip = seccion.querySelector('[data-comentario-respondiendo]');
+    if (chip) {
+        chip.textContent = 'Respondiendo a ' + autor + ' · cancelar';
+        chip.classList.remove('hidden');
+    }
+    const input = seccion.querySelector('[data-comentario-texto]');
+    if (input) input.focus({ preventScroll: true });
+}
+
+function pintarListaComentarios(seccion, comentarios) {
+    const lista = seccion.querySelector('[data-comentarios-lista]');
+    if (!lista) return;
+    const cuenta = seccion.querySelector('[data-comentarios-cuenta]');
+    if (cuenta) cuenta.textContent = comentarios.length;
+    if (!comentarios.length) {
+        lista.innerHTML = '<p class="problogs-vacio">Todavía no hay comentarios. ¡Sé el primero!</p>';
+        return;
+    }
+    const raices = comentarios.filter((c) => !c.comentario_padre_id);
+    const respuestas = comentarios.filter((c) => c.comentario_padre_id);
+    let html = raices
+        .map((c) => comentarioHTML(c, respuestas.filter((r) => String(r.comentario_padre_id) === String(c.id))))
+        .join('');
+    // Respuestas cuyo comentario padre ya no está: se muestran al final y no se
+    // pierden por el camino.
+    const idsRaiz = new Set(raices.map((c) => String(c.id)));
+    const huerfanas = respuestas.filter((r) => !idsRaiz.has(String(r.comentario_padre_id)));
+    if (huerfanas.length) html += huerfanas.map((c) => comentarioHTML(c, [])).join('');
+    lista.innerHTML = html;
+}
+
+// El contador de la fila social (y el título del bloque) reflejan la lista real.
+function actualizarCuentaComentarios(id) {
+    const seccion = seccionComentarios(id);
+    const total = seccion ? seccion.querySelectorAll('.problog-comentario').length : 0;
+    document.querySelectorAll('[data-problog-comentar="' + id + '"] .problog-social-num')
+        .forEach((n) => { n.textContent = total; });
+    if (publicacionAbierta && String(publicacionAbierta.id) === String(id)) {
+        publicacionAbierta.comentarios_count = total;
+    }
+    return total;
+}
+
+async function cargarComentariosDeLaPublicacion(id) {
+    const seccion = seccionComentarios(id);
+    if (!seccion) return;
+    const lista = seccion.querySelector('[data-comentarios-lista]');
+    if (lista) lista.innerHTML = '<p class="problogs-cargando">Cargando comentarios…</p>';
+    try {
+        const data = await apiRequest('/problogs/' + id + '/comentarios');
+        if (!seccion.isConnected) return;   // se cerró la publicación mientras cargaba
+        if (!data || data.success === false) {
+            if (lista) lista.innerHTML = '<p class="problogs-vacio">No se pudieron cargar los comentarios.</p>';
+            return;
+        }
+        pintarListaComentarios(seccion, data.comentarios || []);
+        actualizarCuentaComentarios(id);
+    } catch (err) {
+        debugLog.error('Error cargando comentarios del problog:', err);
+        if (lista) lista.innerHTML = '<p class="problogs-vacio">No se pudieron cargar los comentarios.</p>';
+    }
+}
+
+async function enviarComentarioDeLaPublicacion(seccion) {
+    const id = seccion.dataset.problogComentarios;
+    const input = seccion.querySelector('[data-comentario-texto]');
+    const texto = (input ? input.value : '').trim();
+    if (!texto) {
+        showError('Escribe algo antes de comentar.');
+        if (input) input.focus();
+        return;
+    }
+    const padre = seccion.dataset.comentarioPadre || '';
+    const boton = seccion.querySelector('.problog-comentario-enviar');
+    if (boton) { boton.disabled = true; boton.textContent = 'Enviando…'; }
+    try {
+        const res = await apiRequest('/problogs/' + id + '/comentarios', {
+            method: 'POST',
+            body: JSON.stringify({ texto: texto, comentario_padre_id: padre ? parseInt(padre, 10) : null })
+        });
+        if (!res || res.success === false) {
+            showError((res && res.error) || 'No se pudo publicar el comentario.');
+            return;
+        }
+        if (input) input.value = '';
+        dejarDeResponder(seccion);
+        await cargarComentariosDeLaPublicacion(id);
+        showSuccess('Comentario publicado.');
+    } catch (err) {
+        debugLog.error('Error publicando comentario:', err);
+        showError('Error de conexión al comentar.');
+    } finally {
+        if (boton) { boton.disabled = false; boton.textContent = 'Comentar'; }
+    }
+}
+
+async function alternarLikeComentario(problogId, comentarioId, boton) {
+    try {
+        const res = await apiRequest('/problogs/' + problogId + '/comentarios/' + comentarioId + '/like', { method: 'POST' });
+        if (!res || res.success === false) {
+            showError((res && res.error) || 'No se pudo dar me gusta.');
+            return;
+        }
+        boton.classList.toggle('liked', !!res.liked);
+        boton.setAttribute('aria-pressed', res.liked ? 'true' : 'false');
+        const num = boton.querySelector('[data-comentario-likes]');
+        if (num) num.textContent = res.likes_count;
+        const svg = boton.querySelector('svg');
+        if (svg) svg.setAttribute('fill', res.liked ? 'currentColor' : 'none');
+    } catch (err) {
+        debugLog.error('Error dando like a un comentario:', err);
+        showError('Error de conexión.');
+    }
+}
+
+// Botón de comentarios: lleva a los comentarios de la publicación (y si se pulsó
+// desde la tarjeta del feed, antes abre la publicación).
+async function irAComentarios(id) {
+    // Si se pulsó desde otra sección (el perfil, por ejemplo), los comentarios
+    // viven dentro de la publicación, que está en la sección Problogs: hay que
+    // ir allí primero o el usuario no vería nada.
+    if (seccionEl && seccionEl.classList.contains('hidden')) {
+        toggleProblogs();
+        await new Promise((r) => setTimeout(r, 900));   // deja terminar la transición
+    }
+    let seccion = seccionComentarios(id);
+    if (!seccion) {
+        await abrirLectura(id);
+        seccion = seccionComentarios(id);
+    }
+    if (!seccion) return;
+    seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const input = seccion.querySelector('[data-comentario-texto]');
+    if (input) setTimeout(() => input.focus({ preventScroll: true }), 450);
+}
+
 function pintarLectura(p, conAcciones) {
     const propias = !!conAcciones;
     const imagenes = p.imagenes || [];
@@ -1234,6 +1443,12 @@ function pintarLectura(p, conAcciones) {
     // Iconos de editar/eliminar, junto al tiempo en la fila de autoría.
     const acciones = propias ? accionesIconosHTML(p) : '';
 
+    // Los comentarios solo tienen sentido en una publicación de verdad: la vista
+    // previa del editor todavía no tiene id.
+    const esPublicacion = p.id && String(p.id) !== 'vista-previa';
+
+    // Orden pedido: el texto primero, y AL FINAL de la publicación la fila de
+    // likes/comentarios/reblogs con el bloque de comentarios justo debajo.
     return `
         <button type="button" class="problog-volver" id="problog-volver">← Volver</button>
         <header class="problog-lectura-cab">
@@ -1246,8 +1461,9 @@ function pintarLectura(p, conAcciones) {
             </div>
             <h2 class="problog-lectura-titulo">${renderText(p.titulo)}</h2>
         </header>
+        <div class="problog-lectura-cuerpo">${bloquesHTML}</div>
         ${socialHTML(p)}
-        <div class="problog-lectura-cuerpo">${bloquesHTML}</div>`;
+        ${esPublicacion ? bloqueComentariosHTML(p) : ''}`;
 }
 
 async function abrirLectura(id) {
@@ -1263,6 +1479,8 @@ async function abrirLectura(id) {
         }
         publicacionAbierta = data;
         detalleEl.innerHTML = pintarLectura(data);
+        // Los comentarios de la publicación se cargan al abrirla.
+        cargarComentariosDeLaPublicacion(data.id);
     } catch (err) {
         debugLog.error('Error abriendo problog:', err);
         detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
@@ -1476,9 +1694,36 @@ function manejarAcciones(e, desdePerfil) {
     const comentar = e.target.closest('[data-problog-comentar]');
     if (comentar) {
         e.stopPropagation();
-        // Se reutiliza el cajón de comentarios pasándole el tipo de recurso.
-        abrirComentarios(parseInt(comentar.dataset.problogComentar, 10),
-            comentar.closest('.problog-card'), 'problogs');
+        // Los comentarios de Problogs van dentro de la publicación: el botón
+        // lleva hasta ellos (si se pulsó en la tarjeta, abre la publicación).
+        irAComentarios(parseInt(comentar.dataset.problogComentar, 10));
+        return;
+    }
+    const likeComentario = e.target.closest('[data-comentario-like]');
+    if (likeComentario) {
+        e.stopPropagation();
+        const seccion = likeComentario.closest('[data-problog-comentarios]');
+        if (seccion) {
+            alternarLikeComentario(seccion.dataset.problogComentarios,
+                parseInt(likeComentario.dataset.comentarioLike, 10), likeComentario);
+        }
+        return;
+    }
+    const responder = e.target.closest('[data-comentario-responder]');
+    if (responder) {
+        e.stopPropagation();
+        const seccion = responder.closest('[data-problog-comentarios]');
+        if (seccion) {
+            responderA(seccion, parseInt(responder.dataset.comentarioResponder, 10),
+                responder.dataset.comentarioAutor || '');
+        }
+        return;
+    }
+    const cancelarRespuesta = e.target.closest('[data-comentario-respondiendo]');
+    if (cancelarRespuesta) {
+        e.stopPropagation();
+        const seccion = cancelarRespuesta.closest('[data-problog-comentarios]');
+        if (seccion) dejarDeResponder(seccion);
         return;
     }
     const editar = e.target.closest('[data-problog-editar]');
@@ -1636,6 +1881,15 @@ export function setupProblogs() {
 
     feedEl?.addEventListener('click', (e) => manejarAcciones(e, false));
     detalleEl?.addEventListener('click', (e) => manejarAcciones(e, false));
+    // El formulario de comentarios vive dentro de la vista de lectura (que se
+    // reescribe con innerHTML), así que se escucha delegado en el contenedor.
+    detalleEl?.addEventListener('submit', (e) => {
+        const form = e.target.closest('[data-problog-comentario-form]');
+        if (!form) return;
+        e.preventDefault();
+        const seccion = form.closest('[data-problog-comentarios]');
+        if (seccion) enviarComentarioDeLaPublicacion(seccion);
+    });
 
     // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
     // NO se está editando algo y el editor está VACÍO del todo: antes bastaba
