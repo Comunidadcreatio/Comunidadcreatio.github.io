@@ -675,13 +675,27 @@
 
 #problogs .problog-social-btn.liked,
 #perfil-tab-content .problog-social-btn.liked {
-    color: #c0392b;
+    /* Rojo oscurecido: el #c0392b de antes daba 5.44:1 en claro pero solo
+       3.64:1 sobre el fondo oscuro. */
+    color: #b3261e;
 }
 
-/* Reblogueado: se enciende en verde (el like lo hace en rojo). */
+/* Reblogueado: se enciende en verde (el like lo hace en rojo). El verde de
+   antes (#16a34a) se quedaba en 3.3:1 sobre blanco. */
 #problogs .problog-social-btn.reblogueado,
 #perfil-tab-content .problog-social-btn.reblogueado {
-    color: #16a34a;
+    color: #15803d;
+}
+
+/* En oscuro los dos se aclaran para despegar del fondo #0a0a0a. */
+[data-theme="dark"] #problogs .problog-social-btn.liked,
+[data-theme="dark"] #perfil-tab-content .problog-social-btn.liked {
+    color: #f87171;
+}
+
+[data-theme="dark"] #problogs .problog-social-btn.reblogueado,
+[data-theme="dark"] #perfil-tab-content .problog-social-btn.reblogueado {
+    color: #4ade80;
 }
 
 .problog-social-icono {
@@ -702,50 +716,91 @@
    ------------------------------------------------------------
    Van justo debajo de la fila de likes/comentarios/reblogs: primero el cuadro
    para escribir y debajo los comentarios de la gente.
+
+   CONTRASTE (medido, no a ojo): los colores que cambian según el tema salen de
+   los tokens de style.css, que ya están invertidos en `[data-theme="dark"]`.
+   Los dos que NO pueden salir de ahí son el rojo del like y el verde del
+   reblog, porque un solo valor no sirve para los dos fondos: el verde #16a34a
+   daba 3.3:1 sobre blanco y el rojo #c0392b 3.64:1 sobre el fondo oscuro (los
+   dos por debajo del 4.5:1 mínimo). Por eso van con valor por tema:
+     · claro  → rojo #b3261e (6.54:1) y verde #15803d (5.02:1) sobre blanco
+     · oscuro → rojo #f87171 (7.16:1) y verde #4ade80 (11.36:1) sobre #0a0a0a
    ============================================================ */
 .problog-comentarios {
+    /* Los dos colores que dependen del tema viven aquí: así se cambian en un
+       solo sitio y valen para el bloque entero. */
+    --comentario-rojo: #b3261e;
+    --comentario-verde: #15803d;
+    --comentario-tinte: var(--color-gray-50);
+    /* Bordes de CONTROL (los que delimitan algo con lo que se interactúa): el
+       gris claro de los tokens (#d4d4d4) daba 1.48:1 sobre blanco y muy poco
+       sobre el tinte, y un borde tiene que llegar a 3:1 para distinguirse. */
+    --comentario-borde: #8a8a8a;
     margin-top: 6px;
     padding-top: 12px;
     border-top: 1px solid var(--color-gray-300);
 }
 
+/* Cabecera: título a la izquierda y el número en una píldora, para que se lea
+   como un contador y no como un número suelto. */
 .problog-comentarios-titulo {
-    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
     font-size: 15px;
     font-weight: 800;
+    letter-spacing: -0.01em;
     color: var(--color-ink);
 }
 
 .problog-comentarios-cuenta {
-    color: var(--color-gray-500);
+    min-width: 22px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
 }
 
-/* Cajón compacto: el hueco de la caja, el botón y el aire de debajo, cortos. */
+/* --- Cajón de escribir ---
+   Lleva un tinte suave y su propio borde: así se ve de un vistazo dónde se
+   escribe, separado de la lista de comentarios de debajo. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 10px;
+    border: 1px solid var(--comentario-borde);
+    border-radius: 14px;
+    background: var(--comentario-tinte);
 }
 
 .problog-comentario-input {
     width: 100%;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 8px 11px;
-    border: 1px solid var(--color-gray-300);
+    padding: 9px 11px;
+    border: 1px solid var(--comentario-borde);
     border-radius: 10px;
     background: var(--color-white);
     color: var(--color-ink);
     font-family: inherit;
     font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.45;
     resize: none;
     outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* El foco se marca con el borde Y con un halo: solo con el borde (que pasaba de
+   gris a negro) apenas se notaba. */
 .problog-comentario-input:focus {
     border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
 }
 
 .problog-comentario-input::placeholder {
@@ -759,30 +814,41 @@
     gap: 10px;
 }
 
-/* Chip de "respondiendo a …": también es el botón para cancelar la respuesta. */
+/* Chip de "respondiendo a …": también es el botón para cancelar la respuesta.
+   Con fondo propio, porque como texto suelto sobre el tinte se perdía. */
 .problog-comentario-respondiendo {
     margin-right: auto;
-    padding: 4px 10px;
-    border: 1px dashed var(--color-gray-300);
-    border-radius: 14px;
-    background: transparent;
-    color: var(--color-gray-500);
+    padding: 5px 11px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    background: var(--color-white);
+    color: var(--color-gray-600);
     font-family: inherit;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
 }
 
+.problog-comentario-respondiendo:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+}
+
 .problog-comentario-enviar {
-    padding: 7px 16px;
+    padding: 8px 18px;
     border: none;
-    border-radius: 15px;
+    border-radius: 999px;
     background: var(--color-ink);
     color: var(--color-white);
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.problog-comentario-enviar:hover:not(:disabled) {
+    opacity: 0.88;
 }
 
 .problog-comentario-enviar:disabled {
@@ -790,15 +856,23 @@
     cursor: default;
 }
 
+/* --- Lista --- */
 .problog-comentarios-lista {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
+/* Cada comentario es una fila con su propia línea de separación: antes iban
+   sueltos y con el texto de uno pegado al anterior. */
 .problog-comentario {
     display: flex;
     gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid var(--comentario-borde);
+}
+
+.problog-comentarios-lista > .problog-comentario:first-child {
+    border-top: none;
 }
 
 .problog-comentario-avatar {
@@ -810,8 +884,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-gray-200);
-    color: var(--color-ink);
+    background: var(--color-gray-100);
+    /* El anillo separa el avatar del fondo en los dos temas. */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    color: var(--color-gray-600);
     font-size: 13px;
     font-weight: 800;
     overflow: hidden;
@@ -841,35 +917,44 @@
 }
 
 .problog-comentario-texto {
-    margin: 3px 0 6px;
+    margin: 3px 0 8px;
     font-size: 14px;
-    line-height: 1.5;
-    color: var(--color-text);
+    line-height: 1.55;
+    color: var(--color-ink-light);
     overflow-wrap: break-word;
 }
 
 .problog-comentario-fila {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 4px;
 }
 
+/* Las acciones de cada comentario llevan su propia área de pulsación: eran
+   texto sin relleno y en el móvil costaba acertar. */
 .problog-comentario-accion {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 0;
+    min-height: 28px;
+    padding: 0 8px;
     border: none;
+    border-radius: 999px;
     background: transparent;
-    color: var(--color-gray-500);
+    color: var(--color-gray-600);
     font-family: inherit;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.problog-comentario-accion:hover {
+    background: var(--color-gray-100);
 }
 
 .problog-comentario-accion.liked {
-    color: #c0392b;
+    color: var(--comentario-rojo);
 }
 
 .problog-comentario-corazon {
@@ -883,14 +968,67 @@
     display: block;
 }
 
-/* Respuestas: sangradas y con una línea guía, un solo nivel. */
+/* Respuestas: sangradas y con línea guía, un solo nivel. La guía marca la
+   relación con el comentario padre, así que lleva el borde garantizado (el
+   `--color-gray-200` de antes se quedaba en 1.23:1 sobre blanco). */
 .problog-comentario-respuestas {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    margin-top: 14px;
-    padding-left: 14px;
-    border-left: 2px solid var(--color-gray-200);
+    margin-top: 12px;
+    padding-left: 12px;
+    border-left: 2px solid var(--comentario-borde);
+}
+
+.problog-comentario-respuestas .problog-comentario {
+    border-top: none;
+    padding: 8px 0 0;
+}
+
+.problog-comentario-respuestas .problog-comentario:first-child {
+    padding-top: 0;
+}
+
+/* El estado vacío, centrado y con aire: es lo primero que ve quien llega. */
+.problog-comentarios-lista .problogs-vacio {
+    padding: 22px 12px;
+    font-size: 13px;
+}
+
+/* ============================================================
+   COMENTARIOS EN MODO OSCURO
+   ------------------------------------------------------------
+   Los tokens de style.css ya invierten el texto y los grises; aquí solo se
+   ajusta lo que necesita un valor distinto por tema: el tinte del cajón, el
+   halo del foco (una sombra negra sobre fondo negro no existe) y los dos
+   colores de estado.
+   ============================================================ */
+[data-theme="dark"] .problog-comentarios {
+    --comentario-rojo: #f87171;
+    --comentario-verde: #4ade80;
+    --comentario-tinte: var(--color-gray-100);
+    /* Blanco al 36% sobre el tinte: 3.33:1. El gris de los tokens en oscuro
+       (#525252) se quedaba en 2.11:1. */
+    --comentario-borde: rgba(255, 255, 255, 0.36);
+}
+
+[data-theme="dark"] .problog-comentario-input:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="dark"] .problog-comentario-avatar {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* El contador en oscuro necesita su propio relleno: con el tinte del tema el
+   número quedaba sobre un gris casi igual que el fondo. */
+[data-theme="dark"] .problog-comentarios-cuenta {
+    background: rgba(255, 255, 255, 0.10);
+    color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .problog-comentario-respondiendo {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* Botón "Cargar más": el scroll infinito lo dispara solo, pero se queda visible
