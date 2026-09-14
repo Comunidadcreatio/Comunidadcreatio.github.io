@@ -636,29 +636,41 @@
     border-color: rgba(192, 57, 43, 0.5);
 }
 
-/* Fila de likes + comentarios (misma en la tarjeta y en la vista de lectura) */
+/* Fila de likes + comentarios (misma en la tarjeta y en la vista de lectura).
+   Va pegada al final del texto: el aire de arriba es corto a propósito. */
 .problog-social {
+    --problog-icono: 18px;
     display: flex;
-    gap: 14px;
-    margin-top: 10px;
+    gap: 4px;
+    margin-top: 4px;
 }
 
+/* Área de pulsación de 40px de alto: en el móvil se acierta sin apuntar. El
+   relleno lateral es corto porque el alto ya lo pone min-height. */
 #problogs .problog-social-btn,
 #perfil-tab-content .problog-social-btn {
     width: auto;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 8px;
+    gap: 7px;
+    padding: 0 10px;
     border: none;
-    border-radius: 16px;
+    border-radius: 20px;
     background: transparent;
     color: var(--color-gray-500);
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Los tres marcadores van en GRIS hasta que se pulsan: solo entonces se
+   encienden (el like en rojo, el reblog en verde). */
+#problogs .problog-social-btn:active,
+#perfil-tab-content .problog-social-btn:active {
+    background: var(--color-gray-100);
 }
 
 #problogs .problog-social-btn.liked,
@@ -677,6 +689,14 @@
     align-items: center;
 }
 
+/* El tamaño del SVG lo manda `--problog-icono`, no el propio icono: así el mismo
+   corazón sirve aquí (18px) y en cada comentario (14px). */
+.problog-social-icono svg {
+    width: var(--problog-icono, 18px);
+    height: var(--problog-icono, 18px);
+    display: block;
+}
+
 /* ============================================================
    COMENTARIOS DENTRO DE LA PUBLICACIÓN (solo Problogs)
    ------------------------------------------------------------
@@ -684,13 +704,13 @@
    para escribir y debajo los comentarios de la gente.
    ============================================================ */
 .problog-comentarios {
-    margin-top: 20px;
-    padding-top: 18px;
+    margin-top: 6px;
+    padding-top: 12px;
     border-top: 1px solid var(--color-gray-300);
 }
 
 .problog-comentarios-titulo {
-    margin: 0 0 12px;
+    margin: 0 0 8px;
     font-size: 15px;
     font-weight: 800;
     color: var(--color-ink);
@@ -700,25 +720,26 @@
     color: var(--color-gray-500);
 }
 
+/* Cajón compacto: el hueco de la caja, el botón y el aire de debajo, cortos. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
 .problog-comentario-input {
     width: 100%;
     box-sizing: border-box;
-    min-height: 46px;
-    padding: 11px 13px;
+    min-height: 38px;
+    padding: 8px 11px;
     border: 1px solid var(--color-gray-300);
-    border-radius: 12px;
+    border-radius: 10px;
     background: var(--color-white);
     color: var(--color-ink);
     font-family: inherit;
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: 13px;
+    line-height: 1.4;
     resize: none;
     outline: none;
 }
@@ -753,9 +774,9 @@
 }
 
 .problog-comentario-enviar {
-    padding: 9px 20px;
+    padding: 7px 16px;
     border: none;
-    border-radius: 18px;
+    border-radius: 15px;
     background: var(--color-ink);
     color: var(--color-white);
     font-family: inherit;
@@ -859,6 +880,7 @@
 .problog-comentario-corazon svg {
     width: 14px;
     height: 14px;
+    display: block;
 }
 
 /* Respuestas: sangradas y con una línea guía, un solo nivel. */

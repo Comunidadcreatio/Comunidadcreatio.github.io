@@ -769,10 +769,14 @@ async function eliminarProblog(id, titulo) {
 // ============================================================
 // LIKES Y COMENTARIOS
 // ============================================================
-const ICONO_CORAZON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-const ICONO_COMENTARIO = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>';
+// Los iconos NO llevan width/height propios: el tamaño lo fija el CSS con
+// `--problog-icono`. Así el mismo icono sirve para la fila de marcadores (más
+// grande, que es donde se pulsa en el móvil) y para el corazón de cada
+// comentario, que va más pequeño.
+const ICONO_CORAZON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+const ICONO_COMENTARIO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>';
 // Rebloguear: las dos flechas en bucle.
-const ICONO_REBLOG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+const ICONO_REBLOG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
 
 // Fila de likes, comentarios y reblogueos. La misma en la tarjeta y en la vista
 // de lectura.
@@ -1256,6 +1260,8 @@ function comentarioHTML(c, respuestas) {
         ? `<img class="problog-comentario-avatar" src="${safeImgUrl(c.autor_foto)}" alt="">`
         : `<span class="problog-comentario-avatar">${escapeHtml(inicial)}</span>`;
     const liked = !!c.liked;
+    // Mismo corazón que el like de la publicación (y misma regla: relleno si ya
+    // lo he pulsado), pero el CSS lo pinta más pequeño aquí.
     const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (liked ? 'currentColor' : 'none') + '"');
     const hijos = (respuestas && respuestas.length)
         ? `<div class="problog-comentario-respuestas">${respuestas.map((r) => comentarioHTML(r, [])).join('')}</div>`
@@ -1306,6 +1312,17 @@ function responderA(seccion, comentarioId, autor) {
     if (input) input.focus({ preventScroll: true });
 }
 
+// Los comentarios raíz van del MÁS RECIENTE al más antiguo (el que acabas de
+// escribir aparece arriba del todo, debajo del cajón). Las respuestas NO se
+// invierten: dentro de cada comentario se leen en el orden en que se escribieron,
+// que es como tiene sentido una conversación.
+function porFechaDesc(a, b) {
+    const ta = Date.parse(a.created_at || '') || 0;
+    const tb = Date.parse(b.created_at || '') || 0;
+    if (tb !== ta) return tb - ta;   // si no hay fecha, se respeta el orden que llegó
+    return 0;
+}
+
 function pintarListaComentarios(seccion, comentarios) {
     const lista = seccion.querySelector('[data-comentarios-lista]');
     if (!lista) return;
@@ -1315,7 +1332,7 @@ function pintarListaComentarios(seccion, comentarios) {
         lista.innerHTML = '<p class="problogs-vacio">Todavía no hay comentarios. ¡Sé el primero!</p>';
         return;
     }
-    const raices = comentarios.filter((c) => !c.comentario_padre_id);
+    const raices = comentarios.filter((c) => !c.comentario_padre_id).sort(porFechaDesc);
     const respuestas = comentarios.filter((c) => c.comentario_padre_id);
     let html = raices
         .map((c) => comentarioHTML(c, respuestas.filter((r) => String(r.comentario_padre_id) === String(c.id))))
