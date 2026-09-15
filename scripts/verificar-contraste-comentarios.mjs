@@ -58,72 +58,70 @@ function contraste(a, b) {
 const TEMAS = {
   claro: {
     fondo: '#ffffff',
-    tinte: '#f5f5f5',          // --color-gray-50, fondo del cajón
     ink: '#1a1a1a',            // --color-ink (texto principal)
     inkLight: '#3d3d3d',       // --color-ink-light (texto de cada comentario)
-    gray500: '#737373',        // --color-gray-500 (fechas)
-    gray600: '#525252',        // --color-gray-600 (acciones, contador)
+    gray500: '#737373',        // --color-gray-500 (ya no se usa en comentarios)
+    gray600: '#525252',        // --color-gray-600 (fechas, acciones, contador)
     placeholder: '#737373',
-    borde: '#8a8a8a',          // --comentario-borde en claro
+    control: '#8a8a8a',        // --comentario-control en claro
     rojo: '#b3261e',
     verde: '#15803d',
-    blanco: '#ffffff',
   },
   oscuro: {
     fondo: '#0a0a0a',
-    tinte: '#1f1f1f',          // --color-gray-100 en oscuro
     ink: '#f5f5f5',
     inkLight: '#e5e5e5',       // --color-ink-light en oscuro
     gray500: '#d4d4d4',
     gray600: '#e5e5e5',        // --color-gray-600 en oscuro
     placeholder: '#d4d4d4',
-    // rgba(255,255,255,0.36) ya aplanado sobre el fondo donde se apoya.
-    borde: '#707070',          // sobre el tinte #1f1f1f (3.33:1)
-    bordeCaja: '#626262',      // sobre --color-white #0a0a0a (3.25:1)
+    // rgba(255,255,255,0.36) ya aplanado sobre el fondo oscuro.
+    control: '#626262',
     rojo: '#f87171',
     verde: '#4ade80',
-    blanco: '#0a0a0a',         // --color-white en oscuro (texto sobre el botón)
   },
 };
 
 // [descripción, colorTexto, colorFondo, mínimo]
+// Con los cajones SIN fondo, todo se apoya en el fondo de la página: ese es el
+// color de referencia en los dos temas.
 const PARES = {
   claro: [
     ['título «Comentarios»', 'ink', 'fondo', MIN_TEXTO],
     ['contador del título', 'gray600', 'fondo', MIN_TEXTO],
-    ['texto que se escribe', 'ink', 'blanco', MIN_TEXTO],
-    ['placeholder del cajón', 'placeholder', 'blanco', MIN_TEXTO],
-    ['botón «Comentar»', 'blanco', 'ink', MIN_TEXTO],
-    ['nombre del autor', 'ink', 'fondo', MIN_TEXTO],
-    ['fecha del comentario', 'gray500', 'fondo', MIN_TEXTO],
-    ['texto del comentario', 'inkLight', 'fondo', MIN_TEXTO],
-    ['acción «Responder»', 'gray600', 'fondo', MIN_TEXTO],
-    ['like de comentario activo', 'rojo', 'fondo', MIN_TEXTO],
-    ['reblog activo (marcadores)', 'verde', 'fondo', MIN_TEXTO],
-    ['like activo (marcadores)', 'rojo', 'fondo', MIN_TEXTO],
-    ['borde del cajón', 'borde', 'tinte', MIN_NO_TEXTO],
-    ['borde de la caja de escribir', 'borde', 'blanco', MIN_NO_TEXTO],
-    ['guía de las respuestas', 'borde', 'fondo', MIN_NO_TEXTO],
-    ['línea entre comentarios', 'borde', 'fondo', MIN_NO_TEXTO],
-  ],
-  // En oscuro el tinte es el fondo real de las acciones y de la píldora.
-  oscuro: [
-    ['título «Comentarios»', 'ink', 'fondo', MIN_TEXTO],
-    ['contador del título', 'gray600', 'tinte', MIN_TEXTO],
     ['texto que se escribe', 'ink', 'fondo', MIN_TEXTO],
     ['placeholder del cajón', 'placeholder', 'fondo', MIN_TEXTO],
-    ['botón «Comentar»', 'blanco', 'ink', MIN_TEXTO],
+    // Este era el fallo: el botón iba con texto --color-white sobre relleno
+    // --color-ink, y en oscuro los dos acababan en blanco.
+    ['botón «Comentar» (texto)', 'ink', 'fondo', MIN_TEXTO],
+    ['borde del botón «Comentar»', 'control', 'fondo', MIN_NO_TEXTO],
+    ['chip «respondiendo a…»', 'gray600', 'fondo', MIN_TEXTO],
+    ['borde del chip «respondiendo»', 'control', 'fondo', MIN_NO_TEXTO],
     ['nombre del autor', 'ink', 'fondo', MIN_TEXTO],
-    ['fecha del comentario', 'gray500', 'fondo', MIN_TEXTO],
+    ['fecha del comentario', 'gray600', 'fondo', MIN_TEXTO],
     ['texto del comentario', 'inkLight', 'fondo', MIN_TEXTO],
     ['acción «Responder»', 'gray600', 'fondo', MIN_TEXTO],
     ['like de comentario activo', 'rojo', 'fondo', MIN_TEXTO],
     ['reblog activo (marcadores)', 'verde', 'fondo', MIN_TEXTO],
     ['like activo (marcadores)', 'rojo', 'fondo', MIN_TEXTO],
-    ['borde del cajón', 'borde', 'tinte', MIN_NO_TEXTO],
-    ['borde de la caja de escribir', 'bordeCaja', 'fondo', MIN_NO_TEXTO],
-    ['guía de las respuestas', 'borde', 'fondo', MIN_NO_TEXTO],
-    ['línea entre comentarios', 'borde', 'fondo', MIN_NO_TEXTO],
+    ['borde de la caja de escribir', 'control', 'fondo', MIN_NO_TEXTO],
+  ],
+  oscuro: [
+    ['título «Comentarios»', 'ink', 'fondo', MIN_TEXTO],
+    ['contador del título', 'gray600', 'fondo', MIN_TEXTO],
+    ['texto que se escribe', 'ink', 'fondo', MIN_TEXTO],
+    ['placeholder del cajón', 'placeholder', 'fondo', MIN_TEXTO],
+    ['botón «Comentar» (texto)', 'ink', 'fondo', MIN_TEXTO],
+    ['borde del botón «Comentar»', 'control', 'fondo', MIN_NO_TEXTO],
+    ['chip «respondiendo a…»', 'gray600', 'fondo', MIN_TEXTO],
+    ['borde del chip «respondiendo»', 'control', 'fondo', MIN_NO_TEXTO],
+    ['nombre del autor', 'ink', 'fondo', MIN_TEXTO],
+    ['fecha del comentario', 'gray600', 'fondo', MIN_TEXTO],
+    ['texto del comentario', 'inkLight', 'fondo', MIN_TEXTO],
+    ['acción «Responder»', 'gray600', 'fondo', MIN_TEXTO],
+    ['like de comentario activo', 'rojo', 'fondo', MIN_TEXTO],
+    ['reblog activo (marcadores)', 'verde', 'fondo', MIN_TEXTO],
+    ['like activo (marcadores)', 'rojo', 'fondo', MIN_TEXTO],
+    ['borde de la caja de escribir', 'control', 'fondo', MIN_NO_TEXTO],
   ],
 };
 
@@ -134,8 +132,25 @@ const ESPERADOS_EN_CSS = [
   ['--comentario-rojo: #f87171', 'valor oscuro del rojo'],
   ['--comentario-verde: #15803d', 'valor claro del verde'],
   ['--comentario-verde: #4ade80', 'valor oscuro del verde'],
+  ['--comentario-control: #8a8a8a', 'borde de control en claro'],
+  ['--comentario-control: rgba(255, 255, 255, 0.36)', 'borde de control en oscuro'],
   ['.problog-social-btn.liked', 'regla del like'],
   ['[data-theme="dark"] .problog-comentario-input:focus', 'foco en oscuro'],
+];
+
+// Reglas que NO pueden volver: el botón de enviar tiene que ir sin relleno (con
+// el relleno invertido de los tokens, en oscuro quedaba letra blanca sobre
+// fondo blanco). Se comprueba sobre el texto de la regla, no sobre el archivo
+// entero, para que no salte por un `color: var(--color-white)` de otra zona.
+const PROHIBIDOS_EN_CSS = [
+  [/\.problog-comentario-enviar\s*\{[^}]*background:\s*var\(--color-ink\)/,
+    'el botón «Comentar» no debe llevar relleno --color-ink'],
+  [/\.problog-comentario-enviar\s*\{[^}]*color:\s*var\(--color-white\)/,
+    'el botón «Comentar» no debe pintar su texto con --color-white'],
+  [/\.problog-comentario-input\s*\{[^}]*background:\s*var\(--color-white\)/,
+    'la caja de escribir debe ir sin fondo'],
+  [/\.problog-comentario-form\s*\{[^}]*background:\s*var\(--comentario-tinte\)/,
+    'el cajón debe ir sin fondo'],
 ];
 
 let fallos = 0;
@@ -158,6 +173,9 @@ try {
 }
 for (const [aguja, que] of ESPERADOS_EN_CSS) {
   check(`${que} («${aguja}»)`, css.includes(aguja));
+}
+for (const [patron, que] of PROHIBIDOS_EN_CSS) {
+  check(`no vuelve: ${que}`, !patron.test(css));
 }
 
 for (const [tema, pares] of Object.entries(PARES)) {

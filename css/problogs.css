@@ -731,34 +731,47 @@
        solo sitio y valen para el bloque entero. */
     --comentario-rojo: #b3261e;
     --comentario-verde: #15803d;
-    --comentario-tinte: var(--color-gray-50);
-    /* Bordes de CONTROL (los que delimitan algo con lo que se interactúa): el
-       gris claro de los tokens (#d4d4d4) daba 1.48:1 sobre blanco y muy poco
-       sobre el tinte, y un borde tiene que llegar a 3:1 para distinguirse. */
-    --comentario-borde: #8a8a8a;
+    /* DOS tipos de borde, cada uno con su mínimo:
+       · control: delimita algo con lo que se interactúa (la caja de escribir,
+         los botones). Tiene que llegar a 3:1 para distinguirse del fondo, así
+         que va oscuro: el gris de los tokens (#d4d4d4) daba 1.48:1.
+       · linea: solo REPARTA el bloque en franjas. No delimita nada pulsable,
+         así que basta con que se vea: una línea fina y gris, como una regla. */
+    --comentario-control: #8a8a8a;
+    --comentario-linea: var(--color-gray-300);
+    /* Fondo al pasar por encima de las acciones. Tiene que ser suave y, sobre
+       todo, dejar el texto legible: con `--comentario-linea` en oscuro quedaba
+       un gris claro debajo de letras claras. */
+    --comentario-hover: var(--color-gray-100);
     margin-top: 6px;
     padding-top: 12px;
-    border-top: 1px solid var(--color-gray-300);
+    border-top: 1px solid var(--comentario-linea);
 }
 
 /* Cabecera: título a la izquierda y el número en una píldora, para que se lea
-   como un contador y no como un número suelto. */
+   como un contador y no como un número suelto. La franja la cierra una línea
+   fina, que es la que la separa del cajón de escribir. */
 .problog-comentarios-titulo {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 10px;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--comentario-linea);
     font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.01em;
     color: var(--color-ink);
 }
 
+/* El contador va enmarcado en vez de relleno: con las franjas separadas por
+   líneas, un bloque de fondo se comía la limpieza del conjunto. */
 .problog-comentarios-cuenta {
     min-width: 22px;
-    padding: 2px 7px;
+    padding: 1px 7px;
+    border: 1px solid var(--comentario-linea);
     border-radius: 999px;
-    background: var(--color-gray-100);
+    background: transparent;
     color: var(--color-gray-600);
     font-size: 11px;
     font-weight: 800;
@@ -766,17 +779,18 @@
 }
 
 /* --- Cajón de escribir ---
-   Lleva un tinte suave y su propio borde: así se ve de un vistazo dónde se
-   escribe, separado de la lista de comentarios de debajo. */
+   Sin fondo y sin caja: lo separa de la cabecera una línea fina arriba, y de
+   los comentarios la línea de abajo. Así cada bloque es una franja del mismo
+   plano, que es lo que se pidió. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 6px;
-    padding: 10px;
-    border: 1px solid var(--comentario-borde);
-    border-radius: 14px;
-    background: var(--comentario-tinte);
+    margin: 0;
+    padding: 12px 2px;
+    border-top: 1px solid var(--comentario-linea);
+    border-bottom: 1px solid var(--comentario-linea);
+    background: transparent;
 }
 
 .problog-comentario-input {
@@ -784,9 +798,10 @@
     box-sizing: border-box;
     min-height: 38px;
     padding: 9px 11px;
-    border: 1px solid var(--comentario-borde);
+    /* Borde de control: marca dónde se escribe, así que sí necesita 3:1. */
+    border: 1px solid var(--comentario-control);
     border-radius: 10px;
-    background: var(--color-white);
+    background: transparent;
     color: var(--color-ink);
     font-family: inherit;
     font-size: 13px;
@@ -815,13 +830,13 @@
 }
 
 /* Chip de "respondiendo a …": también es el botón para cancelar la respuesta.
-   Con fondo propio, porque como texto suelto sobre el tinte se perdía. */
+   Con contorno y sin relleno, igual que el resto de la zona. */
 .problog-comentario-respondiendo {
     margin-right: auto;
     padding: 5px 11px;
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--comentario-control);
     border-radius: 999px;
-    background: var(--color-white);
+    background: transparent;
     color: var(--color-gray-600);
     font-family: inherit;
     font-size: 12px;
@@ -834,21 +849,26 @@
     color: var(--color-ink);
 }
 
+/* Botón de enviar: SIN relleno y con el texto en tinta. Antes era fondo
+   `--color-ink` con texto `--color-white` y, como en modo oscuro esos dos
+   tokens se invierten, quedaba texto oscuro... sobre fondo claro solo a
+   medias: el relleno se volvía BLANCO y el texto también, así que las letras
+   no se veían. Sin relleno el problema desaparece: solo hay texto y un borde. */
 .problog-comentario-enviar {
-    padding: 8px 18px;
-    border: none;
+    padding: 7px 18px;
+    border: 1px solid var(--comentario-control);
     border-radius: 999px;
-    background: var(--color-ink);
-    color: var(--color-white);
+    background: transparent;
+    color: var(--color-ink);
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .problog-comentario-enviar:hover:not(:disabled) {
-    opacity: 0.88;
+    background: var(--comentario-hover);
 }
 
 .problog-comentario-enviar:disabled {
@@ -863,16 +883,15 @@
 }
 
 /* Cada comentario es una fila con su propia línea de separación: antes iban
-   sueltos y con el texto de uno pegado al anterior. */
+   sueltos y con el texto de uno pegado al anterior. También la PRIMERA: la
+   lista empieza justo debajo de la línea que cierra el cajón de escribir, así
+   que necesita la suya para que el reparto sea uniforme (con una regla
+   `:first-child` que la quitaba, el primer comentario quedaba sin separación). */
 .problog-comentario {
     display: flex;
     gap: 10px;
     padding: 12px 0;
-    border-top: 1px solid var(--comentario-borde);
-}
-
-.problog-comentarios-lista > .problog-comentario:first-child {
-    border-top: none;
+    border-top: 1px solid var(--comentario-linea);
 }
 
 .problog-comentario-avatar {
@@ -913,7 +932,9 @@
 
 .problog-comentario-fecha {
     font-size: 12px;
-    color: var(--color-gray-500);
+    /* gray-600 y no gray-500: medido sobre el fondo real de la página, el 500 se
+       quedaba en 3.94:1 en tema claro (por debajo del 4.5 mínimo). */
+    color: var(--color-gray-600);
 }
 
 .problog-comentario-texto {
@@ -950,7 +971,7 @@
 }
 
 .problog-comentario-accion:hover {
-    background: var(--color-gray-100);
+    background: var(--comentario-hover);
 }
 
 .problog-comentario-accion.liked {
@@ -968,24 +989,24 @@
     display: block;
 }
 
-/* Respuestas: sangradas y con línea guía, un solo nivel. La guía marca la
-   relación con el comentario padre, así que lleva el borde garantizado (el
-   `--color-gray-200` de antes se quedaba en 1.23:1 sobre blanco). */
+/* Respuestas: sangradas y con línea guía, un solo nivel. La guía es una línea
+   más del reparto (marca la relación con el comentario padre), así que usa el
+   grosor fino y el gris del tema; con el `--color-gray-200` de antes quedaba
+   invisible en claro (1.23:1). */
 .problog-comentario-respuestas {
     display: flex;
     flex-direction: column;
     margin-top: 12px;
     padding-left: 12px;
-    border-left: 2px solid var(--comentario-borde);
+    border-left: 1px solid var(--color-gray-400);
 }
 
+/* Dentro del bloque de respuestas, la separación la pone la propia línea guía
+   del padre: repetir el borde de cada respuesta dejaba tres rayas seguidas. */
 .problog-comentario-respuestas .problog-comentario {
     border-top: none;
     padding: 8px 0 0;
-}
-
-.problog-comentario-respuestas .problog-comentario:first-child {
-    padding-top: 0;
+    gap: 8px;
 }
 
 /* El estado vacío, centrado y con aire: es lo primero que ve quien llega. */
@@ -998,37 +1019,37 @@
    COMENTARIOS EN MODO OSCURO
    ------------------------------------------------------------
    Los tokens de style.css ya invierten el texto y los grises; aquí solo se
-   ajusta lo que necesita un valor distinto por tema: el tinte del cajón, el
+   ajusta lo que necesita un valor distinto por tema: el borde de control, el
    halo del foco (una sombra negra sobre fondo negro no existe) y los dos
-   colores de estado.
+   colores de estado. Las líneas finas no hace falta tocarlas: salen del token
+   `--color-gray-300`, que en oscuro ya es un gris visible pero discreto.
    ============================================================ */
 [data-theme="dark"] .problog-comentarios {
     --comentario-rojo: #f87171;
     --comentario-verde: #4ade80;
-    --comentario-tinte: var(--color-gray-100);
-    /* Blanco al 36% sobre el tinte: 3.33:1. El gris de los tokens en oscuro
-       (#525252) se quedaba en 2.11:1. */
-    --comentario-borde: rgba(255, 255, 255, 0.36);
+    /* Blanco al 36%: 3.25:1 sobre el fondo oscuro. El gris de los tokens en
+       oscuro (#525252) se quedaba en 2.53:1. */
+    --comentario-control: rgba(255, 255, 255, 0.36);
+    /* Un velo claro sutil: el texto se queda encima y sigue leyéndose. */
+    --comentario-hover: rgba(255, 255, 255, 0.10);
 }
 
 [data-theme="dark"] .problog-comentario-input:focus {
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10);
 }
 
+/* El fondo del textarea hay que volver a dejarlo transparente EN OSCURO: hay una
+   regla global en style.css —
+     [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea
+       { background-color: var(--color-gray-100) }
+   — que en modo claro no existe, así que solo pisaba aquí: el cajón salía con
+   un bloque gris (#1f1f1f) que rompía el "sin fondo" que se pidió. */
+[data-theme="dark"] .problog-comentario-input {
+    background: transparent;
+}
+
 [data-theme="dark"] .problog-comentario-avatar {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-}
-
-/* El contador en oscuro necesita su propio relleno: con el tinte del tema el
-   número quedaba sobre un gris casi igual que el fondo. */
-[data-theme="dark"] .problog-comentarios-cuenta {
-    background: rgba(255, 255, 255, 0.10);
-    color: var(--color-gray-600);
-}
-
-[data-theme="dark"] .problog-comentario-respondiendo {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* Botón "Cargar más": el scroll infinito lo dispara solo, pero se queda visible
