@@ -71,11 +71,20 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           localStorage.setItem('creatio_auth_token_persist', 'tok');
       } catch (_) {}
       const ahora = Date.now();
+      // Una imagen de verdad (data URL) para poder comprobar sus esquinas: sin
+      // ella, la lista de figuras queda vacía y la comprobación no se ejecuta.
+      const lienzo = document.createElement('canvas');
+      lienzo.width = 400; lienzo.height = 300;
+      const pincel = lienzo.getContext('2d');
+      pincel.fillStyle = '#8899aa'; pincel.fillRect(0, 0, 400, 300);
+      const imagenPrueba = lienzo.toDataURL('image/jpeg', 0.8);
       const publicacion = { id: 31001, titulo: 'Proceso de la obra', etiquetas: 'arte', estado: 'publicado',
           created_at: new Date(ahora - 3600000).toISOString(),
-          bloques: [{ tipo: 'texto', contenido: 'Texto del cuerpo de la publicacion.' }],
-          imagenes: [null,null,null,null,null,null,null,null], miniaturas: [null,null,null,null,null,null,null,null],
-          portada_slot: null, nombre_artista: 'T', foto_artista: '', likes_count: 3, comentarios_count: 3,
+          bloques: [{ tipo: 'texto', contenido: 'Texto del cuerpo de la publicacion.' },
+                    { tipo: 'imagen', slot: 0, pie: 'Pie de foto' }],
+          imagenes: [imagenPrueba, null, null, null, null, null, null, null],
+          miniaturas: [imagenPrueba, null, null, null, null, null, null, null],
+          portada_slot: 0, nombre_artista: 'T', foto_artista: '', likes_count: 3, comentarios_count: 3,
           reblogs_count: 1, liked: true, reblogged: false };
       const comentarios = [
           { id: 1, problog_id: 31001, usuario_id: 10, texto: 'Primer comentario de la lista', comentario_padre_id: null,
@@ -143,8 +152,35 @@ const MEDIR = (tema) => `(() => {
                  ladosConLinea: gruesos.map((w, i) => (w === '1px' ? ['arriba', 'abajo', 'izquierda'][i] : null)).filter(Boolean) };
     };
     const r = sec.getBoundingClientRect();
+    // Rectángulos de lo que debe llegar de borde a borde: el título, el cajón y
+    // un comentario. Se comparan con el de la sección para ver si la línea se
+    // estira o se queda con aire a los lados.
+    const caja = (el) => { if (!el) return null; const x = el.getBoundingClientRect(); return { left: x.left, right: x.right }; };
+    // Imágenes del contenido: son las que ve el lector al abrir la publicación.
+    const figuras = Array.from(document.querySelectorAll('.problog-lectura-figura img'));
     return JSON.stringify({
         rectSeccion: { left: r.left, top: r.top, width: r.width, height: r.height },
+        ventana: window.innerWidth,
+        bordes: {
+            titulo: caja(g('.problog-comentarios-titulo')),
+            form: caja(g('.problog-comentario-form')),
+            comentario: caja(g('.problog-comentario'))
+        },
+        filaSocial: (() => {
+            const fila = document.querySelector('.problogs-detalle .problog-social');
+            if (!fila) return null;
+            const f = fila.getBoundingClientRect();
+            const padre = fila.parentElement;
+            const p = padre ? padre.getBoundingClientRect() : f;
+            const boton = fila.querySelector('.problog-social-btn');
+            const b = boton ? boton.getBoundingClientRect() : null;
+            const icono = boton ? boton.querySelector('svg') : null;
+            const i = icono ? icono.getBoundingClientRect() : null;
+            return { centro: f.left + f.width / 2, contenedorCentro: p.left + p.width / 2,
+                     botonAlto: b ? b.height : null, iconoAncho: i ? i.width : null,
+                     cantidad: fila.querySelectorAll('.problog-social-btn').length };
+        })(),
+        imagenes: figuras.map((img) => getComputedStyle(img).borderRadius),
         cajas: [
             dato('cajon de escribir (form)', g('.problog-comentario-form')),
             dato('caja de escribir (textarea)', g('.problog-comentario-input')),
@@ -227,7 +263,19 @@ function check(nombre, ok, detalle) {
   if (ok) log(`  PASS  ${nombre}`);
   else { fallos++; log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
-const transparente = (c) => !c || c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || c === 'rgba(255, 255, 255, 0)';
+const transparente = (c) => {
+  if (!c || c === 'transparent') return true;
+  const t = String(c);
+  if (t.indexOf('rgba') === 0) {
+    // Alfa ~0 cuenta como transparente: el navegador devuelve cosas como
+    // `rgba(245, 245, 245, 0.004)` para una transición a medio terminar, y eso
+    // NO es un relleno (daba un falso fallo).
+    const partes = t.slice(t.indexOf('(') + 1, t.indexOf(')')).split(',');
+    const alfa = parseFloat(partes[3]);
+    return !isNaN(alfa) && alfa < 0.02;
+  }
+  return false;
+};
 
 for (const tema of ['dark', 'light']) {
   log(`\n=== Tema ${tema.toUpperCase()} ===`);
@@ -238,8 +286,8 @@ for (const tema of ['dark', 'light']) {
   await sleep(500);
   await apartarRaton();
 
-  const d = JSON.parse(await evalJs(MEDIR(tema)));
-  if (d.error) { check('la sección de comentarios existe', false, JSON.stringify(d)); continue; }
+  const d = JSON.parse((await evalJs(MEDIR(tema))) || 'null');
+  if (!d || d.error) { check('se pudieron leer los datos de la página', false, JSON.stringify(d)); continue; }
   const caja = (n) => d.cajas.find((c) => c.nombre === n) || {};
 
   const imagen = await capturar();
@@ -291,16 +339,46 @@ for (const tema of ['dark', 'light']) {
   check('el contador va sin relleno', transparente(caja('contador').fondo), caja('contador').fondo);
   check('el botón «Comentar» va sin relleno', transparente(caja('boton Comentar').fondo), caja('boton Comentar').fondo);
 
-  // 4) Todo repartido por líneas finas de 1px.
-  check('la cabecera se cierra con una línea de 1px abajo',
-    caja('cabecera (titulo + contador)').lados?.abajo?.startsWith('1px'), caja('cabecera (titulo + contador)').lados?.abajo);
-  check('el cajón de escribir lleva línea de 1px arriba y abajo',
-    caja('cajon de escribir (form)').lados?.arriba?.startsWith('1px') && caja('cajon de escribir (form)').lados?.abajo?.startsWith('1px'),
-    JSON.stringify(caja('cajon de escribir (form)').lados));
+  // 4) Las líneas que QUEDAN: la sección abre con una, el cajón de escribir
+  //    cierra con otra y cada comentario tiene la suya arriba. La cabecera ya no
+  //    lleva línea (se quitó para que la zona no parezca una cuadrícula).
+  check('la cabecera NO lleva línea (menos rayas)',
+    !caja('cabecera (titulo + contador)').lados?.abajo?.startsWith('1px'), caja('cabecera (titulo + contador)').lados?.abajo);
+  check('el cajón de escribir NO lleva línea arriba',
+    !caja('cajon de escribir (form)').lados?.arriba?.startsWith('1px'), caja('cajon de escribir (form)').lados?.arriba);
+  check('el cajón de escribir SÍ cierra con una línea abajo',
+    caja('cajon de escribir (form)').lados?.abajo?.startsWith('1px'), caja('cajon de escribir (form)').lados?.abajo);
   check('el PRIMER comentario lleva línea de 1px arriba',
     caja('primer comentario').lados?.arriba?.startsWith('1px'), caja('primer comentario').lados?.arriba);
   check('la guía de las respuestas es una línea de 1px a la izquierda',
     caja('guia de respuestas').lados?.izquierda?.startsWith('1px'), caja('guia de respuestas').lados?.izquierda);
+
+  // 5) Las líneas van de BORDE A BORDE de la pantalla, sin aire a los lados. Se
+  //    comparan con el ancho de la ventana, no con la sección: la sección vive
+  //    dentro del relleno del main y es más estrecha que la línea a propósito.
+  const ventana = d.ventana;
+  for (const [nombre, b] of Object.entries(d.bordes || {})) {
+    if (!b) { check(`rectángulo de «${nombre}» medido`, false); continue; }
+    const aire = Math.max(b.left, ventana - b.right);
+    log(`   · línea de «${nombre}»: de ${b.left.toFixed(0)} a ${b.right.toFixed(0)} (ventana ${ventana})`);
+    check(`la línea de «${nombre}» llega de borde a borde`, Math.abs(aire) <= 1.5, `aire lateral ${aire.toFixed(1)}px`);
+  }
+
+  // 6) Marcadores centrados y más grandes.
+  const fila = d.filaSocial;
+  if (!fila) { check('la fila de marcadores existe', false); }
+  else {
+    const desvio = Math.abs(fila.centro - fila.contenedorCentro);
+    log(`   · marcadores: centro=${fila.centro.toFixed(1)} vs contenedor=${fila.contenedorCentro.toFixed(1)} (desvío ${desvio.toFixed(1)}px), icono ${fila.iconoAncho}px, alto del botón ${fila.botonAlto}px`);
+    check(`los marcadores están centrados (desvío ${desvio.toFixed(1)}px)`, desvio <= 2, `desvío ${desvio.toFixed(1)}px`);
+    check(`el icono es grande (${fila.iconoAncho}px ≥ 22)`, (fila.iconoAncho || 0) >= 22, String(fila.iconoAncho));
+    check(`el área de pulsación es amplia (${fila.botonAlto}px ≥ 44)`, (fila.botonAlto || 0) >= 44, String(fila.botonAlto));
+  }
+
+  // 7) Las imágenes del contenido, con los vértices rectos.
+  for (const radio of d.imagenes || []) {
+    check(`imagen sin vértices redondeados (border-radius ${radio})`, radio === '0px' || radio === '0', radio);
+  }
 }
 
 log(`\nEXCEPCIONES: ${logs.length ? logs.join(' | ') : 'ninguna'}`);

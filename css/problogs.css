@@ -287,11 +287,13 @@
     padding: 12px;
 }
 
+/* La vista previa del editor, con los vértices rectos igual que la publicación:
+   lo que se ve mientras se escribe tiene que ser lo que se va a publicar. */
 #crear-problogs-contenido .problog-preview {
     width: 100%;
     max-height: 260px;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: 0;
     background: var(--color-gray-100);
 }
 
@@ -491,6 +493,8 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Vértices rectos también en la portada del feed. */
+    border-radius: 0;
 }
 
 .problog-card-cuerpo {
@@ -636,34 +640,52 @@
     border-color: rgba(192, 57, 43, 0.5);
 }
 
-/* Fila de likes + comentarios (misma en la tarjeta y en la vista de lectura).
-   Va pegada al final del texto: el aire de arriba es corto a propósito. */
+/* Fila de likes + comentarios. La MISMA clase se usa en la tarjeta del feed y en
+   la vista de lectura, pero no deben verse igual: en el feed es una línea de
+   metadatos pegada al texto, y al leer la publicación es la zona de pulsar al
+   terminar, así que va centrada y con el icono más grande. Lo de la lectura va
+   bajo `.problogs-detalle` para no tocar las tarjetas. */
 .problog-social {
-    --problog-icono: 18px;
     display: flex;
-    gap: 4px;
-    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 6px;
 }
 
-/* Área de pulsación de 40px de alto: en el móvil se acierta sin apuntar. El
-   relleno lateral es corto porque el alto ya lo pone min-height. */
+.problogs-detalle .problog-social {
+    --problog-icono: 24px;
+    justify-content: center;
+    gap: 10px 26px;
+    margin-top: 18px;
+}
+
+/* Área de pulsación de 40px de alto: en el móvil se acierta sin apuntar. */
 #problogs .problog-social-btn,
 #perfil-tab-content .problog-social-btn {
     width: auto;
     min-height: 40px;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 0 10px;
+    gap: 6px;
+    padding: 0 9px;
     border: none;
-    border-radius: 20px;
+    border-radius: 999px;
     background: transparent;
     color: var(--color-gray-500);
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+/* En la vista de lectura, más grandes: es donde de verdad se pulsan. */
+.problogs-detalle #problogs .problog-social-btn,
+#problogs .problogs-detalle .problog-social-btn {
+    min-height: 46px;
+    gap: 9px;
+    padding: 0 16px;
+    font-size: 16px;
 }
 
 /* Los tres marcadores van en GRIS hasta que se pulsan: solo entonces se
@@ -671,6 +693,12 @@
 #problogs .problog-social-btn:active,
 #perfil-tab-content .problog-social-btn:active {
     background: var(--color-gray-100);
+}
+
+#problogs .problog-social-btn:hover,
+#perfil-tab-content .problog-social-btn:hover {
+    background: var(--color-gray-100);
+    color: var(--color-ink);
 }
 
 #problogs .problog-social-btn.liked,
@@ -743,21 +771,35 @@
        todo, dejar el texto legible: con `--comentario-linea` en oscuro quedaba
        un gris claro debajo de letras claras. */
     --comentario-hover: var(--color-gray-100);
+    /* Aire lateral del contenido (el texto y las cajas). Las LÍNEAS se salen
+       justo este ancho por cada lado para llegar de borde a borde: así reparten
+       el bloque sin quedar flotando con aire a los lados. */
+    --comentario-aire: 24px;
     margin-top: 6px;
     padding-top: 12px;
     border-top: 1px solid var(--comentario-linea);
 }
 
-/* Cabecera: título a la izquierda y el número en una píldora, para que se lea
-   como un contador y no como un número suelto. La franja la cierra una línea
-   fina, que es la que la separa del cajón de escribir. */
+/* De esquina a esquina: se sale del relleno del contenedor y lo compensa con su
+   propio relleno, así el texto sigue alineado y solo la línea se estira. */
+.problog-comentarios-titulo,
+.problog-comentario-form,
+.problog-comentario {
+    margin-left: calc(-1 * var(--comentario-aire));
+    margin-right: calc(-1 * var(--comentario-aire));
+    padding-left: var(--comentario-aire);
+    padding-right: var(--comentario-aire);
+}
+
+/* Cabecera: título a la izquierda y el número en una píldora. SIN línea: con la
+   del cajón de escribir y la de cada comentario ya hay reparto de sobra. */
 .problog-comentarios-titulo {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
     padding-bottom: 10px;
-    border-bottom: 1px solid var(--comentario-linea);
     font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.01em;
@@ -779,16 +821,19 @@
 }
 
 /* --- Cajón de escribir ---
-   Sin fondo y sin caja: lo separa de la cabecera una línea fina arriba, y de
-   los comentarios la línea de abajo. Así cada bloque es una franja del mismo
-   plano, que es lo que se pidió. */
+   Sin fondo y sin caja. La línea de ARRIBA no hace falta: la cabecera y el cajón
+   ya quedan separados por su propio aire, y así hay una línea menos. La de abajo
+   sí se queda, porque deja claro dónde acaba lo que escribes y empiezan los
+   comentarios de la gente. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin: 0;
-    padding: 12px 2px;
-    border-top: 1px solid var(--comentario-linea);
+    /* OJO: propiedades sueltas, NO el atajo `padding`. El atajo resetea también
+       el relleno lateral, que es el que compensa el margen negativo de las
+       líneas de borde a borde (si se pierde, el texto se sale por los lados). */
+    padding-top: 2px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--comentario-linea);
     background: transparent;
 }
@@ -882,15 +927,15 @@
     flex-direction: column;
 }
 
-/* Cada comentario es una fila con su propia línea de separación: antes iban
-   sueltos y con el texto de uno pegado al anterior. También la PRIMERA: la
-   lista empieza justo debajo de la línea que cierra el cajón de escribir, así
-   que necesita la suya para que el reparto sea uniforme (con una regla
-   `:first-child` que la quitaba, el primer comentario quedaba sin separación). */
+/* Cada comentario es una fila con su línea de separación arriba, también la
+   PRIMERA: la lista empieza justo debajo de la línea que cierra el cajón de
+   escribir, así que necesita la suya para que el reparto sea uniforme.
+   (Relleno con propiedades sueltas, por lo mismo que en el cajón.) */
 .problog-comentario {
     display: flex;
     gap: 10px;
-    padding: 12px 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
     border-top: 1px solid var(--comentario-linea);
 }
 
@@ -992,7 +1037,9 @@
 /* Respuestas: sangradas y con línea guía, un solo nivel. La guía es una línea
    más del reparto (marca la relación con el comentario padre), así que usa el
    grosor fino y el gris del tema; con el `--color-gray-200` de antes quedaba
-   invisible en claro (1.23:1). */
+   invisible en claro (1.23:1).
+   Las respuestas NO se salen a sangre: van dentro del comentario padre, y su
+   línea de separación se queda con el aire del padre para que se vea el anidado. */
 .problog-comentario-respuestas {
     display: flex;
     flex-direction: column;
@@ -1002,10 +1049,17 @@
 }
 
 /* Dentro del bloque de respuestas, la separación la pone la propia línea guía
-   del padre: repetir el borde de cada respuesta dejaba tres rayas seguidas. */
+   del padre: repetir el borde de cada respuesta dejaba tres rayas seguidas. La
+   respuesta tampoco se sale a sangre (se queda con el aire del padre, para que
+   se vea que va dentro). */
 .problog-comentario-respuestas .problog-comentario {
     border-top: none;
-    padding: 8px 0 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 8px;
+    padding-bottom: 0;
     gap: 8px;
 }
 
@@ -1247,11 +1301,13 @@
     margin: 0 0 22px;
 }
 
+/* Las imágenes del contenido van con los vértices RECTOS: una foto se ve tal
+   como se subió, sin que el marco le redondee las esquinas. */
 .problog-lectura-figura img {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 12px;
+    border-radius: 0;
     background: var(--color-gray-100);
 }
 
