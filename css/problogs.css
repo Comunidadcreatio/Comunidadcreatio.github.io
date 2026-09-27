@@ -838,14 +838,18 @@
     background: transparent;
 }
 
+/* La caja de escribir va SIN borde y sin relleno de fondo: solo el texto y el
+   placeholder. Al quitarle el contorno se pierde la única marca de "aquí se
+   escribe", así que el foco se señala con un subrayado de tinta (abajo), que
+   ordena el bloque igual que las líneas finas del resto de la sección. */
 .problog-comentario-input {
     width: 100%;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 9px 11px;
-    /* Borde de control: marca dónde se escribe, así que sí necesita 3:1. */
-    border: 1px solid var(--comentario-control);
-    border-radius: 10px;
+    padding: 6px 0;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
     background: transparent;
     color: var(--color-ink);
     font-family: inherit;
@@ -853,14 +857,16 @@
     line-height: 1.45;
     resize: none;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
-/* El foco se marca con el borde Y con un halo: solo con el borde (que pasaba de
-   gris a negro) apenas se notaba. */
+/* Foco: subrayado de tinta más grueso. Es la señal de "estás escribiendo aquí"
+   que antes daba el recuadro, ahora sin recuadro. */
 .problog-comentario-input:focus {
-    border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    border-bottom-color: var(--color-ink);
+    border-bottom-width: 2px;
+    /* Se compensa el píxel de más para que el texto no salte al enfocar. */
+    padding-bottom: 5px;
 }
 
 .problog-comentario-input::placeholder {
@@ -1088,9 +1094,8 @@
     --comentario-hover: rgba(255, 255, 255, 0.10);
 }
 
-[data-theme="dark"] .problog-comentario-input:focus {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10);
-}
+/* El foco ya no usa halo: va con el subrayado de tinta, que en oscuro se ve
+   igual de bien (la tinta es clara y el fondo oscuro). */
 
 /* El fondo del textarea hay que volver a dejarlo transparente EN OSCURO: hay una
    regla global en style.css —
@@ -1297,8 +1302,24 @@
     display: flow-root;
 }
 
+/* Las imágenes del contenido van a SANGRE: sin aire por los laterales, salen del
+   relleno de la columna de lectura igual que las líneas de los comentarios (mismo
+   truco: margen negativo y el relleno se lo queda el texto, que sigue alineado).
+   El poco aire que queda es vertical, para que la foto no toque los párrafos. */
 .problog-lectura-figura {
-    margin: 0 0 22px;
+    /* Esta es la variable que usan también los comentarios (está declarada en
+       .problog-comentarios); aquí se repite por si el bloque no está presente. */
+    --comentario-aire: 24px;
+    margin-left: calc(-1 * var(--comentario-aire));
+    margin-right: calc(-1 * var(--comentario-aire));
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+/* El texto se queda con el aire del sangrado para seguir alineado con la foto. */
+.problog-lectura-cuerpo > .problog-lectura-texto {
+    padding-left: var(--comentario-aire, 24px);
+    padding-right: var(--comentario-aire, 24px);
 }
 
 /* Las imágenes del contenido van con los vértices RECTOS: una foto se ve tal
@@ -1319,7 +1340,13 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 0 0 22px;
+    /* La fila también llega de borde a borde (si no, recortaría el sangrado de
+       las imágenes de dentro y quedaría más estrecha que una foto sola). */
+    --comentario-aire: 24px;
+    margin-left: calc(-1 * var(--comentario-aire));
+    margin-right: calc(-1 * var(--comentario-aire));
+    margin-top: 0;
+    margin-bottom: 22px;
     align-items: flex-start;
 }
 
@@ -1330,7 +1357,11 @@
     margin: 0;
 }
 
-.problog-fila .problog-lectura-texto,
+/* Aquí NO se anula el sangrado de la fila: cada mitad conserva su relleno
+   lateral para que las imágenes de dentro salgan a sangre y el texto de la fila
+   siga alineado. Lo que SÍ se anula es el sangrado de cada figura: dentro de una
+   fila ya manda el ancho de su mitad (si no, cada imagen se saldría 24px de su
+   columna). */
 .problog-fila .problog-lectura-figura {
     margin: 0;
 }

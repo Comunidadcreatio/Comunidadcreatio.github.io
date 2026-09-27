@@ -133,7 +133,7 @@ function visibilidadIconoHeader(btn, mostrar) {
     if (!btn) return;
     if (mostrar) {
         // Si el OTRO icono se está ocultando, diferir la aparición ~300ms
-        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando, #btn-notificaciones.ocultando');
+        const ocultandose = document.querySelector('#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando, #btn-notificaciones.ocultando');
         if (ocultandose && ocultandose !== btn) {
             clearTimeout(btn._mostrarTimer);
             btn._mostrarTimer = setTimeout(() => {
@@ -158,12 +158,12 @@ function visibilidadIconoHeader(btn, mostrar) {
 }
 
 // Calcula cuánto se desplaza la campana: iconos condicionales visibles
-// (problogs, "+", hamburguesa) × (ancho del icono + gap del header).
+// ("+", hamburguesa, conversaciones, lupa) × (ancho del icono + gap del header).
 function sincronizarIconosDerecha() {
     const header = document.getElementById('main-header');
     if (!header) return;
     const gap = parseFloat(getComputedStyle(header).gap) || 8;
-    const count = ['btn-conversaciones', 'btn-problogs', 'btn-crear-cavent', 'btn-configuracion', 'btn-lupa-explorar']
+    const count = ['btn-conversaciones', 'btn-crear-cavent', 'btn-configuracion', 'btn-lupa-explorar']
         .filter(id => {
             const el = document.getElementById(id);
             return el && !el.classList.contains('hidden'); // visibles o en .ocultando
@@ -181,7 +181,6 @@ function actualizarModoFlecha(btn, esFlecha, labelNormal, labelFlecha) {
 function actualizarVisibilidadIconosHeader(section) {
     const ham = document.getElementById('btn-configuracion');
     const plus = document.getElementById('btn-crear-cavent');
-    const problogs = document.getElementById('btn-problogs');
     const conversaciones = document.getElementById('btn-conversaciones');
     const lupaExplorar = document.getElementById('btn-lupa-explorar');
     const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
@@ -196,16 +195,9 @@ function actualizarVisibilidadIconosHeader(section) {
     const enProblogs = !!section && section.id === 'problogs';
     const soyArtista = esArtista();
     const mostrarPlus = soyArtista && (enCarrusel || enPanelCrear || enProblogs);
-    // El icono Problogs/Cavents solo en el carrusel (Cavents) y en Problogs
-    const mostrarProblogs = enCarrusel || enProblogs;
     // Modo flecha: en Mi Cuenta (hamburguesa) y en el panel Crear (+)
     actualizarModoFlecha(ham, !!section && section.id === 'mi-cuenta', 'Menú', 'Volver');
     actualizarModoFlecha(plus, !!section && section.id === 'panel-artista', 'Crear Cavent', 'Volver');
-    // El icono Problogs/Cavents muestra el icono de la sección activa
-    if (problogs) {
-        problogs.classList.toggle('modo-problogs', !!enProblogs);
-        problogs.setAttribute('aria-label', enProblogs ? 'Problogs' : 'Cavents');
-    }
     // Al salir de Explorar se cierra el buscador y se quitan sus clases:
     // - al cambiar a OTRA sección, o
     // - al pasar del grid (Explorar) al carrusel de Cavents (galeriaModo 1),
@@ -224,14 +216,12 @@ function actualizarVisibilidadIconosHeader(section) {
     // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
     if (!mostrarHam) visibilidadIconoHeader(ham, false);
     if (!mostrarPlus) visibilidadIconoHeader(plus, false);
-    if (!mostrarProblogs) visibilidadIconoHeader(problogs, false);
     if (!mostrarConversaciones) visibilidadIconoHeader(conversaciones, false);
     if (!mostrarLupa) visibilidadIconoHeader(lupaExplorar, false);
     if (esExplorar) visibilidadIconoHeader(notif, false);
     // Pasada 2: mostrar (ya con los ocultados marcados → se secuencian)
     if (mostrarHam) visibilidadIconoHeader(ham, true);
     if (mostrarPlus) visibilidadIconoHeader(plus, true);
-    if (mostrarProblogs) visibilidadIconoHeader(problogs, true);
     if (mostrarConversaciones) visibilidadIconoHeader(conversaciones, true);
     if (mostrarLupa) visibilidadIconoHeader(lupaExplorar, true);
     if (!esExplorar) visibilidadIconoHeader(notif, true);
@@ -346,15 +336,20 @@ export function mostrarPaginaBlanca() {
 // ============================================
 export function actualizarEstadoNavButtons() {
     const btnCaventsHub = document.getElementById('btn-cavents-hub');
+    const btnProblogsNav = document.getElementById('btn-problogs-nav');
     const galeria = document.getElementById('galeria-publica');
     const panel = document.getElementById('panel-artista');
+    const problogs = document.getElementById('problogs');
     const galeriaContainer = obtenerGaleriaContainer();
+    const enProblogs = !!problogs && !problogs.classList.contains('hidden');
 
     if (galeria && btnCaventsHub) {
         const galeriaVisible = !galeria.classList.contains('hidden');
         btnCaventsHub.classList.remove('nav-btn-active', 'nav-btn-grid');
 
-        if (galeriaVisible) {
+        // Problogs no es Cavents: si está abierta, el botón de Cavents no se
+        // marca, aunque la galería siga montada por debajo.
+        if (galeriaVisible && !enProblogs) {
             // El modo grid (Explorar) ya no se vincula al botón cavents:
             // explorar sale de la lupa, así que no se marca en amarillo.
             const enGrid = galeriaModo === 2 && galeriaContainer && galeriaContainer.classList.contains('modo-grid');
@@ -362,6 +357,11 @@ export function actualizarEstadoNavButtons() {
                 btnCaventsHub.classList.add('nav-btn-active');
             }
         }
+    }
+
+    // La barrita del botón de Problogs sigue a su sección.
+    if (btnProblogsNav) {
+        btnProblogsNav.classList.toggle('nav-btn-active', enProblogs);
     }
 }
 

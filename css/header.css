@@ -117,9 +117,9 @@ picture {
     }
 }
 /* La campana se desliza a la izquierda para cederle el espacio a cualquiera
-   de los iconos condicionales (hamburguesa, "+", Problogs/Cavents, lupa).
+   de los iconos condicionales (hamburguesa, "+", conversaciones, lupa).
    La distancia la calcula JS (--iconos-derecha = iconos visibles × ancho+gap). */
-#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-problogs:not(.hidden), #btn-conversaciones:not(.hidden), #btn-lupa-explorar:not(.hidden)) #btn-notificaciones {
+#main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-conversaciones:not(.hidden), #btn-lupa-explorar:not(.hidden)) #btn-notificaciones {
     animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes campanaDesliza {
@@ -148,7 +148,7 @@ picture {
     }
 }
 /* La campana se desliza de vuelta a la derecha mientras se oculta */
-#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-problogs.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando) #btn-notificaciones {
+#main-header:has(#btn-configuracion.ocultando, #btn-crear-cavent.ocultando, #btn-conversaciones.ocultando, #btn-lupa-explorar.ocultando) #btn-notificaciones {
     animation: campanaRegresa 0.26s ease-in;
 }
 @keyframes campanaRegresa {
@@ -190,26 +190,11 @@ picture {
 }
 
 /* ==============================================
-   ICONO PROBLOGS / CAVENTS
-   Muestra el icono de la sección activa: cuadrícula
-   (Cavents) o documento (Problogs). Mismo patrón de
-   aparición/ocultado que los demás iconos del header.
+   (AQUÍ ESTABA EL ICONO PROBLOGS / CAVENTS)
+   Se quitó: Problogs se abre ahora desde su propio
+   botón del nav principal (#btn-problogs-nav), así
+   que el header ya no alterna entre dos secciones.
    ============================================== */
-#btn-problogs .icono-problogs-icon {
-    display: none;
-}
-#btn-problogs.modo-problogs .icono-cavents {
-    display: none;
-}
-#btn-problogs.modo-problogs .icono-problogs-icon {
-    display: block;
-}
-#btn-problogs:not(.hidden) {
-    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-#btn-problogs.ocultando {
-    animation: hamburguesaOculta 0.26s ease-in forwards;
-}
 
 /* ==============================================
    ICONO CONVERSACIONES

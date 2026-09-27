@@ -326,7 +326,7 @@ check('al mostrar el editor el hueco se calcula al momento (no espera 350ms)',
 // ============================================================
 console.log('\n=== Feed: error de carga y textos con acentos ===');
 await evalJs(`window.__feedModo = 'vacio'`);
-await evalJs(`document.getElementById('btn-problogs')?.click()`);
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(2500);
 const feedVacio = await evalJs(`document.getElementById('problogs-feed').innerText.trim()`);
 check('el feed vacío se anuncia en buen español', feedVacio.includes('Todavía no hay publicaciones'), JSON.stringify(feedVacio.slice(0, 60)));
@@ -337,7 +337,7 @@ await evalJs(`localStorage.setItem('test_feed_modo', 'error')`);
 await send('Page.reload', { ignoreCache: false });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
 await sleep(1500);
-await evalJs(`document.getElementById('btn-problogs')?.click()`);
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(2500);
 const feedError = await evalJs(`document.getElementById('problogs-feed').innerText.trim()`);
 check('si la carga falla se dice que falló (no "no hay publicaciones")',

@@ -168,7 +168,7 @@ check('desde la galería abre Cavents (no Problogs)', tabTrasPlus === 'tab-caven
 // Y desde la sección Problogs debe abrir el editor de Problogs
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
 await sleep(1500);
-await evalJs(`document.getElementById('btn-problogs')?.click()`);
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(1800);
 await clickPlus();
 const tabDesdeProblogs = await tabActiva();

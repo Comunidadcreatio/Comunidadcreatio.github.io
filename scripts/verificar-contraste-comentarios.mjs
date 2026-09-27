@@ -103,7 +103,8 @@ const PARES = {
     ['like de comentario activo', 'rojo', 'fondo', MIN_TEXTO],
     ['reblog activo (marcadores)', 'verde', 'fondo', MIN_TEXTO],
     ['like activo (marcadores)', 'rojo', 'fondo', MIN_TEXTO],
-    ['borde de la caja de escribir', 'control', 'fondo', MIN_NO_TEXTO],
+    // La caja de escribir ya NO lleva contorno (se quitó a petición): su único
+    // borde es el subrayado de abajo, que es decorativo y no delimita un control.
   ],
   oscuro: [
     ['título «Comentarios»', 'ink', 'fondo', MIN_TEXTO],
@@ -121,7 +122,6 @@ const PARES = {
     ['like de comentario activo', 'rojo', 'fondo', MIN_TEXTO],
     ['reblog activo (marcadores)', 'verde', 'fondo', MIN_TEXTO],
     ['like activo (marcadores)', 'rojo', 'fondo', MIN_TEXTO],
-    ['borde de la caja de escribir', 'control', 'fondo', MIN_NO_TEXTO],
   ],
 };
 
@@ -135,7 +135,8 @@ const ESPERADOS_EN_CSS = [
   ['--comentario-control: #8a8a8a', 'borde de control en claro'],
   ['--comentario-control: rgba(255, 255, 255, 0.36)', 'borde de control en oscuro'],
   ['.problog-social-btn.liked', 'regla del like'],
-  ['[data-theme="dark"] .problog-comentario-input:focus', 'foco en oscuro'],
+  // La caja de escribir ya no lleva recuadro: su foco es el subrayado de tinta.
+  ['border-bottom-color: var(--color-ink)', 'subrayado de foco de la caja'],
 ];
 
 // Reglas que NO pueden volver: el botón de enviar tiene que ir sin relleno (con
@@ -149,6 +150,8 @@ const PROHIBIDOS_EN_CSS = [
     'el botón «Comentar» no debe pintar su texto con --color-white'],
   [/\.problog-comentario-input\s*\{[^}]*background:\s*var\(--color-white\)/,
     'la caja de escribir debe ir sin fondo'],
+  [/\.problog-comentario-input\s*\{[^}]*border:\s*1px\s+solid/,
+    'la caja de escribir no debe volver a tener recuadro'],
   [/\.problog-comentario-form\s*\{[^}]*background:\s*var\(--comentario-tinte\)/,
     'el cajón debe ir sin fondo'],
 ];

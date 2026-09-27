@@ -45,7 +45,7 @@ await sleep(800);
 
 const estado = () => evalJs(`(() => {
     const p = document.getElementById('problogs');
-    const pb = document.getElementById('btn-problogs');
+    const pb = document.getElementById('btn-problogs-nav');
     const plus = document.getElementById('btn-crear-cavent');
     const ham = document.getElementById('btn-configuracion');
     return JSON.stringify({
@@ -62,12 +62,12 @@ console.log('=== 1) Icono Problogs presente y visible ===');
 console.log(await estado());
 
 console.log('\n=== 2) Presionar Problogs desde el inicio → se abre Problogs ===');
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(800);
 console.log(await estado());
 
 console.log('\n=== 3) Presionar de nuevo → vuelve a Cavents ===');
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(900);
 console.log(await estado());
 
@@ -75,10 +75,10 @@ console.log('\n=== 4) Desde Cavents → Problogs → de nuevo → Cavents ===');
 await evalJs(`document.getElementById('btn-cavents-hub').click()`);
 await sleep(900);
 console.log('en Cavents:', await estado());
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(800);
 console.log('tras Problogs:', await estado());
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(900);
 console.log('de nuevo:', await estado());
 
@@ -86,10 +86,10 @@ console.log('\n=== 5) Desde perfil → Problogs → de nuevo → Cavents ===');
 await evalJs(`document.getElementById('btn-perfil-sidebar').click()`);
 await sleep(800);
 console.log('en perfil:', await estado());
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(800);
 console.log('tras Problogs:', await estado());
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(900);
 console.log('de nuevo:', await estado());
 

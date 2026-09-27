@@ -55,11 +55,11 @@ await evalJs(`document.getElementById('btn-cavents-hub').click()`);
 await sleep(900);
 await shot('1-cavents-header');
 // 2) Header en Problogs (icono bocadillo+lápiz + "+")
-await evalJs(`document.getElementById('btn-problogs').click()`);
+await evalJs(`document.getElementById('btn-problogs-nav').click()`);
 await sleep(800);
 await shot('2-problogs-header');
 // 3) Nav inferior (icono híbrido)
-await evalJs(`document.getElementById('btn-problogs').click()`); // volver a Cavents
+await evalJs(`document.getElementById('btn-problogs-nav').click()`); // volver a Cavents
 await sleep(900);
 await shot('3-nav');
 console.log('hecho');

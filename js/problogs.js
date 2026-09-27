@@ -34,7 +34,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=a76a9b6092';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen } from './utils.js?v=8861448e13';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=d2867c8ca0';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=c7f71b241f';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=6eb660d3ba';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
@@ -1329,7 +1329,10 @@ function pintarListaComentarios(seccion, comentarios) {
     const cuenta = seccion.querySelector('[data-comentarios-cuenta]');
     if (cuenta) cuenta.textContent = comentarios.length;
     if (!comentarios.length) {
-        lista.innerHTML = '<p class="problogs-vacio">Todavía no hay comentarios. ¡Sé el primero!</p>';
+        // Sin comentarios no se pinta ningún mensaje: la lista queda vacía y el
+        // bloque se cierra solo con su línea. El cajón de escribir ya dice que
+        // ahí se puede comentar.
+        lista.innerHTML = '';
         return;
     }
     const raices = comentarios.filter((c) => !c.comentario_padre_id).sort(porFechaDesc);

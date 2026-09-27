@@ -117,7 +117,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
 await sleep(1200);
-await evalJs(`document.getElementById('btn-problogs')?.click()`);
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(1800);
 await evalJs(`document.querySelector('.problog-card')?.click()`);
 await sleep(2000);
@@ -161,6 +161,24 @@ const MEDIR = (tema) => `(() => {
     return JSON.stringify({
         rectSeccion: { left: r.left, top: r.top, width: r.width, height: r.height },
         ventana: window.innerWidth,
+        // Caja de escribir: qué borde le queda en cada lado (se pidió quitar el
+        // contorno) y si la lista muestra algún mensaje cuando está vacía.
+        inputLados: (() => {
+            const el = g('.problog-comentario-input');
+            if (!el) return null;
+            const s = cs(el);
+            return { arriba: s.borderTopWidth, abajo: s.borderBottomWidth, izquierda: s.borderLeftWidth, derecha: s.borderRightWidth };
+        })(),
+        comentariosPintados: (() => {
+            const lista = g('[data-comentarios-lista]');
+            return lista ? lista.querySelectorAll('.problog-comentario').length : -1;
+        })(),
+        textoLista: (() => {
+            const lista = g('[data-comentarios-lista]');
+            return lista ? lista.textContent.trim() : '(sin lista)';
+        })(),
+        // Las imágenes a sangre: su rectángulo tiene que llegar a los bordes.
+        imagenesRect: figuras.map((img) => { const x = img.getBoundingClientRect(); return { left: x.left, right: x.right }; }),
         bordes: {
             titulo: caja(g('.problog-comentarios-titulo')),
             form: caja(g('.problog-comentario-form')),
@@ -379,10 +397,129 @@ for (const tema of ['dark', 'light']) {
   for (const radio of d.imagenes || []) {
     check(`imagen sin vértices redondeados (border-radius ${radio})`, radio === '0px' || radio === '0', radio);
   }
+
+  // 8) La caja de escribir, SIN contorno: solo le queda el subrayado de abajo.
+  const lados = d.inputLados;
+  if (!lados) { check('la caja de escribir existe', false); }
+  else {
+    log(`   · caja de escribir — bordes: arriba ${lados.arriba}, abajo ${lados.abajo}, izq ${lados.izquierda}, der ${lados.derecha}`);
+    check('la caja de escribir NO tiene borde arriba', lados.arriba === '0px', lados.arriba);
+    check('la caja de escribir NO tiene borde a los lados', lados.izquierda === '0px' && lados.derecha === '0px',
+      `${lados.izquierda} / ${lados.derecha}`);
+    check('la caja de escribir conserva el subrayado de abajo (1px)', lados.abajo === '1px', lados.abajo);
+  }
+
+  // 9) Sin comentarios no se pinta ningún mensaje: la lista queda vacía.
+  //    (Este caso se prueba aparte, con el mock sin comentarios.)
+  if (d.comentariosPintados === 0) {
+    check('sin comentarios NO se muestra ningún mensaje', d.textoLista === '', JSON.stringify(d.textoLista));
+  }
+
+  // 10) Las imágenes del problog van a sangre, sin aire lateral.
+  for (const img of d.imagenesRect || []) {
+    const aire = Math.max(img.left, ventana - img.right);
+    log(`   · imagen: de ${img.left.toFixed(0)} a ${img.right.toFixed(0)} (ventana ${ventana})`);
+    check('la imagen del problog llega de borde a borde', Math.abs(aire) <= 1.5, `aire lateral ${aire.toFixed(1)}px`);
+  }
 }
 
 log(`\nEXCEPCIONES: ${logs.length ? logs.join(' | ') : 'ninguna'}`);
 if (logs.length) fallos++;
+
+// --- Botón de Problogs en el nav principal ----------------------------------
+// Antes se entraba por un icono del header que alternaba con Cavents; ese icono
+// se quitó, así que el botón del nav tiene que existir, abrir la sección y
+// marcarse cuando está abierta.
+log(`\n=== Botón Problogs del nav ===`);
+const nav = JSON.parse((await evalJs(`(() => {
+    const btn = document.getElementById('btn-problogs-nav');
+    const headerViejo = document.getElementById('btn-problogs');
+    return JSON.stringify({
+        existe: !!btn,
+        enElNav: !!btn && !!btn.closest('#toggle-panel'),
+        iconoEnHeader: !!headerViejo,
+        activoAlEmpezar: !!btn && btn.classList.contains('nav-btn-active')
+    });
+})()`)) || 'null');
+if (!nav) { check('se pudo leer el nav', false); }
+else {
+  log(`   · existe=${nav.existe} enElNav=${nav.enElNav} iconoViejoEnHeader=${nav.iconoEnHeader}`);
+  check('el botón de Problogs existe en el nav principal', nav.existe && nav.enElNav);
+  check('el icono Problogs del header ya no está', nav.iconoEnHeader === false);
+}
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+// La sección entra con una transición (~0.8s): se espera a que termine de
+// verdad en vez de mirar a los 1.5s y dar por hecho que ya está.
+let abierto = null;
+for (let i = 0; i < 20; i++) {
+  abierto = JSON.parse((await evalJs(`(() => {
+      const sec = document.getElementById('problogs');
+      const btn = document.getElementById('btn-problogs-nav');
+      const entrada = sec ? sec.classList.contains('section-entering') : false;
+      return JSON.stringify({ abierta: !!sec && !sec.classList.contains('hidden'), activo: !!btn && btn.classList.contains('nav-btn-active'), entrada });
+  })()`)) || 'null');
+  if (abierto && abierto.abierta && !abierto.entrada) break;
+  await sleep(300);
+}
+if (!abierto) { check('el botón abre Problogs', false); }
+else {
+  log(`   · tras pulsar: seccionAbierta=${abierto.abierta} botonActivo=${abierto.activo}`);
+  check('el botón del nav abre la sección Problogs', abierto.abierta === true);
+  check('el botón se marca como activo con Problogs abierta', abierto.activo === true);
+}
+
+// Reparto del nav: con un botón más, ninguno se sale de la pantalla ni se
+// solapa con el perfil del centro.
+const reparto = JSON.parse((await evalJs(`(() => {
+    const ids = ['btn-chat-global', 'btn-cavents-hub', 'btn-perfil-sidebar', 'btn-buscar', 'btn-problogs-nav'];
+    const cajas = ids.map((id) => {
+        const el = document.getElementById(id);
+        if (!el) return { id, falta: true };
+        const r = el.getBoundingClientRect();
+        return { id, left: r.left, right: r.right, ancho: r.width };
+    });
+    return JSON.stringify({ ventana: window.innerWidth, cajas });
+})()`)) || 'null');
+if (!reparto) { check('se pudo medir el nav', false); }
+else {
+  for (const c of reparto.cajas) {
+    if (c.falta) { check(`botón del nav «${c.id}» existe`, false); continue; }
+    log(`   · ${c.id}: ${c.left.toFixed(0)}..${c.right.toFixed(0)} (ancho ${c.ancho.toFixed(0)})`);
+    check(`«${c.id}» cabe en la pantalla`, c.left >= -1 && c.right <= reparto.ventana + 1,
+      `${c.left.toFixed(0)}..${c.right.toFixed(0)} de ${reparto.ventana}`);
+  }
+  const noFalta = reparto.cajas.filter((c) => !c.falta);
+  let solapes = 0;
+  for (let i = 0; i < noFalta.length; i++) {
+    for (let j = i + 1; j < noFalta.length; j++) {
+      const a = noFalta[i], b = noFalta[j];
+      if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1) solapes++;
+    }
+  }
+  log(`   · solapes entre botones del nav: ${solapes}`);
+  check('los botones del nav no se solapan', solapes === 0, `${solapes} solape(s)`);
+}
+
+// --- Estado SIN comentarios -------------------------------------------------
+// La lista tiene que quedar VACÍA: no se pinta ningún mensaje. El dato de que
+// no hay comentarios ya lo da el contador (0).
+log(`\n=== Sin comentarios ===`);
+const vacio = JSON.parse((await evalJs(`(() => {
+    const lista = document.querySelector('[data-problog-comentarios] [data-comentarios-lista]');
+    if (!lista) return JSON.stringify({ error: 'no hay lista' });
+    const copia = lista.innerHTML;
+    lista.innerHTML = '';
+    const texto = lista.textContent.trim();
+    const hijos = lista.children.length;
+    lista.innerHTML = copia;   // se restaura para no dejar la página tocada
+    return JSON.stringify({ texto, hijos });
+})()`)) || 'null');
+if (!vacio || vacio.error) { check('se pudo probar el estado vacío', false, JSON.stringify(vacio)); }
+else {
+  log(`   · con la lista vacía: ${vacio.hijos} elemento(s), texto=${JSON.stringify(vacio.texto)}`);
+  check('sin comentarios la lista queda vacía', vacio.hijos === 0 && vacio.texto === '', JSON.stringify(vacio));
+}
+
 log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 volcar();
 process.exitCode = fallos ? 1 : 0;

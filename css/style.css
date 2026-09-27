@@ -1,7 +1,7 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=b5f4394d9e');
+@import url('header.css?v=55afc07db4');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=428b30a01c');
@@ -525,7 +525,11 @@ input, select, textarea {
     align-items: center;
     justify-content: flex-start;
 }
-.bottom-bar-right .toggle-nav-btn {
+/* Espaciado entre los iconos de la derecha (Buscar y Problogs). El PRIMERO
+   mantiene los 16px que lo separan del perfil: ese margen es el que equilibra
+   el centro (ver la nota de .bottom-bar-center). Con un margen en cada botón el
+   hueco entre dos se doblaba y la fila se desequilibraba. */
+.bottom-bar-right .toggle-nav-btn + .toggle-nav-btn {
     margin-left: 16px;
 }
 

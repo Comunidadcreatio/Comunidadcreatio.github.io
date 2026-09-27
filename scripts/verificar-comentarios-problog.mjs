@@ -126,7 +126,7 @@ const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__en
 // Botón de comentarios de la TARJETA: abre la publicación
 // ============================================================
 console.log('=== Desde la tarjeta del feed ===');
-await evalJs(`document.getElementById('btn-problogs')?.click()`);
+await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(2500);
 await evalJs(`document.querySelector('.problog-card [data-problog-comentar]')?.click()`);
 await sleep(2500);
