@@ -194,9 +194,16 @@ const MEDIR = (tema) => `(() => {
             const b = boton ? boton.getBoundingClientRect() : null;
             const icono = boton ? boton.querySelector('svg') : null;
             const i = icono ? icono.getBoundingClientRect() : null;
+            // Huecos REALES entre marcadores (borde derecho de uno a izquierdo
+            // del siguiente): al ir centrados y juntos, esto es lo que se ve.
+            const botones = Array.from(fila.querySelectorAll('.problog-social-btn'));
+            const huecos = [];
+            for (let k = 1; k < botones.length; k++) {
+                huecos.push(Math.round(botones[k].getBoundingClientRect().left - botones[k - 1].getBoundingClientRect().right));
+            }
             return { centro: f.left + f.width / 2, contenedorCentro: p.left + p.width / 2,
-                     botonAlto: b ? b.height : null, iconoAncho: i ? i.width : null,
-                     cantidad: fila.querySelectorAll('.problog-social-btn').length };
+                     botonAlto: b ? b.height : null, iconoAncho: i ? i.width : null, huecos,
+                     cantidad: botones.length };
         })(),
         imagenes: figuras.map((img) => getComputedStyle(img).borderRadius),
         cajas: [
@@ -357,15 +364,14 @@ for (const tema of ['dark', 'light']) {
   check('el contador va sin relleno', transparente(caja('contador').fondo), caja('contador').fondo);
   check('el botón «Comentar» va sin relleno', transparente(caja('boton Comentar').fondo), caja('boton Comentar').fondo);
 
-  // 4) Las líneas que QUEDAN: la sección abre con una, el cajón de escribir
-  //    cierra con otra y cada comentario tiene la suya arriba. La cabecera ya no
-  //    lleva línea (se quitó para que la zona no parezca una cuadrícula).
+  // 4) Las líneas que QUEDAN: la sección abre con una y cada comentario tiene la
+  //    suya arriba. El cajón de escribir no lleva ninguna, ni la cabecera.
   check('la cabecera NO lleva línea (menos rayas)',
     !caja('cabecera (titulo + contador)').lados?.abajo?.startsWith('1px'), caja('cabecera (titulo + contador)').lados?.abajo);
   check('el cajón de escribir NO lleva línea arriba',
     !caja('cajon de escribir (form)').lados?.arriba?.startsWith('1px'), caja('cajon de escribir (form)').lados?.arriba);
-  check('el cajón de escribir SÍ cierra con una línea abajo',
-    caja('cajon de escribir (form)').lados?.abajo?.startsWith('1px'), caja('cajon de escribir (form)').lados?.abajo);
+  check('el cajón de escribir NO lleva línea abajo (no separa del botón)',
+    !caja('cajon de escribir (form)').lados?.abajo?.startsWith('1px'), caja('cajon de escribir (form)').lados?.abajo);
   check('el PRIMER comentario lleva línea de 1px arriba',
     caja('primer comentario').lados?.arriba?.startsWith('1px'), caja('primer comentario').lados?.arriba);
   check('la guía de las respuestas es una línea de 1px a la izquierda',
@@ -391,9 +397,13 @@ for (const tema of ['dark', 'light']) {
     check(`los marcadores están centrados (desvío ${desvio.toFixed(1)}px)`, desvio <= 2, `desvío ${desvio.toFixed(1)}px`);
     check(`el icono es grande (${fila.iconoAncho}px ≥ 22)`, (fila.iconoAncho || 0) >= 22, String(fila.iconoAncho));
     check(`el área de pulsación es amplia (${fila.botonAlto}px ≥ 44)`, (fila.botonAlto || 0) >= 44, String(fila.botonAlto));
+    const huecos = fila.huecos || [];
+    log(`   · huecos entre marcadores: ${huecos.join(', ')} px`);
+    check('los marcadores están juntos (hueco ≤ 16px)', huecos.every((h) => h <= 16), JSON.stringify(huecos));
   }
 
-  // 7) Las imágenes del contenido, con los vértices rectos.
+  // 7) Las imágenes del contenido: con sus vértices rectos y CON aire lateral
+  //    (se quedan dentro de la columna de lectura, alineadas con el texto).
   for (const radio of d.imagenes || []) {
     check(`imagen sin vértices redondeados (border-radius ${radio})`, radio === '0px' || radio === '0', radio);
   }
@@ -415,11 +425,13 @@ for (const tema of ['dark', 'light']) {
     check('sin comentarios NO se muestra ningún mensaje', d.textoLista === '', JSON.stringify(d.textoLista));
   }
 
-  // 10) Las imágenes del problog van a sangre, sin aire lateral.
+  // 10) Las imágenes del problog vuelven a tener AIRE lateral: ya no llegan a los
+  //     bordes de la pantalla, se quedan dentro de la columna de lectura (que es
+  //     más estrecha que la ventana).
   for (const img of d.imagenesRect || []) {
     const aire = Math.max(img.left, ventana - img.right);
-    log(`   · imagen: de ${img.left.toFixed(0)} a ${img.right.toFixed(0)} (ventana ${ventana})`);
-    check('la imagen del problog llega de borde a borde', Math.abs(aire) <= 1.5, `aire lateral ${aire.toFixed(1)}px`);
+    log(`   · imagen: de ${img.left.toFixed(0)} a ${img.right.toFixed(0)} (ventana ${ventana}, columna hasta ${(d.rectSeccion.left + d.rectSeccion.width).toFixed(0)})`);
+    check('la imagen del problog tiene aire lateral', aire > 5, `aire lateral ${aire.toFixed(1)}px`);
   }
 }
 

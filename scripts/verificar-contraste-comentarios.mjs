@@ -152,6 +152,10 @@ const PROHIBIDOS_EN_CSS = [
     'la caja de escribir debe ir sin fondo'],
   [/\.problog-comentario-input\s*\{[^}]*border:\s*1px\s+solid/,
     'la caja de escribir no debe volver a tener recuadro'],
+  // El cajón tampoco lleva ya ninguna línea: la que lo separaba del botón
+  // «Comentar» se quitó a petición.
+  [/\.problog-comentario-form\s*\{[^}]*border-bottom:/,
+    'el cajón de escribir no debe llevar línea abajo'],
   [/\.problog-comentario-form\s*\{[^}]*background:\s*var\(--comentario-tinte\)/,
     'el cajón debe ir sin fondo'],
 ];
