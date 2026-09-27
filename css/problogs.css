@@ -844,12 +844,20 @@
 /* La caja de escribir va SIN borde y sin relleno de fondo: solo el texto y el
    placeholder. Al quitarle el contorno se pierde la única marca de "aquí se
    escribe", así que el foco se señala con un subrayado de tinta (abajo), que
-   ordena el bloque igual que las líneas finas del resto de la sección. */
+   ordena el bloque igual que las líneas finas del resto de la sección.
+   Ese subrayado va de BORDE A BORDE: la caja se sale del relleno del cajón (que
+   es quien trae el margen negativo de las líneas) con el mismo truco, y el texto
+   se queda alineado gracias a su relleno lateral. */
 .problog-comentario-input {
-    width: 100%;
+    width: auto;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 6px 0;
+    padding: 6px var(--comentario-aire, 24px);
+    margin-left: calc(-1 * var(--comentario-aire, 24px));
+    margin-right: calc(-1 * var(--comentario-aire, 24px));
+    /* Aire respecto al título: el subrayado pasa por debajo del texto y sin este
+       margen quedaría pegado a «Comentarios». */
+    margin-top: 12px;
     border: none;
     border-bottom: 1px solid var(--color-gray-300);
     border-radius: 0;
@@ -879,7 +887,11 @@
 .problog-comentario-acciones {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    /* El botón «Comentar» va CENTRADO: al terminar de escribir, el gesto natural
+       es bajar la mirada y pulsar; con el botón pegado a la derecha quedaba
+       lejos del texto. El chip de "respondiendo a…" se queda en su sitio porque
+       se saca del flujo centrado con `margin-right: auto`. */
+    justify-content: center;
     gap: 10px;
 }
 
@@ -907,15 +919,18 @@
    `--color-ink` con texto `--color-white` y, como en modo oscuro esos dos
    tokens se invierten, quedaba texto oscuro... sobre fondo claro solo a
    medias: el relleno se volvía BLANCO y el texto también, así que las letras
-   no se veían. Sin relleno el problema desaparece: solo hay texto y un borde. */
+   no se veían. Sin relleno el problema desaparece: solo hay texto y un borde.
+   Más ancho que antes (de 18px a 48px de relleno lateral y 12px de alto, que deja
+   unos 170px de botón) porque es la acción principal de la zona y ahora va
+   centrado. */
 .problog-comentario-enviar {
-    padding: 7px 18px;
+    padding: 12px 48px;
     border: 1px solid var(--comentario-control);
     border-radius: 999px;
     background: transparent;
     color: var(--color-ink);
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s ease;

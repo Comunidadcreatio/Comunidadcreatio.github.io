@@ -179,11 +179,30 @@ const MEDIR = (tema) => `(() => {
         })(),
         // Las imágenes a sangre: su rectángulo tiene que llegar a los bordes.
         imagenesRect: figuras.map((img) => { const x = img.getBoundingClientRect(); return { left: x.left, right: x.right }; }),
+        // Rectángulos de lo que debe llegar de borde a borde: el título, el cajón,
+        // un comentario y la LÍNEA de debajo de la caja de escribir (el subrayado
+        // del input, que es su borde inferior).
         bordes: {
             titulo: caja(g('.problog-comentarios-titulo')),
             form: caja(g('.problog-comentario-form')),
-            comentario: caja(g('.problog-comentario'))
+            comentario: caja(g('.problog-comentario')),
+            lineaInput: caja(g('.problog-comentario-input')),
+            seccion: { left: r.left, right: r.right }
         },
+        // Botón «Comentar»: tiene que ir centrado y ancho.
+        botonEnviar: (() => {
+            const b = g('.problog-comentario-enviar');
+            if (!b) return null;
+            const rb = b.getBoundingClientRect();
+            const acciones = b.parentElement.getBoundingClientRect();
+            const contenedor = g('.problog-comentario-form').getBoundingClientRect();
+            return {
+                centro: rb.left + rb.width / 2,
+                centroAcciones: acciones.left + acciones.width / 2,
+                centroFormulario: contenedor.left + contenedor.width / 2,
+                ancho: rb.width, alto: rb.height, texto: b.textContent.trim()
+            };
+        })(),
         filaSocial: (() => {
             const fila = document.querySelector('.problogs-detalle .problog-social');
             if (!fila) return null;
@@ -382,6 +401,8 @@ for (const tema of ['dark', 'light']) {
   //    dentro del relleno del main y es más estrecha que la línea a propósito.
   const ventana = d.ventana;
   for (const [nombre, b] of Object.entries(d.bordes || {})) {
+    // `seccion` es el propio bloque (la referencia), no una línea.
+    if (nombre === 'seccion') continue;
     if (!b) { check(`rectángulo de «${nombre}» medido`, false); continue; }
     const aire = Math.max(b.left, ventana - b.right);
     log(`   · línea de «${nombre}»: de ${b.left.toFixed(0)} a ${b.right.toFixed(0)} (ventana ${ventana})`);
@@ -417,6 +438,16 @@ for (const tema of ['dark', 'light']) {
     check('la caja de escribir NO tiene borde a los lados', lados.izquierda === '0px' && lados.derecha === '0px',
       `${lados.izquierda} / ${lados.derecha}`);
     check('la caja de escribir conserva el subrayado de abajo (1px)', lados.abajo === '1px', lados.abajo);
+  }
+
+  // 8b) El botón «Comentar»: centrado y ancho.
+  const env = d.botonEnviar;
+  if (!env) { check('el botón «Comentar» existe', false); }
+  else {
+    const desvioBoton = Math.abs(env.centro - env.centroFormulario);
+    log(`   · botón «${env.texto}»: centro=${env.centro.toFixed(1)} vs formulario=${env.centroFormulario.toFixed(1)} (desvío ${desvioBoton.toFixed(1)}px), ancho=${env.ancho.toFixed(0)}px, alto=${env.alto.toFixed(0)}px`);
+    check(`el botón «Comentar» está centrado (desvío ${desvioBoton.toFixed(1)}px)`, desvioBoton <= 2, `desvío ${desvioBoton.toFixed(1)}px`);
+    check(`el botón «Comentar» es ancho (${Math.round(env.ancho)}px ≥ 150)`, env.ancho >= 150, String(Math.round(env.ancho)));
   }
 
   // 9) Sin comentarios no se pinta ningún mensaje: la lista queda vacía.
