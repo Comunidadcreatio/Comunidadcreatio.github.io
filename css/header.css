@@ -81,13 +81,11 @@ picture {
     margin-left: auto;
 }
 
-/* Empuja hacia la derecha el primer icono de la zona derecha del header. El
-   icono de volver (que va pegado a la campana, a su izquierda) es el PRIMERO de
-   ese grupo, así que el empuje va en él: si estuviera en la campana, el de volver
-   quedaría a su derecha, porque el margen empuja lo que viene DESPUÉS. Cuando no
-   hay lectura abierta el icono está oculto (`display: none`) y el `auto` recae en
-   la campana sola, que es justo lo que hacía antes. */
-#btn-problog-volver {
+/* Empuja hacia la derecha la zona de iconos del header. Va en la CAMPANA, que
+   está siempre presente: el icono de volver (a su izquierda) aparece y se oculta
+   al abrir y cerrar una publicación, y si el `auto` estuviera en él, al ocultarse
+   desaparecía con él y toda la fila se corría a la izquierda. */
+#btn-notificaciones {
     margin-left: auto;
 }
 

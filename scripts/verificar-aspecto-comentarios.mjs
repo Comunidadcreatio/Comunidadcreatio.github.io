@@ -121,6 +121,9 @@ await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, devi
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
 await sleep(1200);
+// Se anota el ancho de ventana de estas comprobaciones: el barrido de anchos del
+// final lo cambia, así que no se puede dar por supuesto al comparar medidas.
+const anchoPrincipal = await evalJs(`document.documentElement.clientWidth`);
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(1800);
 // ANTES de abrir ninguna publicación: el icono de volver del header debe estar
@@ -129,7 +132,11 @@ const volverAlInicio = JSON.parse((await evalJs(`(() => {
     const btn = document.getElementById('btn-problog-volver');
     if (!btn) return JSON.stringify({ falta: true });
     const r = btn.getBoundingClientRect();
-    return JSON.stringify({ visible: !btn.classList.contains('hidden'), ocupaEspacio: r.width > 0 });
+    const campana = document.getElementById('btn-notificaciones');
+    const rc = campana ? campana.getBoundingClientRect() : null;
+    return JSON.stringify({ visible: !btn.classList.contains('hidden'), ocupaEspacio: r.width > 0,
+                            campanaDerecha: rc ? Math.round(rc.right) : null,
+                            ventana: document.documentElement.clientWidth });
 })()`)) || 'null');
 await evalJs(`document.querySelector('.problog-card')?.click()`);
 await sleep(2000);
@@ -674,6 +681,117 @@ else {
 
 // --- Las líneas, en varios anchos de pantalla -------------------------------
 // La línea de arriba de la sección es la que va justo DEBAJO de los marcadores:
+// --- Icono «Volver» en el header --------------------------------------------
+// Solo se ve mientras se lee una publicación, va junto a la campana y al pulsarlo
+// se vuelve al feed.
+log(`\n=== Icono «Volver» del header ===`);
+const volver = JSON.parse((await evalJs(`(() => {
+    const btn = document.getElementById('btn-problog-volver');
+    const campana = document.getElementById('btn-notificaciones');
+    const viejo = document.querySelector('#problogs .problog-volver');
+    const header = document.getElementById('main-header');
+    if (!btn || !campana) return JSON.stringify({ falta: true });
+    const rb = btn.getBoundingClientRect();
+    const rc = campana.getBoundingClientRect();
+    return JSON.stringify({
+        // El botón viejo dentro de la publicación ya no debe existir.
+        botonViejo: !!viejo,
+        enElHeader: header.contains(btn),
+        visible: !btn.classList.contains('hidden'),
+        ocupaEspacio: rb.width > 0,
+        centroBoton: rb.left + rb.width / 2,
+        centroCampana: rc.left + rc.width / 2,
+        // Además de estar al lado, tiene que estar a su IZQUIERDA.
+        aLaIzquierda: rb.right <= rc.left + 1
+    });
+})()`)) || 'null');
+if (!volver || volver.falta) { check('el icono de volver existe en el header', false); }
+else {
+  log(`   · enElHeader=${volver.enElHeader} visible=${volver.visible} ocupaEspacio=${volver.ocupaEspacio} centro=${volver.centroBoton.toFixed(0)} vs campana=${volver.centroCampana.toFixed(0)} aLaIzquierda=${volver.aLaIzquierda}`);
+  check('el botón «Volver» de dentro de la publicación ya no existe', volver.botonViejo === false);
+  check('el icono de volver vive en el header', volver.enElHeader === true);
+}
+// Al principio (sin lectura) tenía que estar oculto y no ocupar sitio.
+if (!volverAlInicio || volverAlInicio.falta) { check('se pudo comprobar el icono sin lectura abierta', false); }
+else {
+  log(`   · al principio (sin lectura): visible=${volverAlInicio.visible} ocupaEspacio=${volverAlInicio.ocupaEspacio}`);
+  check('el icono de volver está oculto sin lectura abierta',
+    volverAlInicio.visible === false && volverAlInicio.ocupaEspacio === false,
+    JSON.stringify(volverAlInicio));
+}
+// Al abrir una publicación aparece; al pulsarlo, vuelve al feed.
+await evalJs(`document.querySelector('.problog-card')?.click()`);
+// Se espera a que el icono esté VISIBLE y sin animación en curso: midiendo a
+// mitad de la aparición, la campana aún no ha recuperado su sitio.
+for (let i = 0; i < 20; i++) {
+  const listo = await evalJs(`(() => {
+      const b = document.getElementById('btn-problog-volver');
+      return !!b && !b.classList.contains('hidden') && !b.classList.contains('ocultando')
+          && parseFloat(getComputedStyle(b).opacity) >= 0.99;
+  })()`);
+  if (listo) break;
+  await sleep(200);
+}
+await sleep(250);
+const trasAbrir = JSON.parse((await evalJs(`(() => {
+    const btn = document.getElementById('btn-problog-volver');
+    const campana = document.getElementById('btn-notificaciones');
+    const lectura = !document.getElementById('problogs-detalle').classList.contains('hidden');
+    const rb = btn ? btn.getBoundingClientRect() : null;
+    const rc = campana ? campana.getBoundingClientRect() : null;
+    return JSON.stringify({
+        visible: !!btn && !btn.classList.contains('hidden'),
+        lectura,
+        alLado: !!(rb && rc) && rb.right <= rc.left + 1,
+        campanaDerecha: rc ? Math.round(rc.right) : null,
+        ventana: document.documentElement.clientWidth
+    });
+})()`)) || 'null');
+if (!trasAbrir) { check('se pudo comprobar el icono con la publicación abierta', false); }
+else {
+  log(`   · con la publicación abierta: visible=${trasAbrir.visible} alLadoDeLaCampana=${trasAbrir.alLado} campanaDerecha=${trasAbrir.campanaDerecha}`);
+  check('al abrir una publicación aparece el icono de volver', trasAbrir.visible === true && trasAbrir.lectura === true);
+  check('el icono de volver está justo al lado de la campana', trasAbrir.alLado === true);
+}
+// Lo que se pidió: los iconos del header NO se mueven al aparecer el de volver.
+// Se compara solo si la medida se hizo al mismo ancho que la del principio (el
+// barrido de anchos del final cambia el tamaño de la ventana).
+log(`   · anchos medidos: principal=${anchoPrincipal} trasAbrir=${trasAbrir && trasAbrir.ventana} trasVolver=(pendiente)`);
+if (volverAlInicio && volverAlInicio.campanaDerecha !== null && trasAbrir && trasAbrir.campanaDerecha !== null
+    && trasAbrir.ventana === anchoPrincipal) {
+  const desplazamiento = Math.abs(trasAbrir.campanaDerecha - volverAlInicio.campanaDerecha);
+  log(`   · campana a ${trasAbrir.ventana}px: derecha ${volverAlInicio.campanaDerecha} sin el icono → ${trasAbrir.campanaDerecha} con el icono (se mueve ${desplazamiento}px)`);
+  check(`la campana no se mueve al aparecer el icono de volver (${desplazamiento}px)`, desplazamiento <= 1,
+    `${volverAlInicio.campanaDerecha} → ${trasAbrir.campanaDerecha}`);
+}
+await evalJs(`document.getElementById('btn-problog-volver')?.click()`);
+await sleep(1400);
+const trasVolver = JSON.parse((await evalJs(`(() => {
+    const btn = document.getElementById('btn-problog-volver');
+    const campana = document.getElementById('btn-notificaciones');
+    const rc = campana ? campana.getBoundingClientRect() : null;
+    return JSON.stringify({
+        lectura: !document.getElementById('problogs-detalle').classList.contains('hidden'),
+        oculto: !!btn && (btn.classList.contains('hidden') || btn.classList.contains('ocultando')),
+        campanaDerecha: rc ? Math.round(rc.right) : null,
+        ventana: document.documentElement.clientWidth
+    });
+})()`)) || 'null');
+if (!trasVolver) { check('se pudo comprobar el icono tras volver', false); }
+else {
+  log(`   · tras pulsar volver: lectura=${trasVolver.lectura} iconoOculto=${trasVolver.oculto} campanaDerecha=${trasVolver.campanaDerecha}`);
+  check('el icono de volver cierra la lectura', trasVolver.lectura === false);
+  check('el icono de volver se oculta al volver al feed', trasVolver.oculto === true);
+  // Y al volver al feed (mismo ancho de ventana), sigue en su sitio.
+  if (volverAlInicio && volverAlInicio.campanaDerecha !== null && trasVolver.campanaDerecha !== null
+      && trasVolver.ventana === anchoPrincipal) {
+    const desplazamiento = Math.abs(trasVolver.campanaDerecha - volverAlInicio.campanaDerecha);
+    check(`los iconos del header siguen a la derecha al volver (${desplazamiento}px)`, desplazamiento <= 1,
+      `${volverAlInicio.campanaDerecha} → ${trasVolver.campanaDerecha}`);
+  }
+}
+
+
 // tiene que llegar de extremo a extremo en cualquier ancho, no solo en el móvil
 // de pruebas. Se recorre una lista de anchos y se mide en cada uno.
 log(`\n=== Las líneas de extremo a extremo, por ancho de pantalla ===`);
@@ -762,82 +880,6 @@ for (const anchoVentana of [320, 360, 420, 768, 1280]) {
     }
   }
 }
-
-// --- Icono «Volver» en el header --------------------------------------------
-// Solo se ve mientras se lee una publicación, va junto a la campana y al pulsarlo
-// se vuelve al feed.
-log(`\n=== Icono «Volver» del header ===`);
-const volver = JSON.parse((await evalJs(`(() => {
-    const btn = document.getElementById('btn-problog-volver');
-    const campana = document.getElementById('btn-notificaciones');
-    const viejo = document.querySelector('#problogs .problog-volver');
-    const header = document.getElementById('main-header');
-    if (!btn || !campana) return JSON.stringify({ falta: true });
-    const rb = btn.getBoundingClientRect();
-    const rc = campana.getBoundingClientRect();
-    return JSON.stringify({
-        // El botón viejo dentro de la publicación ya no debe existir.
-        botonViejo: !!viejo,
-        enElHeader: header.contains(btn),
-        visible: !btn.classList.contains('hidden'),
-        ocupaEspacio: rb.width > 0,
-        centroBoton: rb.left + rb.width / 2,
-        centroCampana: rc.left + rc.width / 2,
-        // Además de estar al lado, tiene que estar a su IZQUIERDA.
-        aLaIzquierda: rb.right <= rc.left + 1
-    });
-})()`)) || 'null');
-if (!volver || volver.falta) { check('el icono de volver existe en el header', false); }
-else {
-  log(`   · enElHeader=${volver.enElHeader} visible=${volver.visible} ocupaEspacio=${volver.ocupaEspacio} centro=${volver.centroBoton.toFixed(0)} vs campana=${volver.centroCampana.toFixed(0)} aLaIzquierda=${volver.aLaIzquierda}`);
-  check('el botón «Volver» de dentro de la publicación ya no existe', volver.botonViejo === false);
-  check('el icono de volver vive en el header', volver.enElHeader === true);
-}
-// Al principio (sin lectura) tenía que estar oculto y no ocupar sitio.
-if (!volverAlInicio || volverAlInicio.falta) { check('se pudo comprobar el icono sin lectura abierta', false); }
-else {
-  log(`   · al principio (sin lectura): visible=${volverAlInicio.visible} ocupaEspacio=${volverAlInicio.ocupaEspacio}`);
-  check('el icono de volver está oculto sin lectura abierta',
-    volverAlInicio.visible === false && volverAlInicio.ocupaEspacio === false,
-    JSON.stringify(volverAlInicio));
-}
-// Al abrir una publicación aparece; al pulsarlo, vuelve al feed.
-await evalJs(`document.querySelector('.problog-card')?.click()`);
-await sleep(2200);
-const trasAbrir = JSON.parse((await evalJs(`(() => {
-    const btn = document.getElementById('btn-problog-volver');
-    const campana = document.getElementById('btn-notificaciones');
-    const lectura = !document.getElementById('problogs-detalle').classList.contains('hidden');
-    const rb = btn ? btn.getBoundingClientRect() : null;
-    const rc = campana ? campana.getBoundingClientRect() : null;
-    return JSON.stringify({
-        visible: !!btn && !btn.classList.contains('hidden'),
-        lectura,
-        alLado: !!(rb && rc) && rb.right <= rc.left + 1
-    });
-})()`)) || 'null');
-if (!trasAbrir) { check('se pudo comprobar el icono con la publicación abierta', false); }
-else {
-  log(`   · con la publicación abierta: visible=${trasAbrir.visible} alLadoDeLaCampana=${trasAbrir.alLado}`);
-  check('al abrir una publicación aparece el icono de volver', trasAbrir.visible === true && trasAbrir.lectura === true);
-  check('el icono de volver está justo al lado de la campana', trasAbrir.alLado === true);
-}
-await evalJs(`document.getElementById('btn-problog-volver')?.click()`);
-await sleep(900);
-const trasVolver = JSON.parse((await evalJs(`(() => {
-    const btn = document.getElementById('btn-problog-volver');
-    return JSON.stringify({
-        lectura: !document.getElementById('problogs-detalle').classList.contains('hidden'),
-        oculto: !!btn && (btn.classList.contains('hidden') || btn.classList.contains('ocultando'))
-    });
-})()`)) || 'null');
-if (!trasVolver) { check('se pudo comprobar el icono tras volver', false); }
-else {
-  log(`   · tras pulsar volver: lectura=${trasVolver.lectura} iconoOculto=${trasVolver.oculto}`);
-  check('el icono de volver cierra la lectura', trasVolver.lectura === false);
-  check('el icono de volver se oculta al volver al feed', trasVolver.oculto === true);
-}
-
 
 log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 volcar();
