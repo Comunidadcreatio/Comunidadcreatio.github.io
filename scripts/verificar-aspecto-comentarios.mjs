@@ -114,6 +114,10 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
   })();`
 });
 
+// Las comprobaciones principales se hacen al tamaño de móvil (el caso que se usa
+// de verdad); el barrido de anchos del final abre cada ancho en una carga limpia,
+// porque cambiar el tamaño de la ventana en caliente deja medidas a medias.
+await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
 await sleep(1200);
@@ -138,10 +142,27 @@ const MEDIR = (tema) => `(() => {
     const sec = document.querySelector('[data-problog-comentarios]');
     if (!sec) return JSON.stringify({ error: 'no hay seccion de comentarios' });
     const g = (sel) => sec.querySelector(sel);
-    const cs = (el) => el ? getComputedStyle(el) : null;
+    // OJO: el segundo argumento es el pseudo-elemento ('::after'/'::before'); sin
+    // él, getComputedStyle devuelve los estilos del ELEMENTO y las líneas
+    // dibujadas con pseudos no se verían.
+    const cs = (el, pseudo) => el ? getComputedStyle(el, pseudo || null) : null;
     const dato = (nombre, el) => {
         if (!el) return { nombre, falta: true };
         const s = cs(el);
+        // Las líneas del cajón y de cada comentario las dibuja un
+        // pseudo-elemento absoluto (no un borde): se localizan por su caja.
+        const pseudoLinea = (pseudo) => {
+            const p = cs(el, pseudo);
+            if (!p || p.content === 'none' || p.borderTopWidth === '0px') return null;
+            const r = el.getBoundingClientRect();
+            // OJO con el signo: el pseudo lleva un desplazamiento negativo, así
+            // que su borde izquierdo es r.left MENOS ese valor.
+            const izq = parseFloat(p.left) || 0;
+            const der = parseFloat(p.right) || 0;
+            return { left: r.left - izq, right: r.right + der, ancho: p.borderTopWidth + ' ' + p.borderTopColor,
+                     // Datos para poder diagnosticar si algo no cuadra.
+                     rect: { left: r.left, right: r.right }, offset: { left: p.left, right: p.right } };
+        };
         const lados = {
             arriba: s.borderTopWidth + ' ' + s.borderTopColor,
             abajo: s.borderBottomWidth + ' ' + s.borderBottomColor,
@@ -149,6 +170,7 @@ const MEDIR = (tema) => `(() => {
         };
         const gruesos = [s.borderTopWidth, s.borderBottomWidth, s.borderLeftWidth];
         return { nombre, fondo: s.backgroundColor, color: s.color, lados,
+                 lineaPropia: pseudoLinea('::after') || pseudoLinea('::before'),
                  ladosConLinea: gruesos.map((w, i) => (w === '1px' ? ['arriba', 'abajo', 'izquierda'][i] : null)).filter(Boolean) };
     };
     const r = sec.getBoundingClientRect();
@@ -337,6 +359,9 @@ for (const tema of ['dark', 'light']) {
   // fuera de la captura y el fondo saldría null (una medida a ciegas).
   await evalJs(`document.documentElement.setAttribute('data-theme', '${tema}')`);
   await evalJs(`document.querySelector('[data-problog-comentarios]')?.scrollIntoView({ block: 'start', behavior: 'instant' })`);
+  // El sangrado de las líneas interiores lo mide el JS al abrir y al cambiar el
+  // tamaño: hay que avisarle, como haría el navegador de verdad.
+  await evalJs(`window.dispatchEvent(new Event('resize'))`);
   await sleep(500);
   await apartarRaton();
 
@@ -393,16 +418,14 @@ for (const tema of ['dark', 'light']) {
   check('el contador va sin relleno', transparente(caja('contador').fondo), caja('contador').fondo);
   check('el botón «Comentar» va sin relleno', transparente(caja('boton Comentar').fondo), caja('boton Comentar').fondo);
 
-  // 4) Las líneas que QUEDAN: la sección abre con una y cada comentario tiene la
-  //    suya arriba. El cajón de escribir no lleva ninguna, ni la cabecera.
+  // 4) Las líneas: la sección abre con una y el cajón y cada comentario la
+  //    dibujan con un pseudo-elemento. La cabecera no lleva ninguna.
   check('la cabecera NO lleva línea (menos rayas)',
     !caja('cabecera (titulo + contador)').lados?.abajo?.startsWith('1px'), caja('cabecera (titulo + contador)').lados?.abajo);
-  check('el cajón de escribir NO lleva línea arriba',
-    !caja('cajon de escribir (form)').lados?.arriba?.startsWith('1px'), caja('cajon de escribir (form)').lados?.arriba);
-  check('el cajón de escribir NO lleva línea abajo (no separa del botón)',
-    !caja('cajon de escribir (form)').lados?.abajo?.startsWith('1px'), caja('cajon de escribir (form)').lados?.abajo);
-  check('el PRIMER comentario lleva línea de 1px arriba',
-    caja('primer comentario').lados?.arriba?.startsWith('1px'), caja('primer comentario').lados?.arriba);
+  check('el cajón de escribir dibuja su línea de abajo',
+    !!caja('cajon de escribir (form)').lineaPropia, JSON.stringify(caja('cajon de escribir (form)').lineaPropia));
+  check('cada comentario dibuja su línea de arriba',
+    !!caja('primer comentario').lineaPropia, JSON.stringify(caja('primer comentario').lineaPropia));
   check('la guía de las respuestas es una línea de 1px a la izquierda',
     caja('guia de respuestas').lados?.izquierda?.startsWith('1px'), caja('guia de respuestas').lados?.izquierda);
 
@@ -420,14 +443,21 @@ for (const tema of ['dark', 'light']) {
   for (const [nombre, b] of Object.entries(d.bordes || {})) {
     if (nombre === 'seccion' || !b) continue;
     log(`   · ${nombre}: ${b.left.toFixed(0)}..${b.right.toFixed(0)}`);
-    check(`«${nombre}» se queda dentro de la pantalla`, b.left >= -1 && b.right <= ventana + 1, `${b.left.toFixed(0)}..${b.right.toFixed(0)} de ${ventana}`);
   }
-  // La de la sección tiene que salir MÁS que las interiores: es la única que va
-  // a los extremos.
-  if (seccion && d.bordes?.comentario) {
-    check('la línea de la sección sale más que la de los comentarios',
-      seccion.left <= d.bordes.comentario.left + 0.5 && seccion.right >= d.bordes.comentario.right - 0.5,
-      `sección ${seccion.left.toFixed(0)}..${seccion.right.toFixed(0)} vs comentario ${d.bordes.comentario.left.toFixed(0)}..${d.bordes.comentario.right.toFixed(0)}`);
+  // Las líneas del cajón y de cada comentario (pseudo-elementos) van al mismo
+  // sitio que la de la sección: de extremo a extremo.
+  const lineaForm = caja('cajon de escribir (form)').lineaPropia;
+  const lineaComentario = caja('primer comentario').lineaPropia;
+  if (seccion && lineaForm) {
+    const aire = Math.max(lineaForm.left, ventana - lineaForm.right);
+    log(`   · línea del cajón: ${lineaForm.left.toFixed(0)}..${lineaForm.right.toFixed(0)} (aire ${aire.toFixed(0)}px)`);
+    log(`       [cajón ${lineaForm.rect.left.toFixed(0)}..${lineaForm.rect.right.toFixed(0)}, desplazamiento ${lineaForm.offset.left}/${lineaForm.offset.right}]`);
+    check('la línea del cajón va de extremo a extremo', Math.abs(aire) <= 1.5, `aire ${aire.toFixed(1)}px`);
+  }
+  if (seccion && lineaComentario) {
+    const aire = Math.max(lineaComentario.left, ventana - lineaComentario.right);
+    log(`   · línea del comentario: ${lineaComentario.left.toFixed(0)}..${lineaComentario.right.toFixed(0)} (aire ${aire.toFixed(0)}px)`);
+    check('la línea de cada comentario va de extremo a extremo', Math.abs(aire) <= 1.5, `aire ${aire.toFixed(1)}px`);
   }
 
   // 6) Marcadores centrados y más grandes.
@@ -450,15 +480,14 @@ for (const tema of ['dark', 'light']) {
     check(`imagen sin vértices redondeados (border-radius ${radio})`, radio === '0px' || radio === '0', radio);
   }
 
-  // 8) La caja de escribir, SIN contorno: solo le queda el subrayado de abajo.
+  // 8) La caja de escribir, SIN contorno: su línea la dibuja el cajón.
   const lados = d.inputLados;
   if (!lados) { check('la caja de escribir existe', false); }
   else {
     log(`   · caja de escribir — bordes: arriba ${lados.arriba}, abajo ${lados.abajo}, izq ${lados.izquierda}, der ${lados.derecha}`);
-    check('la caja de escribir NO tiene borde arriba', lados.arriba === '0px', lados.arriba);
-    check('la caja de escribir NO tiene borde a los lados', lados.izquierda === '0px' && lados.derecha === '0px',
-      `${lados.izquierda} / ${lados.derecha}`);
-    check('la caja de escribir conserva el subrayado de abajo (1px)', lados.abajo === '1px', lados.abajo);
+    check('la caja de escribir NO tiene ningún borde propio',
+      lados.arriba === '0px' && lados.abajo === '0px' && lados.izquierda === '0px' && lados.derecha === '0px',
+      JSON.stringify(lados));
   }
 
   // 8b) El botón «Comentar»: centrado y ancho.
@@ -589,8 +618,24 @@ const LINEAS = `(() => {
             const s = getComputedStyle(el);
             return { left: Math.round(r.left - parseFloat(s.paddingLeft || 0)), right: Math.round(r.right + parseFloat(s.paddingRight || 0)) };
         })(),
-        subrayadoInput: rect('[data-problog-comentarios] .problog-comentario-input'),
-        primerComentario: rect('[data-problog-comentarios] .problog-comentario')
+        subrayadoInput: (() => {
+            // La línea del cajón es un pseudo-elemento absoluto: su caja se saca
+            // del rectángulo del cajón menos el desplazamiento negativo del pseudo.
+            const el = document.querySelector('[data-problog-comentarios] .problog-comentario-form');
+            if (!el) return null;
+            const p = getComputedStyle(el, '::after');
+            if (!p || p.content === 'none' || p.borderTopWidth === '0px') return null;
+            const r = el.getBoundingClientRect();
+            return { left: Math.round(r.left - (parseFloat(p.left) || 0)), right: Math.round(r.right + (parseFloat(p.right) || 0)) };
+        })(),
+        primerComentario: (() => {
+            const el = document.querySelector('[data-problog-comentarios] .problog-comentario');
+            if (!el) return null;
+            const p = getComputedStyle(el, '::before');
+            if (!p || p.content === 'none' || p.borderTopWidth === '0px') return null;
+            const r = el.getBoundingClientRect();
+            return { left: Math.round(r.left - (parseFloat(p.left) || 0)), right: Math.round(r.right + (parseFloat(p.right) || 0)) };
+        })()
     });
 })()`;
 
@@ -604,7 +649,10 @@ for (const anchoVentana of [320, 360, 420, 768, 1280]) {
   await evalJs(`document.querySelector('.problog-card')?.click()`);
   await sleep(1800);
   await evalJs(`document.querySelector('[data-problog-comentarios]')?.scrollIntoView({ block: 'start', behavior: 'instant' })`);
-  await sleep(400);
+  // El sangrado de las líneas interiores se mide en JS al abrir y al cambiar el
+  // tamaño de la ventana: hay que avisar, como haría el navegador de verdad.
+  await evalJs(`window.dispatchEvent(new Event('resize'))`);
+  await sleep(500);
   const m = JSON.parse((await evalJs(LINEAS)) || 'null');
   if (!m) { check(`se pudieron medir las líneas a ${anchoVentana}px`, false); continue; }
   for (const [nombre, b] of Object.entries(m)) {
@@ -612,21 +660,19 @@ for (const anchoVentana of [320, 360, 420, 768, 1280]) {
     const aire = Math.max(b.left, m.ventana - b.right);
     log(`   · ${anchoVentana}px · ${nombre}: ${b.left}..${b.right} (aire ${aire}px)`);
     if (nombre === 'bajoMarcadores') {
-      // ESTA es la que se pidió: la de arriba de la sección, justo debajo de los
-      // marcadores. En móvil (hasta 768px, donde la columna de lectura ocupa todo
-      // el ancho) tiene que llegar de extremo a extremo. En pantallas anchas la
-      // columna está centrada y la línea llega a los extremos de la PANTALLA.
+      // En móvil (hasta 768px, donde la columna ocupa todo el ancho) la línea va
+      // de extremo a extremo. En pantallas anchas la columna está centrada.
       const debeLlegar = anchoVentana <= 768;
       if (debeLlegar) {
         check(`${anchoVentana}px · la línea bajo los marcadores llega de extremo a extremo`, Math.abs(aire) <= 1.5, `aire ${aire}px`);
       } else {
-        // Fuera de la columna de lectura (que es lo que se veía antes de aire).
         const fueraDeLaColumna = b.left < (m.ventana - 720) / 2 + 1 && b.right > (m.ventana + 720) / 2 - 1;
         check(`${anchoVentana}px · la línea bajo los marcadores sale de la columna`, fueraDeLaColumna, `${b.left}..${b.right} de ${m.ventana}`);
       }
     } else {
-      // Las interiores se quedan dentro de la columna (a petición).
-      check(`${anchoVentana}px · «${nombre}» se queda dentro de la pantalla`, b.left >= -1 && b.right <= m.ventana + 1, `${b.left}..${b.right}`);
+      // El subrayado de la caja y la línea de cada comentario van a los extremos
+      // igual que la de arriba (es lo que se pidió en la última revisión).
+      check(`${anchoVentana}px · «${nombre}» llega de extremo a extremo`, Math.abs(aire) <= 1.5, `aire ${aire}px`);
     }
   }
 }

@@ -786,30 +786,66 @@
     --comentario-aire: 24px;
     /* La sección ocupa todo el ancho disponible aunque viva dentro del relleno
        del main: se sale ese relleno con margen negativo y lo recupera en su
-       ancho. El contenido no se mueve porque el grid de abajo lo vuelve a
-       centrar. */
+       ancho. Así su línea de arriba (la que va justo debajo de los marcadores)
+       llega de extremo a extremo, sin aire. */
     width: calc(100% + 2 * var(--comentario-aire));
     margin-left: calc(-1 * var(--comentario-aire));
     margin-right: calc(-1 * var(--comentario-aire));
     margin-top: 6px;
-    /* Grid de TRES columnas: la del medio es la de lectura (el contenido) y las
-       laterales se comen el aire. Así el relleno de la sección es 0 y su borde
-       llega de un extremo al otro. */
-    display: grid;
-    grid-template-columns: 1fr min(720px, 100%) 1fr;
     padding-top: 12px;
     border-top: 1px solid var(--comentario-linea);
 }
 
-/* Todo el contenido del bloque va en la columna central, con su aire. Así el
-   texto queda alineado con la publicación y las líneas INTERIORES (el subrayado
-   de la caja y la de cada comentario) se quedan dentro de la columna. La única
-   que sale a los extremos de la pantalla es la de ARRIBA de la sección. */
-.problog-comentarios > * {
-    grid-column: 2;
-    min-width: 0;
+/* OJO: nada de grid aquí. Con `display: grid` el navegador resuelve el `width:
+   100%` de las cajas de dentro de forma distinta en móvil y en escritorio
+   (medido: 24px de más por lado en móvil y 48px de menos en escritorio) y las
+   líneas no cuadraban. Con el flujo normal el ancho sale exacto. */
+
+/* El contenido que NO lleva línea (la cabecera) lleva el aire a los lados. */
+.problog-comentarios-titulo {
     padding-left: var(--comentario-aire);
     padding-right: var(--comentario-aire);
+}
+
+/* Las piezas que llevan LÍNEA (el cajón de escribir y cada comentario) NO se
+   ensanchan: su caja se queda igual que el resto del contenido (alineada con el
+   texto de la publicación) y la línea la dibuja un pseudo-elemento absoluto que se
+   sale por los lados. Ensanchar la caja no funciona aquí: el navegador la estiraba
+   a 548px en una pantalla de 500 (medido) porque `width` y márgenes negativos se
+   sumaban. El desplazamiento del pseudo lo calcula JS con las coordenadas reales
+   (`--linea-sangria`), porque en CSS el navegador no da la misma respuesta en
+   móvil que en escritorio. */
+.problog-comentario-form,
+.problog-comentario {
+    position: relative;
+}
+
+.problog-comentario-form::after,
+.problog-comentario::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--linea-sangria, 24px));
+    right: calc(-1 * var(--linea-sangria-der, var(--linea-sangria, 24px)));
+    height: 0;
+    border-top: 1px solid var(--comentario-linea);
+    pointer-events: none;
+}
+
+/* La del cajón va DEBAJO (es el subrayado de la caja) y la de cada comentario
+   ARRIBA (separa un comentario del anterior). */
+.problog-comentario-form::after {
+    bottom: 0;
+}
+
+.problog-comentario::before {
+    top: 0;
+}
+
+/* La caja de escribir va SIN recuadro: solo su subrayado de abajo, que es la
+   línea que separa el cajón de los comentarios. El aire del texto lo pone su
+   relleno lateral. */
+.problog-comentario-form > * {
+    min-width: 0;
 }
 
 /* Cabecera: título a la izquierda y el número en una píldora. SIN línea: con la
@@ -852,10 +888,7 @@
 }
 
 /* --- Cajón de escribir ---
-   Sin fondo y sin caja. Aquí ya NO hay ninguna línea: ni arriba (la cabecera y el
-   cajón ya quedan separados por su aire) ni abajo (la que lo separaba del botón
-   «Comentar»). La primera línea que se ve es la de arriba del primer comentario,
-   que es la que de verdad marca dónde empiezan. */
+   Sin fondo y sin caja: su única línea es el subrayado de la caja de dentro. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
@@ -865,27 +898,15 @@
     background: transparent;
 }
 
-/* La caja de escribir va SIN borde y sin relleno de fondo: solo el texto y el
-   placeholder. Al quitarle el contorno se pierde la única marca de "aquí se
-   escribe", así que el foco se señala con un subrayado de tinta (abajo), que
-   ordena el bloque igual que las líneas finas del resto de la sección.
-   El subrayado es la línea que va justo ENCIMA de los comentarios, así que
-   llega de extremo a extremo como las demás: la caja se sale el relleno del
-   cajón por cada lado y lo recupera en su propio relleno (así el texto no se
-   mueve). El relleno es el del MAIN (24px), no el de la sección: si no, en
-   pantallas anchas el subrayado se saldría de la columna de lectura. */
+/* La caja de escribir va SIN recuadro: su línea (el subrayado) la dibuja el
+   pseudo-elemento del cajón. Aquí solo van el texto y su aire. */
 .problog-comentario-input {
-    width: auto;
+    width: 100%;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 6px 24px;
-    margin-left: calc(24px - var(--comentario-aire));
-    margin-right: calc(24px - var(--comentario-aire));
-    /* Aire respecto al título: el subrayado pasa por debajo del texto y sin este
-       margen quedaría pegado a «Comentarios». */
-    margin-top: 12px;
+    padding: 6px 0;
+    margin: 12px 0 0;
     border: none;
-    border-bottom: 1px solid var(--color-gray-300);
     border-radius: 0;
     background: transparent;
     color: var(--color-ink);
@@ -894,16 +915,13 @@
     line-height: 1.45;
     resize: none;
     outline: none;
-    transition: border-color 0.2s ease;
 }
 
-/* Foco: subrayado de tinta más grueso. Es la señal de "estás escribiendo aquí"
-   que antes daba el recuadro, ahora sin recuadro. */
-.problog-comentario-input:focus {
-    border-bottom-color: var(--color-ink);
-    border-bottom-width: 2px;
-    /* Se compensa el píxel de más para que el texto no salte al enfocar. */
-    padding-bottom: 5px;
+/* El foco no pinta bordes en la caja (no tiene): se marca engordando la línea
+   del cajón y poniéndola en tinta. */
+.problog-comentario-form:focus-within::after {
+    border-top-width: 2px;
+    border-top-color: var(--color-ink);
 }
 
 .problog-comentario-input::placeholder {
@@ -977,18 +995,17 @@
     flex-direction: column;
 }
 
-/* Cada comentario es una fila con su línea de separación arriba, también la
-   PRIMERA: la lista empieza justo debajo de la línea que cierra el cajón de
-   escribir, así que necesita la suya para que el reparto sea uniforme.
-   (Relleno con propiedades sueltas, por lo mismo que en el cajón.) */
+/* Cada comentario es una fila. Su línea de separación (arriba, también en el
+   primero) la dibuja el pseudo-elemento `::before`, que llega a los extremos. */
 .problog-comentario {
     display: flex;
     gap: 10px;
     padding-top: 12px;
     padding-bottom: 12px;
-    border-top: 1px solid var(--comentario-linea);
 }
 
+/* El aire del contenido de cada comentario lo pone el relleno de la sección, así
+   que aquí no hace falta margen extra. */
 .problog-comentario-avatar {
     flex: 0 0 34px;
     width: 34px;

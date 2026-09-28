@@ -1323,6 +1323,51 @@ function porFechaDesc(a, b) {
     return 0;
 }
 
+// ============================================================
+// SANGRADO DE LAS LÍNEAS INTERIORES
+// ------------------------------------------------------------
+// El cajón de escribir (su subrayado) y cada comentario (su separación) tienen
+// que llegar de extremo a extremo, igual que la línea de arriba de la sección.
+// Aquí se MIDE cuánto hay entre el borde de cada caja y el borde de la pantalla y
+// se guarda en `--linea-sangria` (y `--linea-sangria-der` si difieren), que es lo
+// que usan los pseudo-elementos que dibujan las líneas. Se mide en vez de
+// calcularlo en CSS porque el navegador resolvía los porcentajes y márgenes de
+// forma distinta en móvil y en escritorio (medido: la línea acababa con 24px de
+// aire, o 24px de más), y porque no siempre está a la vista al pintar.
+function ajustarAnchoCajasComentarios() {
+    const seccion = document.querySelector('[data-problog-comentarios]');
+    if (!seccion) return;
+    const cajas = seccion.querySelectorAll('.problog-comentario-form, .problog-comentario');
+    // Se quitan medidas que hubieran quedado aplicadas antes.
+    cajas.forEach((caja) => {
+        for (const prop of ['width', 'margin-left', 'margin-right']) {
+            if (caja.style.getPropertyValue(prop)) caja.style.removeProperty(prop);
+        }
+    });
+    // Cuánto tiene que salirse la línea por cada lado para llegar al extremo de la
+    // pantalla: lo que hay entre el borde de la caja y el borde de la ventana. Se
+    // mide (no se calcula en CSS) porque el navegador no da la misma respuesta en
+    // móvil que en escritorio; con esto el pseudo-elemento se sale lo justo.
+    const anchoVentana = document.documentElement.clientWidth;
+    cajas.forEach((caja) => {
+        const r = caja.getBoundingClientRect();
+        const izq = Math.max(0, Math.round(r.left));
+        const der = Math.max(0, Math.round(anchoVentana - r.right));
+        caja.style.setProperty('--linea-sangria', izq + 'px');
+        if (der !== izq) caja.style.setProperty('--linea-sangria-der', der + 'px');
+        else caja.style.removeProperty('--linea-sangria-der');
+    });
+    debugLog.log('[lineas comentarios] sangria calculada para ' + cajas.length + ' caja(s), ventana ' + anchoVentana);
+}
+
+// Al girar el móvil o cambiar el ancho de la ventana hay que volver a medir.
+let temporizadorAnchoComentarios = null;
+window.addEventListener('resize', () => {
+    if (!document.querySelector('[data-problog-comentarios]')) return;
+    clearTimeout(temporizadorAnchoComentarios);
+    temporizadorAnchoComentarios = setTimeout(ajustarAnchoCajasComentarios, 150);
+});
+
 function pintarListaComentarios(seccion, comentarios) {
     const lista = seccion.querySelector('[data-comentarios-lista]');
     if (!lista) return;
@@ -1374,6 +1419,7 @@ async function cargarComentariosDeLaPublicacion(id) {
         }
         pintarListaComentarios(seccion, data.comentarios || []);
         actualizarCuentaComentarios(id);
+        ajustarAnchoCajasComentarios();
     } catch (err) {
         debugLog.error('Error cargando comentarios del problog:', err);
         if (lista) lista.innerHTML = '<p class="problogs-vacio">No se pudieron cargar los comentarios.</p>';
@@ -1501,6 +1547,8 @@ async function abrirLectura(id) {
         detalleEl.innerHTML = pintarLectura(data);
         // Los comentarios de la publicación se cargan al abrirla.
         cargarComentariosDeLaPublicacion(data.id);
+        // Y se miden las cajas con línea (el cajón de escribir) al ancho real.
+        ajustarAnchoCajasComentarios();
     } catch (err) {
         debugLog.error('Error abriendo problog:', err);
         detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
