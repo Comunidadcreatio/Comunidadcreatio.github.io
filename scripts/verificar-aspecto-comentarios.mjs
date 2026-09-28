@@ -255,6 +255,8 @@ const MEDIR = (tema) => `(() => {
                 centro: rb.left + rb.width / 2,
                 centroFormulario: contenedor.left + contenedor.width / 2,
                 ancho: rb.width, alto: rb.height, radio: s.borderRadius,
+                // Para comprobar que no queda aire por debajo del botón.
+                abajo: rb.bottom, abajoCajon: contenedor.bottom,
                 texto: b.textContent.trim()
             };
         })(),
@@ -531,6 +533,10 @@ for (const tema of ['dark', 'light']) {
     check('el botón «Comentar» no tiene vértices curvos', env.radio === '0px' || env.radio === '0', String(env.radio));
     check(`el texto del botón va centrado (desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px)`,
       Math.abs(env.centro - env.centroFormulario) <= 2, `desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px`);
+    // El botón cierra el cajón: no puede quedar aire por debajo.
+    const aireAbajo = env.abajoCajon - env.abajo;
+    log(`   · hueco por debajo del botón: ${aireAbajo.toFixed(1)}px`);
+    check('el botón «Comentar» cierra el cajón (sin aire debajo)', Math.abs(aireAbajo) <= 1.5, `aire ${aireAbajo.toFixed(1)}px`);
   }
   if (d.lineaCajonY !== null && d.lineaCajonY !== undefined && d.botonEnviarY !== null && d.botonEnviarY !== undefined) {
     const encima = d.lineaCajonY <= d.botonEnviarY + 1;

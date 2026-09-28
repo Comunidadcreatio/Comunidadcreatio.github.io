@@ -889,13 +889,15 @@
 }
 
 /* --- Cajón de escribir ---
-   Sin fondo y sin caja: su única línea es el subrayado de la caja de dentro. */
+   Sin fondo y sin caja: su única línea es el subrayado de la caja de dentro.
+   SIN relleno inferior: el botón «Comentar» cierra el cajón, así que ese hueco
+   solo dejaba aire de sobra por debajo del botón. */
 .problog-comentario-form {
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding-top: 2px;
-    padding-bottom: 12px;
+    padding-bottom: 0;
     background: transparent;
 }
 
