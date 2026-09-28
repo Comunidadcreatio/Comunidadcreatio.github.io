@@ -774,23 +774,40 @@
        todo, dejar el texto legible: con `--comentario-linea` en oscuro quedaba
        un gris claro debajo de letras claras. */
     --comentario-hover: var(--color-gray-100);
-    /* Aire lateral del contenido del bloque de comentarios. Las LÍNEAS se salen
-       justo este ancho por cada lado para llegar de borde a borde: así reparten
-       el bloque sin quedar flotando con aire a los lados. (Las imágenes de la
-       publicación NO lo usan: esas llevan su aire propio.) */
+    /* Aire lateral del contenido del bloque de comentarios. Sirve para dos cosas
+       a la vez, y por eso un solo valor basta:
+       · es el relleno de la columna central (donde va el texto), centrado.
+       · es lo que la sección se sale por cada lado para que sus líneas de borde
+         -la de arriba, la que va justo debajo de los marcadores- lleguen de
+         extremo a extremo, sin aire.
+       En móvil vale el aire del main (24px) y la sección acaba justo en los
+       bordes de la pantalla; en escritorio se sube (ver el @media) para que el
+       contenido siga alineado con la publicación. */
     --comentario-aire: 24px;
+    /* La sección ocupa todo el ancho disponible aunque viva dentro del relleno
+       del main: se sale ese relleno con margen negativo y lo recupera en su
+       ancho. El contenido no se mueve porque el grid de abajo lo vuelve a
+       centrar. */
+    width: calc(100% + 2 * var(--comentario-aire));
+    margin-left: calc(-1 * var(--comentario-aire));
+    margin-right: calc(-1 * var(--comentario-aire));
     margin-top: 6px;
+    /* Grid de TRES columnas: la del medio es la de lectura (el contenido) y las
+       laterales se comen el aire. Así el relleno de la sección es 0 y su borde
+       llega de un extremo al otro. */
+    display: grid;
+    grid-template-columns: 1fr min(720px, 100%) 1fr;
     padding-top: 12px;
     border-top: 1px solid var(--comentario-linea);
 }
 
-/* De esquina a esquina: se sale del relleno del contenedor y lo compensa con su
-   propio relleno, así el texto sigue alineado y solo la línea se estira. */
-.problog-comentarios-titulo,
-.problog-comentario-form,
-.problog-comentario {
-    margin-left: calc(-1 * var(--comentario-aire));
-    margin-right: calc(-1 * var(--comentario-aire));
+/* Todo el contenido del bloque va en la columna central, con su aire. Así el
+   texto queda alineado con la publicación y las líneas INTERIORES (el subrayado
+   de la caja y la de cada comentario) se quedan dentro de la columna. La única
+   que sale a los extremos de la pantalla es la de ARRIBA de la sección. */
+.problog-comentarios > * {
+    grid-column: 2;
+    min-width: 0;
     padding-left: var(--comentario-aire);
     padding-right: var(--comentario-aire);
 }
@@ -824,6 +841,16 @@
     text-align: center;
 }
 
+/* En pantallas anchas la columna de lectura se centra (720px con márgenes
+   automáticos) y deja aire a los lados: con 24px la sección no llegaría a los
+   extremos, así que se sube a 48px. Es la mitad de (720px + 2×48px) = 816px, el
+   ancho a partir del cual la columna ya no llena la pantalla. */
+@media (min-width: 865px) {
+    .problog-comentarios {
+        --comentario-aire: 48px;
+    }
+}
+
 /* --- Cajón de escribir ---
    Sin fondo y sin caja. Aquí ya NO hay ninguna línea: ni arriba (la cabecera y el
    cajón ya quedan separados por su aire) ni abajo (la que lo separaba del botón
@@ -833,9 +860,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* OJO: propiedades sueltas, NO el atajo `padding`. El atajo resetea también
-       el relleno lateral, que es el que compensa el margen negativo de las
-       líneas de borde a borde (si se pierde, el texto se sale por los lados). */
     padding-top: 2px;
     padding-bottom: 12px;
     background: transparent;
@@ -845,16 +869,18 @@
    placeholder. Al quitarle el contorno se pierde la única marca de "aquí se
    escribe", así que el foco se señala con un subrayado de tinta (abajo), que
    ordena el bloque igual que las líneas finas del resto de la sección.
-   Ese subrayado va de BORDE A BORDE: la caja se sale del relleno del cajón (que
-   es quien trae el margen negativo de las líneas) con el mismo truco, y el texto
-   se queda alineado gracias a su relleno lateral. */
+   El subrayado es la línea que va justo ENCIMA de los comentarios, así que
+   llega de extremo a extremo como las demás: la caja se sale el relleno del
+   cajón por cada lado y lo recupera en su propio relleno (así el texto no se
+   mueve). El relleno es el del MAIN (24px), no el de la sección: si no, en
+   pantallas anchas el subrayado se saldría de la columna de lectura. */
 .problog-comentario-input {
     width: auto;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 6px var(--comentario-aire, 24px);
-    margin-left: calc(-1 * var(--comentario-aire, 24px));
-    margin-right: calc(-1 * var(--comentario-aire, 24px));
+    padding: 6px 24px;
+    margin-left: calc(24px - var(--comentario-aire));
+    margin-right: calc(24px - var(--comentario-aire));
     /* Aire respecto al título: el subrayado pasa por debajo del texto y sin este
        margen quedaría pegado a «Comentarios». */
     margin-top: 12px;

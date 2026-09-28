@@ -152,6 +152,14 @@ const MEDIR = (tema) => `(() => {
                  ladosConLinea: gruesos.map((w, i) => (w === '1px' ? ['arriba', 'abajo', 'izquierda'][i] : null)).filter(Boolean) };
     };
     const r = sec.getBoundingClientRect();
+    // La línea de arriba de la sección se pinta en el BORDE de su caja: hay que
+    // sumar su relleno lateral (el texto va dentro, pero la línea llega más
+    // lejos). Medir solo el rectángulo daba por bueno un sangrado que no existía.
+    const rellenoSec = getComputedStyle(sec);
+    const lineaSeccion = {
+        left: r.left - parseFloat(rellenoSec.paddingLeft || 0),
+        right: r.right + parseFloat(rellenoSec.paddingRight || 0)
+    };
     // Rectángulos de lo que debe llegar de borde a borde: el título, el cajón y
     // un comentario. Se comparan con el de la sección para ver si la línea se
     // estira o se queda con aire a los lados.
@@ -187,7 +195,9 @@ const MEDIR = (tema) => `(() => {
             form: caja(g('.problog-comentario-form')),
             comentario: caja(g('.problog-comentario')),
             lineaInput: caja(g('.problog-comentario-input')),
-            seccion: { left: r.left, right: r.right }
+            // OJO: la sección puede llevar relleno lateral (el texto va dentro y
+            // la línea va en el borde), así que su línea se mide con ese relleno.
+            seccion: { left: lineaSeccion.left, right: lineaSeccion.right }
         },
         // Botón «Comentar»: tiene que ir centrado y ancho.
         botonEnviar: (() => {
@@ -396,17 +406,28 @@ for (const tema of ['dark', 'light']) {
   check('la guía de las respuestas es una línea de 1px a la izquierda',
     caja('guia de respuestas').lados?.izquierda?.startsWith('1px'), caja('guia de respuestas').lados?.izquierda);
 
-  // 5) Las líneas van de BORDE A BORDE de la pantalla, sin aire a los lados. Se
-  //    comparan con el ancho de la ventana, no con la sección: la sección vive
-  //    dentro del relleno del main y es más estrecha que la línea a propósito.
+  // 5) La línea que se pidió (la de ARRIBA de la sección, justo debajo de los
+  //    marcadores) llega de extremo a extremo. Las interiores se quedan dentro de
+  //    la columna de lectura, que es lo que se pidió después.
   const ventana = d.ventana;
+  const seccion = d.bordes?.seccion;
+  if (!seccion) { check('se midió la línea de la sección', false); }
+  else {
+    const aireSeccion = Math.max(seccion.left, ventana - seccion.right);
+    log(`   · línea bajo los marcadores: ${seccion.left.toFixed(0)}..${seccion.right.toFixed(0)} (ventana ${ventana}, aire ${aireSeccion.toFixed(0)}px)`);
+    check('la línea bajo los marcadores llega de extremo a extremo', Math.abs(aireSeccion) <= 1.5, `aire ${aireSeccion.toFixed(1)}px`);
+  }
   for (const [nombre, b] of Object.entries(d.bordes || {})) {
-    // `seccion` es el propio bloque (la referencia), no una línea.
-    if (nombre === 'seccion') continue;
-    if (!b) { check(`rectángulo de «${nombre}» medido`, false); continue; }
-    const aire = Math.max(b.left, ventana - b.right);
-    log(`   · línea de «${nombre}»: de ${b.left.toFixed(0)} a ${b.right.toFixed(0)} (ventana ${ventana})`);
-    check(`la línea de «${nombre}» llega de borde a borde`, Math.abs(aire) <= 1.5, `aire lateral ${aire.toFixed(1)}px`);
+    if (nombre === 'seccion' || !b) continue;
+    log(`   · ${nombre}: ${b.left.toFixed(0)}..${b.right.toFixed(0)}`);
+    check(`«${nombre}» se queda dentro de la pantalla`, b.left >= -1 && b.right <= ventana + 1, `${b.left.toFixed(0)}..${b.right.toFixed(0)} de ${ventana}`);
+  }
+  // La de la sección tiene que salir MÁS que las interiores: es la única que va
+  // a los extremos.
+  if (seccion && d.bordes?.comentario) {
+    check('la línea de la sección sale más que la de los comentarios',
+      seccion.left <= d.bordes.comentario.left + 0.5 && seccion.right >= d.bordes.comentario.right - 0.5,
+      `sección ${seccion.left.toFixed(0)}..${seccion.right.toFixed(0)} vs comentario ${d.bordes.comentario.left.toFixed(0)}..${d.bordes.comentario.right.toFixed(0)}`);
   }
 
   // 6) Marcadores centrados y más grandes.
@@ -541,6 +562,73 @@ else {
   }
   log(`   · solapes entre botones del nav: ${solapes}`);
   check('los botones del nav no se solapan', solapes === 0, `${solapes} solape(s)`);
+}
+
+// --- Las líneas, en varios anchos de pantalla -------------------------------
+// La línea de arriba de la sección es la que va justo DEBAJO de los marcadores:
+// tiene que llegar de extremo a extremo en cualquier ancho, no solo en el móvil
+// de pruebas. Se recorre una lista de anchos y se mide en cada uno.
+log(`\n=== Las líneas de extremo a extremo, por ancho de pantalla ===`);
+const LINEAS = `(() => {
+    const rect = (sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        if (!r.width) return null;
+        return { left: Math.round(r.left), right: Math.round(r.right) };
+    };
+    return JSON.stringify({
+        ventana: window.innerWidth,
+        // Esta es la que se pidió: la de arriba de la sección, justo debajo de
+        // los marcadores y por encima de «Comentarios». Se mide en el BORDE de la
+        // caja (rectángulo + relleno lateral), que es donde se pinta.
+        bajoMarcadores: (() => {
+            const el = document.querySelector('[data-problog-comentarios]');
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return { left: Math.round(r.left - parseFloat(s.paddingLeft || 0)), right: Math.round(r.right + parseFloat(s.paddingRight || 0)) };
+        })(),
+        subrayadoInput: rect('[data-problog-comentarios] .problog-comentario-input'),
+        primerComentario: rect('[data-problog-comentarios] .problog-comentario')
+    });
+})()`;
+
+for (const anchoVentana of [320, 360, 420, 768, 1280]) {
+  await send('Emulation.setDeviceMetricsOverride', { width: anchoVentana, height: 900, deviceScaleFactor: 1, mobile: anchoVentana < 700 });
+  await send('Page.navigate', { url: URL_BASE });
+  for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
+  await sleep(900);
+  await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+  await sleep(1500);
+  await evalJs(`document.querySelector('.problog-card')?.click()`);
+  await sleep(1800);
+  await evalJs(`document.querySelector('[data-problog-comentarios]')?.scrollIntoView({ block: 'start', behavior: 'instant' })`);
+  await sleep(400);
+  const m = JSON.parse((await evalJs(LINEAS)) || 'null');
+  if (!m) { check(`se pudieron medir las líneas a ${anchoVentana}px`, false); continue; }
+  for (const [nombre, b] of Object.entries(m)) {
+    if (nombre === 'ventana' || !b) continue;
+    const aire = Math.max(b.left, m.ventana - b.right);
+    log(`   · ${anchoVentana}px · ${nombre}: ${b.left}..${b.right} (aire ${aire}px)`);
+    if (nombre === 'bajoMarcadores') {
+      // ESTA es la que se pidió: la de arriba de la sección, justo debajo de los
+      // marcadores. En móvil (hasta 768px, donde la columna de lectura ocupa todo
+      // el ancho) tiene que llegar de extremo a extremo. En pantallas anchas la
+      // columna está centrada y la línea llega a los extremos de la PANTALLA.
+      const debeLlegar = anchoVentana <= 768;
+      if (debeLlegar) {
+        check(`${anchoVentana}px · la línea bajo los marcadores llega de extremo a extremo`, Math.abs(aire) <= 1.5, `aire ${aire}px`);
+      } else {
+        // Fuera de la columna de lectura (que es lo que se veía antes de aire).
+        const fueraDeLaColumna = b.left < (m.ventana - 720) / 2 + 1 && b.right > (m.ventana + 720) / 2 - 1;
+        check(`${anchoVentana}px · la línea bajo los marcadores sale de la columna`, fueraDeLaColumna, `${b.left}..${b.right} de ${m.ventana}`);
+      }
+    } else {
+      // Las interiores se quedan dentro de la columna (a petición).
+      check(`${anchoVentana}px · «${nombre}» se queda dentro de la pantalla`, b.left >= -1 && b.right <= m.ventana + 1, `${b.left}..${b.right}`);
+    }
+  }
 }
 
 // --- Estado SIN comentarios -------------------------------------------------
