@@ -248,13 +248,14 @@ const MEDIR = (tema) => `(() => {
             const b = g('.problog-comentario-enviar');
             if (!b) return null;
             const rb = b.getBoundingClientRect();
-            const acciones = b.parentElement.getBoundingClientRect();
             const contenedor = g('.problog-comentario-form').getBoundingClientRect();
+            const s = cs(b);
             return {
+                izq: rb.left, der: rb.right,
                 centro: rb.left + rb.width / 2,
-                centroAcciones: acciones.left + acciones.width / 2,
                 centroFormulario: contenedor.left + contenedor.width / 2,
-                ancho: rb.width, alto: rb.height, texto: b.textContent.trim()
+                ancho: rb.width, alto: rb.height, radio: s.borderRadius,
+                texto: b.textContent.trim()
             };
         })(),
         filaSocial: (() => {
@@ -519,14 +520,17 @@ for (const tema of ['dark', 'light']) {
       JSON.stringify(lados));
   }
 
-  // 8b) El botón «Comentar»: centrado y ancho. Y la línea del cajón va ENCIMA.
+  // 8b) El botón «Comentar»: de extremo a extremo (rectángulo, sin curvas) y
+  //     centrado su texto. Y la línea del cajón va ENCIMA de él.
   const env = d.botonEnviar;
   if (!env) { check('el botón «Comentar» existe', false); }
   else {
-    const desvioBoton = Math.abs(env.centro - env.centroFormulario);
-    log(`   · botón «${env.texto}»: centro=${env.centro.toFixed(1)} vs formulario=${env.centroFormulario.toFixed(1)} (desvío ${desvioBoton.toFixed(1)}px), ancho=${env.ancho.toFixed(0)}px, alto=${env.alto.toFixed(0)}px`);
-    check(`el botón «Comentar» está centrado (desvío ${desvioBoton.toFixed(1)}px)`, desvioBoton <= 2, `desvío ${desvioBoton.toFixed(1)}px`);
-    check(`el botón «Comentar» es ancho (${Math.round(env.ancho)}px ≥ 150)`, env.ancho >= 150, String(Math.round(env.ancho)));
+    const aireBoton = Math.max(env.izq, ventana - env.der);
+    log(`   · botón «${env.texto}»: ${env.izq.toFixed(0)}..${env.der.toFixed(0)} (aire ${aireBoton.toFixed(0)}px), ancho=${env.ancho.toFixed(0)}px, alto=${env.alto.toFixed(0)}px, radio=${env.radio}, centro=${env.centro.toFixed(1)} vs cajón=${env.centroFormulario.toFixed(1)}`);
+    check('el botón «Comentar» llega de extremo a extremo', Math.abs(aireBoton) <= 1.5, `aire ${aireBoton.toFixed(1)}px`);
+    check('el botón «Comentar» no tiene vértices curvos', env.radio === '0px' || env.radio === '0', String(env.radio));
+    check(`el texto del botón va centrado (desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px)`,
+      Math.abs(env.centro - env.centroFormulario) <= 2, `desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px`);
   }
   if (d.lineaCajonY !== null && d.lineaCajonY !== undefined && d.botonEnviarY !== null && d.botonEnviarY !== undefined) {
     const encima = d.lineaCajonY <= d.botonEnviarY + 1;

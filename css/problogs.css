@@ -932,11 +932,12 @@
 .problog-comentario-acciones {
     display: flex;
     align-items: center;
-    /* El botón «Comentar» va CENTRADO: al terminar de escribir, el gesto natural
-       es bajar la mirada y pulsar; con el botón pegado a la derecha quedaba
-       lejos del texto. El chip de "respondiendo a…" se queda en su sitio porque
-       se saca del flujo centrado con `margin-right: auto`. */
-    justify-content: center;
+    /* La fila se sale igual que las líneas (mismo sangrado) para que el botón
+       llegue de extremo a extremo, como el contenedor. El chip de "respondiendo
+       a…" se queda pegado a la izquierda. */
+    margin-left: calc(-1 * var(--linea-sangria, 24px));
+    margin-right: calc(-1 * var(--linea-sangria-der, var(--linea-sangria, 24px)));
+    justify-content: flex-start;
     gap: 10px;
 }
 
@@ -965,18 +966,20 @@
    tokens se invierten, quedaba texto oscuro... sobre fondo claro solo a
    medias: el relleno se volvía BLANCO y el texto también, así que las letras
    no se veían. Sin relleno el problema desaparece: solo hay texto y un borde.
-   Más ancho que antes (de 18px a 48px de relleno lateral y 12px de alto, que deja
-   unos 170px de botón) porque es la acción principal de la zona y ahora va
-   centrado. */
+   Va de EXTREMO A EXTREMO y con los vértices rectos, como las líneas de la
+   sección: la fila ya se sale con el sangrado, así que aquí solo hay que ocupar
+   el ancho y quitar el redondeo. */
 .problog-comentario-enviar {
-    padding: 12px 48px;
+    width: 100%;
+    padding: 12px 16px;
     border: 1px solid var(--comentario-control);
-    border-radius: 999px;
+    border-radius: 0;
     background: transparent;
     color: var(--color-ink);
     font-family: inherit;
     font-size: 14px;
     font-weight: 700;
+    text-align: center;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
