@@ -1,7 +1,7 @@
 /* css/style.css - Archivo principal */
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=55afc07db4');
+@import url('header.css?v=aab26dd663');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=428b30a01c');

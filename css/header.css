@@ -81,8 +81,13 @@ picture {
     margin-left: auto;
 }
 
-/* Empuja los iconos restantes (notificaciones, menú) hacia la derecha */
-#btn-notificaciones {
+/* Empuja hacia la derecha el primer icono de la zona derecha del header. El
+   icono de volver (que va pegado a la campana, a su izquierda) es el PRIMERO de
+   ese grupo, así que el empuje va en él: si estuviera en la campana, el de volver
+   quedaría a su derecha, porque el margen empuja lo que viene DESPUÉS. Cuando no
+   hay lectura abierta el icono está oculto (`display: none`) y el `auto` recae en
+   la campana sola, que es justo lo que hacía antes. */
+#btn-problog-volver {
     margin-left: auto;
 }
 
@@ -257,6 +262,18 @@ picture {
 @keyframes flechaAparece {
     from { opacity: 0; transform: translateX(8px) scale(0.7); }
     to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ==============================================
+   ICONO VOLVER (lectura de un problog)
+   Va pegado a la campana, a su izquierda. Solo
+   aparece mientras se lee una publicación.
+   ============================================== */
+#btn-problog-volver:not(.hidden) {
+    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#btn-problog-volver.ocultando {
+    animation: hamburguesaOculta 0.26s ease-in forwards;
 }
 
 /* ==============================================

@@ -1533,7 +1533,6 @@ function pintarLectura(p, conAcciones) {
     // Orden pedido: el texto primero, y AL FINAL de la publicación la fila de
     // likes/comentarios/reblogs con el bloque de comentarios justo debajo.
     return `
-        <button type="button" class="problog-volver" id="problog-volver">← Volver</button>
         <header class="problog-lectura-cab">
             <!-- Autoría arriba y a la izquierda: avatar, nombre y tiempo. -->
             <div class="problog-lectura-autoria">
@@ -1554,10 +1553,14 @@ async function abrirLectura(id) {
     detalleEl.innerHTML = '<p class="problogs-cargando">Cargando…</p>';
     detalleEl.classList.remove('hidden');
     feedEl.classList.add('hidden');
+    // El icono de volver vive en el header (junto a la campana) y solo se ve
+    // mientras hay una publicación abierta.
+    mostrarIconoVolver(true);
     try {
         const data = await apiRequest('/problogs/' + id);
         if (!data || data.success === false || !data.id) {
             detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
+            mostrarIconoVolver(false);
             return;
         }
         publicacionAbierta = data;
@@ -1569,7 +1572,28 @@ async function abrirLectura(id) {
     } catch (err) {
         debugLog.error('Error abriendo problog:', err);
         detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
+        mostrarIconoVolver(false);
     }
+}
+
+// Icono de volver del header: aparece solo mientras hay una publicación abierta.
+// Se aplica el mismo patrón que los demás iconos del header (clase `.ocultando` y
+// retardo, para que la aparición y el ocultado no choquen con la campana).
+function mostrarIconoVolver(mostrar) {
+    const btn = document.getElementById('btn-problog-volver');
+    if (!btn) return;
+    clearTimeout(btn._mostrarTimer);
+    clearTimeout(btn._ocultarTimer);
+    if (mostrar) {
+        btn.classList.remove('ocultando', 'hidden');
+        return;
+    }
+    if (btn.classList.contains('hidden')) return;
+    btn.classList.add('ocultando');
+    btn._ocultarTimer = setTimeout(() => {
+        btn.classList.remove('ocultando');
+        btn.classList.add('hidden');
+    }, 280);
 }
 
 function cerrarLectura() {
@@ -1578,6 +1602,7 @@ function cerrarLectura() {
     detalleEl.innerHTML = '';
     feedEl.classList.remove('hidden');
     publicacionAbierta = null;
+    mostrarIconoVolver(false);
 }
 
 // ============================================================
@@ -1629,7 +1654,7 @@ function abrirVistaPrevia() {
         <div class="problog-vista-previa-cuerpo">${pintarLectura(publicacion, false)}</div>`;
 
     capa.addEventListener('click', (e) => {
-        if (e.target.closest('[data-cerrar-vista-previa]') || e.target.closest('#problog-volver')) {
+        if (e.target.closest('[data-cerrar-vista-previa]')) {
             cerrarVistaPrevia();
         }
     });
@@ -1838,10 +1863,6 @@ function manejarAcciones(e, desdePerfil) {
         eliminarProblog(id, titulo);
         return;
     }
-    if (e.target.closest('#problog-volver')) {
-        cerrarLectura();
-        return;
-    }
     // Clic en la tarjeta (y no en una acción) -> vista de lectura.
     const card = e.target.closest('.problog-card');
     if (!card) return;
@@ -1852,6 +1873,12 @@ function manejarAcciones(e, desdePerfil) {
 // ============================================================
 // INICIALIZACIÓN
 // ============================================================
+// El icono de volver del header cierra la lectura. Se expone para que main.js lo
+// conecte (igual que el resto de iconos del header).
+export function volverDesdeLectura() {
+    cerrarLectura();
+}
+
 export function setupProblogs() {
     form = document.getElementById('problog-form');
 

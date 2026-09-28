@@ -1205,19 +1205,8 @@
     margin: 0 auto;
 }
 
-#problogs .problog-volver {
-    width: auto;
-    padding: 8px 14px;
-    margin-bottom: 18px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 20px;
-    background: transparent;
-    color: var(--color-ink);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
+/* (El botón «Volver» que vivía aquí se quitó: ahora es un icono del header,
+   junto a la campana, que solo se ve mientras se lee una publicación.) */
 
 .problog-lectura-cab {
     margin-bottom: 22px;
@@ -1459,7 +1448,6 @@
 [data-theme="dark"] #crear-problogs-contenido .problog-vacio,
 [data-theme="dark"] #crear-problogs-contenido .problog-preview-vacia,
 [data-theme="dark"] #crear-problogs-contenido #problog-form .problog-anadir-btn,
-[data-theme="dark"] #problogs .problog-volver,
 [data-theme="dark"] #crear-problogs-contenido #problog-form .problog-accion-suave {
     border-color: rgba(255, 255, 255, 0.18);
 }
@@ -1703,8 +1691,7 @@ body.creando-problogs #problog-nav-bar {
 }
 
 /* Sin interacciones en la vista previa. */
-#problog-vista-previa-capa .problog-social,
-#problog-vista-previa-capa #problog-volver {
+#problog-vista-previa-capa .problog-social {
     display: none;
 }
 

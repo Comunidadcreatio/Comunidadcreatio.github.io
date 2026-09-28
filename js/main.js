@@ -42,7 +42,7 @@ import {
     limpiarFormularioConConfirmacion
 } from './panel-ui.js?v=ae9b95685f';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=933672191c';
-import { setupProblogs, abrirProblogDesdeNotificacion } from './problogs.js?v=891a0e098d';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=57c95c767b';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=225df8eb80';
 import { setupPush } from './push.js?v=b8da30e8a1';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
@@ -557,6 +557,16 @@ function setupEvents() {
     if (btnProblogsNav) {
         btnProblogsNav.addEventListener('click', () => {
             toggleProblogs();
+        });
+    }
+
+    // ----- Icono de volver (header): cierra la lectura de un problog -----
+    // Vive junto a la campana y solo se ve mientras hay una publicación abierta
+    // (lo muestra/oculta problogs.js al abrir y cerrar la lectura).
+    const btnProblogVolver = document.getElementById('btn-problog-volver');
+    if (btnProblogVolver) {
+        btnProblogVolver.addEventListener('click', () => {
+            volverDesdeLectura();
         });
     }
 
