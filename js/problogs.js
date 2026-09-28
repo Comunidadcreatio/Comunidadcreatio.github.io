@@ -1357,6 +1357,16 @@ function ajustarAnchoCajasComentarios() {
         if (der !== izq) caja.style.setProperty('--linea-sangria-der', der + 'px');
         else caja.style.removeProperty('--linea-sangria-der');
     });
+    // La línea del cajón va ENCIMA del botón «Comentar»: se mide el alto de esa
+    // fila (más el hueco) y se deja esa distancia desde abajo.
+    const cajon = seccion.querySelector('.problog-comentario-form');
+    const acciones = cajon ? cajon.querySelector('.problog-comentario-acciones') : null;
+    if (cajon && acciones) {
+        const rc = cajon.getBoundingClientRect();
+        const ra = acciones.getBoundingClientRect();
+        const desdeAbajo = Math.max(0, Math.round(rc.bottom - ra.top));
+        cajon.style.setProperty('--linea-cajon-abajo', desdeAbajo + 'px');
+    }
     debugLog.log('[lineas comentarios] sangria calculada para ' + cajas.length + ' caja(s), ventana ' + anchoVentana);
 }
 
@@ -1366,6 +1376,13 @@ window.addEventListener('resize', () => {
     if (!document.querySelector('[data-problog-comentarios]')) return;
     clearTimeout(temporizadorAnchoComentarios);
     temporizadorAnchoComentarios = setTimeout(ajustarAnchoCajasComentarios, 150);
+});
+
+// El chip de "respondiendo a…" cambia la fila de acciones de alto (aparece a la
+// izquierda del botón): hay que recolocar la línea del cajón, que va justo encima.
+document.addEventListener('click', (e) => {
+    if (!e.target.closest || !e.target.closest('[data-comentario-responder], [data-comentario-respondiendo]')) return;
+    setTimeout(ajustarAnchoCajasComentarios, 60);
 });
 
 function pintarListaComentarios(seccion, comentarios) {

@@ -831,10 +831,11 @@
     pointer-events: none;
 }
 
-/* La del cajón va DEBAJO (es el subrayado de la caja) y la de cada comentario
-   ARRIBA (separa un comentario del anterior). */
+/* La del cajón va ENCIMA DEL BOTÓN «Comentar» (no debajo del todo): separa lo que
+   escribes de la fila del botón. Su distancia desde abajo la calcula JS
+   (`ajustarAnchoCajasComentarios`), que es quien conoce el alto de esa fila. */
 .problog-comentario-form::after {
-    bottom: 0;
+    bottom: var(--linea-cajon-abajo, 0px);
 }
 
 .problog-comentario::before {
@@ -1115,12 +1116,10 @@
     border-left: 1px solid var(--color-gray-400);
 }
 
-/* Dentro del bloque de respuestas, la separación la pone la propia línea guía
-   del padre: repetir el borde de cada respuesta dejaba tres rayas seguidas. La
-   respuesta tampoco se sale a sangre (se queda con el aire del padre, para que
-   se vea que va dentro). */
+/* Dentro del bloque de respuestas NO hay línea de división: la respuesta va
+   pegada a su comentario padre (la relación la marca la línea guía de la
+   izquierda) y una raya entre los dos sobraba. Tampoco se sale a sangre. */
 .problog-comentario-respuestas .problog-comentario {
-    border-top: none;
     margin-left: 0;
     margin-right: 0;
     padding-left: 0;
@@ -1128,6 +1127,10 @@
     padding-top: 8px;
     padding-bottom: 0;
     gap: 8px;
+}
+
+.problog-comentario-respuestas .problog-comentario::before {
+    content: none;
 }
 
 /* El estado vacío, centrado y con aire: es lo primero que ve quien llega. */

@@ -222,6 +222,28 @@ const MEDIR = (tema) => `(() => {
             seccion: { left: lineaSeccion.left, right: lineaSeccion.right }
         },
         // Botón «Comentar»: tiene que ir centrado y ancho.
+        // Botón «Comentar»: tiene que ir centrado y ancho. Y la línea del cajón
+        // tiene que quedar ENCIMA de él (a qué altura empieza el botón).
+        botonEnviarY: (() => {
+            const b = g('.problog-comentario-enviar');
+            return b ? Math.round(b.getBoundingClientRect().top) : null;
+        })(),
+        lineaCajonY: (() => {
+            const el = g('.problog-comentario-form');
+            if (!el) return null;
+            const p = cs(el, '::after');
+            if (!p || p.content === 'none' || p.borderTopWidth === '0px') return null;
+            const r = el.getBoundingClientRect();
+            return Math.round(r.bottom - (parseFloat(p.bottom) || 0));
+        })(),
+        // Respuesta anidada: NO debe llevar línea de división (va pegada a su
+        // comentario padre; la relación la marca la línea guía de la izquierda).
+        lineaRespuesta: (() => {
+            const el = g('.problog-comentario-respuestas .problog-comentario');
+            if (!el) return null;
+            const p = cs(el, '::before');
+            return p ? (p.content === 'none' || p.borderTopWidth === '0px' ? 'sin linea' : 'con linea') : null;
+        })(),
         botonEnviar: (() => {
             const b = g('.problog-comentario-enviar');
             if (!b) return null;
@@ -428,6 +450,13 @@ for (const tema of ['dark', 'light']) {
     !!caja('primer comentario').lineaPropia, JSON.stringify(caja('primer comentario').lineaPropia));
   check('la guía de las respuestas es una línea de 1px a la izquierda',
     caja('guia de respuestas').lados?.izquierda?.startsWith('1px'), caja('guia de respuestas').lados?.izquierda);
+  // La respuesta va pegada a su comentario: sin línea de división entre los dos.
+  if (d.lineaRespuesta === null || d.lineaRespuesta === undefined) {
+    check('hay una respuesta anidada que medir', false);
+  } else {
+    log(`   · respuesta anidada: ${d.lineaRespuesta}`);
+    check('la respuesta anidada NO lleva línea de división', d.lineaRespuesta === 'sin linea', d.lineaRespuesta);
+  }
 
   // 5) La línea que se pidió (la de ARRIBA de la sección, justo debajo de los
   //    marcadores) llega de extremo a extremo. Las interiores se quedan dentro de
@@ -490,7 +519,7 @@ for (const tema of ['dark', 'light']) {
       JSON.stringify(lados));
   }
 
-  // 8b) El botón «Comentar»: centrado y ancho.
+  // 8b) El botón «Comentar»: centrado y ancho. Y la línea del cajón va ENCIMA.
   const env = d.botonEnviar;
   if (!env) { check('el botón «Comentar» existe', false); }
   else {
@@ -498,6 +527,15 @@ for (const tema of ['dark', 'light']) {
     log(`   · botón «${env.texto}»: centro=${env.centro.toFixed(1)} vs formulario=${env.centroFormulario.toFixed(1)} (desvío ${desvioBoton.toFixed(1)}px), ancho=${env.ancho.toFixed(0)}px, alto=${env.alto.toFixed(0)}px`);
     check(`el botón «Comentar» está centrado (desvío ${desvioBoton.toFixed(1)}px)`, desvioBoton <= 2, `desvío ${desvioBoton.toFixed(1)}px`);
     check(`el botón «Comentar» es ancho (${Math.round(env.ancho)}px ≥ 150)`, env.ancho >= 150, String(Math.round(env.ancho)));
+  }
+  if (d.lineaCajonY !== null && d.lineaCajonY !== undefined && d.botonEnviarY !== null && d.botonEnviarY !== undefined) {
+    const encima = d.lineaCajonY <= d.botonEnviarY + 1;
+    log(`   · línea del cajón a y=${d.lineaCajonY}, el botón empieza en y=${d.botonEnviarY}`);
+    check('la línea del cajón va ENCIMA del botón «Comentar»', encima,
+      `línea y=${d.lineaCajonY} vs botón y=${d.botonEnviarY}`);
+  } else {
+    check('se pudo medir la altura de la línea del cajón y del botón', false,
+      `linea=${d.lineaCajonY} boton=${d.botonEnviarY}`);
   }
 
   // 9) Sin comentarios no se pinta ningún mensaje: la lista queda vacía.
@@ -626,7 +664,13 @@ const LINEAS = `(() => {
             const p = getComputedStyle(el, '::after');
             if (!p || p.content === 'none' || p.borderTopWidth === '0px') return null;
             const r = el.getBoundingClientRect();
-            return { left: Math.round(r.left - (parseFloat(p.left) || 0)), right: Math.round(r.right + (parseFloat(p.right) || 0)) };
+            return { left: Math.round(r.left - (parseFloat(p.left) || 0)), right: Math.round(r.right + (parseFloat(p.right) || 0)),
+                     // Posición vertical: sirve para comprobar que va ENCIMA del botón.
+                     arriba: Math.round(r.bottom - (parseFloat(p.bottom) || 0)) };
+        })(),
+        botonEnviarY: (() => {
+            const b = document.querySelector('[data-problog-comentarios] .problog-comentario-enviar');
+            return b ? Math.round(b.getBoundingClientRect().top) : null;
         })(),
         primerComentario: (() => {
             const el = document.querySelector('[data-problog-comentarios] .problog-comentario');
@@ -656,7 +700,8 @@ for (const anchoVentana of [320, 360, 420, 768, 1280]) {
   const m = JSON.parse((await evalJs(LINEAS)) || 'null');
   if (!m) { check(`se pudieron medir las líneas a ${anchoVentana}px`, false); continue; }
   for (const [nombre, b] of Object.entries(m)) {
-    if (nombre === 'ventana' || !b) continue;
+    // `ventana` y `botonEnviarY` son números, no cajas: no se miden como líneas.
+    if (nombre === 'ventana' || !b || typeof b !== 'object' || b.left === undefined) continue;
     const aire = Math.max(b.left, m.ventana - b.right);
     log(`   · ${anchoVentana}px · ${nombre}: ${b.left}..${b.right} (aire ${aire}px)`);
     if (nombre === 'bajoMarcadores') {
