@@ -255,6 +255,7 @@ const MEDIR = (tema) => `(() => {
                 centro: rb.left + rb.width / 2,
                 centroFormulario: contenedor.left + contenedor.width / 2,
                 ancho: rb.width, alto: rb.height, radio: s.borderRadius,
+                borde: s.borderTopWidth,
                 // Para comprobar que no queda aire por debajo del botón.
                 abajo: rb.bottom, abajoCajon: contenedor.bottom,
                 texto: b.textContent.trim()
@@ -531,6 +532,9 @@ for (const tema of ['dark', 'light']) {
     log(`   · botón «${env.texto}»: ${env.izq.toFixed(0)}..${env.der.toFixed(0)} (aire ${aireBoton.toFixed(0)}px), ancho=${env.ancho.toFixed(0)}px, alto=${env.alto.toFixed(0)}px, radio=${env.radio}, centro=${env.centro.toFixed(1)} vs cajón=${env.centroFormulario.toFixed(1)}`);
     check('el botón «Comentar» llega de extremo a extremo', Math.abs(aireBoton) <= 1.5, `aire ${aireBoton.toFixed(1)}px`);
     check('el botón «Comentar» no tiene vértices curvos', env.radio === '0px' || env.radio === '0', String(env.radio));
+    // Sin borde: se pidió que no se vea el contorno del botón.
+    check('el botón «Comentar» no tiene borde visible',
+      env.borde === '0px' || env.borde === '0' || env.borde === 'none', String(env.borde));
     check(`el texto del botón va centrado (desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px)`,
       Math.abs(env.centro - env.centroFormulario) <= 2, `desvío ${Math.abs(env.centro - env.centroFormulario).toFixed(1)}px`);
     // El botón cierra el cajón: no puede quedar aire por debajo.

@@ -963,18 +963,17 @@
     color: var(--color-ink);
 }
 
-/* Botón de enviar: SIN relleno y con el texto en tinta. Antes era fondo
-   `--color-ink` con texto `--color-white` y, como en modo oscuro esos dos
-   tokens se invierten, quedaba texto oscuro... sobre fondo claro solo a
-   medias: el relleno se volvía BLANCO y el texto también, así que las letras
-   no se veían. Sin relleno el problema desaparece: solo hay texto y un borde.
-   Va de EXTREMO A EXTREMO y con los vértices rectos, como las líneas de la
-   sección: la fila ya se sale con el sangrado, así que aquí solo hay que ocupar
-   el ancho y quitar el redondeo. */
+/* Botón de enviar: SIN borde, sin relleno y con el texto en tinta. Antes era
+   fondo `--color-ink` con texto `--color-white` y, como en modo oscuro esos dos
+   tokens se invierten, el relleno se volvía blanco y las letras también: no se
+   veían. Sin relleno el problema desaparece.
+   Ocupa el ancho completo (la fila ya se sale con el sangrado) y sin vértices
+   curvos. Al no llevar borde, la única pista de que es pulsable es el texto y el
+   tiñe al pasar por encima, así que ese hover se queda. */
 .problog-comentario-enviar {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--comentario-control);
+    border: none;
     border-radius: 0;
     background: transparent;
     color: var(--color-ink);
