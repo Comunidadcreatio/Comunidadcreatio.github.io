@@ -932,15 +932,11 @@ body.responder-subida .problog-responder-barra {
     top: var(--barra-top, 0px);
 }
 
-/* El MENÚ PRINCIPAL se oculta SOLO cuando la barra ocupa su sitio (cuando hay que
-   subirla para no quedar bajo el teclado). Es lo que hace Cavents con su cajón y es
-   lo que quita el aire: esa franja la ocupa la barra. Si NO hay que subirla, el menú
-   se queda a la vista: si se ocultara, su franja quedaría vacía entre la barra y el
-   teclado, que era el hueco que se veía. */
-body.responder-subida #toggle-panel {
-    visibility: hidden;
-    pointer-events: none;
-}
+/* OJO: el MENÚ PRINCIPAL se deja A LA VISTA también con el teclado abierto. Antes se
+   ocultaba (como hace Cavents con su cajón) para que la barra ocupara su franja. Pero
+   en este móvil esa franja SÍ se veía, así que quedaba un hueco vacío entre la barra y
+   el teclado. Dejando el menú, esa banda la ocupa él y no hay hueco. La barra nunca lo
+   tapa: problogs.js la deja como mucho justo encima de él. */
 
 /* En pantallas anchas la barra se centra con el ancho de la columna de lectura,
    como el contenido. OJO: el `bottom` sigue siendo el del menú principal, porque

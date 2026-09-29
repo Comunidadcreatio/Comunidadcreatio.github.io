@@ -1389,16 +1389,21 @@ function ajustarBarraResponderAlTeclado() {
     const baseFija = ventana - altoNav;
     // Fondo de lo que se ve, en coordenadas de la pantalla.
     const fondoVisible = pan + Math.round(visH);
-    // Solo hay que recolocarla si su sitio natural queda por debajo de lo visible (el
-    // teclado lo tapa). Si no, se deja como está el CSS: `fixed` encima del menú.
-    const tapada = baseFija > fondoVisible + 1;
-    if (!tapada) {
+    // DÓNDE DEBE QUEDAR. Dos condiciones a la vez:
+    //   - su borde de abajo no puede pasar del fondo de lo visible (si no, el teclado
+    //     la tapa),
+    //   - ni pasar del borde de arriba del MENÚ PRINCIPAL, que ahora se deja a la
+    //     vista: antes se ocultaba y su franja quedaba vacía entre la barra y el
+    //     teclado, que era el hueco que se veía. Con el menú a la vista, esa banda la
+    //     ocupa él y la barra se apoya justo encima.
+    const limite = Math.min(fondoVisible, baseFija);
+    const nuevoTop = Math.max(0, Math.round(limite - altoBarra));
+    // Si coincide con su sitio natural, no hay nada que recolocar: se deja el CSS.
+    if (nuevoTop >= baseFija - altoBarra - 1) {
         barra.style.removeProperty('--barra-top');
         document.body.classList.remove('responder-subida');
         return;
     }
-    // Se le pone el `top` para que su borde de abajo caiga en el fondo de lo visible.
-    const nuevoTop = Math.max(0, Math.round(fondoVisible - altoBarra));
     // Solo se escribe si cambia de verdad (5px o más): así el ruido de ±2px de las
     // medidas del viewport visual no la mueve, pero sí se sigue la animación del
     // teclado (que va en pasos de ~20px).
@@ -1406,8 +1411,7 @@ function ajustarBarraResponderAlTeclado() {
     if (!Number.isFinite(actual) || Math.abs(actual - nuevoTop) >= 5) {
         barra.style.setProperty('--barra-top', nuevoTop + 'px');
     }
-    // El menú principal se oculta porque la barra ocupa su franja: si se quedara, esa
-    // banda quedaría vacía entre la barra y el teclado, que es el hueco que se veía.
+    // La clase solo cambia la barra al modo `top` (el menú ya NO se oculta).
     document.body.classList.add('responder-subida');
     void altoBarra;
 }

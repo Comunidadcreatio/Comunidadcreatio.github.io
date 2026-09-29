@@ -323,8 +323,11 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
           // Sin aire: el borde de abajo de la barra coincide con el borde visible.
           hueco: Math.round(bordeVisible - b.bottom),
           clase: document.body.classList.contains('responder-teclado'),
-          // El menú principal se oculta: es lo que hacía el hueco.
-          navOculto: sn.visibility === 'hidden'
+          // El menú principal SE QUEDA A LA VISTA: su franja es la que antes quedaba
+          // vacía entre la barra y el teclado (era el hueco que se veía).
+          navVisible: sn.visibility !== 'hidden',
+          // Y la barra no puede taparlo.
+          noLaTapaElNav: b.bottom <= n.getBoundingClientRect().top + 1
       });
   })()`)) || 'null');
   console.log(`   · ${nombre}: barra ${conTeclado && conTeclado.barra} vs borde visible ${conTeclado && conTeclado.bordeVisible} (hueco ${conTeclado && conTeclado.hueco}px, navOculto ${conTeclado && conTeclado.navOculto})`);
@@ -332,8 +335,10 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
   check(`${nombre}: la barra queda pegada al borde visible, SIN aire`,
     !!conTeclado && Math.abs(conTeclado.hueco) <= 1.5, JSON.stringify(conTeclado));
   check(`${nombre}: el teclado se detecta`, !!conTeclado && conTeclado.clase === true, JSON.stringify(conTeclado));
-  check(`${nombre}: el menú principal se oculta (como en Cavents)`,
-    !!conTeclado && conTeclado.navOculto === true, JSON.stringify(conTeclado));
+  check(`${nombre}: el menú principal se queda A LA VISTA (no se oculta)`,
+    !!conTeclado && conTeclado.navVisible === true, JSON.stringify(conTeclado));
+  check(`${nombre}: la barra NO tapa el menú principal`,
+    !!conTeclado && conTeclado.noLaTapaElNav === true, JSON.stringify(conTeclado));
   // NO PUEDE TEMBLAR: con el teclado abierto se scrollea y se mira la posición de la
   // barra EN PANTALLA (debe ser siempre la misma) y, sobre todo, CUÁNTAS VECES SE
   // ESCRIBE su estilo. Si es 0 durante el scroll, no hay nada que pueda moverse: es la
