@@ -743,15 +743,22 @@ const trasAbrir = JSON.parse((await evalJs(`(() => {
         visible: !!btn && !btn.classList.contains('hidden'),
         lectura,
         alLado: !!(rb && rc) && rb.right <= rc.left + 1,
+        // Hueco real hasta la campana: si es grande, el icono se ha ido al otro
+        // extremo (pegado al logo) en vez de quedarse junto a la campana.
+        hueco: (rb && rc) ? rc.left - rb.right : null,
         campanaDerecha: rc ? Math.round(rc.right) : null,
         ventana: document.documentElement.clientWidth
     });
 })()`)) || 'null');
 if (!trasAbrir) { check('se pudo comprobar el icono con la publicación abierta', false); }
 else {
-  log(`   · con la publicación abierta: visible=${trasAbrir.visible} alLadoDeLaCampana=${trasAbrir.alLado} campanaDerecha=${trasAbrir.campanaDerecha}`);
+  log(`   · con la publicación abierta: visible=${trasAbrir.visible} alLadoDeLaCampana=${trasAbrir.alLado} hueco=${trasAbrir.hueco} campanaDerecha=${trasAbrir.campanaDerecha}`);
   check('al abrir una publicación aparece el icono de volver', trasAbrir.visible === true && trasAbrir.lectura === true);
   check('el icono de volver está justo al lado de la campana', trasAbrir.alLado === true);
+  if (typeof trasAbrir.hueco === 'number') {
+    check(`el icono de volver NO queda pegado al logo (hueco hasta la campana ${trasAbrir.hueco}px ≤ 24)`,
+      trasAbrir.hueco <= 24, `${trasAbrir.hueco}px`);
+  }
 }
 // Lo que se pidió: los iconos del header NO se mueven al aparecer el de volver.
 // Se compara solo si la medida se hizo al mismo ancho que la del principio (el

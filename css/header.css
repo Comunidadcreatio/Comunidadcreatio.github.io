@@ -81,12 +81,15 @@ picture {
     margin-left: auto;
 }
 
-/* Empuja hacia la derecha la zona de iconos del header. Va en la CAMPANA, que
-   está siempre presente: el icono de volver (a su izquierda) aparece y se oculta
-   al abrir y cerrar una publicación, y si el `auto` estuviera en él, al ocultarse
-   desaparecía con él y toda la fila se corría a la izquierda. */
-#btn-notificaciones {
-    margin-left: auto;
+/* Empuja al extremo derecho TODO el grupo de iconos (volver, campana, menú…).
+   Antes el empuje estaba en la campana y solo la movía a ella: en móvil el logo
+   ocupa casi la mitad del ancho, así que el icono de volver se quedaba pegado al
+   logo y la campana al otro extremo. Con el hueco siempre presente el grupo se
+   mantiene junto y a la derecha, y no se mueve al aparecer y ocultarse el icono
+   de volver. */
+.header-espaciador {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .header-icon:hover {

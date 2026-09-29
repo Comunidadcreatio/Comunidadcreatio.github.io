@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.606';
+        var currentVer = '1.0.607';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -76,7 +76,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=fdc2b021f8">
+    <link rel="stylesheet" href="css/style.css?v=c26c6222cb">
     <link rel="stylesheet" href="css/notificaciones.css?v=49fb96aa35">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
@@ -216,11 +216,16 @@
             <img src="iconos/Logo-temporal.svg" alt="Creatio" class="header__logo">
         </picture>
 
+        <!-- Espaciador: empuja TODO lo que venga después al extremo derecho del
+             header. Hace falta porque el logo ocupa casi la mitad del ancho en
+             móvil y, con el empuje puesto en la campana, el icono de volver se
+             quedaba pegado al logo con un hueco enorme hasta la campana. Al ser un
+             hueco siempre presente (a diferencia del icono de volver, que aparece y
+             se oculta), la fila no se mueve al abrir y cerrar una publicación. -->
+        <div class="header-espaciador" aria-hidden="true"></div>
         <!-- Icono de volver: solo mientras se lee un problog. Va justo a la
-             IZQUIERDA de la campana (la campana es la que lleva el
-             `margin-left: auto` que empuja los iconos a la derecha, así que este
-             icono tiene que ir ANTES que ella en el marcado). Al pulsarlo se
-             cierra la lectura y se vuelve al feed. -->
+             IZQUIERDA de la campana. Al pulsarlo se cierra la lectura y se vuelve
+             al feed. -->
         <button id="btn-problog-volver" class="header-icon hidden" aria-label="Volver a los problogs">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
