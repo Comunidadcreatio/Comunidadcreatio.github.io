@@ -325,6 +325,50 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
 await sleep(500);
+
+// 2) La forma BUENA (la que usan los navegadores de hoy): el meta del viewport
+//    lleva `interactive-widget=resizes-content`, así que el teclado encoge el
+//    viewport de LAYOUT. En ese caso no hay que subir nada a mano: la barra (que
+//    va fija abajo) y el menú principal suben solos y quedan pegados al teclado.
+console.log('\n=== El teclado encogiendo el viewport de layout (resizes-content) ===');
+for (const [nombre, altoVentana] of [['teclado mediano (ventana 450px)', 450], ['teclado grande (ventana 330px)', 330]]) {
+  await send('Emulation.setDeviceMetricsOverride', { width: 393, height: altoVentana, deviceScaleFactor: 1, mobile: true });
+  await sleep(900);
+  const encogido = JSON.parse((await evalJs(`(() => {
+      const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
+      const n = document.getElementById('toggle-panel').getBoundingClientRect();
+      return JSON.stringify({
+          altoVentana: window.innerHeight,
+          barra: Math.round(b.top) + '..' + Math.round(b.bottom),
+          nav: Math.round(n.top) + '..' + Math.round(n.bottom),
+          // Con el layout encogido, el menú principal sigue visible abajo del todo
+          // y la barra se apoya encima de él: el hueco hasta el final de la ventana
+          // es el alto del menú, y eso es lo correcto.
+          huecoHastaElNav: Math.round(n.top - b.bottom),
+          pegadaAlNav: Math.abs(n.top - b.bottom) <= 1.5,
+          transform: getComputedStyle(document.getElementById('problog-responder-barra')).transform
+      });
+  })()`)) || 'null');
+  // El navegador devuelve la matriz identidad aunque el desplazamiento sea 0, así
+  // que se mira el valor: 0 es "no hizo falta desplazarla".
+  const sinDesplazamientoPropio = (t) => {
+    if (!t || t === 'none') return true;
+    const nums = String(t).match(/-?[\d.]+/g) || [];
+    const y = nums.length >= 6 ? parseFloat(nums[5]) : 0;
+    return Math.abs(y) < 1;
+  };
+  console.log(`   · ${nombre}: barra ${encogido && encogido.barra}, nav ${encogido && encogido.nav}, ventana ${encogido && encogido.altoVentana}`);
+  check(`${nombre}: la barra sigue pegada al menú principal, sin aire`,
+    !!encogido && Math.abs(encogido.huecoHastaElNav) <= 1.5, JSON.stringify(encogido));
+  check(`${nombre}: el menú principal sigue a la vista abajo`,
+    !!encogido && encogido.nav && Math.abs(encogido.altoVentana - parseInt(String(encogido.nav).split('..')[1], 10)) <= 1.5,
+    JSON.stringify(encogido));
+  check(`${nombre}: no hace falta desplazar la barra a mano (lo hace el navegador)`,
+    !!encogido && sinDesplazamientoPropio(encogido.transform), JSON.stringify(encogido));
+}
+// Se devuelve la ventana a su tamaño para el resto de comprobaciones.
+await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
+await sleep(700);
 await evalJs(`(() => {
     const input = document.getElementById('problog-responder-texto');
     input.value = 'Respuesta de prueba';

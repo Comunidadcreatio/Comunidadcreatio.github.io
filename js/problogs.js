@@ -1302,11 +1302,16 @@ function seccionComentarios(id) {
 // ============================================================
 // LA BARRA DE RESPONDER Y EL TECLADO
 // ------------------------------------------------------------
-// En Android el teclado NO encoge el viewport de layout (el meta lleva
-// `interactive-widget=resizes-visual`), así que una pieza `position: fixed` pegada
-// abajo se queda TAPADA por el teclado en vez de subir. La solución es la misma que
-// usa el chat: mirar `window.visualViewport` (que sí mide lo que se ve de verdad) y
-// subir la barra a mano. Se sube con `transform`, que no toca el layout.
+// El meta del viewport lleva `interactive-widget=resizes-content`, así que al
+// abrirse el teclado el navegador ENCOGE el viewport de layout y todo lo que va
+// fijo abajo (el menú principal y esta barra) sube solo, quedando pegada al
+// teclado. No hace falta subir nada a mano.
+//
+// Lo que queda aquí es un RESPALDO para navegadores que no apliquen ese meta (una
+// WebView antigua): en esos, el layout NO se encoge (sigue midiendo como la
+// ventana) pero el viewport visual sí, que es justo el caso que dejaba la barra
+// tapada. Solo en ese caso se sube la barra. Y NO se escucha el scroll: hacerlo
+// movía la barra arriba y abajo mientras se desplazaba la publicación.
 const TECLADO_UMBRAL_PROBLOGS = 120;
 
 function ajustarBarraResponderAlTeclado() {
@@ -1315,26 +1320,27 @@ function ajustarBarraResponderAlTeclado() {
     // Las pruebas sustituyen `visualViewport` para reproducir el teclado de
     // Android: con esta bandera se evita que sus avisos entren en bucle.
     if (window.__ignorarAjusteTeclado) return;
-    // Con la barra cerrada no hay nada que colocar.
-    if (barra.classList.contains('hidden')) {
+    const vv = window.__vvPrueba || window.visualViewport;
+    const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+    // `offsetTop` cuenta: en iOS el viewport visual además se desplaza hacia abajo
+    // y con la altura sola la barra quedaba 100px por encima del teclado (medido).
+    const visible = vv && vv.height ? (vv.offsetTop || 0) + vv.height : layout;
+    // El meta funcionó si el propio documento se encogió con el teclado.
+    const documentoEncogido = (document.documentElement.clientHeight || layout) < layout - TECLADO_UMBRAL_PROBLOGS;
+    if (documentoEncogido) {
         barra.style.removeProperty('--teclado-abajo');
         document.body.classList.remove('responder-teclado');
         return;
     }
-    const vv = window.__vvPrueba || window.visualViewport;
-    const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
-    const visible = vv && vv.height ? (vv.offsetTop || 0) + vv.height : layout;
     const tecladoAbierto = (layout - visible) > TECLADO_UMBRAL_PROBLOGS;
-    // OJO: `problog-teclado` ya la usa el editor para su propio hueco; aquí se usa
-    // otra clase para no pisarla.
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
-    // La barra se pega al BORDE VISIBLE (abajo del todo de lo que se ve), no al
-    // menú principal. Antes se subía el alto del menú y con el teclado abierto ese
-    // hueco quedaba vacío (el menú está detrás del teclado), que es el aire que se
-    // veía al llegar al final.
-    // Se mide sobre la posición SIN transformar (el rectángulo ya incluye el
-    // desplazamiento anterior, y usarlo tal cual se realimentaba) y se sube lo que
-    // le sobra para llegar al borde visible.
+    if (!tecladoAbierto || barra.classList.contains('hidden')) {
+        barra.style.removeProperty('--teclado-abajo');
+        return;
+    }
+    // Respaldo: se sube la barra lo justo para que su borde de abajo coincida con
+    // el borde visible. Se mide sobre la posición SIN desplazar (el rectángulo ya
+    // incluye el desplazamiento anterior y usarlo tal cual se realimentaba).
     const r = barra.getBoundingClientRect();
     const actual = parseFloat(barra.style.getPropertyValue('--teclado-abajo')) || 0;
     const sinDesplazar = r.bottom + actual;
@@ -2129,14 +2135,15 @@ export function setupProblogs() {
     barraResponder()?.addEventListener('click', (e) => {
         if (e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
     });
-    // La barra de responder tiene que subir con el teclado (en Android el teclado
-    // no encoge el viewport de layout, así que `fixed` no basta: ver
-    // `ajustarBarraResponderAlTeclado`).
+    // La barra de responder sube con el teclado. Con el meta
+    // `interactive-widget=resizes-content` eso ya lo hace el navegador solo (encoge
+    // el layout y la barra, que va fija abajo, sube); lo que queda aquí es el
+    // respaldo para navegadores que no lo apliquen. NO se escucha el scroll a
+    // propósito: hacerlo movía la barra arriba y abajo al desplazar la publicación.
     ajustarBarraResponderAlTeclado();
     window.addEventListener('resize', ajustarBarraResponderAlTeclado);
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', ajustarBarraResponderAlTeclado);
-        window.visualViewport.addEventListener('scroll', ajustarBarraResponderAlTeclado);
     }
 
     // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
