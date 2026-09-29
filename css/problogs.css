@@ -901,17 +901,16 @@
    a X», su input y los iconos de enviar y cancelar justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
-    position: fixed;
+    /* ABSOLUTA, no fija: con el teclado abierto y la página desplazada hasta el
+       final, una pieza `fixed` queda clavada en el fondo del viewport de LAYOUT y
+       NO puede bajar de ahí, así que quedaba un hueco de 60px (el alto del menú)
+       entre la barra y el teclado. Con `absolute` se puede colocar exactamente
+       donde toca: problogs.js le pone el `top` en coordenadas del documento,
+       medido contra el borde visible (el fondo del viewport visual). */
+    position: absolute;
     left: 0;
     right: 0;
-    /* Su sitio NATURAL: pegado encima del menú principal (de ahí no se mueve).
-       Cuando hace falta subirla (el teclado tapa esa franja) NO se toca el
-       `bottom`: se aplica un desplazamiento medido en `--barra-desplazada`, que
-       problogs.js calcula midiendo el borde visible de verdad. Así funciona sin
-       depender de si el navegador encoge o no el viewport de layout, que es donde
-       estaba fallando. Con `transform` no se toca el layout. */
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-    transform: translateY(calc(-1 * var(--barra-desplazada, 0px)));
+    top: var(--barra-top, 0px);
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;

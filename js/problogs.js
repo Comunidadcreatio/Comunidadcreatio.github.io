@@ -1358,31 +1358,28 @@ function ajustarBarraResponderAlTeclado() {
     const tecladoAbierto = caida > Math.max(TECLADO_UMBRAL_PROBLOGS, Math.round(ventana / 3));
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
     if (barra.classList.contains('hidden')) {
-        barra.style.removeProperty('--barra-desplazada');
+        barra.style.removeProperty('--barra-top');
         pararVigilanciaBarra();
         return;
     }
-    // DÓNDE COLOCARLA. En vez de calcular un `bottom` "adivinando" si el navegador
-    // encogió el layout o no (ahí estaba el fallo: en el móvil del usuario se
-    // comporta distinto), se MIDE: la barra tiene su `bottom` natural (encima del
-    // menú, según el CSS) y se calcula cuánto hay que subirla para que su borde de
-    // abajo caiga en el FONDO DE LO QUE SE VE. El desplazamiento se aplica con
-    // `transform` (no afecta al layout) y se mide sobre la posición SIN descontar el
-    // desplazamiento anterior (si no, se realimenta).
-    const actual = parseFloat(barra.style.getPropertyValue('--barra-desplazada')) || 0;
-    const r = barra.getBoundingClientRect();
-    const sinDesplazar = r.bottom + actual;
-    // Fondo de lo que se ve: `pan + visH` (el alto visible por debajo del
-    // desplazamiento del viewport visual). OJO: NO es `ventana - pan`, que es el
-    // fondo del viewport de LAYOUT y no tiene en cuenta el teclado: con eso el
-    // cálculo daba 0 y la barra no subía.
+    // DÓNDE COLOCARLA. Es `position: absolute`, así que se le pone el `top` en
+    // coordenadas del DOCUMENTO: el fondo de lo que se ve (`scroll + pan + alto
+    // visible`) menos su propio alto. Así puede quedar justo encima del teclado
+    // aunque eso esté por debajo del fondo del viewport de layout, que es lo que
+    // hacía imposible colocarla bien con `fixed`: al llegar al final con el teclado
+    // abierto, un `fixed` se quedaba clavado en el fondo del layout y dejaba un
+    // hueco del alto del menú (60px) entre la barra y el teclado.
+    const actual = parseFloat(barra.style.getPropertyValue('--barra-top'));
+    const scroll = Math.max(0, window.scrollY || window.pageYOffset || 0);
     const fondoVisible = pan + Math.round(visH);
-    const subir = Math.max(0, Math.round(sinDesplazar - fondoVisible));
+    const altoBarra = Math.max(1, Math.round(barra.getBoundingClientRect().height));
+    // Sin teclado se apoya encima del menú principal; con el teclado, sobre él.
+    const nuevo = Math.max(0, Math.round(scroll + fondoVisible - altoBarra
+        - (tecladoAbierto ? 0 : ALTO_NAV_PROBLOGS)));
     // Solo se toca el estilo si cambia (y como mucho un píxel): así el `scroll` del
     // viewport visual necesita recalcular pero no hace bailar la barra.
-    if (Math.abs(subir - actual) >= 1) {
-        if (subir > 0) barra.style.setProperty('--barra-desplazada', subir + 'px');
-        else barra.style.removeProperty('--barra-desplazada');
+    if (!Number.isFinite(actual) || Math.abs(actual - nuevo) >= 1) {
+        barra.style.setProperty('--barra-top', nuevo + 'px');
     }
 }
 
@@ -1430,7 +1427,7 @@ function dejarDeResponder(seccion) {
     reservarHuecoDeLaBarra(false);
     pararVigilanciaBarra();
     // Con la barra cerrada no hay desplazamiento de teclado que valga.
-    if (barra) barra.style.removeProperty('--barra-desplazada');
+    if (barra) barra.style.removeProperty('--barra-top');
     document.body.classList.remove('responder-teclado');
     if (!barra) return;
     barra.classList.add('hidden');

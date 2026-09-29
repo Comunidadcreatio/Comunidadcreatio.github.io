@@ -241,7 +241,10 @@ const barra = JSON.parse(await evalJs(`(() => {
         // Los iconos van a la derecha, después del input.
         iconosALaDerecha: !!(ir && ultimo) && ultimo.left >= ir.right - 1,
         chipViejo: !!document.querySelector('[data-comentario-respondiendo]'),
-        // Es FIJA (se queda a la vista al abrirse el teclado), no sticky.
+        // Es ABSOLUTA (no fixed): con fixed, al llegar al final con el teclado
+        // abierto la barra quedaba clavada en el fondo del viewport de layout y no
+        // podia bajar de ahi, dejando un hueco del alto del menu. Con absolute se
+        // le pone el top medido y queda justo donde toca.
         posicion: getComputedStyle(b).position,
         abajo: r.bottom,
         // NO puede tapar el contenido: el bloque de la publicación acaba antes.
@@ -258,7 +261,7 @@ check('la barra lleva el subtítulo «Respondiendo a X»', !!barra && /^Respondi
 check('la barra tiene su propio input', !!barra && barra.tieneInput === true);
 check('la barra tiene los iconos de enviar y cancelar', !!barra && barra.iconos === 2, barra && String(barra.iconos));
 check('los iconos de la barra van justificados a la derecha', !!barra && barra.iconosALaDerecha === true);
-check('la barra es fija (se queda con el teclado abierto)', !!barra && barra.posicion === 'fixed', barra && barra.posicion);
+check('la barra es absoluta con su `top` medido (no `fixed`)', !!barra && barra.posicion === 'absolute', barra && barra.posicion);
 // Lo pedido: abajo, justo encima del menú principal.
 if (barra && barra.nav && barra.nav.visible) {
   const separacion = Math.abs(barra.nav.arriba - barra.abajo);
