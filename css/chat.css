@@ -55,7 +55,13 @@ body.teclado-abierto #chat-global {
     overflow: hidden;
     overscroll-behavior: contain;
 }
-body.teclado-abierto #toggle-panel {
+/* El menú principal se oculta SOLO mientras el CHAT está abierto y con el teclado
+   desplegado. OJO: esta regla la aplicaba el chat en TODA la app (la clase
+   `teclado-abierto` va en el `body` y se pone con el teclado, estés donde estés), así
+   que ocultaba el menú también en Problogs y allí su franja quedaba vacía: era el
+   hueco que se veía entre la barra de responder y el teclado. Con `:has()` queda
+   acotada a su vista, que es lo que pretende. */
+body.teclado-abierto:has(#chat-global:not(.hidden)) #toggle-panel {
     display: none;
 }
 /* Contiene el rebote para que el input/botones no se desplacen al llegar al final */

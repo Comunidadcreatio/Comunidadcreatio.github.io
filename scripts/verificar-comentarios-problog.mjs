@@ -324,8 +324,10 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
           hueco: Math.round(bordeVisible - b.bottom),
           clase: document.body.classList.contains('responder-teclado'),
           // El menú principal SE QUEDA A LA VISTA: su franja es la que antes quedaba
-          // vacía entre la barra y el teclado (era el hueco que se veía).
-          navVisible: sn.visibility !== 'hidden',
+          // vacía entre la barra y el teclado (era el hueco que se veía). Se mira
+          // display Y visibility, porque el chat lo ocultaba con display: none.
+          navVisible: sn.visibility !== 'hidden' && sn.display !== 'none' && n.getBoundingClientRect().height > 0,
+          navDisplay: sn.display,
           // Y la barra no puede taparlo.
           noLaTapaElNav: b.bottom <= n.getBoundingClientRect().top + 1
       });
@@ -337,6 +339,11 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
   check(`${nombre}: el teclado se detecta`, !!conTeclado && conTeclado.clase === true, JSON.stringify(conTeclado));
   check(`${nombre}: el menú principal se queda A LA VISTA (no se oculta)`,
     !!conTeclado && conTeclado.navVisible === true, JSON.stringify(conTeclado));
+  // OJO: hay que mirar TAMBIÉN `display`. El chat pone la clase `teclado-abierto` en el
+  // body con el teclado desplegado (en cualquier vista) y su CSS ocultaba el menú con
+  // `display: none`: mirando solo `visibility` se colaba y el menú no se veía.
+  check(`${nombre}: el menú principal no queda con display:none (la regla del chat)`,
+    !!conTeclado && conTeclado.navDisplay === 'flex', conTeclado && conTeclado.navDisplay);
   check(`${nombre}: la barra NO tapa el menú principal`,
     !!conTeclado && conTeclado.noLaTapaElNav === true, JSON.stringify(conTeclado));
   // NO PUEDE TEMBLAR: con el teclado abierto se scrollea y se mira la posición de la
