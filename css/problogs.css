@@ -899,8 +899,14 @@
    ============================================================ */
 .problog-responder-barra {
     position: sticky;
-    top: var(--header-height, 64px);
-    z-index: 6;
+    /* El header es fijo y mide 64px + la barra de estado, y tiene z-index 1000.
+       Antes esta barra llevaba `top: var(--header-height, 64px)` (una variable que
+       no existe en móvil, así que se quedaba en 64px, por DEBAJO del header) y
+       `z-index: 6`: al bajar por la publicación la barra se metía debajo de la
+       cabecera y desaparecía. Ahora se pega justo debajo del header (misma fórmula
+       que usan las demás piezas de la app) y va por ENCIMA del header. */
+    top: calc(64px + var(--status-bar-height, 24px));
+    z-index: 1100;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: var(--comentario-aire, 24px);
