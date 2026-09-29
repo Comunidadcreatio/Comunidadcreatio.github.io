@@ -205,6 +205,28 @@ const MEDIR = (tema) => `(() => {
     const figuras = Array.from(document.querySelectorAll('.problog-lectura-figura img'));
     return JSON.stringify({
         rectSeccion: { left: r.left, top: r.top, width: r.width, height: r.height },
+        // Aire lateral que usa la sección (= el del contenido de la publicación).
+        aireSeccion: (() => { const el = g('.problog-comentarios'); return el ? cs(el).getPropertyValue('--comentario-aire') : '0px'; })(),
+        // Dónde empieza el CONTENIDO del cajón y de un comentario: el marcador del
+        // textarea (su borde + su relleno) y el avatar.
+        inputRect: (() => {
+            const el = g('.problog-comentario-input');
+            if (!el) return null;
+            const x = el.getBoundingClientRect();
+            const s = cs(el);
+            // El texto no empieza en el borde de la caja, sino tras su relleno.
+            return { left: x.left + (parseFloat(s.paddingLeft) || 0), right: x.right - (parseFloat(s.paddingRight) || 0) };
+        })(),
+        avatarRect: caja(g('.problog-comentario-avatar')),
+        // Referencia: dónde empieza el texto de la publicación. OJO: el ayudante g
+        // busca dentro de la sección de comentarios, y el texto del post está
+        // fuera, así que aquí se consulta el documento entero.
+        postRect: (() => {
+            const el = document.querySelector('.problog-lectura-texto p')
+                || document.querySelector('.problog-lectura-texto')
+                || document.querySelector('.problog-lectura-cuerpo');
+            return el ? { left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right } : null;
+        })(),
         ventana: window.innerWidth,
         // Caja de escribir: qué borde le queda en cada lado (se pidió quitar el
         // contorno) y si la lista muestra algún mensaje cuando está vacía.
@@ -580,6 +602,22 @@ for (const tema of ['dark', 'light']) {
     const aire = Math.max(img.left, ventana - img.right);
     log(`   · imagen: de ${img.left.toFixed(0)} a ${img.right.toFixed(0)} (ventana ${ventana}, columna hasta ${(d.rectSeccion.left + d.rectSeccion.width).toFixed(0)})`);
     check('la imagen del problog tiene aire lateral', aire > 5, `aire lateral ${aire.toFixed(1)}px`);
+  }
+
+  // 11) El contenido de los comentarios va alineado con el texto de la publicación:
+  //     el marcador del cajón y el avatar del primer comentario empiezan en la
+  //     MISMA x que el texto del post. Las líneas de separación no se tocan (siguen
+  //     de extremo a extremo, comprobado más arriba).
+  if (!d.postRect) { check('se pudo medir dónde empieza el texto del post', false); }
+  else {
+    const bordeContenido = d.postRect.left;
+    for (const [etiqueta, caja] of [['marcador del cajón', d.inputRect], ['avatar de un comentario', d.avatarRect]]) {
+      if (!caja) { check(`se pudo medir el aire de «${etiqueta}»`, false); continue; }
+      const desvio = Math.abs(caja.left - bordeContenido);
+      log(`   · ${etiqueta}: empieza en ${caja.left.toFixed(0)}, texto del post en ${bordeContenido.toFixed(0)} (desvío ${desvio.toFixed(1)}px)`);
+      check(`«${etiqueta}» va alineado con el texto del post (desvío ${desvio.toFixed(1)}px)`, desvio <= 1.5,
+        `${caja.left.toFixed(0)} vs ${bordeContenido.toFixed(0)}`);
+    }
   }
 }
 

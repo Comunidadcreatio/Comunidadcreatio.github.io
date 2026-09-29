@@ -902,12 +902,15 @@
 }
 
 /* La caja de escribir va SIN recuadro: su línea (el subrayado) la dibuja el
-   pseudo-elemento del cajón. Aquí solo van el texto y su aire. */
+   pseudo-elemento del cajón. El texto lleva el MISMO aire lateral que el
+   contenido de la publicación (el relleno del cajón), para que el marcador
+   "Escribe un comentario…" quede alineado con el texto del post. Ese relleno va
+   DENTRO de la caja (`border-box`), así que la línea del subrayado no se mueve. */
 .problog-comentario-input {
     width: 100%;
     box-sizing: border-box;
     min-height: 38px;
-    padding: 6px 0;
+    padding: 6px var(--comentario-aire);
     margin: 12px 0 0;
     border: none;
     border-radius: 0;
@@ -1000,8 +1003,10 @@
     flex-direction: column;
 }
 
-/* Cada comentario es una fila. Su línea de separación (arriba, también en el
-   primero) la dibuja el pseudo-elemento `::before`, que llega a los extremos. */
+/* El contenido de cada comentario (del avatar a la derecha) lleva el MISMO aire
+   lateral que el contenido de la publicación, para que quede alineado con él. Se
+   aplica al avatar, que es el primero de la fila, y no al comentario entero: así
+   la línea de separación (pseudo-elemento) sigue llegando de extremo a extremo. */
 .problog-comentario {
     display: flex;
     gap: 10px;
@@ -1009,9 +1014,9 @@
     padding-bottom: 12px;
 }
 
-/* El aire del contenido de cada comentario lo pone el relleno de la sección, así
-   que aquí no hace falta margen extra. */
 .problog-comentario-avatar {
+    /* El aire lateral, en el primero de la fila. */
+    margin-left: var(--comentario-aire);
     flex: 0 0 34px;
     width: 34px;
     height: 34px;
