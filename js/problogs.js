@@ -1374,8 +1374,21 @@ function ajustarBarraResponderAlTeclado() {
     const fondoVisible = pan + Math.round(visH);
     const altoBarra = Math.max(1, Math.round(barra.getBoundingClientRect().height));
     // Sin teclado se apoya encima del menú principal; con el teclado, sobre él.
-    const nuevo = Math.max(0, Math.round(scroll + fondoVisible - altoBarra
-        - (tecladoAbierto ? 0 : ALTO_NAV_PROBLOGS)));
+    let nuevo = Math.round(scroll + fondoVisible - altoBarra
+        - (tecladoAbierto ? 0 : ALTO_NAV_PROBLOGS));
+    // TOPE DE SEGURIDAD: la barra NUNCA puede bajar más de donde empieza el menú
+    // principal. Se MIDE la posición de ese menú (en coordenadas del documento) y se
+    // limita. Así, aunque en un móvil concreto las medidas del viewport visual sean
+    // distintas de las esperadas, el menú no puede taparla por abajo.
+    if (!tecladoAbierto) {
+        const nav = document.getElementById('toggle-panel');
+        const rn = nav ? nav.getBoundingClientRect() : null;
+        if (rn && rn.height > 0) {
+            const maximo = Math.round(rn.top + scroll - altoBarra);
+            if (nuevo > maximo) nuevo = maximo;
+        }
+    }
+    nuevo = Math.max(0, nuevo);
     // Solo se toca el estilo si cambia (y como mucho un píxel): así el `scroll` del
     // viewport visual necesita recalcular pero no hace bailar la barra.
     if (!Number.isFinite(actual) || Math.abs(actual - nuevo) >= 1) {

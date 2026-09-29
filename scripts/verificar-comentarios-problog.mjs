@@ -373,6 +373,8 @@ for (const [nombre, avisa] of CIERRES) {
           ventana: window.innerHeight,
           // No puede quedar cortada: entera dentro de la pantalla…
           cabeEntera: r.top >= -1 && r.bottom <= window.innerHeight + 1,
+          // …ni el menú principal puede taparla por abajo.
+          noLaTapaElNav: r.bottom <= n.getBoundingClientRect().top + 1,
           // …y con el teclado cerrado, apoyada encima del menú principal.
           pegadaAlNav: Math.abs(n.getBoundingClientRect().top - r.bottom) <= 1.5,
           navVisible: sn.visibility !== 'hidden'
@@ -381,6 +383,8 @@ for (const [nombre, avisa] of CIERRES) {
   console.log(`   · ${nombre}: barra ${cerrado && cerrado.barra}, bottom ${cerrado && cerrado.bottomCss} (ventana ${cerrado && cerrado.ventana})`);
   check(`${nombre}: la barra NO se queda cortada al cerrarse el teclado`,
     !!cerrado && cerrado.cabeEntera === true, JSON.stringify(cerrado));
+  check(`${nombre}: el menú principal NO tapa la barra`,
+    !!cerrado && cerrado.noLaTapaElNav === true, JSON.stringify(cerrado));
   check(`${nombre}: vuelve a apoyarse encima del menú principal`,
     !!cerrado && cerrado.pegadaAlNav === true, JSON.stringify(cerrado));
   check(`${nombre}: el menú principal vuelve a verse`,
