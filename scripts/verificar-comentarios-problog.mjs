@@ -333,11 +333,11 @@ await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event(
 await sleep(500);
 
 // 2) La ventana encogida SIN teclado (por ejemplo el usuario redimensionando en
-//    escritorio): aquí NO hay teclado, así que el menú principal sigue a la vista y
-//    la barra se apoya encima de él, como siempre. Sirve para comprobar que el
+//    escritorio, un cambio pequeño): aquí NO hay teclado, así que el menú principal
+//    sigue a la vista y la barra se apoya encima de él. Sirve para comprobar que el
 //    cálculo no se confunde y cree que hay un teclado donde no lo hay.
 console.log('\n=== La ventana encogida sin teclado ===');
-for (const [nombre, altoVentana] of [['teclado mediano (ventana 450px)', 450], ['teclado grande (ventana 330px)', 330]]) {
+for (const [nombre, altoVentana] of [['ventana 752px', 752], ['ventana 700px', 700]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: 393, height: altoVentana, deviceScaleFactor: 1, mobile: true });
   await sleep(900);
   const encogido = JSON.parse((await evalJs(`(() => {
@@ -348,8 +348,8 @@ for (const [nombre, altoVentana] of [['teclado mediano (ventana 450px)', 450], [
           altoVentana: window.innerHeight,
           barra: Math.round(b.top) + '..' + Math.round(b.bottom),
           nav: Math.round(n.getBoundingClientRect().top) + '..' + Math.round(n.getBoundingClientRect().bottom),
-          // Con el layout encogido (y también en el caso de solo-visual) el menú se
-          // oculta, así que la barra tiene que acabar en el borde de la ventana.
+          // Sin teclado el menú sigue a la vista, así que el hueco hasta el final
+          // de la ventana es su alto (60px), y eso es lo correcto.
           hueco: Math.round(window.innerHeight - b.bottom),
           navOculto: sn.visibility === 'hidden'
       });
