@@ -904,13 +904,14 @@
     position: fixed;
     left: 0;
     right: 0;
-    /* El borde de abajo, EN PÍXELES, lo pone problogs.js midiendo el teclado con
-       `visualViewport` (mismo criterio que el cajón de comentarios de Cavents, que
-       es el que funciona). Sin teclado vale el alto del menú principal; con el
-       teclado abierto, el borde de arriba del teclado. Se hace así y no con
-       `calc()` porque en Android el layout no siempre se encoge con el teclado y
-       una pieza `fixed` pegada abajo se quedaba tapada, con aire hasta el teclado. */
-    bottom: var(--barra-abajo, 60px);
+    /* Su sitio NATURAL: pegado encima del menú principal (de ahí no se mueve).
+       Cuando hace falta subirla (el teclado tapa esa franja) NO se toca el
+       `bottom`: se aplica un desplazamiento medido en `--barra-desplazada`, que
+       problogs.js calcula midiendo el borde visible de verdad. Así funciona sin
+       depender de si el navegador encoge o no el viewport de layout, que es donde
+       estaba fallando. Con `transform` no se toca el layout. */
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(calc(-1 * var(--barra-desplazada, 0px)));
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;

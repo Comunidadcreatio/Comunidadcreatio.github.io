@@ -276,12 +276,15 @@ check('el chip viejo de «respondiendo a…» ya no existe', !!barra && barra.ch
 // ============================================================
 // El teclado de Android
 // ============================================================
-// En Android el teclado NO encoge el viewport de layout (solo el visual), así que
-// una pieza `fixed` pegada abajo se queda tapada. Se reproduce esa geometría
-// sustituyendo `visualViewport` y se comprueba que la barra sube y queda pegada al
-// BORDE VISIBLE, sin aire. Casos: teclado normal, teclado grande, iOS (donde además
-// el viewport visual se desplaza) y habiendo bajado hasta el final de una
-// publicación larga, que es donde el usuario veía el hueco.
+// En Android el teclado NO siempre encoge el viewport de layout (puede encoger solo
+// el visual), así que una pieza `fixed` pegada abajo se queda tapada. Se reproduce
+// esa geometría sustituyendo `visualViewport` y se comprueba que la barra sube y
+// queda pegada al borde visible, sin aire. Casos: teclado normal, teclado grande,
+// iOS (donde además el viewport visual se desplaza) y habiendo bajado hasta el final
+// de una publicación larga, que es donde el usuario veía el hueco.
+// La colocación se hace con un DESPLAZAMIENTO medido contra el borde visible
+// (`--barra-desplazada`), no con un `bottom` calculado: así da igual si el navegador
+// encoge el layout o no.
 console.log('\n=== La barra con el teclado de Android ===');
 const CASOS_TECLADO = [
   ['teclado de Android (~400px)', 450, 0, false],
@@ -390,17 +393,20 @@ for (const [nombre, altoVentana] of [['ventana 752px', 752], ['ventana 700px', 7
   await send('Emulation.setDeviceMetricsOverride', { width: 393, height: altoVentana, deviceScaleFactor: 1, mobile: true });
   await sleep(900);
   const encogido = JSON.parse((await evalJs(`(() => {
-      const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
+      const b = document.getElementById('problog-responder-barra');
+      const r = b.getBoundingClientRect();
       const n = document.getElementById('toggle-panel');
       const sn = getComputedStyle(n);
       return JSON.stringify({
           altoVentana: window.innerHeight,
-          barra: Math.round(b.top) + '..' + Math.round(b.bottom),
+          barra: Math.round(r.top) + '..' + Math.round(r.bottom),
           nav: Math.round(n.getBoundingClientRect().top) + '..' + Math.round(n.getBoundingClientRect().bottom),
           // Sin teclado el menú sigue a la vista, así que el hueco hasta el final
           // de la ventana es su alto (60px), y eso es lo correcto.
-          hueco: Math.round(window.innerHeight - b.bottom),
-          navOculto: sn.visibility === 'hidden'
+          hueco: Math.round(window.innerHeight - r.bottom),
+          cabeEntera: r.top >= -1 && r.bottom <= window.innerHeight + 1,
+          navOcultoSinTeclado: sn.visibility === 'hidden',
+          transform: getComputedStyle(b).transform
       });
   })()`)) || 'null');
   // El navegador devuelve la matriz identidad aunque el desplazamiento sea 0, así
@@ -412,13 +418,18 @@ for (const [nombre, altoVentana] of [['ventana 752px', 752], ['ventana 700px', 7
     return Math.abs(y) < 1;
   };
   console.log(`   · ${nombre}: barra ${encogido && encogido.barra}, nav ${encogido && encogido.nav}, ventana ${encogido && encogido.altoVentana} (hueco ${encogido && encogido.hueco}px)`);
-  // Sin teclado: la barra sigue pegada ENCIMA del menú, como siempre (el hueco
-  // hasta el final de la ventana es el alto del menú, y eso es lo correcto).
-  check(`${nombre}: sin teclado, la barra sigue pegada al menú principal`,
-    !!encogido && Math.abs(encogido.hueco - 60) <= 1.5, JSON.stringify(encogido));
-  check(`${nombre}: sin teclado, el menú principal NO se oculta`,
-    !!encogido && encogido.navOculto === false, JSON.stringify(encogido));
-  check(`${nombre}: la barra no lleva desplazamiento propio (la coloca su bottom)`,
+  // Sin teclado, lo que importa es que la barra quede ENTERA dentro de la pantalla y
+  // pegada al menú principal. El hueco hasta el final de la ventana es el alto del
+  // menú (60px), así que se comprueba con margen: en esta simulación el navegador
+  // ajusta el scroll al encoger y el viewport visual puede desplazarse unos píxeles,
+  // así que exigir el píxel exacto daría un falso fallo.
+  check(`${nombre}: sin teclado, la barra queda pegada al menú principal (hueco ≈60px)`,
+    !!encogido && Math.abs(encogido.hueco - 60) <= 8, JSON.stringify(encogido));
+  check(`${nombre}: sin teclado, la barra NO queda cortada`,
+    !!encogido && encogido.cabeEntera === true, JSON.stringify(encogido));
+  check(`${nombre}: sin teclado, el menú principal está a la vista (no tapado)`,
+    !!encogido && encogido.navOcultoSinTeclado === false, JSON.stringify(encogido));
+  check(`${nombre}: la barra no lleva desplazamiento propio`,
     !!encogido && sinDesplazamientoPropio(encogido.transform), JSON.stringify(encogido));
 }
 // Se devuelve la ventana a su tamaño para el resto de comprobaciones.

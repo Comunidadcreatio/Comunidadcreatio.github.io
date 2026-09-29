@@ -1342,34 +1342,48 @@ function ajustarBarraResponderAlTeclado() {
     // ALTO DE REFERENCIA: el mayor que se haya visto del viewport VISUAL (que es el
     // que se encoge con el teclado, en los dos comportamientos de Android). Solo se
     // sube, nunca baja, así que no se contamina con el alto del documento ni con el
-    // teclado. Así el teclado sale de restarle lo visible ahora.
+    // teclado.
     // OJO: no sirve `documentElement.clientHeight`, que mide el CONTENIDO y crece.
     if (visH > altoReferenciaBarra) altoReferenciaBarra = Math.round(visH);
     const referencia = Math.max(altoReferenciaBarra, Math.round(visH));
-    // Cuánto hay que subir el borde de abajo de la barra, en coordenadas del
-    // viewport de LAYOUT (que es respecto al que se coloca una pieza `fixed`): el
-    // hueco entre el fondo del layout y el fondo de lo que se ve. `pan` cuenta
-    // porque en iOS el viewport visual además se desplaza.
-    const bordeTeclado = Math.max(0, Math.round(ventana - pan - visH));
-    // La referencia solo sirve para saber si hay teclado: se compara contra el
-    // viewport VISUAL, que se encoge con el teclado en los dos comportamientos de
-    // Android (haya encogido o no `innerHeight`). Se exige además que el hueco de
-    // abajo sea grande, para no confundir un cambio de tamaño de la ventana con un
-    // teclado.
-    const tecladoAbierto = (referencia - Math.round(visH)) > TECLADO_UMBRAL_PROBLOGS
-        && bordeTeclado > TECLADO_UMBRAL_PROBLOGS;
+    // Si el teclado se ha cerrado del todo, la barra vuelve a su sitio de siempre y
+    // se olvida la referencia (así no se queda un valor viejo).
+    if (referencia - Math.round(visH) <= TECLADO_UMBRAL_PROBLOGS) altoReferenciaBarra = Math.round(visH);
+    // ¿Hay teclado? Se mira cuánto ha caído la parte visible respecto a la
+    // referencia, y se exige que sea MÁS DE UN TERCIO de la ventana: un teclado
+    // ocupa mucho, mientras que un cambio de tamaño de la ventana o un ajuste del
+    // scroll del viewport visual son caídas pequeñas (medido: un 12% daba falso
+    // positivo y ocultaba el menú principal sin motivo).
+    const caida = Math.max(0, Math.round(referencia - visH));
+    const tecladoAbierto = caida > Math.max(TECLADO_UMBRAL_PROBLOGS, Math.round(ventana / 3));
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
     if (barra.classList.contains('hidden')) {
-        barra.style.removeProperty('--barra-abajo');
+        barra.style.removeProperty('--barra-desplazada');
+        pararVigilanciaBarra();
         return;
     }
-    // Con el teclado abierto el menú se oculta y la barra se apoya en el teclado;
-    // sin teclado, se apoya encima del menú.
-    const abajo = tecladoAbierto ? bordeTeclado : ALTO_NAV_PROBLOGS;
+    // DÓNDE COLOCARLA. En vez de calcular un `bottom` "adivinando" si el navegador
+    // encogió el layout o no (ahí estaba el fallo: en el móvil del usuario se
+    // comporta distinto), se MIDE: la barra tiene su `bottom` natural (encima del
+    // menú, según el CSS) y se calcula cuánto hay que subirla para que su borde de
+    // abajo caiga en el FONDO DE LO QUE SE VE. El desplazamiento se aplica con
+    // `transform` (no afecta al layout) y se mide sobre la posición SIN descontar el
+    // desplazamiento anterior (si no, se realimenta).
+    const actual = parseFloat(barra.style.getPropertyValue('--barra-desplazada')) || 0;
+    const r = barra.getBoundingClientRect();
+    const sinDesplazar = r.bottom + actual;
+    // Fondo de lo que se ve: `pan + visH` (el alto visible por debajo del
+    // desplazamiento del viewport visual). OJO: NO es `ventana - pan`, que es el
+    // fondo del viewport de LAYOUT y no tiene en cuenta el teclado: con eso el
+    // cálculo daba 0 y la barra no subía.
+    const fondoVisible = pan + Math.round(visH);
+    const subir = Math.max(0, Math.round(sinDesplazar - fondoVisible));
     // Solo se toca el estilo si cambia (y como mucho un píxel): así el `scroll` del
     // viewport visual necesita recalcular pero no hace bailar la barra.
-    const actual = Math.round(parseFloat(barra.style.getPropertyValue('--barra-abajo')) || 0);
-    if (Math.abs(actual - abajo) >= 1) barra.style.setProperty('--barra-abajo', abajo + 'px');
+    if (Math.abs(subir - actual) >= 1) {
+        if (subir > 0) barra.style.setProperty('--barra-desplazada', subir + 'px');
+        else barra.style.removeProperty('--barra-desplazada');
+    }
 }
 
 // Mientras la barra está abierta se revisa la medida en cada fotograma, porque hay
@@ -1416,7 +1430,7 @@ function dejarDeResponder(seccion) {
     reservarHuecoDeLaBarra(false);
     pararVigilanciaBarra();
     // Con la barra cerrada no hay desplazamiento de teclado que valga.
-    if (barra) barra.style.removeProperty('--barra-abajo');
+    if (barra) barra.style.removeProperty('--barra-desplazada');
     document.body.classList.remove('responder-teclado');
     if (!barra) return;
     barra.classList.add('hidden');
