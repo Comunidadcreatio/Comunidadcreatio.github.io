@@ -185,6 +185,23 @@ for (const [patron, que] of PROHIBIDOS_EN_CSS) {
   check(`no vuelve: ${que}`, !patron.test(css));
 }
 
+// --- La barra de responder tiene que llevar el VIDRIO de la app ---
+// El header y el menú principal usan fondo translúcido + desenfoque (style.css).
+// La barra se pinta con un fondo SÓLIDO al principio y desentonaba; aquí queda
+// comprobado que usa el mismo tratamiento.
+log('\n=== La barra de responder lleva el vidrio de la app ===');
+const reglaBarra = (css.match(/\.problog-responder-barra\s*\{[^}]*\}/) || [''])[0];
+log(`   · regla de la barra:\n${reglaBarra.split('\n').map((l) => '       ' + l.trim()).join('\n')}`);
+check('la barra usa fondo translúcido (vidrio), no sólido',
+  /background:\s*rgba\(255,\s*255,\s*255,\s*0\.20\)/.test(reglaBarra));
+check('la barra lleva backdrop-filter (desenfoque)',
+  /backdrop-filter:\s*blur\(/.test(reglaBarra) && /-webkit-backdrop-filter:\s*blur\(/.test(reglaBarra));
+check('la barra NO vuelve al blanco sólido',
+  !/\.problog-responder-barra\s*\{[^}]*background:\s*var\(--color-white\)/.test(css));
+const reglaBarraOscura = (css.match(/\[data-theme="dark"\]\s*\.problog-responder-barra\s*\{[^}]*\}/) || [''])[0];
+check('la barra tiene su vidrio oscuro',
+  /background:\s*rgba\(10,\s*10,\s*10,\s*0\.35\)/.test(reglaBarraOscura), reglaBarraOscura.trim());
+
 for (const [tema, pares] of Object.entries(PARES)) {
   log(`\n=== Contraste en tema ${tema.toUpperCase()} ===`);
   const c = TEMAS[tema];

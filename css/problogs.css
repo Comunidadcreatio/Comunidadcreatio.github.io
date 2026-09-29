@@ -910,9 +910,20 @@
     z-index: 1100;
     box-sizing: border-box;
     padding: 10px 24px;
-    background: var(--color-white);
+    /* EFECTO VIDRIO, igual que el header y el menú principal (ver style.css):
+       fondo translúcido y desenfoque. Antes era blanco SÓLIDO y por eso
+       desentonaba con el resto de la app. */
+    background: rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 0.5px solid var(--color-gray-200);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* En oscuro, el mismo vidrio oscuro que el header y el nav. */
+[data-theme="dark"] .problog-responder-barra {
+    background: rgba(10, 10, 10, 0.35);
+    border-bottom-color: var(--color-border, rgba(255, 255, 255, 0.18));
 }
 
 /* El hueco que tapa la barra se devuelve aquí mientras está abierta. El selector
@@ -961,7 +972,11 @@
     color: var(--color-gray-500);
 }
 
+/* El foco del input de la barra: el subrayado engorda y se pone en tinta, igual
+   que en la caja de los comentarios (aquí es la única señal, no hay recuadro). */
 .problog-responder-input:focus {
+    border-bottom-width: 2px;
+    padding-bottom: 5px;
     border-bottom-color: var(--color-ink);
 }
 
@@ -996,20 +1011,22 @@
     cursor: default;
 }
 
-/* En oscuro la barra sigue al header: fondo oscuro y línea clara. */
-[data-theme="dark"] .problog-responder-barra {
-    background: var(--color-black);
-    border-bottom-color: rgba(255, 255, 255, 0.18);
-}
-
+/* En oscuro los iconos y el subrayado del input siguen al tema. */
 [data-theme="dark"] .problog-responder-icono:hover {
     background-color: rgba(255, 255, 255, 0.10);
 }
 
 [data-theme="dark"] .problog-responder-input {
+    /* Hay una regla global en style.css que da fondo a los textarea en oscuro
+       (`[data-theme="dark"] textarea { background-color: var(--color-gray-100) }`),
+       y el input salía como un bloque gris dentro del vidrio. Se deja
+       transparente, igual que la caja de los comentarios. */
+    background: transparent;
     border-bottom-color: rgba(255, 255, 255, 0.24);
 }
 
+/* La barra de responder lleva el mismo VIDRIO que el header: se comprueba aquí
+   para que no se cuele un fondo sólido (fue el fallo original). */
 /* --- Cajón de escribir ---
    Sin fondo y sin caja: su única línea es el subrayado de la caja de dentro.
    SIN relleno inferior: el botón «Comentar» cierra el cajón, así que ese hueco
