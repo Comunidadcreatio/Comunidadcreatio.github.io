@@ -1323,23 +1323,22 @@ function ajustarBarraResponderAlTeclado() {
     }
     const vv = window.__vvPrueba || window.visualViewport;
     const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
-    // El teclado es lo que la parte visible NO llega a cubrir del viewport de
-    // layout. Se cuenta también `offsetTop`, porque en iOS el viewport visual
-    // además se desplaza hacia abajo y con la altura sola la barra se quedaba 100px
-    // por debajo del teclado (medido).
     const visible = vv && vv.height ? (vv.offsetTop || 0) + vv.height : layout;
-    const hueco = Math.max(0, Math.round(layout - visible));
-    const tecladoAbierto = hueco > TECLADO_UMBRAL_PROBLOGS;
+    const tecladoAbierto = (layout - visible) > TECLADO_UMBRAL_PROBLOGS;
     // OJO: `problog-teclado` ya la usa el editor para su propio hueco; aquí se usa
     // otra clase para no pisarla.
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
-    // Con el teclado abierto, el menú principal queda debajo de él (no se ve), así
-    // que la barra se apoya directamente sobre el teclado; con el teclado cerrado,
-    // se apoya encima del menú, como estaba.
-    const abajo = tecladoAbierto
-        ? Math.max(0, hueco - 60)
-        : Math.max(0, hueco);
-    barra.style.setProperty('--teclado-abajo', abajo + 'px');
+    // La barra se pega al BORDE VISIBLE (abajo del todo de lo que se ve), no al
+    // menú principal. Antes se subía el alto del menú y con el teclado abierto ese
+    // hueco quedaba vacío (el menú está detrás del teclado), que es el aire que se
+    // veía al llegar al final.
+    // Se mide sobre la posición SIN transformar (el rectángulo ya incluye el
+    // desplazamiento anterior, y usarlo tal cual se realimentaba) y se sube lo que
+    // le sobra para llegar al borde visible.
+    const r = barra.getBoundingClientRect();
+    const actual = parseFloat(barra.style.getPropertyValue('--teclado-abajo')) || 0;
+    const sinDesplazar = r.bottom + actual;
+    barra.style.setProperty('--teclado-abajo', Math.round(Math.max(0, sinDesplazar - visible)) + 'px');
 }
 
 // Después de abrir o cerrar la barra hay que recolocarla.
