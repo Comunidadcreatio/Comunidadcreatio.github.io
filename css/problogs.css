@@ -904,10 +904,13 @@
     position: fixed;
     left: 0;
     right: 0;
-    /* Pegada al borde de arriba del menú principal: su alto (60px) más el margen
-       seguro del móvil. Al abrirse el teclado, el navegador sube lo fijo y la
-       barra se va con él. */
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* El borde de abajo, EN PÍXELES, lo pone problogs.js midiendo el teclado con
+       `visualViewport` (mismo criterio que el cajón de comentarios de Cavents, que
+       es el que funciona). Sin teclado vale el alto del menú principal; con el
+       teclado abierto, el borde de arriba del teclado. Se hace así y no con
+       `calc()` porque en Android el layout no siempre se encoge con el teclado y
+       una pieza `fixed` pegada abajo se quedaba tapada, con aire hasta el teclado. */
+    bottom: var(--barra-abajo, 60px);
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;
@@ -920,13 +923,14 @@
     -webkit-backdrop-filter: blur(12px);
     border-top: 0.5px solid var(--color-gray-200);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-    /* Subida extra cuando está abierto el teclado. En Android el teclado no encoge
-       el viewport de layout (el meta lleva `interactive-widget=resizes-visual`),
-       así que una pieza `fixed` pegada abajo se queda tapada: problogs.js mide el
-       hueco con `visualViewport` y lo deja aquí. Con `transform` no toca el
-       layout. Con el teclado cerrado vale 0 y la barra se queda sobre el menú. */
-    transform: translateY(calc(-1 * var(--teclado-abajo, 0px)));
-    transition: transform 0.22s ease;
+}
+
+/* Mientras el teclado está abierto, el MENÚ PRINCIPAL se oculta. Es lo que hace
+   Cavents con su cajón (`cajon-teclado`) y es lo que quita el aire: la franja del
+   menú quedaba vacía entre la barra y el teclado y nadie la ocupaba. */
+body.responder-teclado #toggle-panel {
+    visibility: hidden;
+    pointer-events: none;
 }
 
 /* En pantallas anchas la barra se centra con el ancho de la columna de lectura,
@@ -945,6 +949,12 @@
    (`#problogs .problogs-detalle`) que fija su relleno y, sin esto, la ganaría. */
 #problogs #problogs-detalle.con-barra-responder {
     padding-bottom: 111px;
+}
+
+/* Con el teclado abierto el menú principal se oculta, así que solo hay que
+   reservar el alto de la propia barra. */
+body.responder-teclado #problogs #problogs-detalle.con-barra-responder {
+    padding-bottom: 90px;
 }
 
 /* En oscuro, el mismo vidrio oscuro que el header y el nav. */

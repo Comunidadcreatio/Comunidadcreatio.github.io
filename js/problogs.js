@@ -1302,49 +1302,46 @@ function seccionComentarios(id) {
 // ============================================================
 // LA BARRA DE RESPONDER Y EL TECLADO
 // ------------------------------------------------------------
-// El meta del viewport lleva `interactive-widget=resizes-content`, así que al
-// abrirse el teclado el navegador ENCOGE el viewport de layout y todo lo que va
-// fijo abajo (el menú principal y esta barra) sube solo, quedando pegada al
-// teclado. No hace falta subir nada a mano.
+// Mismo criterio que el cajón de comentarios de Cavents (js/comentarios.js), que
+// es el que funciona bien: se mide con `visualViewport` y se coloca el borde de
+// abajo de la barra EN PÍXELES, sin fiarse de que el navegador encoja o no el
+// layout.
 //
-// Lo que queda aquí es un RESPALDO para navegadores que no apliquen ese meta (una
-// WebView antigua): en esos, el layout NO se encoge (sigue midiendo como la
-// ventana) pero el viewport visual sí, que es justo el caso que dejaba la barra
-// tapada. Solo en ese caso se sube la barra. Y NO se escucha el scroll: hacerlo
-// movía la barra arriba y abajo mientras se desplazaba la publicación.
+// Y lo que faltaba: mientras el teclado está abierto, el MENÚ PRINCIPAL se oculta.
+// El menú es lo que quedaba como aire entre la barra y el teclado (la barra se
+// apoyaba encima del menú, y el menú, con el teclado abierto, no lo ocupa nadie).
+// Cavents hace exactamente eso (`cajon-teclado` oculta el nav).
 const TECLADO_UMBRAL_PROBLOGS = 120;
+const ALTO_NAV_PROBLOGS = 60;
 
 function ajustarBarraResponderAlTeclado() {
     const barra = barraResponder();
     if (!barra) return;
-    // Las pruebas sustituyen `visualViewport` para reproducir el teclado de
-    // Android: con esta bandera se evita que sus avisos entren en bucle.
+    // Las pruebas sustituyen `visualViewport` para reproducir el teclado: con esta
+    // bandera se evita que sus avisos entren en bucle.
     if (window.__ignorarAjusteTeclado) return;
     const vv = window.__vvPrueba || window.visualViewport;
-    const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
-    // `offsetTop` cuenta: en iOS el viewport visual además se desplaza hacia abajo
-    // y con la altura sola la barra quedaba 100px por encima del teclado (medido).
-    const visible = vv && vv.height ? (vv.offsetTop || 0) + vv.height : layout;
-    // El meta funcionó si el propio documento se encogió con el teclado.
-    const documentoEncogido = (document.documentElement.clientHeight || layout) < layout - TECLADO_UMBRAL_PROBLOGS;
-    if (documentoEncogido) {
-        barra.style.removeProperty('--teclado-abajo');
-        document.body.classList.remove('responder-teclado');
-        return;
-    }
-    const tecladoAbierto = (layout - visible) > TECLADO_UMBRAL_PROBLOGS;
+    const innerH = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+    if (!innerH) return;
+    // El sistema desplaza el viewport visual para "mostrar" el input enfocado: se
+    // descuenta para que la barra quede quieta en pantalla (igual que Cavents).
+    const pan = vv ? Math.max(0, Math.round(vv.offsetTop || 0)) : 0;
+    const visH = vv && vv.height ? vv.height : innerH;
+    // Borde de arriba del teclado, con la misma fórmula que el cajón de Cavents:
+    // lo que el layout NO llega a cubrir por abajo. Con `resizes-visual` (que es el
+    // meta que usa la app) el layout no se encoge, así que esto mide justo el
+    // teclado; y si algún día se encogiera, sale 0 y la barra se apoya en su sitio.
+    const bordeTeclado = Math.max(0, Math.round(innerH - pan - visH));
+    const tecladoAbierto = bordeTeclado > TECLADO_UMBRAL_PROBLOGS;
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
-    if (!tecladoAbierto || barra.classList.contains('hidden')) {
-        barra.style.removeProperty('--teclado-abajo');
+    if (barra.classList.contains('hidden')) {
+        barra.style.removeProperty('--barra-abajo');
         return;
     }
-    // Respaldo: se sube la barra lo justo para que su borde de abajo coincida con
-    // el borde visible. Se mide sobre la posición SIN desplazar (el rectángulo ya
-    // incluye el desplazamiento anterior y usarlo tal cual se realimentaba).
-    const r = barra.getBoundingClientRect();
-    const actual = parseFloat(barra.style.getPropertyValue('--teclado-abajo')) || 0;
-    const sinDesplazar = r.bottom + actual;
-    barra.style.setProperty('--teclado-abajo', Math.round(Math.max(0, sinDesplazar - visible)) + 'px');
+    // Con el teclado abierto, el menú se oculta y la barra se apoya en el teclado;
+    // sin teclado, se apoya encima del menú.
+    const abajo = tecladoAbierto ? bordeTeclado : ALTO_NAV_PROBLOGS;
+    barra.style.setProperty('--barra-abajo', abajo + 'px');
 }
 
 // Después de abrir o cerrar la barra hay que recolocarla.
@@ -1372,7 +1369,7 @@ function dejarDeResponder(seccion) {
     const barra = barraResponder();
     reservarHuecoDeLaBarra(false);
     // Con la barra cerrada no hay desplazamiento de teclado que valga.
-    if (barra) barra.style.removeProperty('--teclado-abajo');
+    if (barra) barra.style.removeProperty('--barra-abajo');
     document.body.classList.remove('responder-teclado');
     if (!barra) return;
     barra.classList.add('hidden');
@@ -2135,11 +2132,10 @@ export function setupProblogs() {
     barraResponder()?.addEventListener('click', (e) => {
         if (e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
     });
-    // La barra de responder sube con el teclado. Con el meta
-    // `interactive-widget=resizes-content` eso ya lo hace el navegador solo (encoge
-    // el layout y la barra, que va fija abajo, sube); lo que queda aquí es el
-    // respaldo para navegadores que no lo apliquen. NO se escucha el scroll a
-    // propósito: hacerlo movía la barra arriba y abajo al desplazar la publicación.
+    // La barra de responder se coloca como el cajón de comentarios de Cavents:
+    // midiendo el teclado con `visualViewport` y poniendo el borde de abajo en
+    // píxeles. NO se escucha el `scroll` a propósito: hacerlo movía la barra
+    // arriba y abajo al desplazar la publicación.
     ajustarBarraResponderAlTeclado();
     window.addEventListener('resize', ajustarBarraResponderAlTeclado);
     if (window.visualViewport) {

@@ -307,46 +307,51 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
       const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
       const vv = window.__vvPrueba || window.visualViewport;
       const bordeVisible = (vv.offsetTop || 0) + vv.height;
+      const n = document.getElementById('toggle-panel');
+      const sn = getComputedStyle(n);
       return JSON.stringify({
           barra: Math.round(b.top) + '..' + Math.round(b.bottom),
           bordeVisible: Math.round(bordeVisible),
           dentro: b.bottom <= bordeVisible + 1 && b.top >= vv.offsetTop - 1,
           // Sin aire: el borde de abajo de la barra coincide con el borde visible.
           hueco: Math.round(bordeVisible - b.bottom),
-          clase: document.body.classList.contains('responder-teclado')
+          clase: document.body.classList.contains('responder-teclado'),
+          // El menú principal se oculta: es lo que hacía el hueco.
+          navOculto: sn.visibility === 'hidden'
       });
   })()`)) || 'null');
-  console.log(`   · ${nombre}: barra ${conTeclado && conTeclado.barra} vs borde visible ${conTeclado && conTeclado.bordeVisible} (hueco ${conTeclado && conTeclado.hueco}px)`);
+  console.log(`   · ${nombre}: barra ${conTeclado && conTeclado.barra} vs borde visible ${conTeclado && conTeclado.bordeVisible} (hueco ${conTeclado && conTeclado.hueco}px, navOculto ${conTeclado && conTeclado.navOculto})`);
   check(`${nombre}: la barra sube y queda dentro de lo visible`, !!conTeclado && conTeclado.dentro === true, JSON.stringify(conTeclado));
   check(`${nombre}: la barra queda pegada al borde visible, SIN aire`,
     !!conTeclado && Math.abs(conTeclado.hueco) <= 1.5, JSON.stringify(conTeclado));
   check(`${nombre}: el teclado se detecta`, !!conTeclado && conTeclado.clase === true, JSON.stringify(conTeclado));
+  check(`${nombre}: el menú principal se oculta (como en Cavents)`,
+    !!conTeclado && conTeclado.navOculto === true, JSON.stringify(conTeclado));
 }
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
 await sleep(500);
 
-// 2) La forma BUENA (la que usan los navegadores de hoy): el meta del viewport
-//    lleva `interactive-widget=resizes-content`, así que el teclado encoge el
-//    viewport de LAYOUT. En ese caso no hay que subir nada a mano: la barra (que
-//    va fija abajo) y el menú principal suben solos y quedan pegados al teclado.
-console.log('\n=== El teclado encogiendo el viewport de layout (resizes-content) ===');
+// 2) La ventana encogida SIN teclado (por ejemplo el usuario redimensionando en
+//    escritorio): aquí NO hay teclado, así que el menú principal sigue a la vista y
+//    la barra se apoya encima de él, como siempre. Sirve para comprobar que el
+//    cálculo no se confunde y cree que hay un teclado donde no lo hay.
+console.log('\n=== La ventana encogida sin teclado ===');
 for (const [nombre, altoVentana] of [['teclado mediano (ventana 450px)', 450], ['teclado grande (ventana 330px)', 330]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: 393, height: altoVentana, deviceScaleFactor: 1, mobile: true });
   await sleep(900);
   const encogido = JSON.parse((await evalJs(`(() => {
       const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
-      const n = document.getElementById('toggle-panel').getBoundingClientRect();
+      const n = document.getElementById('toggle-panel');
+      const sn = getComputedStyle(n);
       return JSON.stringify({
           altoVentana: window.innerHeight,
           barra: Math.round(b.top) + '..' + Math.round(b.bottom),
-          nav: Math.round(n.top) + '..' + Math.round(n.bottom),
-          // Con el layout encogido, el menú principal sigue visible abajo del todo
-          // y la barra se apoya encima de él: el hueco hasta el final de la ventana
-          // es el alto del menú, y eso es lo correcto.
-          huecoHastaElNav: Math.round(n.top - b.bottom),
-          pegadaAlNav: Math.abs(n.top - b.bottom) <= 1.5,
-          transform: getComputedStyle(document.getElementById('problog-responder-barra')).transform
+          nav: Math.round(n.getBoundingClientRect().top) + '..' + Math.round(n.getBoundingClientRect().bottom),
+          // Con el layout encogido (y también en el caso de solo-visual) el menú se
+          // oculta, así que la barra tiene que acabar en el borde de la ventana.
+          hueco: Math.round(window.innerHeight - b.bottom),
+          navOculto: sn.visibility === 'hidden'
       });
   })()`)) || 'null');
   // El navegador devuelve la matriz identidad aunque el desplazamiento sea 0, así
@@ -357,13 +362,14 @@ for (const [nombre, altoVentana] of [['teclado mediano (ventana 450px)', 450], [
     const y = nums.length >= 6 ? parseFloat(nums[5]) : 0;
     return Math.abs(y) < 1;
   };
-  console.log(`   · ${nombre}: barra ${encogido && encogido.barra}, nav ${encogido && encogido.nav}, ventana ${encogido && encogido.altoVentana}`);
-  check(`${nombre}: la barra sigue pegada al menú principal, sin aire`,
-    !!encogido && Math.abs(encogido.huecoHastaElNav) <= 1.5, JSON.stringify(encogido));
-  check(`${nombre}: el menú principal sigue a la vista abajo`,
-    !!encogido && encogido.nav && Math.abs(encogido.altoVentana - parseInt(String(encogido.nav).split('..')[1], 10)) <= 1.5,
-    JSON.stringify(encogido));
-  check(`${nombre}: no hace falta desplazar la barra a mano (lo hace el navegador)`,
+  console.log(`   · ${nombre}: barra ${encogido && encogido.barra}, nav ${encogido && encogido.nav}, ventana ${encogido && encogido.altoVentana} (hueco ${encogido && encogido.hueco}px)`);
+  // Sin teclado: la barra sigue pegada ENCIMA del menú, como siempre (el hueco
+  // hasta el final de la ventana es el alto del menú, y eso es lo correcto).
+  check(`${nombre}: sin teclado, la barra sigue pegada al menú principal`,
+    !!encogido && Math.abs(encogido.hueco - 60) <= 1.5, JSON.stringify(encogido));
+  check(`${nombre}: sin teclado, el menú principal NO se oculta`,
+    !!encogido && encogido.navOculto === false, JSON.stringify(encogido));
+  check(`${nombre}: la barra no lleva desplazamiento propio (la coloca su bottom)`,
     !!encogido && sinDesplazamientoPropio(encogido.transform), JSON.stringify(encogido));
 }
 // Se devuelve la ventana a su tamaño para el resto de comprobaciones.

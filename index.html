@@ -3,15 +3,13 @@
 <html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <!-- interactive-widget=resizes-content: al abrir el teclado SÍ se encoge el
-         viewport de layout, así que todo lo que va fijo abajo (el menú principal y
-         la barra de responder de Problogs) sube solo y queda pegado al teclado.
-         Antes estaba en `resizes-visual`: el layout no se encogía, la barra se
-         quedaba tapada, había que subirla a mano desde JavaScript y quedaba aire
-         entre la barra y el teclado.
-         OJO: si se cambia esto, hay que volver a probar el teclado en Problogs
-         (la barra de responder) y en el chat. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+    <!-- interactive-widget=resizes-visual: al abrir el teclado NO se redimensiona
+         el layout (no se reacomoda todo lo fixed: nav, cajones, cabecera); solo
+         se reduce el viewport visual y el teclado se superpone. Así controlamos
+         nosotros qué se mueve (el área del input) y nada más se desplaza. Es el
+         modo con el que están probados el cajón de comentarios de Cavents y el
+         chat: si se cambia, hay que volver a probar los dos. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-visual">
     <meta name="theme-color" content="#1a1a1a">
     <link rel="manifest" href="manifest.webmanifest">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -20,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.616';
+        var currentVer = '1.0.617';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -84,7 +82,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=49fb96aa35">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=fc78c2cd84">
+    <link rel="stylesheet" href="css/problogs.css?v=f142793f69">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -1140,7 +1138,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=fe855318d8" type="module"></script>
+    <script src="js/main.js?v=b6e96f0f0c" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
