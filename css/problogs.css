@@ -920,6 +920,13 @@
     -webkit-backdrop-filter: blur(12px);
     border-top: 0.5px solid var(--color-gray-200);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    /* Subida extra cuando está abierto el teclado. En Android el teclado no encoge
+       el viewport de layout (el meta lleva `interactive-widget=resizes-visual`),
+       así que una pieza `fixed` pegada abajo se queda tapada: problogs.js mide el
+       hueco con `visualViewport` y lo deja aquí. Con `transform` no toca el
+       layout. Con el teclado cerrado vale 0 y la barra se queda sobre el menú. */
+    transform: translateY(calc(-1 * var(--teclado-abajo, 0px)));
+    transition: transform 0.22s ease;
 }
 
 /* En pantallas anchas la barra se centra con el ancho de la columna de lectura,

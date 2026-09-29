@@ -1299,6 +1299,58 @@ function seccionComentarios(id) {
 // arriba) con el subtítulo «Respondiendo a X», su propio input y los iconos de
 // enviar y cancelar. Ahí escribe el usuario su respuesta. Al enviarla o
 // cancelarla, la barra se oculta y el cajón de abajo vuelve a su estado normal.
+// ============================================================
+// LA BARRA DE RESPONDER Y EL TECLADO
+// ------------------------------------------------------------
+// En Android el teclado NO encoge el viewport de layout (el meta lleva
+// `interactive-widget=resizes-visual`), así que una pieza `position: fixed` pegada
+// abajo se queda TAPADA por el teclado en vez de subir. La solución es la misma que
+// usa el chat: mirar `window.visualViewport` (que sí mide lo que se ve de verdad) y
+// subir la barra a mano. Se sube con `transform`, que no toca el layout.
+const TECLADO_UMBRAL_PROBLOGS = 120;
+
+function ajustarBarraResponderAlTeclado() {
+    const barra = barraResponder();
+    if (!barra) return;
+    // Las pruebas sustituyen `visualViewport` para reproducir el teclado de
+    // Android: con esta bandera se evita que sus avisos entren en bucle.
+    if (window.__ignorarAjusteTeclado) return;
+    // Con la barra cerrada no hay nada que colocar.
+    if (barra.classList.contains('hidden')) {
+        barra.style.removeProperty('--teclado-abajo');
+        document.body.classList.remove('responder-teclado');
+        return;
+    }
+    const vv = window.__vvPrueba || window.visualViewport;
+    const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+    // El teclado es lo que la parte visible NO llega a cubrir del viewport de
+    // layout. Se cuenta también `offsetTop`, porque en iOS el viewport visual
+    // además se desplaza hacia abajo y con la altura sola la barra se quedaba 100px
+    // por debajo del teclado (medido).
+    const visible = vv && vv.height ? (vv.offsetTop || 0) + vv.height : layout;
+    const hueco = Math.max(0, Math.round(layout - visible));
+    const tecladoAbierto = hueco > TECLADO_UMBRAL_PROBLOGS;
+    // OJO: `problog-teclado` ya la usa el editor para su propio hueco; aquí se usa
+    // otra clase para no pisarla.
+    document.body.classList.toggle('responder-teclado', tecladoAbierto);
+    // Con el teclado abierto, el menú principal queda debajo de él (no se ve), así
+    // que la barra se apoya directamente sobre el teclado; con el teclado cerrado,
+    // se apoya encima del menú, como estaba.
+    const abajo = tecladoAbierto
+        ? Math.max(0, hueco - 60)
+        : Math.max(0, hueco);
+    barra.style.setProperty('--teclado-abajo', abajo + 'px');
+}
+
+// Después de abrir o cerrar la barra hay que recolocarla.
+function recolocarBarraResponder() {
+    ajustarBarraResponderAlTeclado();
+    // Segundo intento: el teclado no aparece de golpe, así que se vuelve a mirar
+    // cuando termina de abrirse (y al cerrarse).
+    clearTimeout(recolocarBarraResponder._t);
+    recolocarBarraResponder._t = setTimeout(ajustarBarraResponderAlTeclado, 350);
+}
+
 function barraResponder() {
     return document.getElementById('problog-responder-barra');
 }
@@ -1314,6 +1366,9 @@ function dejarDeResponder(seccion) {
     if (seccion) delete seccion.dataset.comentarioPadre;
     const barra = barraResponder();
     reservarHuecoDeLaBarra(false);
+    // Con la barra cerrada no hay desplazamiento de teclado que valga.
+    if (barra) barra.style.removeProperty('--teclado-abajo');
+    document.body.classList.remove('responder-teclado');
     if (!barra) return;
     barra.classList.add('hidden');
     const id = document.getElementById('problog-responder-comentario-id');
@@ -1342,6 +1397,8 @@ function responderA(seccion, comentarioId, autor) {
     campo.value = String(comentarioId);
     barra.classList.remove('hidden');
     reservarHuecoDeLaBarra(true);
+    // Se recoloca al momento y otra vez cuando el teclado acabe de abrirse.
+    recolocarBarraResponder();
     const texto = document.getElementById('problog-responder-texto');
     if (texto) {
         texto.value = '';
@@ -2073,6 +2130,15 @@ export function setupProblogs() {
     barraResponder()?.addEventListener('click', (e) => {
         if (e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
     });
+    // La barra de responder tiene que subir con el teclado (en Android el teclado
+    // no encoge el viewport de layout, así que `fixed` no basta: ver
+    // `ajustarBarraResponderAlTeclado`).
+    ajustarBarraResponderAlTeclado();
+    window.addEventListener('resize', ajustarBarraResponderAlTeclado);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', ajustarBarraResponderAlTeclado);
+        window.visualViewport.addEventListener('scroll', ajustarBarraResponderAlTeclado);
+    }
 
     // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
     // NO se está editando algo y el editor está VACÍO del todo: antes bastaba

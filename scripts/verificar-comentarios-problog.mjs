@@ -272,6 +272,49 @@ if (barra && barra.nav && barra.nav.visible) {
   check('se pudo medir el menú principal', false, JSON.stringify(barra && barra.nav));
 }
 check('el chip viejo de «respondiendo a…» ya no existe', !!barra && barra.chipViejo === false);
+
+// ============================================================
+// El teclado de Android
+// ============================================================
+// En Android el teclado NO encoge el viewport de layout (solo el visual), así que
+// una pieza `fixed` pegada abajo se queda tapada. Se reproduce esa geometría
+// sustituyendo `visualViewport` y se comprueba que la barra sube y queda dentro de
+// la parte visible. Casos: teclado normal, teclado grande y el de iOS (donde
+// además el viewport visual se desplaza hacia abajo).
+console.log('\n=== La barra con el teclado de Android ===');
+const CASOS_TECLADO = [
+  ['teclado de Android (~400px)', 450, 0],
+  ['teclado grande (~520px)', 330, 0],
+  ['iOS (visual desplazado)', 400, 100],
+];
+for (const [nombre, altoVisual, desplazamiento] of CASOS_TECLADO) {
+  await evalJs(`(() => {
+      // El modulo lee window.__vvPrueba antes que el real: asi la prueba es
+      // reversible (en Chromium visualViewport no se puede borrar).
+      window.__vvPrueba = { height: ${altoVisual}, width: window.innerWidth, offsetTop: ${desplazamiento}, offsetLeft: 0, scale: 1,
+          addEventListener: () => {}, removeEventListener: () => {} };
+      window.dispatchEvent(new Event('resize'));
+  })()`);
+  await sleep(700);
+  const conTeclado = JSON.parse((await evalJs(`(() => {
+      const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
+      const vv = window.__vvPrueba || window.visualViewport;
+      const bordeVisible = vv.offsetTop + vv.height;
+      return JSON.stringify({
+          barra: Math.round(b.top) + '..' + Math.round(b.bottom),
+          bordeVisible: Math.round(bordeVisible),
+          dentro: b.bottom <= bordeVisible + 1 && b.top >= vv.offsetTop - 1,
+          pegada: Math.abs(b.bottom - bordeVisible) <= 2,
+          clase: document.body.classList.contains('responder-teclado')
+      });
+  })()`)) || 'null');
+  console.log(`   · ${nombre}: barra ${conTeclado && conTeclado.barra} vs borde visible ${conTeclado && conTeclado.bordeVisible}`);
+  check(`${nombre}: la barra sube y queda dentro de lo visible`, !!conTeclado && conTeclado.dentro === true, JSON.stringify(conTeclado));
+  check(`${nombre}: la barra queda pegada al teclado`, !!conTeclado && conTeclado.pegada === true, JSON.stringify(conTeclado));
+}
+// Se quita el viewport falso para no dejar la página tocada.
+await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
+await sleep(500);
 await evalJs(`(() => {
     const input = document.getElementById('problog-responder-texto');
     input.value = 'Respuesta de prueba';
