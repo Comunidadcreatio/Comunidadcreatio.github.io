@@ -219,7 +219,6 @@ const barra = JSON.parse(await evalJs(`(() => {
     const b = document.getElementById('problog-responder-barra');
     if (!b) return JSON.stringify({ falta: true });
     const r = b.getBoundingClientRect();
-    const cabecera = document.getElementById('main-header').getBoundingClientRect();
     const titulo = b.querySelector('.problog-responder-titulo');
     const input = document.getElementById('problog-responder-texto');
     const iconos = b.querySelectorAll('.problog-responder-icono');
@@ -230,17 +229,26 @@ const barra = JSON.parse(await evalJs(`(() => {
         titulo: (titulo ? titulo.textContent : '').replace(/\\s+/g, ' ').trim(),
         tieneInput: !!input,
         iconos: iconos.length,
-        // Va debajo del header (justo después del menú principal).
-        debajoDelHeader: r.top >= cabecera.bottom - 1,
+        // Va ABAJO, pegada por encima del menú principal (que en móvil va fijo
+        // abajo), y dentro de la pantalla.
+        nav: (() => {
+            const n = document.getElementById('toggle-panel');
+            if (!n) return null;
+            const rn = n.getBoundingClientRect();
+            return { arriba: rn.top, visible: rn.height > 0 && getComputedStyle(n).display !== 'none' };
+        })(),
+        ventana: { ancho: window.innerWidth, alto: window.innerHeight },
         // Los iconos van a la derecha, después del input.
         iconosALaDerecha: !!(ir && ultimo) && ultimo.left >= ir.right - 1,
         chipViejo: !!document.querySelector('[data-comentario-respondiendo]'),
         // Es FIJA (se queda a la vista al abrirse el teclado), no sticky.
         posicion: getComputedStyle(b).position,
-        // NO puede tapar el contenido: el título tiene que empezar por debajo.
-        tituloDebajoDeLaBarra: (() => {
-            const t = document.querySelector('.problog-lectura-titulo');
-            return t ? t.getBoundingClientRect().top >= r.bottom - 1 : null;
+        abajo: r.bottom,
+        // NO puede tapar el contenido: el bloque de la publicación acaba antes.
+        contenidoLibre: (() => {
+            const d = document.getElementById('problogs-detalle');
+            const s = d ? getComputedStyle(d) : null;
+            return s ? parseFloat(s.paddingBottom) : null;
         })()
     });
 })()`) || 'null');
@@ -249,10 +257,20 @@ check('al pulsar «Responder» aparece la barra de respuesta', barra && barra.vi
 check('la barra lleva el subtítulo «Respondiendo a X»', !!barra && /^Respondiendo a Ana/.test(barra.titulo), barra && barra.titulo);
 check('la barra tiene su propio input', !!barra && barra.tieneInput === true);
 check('la barra tiene los iconos de enviar y cancelar', !!barra && barra.iconos === 2, barra && String(barra.iconos));
-check('la barra queda debajo del header (tras el menú principal)', !!barra && barra.debajoDelHeader === true);
 check('los iconos de la barra van justificados a la derecha', !!barra && barra.iconosALaDerecha === true);
 check('la barra es fija (se queda con el teclado abierto)', !!barra && barra.posicion === 'fixed', barra && barra.posicion);
-check('la barra NO tapa el contenido de la publicación', !!barra && barra.tituloDebajoDeLaBarra === true);
+// Lo pedido: abajo, justo encima del menú principal.
+if (barra && barra.nav && barra.nav.visible) {
+  const separacion = Math.abs(barra.nav.arriba - barra.abajo);
+  console.log(`   · barra hasta y=${barra.abajo}, menú principal empieza en y=${barra.nav.arriba} (separación ${separacion.toFixed(1)}px)`);
+  check(`la barra va pegada ENCIMA del menú principal (${separacion.toFixed(1)}px)`, separacion <= 1.5, `${separacion.toFixed(1)}px`);
+  check('la barra queda dentro de la pantalla', barra.abajo <= barra.ventana.alto + 1,
+    `abajo=${barra.abajo} ventana=${barra.ventana.alto}`);
+  check(`el bloque de la publicación reserva el hueco de la barra (relleno ${barra.contenidoLibre}px)`,
+    (barra.contenidoLibre || 0) >= 90, String(barra.contenidoLibre));
+} else {
+  check('se pudo medir el menú principal', false, JSON.stringify(barra && barra.nav));
+}
 check('el chip viejo de «respondiendo a…» ya no existe', !!barra && barra.chipViejo === false);
 await evalJs(`(() => {
     const input = document.getElementById('problog-responder-texto');

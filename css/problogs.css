@@ -891,22 +891,24 @@
 /* ============================================================
    BARRA PARA RESPONDER A UN COMENTARIO
    ------------------------------------------------------------
-   Se abre al pulsar «Responder» y vive justo DEBAJO del header (y por tanto del
-   menú principal), FIJA, como el propio header: así se queda a la vista cuando
-   aparece el teclado en vez de irse con el scroll. Al ser fija no ocupa sitio en
-   el flujo, así que el hueco que tapa se devuelve con `padding-top` al bloque de
-   la publicación (clase `con-barra-responder`, que pone problogs.js). Lleva el
-   subtítulo «Respondiendo a X», su input y los iconos de enviar y cancelar
-   justificados a la derecha.
+   Se abre al pulsar «Responder» y vive en la parte de ABAJO de la pantalla, justo
+   ENCIMA del menú principal (que en móvil va fijo abajo), con el mismo vidrio que
+   el header. Es `position: fixed`, así que al desplegarse el teclado la barra se
+   va hacia arriba con él y queda pegada al teclado: se escribe sin perderla de
+   vista. Al ser fija no ocupa sitio en el flujo, así que el hueco que tapa se
+   devuelve con `padding-bottom` al bloque de la publicación (clase
+   `con-barra-responder`, que pone problogs.js). Lleva el subtítulo «Respondiendo
+   a X», su input y los iconos de enviar y cancelar justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
     position: fixed;
     left: 0;
     right: 0;
-    /* Pegada al borde de abajo del header, con la misma fórmula que el resto de
-       piezas de la app (el header mide 64px + la barra de estado). */
-    top: calc(64px + var(--status-bar-height, 24px));
-    /* Por encima del header (1000), como los paneles que se despliegan. */
+    /* Pegada al borde de arriba del menú principal: su alto (60px) más el margen
+       seguro del móvil. Al abrirse el teclado, el navegador sube lo fijo y la
+       barra se va con él. */
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;
     padding: 10px 24px;
@@ -916,22 +918,35 @@
     background: rgba(255, 255, 255, 0.20);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 0.5px solid var(--color-gray-200);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-top: 0.5px solid var(--color-gray-200);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* En oscuro, el mismo vidrio oscuro que el header y el nav. */
-[data-theme="dark"] .problog-responder-barra {
-    background: rgba(10, 10, 10, 0.35);
-    border-bottom-color: var(--color-border, rgba(255, 255, 255, 0.18));
+/* En pantallas anchas la barra se centra con el ancho de la columna de lectura,
+   como el contenido. OJO: el `bottom` sigue siendo el del menú principal, porque
+   ese menú va abajo en TODOS los anchos (comprobado: a 1280px también mide 60px y
+   está fijo abajo); si se pusiera `bottom: 0` se montaría encima de él. */
+@media (min-width: 769px) {
+    .problog-responder-barra {
+        max-width: 720px;
+        margin: 0 auto;
+    }
 }
 
 /* El hueco que tapa la barra se devuelve aquí mientras está abierta. El selector
    lleva el `#problogs` delante a propósito: hay otra regla más específica
    (`#problogs .problogs-detalle`) que fija su relleno y, sin esto, la ganaría. */
 #problogs #problogs-detalle.con-barra-responder {
-    padding-top: 108px;
+    padding-bottom: 111px;
 }
+
+/* En oscuro, el mismo vidrio oscuro que el header y el nav. */
+[data-theme="dark"] .problog-responder-barra {
+    background: rgba(10, 10, 10, 0.35);
+    border-top-color: var(--color-border, rgba(255, 255, 255, 0.18));
+}
+
+/* (El hueco de la barra de responder se reserva más abajo, junto a su regla.) */
 
 .problog-responder-titulo {
     margin: 0 0 8px;
