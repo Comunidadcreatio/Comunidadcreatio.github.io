@@ -901,18 +901,13 @@
    a X», su input y los iconos de enviar y cancelar justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
-    /* SIEMPRE FIJA, pegada encima del menú principal. Es lo más sólido: una pieza
-       fija no depende del scroll, así que no se mueve ni un píxel al desplazar la
-       publicación. Cuando hay que subirla (el teclado tapa esa franja) NO se cambia
-       de modo ni se toca el `top`: se aplica un `transform` con el desplazamiento
-       que calcula problogs.js. */
+    /* SIEMPRE FIJA. Una pieza fija no depende del scroll, así que no se mueve ni un
+       píxel al desplazar la publicación, y no necesita JavaScript para mantenerse.
+       Su sitio natural es pegado encima del menú principal. */
     position: fixed;
     left: 0;
     right: 0;
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-    /* Subida cuando el teclado tapa su sitio. Depende SOLO del viewport visual, nunca
-       del scroll: por eso no tiembla. Con `transform` no se toca el layout. */
-    transform: translateY(calc(-1 * var(--barra-subir, 0px)));
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;
@@ -927,11 +922,21 @@
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* El MENÚ PRINCIPAL se oculta SOLO cuando la barra ocupa su sitio (es decir, cuando
-   hay que subirla para no quedar bajo el teclado). Es lo que hace Cavents con su
-   cajón y es lo que quita el aire: esa franja la ocupa la barra. Si NO hay que
-   subirla, el menú se queda a la vista: si se ocultara, su franja quedaría vacía
-   entre la barra y el teclado, que era el hueco que se veía. */
+/* CUANDO EL TECLADO TAPA SU SITIO: se le pone el `top` en píxeles (lo calcula
+   problogs.js con el borde visible del viewport visual) y se suelta el `bottom` para
+   no quedar sobre-restringida (con `top` y `bottom` a la vez, el navegador estiraría
+   su alto). Con `top` en vez de un `transform` se evita la capa del compositor, que
+   en Android puede ir con retraso al scrollear y verse como temblor. */
+body.responder-subida .problog-responder-barra {
+    bottom: auto;
+    top: var(--barra-top, 0px);
+}
+
+/* El MENÚ PRINCIPAL se oculta SOLO cuando la barra ocupa su sitio (cuando hay que
+   subirla para no quedar bajo el teclado). Es lo que hace Cavents con su cajón y es
+   lo que quita el aire: esa franja la ocupa la barra. Si NO hay que subirla, el menú
+   se queda a la vista: si se ocultara, su franja quedaría vacía entre la barra y el
+   teclado, que era el hueco que se veía. */
 body.responder-subida #toggle-panel {
     visibility: hidden;
     pointer-events: none;

@@ -335,10 +335,18 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
   check(`${nombre}: el menú principal se oculta (como en Cavents)`,
     !!conTeclado && conTeclado.navOculto === true, JSON.stringify(conTeclado));
   // NO PUEDE TEMBLAR: con el teclado abierto se scrollea y se mira la posición de la
-  // barra EN PANTALLA. Debe ser siempre la misma. Además se mete ruido de ±2px en las
+  // barra EN PANTALLA (debe ser siempre la misma) y, sobre todo, CUÁNTAS VECES SE
+  // ESCRIBE su estilo. Si es 0 durante el scroll, no hay nada que pueda moverse: es la
+  // garantía de fondo, mejor que medir el temblor. Se mete además ruido de ±2px en las
   // medidas del viewport visual, que es lo que hace el navegador de verdad.
   const temblor = JSON.parse((await evalJs(`(async () => {
       const b = document.getElementById('problog-responder-barra');
+      const st = b.style;
+      const set0 = st.setProperty.bind(st);
+      const rem0 = st.removeProperty.bind(st);
+      let escrituras = 0;
+      st.setProperty = function (...a) { escrituras++; return set0(...a); };
+      st.removeProperty = function (...a) { escrituras++; return rem0(...a); };
       const posiciones = [];
       const ruido = [0, 2, 1, -1, 0, 1, -1, 2, 0, 1];
       for (let i = 0; i < 12; i++) {
@@ -350,23 +358,23 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
           await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
           posiciones.push(Math.round(b.getBoundingClientRect().top));
       }
+      st.setProperty = set0; st.removeProperty = rem0;
       const min = Math.min(...posiciones), max = Math.max(...posiciones);
-      return JSON.stringify({ min, max, rango: max - min });
+      return JSON.stringify({ min, max, rango: max - min, escrituras });
   })()`)) || 'null');
-  console.log(`   · ${nombre}: al scrollear con el teclado abierto la barra se mueve ${temblor && temblor.rango}px (min ${temblor && temblor.min}, max ${temblor && temblor.max})`);
+  console.log(`   · ${nombre}: al scrollear, la barra se mueve ${temblor && temblor.rango}px y su estilo se escribe ${temblor && temblor.escrituras} vez/veces`);
   check(`${nombre}: la barra NO tiembla al scrollear con el teclado abierto`,
     !!temblor && temblor.rango <= 1, JSON.stringify(temblor));
+  // Lo importante de fondo: durante el scroll NO se toca el estilo.
+  check(`${nombre}: al scrollear NO se reescribe el estilo de la barra`,
+    !!temblor && temblor.escrituras === 0, JSON.stringify(temblor));
   const posicionConTeclado = await evalJs(`getComputedStyle(document.getElementById('problog-responder-barra')).position`);
   check(`${nombre}: con el teclado abierto la barra sigue siendo fija (no depende del scroll)`,
     posicionConTeclado === 'fixed', String(posicionConTeclado));
-  // Y se sube con un `transform` (constante, sin depender del scroll). El navegador
-  // devuelve `matrix(a, b, c, d, tx, ty)`: se saca el último número, que es la
-  // subida vertical. Sin regex, para no pelearse con los escapes.
-  const subida = await evalJs(`getComputedStyle(document.getElementById('problog-responder-barra')).transform`);
-  const trozos = String(subida).split(',');
-  const subidaY = Math.abs(parseFloat(trozos[trozos.length - 1]) || 0);
-  check(`${nombre}: la barra se sube con un transform de más de 100px (${subidaY}px)`,
-    subidaY > 100, String(subida));
+  // Y se coloca con un `top` en píxeles (propiedad de layout, sin capa del compositor).
+  const topPuesto = await evalJs(`document.getElementById('problog-responder-barra').style.getPropertyValue('--barra-top')`);
+  check(`${nombre}: la barra se coloca con su top medido (${topPuesto || 'sin valor'})`,
+    !!topPuesto && parseFloat(topPuesto) > 0, String(topPuesto));
 }
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
