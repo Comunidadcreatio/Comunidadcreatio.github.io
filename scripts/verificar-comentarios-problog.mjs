@@ -211,23 +211,53 @@ check('el cuadro de escritura se vacía', trasPublicar.input === '', JSON.string
 // Responder a un comentario
 // ============================================================
 console.log('\n=== Responder ===');
+// El botón «Responder» ya NO rellena un chip en el cajón de abajo: abre la barra
+// temporal de arriba, justo debajo del menú principal, con su propio input.
 await evalJs(`document.querySelector('[data-comentario-responder="1"]')?.click()`);
 await sleep(500);
-const chip = await evalJs(`(() => { const c = document.querySelector('[data-comentario-respondiendo]'); return c && !c.classList.contains('hidden') ? c.textContent.trim() : ''; })()`);
-check('el chip dice a quién se responde', /Respondiendo a Ana/.test(chip || ''), JSON.stringify(chip));
+const barra = JSON.parse(await evalJs(`(() => {
+    const b = document.getElementById('problog-responder-barra');
+    if (!b) return JSON.stringify({ falta: true });
+    const r = b.getBoundingClientRect();
+    const cabecera = document.getElementById('main-header').getBoundingClientRect();
+    const titulo = b.querySelector('.problog-responder-titulo');
+    const input = document.getElementById('problog-responder-texto');
+    const iconos = b.querySelectorAll('.problog-responder-icono');
+    const ir = input ? input.getBoundingClientRect() : null;
+    const ultimo = iconos.length ? iconos[iconos.length - 1].getBoundingClientRect() : null;
+    return JSON.stringify({
+        visible: !b.classList.contains('hidden'),
+        titulo: (titulo ? titulo.textContent : '').replace(/\\s+/g, ' ').trim(),
+        tieneInput: !!input,
+        iconos: iconos.length,
+        // Va debajo del header (justo después del menú principal).
+        debajoDelHeader: r.top >= cabecera.bottom - 1,
+        // Los iconos van a la derecha, después del input.
+        iconosALaDerecha: !!(ir && ultimo) && ultimo.left >= ir.right - 1,
+        chipViejo: !!document.querySelector('[data-comentario-respondiendo]')
+    });
+})()`) || 'null');
+console.log('   ' + JSON.stringify(barra));
+check('al pulsar «Responder» aparece la barra de respuesta', barra && barra.visible === true, JSON.stringify(barra));
+check('la barra lleva el subtítulo «Respondiendo a X»', !!barra && /^Respondiendo a Ana/.test(barra.titulo), barra && barra.titulo);
+check('la barra tiene su propio input', !!barra && barra.tieneInput === true);
+check('la barra tiene los iconos de enviar y cancelar', !!barra && barra.iconos === 2, barra && String(barra.iconos));
+check('la barra queda debajo del header (tras el menú principal)', !!barra && barra.debajoDelHeader === true);
+check('los iconos de la barra van justificados a la derecha', !!barra && barra.iconosALaDerecha === true);
+check('el chip viejo de «respondiendo a…» ya no existe', !!barra && barra.chipViejo === false);
 await evalJs(`(() => {
-    const caja = document.querySelector('[data-problog-comentarios]');
-    caja.querySelector('[data-comentario-texto]').value = 'Respuesta de prueba';
-    caja.querySelector('[data-problog-comentario-form]').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    const input = document.getElementById('problog-responder-texto');
+    input.value = 'Respuesta de prueba';
+    document.getElementById('problog-responder-barra').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 })()`);
-await sleep(2200);
+await sleep(2400);
 todos = await enviados();
 const respuesta = todos.filter((e) => e.tipo === 'comentario').pop();
 check('la respuesta se envía con comentario_padre_id = 1', respuesta && respuesta.padre === 1, JSON.stringify(respuesta));
 const anidadasTras = await evalJs(`document.querySelectorAll('.problog-comentario-respuestas .problog-comentario').length`);
 check('la respuesta se ve anidada', anidadasTras === 2, String(anidadasTras));
-const chipTras = await evalJs(`document.querySelector('[data-comentario-respondiendo]').classList.contains('hidden')`);
-check('el chip de responder se limpia tras enviar', chipTras === true);
+const barraTras = await evalJs(`document.getElementById('problog-responder-barra').classList.contains('hidden')`);
+check('la barra se cierra tras enviar la respuesta', barraTras === true);
 
 // ============================================================
 // Me gusta en un comentario

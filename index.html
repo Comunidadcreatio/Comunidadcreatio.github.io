@@ -16,7 +16,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.608';
+        var currentVer = '1.0.609';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -80,7 +80,7 @@
     <link rel="stylesheet" href="css/notificaciones.css?v=49fb96aa35">
     <link rel="stylesheet" href="css/search-results.css?v=b6c95a1760">
     <link rel="stylesheet" href="css/skeleton.css?v=02eef717eb">
-    <link rel="stylesheet" href="css/problogs.css?v=ac4a649012">
+    <link rel="stylesheet" href="css/problogs.css?v=c6d3126e15">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -1024,6 +1024,31 @@
         <!-- SECCIÓN: PROBLOGS -->
         <section id="problogs" class="hidden" aria-label="Problogs" role="region">
             <h2 class="visually-hidden">Problogs</h2>
+            <!-- Barra para RESPONDER a un comentario. Aparece justo debajo del menú
+                 principal (es el primer elemento de la sección, y se queda fija
+                 arriba mientras respondes) y solo mientras hay una respuesta en
+                 curso: la muestra y la oculta problogs.js al pulsar «Responder» y
+                 al enviar o cancelar. Lleva su propio input, el icono de enviar y
+                 el de cancelar, los dos justificados a la derecha. -->
+            <form id="problog-responder-barra" class="problog-responder-barra hidden" autocomplete="off">
+                <p class="problog-responder-titulo">Respondiendo a <strong data-responder-autor></strong></p>
+                <div class="problog-responder-linea">
+                    <textarea id="problog-responder-texto" class="problog-responder-input" rows="1" maxlength="1000"
+                        placeholder="Escribe tu respuesta…" aria-label="Escribe tu respuesta"></textarea>
+                    <button type="submit" class="problog-responder-icono" title="Enviar respuesta" aria-label="Enviar respuesta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                    <button type="button" class="problog-responder-icono" data-responder-cancelar title="Cancelar" aria-label="Cancelar respuesta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </form>
             <div id="problogs-feed" class="problogs-feed">
                 <p class="problogs-cargando">Cargando publicaciones…</p>
             </div>
@@ -1111,7 +1136,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=b803270665"></script>
-    <script src="js/main.js?v=859faae671" type="module"></script>
+    <script src="js/main.js?v=2bc3b1bf3f" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=4adf7ca191"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

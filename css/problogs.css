@@ -888,6 +888,98 @@
     }
 }
 
+/* ============================================================
+   BARRA PARA RESPONDER A UN COMENTARIO
+   ------------------------------------------------------------
+   Aparece justo debajo del menú principal (es la primera pieza de la sección) y
+   se queda pegada arriba mientras se escribe, para no perderla al bajar por los
+   comentarios. Solo se ve mientras hay una respuesta en curso. Lleva el
+   subtítulo «Respondiendo a X», su input y los iconos de enviar y cancelar
+   justificados a la derecha.
+   ============================================================ */
+.problog-responder-barra {
+    position: sticky;
+    top: var(--header-height, 64px);
+    z-index: 6;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: var(--comentario-aire, 24px);
+    padding-right: var(--comentario-aire, 24px);
+    background: var(--color-white);
+    border-bottom: 1px solid var(--comentario-linea, var(--color-gray-300));
+}
+
+.problog-responder-titulo {
+    margin: 0 0 8px;
+    color: var(--color-gray-600);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.problog-responder-titulo strong {
+    color: var(--color-ink);
+    font-weight: 800;
+}
+
+.problog-responder-linea {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.problog-responder-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 0;
+    border: none;
+    border-bottom: 1px solid var(--comentario-linea, var(--color-gray-300));
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+    resize: none;
+    outline: none;
+}
+
+.problog-responder-input::placeholder {
+    color: var(--color-gray-500);
+}
+
+.problog-responder-input:focus {
+    border-bottom-color: var(--color-ink);
+}
+
+.problog-responder-icono {
+    flex: 0 0 auto;
+    padding: 6px;
+    border: none;
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+}
+
+.problog-responder-icono svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+.problog-responder-icono:hover {
+    background: var(--comentario-hover);
+}
+
+.problog-responder-icono:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* En oscuro el fondo del header es oscuro: la barra tiene que seguirlo. */
+[data-theme="dark"] .problog-responder-barra {
+    background: var(--color-black);
+}
+
 /* --- Cajón de escribir ---
    Sin fondo y sin caja: su única línea es el subrayado de la caja de dentro.
    SIN relleno inferior: el botón «Comentar» cierra el cajón, así que ese hueco
@@ -946,25 +1038,8 @@
     gap: 10px;
 }
 
-/* Chip de "respondiendo a …": también es el botón para cancelar la respuesta.
-   Con contorno y sin relleno, igual que el resto de la zona. */
-.problog-comentario-respondiendo {
-    margin-right: auto;
-    padding: 5px 11px;
-    border: 1px solid var(--comentario-control);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-gray-600);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.problog-comentario-respondiendo:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-}
+/* (El chip de "respondiendo a …" se quitó: responder se hace ahora en la barra de
+   arriba, justo debajo del menú principal; ver `.problog-responder-barra`.) */
 
 /* Botón de enviar: SIN borde, sin relleno y con el texto en tinta. Antes era
    fondo `--color-ink` con texto `--color-white` y, como en modo oscuro esos dos

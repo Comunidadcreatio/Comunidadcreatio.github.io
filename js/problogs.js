@@ -1243,7 +1243,6 @@ function bloqueComentariosHTML(p) {
                 <textarea class="problog-comentario-input" data-comentario-texto rows="2" maxlength="1000"
                     placeholder="Escribe un comentario…" aria-label="Escribe un comentario"></textarea>
                 <div class="problog-comentario-acciones">
-                    <button type="button" class="problog-comentario-respondiendo hidden" data-comentario-respondiendo></button>
                     <button type="submit" class="problog-comentario-enviar">Comentar</button>
                 </div>
             </form>
@@ -1292,24 +1291,53 @@ function seccionComentarios(id) {
     return document.querySelector('[data-problog-comentarios="' + id + '"]');
 }
 
+// ============================================================
+// RESPONDER A UN COMENTARIO (barra de arriba)
+// ------------------------------------------------------------
+// Al pulsar «Responder» NO se contesta en el cajón de abajo: aparece una barra
+// temporal justo debajo del menú principal (la primera pieza de la sección, fija
+// arriba) con el subtítulo «Respondiendo a X», su propio input y los iconos de
+// enviar y cancelar. Ahí escribe el usuario su respuesta. Al enviarla o
+// cancelarla, la barra se oculta y el cajón de abajo vuelve a su estado normal.
+function barraResponder() {
+    return document.getElementById('problog-responder-barra');
+}
+
 function dejarDeResponder(seccion) {
-    delete seccion.dataset.comentarioPadre;
-    const chip = seccion.querySelector('[data-comentario-respondiendo]');
-    if (chip) {
-        chip.classList.add('hidden');
-        chip.textContent = '';
-    }
+    if (seccion) delete seccion.dataset.comentarioPadre;
+    const barra = barraResponder();
+    if (!barra) return;
+    barra.classList.add('hidden');
+    const id = document.getElementById('problog-responder-comentario-id');
+    if (id) id.remove();
+    const autor = barra.querySelector('[data-responder-autor]');
+    if (autor) autor.textContent = '';
+    const texto = document.getElementById('problog-responder-texto');
+    if (texto) texto.value = '';
 }
 
 function responderA(seccion, comentarioId, autor) {
     seccion.dataset.comentarioPadre = String(comentarioId);
-    const chip = seccion.querySelector('[data-comentario-respondiendo]');
-    if (chip) {
-        chip.textContent = 'Respondiendo a ' + autor + ' · cancelar';
-        chip.classList.remove('hidden');
+    const barra = barraResponder();
+    if (!barra) return;
+    const nodoAutor = barra.querySelector('[data-responder-autor]');
+    if (nodoAutor) nodoAutor.textContent = autor || 'este comentario';
+    // El id del comentario al que se responde viaja en la propia barra: así no hay
+    // que depender de ninguna variable global que se pueda quedar desfasada.
+    let campo = document.getElementById('problog-responder-comentario-id');
+    if (!campo) {
+        campo = document.createElement('input');
+        campo.type = 'hidden';
+        campo.id = 'problog-responder-comentario-id';
+        barra.appendChild(campo);
     }
-    const input = seccion.querySelector('[data-comentario-texto]');
-    if (input) input.focus({ preventScroll: true });
+    campo.value = String(comentarioId);
+    barra.classList.remove('hidden');
+    const texto = document.getElementById('problog-responder-texto');
+    if (texto) {
+        texto.value = '';
+        texto.focus({ preventScroll: true });
+    }
 }
 
 // Los comentarios raíz van del MÁS RECIENTE al más antiguo (el que acabas de
@@ -1378,11 +1406,11 @@ window.addEventListener('resize', () => {
     temporizadorAnchoComentarios = setTimeout(ajustarAnchoCajasComentarios, 150);
 });
 
-// El chip de "respondiendo a…" cambia la fila de acciones de alto (aparece a la
-// izquierda del botón): hay que recolocar la línea del cajón, que va justo encima.
-document.addEventListener('click', (e) => {
-    if (!e.target.closest || !e.target.closest('[data-comentario-responder], [data-comentario-respondiendo]')) return;
-    setTimeout(ajustarAnchoCajasComentarios, 60);
+// Al abrir una publicación se vuelve a medir al ancho real (el alto del cajón
+// depende de su contenido, y el del textarea cambia según lo que se escriba).
+document.addEventListener('input', (e) => {
+    if (!e.target.closest || !e.target.closest('[data-comentario-texto]')) return;
+    setTimeout(ajustarAnchoCajasComentarios, 40);
 });
 
 function pintarListaComentarios(seccion, comentarios) {
@@ -1473,6 +1501,35 @@ async function enviarComentarioDeLaPublicacion(seccion) {
         showError('Error de conexión al comentar.');
     } finally {
         if (boton) { boton.disabled = false; boton.textContent = 'Comentar'; }
+    }
+}
+
+// Envía la RESPUESTA escrita en la barra de arriba. El comentario padre sale de la
+// propia barra (el campo oculto), y el texto de su input.
+async function enviarRespuestaDeLaBarra() {
+    const barra = barraResponder();
+    if (!barra) return;
+    const seccion = document.querySelector('[data-problog-comentarios]');
+    if (!seccion) return;
+    const texto = document.getElementById('problog-responder-texto');
+    const valor = (texto ? texto.value : '').trim();
+    if (!valor) {
+        showError('Escribe algo antes de responder.');
+        if (texto) texto.focus();
+        return;
+    }
+    const campoPadre = document.getElementById('problog-responder-comentario-id');
+    // Se deja el padre en la sección para reutilizar el envío de siempre (que ya
+    // sabe avisar de errores, recargar la lista y limpiar).
+    if (campoPadre && campoPadre.value) seccion.dataset.comentarioPadre = campoPadre.value;
+    const cajon = seccion.querySelector('[data-comentario-texto]');
+    if (cajon) cajon.value = valor;
+    const enviar = barra.querySelector('.problog-responder-icono[type="submit"]');
+    if (enviar) enviar.disabled = true;
+    try {
+        await enviarComentarioDeLaPublicacion(seccion);
+    } finally {
+        if (enviar) enviar.disabled = false;
     }
 }
 
@@ -1602,6 +1659,8 @@ function cerrarLectura() {
     detalleEl.innerHTML = '';
     feedEl.classList.remove('hidden');
     publicacionAbierta = null;
+    // Si se estaba respondiendo a un comentario, la barra se va con la vista.
+    dejarDeResponder();
     mostrarIconoVolver(false);
 }
 
@@ -1829,13 +1888,6 @@ function manejarAcciones(e, desdePerfil) {
         }
         return;
     }
-    const cancelarRespuesta = e.target.closest('[data-comentario-respondiendo]');
-    if (cancelarRespuesta) {
-        e.stopPropagation();
-        const seccion = cancelarRespuesta.closest('[data-problog-comentarios]');
-        if (seccion) dejarDeResponder(seccion);
-        return;
-    }
     const editar = e.target.closest('[data-problog-editar]');
     if (editar) {
         e.stopPropagation();
@@ -2001,6 +2053,16 @@ export function setupProblogs() {
         e.preventDefault();
         const seccion = form.closest('[data-problog-comentarios]');
         if (seccion) enviarComentarioDeLaPublicacion(seccion);
+    });
+
+    // Barra de responder: es HTML fijo de la página (no se reescribe con la vista
+    // de lectura), así que sus eventos se escuchan directamente.
+    barraResponder()?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        enviarRespuestaDeLaBarra();
+    });
+    barraResponder()?.addEventListener('click', (e) => {
+        if (e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
     });
 
     // Al entrar en la pestaña Problogs, el editor arranca limpio — pero solo si
