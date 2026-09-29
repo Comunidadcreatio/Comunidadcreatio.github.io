@@ -332,6 +332,55 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
 await sleep(500);
 
+// 3) EL CIERRE DEL TECLADO SIN AVISO. Se comprobó que hay casos en los que el
+//    teclado se cierra y el navegador no dispara NINGÚN evento: la barra se quedaba
+//    con el `bottom` de cuando estaba abierto y aparecía CORTADA (asomaba su parte
+//    de arriba, la de «Respondiendo a …»). Aquí se reproducen los dos caminos: que
+//    sí avise y que no avise (el que fallaba).
+console.log('\n=== El teclado se CIERRA ===');
+const CIERRES = [
+  ['avisa el navegador', true],
+  ['NO avisa (el caso que fallaba)', false],
+];
+for (const [nombre, avisa] of CIERRES) {
+  // Se abre el teclado (solo visual, el caso clásico).
+  await evalJs(`(() => {
+      window.__vvPrueba = { height: 450, width: window.innerWidth, offsetTop: 0, offsetLeft: 0, scale: 1,
+          addEventListener: () => {}, removeEventListener: () => {} };
+      window.dispatchEvent(new Event('resize'));
+  })()`);
+  await sleep(800);
+  // Y se cierra: si `avisa`, se lanza el evento; si no, solo cambia la medida.
+  await evalJs(`(() => {
+      delete window.__vvPrueba;
+      ${avisa ? "window.dispatchEvent(new Event('resize'));" : '/* sin avisar */'}
+  })()`);
+  await sleep(1400);
+  const cerrado = JSON.parse((await evalJs(`(() => {
+      const b = document.getElementById('problog-responder-barra');
+      const r = b.getBoundingClientRect();
+      const n = document.getElementById('toggle-panel');
+      const sn = getComputedStyle(n);
+      return JSON.stringify({
+          barra: Math.round(r.top) + '..' + Math.round(r.bottom),
+          bottomCss: getComputedStyle(b).bottom,
+          ventana: window.innerHeight,
+          // No puede quedar cortada: entera dentro de la pantalla…
+          cabeEntera: r.top >= -1 && r.bottom <= window.innerHeight + 1,
+          // …y con el teclado cerrado, apoyada encima del menú principal.
+          pegadaAlNav: Math.abs(n.getBoundingClientRect().top - r.bottom) <= 1.5,
+          navVisible: sn.visibility !== 'hidden'
+      });
+  })()`)) || 'null');
+  console.log(`   · ${nombre}: barra ${cerrado && cerrado.barra}, bottom ${cerrado && cerrado.bottomCss} (ventana ${cerrado && cerrado.ventana})`);
+  check(`${nombre}: la barra NO se queda cortada al cerrarse el teclado`,
+    !!cerrado && cerrado.cabeEntera === true, JSON.stringify(cerrado));
+  check(`${nombre}: vuelve a apoyarse encima del menú principal`,
+    !!cerrado && cerrado.pegadaAlNav === true, JSON.stringify(cerrado));
+  check(`${nombre}: el menú principal vuelve a verse`,
+    !!cerrado && cerrado.navVisible === true, JSON.stringify(cerrado));
+}
+
 // 2) La ventana encogida SIN teclado (por ejemplo el usuario redimensionando en
 //    escritorio, un cambio pequeño): aquí NO hay teclado, así que el menú principal
 //    sigue a la vista y la barra se apoya encima de él. Sirve para comprobar que el

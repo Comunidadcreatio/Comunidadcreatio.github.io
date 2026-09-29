@@ -1304,22 +1304,29 @@ function seccionComentarios(id) {
 // ------------------------------------------------------------
 // Mismo criterio que el cajón de comentarios de Cavents (js/comentarios.js), que
 // es el que funciona bien: se mide con `visualViewport` y se coloca el borde de
-// abajo de la barra EN PÍXELES, sin fiarse de que el navegador encoja o no el
-// layout.
+// abajo EN PÍXELES, sin fiarse de que el navegador encoja o no el layout.
 //
 // Y lo que faltaba: mientras el teclado está abierto, el MENÚ PRINCIPAL se oculta.
 // El menú es lo que quedaba como aire entre la barra y el teclado (la barra se
 // apoyaba encima del menú, y el menú, con el teclado abierto, no lo ocupa nadie).
 // Cavents hace exactamente eso (`cajon-teclado` oculta el nav).
+//
+// ADEMÁS: no basta con los eventos. Se comprobó que hay casos en los que el
+// teclado se cierra y el navegador NO avisa ni por `resize` de la ventana ni por
+// `resize`/`scroll` del viewport visual: la barra se quedaba con el `bottom` de
+// cuando el teclado estaba abierto y aparecía CORTADA (asomaba su parte de arriba,
+// la de «Respondiendo a …»). Por eso, mientras la barra está abierta, se revisa la
+// medida en cada fotograma. Es una lectura de propiedades y solo se toca el estilo
+// si el valor cambia, así que no cuesta nada apreciable.
 const TECLADO_UMBRAL_PROBLOGS = 120;
 const ALTO_NAV_PROBLOGS = 60;
 
-// Alto de la ventana CON EL TECLADO CERRADO. Hace falta porque en Android
-// `innerHeight` también se encoge al abrirse el teclado, así que restarlo contra el
-// alto visible daba casi 0 y la barra se quedaba arriba, dejando el hueco. Se toma
-// el mayor que se haya visto mientras la barra está abierta (con la ventana
-// entera), que es justo ese valor.
+// Alto del viewport visual CON EL TECLADO CERRADO. Hace falta porque en algunos
+// Android `innerHeight` también se encoge al abrirse el teclado, así que restarlo
+// contra el alto visible daba casi 0 y la barra se quedaba arriba, con hueco. Se
+// toma el mayor que se haya visto mientras la barra está abierta.
 let altoReferenciaBarra = 0;
+let bucleBarra = 0;
 
 function ajustarBarraResponderAlTeclado() {
     const barra = barraResponder();
@@ -1363,9 +1370,24 @@ function ajustarBarraResponderAlTeclado() {
     // viewport visual necesita recalcular pero no hace bailar la barra.
     const actual = Math.round(parseFloat(barra.style.getPropertyValue('--barra-abajo')) || 0);
     if (Math.abs(actual - abajo) >= 1) barra.style.setProperty('--barra-abajo', abajo + 'px');
-    debugLog.log('[barra responder] referencia=' + referencia + ' ventana=' + ventana
-        + ' visH=' + Math.round(visH) + ' pan=' + pan + ' bordeTeclado=' + bordeTeclado
-        + ' abajo=' + abajo);
+}
+
+// Mientras la barra está abierta se revisa la medida en cada fotograma, porque hay
+// cierres de teclado que no avisan por ningún evento (ver la nota de arriba).
+function vigilarBarraResponder() {
+    cancelAnimationFrame(bucleBarra);
+    const paso = () => {
+        const barra = barraResponder();
+        if (!barra || barra.classList.contains('hidden')) { bucleBarra = 0; return; }
+        ajustarBarraResponderAlTeclado();
+        bucleBarra = requestAnimationFrame(paso);
+    };
+    bucleBarra = requestAnimationFrame(paso);
+}
+
+function pararVigilanciaBarra() {
+    cancelAnimationFrame(bucleBarra);
+    bucleBarra = 0;
 }
 
 // Después de abrir o cerrar la barra hay que recolocarla.
@@ -1392,6 +1414,7 @@ function dejarDeResponder(seccion) {
     if (seccion) delete seccion.dataset.comentarioPadre;
     const barra = barraResponder();
     reservarHuecoDeLaBarra(false);
+    pararVigilanciaBarra();
     // Con la barra cerrada no hay desplazamiento de teclado que valga.
     if (barra) barra.style.removeProperty('--barra-abajo');
     document.body.classList.remove('responder-teclado');
@@ -1425,6 +1448,9 @@ function responderA(seccion, comentarioId, autor) {
     reservarHuecoDeLaBarra(true);
     // Se recoloca al momento y otra vez cuando el teclado acabe de abrirse.
     recolocarBarraResponder();
+    // Y se vigila cada fotograma: hay cierres de teclado que no avisan por ningún
+    // evento y la barra se quedaba con el `bottom` viejo (se veía cortada).
+    vigilarBarraResponder();
     const texto = document.getElementById('problog-responder-texto');
     if (texto) {
         texto.value = '';
