@@ -1303,9 +1303,17 @@ function barraResponder() {
     return document.getElementById('problog-responder-barra');
 }
 
+// La barra es fija (se queda a la vista con el teclado abierto), así que el hueco
+// que tapa se devuelve como relleno arriba del bloque de la publicación.
+function reservarHuecoDeLaBarra(abierta) {
+    const detalle = document.getElementById('problogs-detalle');
+    if (detalle) detalle.classList.toggle('con-barra-responder', !!abierta);
+}
+
 function dejarDeResponder(seccion) {
     if (seccion) delete seccion.dataset.comentarioPadre;
     const barra = barraResponder();
+    reservarHuecoDeLaBarra(false);
     if (!barra) return;
     barra.classList.add('hidden');
     const id = document.getElementById('problog-responder-comentario-id');
@@ -1333,6 +1341,7 @@ function responderA(seccion, comentarioId, autor) {
     }
     campo.value = String(comentarioId);
     barra.classList.remove('hidden');
+    reservarHuecoDeLaBarra(true);
     const texto = document.getElementById('problog-responder-texto');
     if (texto) {
         texto.value = '';

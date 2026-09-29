@@ -891,28 +891,35 @@
 /* ============================================================
    BARRA PARA RESPONDER A UN COMENTARIO
    ------------------------------------------------------------
-   Aparece justo debajo del menú principal (es la primera pieza de la sección) y
-   se queda pegada arriba mientras se escribe, para no perderla al bajar por los
-   comentarios. Solo se ve mientras hay una respuesta en curso. Lleva el
+   Se abre al pulsar «Responder» y vive justo DEBAJO del header (y por tanto del
+   menú principal), FIJA, como el propio header: así se queda a la vista cuando
+   aparece el teclado en vez de irse con el scroll. Al ser fija no ocupa sitio en
+   el flujo, así que el hueco que tapa se devuelve con `padding-top` al bloque de
+   la publicación (clase `con-barra-responder`, que pone problogs.js). Lleva el
    subtítulo «Respondiendo a X», su input y los iconos de enviar y cancelar
    justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
-    position: sticky;
-    /* El header es fijo y mide 64px + la barra de estado, y tiene z-index 1000.
-       Antes esta barra llevaba `top: var(--header-height, 64px)` (una variable que
-       no existe en móvil, así que se quedaba en 64px, por DEBAJO del header) y
-       `z-index: 6`: al bajar por la publicación la barra se metía debajo de la
-       cabecera y desaparecía. Ahora se pega justo debajo del header (misma fórmula
-       que usan las demás piezas de la app) y va por ENCIMA del header. */
+    position: fixed;
+    left: 0;
+    right: 0;
+    /* Pegada al borde de abajo del header, con la misma fórmula que el resto de
+       piezas de la app (el header mide 64px + la barra de estado). */
     top: calc(64px + var(--status-bar-height, 24px));
+    /* Por encima del header (1000), como los paneles que se despliegan. */
     z-index: 1100;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: var(--comentario-aire, 24px);
-    padding-right: var(--comentario-aire, 24px);
+    box-sizing: border-box;
+    padding: 10px 24px;
     background: var(--color-white);
-    border-bottom: 1px solid var(--comentario-linea, var(--color-gray-300));
+    border-bottom: 0.5px solid var(--color-gray-200);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* El hueco que tapa la barra se devuelve aquí mientras está abierta. El selector
+   lleva el `#problogs` delante a propósito: hay otra regla más específica
+   (`#problogs .problogs-detalle`) que fija su relleno y, sin esto, la ganaría. */
+#problogs #problogs-detalle.con-barra-responder {
+    padding-top: 108px;
 }
 
 .problog-responder-titulo {
@@ -920,6 +927,7 @@
     color: var(--color-gray-600);
     font-size: 12px;
     font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .problog-responder-titulo strong {
@@ -938,7 +946,7 @@
     min-width: 0;
     padding: 6px 0;
     border: none;
-    border-bottom: 1px solid var(--comentario-linea, var(--color-gray-300));
+    border-bottom: 1px solid var(--color-gray-300);
     border-radius: 0;
     background: transparent;
     color: var(--color-ink);
@@ -959,11 +967,18 @@
 
 .problog-responder-icono {
     flex: 0 0 auto;
-    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
     border: none;
+    border-radius: 50%;
     background: transparent;
     color: var(--color-ink);
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .problog-responder-icono svg {
@@ -973,7 +988,7 @@
 }
 
 .problog-responder-icono:hover {
-    background: var(--comentario-hover);
+    background-color: var(--color-gray-100);
 }
 
 .problog-responder-icono:disabled {
@@ -981,9 +996,18 @@
     cursor: default;
 }
 
-/* En oscuro el fondo del header es oscuro: la barra tiene que seguirlo. */
+/* En oscuro la barra sigue al header: fondo oscuro y línea clara. */
 [data-theme="dark"] .problog-responder-barra {
     background: var(--color-black);
+    border-bottom-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .problog-responder-icono:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="dark"] .problog-responder-input {
+    border-bottom-color: rgba(255, 255, 255, 0.24);
 }
 
 /* --- Cajón de escribir ---

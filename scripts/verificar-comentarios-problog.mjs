@@ -234,7 +234,14 @@ const barra = JSON.parse(await evalJs(`(() => {
         debajoDelHeader: r.top >= cabecera.bottom - 1,
         // Los iconos van a la derecha, después del input.
         iconosALaDerecha: !!(ir && ultimo) && ultimo.left >= ir.right - 1,
-        chipViejo: !!document.querySelector('[data-comentario-respondiendo]')
+        chipViejo: !!document.querySelector('[data-comentario-respondiendo]'),
+        // Es FIJA (se queda a la vista al abrirse el teclado), no sticky.
+        posicion: getComputedStyle(b).position,
+        // NO puede tapar el contenido: el título tiene que empezar por debajo.
+        tituloDebajoDeLaBarra: (() => {
+            const t = document.querySelector('.problog-lectura-titulo');
+            return t ? t.getBoundingClientRect().top >= r.bottom - 1 : null;
+        })()
     });
 })()`) || 'null');
 console.log('   ' + JSON.stringify(barra));
@@ -244,6 +251,8 @@ check('la barra tiene su propio input', !!barra && barra.tieneInput === true);
 check('la barra tiene los iconos de enviar y cancelar', !!barra && barra.iconos === 2, barra && String(barra.iconos));
 check('la barra queda debajo del header (tras el menú principal)', !!barra && barra.debajoDelHeader === true);
 check('los iconos de la barra van justificados a la derecha', !!barra && barra.iconosALaDerecha === true);
+check('la barra es fija (se queda con el teclado abierto)', !!barra && barra.posicion === 'fixed', barra && barra.posicion);
+check('la barra NO tapa el contenido de la publicación', !!barra && barra.tituloDebajoDeLaBarra === true);
 check('el chip viejo de «respondiendo a…» ya no existe', !!barra && barra.chipViejo === false);
 await evalJs(`(() => {
     const input = document.getElementById('problog-responder-texto');
