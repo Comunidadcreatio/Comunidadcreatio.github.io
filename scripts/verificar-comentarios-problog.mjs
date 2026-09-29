@@ -546,6 +546,47 @@ console.log('   ' + JSON.stringify(trasPerfil));
 check('lleva a la sección Problogs con la publicación abierta', trasPerfil.enProblogs && trasPerfil.lectura, JSON.stringify(trasPerfil));
 check('y muestra sus comentarios', trasPerfil.comentarios && trasPerfil.textos >= 2, JSON.stringify(trasPerfil));
 
+// ============================================================
+// El teclado YA ABIERTO al pulsar «Responder»
+// ============================================================
+// El usuario venía de escribir en la caja de comentarios (teclado ya desplegado) y
+// pulsaba «Responder». Es el caso que rompía la detección: la altura de referencia se
+// tomaba ya con el teclado puesto, el teclado dejaba de detectarse y la barra se
+// quedaba abajo (con hueco) en vez de subir. Va AL FINAL a propósito: abre la barra y
+// cambia el estado, así que no puede contaminar las comprobaciones de arriba.
+console.log('\n=== El teclado YA estaba abierto al pulsar «Responder» ===');
+await evalJs(`(() => {
+    // Se abre una publicación y se deja el teclado ya desplegado ANTES de responder.
+    window.__vvPrueba = { height: 450, width: window.innerWidth, offsetTop: 0, offsetLeft: 0, scale: 1,
+        addEventListener: () => {}, removeEventListener: () => {} };
+    window.dispatchEvent(new Event('resize'));
+})()`);
+await sleep(600);
+await evalJs(`document.querySelector('#problogs-detalle [data-comentario-responder]')?.click()`);
+await sleep(1200);
+const yaAbierto = JSON.parse((await evalJs(`(() => {
+    const b = document.getElementById('problog-responder-barra');
+    const r = b.getBoundingClientRect();
+    const vv = window.__vvPrueba;
+    const fondo = (vv.offsetTop || 0) + vv.height;
+    return JSON.stringify({
+        barra: Math.round(r.top) + '..' + Math.round(r.bottom),
+        fondoVisible: Math.round(fondo),
+        hueco: Math.round(fondo - r.bottom),
+        posicion: getComputedStyle(b).position,
+        clase: document.body.classList.contains('responder-teclado')
+    });
+})()`)) || 'null');
+console.log(`   · barra ${yaAbierto && yaAbierto.barra} vs fondo visible ${yaAbierto && yaAbierto.fondoVisible} (hueco ${yaAbierto && yaAbierto.hueco}px, ${yaAbierto && yaAbierto.posicion})`);
+check('con el teclado ya abierto, el teclado se detecta',
+  !!yaAbierto && yaAbierto.clase === true, JSON.stringify(yaAbierto));
+check('con el teclado ya abierto, la barra se coloca encima del teclado (sin hueco)',
+  !!yaAbierto && Math.abs(yaAbierto.hueco) <= 6, JSON.stringify(yaAbierto));
+check('con el teclado ya abierto, la barra va absoluta con su top medido',
+  !!yaAbierto && yaAbierto.posicion === 'absolute', JSON.stringify(yaAbierto));
+await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
+await sleep(600);
+
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 if (logs.length) fallos++;

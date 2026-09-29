@@ -1342,23 +1342,32 @@ function ajustarBarraResponderAlTeclado() {
     if (!ventana) return;
     const pan = vv ? Math.max(0, Math.round(vv.offsetTop || 0)) : 0;
     const visH = vv && vv.height ? vv.height : ventana;
-    // ALTO DE REFERENCIA: el mayor que se haya visto del viewport VISUAL (que es el
-    // que se encoge con el teclado, en los dos comportamientos de Android). Solo se
-    // sube, nunca baja, así que no se contamina con el alto del documento ni con el
-    // teclado.
-    // OJO: no sirve `documentElement.clientHeight`, que mide el CONTENIDO y crece.
+    // SEÑAL CLÁSICA de teclado: el viewport visual se ha encogido respecto a la
+    // ventana (es lo que pasa cuando el navegador NO encoge el layout).
+    const senalClasica = (ventana - visH) > TECLADO_UMBRAL_PROBLOGS;
+    // ALTO DE REFERENCIA: el mayor que se haya visto del viewport VISUAL. Sirve para
+    // los navegadores que SÍ encogen la ventana con el teclado (ahí `senalClasica` no
+    // distingue nada).
+    //
+    // CLAVE: la referencia NUNCA baja mientras la barra está abierta o hay señal de
+    // teclado. Antes bajaba en cuanto la caída era pequeña, y como el teclado se abre
+    // ANIMADO (en pasos de pocos píxeles), cada paso bajaba la referencia: al final
+    // valía lo mismo que el alto con el teclado puesto, el teclado dejaba de
+    // detectarse y la barra saltaba entre su sitio de abajo (con hueco) y el de
+    // arriba. Ese salto era a la vez el hueco y el temblor.
+    //
+    // Solo se deja bajar cuando la barra está CERRADA y no hay señal de teclado: así
+    // un cambio de tamaño real de la ventana se absorbe y no se queda un valor viejo.
+    const barraAbierta = !barra.classList.contains('hidden');
     if (visH > altoReferenciaBarra) altoReferenciaBarra = Math.round(visH);
+    else if (!barraAbierta && !senalClasica) altoReferenciaBarra = Math.round(visH);
     const referencia = Math.max(altoReferenciaBarra, Math.round(visH));
-    // Si el teclado se ha cerrado del todo, la barra vuelve a su sitio de siempre y
-    // se olvida la referencia (así no se queda un valor viejo).
-    if (referencia - Math.round(visH) <= TECLADO_UMBRAL_PROBLOGS) altoReferenciaBarra = Math.round(visH);
-    // ¿Hay teclado? Se mira cuánto ha caído la parte visible respecto a la
-    // referencia, y se exige que sea MÁS DE UN TERCIO de la ventana: un teclado
-    // ocupa mucho, mientras que un cambio de tamaño de la ventana o un ajuste del
-    // scroll del viewport visual son caídas pequeñas (medido: un 12% daba falso
-    // positivo y ocultaba el menú principal sin motivo).
+    // ¿Hay teclado? Por la señal clásica, o porque la parte visible ha caído más de
+    // un TERCIO de la ventana (un teclado ocupa mucho; un cambio de tamaño de ventana
+    // o un ajuste del scroll del viewport visual son caídas pequeñas).
     const caida = Math.max(0, Math.round(referencia - visH));
-    const tecladoAbierto = caida > Math.max(TECLADO_UMBRAL_PROBLOGS, Math.round(ventana / 3));
+    const tecladoAbierto = senalClasica
+        || caida > Math.max(TECLADO_UMBRAL_PROBLOGS, Math.round(ventana / 3));
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
     if (barra.classList.contains('hidden')) {
         barra.style.removeProperty('--barra-top');
@@ -1381,12 +1390,14 @@ function ajustarBarraResponderAlTeclado() {
     const r = barra.getBoundingClientRect();
     const altoBarra = Math.max(1, Math.round(r.height));
     const deseadaEnPantalla = pan + Math.round(visH) - altoBarra;
-    // EL OBJETIVO SE FIJA UNA VEZ. Las medidas del viewport visual bailan 1-2px al
-    // scrollear y, si se recalculara cada fotograma, la barra se movía con ellas
-    // (medido: 3px de temblor). El teclado no se mueve de la pantalla al scrollear,
-    // así que su borde tampoco: se guarda la primera medida y solo se vuelve a fijar
-    // si cambia DE VERDAD (otro teclado, giro de pantalla, 24px o más).
-    if (objetivoBarra === null || Math.abs(deseadaEnPantalla - objetivoBarra) > 24) {
+    // EL OBJETIVO SE FIJA, PERO SE SIGUE SI CAMBIA DE VERDAD. Las medidas del
+    // viewport visual bailan 1-2px al scrollear, y si se recalculara cada fotograma
+    // la barra se movía con ellas (medido: 3px de temblor). Pero el teclado se abre
+    // ANIMADO (en pasos de ~20px): si solo se fijara la primera medida, que cae a
+    // mitad de la animación, la barra se quedaba 20px por debajo del teclado.
+    // Por eso: se vuelve a fijar cuando el cambio es de 5px o más (sigue la
+    // animación) y se ignora por debajo (el ruido de ±2px no la mueve).
+    if (objetivoBarra === null || Math.abs(deseadaEnPantalla - objetivoBarra) >= 5) {
         objetivoBarra = deseadaEnPantalla;
     }
     // TOPE DE SEGURIDAD: la barra NUNCA puede bajar más de donde empieza el menú
