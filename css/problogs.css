@@ -901,16 +901,14 @@
    a X», su input y los iconos de enviar y cancelar justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
-    /* ABSOLUTA, no fija: con el teclado abierto y la página desplazada hasta el
-       final, una pieza `fixed` queda clavada en el fondo del viewport de LAYOUT y
-       NO puede bajar de ahí, así que quedaba un hueco de 60px (el alto del menú)
-       entre la barra y el teclado. Con `absolute` se puede colocar exactamente
-       donde toca: problogs.js le pone el `top` en coordenadas del documento,
-       medido contra el borde visible (el fondo del viewport visual). */
-    position: absolute;
+    /* Por defecto FIJA, pegada encima del menú principal. Es lo más sólido: al ser
+       fija no depende del scroll, así que no se mueve ni un píxel al desplazar la
+       publicación (con `absolute` había que recalcular el `top` en cada scroll y se
+       veía temblar). */
+    position: fixed;
     left: 0;
     right: 0;
-    top: var(--barra-top, 0px);
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;
@@ -923,6 +921,18 @@
     -webkit-backdrop-filter: blur(12px);
     border-top: 0.5px solid var(--color-gray-200);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* CON EL TECLADO ABIERTO pasa a ABSOLUTA. Motivo: con el teclado desplegado y la
+   página desplazada hasta el final, una pieza `fixed` queda clavada en el fondo del
+   viewport de LAYOUT y NO puede bajar de ahí, dejando un hueco de 60px (el alto del
+   menú) entre la barra y el teclado. Con `absolute` se le puede poner el `top` en
+   coordenadas del documento y queda justo encima del teclado. En este modo el `top`
+   lo pone problogs.js midiendo el borde visible del viewport visual. */
+body.responder-teclado .problog-responder-barra {
+    position: absolute;
+    bottom: auto;
+    top: var(--barra-top, 0px);
 }
 
 /* Mientras el teclado está abierto, el MENÚ PRINCIPAL se oculta. Es lo que hace

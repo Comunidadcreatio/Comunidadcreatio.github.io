@@ -1319,13 +1319,16 @@ function seccionComentarios(id) {
 // medida en cada fotograma. Es una lectura de propiedades y solo se toca el estilo
 // si el valor cambia, así que no cuesta nada apreciable.
 const TECLADO_UMBRAL_PROBLOGS = 120;
-const ALTO_NAV_PROBLOGS = 60;
 
 // Alto del viewport visual CON EL TECLADO CERRADO. Hace falta porque en algunos
 // Android `innerHeight` también se encoge al abrirse el teclado, así que restarlo
 // contra el alto visible daba casi 0 y la barra se quedaba arriba, con hueco. Se
 // toma el mayor que se haya visto mientras la barra está abierta.
 let altoReferenciaBarra = 0;
+// Posición en PANTALLA que debe ocupar la barra mientras el teclado está abierto. Se
+// fija una vez (ver `ajustarBarraResponderAlTeclado`) para que las medidas ruidosas
+// del viewport visual no la muevan.
+let objetivoBarra = null;
 let bucleBarra = 0;
 
 function ajustarBarraResponderAlTeclado() {
@@ -1362,35 +1365,43 @@ function ajustarBarraResponderAlTeclado() {
         pararVigilanciaBarra();
         return;
     }
-    // DÓNDE COLOCARLA. Es `position: absolute`, así que se le pone el `top` en
-    // coordenadas del DOCUMENTO: el fondo de lo que se ve (`scroll + pan + alto
-    // visible`) menos su propio alto. Así puede quedar justo encima del teclado
-    // aunque eso esté por debajo del fondo del viewport de layout, que es lo que
-    // hacía imposible colocarla bien con `fixed`: al llegar al final con el teclado
-    // abierto, un `fixed` se quedaba clavado en el fondo del layout y dejaba un
-    // hueco del alto del menú (60px) entre la barra y el teclado.
-    const actual = parseFloat(barra.style.getPropertyValue('--barra-top'));
+    // DÓNDE COLOCARLA. Sin teclado NO hace falta nada: el CSS la deja `fixed` pegada
+    // encima del menú principal, que es lo más sólido (no depende del scroll, así que
+    // no se mueve ni un píxel al desplazar la publicación).
+    if (!tecladoAbierto) {
+        objetivoBarra = null;
+        barra.style.removeProperty('--barra-top');
+        return;
+    }
+    // CON EL TECLADO ABIERTO sí hay que colocarla: el CSS la pasa a `absolute` y aquí
+    // se le pone el `top` en coordenadas del DOCUMENTO. Así puede quedar justo encima
+    // del teclado aunque eso esté por debajo del fondo del viewport de layout, que es
+    // lo que hacía imposible colocarla bien con `fixed`.
     const scroll = Math.max(0, window.scrollY || window.pageYOffset || 0);
-    const fondoVisible = pan + Math.round(visH);
-    const altoBarra = Math.max(1, Math.round(barra.getBoundingClientRect().height));
-    // Sin teclado se apoya encima del menú principal; con el teclado, sobre él.
-    let nuevo = Math.round(scroll + fondoVisible - altoBarra
-        - (tecladoAbierto ? 0 : ALTO_NAV_PROBLOGS));
+    const r = barra.getBoundingClientRect();
+    const altoBarra = Math.max(1, Math.round(r.height));
+    const deseadaEnPantalla = pan + Math.round(visH) - altoBarra;
+    // EL OBJETIVO SE FIJA UNA VEZ. Las medidas del viewport visual bailan 1-2px al
+    // scrollear y, si se recalculara cada fotograma, la barra se movía con ellas
+    // (medido: 3px de temblor). El teclado no se mueve de la pantalla al scrollear,
+    // así que su borde tampoco: se guarda la primera medida y solo se vuelve a fijar
+    // si cambia DE VERDAD (otro teclado, giro de pantalla, 24px o más).
+    if (objetivoBarra === null || Math.abs(deseadaEnPantalla - objetivoBarra) > 24) {
+        objetivoBarra = deseadaEnPantalla;
+    }
     // TOPE DE SEGURIDAD: la barra NUNCA puede bajar más de donde empieza el menú
     // principal. Se MIDE la posición de ese menú (en coordenadas del documento) y se
     // limita. Así, aunque en un móvil concreto las medidas del viewport visual sean
     // distintas de las esperadas, el menú no puede taparla por abajo.
-    if (!tecladoAbierto) {
-        const nav = document.getElementById('toggle-panel');
-        const rn = nav ? nav.getBoundingClientRect() : null;
-        if (rn && rn.height > 0) {
-            const maximo = Math.round(rn.top + scroll - altoBarra);
-            if (nuevo > maximo) nuevo = maximo;
-        }
+    let nuevo = Math.round(scroll + objetivoBarra);
+    const nav = document.getElementById('toggle-panel');
+    const rn = nav ? nav.getBoundingClientRect() : null;
+    if (rn && rn.height > 0) {
+        const maximo = Math.round(rn.top + scroll - altoBarra);
+        if (nuevo > maximo) nuevo = maximo;
     }
     nuevo = Math.max(0, nuevo);
-    // Solo se toca el estilo si cambia (y como mucho un píxel): así el `scroll` del
-    // viewport visual necesita recalcular pero no hace bailar la barra.
+    const actual = parseFloat(barra.style.getPropertyValue('--barra-top'));
     if (!Number.isFinite(actual) || Math.abs(actual - nuevo) >= 1) {
         barra.style.setProperty('--barra-top', nuevo + 'px');
     }

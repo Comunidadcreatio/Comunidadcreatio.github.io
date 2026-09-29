@@ -241,10 +241,10 @@ const barra = JSON.parse(await evalJs(`(() => {
         // Los iconos van a la derecha, después del input.
         iconosALaDerecha: !!(ir && ultimo) && ultimo.left >= ir.right - 1,
         chipViejo: !!document.querySelector('[data-comentario-respondiendo]'),
-        // Es ABSOLUTA (no fixed): con fixed, al llegar al final con el teclado
-        // abierto la barra quedaba clavada en el fondo del viewport de layout y no
-        // podia bajar de ahi, dejando un hueco del alto del menu. Con absolute se
-        // le pone el top medido y queda justo donde toca.
+        // DISEÑO: sin teclado es fixed (pegada encima del menu y sin depender del
+        // scroll, asi que no se mueve nada al desplazar). Con el teclado abierto el
+        // CSS la pasa a absolute y se le pone el top medido, para poder quedar justo
+        // encima del teclado aunque eso este por debajo del fondo del layout.
         posicion: getComputedStyle(b).position,
         abajo: r.bottom,
         // NO puede tapar el contenido: el bloque de la publicación acaba antes.
@@ -261,7 +261,8 @@ check('la barra lleva el subtítulo «Respondiendo a X»', !!barra && /^Respondi
 check('la barra tiene su propio input', !!barra && barra.tieneInput === true);
 check('la barra tiene los iconos de enviar y cancelar', !!barra && barra.iconos === 2, barra && String(barra.iconos));
 check('los iconos de la barra van justificados a la derecha', !!barra && barra.iconosALaDerecha === true);
-check('la barra es absoluta con su `top` medido (no `fixed`)', !!barra && barra.posicion === 'absolute', barra && barra.posicion);
+check('sin teclado la barra es `fixed` (pegada al menú, sin depender del scroll)',
+  !!barra && barra.posicion === 'fixed', barra && barra.posicion);
 // Lo pedido: abajo, justo encima del menú principal.
 if (barra && barra.nav && barra.nav.visible) {
   const separacion = Math.abs(barra.nav.arriba - barra.abajo);
@@ -333,6 +334,31 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
   check(`${nombre}: el teclado se detecta`, !!conTeclado && conTeclado.clase === true, JSON.stringify(conTeclado));
   check(`${nombre}: el menú principal se oculta (como en Cavents)`,
     !!conTeclado && conTeclado.navOculto === true, JSON.stringify(conTeclado));
+  // NO PUEDE TEMBLAR: con el teclado abierto se scrollea y se mira la posición de la
+  // barra EN PANTALLA. Debe ser siempre la misma. Además se mete ruido de ±2px en las
+  // medidas del viewport visual, que es lo que hace el navegador de verdad.
+  const temblor = JSON.parse((await evalJs(`(async () => {
+      const b = document.getElementById('problog-responder-barra');
+      const posiciones = [];
+      const ruido = [0, 2, 1, -1, 0, 1, -1, 2, 0, 1];
+      for (let i = 0; i < 12; i++) {
+          window.scrollTo(0, 400 + i * 120);
+          window.__vvPrueba = { height: ${altoVisual} + ruido[i % ruido.length], width: window.innerWidth,
+              offsetTop: ${desplazamiento}, offsetLeft: 0, scale: 1,
+              addEventListener: () => {}, removeEventListener: () => {} };
+          window.dispatchEvent(new Event('resize'));
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          posiciones.push(Math.round(b.getBoundingClientRect().top));
+      }
+      const min = Math.min(...posiciones), max = Math.max(...posiciones);
+      return JSON.stringify({ min, max, rango: max - min });
+  })()`)) || 'null');
+  console.log(`   · ${nombre}: al scrollear con el teclado abierto la barra se mueve ${temblor && temblor.rango}px (min ${temblor && temblor.min}, max ${temblor && temblor.max})`);
+  check(`${nombre}: la barra NO tiembla al scrollear con el teclado abierto`,
+    !!temblor && temblor.rango <= 1, JSON.stringify(temblor));
+  const posicionConTeclado = await evalJs(`getComputedStyle(document.getElementById('problog-responder-barra')).position`);
+  check(`${nombre}: con el teclado abierto la barra es absoluta, con su top medido`,
+    posicionConTeclado === 'absolute', String(posicionConTeclado));
 }
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
