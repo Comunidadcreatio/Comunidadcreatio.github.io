@@ -357,8 +357,16 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
   check(`${nombre}: la barra NO tiembla al scrollear con el teclado abierto`,
     !!temblor && temblor.rango <= 1, JSON.stringify(temblor));
   const posicionConTeclado = await evalJs(`getComputedStyle(document.getElementById('problog-responder-barra')).position`);
-  check(`${nombre}: con el teclado abierto la barra es absoluta, con su top medido`,
-    posicionConTeclado === 'absolute', String(posicionConTeclado));
+  check(`${nombre}: con el teclado abierto la barra sigue siendo fija (no depende del scroll)`,
+    posicionConTeclado === 'fixed', String(posicionConTeclado));
+  // Y se sube con un `transform` (constante, sin depender del scroll). El navegador
+  // devuelve `matrix(a, b, c, d, tx, ty)`: se saca el último número, que es la
+  // subida vertical. Sin regex, para no pelearse con los escapes.
+  const subida = await evalJs(`getComputedStyle(document.getElementById('problog-responder-barra')).transform`);
+  const trozos = String(subida).split(',');
+  const subidaY = Math.abs(parseFloat(trozos[trozos.length - 1]) || 0);
+  check(`${nombre}: la barra se sube con un transform de más de 100px (${subidaY}px)`,
+    subidaY > 100, String(subida));
 }
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
@@ -582,8 +590,8 @@ check('con el teclado ya abierto, el teclado se detecta',
   !!yaAbierto && yaAbierto.clase === true, JSON.stringify(yaAbierto));
 check('con el teclado ya abierto, la barra se coloca encima del teclado (sin hueco)',
   !!yaAbierto && Math.abs(yaAbierto.hueco) <= 6, JSON.stringify(yaAbierto));
-check('con el teclado ya abierto, la barra va absoluta con su top medido',
-  !!yaAbierto && yaAbierto.posicion === 'absolute', JSON.stringify(yaAbierto));
+check('con el teclado ya abierto, la barra sigue siendo fija',
+  !!yaAbierto && yaAbierto.posicion === 'fixed', JSON.stringify(yaAbierto));
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
 await sleep(600);
 

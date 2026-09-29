@@ -1325,10 +1325,6 @@ const TECLADO_UMBRAL_PROBLOGS = 120;
 // contra el alto visible daba casi 0 y la barra se quedaba arriba, con hueco. Se
 // toma el mayor que se haya visto mientras la barra está abierta.
 let altoReferenciaBarra = 0;
-// Posición en PANTALLA que debe ocupar la barra mientras el teclado está abierto. Se
-// fija una vez (ver `ajustarBarraResponderAlTeclado`) para que las medidas ruidosas
-// del viewport visual no la muevan.
-let objetivoBarra = null;
 let bucleBarra = 0;
 
 function ajustarBarraResponderAlTeclado() {
@@ -1370,52 +1366,42 @@ function ajustarBarraResponderAlTeclado() {
         || caida > Math.max(TECLADO_UMBRAL_PROBLOGS, Math.round(ventana / 3));
     document.body.classList.toggle('responder-teclado', tecladoAbierto);
     if (barra.classList.contains('hidden')) {
-        barra.style.removeProperty('--barra-top');
+        barra.style.removeProperty('--barra-subir');
+        document.body.classList.remove('responder-subida');
         pararVigilanciaBarra();
         return;
     }
-    // DÓNDE COLOCARLA. Sin teclado NO hace falta nada: el CSS la deja `fixed` pegada
-    // encima del menú principal, que es lo más sólido (no depende del scroll, así que
-    // no se mueve ni un píxel al desplazar la publicación).
-    if (!tecladoAbierto) {
-        objetivoBarra = null;
-        barra.style.removeProperty('--barra-top');
-        return;
-    }
-    // CON EL TECLADO ABIERTO sí hay que colocarla: el CSS la pasa a `absolute` y aquí
-    // se le pone el `top` en coordenadas del DOCUMENTO. Así puede quedar justo encima
-    // del teclado aunque eso esté por debajo del fondo del viewport de layout, que es
-    // lo que hacía imposible colocarla bien con `fixed`.
-    const scroll = Math.max(0, window.scrollY || window.pageYOffset || 0);
+    // DÓNDE COLOCARLA. SIEMPRE `fixed` (lo pone el CSS), y cuando hay que subirla se
+    // hace con un `transform`. Esa es la clave para que NO tiemble: el desplazamiento
+    // depende solo del viewport visual (`pan` y su alto), NUNCA del scroll. Con
+    // `absolute` había que recalcular el `top` en cada scroll y la barra iba un
+    // fotograma por detrás: eso era la vibración que se veía al scrollear con el
+    // teclado abierto.
     const r = barra.getBoundingClientRect();
     const altoBarra = Math.max(1, Math.round(r.height));
-    const deseadaEnPantalla = pan + Math.round(visH) - altoBarra;
-    // EL OBJETIVO SE FIJA, PERO SE SIGUE SI CAMBIA DE VERDAD. Las medidas del
-    // viewport visual bailan 1-2px al scrollear, y si se recalculara cada fotograma
-    // la barra se movía con ellas (medido: 3px de temblor). Pero el teclado se abre
-    // ANIMADO (en pasos de ~20px): si solo se fijara la primera medida, que cae a
-    // mitad de la animación, la barra se quedaba 20px por debajo del teclado.
-    // Por eso: se vuelve a fijar cuando el cambio es de 5px o más (sigue la
-    // animación) y se ignora por debajo (el ruido de ±2px no la mueve).
-    if (objetivoBarra === null || Math.abs(deseadaEnPantalla - objetivoBarra) >= 5) {
-        objetivoBarra = deseadaEnPantalla;
-    }
-    // TOPE DE SEGURIDAD: la barra NUNCA puede bajar más de donde empieza el menú
-    // principal. Se MIDE la posición de ese menú (en coordenadas del documento) y se
-    // limita. Así, aunque en un móvil concreto las medidas del viewport visual sean
-    // distintas de las esperadas, el menú no puede taparla por abajo.
-    let nuevo = Math.round(scroll + objetivoBarra);
     const nav = document.getElementById('toggle-panel');
     const rn = nav ? nav.getBoundingClientRect() : null;
-    if (rn && rn.height > 0) {
-        const maximo = Math.round(rn.top + scroll - altoBarra);
-        if (nuevo > maximo) nuevo = maximo;
+    const altoNav = rn && rn.height > 0 ? Math.round(rn.height) : 60;
+    // Su borde de abajo tal y como está colocado por el CSS (encima del menú).
+    const baseFija = ventana - altoNav;
+    // Fondo de lo que se ve (en coordenadas de la pantalla).
+    const fondoVisible = pan + Math.round(visH);
+    // Lo que hay que subirla para que su borde de abajo caiga justo ahí. Nunca baja
+    // de 0: si el fondo visible está por debajo de su sitio, se queda donde está (con
+    // el menú a la vista, que es lo correcto).
+    const subir = Math.max(0, Math.round(baseFija - fondoVisible));
+    // Solo se toca el estilo si cambia de verdad (5px o más): así el ruido de ±2px de
+    // las medidas del viewport visual no la mueve, pero sí se sigue la animación del
+    // teclado (que va en pasos de ~20px).
+    const actual = parseFloat(barra.style.getPropertyValue('--barra-subir'));
+    if (!Number.isFinite(actual) || Math.abs(actual - subir) >= 5) {
+        barra.style.setProperty('--barra-subir', subir + 'px');
     }
-    nuevo = Math.max(0, nuevo);
-    const actual = parseFloat(barra.style.getPropertyValue('--barra-top'));
-    if (!Number.isFinite(actual) || Math.abs(actual - nuevo) >= 1) {
-        barra.style.setProperty('--barra-top', nuevo + 'px');
-    }
+    // El menú principal se oculta SOLO si la barra ocupa su sitio. Si no hay que
+    // subirla (subir = 0), el menú se queda: si no, su franja quedaría vacía entre la
+    // barra y el teclado, que es el hueco que se veía.
+    document.body.classList.toggle('responder-subida', subir > 1);
+    void altoBarra;
 }
 
 // Mientras la barra está abierta se revisa la medida en cada fotograma, porque hay
@@ -1462,8 +1448,8 @@ function dejarDeResponder(seccion) {
     reservarHuecoDeLaBarra(false);
     pararVigilanciaBarra();
     // Con la barra cerrada no hay desplazamiento de teclado que valga.
-    if (barra) barra.style.removeProperty('--barra-top');
-    document.body.classList.remove('responder-teclado');
+    if (barra) barra.style.removeProperty('--barra-subir');
+    document.body.classList.remove('responder-teclado', 'responder-subida');
     if (!barra) return;
     barra.classList.add('hidden');
     const id = document.getElementById('problog-responder-comentario-id');

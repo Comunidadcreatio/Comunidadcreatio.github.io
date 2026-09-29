@@ -901,14 +901,18 @@
    a X», su input y los iconos de enviar y cancelar justificados a la derecha.
    ============================================================ */
 .problog-responder-barra {
-    /* Por defecto FIJA, pegada encima del menú principal. Es lo más sólido: al ser
+    /* SIEMPRE FIJA, pegada encima del menú principal. Es lo más sólido: una pieza
        fija no depende del scroll, así que no se mueve ni un píxel al desplazar la
-       publicación (con `absolute` había que recalcular el `top` en cada scroll y se
-       veía temblar). */
+       publicación. Cuando hay que subirla (el teclado tapa esa franja) NO se cambia
+       de modo ni se toca el `top`: se aplica un `transform` con el desplazamiento
+       que calcula problogs.js. */
     position: fixed;
     left: 0;
     right: 0;
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    /* Subida cuando el teclado tapa su sitio. Depende SOLO del viewport visual, nunca
+       del scroll: por eso no tiembla. Con `transform` no se toca el layout. */
+    transform: translateY(calc(-1 * var(--barra-subir, 0px)));
     /* Por encima del menú principal (998) y del header (1000). */
     z-index: 1100;
     box-sizing: border-box;
@@ -923,22 +927,12 @@
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* CON EL TECLADO ABIERTO pasa a ABSOLUTA. Motivo: con el teclado desplegado y la
-   página desplazada hasta el final, una pieza `fixed` queda clavada en el fondo del
-   viewport de LAYOUT y NO puede bajar de ahí, dejando un hueco de 60px (el alto del
-   menú) entre la barra y el teclado. Con `absolute` se le puede poner el `top` en
-   coordenadas del documento y queda justo encima del teclado. En este modo el `top`
-   lo pone problogs.js midiendo el borde visible del viewport visual. */
-body.responder-teclado .problog-responder-barra {
-    position: absolute;
-    bottom: auto;
-    top: var(--barra-top, 0px);
-}
-
-/* Mientras el teclado está abierto, el MENÚ PRINCIPAL se oculta. Es lo que hace
-   Cavents con su cajón (`cajon-teclado`) y es lo que quita el aire: la franja del
-   menú quedaba vacía entre la barra y el teclado y nadie la ocupaba. */
-body.responder-teclado #toggle-panel {
+/* El MENÚ PRINCIPAL se oculta SOLO cuando la barra ocupa su sitio (es decir, cuando
+   hay que subirla para no quedar bajo el teclado). Es lo que hace Cavents con su
+   cajón y es lo que quita el aire: esa franja la ocupa la barra. Si NO hay que
+   subirla, el menú se queda a la vista: si se ocultara, su franja quedaría vacía
+   entre la barra y el teclado, que era el hueco que se veía. */
+body.responder-subida #toggle-panel {
     visibility: hidden;
     pointer-events: none;
 }
