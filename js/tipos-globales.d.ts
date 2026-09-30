@@ -61,6 +61,8 @@ interface Window {
 interface HTMLElement {
     /** Temporizador del filtro del grid (lo pone galeria.js en el contenedor). */
     _filtroTimer?: number;
+    /** Temporizador de la transición del carrusel de etiquetas (galeria-ui.js). */
+    _ptrTransTimer?: number;
 }
 
 /**

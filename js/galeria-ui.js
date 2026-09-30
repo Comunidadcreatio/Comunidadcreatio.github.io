@@ -1,3 +1,4 @@
+// @ts-check
 // js/galeria-ui.js
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
@@ -68,7 +69,7 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     if (document.body.classList.contains('search-abierto') &&
         sectionSaliente && sectionSaliente.id === 'galeria-publica') {
         document.body.classList.remove('search-abierto', 'search-escribiendo');
-        const tags = document.getElementById('tags-carrusel');
+        const tags = /** @type {HTMLInputElement} */ (document.getElementById('tags-carrusel'));
         if (tags) {
             tags.classList.add('hidden');
             tags.style.transform = ''; // limpiar un translateY residual del PTR
@@ -202,7 +203,7 @@ function visibilidadIconoHeader(btn, mostrar) {
 // Calcula cuánto se desplaza la campana: iconos condicionales visibles
 // ("+", hamburguesa, conversaciones, lupa) × (ancho del icono + gap del header).
 function sincronizarIconosDerecha() {
-    const header = document.getElementById('main-header');
+    const header = /** @type {HTMLElement} */ (document.getElementById('main-header'));
     if (!header) return;
     const gap = parseFloat(getComputedStyle(header).gap) || 8;
     const count = ['btn-conversaciones', 'btn-crear-cavent', 'btn-configuracion', 'btn-lupa-explorar']
@@ -221,10 +222,10 @@ function actualizarModoFlecha(btn, esFlecha, labelNormal, labelFlecha) {
 }
 
 function actualizarVisibilidadIconosHeader(section) {
-    const ham = document.getElementById('btn-configuracion');
-    const plus = document.getElementById('btn-crear-cavent');
-    const conversaciones = document.getElementById('btn-conversaciones');
-    const lupaExplorar = document.getElementById('btn-lupa-explorar');
+    const ham = /** @type {HTMLButtonElement} */ (document.getElementById('btn-configuracion'));
+    const plus = /** @type {HTMLButtonElement} */ (document.getElementById('btn-crear-cavent'));
+    const conversaciones = /** @type {HTMLButtonElement} */ (document.getElementById('btn-conversaciones'));
+    const lupaExplorar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-lupa-explorar'));
     const mostrarHam = !!section && (section.id === 'perfil-usuario' || section.id === 'mi-cuenta');
     // Icono de conversaciones: solo en la sección Chat (abre la lista de chats privados)
     const mostrarConversaciones = !!section && section.id === 'chat-global';
@@ -247,14 +248,14 @@ function actualizarVisibilidadIconosHeader(section) {
     const esExplorar = !!section && section.id === 'galeria-publica' && galeriaModo === 2;
     if (!esExplorar) {
         document.body.classList.remove('search-abierto', 'search-escribiendo');
-        const panelBusqueda = document.getElementById('search-panel');
+        const panelBusqueda = /** @type {HTMLElement} */ (document.getElementById('search-panel'));
         if (panelBusqueda) {
             panelBusqueda.classList.add('hidden');
             panelBusqueda.classList.remove('modo-busqueda');
         }
     }
     // La campana de notificaciones se oculta en Explorar (solo queda la lupa)
-    const notif = document.getElementById('btn-notificaciones');
+    const notif = /** @type {HTMLButtonElement} */ (document.getElementById('btn-notificaciones'));
     // Pasada 1: ocultar lo que deba ocultarse (marca .ocultando)
     if (!mostrarHam) visibilidadIconoHeader(ham, false);
     if (!mostrarPlus) visibilidadIconoHeader(plus, false);
@@ -277,11 +278,12 @@ export { actualizarVisibilidadIconosHeader, actualizarModoFlecha };
 // (hamburguesa → Mi Cuenta, "+" → Crear) se recuerda la
 // sección anterior para que la flecha regrese a ella.
 // ============================================
-let iconoAnterior = null; // { seccion, modoGrid }
+/** @type {{ seccion?: string, modoGrid?: boolean, tabPerfil?: string } | null} */
+let iconoAnterior = null;
 
 export function abrirMiCuentaDesdeIcono() {
     // Se recuerda la subpestaña del perfil para volver a ella al salir.
-    iconoAnterior = { seccion: 'perfil-usuario', tabPerfil: tabPerfilActivo() };
+    iconoAnterior = { seccion: 'perfil-usuario', tabPerfil: tabPerfilActivo() ?? undefined };
     toggleMiCuenta();
 }
 
@@ -292,7 +294,7 @@ export function abrirCrearDesdeIcono() {
     iconoAnterior = {
         seccion: actual ? actual.id : 'galeria-publica',
         modoGrid: galeriaModo === 2,
-        tabPerfil: tabPerfilActivo()
+        tabPerfil: tabPerfilActivo() ?? undefined
     };
     togglePanel('crear');
     // La pestaña depende de DÓNDE se pulsa el "+": desde Problogs se crea un
@@ -307,7 +309,7 @@ export function abrirCrearDesdeIcono() {
 // devolver al usuario donde estaba al volver de editar o de Mi Cuenta.
 function tabPerfilActivo() {
     const activo = document.querySelector('.perfil-tab-btn.active');
-    return activo ? activo.dataset.tab : null;
+    return activo ? /** @type {HTMLElement} */ (activo).dataset.tab : null;
 }
 
 export function volverDesdeIcono() {
@@ -322,7 +324,7 @@ export function volverDesdeIcono() {
         const tab = prev.tabPerfil
             ? document.querySelector('.perfil-tab-btn[data-tab="' + prev.tabPerfil + '"]')
             : null;
-        if (tab && !tab.classList.contains('active')) tab.click();
+        if (tab && !/** @type {HTMLElement} */ (tab).classList.contains('active')) /** @type {HTMLElement} */ (tab).click();
     } else if (prev.seccion === 'galeria-publica') {
         if (prev.modoGrid) toggleExplorar();
         else toggleGaleria(obtenerGaleriaContainer());
@@ -367,9 +369,9 @@ export function ocultarTodasLasSecciones() {
 export function mostrarPaginaBlanca() {
     ocultarTodasLasSecciones();
     actualizarVisibilidadIconosHeader(null);
-    const paginaBlanca = document.getElementById('pagina-blanca');
+    const paginaBlanca = /** @type {HTMLElement} */ (document.getElementById('pagina-blanca'));
     if (paginaBlanca) paginaBlanca.classList.remove('hidden');
-    const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+    const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
     if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 }
 
@@ -377,11 +379,11 @@ export function mostrarPaginaBlanca() {
 // ACTUALIZAR ESTADO DE BOTONES DE NAVEGACIÓN
 // ============================================
 export function actualizarEstadoNavButtons() {
-    const btnCaventsHub = document.getElementById('btn-cavents-hub');
-    const btnProblogsNav = document.getElementById('btn-problogs-nav');
-    const galeria = document.getElementById('galeria-publica');
-    const panel = document.getElementById('panel-artista');
-    const problogs = document.getElementById('problogs');
+    const btnCaventsHub = /** @type {HTMLButtonElement} */ (document.getElementById('btn-cavents-hub'));
+    const btnProblogsNav = /** @type {HTMLButtonElement} */ (document.getElementById('btn-problogs-nav'));
+    const galeria = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
+    const panel = /** @type {HTMLElement} */ (document.getElementById('panel-artista'));
+    const problogs = /** @type {HTMLElement} */ (document.getElementById('problogs'));
     const galeriaContainer = obtenerGaleriaContainer();
     const enProblogs = !!problogs && !problogs.classList.contains('hidden');
 
@@ -451,7 +453,7 @@ export function verPerfilArtistaDesdeGaleria(artistaId) {
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (galeriaContainerLocal) galeriaContainerLocal.classList.remove('modo-grid');
 
-    const galeria = document.getElementById('galeria-publica');
+    const galeria = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
     if (galeria) galeria.classList.add('hidden');
     mostrarPaginaBlanca();
 
@@ -472,7 +474,7 @@ export function seleccionarObraDesdeGrid(obraId) {
         requestAnimationFrame(() => {
             const targetCard = galeriaContainerLocal.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
             if (targetCard) {
-                galeriaContainerLocal.scrollTop = targetCard.offsetTop;
+                galeriaContainerLocal.scrollTop = /** @type {HTMLElement} */ (targetCard).offsetTop;
             }
 
             const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
@@ -492,7 +494,7 @@ export function isTransitioningNow() {
 export async function toggleGaleria(galeriaContainer) {
     if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
 
-    const galeria = document.getElementById('galeria-publica');
+    const galeria = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (!galeria) return;
 
@@ -510,7 +512,7 @@ export async function toggleGaleria(galeriaContainer) {
             setupPullToRefresh(galeriaContainerLocal);
         }
         ptrReparent(galeriaContainerLocal); // a carrusel: indicador en el contenedor
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
         switchSection(encontrarSeccionActual(), galeria, () => {
@@ -556,7 +558,7 @@ async function activarExplorar() {
     // la sección siga siendo la galería (solo cambia a modo grid).
     cerrarOverlaysFlotantes();
 
-    const galeria = document.getElementById('galeria-publica');
+    const galeria = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (!galeria) return false;
 
@@ -571,7 +573,7 @@ async function activarExplorar() {
             setupPullToRefresh(galeriaContainerLocal);
         }
         ptrReparent(galeriaContainerLocal); // a Explorar: indicador en la sección (encima de etiquetas)
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
         // Devolvemos una Promise que resuelve cuando el grid está listo,
@@ -629,7 +631,7 @@ export function mostrarExplorar() {
 export async function toggleExplorar() {
     if (isTransitioning || gridEntering || gridExiting || !(await confirmarDescartarCambios())) return;
 
-    const galeria = document.getElementById('galeria-publica');
+    const galeria = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
     const galeriaContainerLocal = obtenerGaleriaContainer();
     if (!galeria) return;
 
@@ -650,7 +652,7 @@ export async function toggleExplorar() {
 export function toggleProblogs() {
     if (isTransitioning || gridEntering || gridExiting) return;
 
-    const problogs = document.getElementById('problogs');
+    const problogs = /** @type {HTMLElement} */ (document.getElementById('problogs'));
     if (!problogs) return;
 
     if (problogs.classList.contains('hidden')) {
@@ -668,6 +670,7 @@ export function toggleProblogs() {
 // el arrastre, gira como spinner mientras carga y hace un pop
 // de confirmación al terminar. Comparte lógica táctil y ratón.
 // ============================================================
+/** @type {HTMLElement | null} */
 let ptrIndicator = null;
 let ptrStartY = 0;
 let ptrPulling = false;
@@ -678,11 +681,16 @@ const PTR_THRESHOLD = 70;
 const PTR_CIRC = 97.39; // 2π·15.5 — circunferencia del anillo SVG
 let ptrCooldown = 0; // timestamp post-refresh para evitar doble disparo
 let ptrDidDrag = false; // solo true si hubo arrastre real (dist > 5)
-let ptrDoneTimer = null; // timer de la animación de confirmación
-let ptrHideTimer = null; // timer del desvanecido al cancelar
-let ptrTouchRaf = null; // rAF del gesto táctil
-let ptrMouseRaf = null; // rAF del gesto con ratón
-let ptrAssertRaf = null; // bucle que fija el grid arriba durante la carga
+/** @type {number | undefined} */
+let ptrDoneTimer;
+/** @type {number | undefined} */
+let ptrHideTimer;
+/** @type {number | undefined} */
+let ptrTouchRaf;
+/** @type {number | undefined} */
+let ptrMouseRaf;
+/** @type {number | undefined} */
+let ptrAssertRaf;
 
 // Bloquea/restaura el scroll del grid durante el gesto PTR y la carga.
 // Al bloquear overflow el navegador no inicia scroll nativo ni rubber-band
@@ -727,21 +735,21 @@ function setPtrProgress(progress) {
     const arc = ptrIndicator.querySelector('.ptr-arc');
     if (!arc) return;
     const p = Math.min(Math.max(progress, 0), 1);
-    arc.style.strokeDashoffset = String(PTR_CIRC * (1 - p));
+    /** @type {HTMLElement} */ (arc).style.strokeDashoffset = String(PTR_CIRC * (1 - p));
 }
 
 // Fija el estado visual del indicador (visible/pulling/ready/loading/done/hiding)
 function setPtrState(...classes) {
     if (!ptrIndicator) return;
-    ptrIndicator.classList.remove('visible', 'pulling', 'ready', 'loading', 'done', 'hiding');
-    if (classes.length) ptrIndicator.classList.add(...classes);
+    ptrIndicator?.classList.remove('visible', 'pulling', 'ready', 'loading', 'done', 'hiding');
+    if (classes.length) ptrIndicator?.classList.add(...classes);
 }
 
 // Muestra el indicador al empezar el arrastre (con pop elástico)
 function mostrarPtrPulling() {
     clearTimeout(ptrHideTimer);
     clearTimeout(ptrDoneTimer); // cancelar el desvanecido de confirmación pendiente
-    if (ptrIndicator && !ptrIndicator.classList.contains('visible')) {
+    if (ptrIndicator && !ptrIndicator?.classList.contains('visible')) {
         setPtrState('visible', 'pulling');
         setPtrProgress(0);
     }
@@ -749,8 +757,8 @@ function mostrarPtrPulling() {
 
 // Oculta el indicador con desvanecido (JS lo retira tras la transición)
 function ocultarPtr(ms = 220) {
-    if (!ptrIndicator || !ptrIndicator.classList.contains('visible')) return;
-    ptrIndicator.classList.add('hiding');
+    if (!ptrIndicator || !ptrIndicator?.classList.contains('visible')) return;
+    ptrIndicator?.classList.add('hiding');
     clearTimeout(ptrHideTimer);
     ptrHideTimer = setTimeout(() => {
         if (!ptrPulling && !ptrRefreshing) setPtrState();
@@ -772,7 +780,7 @@ async function ejecutarRefreshGrid(container) {
     // bajando suavemente, sin chocar entre sí. El refresco desde la lupa del
     // nav hace lo mismo.
     if (document.body.classList.contains('search-abierto')) {
-        const tags = document.getElementById('tags-carrusel');
+        const tags = /** @type {HTMLInputElement} */ (document.getElementById('tags-carrusel'));
         if (tags) ptrSyncTags(56, true);
         if (container.style.paddingTop !== '56px') {
             container.style.transition = 'padding-top 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
@@ -803,7 +811,7 @@ function finalizarRefresh(container) {
     container.style.paddingTop = ''; // restaura el padding CSS (0 en flex, 6px en grid)
     container.style.userSelect = '';
     ptrResetTags(true); // las etiquetas vuelven a su sitio con la misma transición
-    if (ptrAssertRaf) { cancelAnimationFrame(ptrAssertRaf); ptrAssertRaf = null; }
+    if (ptrAssertRaf) { cancelAnimationFrame(ptrAssertRaf); ptrAssertRaf = undefined; }
     ptrBloquearScroll(container, false); // el grid vuelve a ser scrolleable
     container.scrollTop = 0; // el grid siempre queda arriba tras refrescar
     setPtrState('done');
@@ -855,8 +863,8 @@ function revertirPtr(container) {
 
 // Cancelación del gesto (touchcancel/pointercancel/blur): restaura todo
 function cancelarPtr(container) {
-    if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = null; }
-    if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = null; }
+    if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = undefined; }
+    if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = undefined; }
     if (!ptrPulling || ptrRefreshing) return;
     ptrPulling = false;
     ptrDidDrag = false;
@@ -892,7 +900,7 @@ export async function triggerRefreshGrid() {
 function ptrReparent(container) {
     if (!ptrIndicator) return;
     const enGrid = container.classList.contains('modo-grid');
-    const seccion = document.getElementById('galeria-publica');
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('galeria-publica'));
     const destino = enGrid ? seccion : container;
     if (ptrIndicator.parentNode !== destino) {
         destino.insertBefore(ptrIndicator, destino.firstChild);
@@ -922,7 +930,7 @@ function createPTRIndicator(container) {
 // junto al grid (mismo desplazamiento) para que el círculo quede encima.
 // Con suave=true se anima el cambio (asentarse en 56px o volver al reposo).
 function ptrSyncTags(px, suave) {
-    const tags = document.getElementById('tags-carrusel');
+    const tags = /** @type {HTMLInputElement} */ (document.getElementById('tags-carrusel'));
     if (!tags) return;
     if (suave) {
         tags.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
@@ -934,7 +942,7 @@ function ptrSyncTags(px, suave) {
 
 // Restaura la posición de las etiquetas (opcional: con transición suave)
 function ptrResetTags(suave) {
-    const tags = document.getElementById('tags-carrusel');
+    const tags = /** @type {HTMLInputElement} */ (document.getElementById('tags-carrusel'));
     if (!tags || !tags.style.transform) return;
     if (suave) {
         tags.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
@@ -1002,16 +1010,16 @@ export function setupPullToRefresh(container) {
                 mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
                 setPtrProgress(progress);
-                ptrIndicator.classList.toggle('ready', progress >= 1);
+                ptrIndicator?.classList.toggle('ready', progress >= 1);
             });
         }
     }
 
     async function onTouchEnd() {
-        if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = null; }
+        if (ptrTouchRaf) { cancelAnimationFrame(ptrTouchRaf); ptrTouchRaf = undefined; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        if (ptrIndicator) ptrIndicator.classList.remove('pulling'); // activa transiciones del arco
+        if (ptrIndicator) ptrIndicator?.classList.remove('pulling'); // activa transiciones del arco
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             await dispararRefresh(container);
@@ -1060,16 +1068,16 @@ export function setupPullToRefresh(container) {
                 mostrarPtrPulling();
                 const progress = Math.min(dist / PTR_THRESHOLD, 1);
                 setPtrProgress(progress);
-                ptrIndicator.classList.toggle('ready', progress >= 1);
+                ptrIndicator?.classList.toggle('ready', progress >= 1);
             });
         }
     }
 
     async function onMouseUp() {
-        if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = null; }
+        if (ptrMouseRaf) { cancelAnimationFrame(ptrMouseRaf); ptrMouseRaf = undefined; }
         if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
         ptrPulling = false;
-        if (ptrIndicator) ptrIndicator.classList.remove('pulling');
+        if (ptrIndicator) ptrIndicator?.classList.remove('pulling');
 
         if (ptrDidDrag && ptrMaxPull >= PTR_THRESHOLD && container.scrollTop <= 0) {
             await dispararRefresh(container);
@@ -1117,8 +1125,8 @@ export function setupPullToRefresh(container) {
 export function togglePanel(view) {
     if (isTransitioning) return;
 
-    const panel = document.getElementById('panel-artista');
-    const paginaBlanca = document.getElementById('pagina-blanca');
+    const panel = /** @type {HTMLElement} */ (document.getElementById('panel-artista'));
+    const paginaBlanca = /** @type {HTMLElement} */ (document.getElementById('pagina-blanca'));
     if (!panel || !paginaBlanca) return;
 
     // El "+" es navegación también cuando el panel ya está abierto (entonces
@@ -1131,10 +1139,10 @@ export function togglePanel(view) {
     // Si se especifica vista, siempre mostrar (no toggle)
     if (view) {
         if (panel.classList.contains('hidden')) {
-            const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+            const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
             if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
             if (artistaActual && artistaActual.nombre_artista) {
-                const inputArtista = document.getElementById('input-artista');
+                const inputArtista = /** @type {HTMLInputElement} */ (document.getElementById('input-artista'));
                 if (inputArtista && !inputArtista.value) {
                     inputArtista.value = artistaActual.nombre_artista;
                 }
@@ -1150,10 +1158,10 @@ export function togglePanel(view) {
 
     // Comportamiento toggle original
     if (panel.classList.contains('hidden')) {
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
         if (artistaActual && artistaActual.nombre_artista) {
-            const inputArtista = document.getElementById('input-artista');
+            const inputArtista = /** @type {HTMLInputElement} */ (document.getElementById('input-artista'));
             if (inputArtista && !inputArtista.value) {
                 inputArtista.value = artistaActual.nombre_artista;
             }
@@ -1168,8 +1176,8 @@ export function togglePanel(view) {
 
 // Panel sub-navegación: nav ↔ crear ↔ mis-cavents
 export function showPanelSubView(view) {
-    const panelCrear = document.getElementById('panel-crear');
-    const panelNav = document.getElementById('panel-nav');
+    const panelCrear = /** @type {HTMLElement} */ (document.getElementById('panel-crear'));
+    const panelNav = /** @type {HTMLButtonElement} */ (document.getElementById('panel-nav'));
 
     if (view === 'crear') {
         if (panelCrear) panelCrear.classList.remove('hidden');
@@ -1185,7 +1193,7 @@ export function setupPanelNav() {
     // Botones principales
     document.querySelectorAll('.panel-nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const target = btn.dataset.target;
+            const target = /** @type {HTMLElement} */ (btn).dataset.target;
             showPanelSubView(target);
         });
     });
@@ -1201,21 +1209,21 @@ export function setupPanelNav() {
 export function toggleMiCuenta() {
     if (isTransitioning) return;
 
-    const miCuenta = document.getElementById('mi-cuenta');
-    const paginaBlanca = document.getElementById('pagina-blanca');
+    const miCuenta = /** @type {HTMLElement} */ (document.getElementById('mi-cuenta'));
+    const paginaBlanca = /** @type {HTMLElement} */ (document.getElementById('pagina-blanca'));
     if (!miCuenta || !paginaBlanca) return;
 
     if (miCuenta.classList.contains('hidden')) {
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
-        const emailInput = document.getElementById('cuenta-email-actual');
+        const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('cuenta-email-actual'));
         if (emailInput && artistaActual) {
             emailInput.value = artistaActual.email || artistaActual.correo || '';
         }
-        const avatarBtn = document.getElementById('perfil-avatar-btn');
+        const avatarBtn = /** @type {HTMLImageElement} */ (document.getElementById('perfil-avatar-btn'));
         const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
         if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
+        if (avatarOverlay) { /** @type {HTMLElement} */ (avatarOverlay).style.display = 'flex'; }
         switchSection(encontrarSeccionActual(), miCuenta);
     } else {
         switchSection(miCuenta, paginaBlanca);
@@ -1225,8 +1233,8 @@ export function toggleMiCuenta() {
 export function togglePerfil() {
     if (isTransitioning) return;
 
-    const perfilUsuario = document.getElementById('perfil-usuario');
-    const paginaBlanca = document.getElementById('pagina-blanca');
+    const perfilUsuario = /** @type {HTMLElement} */ (document.getElementById('perfil-usuario'));
+    const paginaBlanca = /** @type {HTMLElement} */ (document.getElementById('pagina-blanca'));
     if (!perfilUsuario || !paginaBlanca) return;
 
     const viendoPerfilExterno = perfilUsuario.dataset.viewing === 'external';
@@ -1234,19 +1242,19 @@ export function togglePerfil() {
     if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
         perfilUsuario.dataset.viewing = 'own';
         actualizarPerfilUI();
-        const btnPerfilSidebar = document.getElementById('btn-perfil-sidebar');
+        const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
-        const avatarBtn = document.getElementById('perfil-avatar-btn');
+        const avatarBtn = /** @type {HTMLImageElement} */ (document.getElementById('perfil-avatar-btn'));
         const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
         if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { avatarOverlay.style.display = 'flex'; }
-        window.actualizarEstadisticas();
+        if (avatarOverlay) { /** @type {HTMLElement} */ (avatarOverlay).style.display = 'flex'; }
+        window.actualizarEstadisticas?.();
         activarTabCavents();
         switchSection(encontrarSeccionActual(), perfilUsuario);
     } else {
         // Ya visible el perfil propio: REFRESCAR los datos (mismo patrón que la
         // lupa), nunca ocultar la sección al re-presionar el icono.
         actualizarPerfilUI();
-        if (window.actualizarEstadisticas) window.actualizarEstadisticas();
+        if (window.actualizarEstadisticas) window.actualizarEstadisticas?.();
     }
 }
