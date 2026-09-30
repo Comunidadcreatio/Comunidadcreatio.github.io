@@ -130,14 +130,14 @@ una línea del código que se sirve ni del deploy.
 vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
 Ese fichero queda protegido para siempre.
 
-Adoptados (**20 de 27**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
-`ciudades.js`, `bloqueo-fondo.js`, `auth.js`, `panel.js`, `password-strength.js`, `pwa.js`,
-`busqueda.js`, `version-check.js`, `biometric-login.js`, `capacitor-native-biometric.js`,
-`cuenta.js`, `push.js`, `notificaciones.js`, `comentarios.js` y `perfil.js`.
+Adoptados (**26 de 27**): `auth-logic.js`, `auth.js`, `biometric-login.js`,
+`bloqueo-fondo.js`, `busqueda.js`, `capacitor-native-biometric.js`, `chat.js`, `ciudades.js`,
+`comentarios.js`, `config.js`, `cuenta.js`, `etiquetas.js`, `galeria-ui.js`, `galeria.js`,
+`main.js`, `notificaciones.js`, `overlays.js`, `panel.js`, `password-strength.js`,
+`perfil.js`, `problogs.js`, `push.js`, `pwa.js`, `theme.js`, `utils.js` y `version-check.js`.
 
-**Diferidos a propósito** (necesitan una pasada dedicada; se les quitó el `@ts-check` y
-quedan apuntados): `galeria.js` (**37** avisos) y `auth-logic.js` (**130**). Sus patrones ya
-se conocen y **están contados** (medidos al adoptarlos):
+**Diferido a propósito**: `panel-ui.js` (**52** avisos de 172). Los patrones que se repiten
+en esta casa ya están **contados** (medidos al adoptar los demás ficheros):
 
 | Patrón | Cuántos | Qué hace falta |
 |---|---|---|
@@ -150,15 +150,13 @@ se conocen y **están contados** (medidos al adoptarlos):
 **Se probó a hacerlo automático y NO sirve** (queda escrito para que nadie lo repita): un
 script que deduce el tipo por el nombre de la propiedad bajó los avisos de 167 a 129, pero
 (a) **destrozó la indentación** (reescribía la declaración sin conservar los espacios) y
-(b) metió un aviso nuevo. Se revirtió. **Estos dos ficheros se hacen a mano**, empezando por
+(b) metió un aviso nuevo. Se revirtió. **Estos ficheros se hacen a mano**, empezando por
 las variables que se repiten (`msgEl` son 13 avisos de una sola anotación).
 
 Los globales que necesitan (`_likedObras`, `_vistasRegistradas`, `volverAlBranding`) **ya
 están declarados** en `js/tipos-globales.d.ts`, así que la pasada empieza con ventaja.
 
-Ya adoptados de los grandes: `main.js`, `galeria-ui.js` y `chat.js` (los tres limpios).
-
-**Diferido**: `panel-ui.js` (quedan **52** avisos de 172). Lo que ya se hizo:
+Lo que ya se hizo en `panel-ui.js` (y lo que queda):
 
 - **Se encontró y quitó CÓDIGO MUERTO PELIGROSO**: `refrescarTabla()` tenía 19 líneas
   inalcanzables (la función sale antes, porque `#page-info` ya no existe: la tabla de "Mis
@@ -178,7 +176,36 @@ muerto huérfano fuera de la función** — en un módulo ES eso **se ejecuta al
 roto la app entera. Lo cazó `node --check` en el mismo paso. **Para borrar bloques: por
 números de línea comprobados, nunca buscando llaves.**
 
-Queda el grande: `problogs.js` (2267 líneas).
+### Cómo se adoptó `problogs.js` (el último grande: 2267 líneas)
+
+Empezó con **53 avisos** y quedó limpio con **30 cambios en dos tandas**
+(`scripts/arreglar-tipos-problogs.mjs` y `scripts/arreglar-tipos-problogs-2.mjs`). Son
+anotaciones JSDoc y guardas: nada de lo que se ejecuta cambió de sentido (lo confirma la foto
+de estilos, sin diferencias).
+
+| Patrón | Avisos | Qué se hizo |
+|---|---|---|
+| `Element`/`HTMLElement` → `.value`, `.checked`, `.style`, `.dataset`, `.disabled` | 21 | Decir el tipo del elemento (se deduce del id o de la etiqueta: `problog-responder-texto` es un `textarea`) |
+| «posiblemente `null`» y variables que empiezan en `null` (que TypeScript reduce a `never`) | 13 | **Una anotación por declaración** (`publicacionAbierta`, `observadorFeed`, `portadaNombre`, `lista`…), más un `@typedef Problog` para la publicación abierta |
+| `e.target` → `.closest` (`TS18047` + `TS2339`) | 10 | Guarda de verdad: `e.target instanceof Element` antes de usarlo (son `TypeError` latentes) |
+| `window.__vvPrueba`, `window.__ignorarAjusteTeclado`, `btn._mostrarTimer` | 5 | Se **declaran** en `js/tipos-globales.d.ts`, no se castean |
+| Temporizador guardado como propiedad de la función (`recolocarBarraResponder._t`) | 2 | Pasa a variable del módulo (`number \| undefined`) |
+| `textContent = total` con un `number` | 1 | `String(total)`: es la conversión que hacía el navegador solo |
+| `e.detail` sobre un `Event` | 1 | Cast a `CustomEvent` |
+
+**Dos cosas que hay que recordar de este fichero:**
+
+1. **Usa CRLF** (los demás del proyecto, no). Un script de reemplazos que busque textos de
+   varias líneas con `\n` **no encuentra nada**: hay que pasarlos a `\r\n` (y escribir con
+   `\r\n` para no cambiar los finales de línea del fichero).
+2. **El cast va en la EXPRESIÓN, no en la declaración.** Esto sigue dando `TS2322` (la
+   anotación no convierte el `HTMLElement` que devuelve el DOM):
+   `/** @type {HTMLInputElement | null} */ let campo = document.getElementById(...)`.
+   Hace falta el paréntesis:
+   `let campo = /** @type {HTMLInputElement | null} */ (document.getElementById(...))`.
+
+**Quedó verde de verdad**: `verificar-comentarios-problog.mjs` **92/92**,
+`verificar-problogs-editor.mjs` **10/10** y la foto de estilos **sin diferencias**.
 
 ### Dos trampas que han costado tiempo
 

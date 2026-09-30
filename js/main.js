@@ -43,7 +43,7 @@ import {
     limpiarFormularioConConfirmacion
 } from './panel-ui.js?v=49cd0fae5d';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a6924cbcfa';
-import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=996acf0b5c';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=4a9a79e9c3';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=edc79bd347';
 import { setupPush } from './push.js?v=b7e86ebf34';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta

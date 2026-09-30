@@ -51,6 +51,12 @@ interface Window {
     syncChatEntregas?: () => any;
     /** Refresca el contador de mensajes sin leer del chat (lo expone chat.js). */
     refrescarChatNoLeidos?: () => any;
+    /** Bandera de las PRUEBAS de problogs.js: con ella el ajuste del teclado ignora el
+     *  `visualViewport` de mentira que le meten (si no, sus avisos entran en bucle). */
+    __ignorarAjusteTeclado?: boolean;
+    /** `visualViewport` de mentira que inyectan las pruebas de problogs.js para
+     *  reproducir el teclado sin abrirlo de verdad. */
+    __vvPrueba?: VisualViewport;
 }
 
 /**
@@ -63,6 +69,10 @@ interface HTMLElement {
     _filtroTimer?: number;
     /** Temporizador de la transición del carrusel de etiquetas (galeria-ui.js). */
     _ptrTransTimer?: number;
+    /** Temporizador de APARICIÓN del icono de volver de Problogs (problogs.js). */
+    _mostrarTimer?: number;
+    /** Temporizador de OCULTADO del icono de volver de Problogs (problogs.js). */
+    _ocultarTimer?: number;
 }
 
 /**

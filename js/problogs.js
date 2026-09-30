@@ -1,3 +1,4 @@
+// @ts-check
 // js/problogs.js
 // ============================================================
 // PROBLOGS: publicaciones de blog del artista sobre su proceso creativo.
@@ -44,6 +45,11 @@ import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
 import { artistaActual } from './auth.js?v=c69ad117da';
 
+/**
+ * Una publicacion de Problogs tal como la devuelve el backend: solo los campos que usa
+ * este modulo. El indice deja pasar los demas sin tener que listarlos todos.
+ * @typedef {{ id?: number | string, titulo?: string, comentarios_count?: number, [clave: string]: any }} Problog
+ */
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
 const MIN_ALTO_CONTENIDO = 260;
@@ -59,7 +65,7 @@ let feedEl, detalleEl, seccionEl, masBtn;
 let imagenesLocales = new Map();
 let imagenesGuardadas = new Map();
 // Cuál de esas imágenes va de portada (por nombre; el slot se resuelve al guardar).
-let portadaNombre = null;
+/** @type {string | null} */ let portadaNombre = null;
 // Firma de lo último pintado en los cuadros de portada (evita repintar en cada tecla).
 let firmaPortadas = '';
 let observandoSeccion = false;
@@ -74,11 +80,11 @@ const POR_PAGINA = 10;
 let paginaFeed = 1;
 let hayMasFeed = false;
 let cargandoFeed = false;
-let observadorFeed = null;
+/** @type {IntersectionObserver | null} */ let observadorFeed = null;
 
 // Estado de edición
 let editandoId = null;        // null = creando; si no, id de la publicación
-let publicacionAbierta = null;
+/** @type {Problog | null} */ let publicacionAbierta = null;
 
 // ============================================================
 // UTILIDADES
@@ -509,7 +515,7 @@ function limpiarEditor() {
     if (contenidoEl) contenidoEl.value = '';
     if (tituloEl) tituloEl.value = '';
     if (etiquetasEl) etiquetasEl.value = '';
-    const publicado = document.querySelector('input[name="problog-estado"][value="publicado"]');
+    const publicado = /** @type {HTMLInputElement | null} */ (document.querySelector('input[name="problog-estado"][value="publicado"]'));
     if (publicado) publicado.checked = true;
     if (guardarBtn) guardarBtn.textContent = 'Crear Problog';
     actualizarContador();
@@ -622,7 +628,7 @@ async function guardar(e) {
     // Estado: el selector se quitó de la interfaz, así que al EDITAR se conserva
     // el que ya tenía la publicación (antes se reenviaba siempre 'publicado' y
     // un borrador se publicaba solo con abrirlo y guardar). Al crear, publicado.
-    const estadoSel = document.querySelector('input[name="problog-estado"]:checked');
+    const estadoSel = /** @type {HTMLInputElement | null} */ (document.querySelector('input[name="problog-estado"]:checked'));
     formData.append('estado', estadoSel ? estadoSel.value : estadoActual);
     // Cuál de las imágenes va de portada (el servidor cae a la primera si no
     // llega o si esa imagen ya no está).
@@ -695,14 +701,14 @@ function cargarParaEditar(p) {
     // Sin selector de estado en la interfaz, el estado de la publicación se
     // recuerda para reenviarlo igual al guardar los cambios.
     estadoActual = valor;
-    const radio = document.querySelector('input[name="problog-estado"][value="' + valor + '"]');
+    const radio = /** @type {HTMLInputElement | null} */ (document.querySelector('input[name="problog-estado"][value="' + valor + '"]'));
     if (radio) radio.checked = true;
 
     // Los bloques vuelven al editor como texto: cada imagen, con su etiqueta y
     // el nombre de archivo sacado de su URL, para que al guardar conserve su slot.
     const imagenes = p.imagenes || [];
     const partes = [];
-    let nombrePortada = null;
+    /** @type {string | null} */ let nombrePortada = null;
     (p.bloques || []).forEach((b) => {
         if (b.tipo === 'texto') {
             if ((b.contenido || '').trim()) partes.push(b.contenido);
@@ -1041,7 +1047,7 @@ function renderMarkdown(texto) {
     const salida = [];
     let parrafo = [];
     let parrafoClase = null;
-    let lista = null;         // 'ul' | 'ol'
+    /** @type {'ul' | 'ol' | null} */ let lista = null;   // 'ul' | 'ol'
     let cita = false;
     let alineacion = null;    // clase pendiente de aplicar al bloque
 
@@ -1434,13 +1440,18 @@ function pararVigilanciaBarra() {
     bucleBarra = 0;
 }
 
+// Segundo recolocado de la barra (el teclado no aparece de golpe). Es una variable del
+// modulo y no una propiedad de la funcion: asi el chequeo de tipos ve que existe.
+/** @type {number | undefined} */
+let timerRecolocarBarra;
+
 // Después de abrir o cerrar la barra hay que recolocarla.
 function recolocarBarraResponder() {
     ajustarBarraResponderAlTeclado();
     // Segundo intento: el teclado no aparece de golpe, así que se vuelve a mirar
     // cuando termina de abrirse (y al cerrarse).
-    clearTimeout(recolocarBarraResponder._t);
-    recolocarBarraResponder._t = setTimeout(ajustarBarraResponderAlTeclado, 350);
+    clearTimeout(timerRecolocarBarra);
+    timerRecolocarBarra = setTimeout(ajustarBarraResponderAlTeclado, 350);
 }
 
 function barraResponder() {
@@ -1468,7 +1479,7 @@ function dejarDeResponder(seccion) {
     if (id) id.remove();
     const autor = barra.querySelector('[data-responder-autor]');
     if (autor) autor.textContent = '';
-    const texto = document.getElementById('problog-responder-texto');
+    const texto = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('problog-responder-texto'));
     if (texto) texto.value = '';
 }
 
@@ -1480,7 +1491,7 @@ function responderA(seccion, comentarioId, autor) {
     if (nodoAutor) nodoAutor.textContent = autor || 'este comentario';
     // El id del comentario al que se responde viaja en la propia barra: así no hay
     // que depender de ninguna variable global que se pueda quedar desfasada.
-    let campo = document.getElementById('problog-responder-comentario-id');
+    let campo = /** @type {HTMLInputElement | null} */ (document.getElementById('problog-responder-comentario-id'));
     if (!campo) {
         campo = document.createElement('input');
         campo.type = 'hidden';
@@ -1495,7 +1506,7 @@ function responderA(seccion, comentarioId, autor) {
     // Y se vigila cada fotograma: hay cierres de teclado que no avisan por ningún
     // evento y la barra se quedaba con el `bottom` viejo (se veía cortada).
     vigilarBarraResponder();
-    const texto = document.getElementById('problog-responder-texto');
+    const texto = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('problog-responder-texto'));
     if (texto) {
         texto.value = '';
         texto.focus({ preventScroll: true });
@@ -1527,7 +1538,7 @@ function porFechaDesc(a, b) {
 function ajustarAnchoCajasComentarios() {
     const seccion = document.querySelector('[data-problog-comentarios]');
     if (!seccion) return;
-    const cajas = seccion.querySelectorAll('.problog-comentario-form, .problog-comentario');
+    const cajas = /** @type {NodeListOf<HTMLElement>} */ (seccion.querySelectorAll('.problog-comentario-form, .problog-comentario'));
     // Se quitan medidas que hubieran quedado aplicadas antes.
     cajas.forEach((caja) => {
         for (const prop of ['width', 'margin-left', 'margin-right']) {
@@ -1549,7 +1560,7 @@ function ajustarAnchoCajasComentarios() {
     });
     // La línea del cajón va ENCIMA del botón «Comentar»: se mide el alto de esa
     // fila (más el hueco) y se deja esa distancia desde abajo.
-    const cajon = seccion.querySelector('.problog-comentario-form');
+    const cajon = /** @type {HTMLElement | null} */ (seccion.querySelector('.problog-comentario-form'));
     const acciones = cajon ? cajon.querySelector('.problog-comentario-acciones') : null;
     if (cajon && acciones) {
         const rc = cajon.getBoundingClientRect();
@@ -1561,7 +1572,8 @@ function ajustarAnchoCajasComentarios() {
 }
 
 // Al girar el móvil o cambiar el ancho de la ventana hay que volver a medir.
-let temporizadorAnchoComentarios = null;
+/** @type {number | undefined} */
+let temporizadorAnchoComentarios;
 window.addEventListener('resize', () => {
     if (!document.querySelector('[data-problog-comentarios]')) return;
     clearTimeout(temporizadorAnchoComentarios);
@@ -1571,7 +1583,10 @@ window.addEventListener('resize', () => {
 // Al abrir una publicación se vuelve a medir al ancho real (el alto del cajón
 // depende de su contenido, y el del textarea cambia según lo que se escriba).
 document.addEventListener('input', (e) => {
-    if (!e.target.closest || !e.target.closest('[data-comentario-texto]')) return;
+    // El destino de un evento input puede no ser un elemento (document, window): sin
+    // esta comprobacion, .closest lanzaria un TypeError.
+    const objetivo = e.target instanceof Element ? e.target : null;
+    if (!objetivo || !objetivo.closest('[data-comentario-texto]')) return;
     setTimeout(ajustarAnchoCajasComentarios, 40);
 });
 
@@ -1605,7 +1620,7 @@ function actualizarCuentaComentarios(id) {
     const seccion = seccionComentarios(id);
     const total = seccion ? seccion.querySelectorAll('.problog-comentario').length : 0;
     document.querySelectorAll('[data-problog-comentar="' + id + '"] .problog-social-num')
-        .forEach((n) => { n.textContent = total; });
+        .forEach((n) => { n.textContent = String(total); });
     if (publicacionAbierta && String(publicacionAbierta.id) === String(id)) {
         publicacionAbierta.comentarios_count = total;
     }
@@ -1635,7 +1650,7 @@ async function cargarComentariosDeLaPublicacion(id) {
 
 async function enviarComentarioDeLaPublicacion(seccion) {
     const id = seccion.dataset.problogComentarios;
-    const input = seccion.querySelector('[data-comentario-texto]');
+    const input = /** @type {HTMLTextAreaElement | null} */ (seccion.querySelector('[data-comentario-texto]'));
     const texto = (input ? input.value : '').trim();
     if (!texto) {
         showError('Escribe algo antes de comentar.');
@@ -1671,22 +1686,22 @@ async function enviarComentarioDeLaPublicacion(seccion) {
 async function enviarRespuestaDeLaBarra() {
     const barra = barraResponder();
     if (!barra) return;
-    const seccion = document.querySelector('[data-problog-comentarios]');
+    const seccion = /** @type {HTMLElement | null} */ (document.querySelector('[data-problog-comentarios]'));
     if (!seccion) return;
-    const texto = document.getElementById('problog-responder-texto');
+    const texto = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('problog-responder-texto'));
     const valor = (texto ? texto.value : '').trim();
     if (!valor) {
         showError('Escribe algo antes de responder.');
         if (texto) texto.focus();
         return;
     }
-    const campoPadre = document.getElementById('problog-responder-comentario-id');
+    const campoPadre = /** @type {HTMLInputElement | null} */ (document.getElementById('problog-responder-comentario-id'));
     // Se deja el padre en la sección para reutilizar el envío de siempre (que ya
     // sabe avisar de errores, recargar la lista y limpiar).
     if (campoPadre && campoPadre.value) seccion.dataset.comentarioPadre = campoPadre.value;
-    const cajon = seccion.querySelector('[data-comentario-texto]');
+    const cajon = /** @type {HTMLTextAreaElement | null} */ (seccion.querySelector('[data-comentario-texto]'));
     if (cajon) cajon.value = valor;
-    const enviar = barra.querySelector('.problog-responder-icono[type="submit"]');
+    const enviar = /** @type {HTMLButtonElement | null} */ (barra.querySelector('.problog-responder-icono[type="submit"]'));
     if (enviar) enviar.disabled = true;
     try {
         await enviarComentarioDeLaPublicacion(seccion);
@@ -1731,7 +1746,7 @@ async function irAComentarios(id) {
     }
     if (!seccion) return;
     desplazarA(seccion, { block: 'start' });
-    const input = seccion.querySelector('[data-comentario-texto]');
+    const input = /** @type {HTMLTextAreaElement | null} */ (seccion.querySelector('[data-comentario-texto]'));
     if (input) setTimeout(() => input.focus({ preventScroll: true }), 450);
 }
 
@@ -1886,7 +1901,7 @@ function abrirVistaPrevia() {
         <div class="problog-vista-previa-cuerpo">${pintarLectura(publicacion, false)}</div>`;
 
     capa.addEventListener('click', (e) => {
-        if (e.target.closest('[data-cerrar-vista-previa]')) {
+        if (e.target instanceof Element && e.target.closest('[data-cerrar-vista-previa]')) {
             cerrarVistaPrevia();
         }
     });
@@ -1912,8 +1927,8 @@ registrarOverlay('vista-previa-problogs', cerrarVistaPrevia);
 // ============================================================
 // Se recuerda el último contenedor pintado en el perfil para poder refrescarlo
 // tras borrar una publicación desde ahí (si no, seguiría viéndose la tarjeta).
-let contenedorPerfil = null;
-let autorPerfil = null;
+/** @type {HTMLElement | null} */ let contenedorPerfil = null;
+/** @type {string | number | null} */ let autorPerfil = null;
 
 // Pinta la vista previa de las publicaciones dentro de la pestaña Problogs del
 // perfil. Sin `autorId` es tu propio perfil (incluye borradores); con id es el
@@ -2111,7 +2126,7 @@ export function setupProblogs() {
     // importarnos sin crear un ciclo de módulos. Se registra ANTES del corte de
     // abajo a propósito, porque la vista previa no depende del editor.
     document.addEventListener('perfil:problogs', (e) => {
-        const d = (e && e.detail) || {};
+        const d = (/** @type {CustomEvent} */ (e)).detail || {};
         pintarProblogsEn(d.contenedor, d.autorId);
     });
 
@@ -2166,7 +2181,7 @@ export function setupProblogs() {
 
     // Los iconos de formato: un solo listener delegado para todos.
     document.getElementById('problog-anadir')?.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-formato]');
+        const btn = /** @type {HTMLElement | null} */ (e.target instanceof Element ? e.target.closest('[data-formato]') : null);
         if (btn) aplicarFormato(btn.dataset.formato);
     });
 
@@ -2235,7 +2250,7 @@ export function setupProblogs() {
         enviarRespuestaDeLaBarra();
     });
     barraResponder()?.addEventListener('click', (e) => {
-        if (e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
+        if (e.target instanceof Element && e.target.closest('[data-responder-cancelar]')) dejarDeResponder();
     });
     // La barra se coloca como el cajón de comentarios de Cavents: midiendo el
     // teclado con `visualViewport` y poniendo el borde de abajo en píxeles. SÍ se
