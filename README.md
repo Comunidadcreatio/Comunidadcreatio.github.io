@@ -196,7 +196,22 @@ Lo que SÍ se quedó (y está medido): las **View Transitions** del feed a la le
 | scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
+| scripts/verificar-todo.mjs | **Corre los 13 verificadores** y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
+
+### Antes de publicar: `node scripts/verificar-todo.mjs`
+
+**Hay 13 verificadores y hay que correrlos TODOS**, no solo los de la zona que se ha
+tocado. En una sesión larga se corrieron cinco durante horas y los otros ocho quedaron sin
+mirar: al correrlos aparecieron dos avisos que llevaban ahí sin que nadie los viera (uno
+era un verificador que ya no reflejaba el comportamiento correcto, y otro una prueba de
+integración contra datos reales). `verificar-todo.mjs` los corre todos y saca el resumen.
+
+**Un aviso para interpretar el resultado:** `verificar-filtro-problogs-perfil.mjs` es la
+única prueba **de integración contra el backend real** (su mock deja pasar a propósito las
+URLs `/problog`). Depende de que en producción exista una publicación de un artista
+concreto (id 480001), así que **se pone roja cuando cambian los datos reales** — no cuando
+el código está mal. Está pendiente de rehacerlo con datos simulados, como el resto.
 | scripts/minify.js | Genera .min.css/.min.js (enmascara strings, valida con node --check; falla en voz alta si algo no es minificable, ej. perfil.js con templates anidados → usar Terser) |
 | scripts/add_banderas.py / fix_banderas.py | Utilidades de banderas (una vez) |
 

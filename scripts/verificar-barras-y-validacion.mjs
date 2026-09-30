@@ -127,16 +127,28 @@ check('con el nav visible las barras están pegadas abajo', num(A.stepBar.bottom
 check('la barra de pasos se ve en pantalla', A.stepBar.enPantalla === true, JSON.stringify(A.stepBar));
 check('las pestañas se ven en pantalla', A.tabs.enPantalla === true, JSON.stringify(A.tabs));
 
-// Teclado abierto: chat.js oculta el nav y el layout se redimensiona
+// Teclado abierto. OJO: la regla de ocultar el nav está ACOTADA AL CHAT a propósito
+// (`body.teclado-abierto:has(#chat-global:not(.hidden)) #toggle-panel`). Antes ocultaba el
+// nav en TODA la app, y en Problogs eso dejaba su franja vacía entre la barra de responder
+// y el teclado: era el hueco que se veía. Aquí se comprueban los dos casos.
 await evalJs(`document.body.classList.add('teclado-abierto'); window.dispatchEvent(new Event('resize'));`);
 await sleep(400);
 const B = JSON.parse(await evalJs(LEER));
-console.log('   B (teclado):     ' + JSON.stringify({ nav: B.navVisible, stepBar: B.stepBar.bottom, tabs: B.tabs.bottom, fondo: B.fondo.bottom }));
-check('el nav queda oculto (como con el teclado)', B.navVisible === false, JSON.stringify(B.navVisible));
+console.log('   B (teclado, sin chat): ' + JSON.stringify({ nav: B.navVisible, stepBar: B.stepBar.bottom, tabs: B.tabs.bottom, fondo: B.fondo.bottom }));
+check('con el teclado pero SIN el chat, el nav sigue a la vista (no deja franja vacía)',
+    B.navVisible === true, JSON.stringify(B.navVisible));
 check('las barras NO se van fuera de la pantalla', num(B.stepBar.bottom) <= 150 && num(B.tabs.bottom) <= 150 && num(B.fondo.bottom) <= 150, JSON.stringify(B.stepBar.bottom + '/' + B.tabs.bottom + '/' + B.fondo.bottom));
 check('la barra de pasos sigue en pantalla con el teclado', B.stepBar.enPantalla === true, JSON.stringify(B.stepBar));
 check('las pestañas siguen en pantalla con el teclado', B.tabs.enPantalla === true, JSON.stringify(B.tabs));
 check('el fondo de las barras sigue en pantalla', B.fondo.enPantalla === true, JSON.stringify(B.fondo));
+// Y CON el chat abierto sí se oculta, que es para lo que existe la regla.
+await evalJs(`document.getElementById('chat-global').classList.remove('hidden'); window.dispatchEvent(new Event('resize'));`);
+await sleep(400);
+const B2 = JSON.parse(await evalJs(LEER));
+console.log('   B2 (teclado, chat abierto): ' + JSON.stringify({ nav: B2.navVisible }));
+check('con el CHAT abierto y el teclado, el nav sí se oculta', B2.navVisible === false, JSON.stringify(B2.navVisible));
+await evalJs(`document.getElementById('chat-global').classList.add('hidden'); window.dispatchEvent(new Event('resize'));`);
+await sleep(300);
 // La barra del desplegable "Mis Cavents" usaba la misma fórmula
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
 await sleep(900);

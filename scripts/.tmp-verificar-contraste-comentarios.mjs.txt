@@ -1,0 +1,79 @@
+=== Los colores del CSS son los que audita este script ===
+  PASS  valor claro del rojo («--comentario-rojo: #b3261e»)
+  PASS  valor oscuro del rojo («--comentario-rojo: #f87171»)
+  PASS  valor claro del verde («--comentario-verde: #15803d»)
+  PASS  valor oscuro del verde («--comentario-verde: #4ade80»)
+  PASS  borde de control en claro («--comentario-control: #8a8a8a»)
+  PASS  borde de control en oscuro («--comentario-control: rgba(255, 255, 255, 0.36)»)
+  PASS  regla del like («.problog-social-btn.liked»)
+  PASS  subrayado de foco de la caja («border-bottom-color: var(--color-ink)»)
+  PASS  no vuelve: el botón «Comentar» no debe llevar relleno --color-ink
+  PASS  no vuelve: el botón «Comentar» no debe pintar su texto con --color-white
+  PASS  no vuelve: la caja de escribir debe ir sin fondo
+  PASS  no vuelve: la caja de escribir no debe volver a tener recuadro
+  PASS  no vuelve: el cajón de escribir no debe llevar línea abajo
+  PASS  no vuelve: el cajón debe ir sin fondo
+
+=== La barra de responder lleva el vidrio de la app ===
+   · regla de la barra:
+       .problog-responder-barra {
+       /* SIEMPRE FIJA. Una pieza fija no depende del scroll, así que no se mueve ni un
+       píxel al desplazar la publicación, y no necesita JavaScript para mantenerse.
+       Su sitio natural es pegado encima del menú principal. */
+       position: fixed;
+       left: 0;
+       right: 0;
+       bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+       /* Por encima del menú principal (998) y del header (1000). */
+       z-index: 1100;
+       box-sizing: border-box;
+       padding: 10px 24px;
+       /* EFECTO VIDRIO, igual que el header y el menú principal (ver style.css):
+       fondo translúcido y desenfoque. Antes era blanco SÓLIDO y por eso
+       desentonaba con el resto de la app. */
+       background: rgba(255, 255, 255, 0.20);
+       backdrop-filter: blur(12px);
+       -webkit-backdrop-filter: blur(12px);
+       border-top: 0.5px solid var(--color-gray-200);
+       box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+       }
+  PASS  la barra usa fondo translúcido (vidrio), no sólido
+  PASS  la barra lleva backdrop-filter (desenfoque)
+  PASS  la barra NO vuelve al blanco sólido
+  PASS  la barra tiene su vidrio oscuro
+
+=== Contraste en tema CLARO ===
+  PASS  título «Comentarios»: 17.4:1 (mín 4.5)
+  PASS  contador del título: 7.81:1 (mín 4.5)
+  PASS  texto que se escribe: 17.4:1 (mín 4.5)
+  PASS  placeholder del cajón: 4.74:1 (mín 4.5)
+  PASS  botón «Comentar» (texto): 17.4:1 (mín 4.5)
+  PASS  borde del botón «Comentar»: 3.45:1 (mín 3)
+  PASS  chip «respondiendo a…»: 7.81:1 (mín 4.5)
+  PASS  borde del chip «respondiendo»: 3.45:1 (mín 3)
+  PASS  nombre del autor: 17.4:1 (mín 4.5)
+  PASS  fecha del comentario: 7.81:1 (mín 4.5)
+  PASS  texto del comentario: 10.86:1 (mín 4.5)
+  PASS  acción «Responder»: 7.81:1 (mín 4.5)
+  PASS  like de comentario activo: 6.54:1 (mín 4.5)
+  PASS  reblog activo (marcadores): 5.02:1 (mín 4.5)
+  PASS  like activo (marcadores): 6.54:1 (mín 4.5)
+
+=== Contraste en tema OSCURO ===
+  PASS  título «Comentarios»: 18.16:1 (mín 4.5)
+  PASS  contador del título: 15.72:1 (mín 4.5)
+  PASS  texto que se escribe: 18.16:1 (mín 4.5)
+  PASS  placeholder del cajón: 13.36:1 (mín 4.5)
+  PASS  botón «Comentar» (texto): 18.16:1 (mín 4.5)
+  PASS  borde del botón «Comentar»: 3.25:1 (mín 3)
+  PASS  chip «respondiendo a…»: 15.72:1 (mín 4.5)
+  PASS  borde del chip «respondiendo»: 3.25:1 (mín 3)
+  PASS  nombre del autor: 18.16:1 (mín 4.5)
+  PASS  fecha del comentario: 15.72:1 (mín 4.5)
+  PASS  texto del comentario: 15.72:1 (mín 4.5)
+  PASS  acción «Responder»: 15.72:1 (mín 4.5)
+  PASS  like de comentario activo: 7.16:1 (mín 4.5)
+  PASS  reblog activo (marcadores): 11.36:1 (mín 4.5)
+  PASS  like activo (marcadores): 7.16:1 (mín 4.5)
+
+RESULTADO: 48/48 comprobaciones OK — sin fallos
