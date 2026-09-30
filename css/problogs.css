@@ -1684,6 +1684,46 @@ body.responder-subida .problog-responder-barra {
 }
 
 /* ============================================================
+   CONTAINER QUERIES: la tarjeta mira SU CONTENEDOR, no la pantalla
+   ============================================================
+   El feed es el contenedor y las TARJETAS de dentro pueden preguntar por su ancho. Hace
+   falta porque la misma tarjeta se usa en dos sitios de anchos muy distintos:
+
+     - el feed principal (`#problogs .problogs-feed`), que ocupa el ancho de la pantalla;
+     - la pestaña de Problogs del PERFIL (`.problogs-feed-perfil`), que va en una columna
+       más estrecha porque al lado hay barra lateral.
+
+   Con una media query eso no se puede saber: mira la PANTALLA, así que en el perfil
+   aplica las reglas del ancho de la ventana aunque la columna real sea más estrecha.
+
+   DECISIÓN DE DISEÑO (la mínima que no cambia nada donde ya se veía bien): por debajo de
+   320px de contenedor, la tarjeta aprieta un poco los lados y baja un punto el tamaño del
+   título y del extracto, para que el texto respire. En el móvil de pruebas el contenedor
+   mide ~345px, así que NO cambia nada ahí (lo comprueba la foto: cero diferencias).
+
+   OJO, TRAMPA: un contenedor NO puede consultarse a SÍ MISMO. Por eso el reparto de
+   columnas de `.problogs-feed-perfil` (que ES el contenedor) sigue con media query: para
+   pasarlo a container query habría que declarar el contenedor en su PADRE (la pestaña del
+   perfil). Queda apuntado; ponerlo aquí no haría nada. */
+.problogs-feed,
+.problogs-feed-perfil {
+    container-type: inline-size;
+    container-name: feed;
+}
+
+@container feed (max-width: 320px) {
+    /* Solo se toca la TIPOGRAFIA. La tarjeta NO tiene padding lateral (0 por diseño, el
+       texto va de borde a borde), asi que añadirlo la habria dejado MAS apretada, no menos:
+       lo cazo el verificador, que mide los dos anchos y compara. */
+    .problog-card-titulo {
+        font-size: 0.95rem;
+    }
+    .problog-card-extracto {
+        font-size: 13px;
+    }
+}
+
+/* ============================================================
    5. LA SECCIÓN DE CREAR, A SANGRE Y PEGADA AL HEADER
    ------------------------------------------------------------
    El hueco de arriba: al crear un Problog se ocultan las barras fijas de
