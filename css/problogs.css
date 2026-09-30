@@ -1,3 +1,5 @@
+
+@layer components {
 /* css/problogs.css
    ============================================================
    PROBLOGS: editor de bloques, feed y vista de lectura.
@@ -952,15 +954,10 @@ body.responder-subida .problog-responder-barra {
 /* El hueco que tapa la barra se devuelve aquí mientras está abierta. El selector
    lleva el `#problogs` delante a propósito: hay otra regla más específica
    (`#problogs .problogs-detalle`) que fija su relleno y, sin esto, la ganaría. */
-#problogs #problogs-detalle.con-barra-responder {
-    padding-bottom: 111px;
-}
-
-/* Con el teclado abierto el menú principal se oculta, así que solo hay que
-   reservar el alto de la propia barra. */
-body.responder-teclado #problogs #problogs-detalle.con-barra-responder {
-    padding-bottom: 90px;
-}
+/* El hueco que tapa la barra se devuelve mientras está abierta. Estas dos reglas se
+   movieron AL FINAL del archivo, a la capa `utilities`: allí ganan por ORDEN DE CAPAS y
+   ya no hace falta el `#problogs` extra que había que añadir para ganarle a
+   `#problogs .problogs-detalle`. Ver «AJUSTES DE ESTADO» al final. */
 
 /* En oscuro, el mismo vidrio oscuro que el header y el nav. */
 [data-theme="dark"] .problog-responder-barra {
@@ -1863,3 +1860,29 @@ body.creando-problogs #problog-nav-bar {
 [data-theme="dark"] .problog-vista-previa-cerrar {
     border-color: rgba(255, 255, 255, 0.18);
 }
+} /* <- cierre de @layer components (todo el archivo) */
+
+/* ============================================================
+   AJUSTES DE ESTADO (capa `utilities`)
+   ============================================================
+   Lo que tiene que ganar a TODO lo de `components`. Al estar en la última capa gana por
+   ORDEN DE CAPAS, así que el selector se queda en la clase y NO hacen falta ids de
+   refuerzo: antes había que escribir
+   `#problogs #problogs-detalle.con-barra-responder` para ganarle a
+   `#problogs .problogs-detalle`, que es más específico y va más abajo en el archivo.
+   Ese hack ya no existe. */
+@layer utilities {
+
+    /* Mientras la barra de responder está abierta se reserva su hueco. */
+    .problogs-detalle.con-barra-responder {
+        padding-bottom: 111px;
+    }
+
+    /* Con el teclado abierto el menú principal se oculta, así que solo hay que
+       reservar el alto de la propia barra. */
+    body.responder-teclado .problogs-detalle.con-barra-responder {
+        padding-bottom: 90px;
+    }
+
+}
+

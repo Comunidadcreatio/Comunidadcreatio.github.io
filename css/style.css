@@ -22,23 +22,136 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=f1336e0915');
+@import url('header.css?v=0f47c253d1');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=04677eb795');
+@import url('galeria-publica.css?v=af0f66c813');
 
 /* Chat global + privado */
-@import url('chat.css?v=dc10d458c9');
+@import url('chat.css?v=2551013284');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=afc9c82dac');
+@import url('panel-artista.css?v=3b66376f08');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
-@import url('modales.css?v=ab0b7c97d0');
+@import url('modales.css?v=c5640ff8ae');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=bba30b0046');
+@import url('formularios.css?v=63fe3ac753');
+
+/* ==============================================
+   CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
+   ==============================================
+   Estas reglas solo llevan etiquetas y atributos (ninguna clase ni id), así que son
+   "base" por naturaleza. En una capa, cualquier componente (`.problog-comentario-input`,
+   `#registro-form input`...) las gana por ORDEN DE CAPAS y no hace falta que le suban
+   la especificidad.
+
+   IMPORTANTE: `select` y `[data-theme="dark"] select` van JUNTAS. Si la oscura se
+   quedara fuera de la capa, ganaría a la clara y el desplegable en modo oscuro
+   perdería su flecha blanca. */
+@layer base {
+
+    /* Flecha personalizada para selects (modo claro - negra) */
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px;
+        padding-right: 30px;
+    }
+
+    [data-theme="dark"] input,
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea {
+        background-color: var(--color-gray-100);
+        border-color: var(--color-border);
+        color: var(--color-ink);
+    }
+
+    /* Flecha personalizada blanca para selects en modo oscuro */
+    [data-theme="dark"] select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px;
+        padding-right: 30px;
+    }
+
+    [data-theme="dark"] input::placeholder,
+    [data-theme="dark"] textarea::placeholder {
+        color: var(--color-gray-400);
+    }
+
+    [data-theme="dark"] button {
+        color: var(--color-ink);
+    }
+
+}
+
+/* ==============================================
+   TIPOGRAFÍA GLOBAL (Nunito) — capa `base`
+   ==============================================
+   Se separa lo de ETIQUETA (va a la capa `base`) de lo que lleva clase o id (se queda
+   sin capa por ahora). Al repetir la MISMA declaración en las dos partes el resultado es
+   idéntico: para un elemento que case con ambas gana la de clase, y pone lo mismo.
+   OJO: no se pueden juntar en una sola regla, porque `font-weight: 700` es solo de los
+   títulos; si se unieran, los `.filter-controls input` saldrían en negrita. */
+@layer base {
+    body, input, button, select, textarea {
+        font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background-color: transparent; /* el fondo rotativo (slideshow) se ve detrás */
+        color: var(--color-text);
+        transition: background-color 0.3s ease, color 0.3s ease;
+        overflow-x: hidden; /* evita el paneo horizontal de toda la página */
+    }
+
+    /* Ocultar la barra de scroll global (lado derecho) en escritorio y móvil,
+       sin desactivar el scroll en sí */
+    html {
+        scrollbar-width: none;      /* Firefox */
+        -ms-overflow-style: none;   /* IE / Edge legacy */
+    }
+    html::-webkit-scrollbar {
+        display: none;              /* Chrome, Safari, Edge Chromium */
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 700; /* Negrita para títulos */
+    }
+
+    /* Opcional: darle un peso un poco más ligero al contenido normal para mejorar la lectura */
+    p, span, label {
+        font-weight: 400;
+    }
+}
+
+/* Opcional: ajuste fino para inputs (también es base: solo etiquetas) */
+@layer base {
+    input, select, textarea {
+        font-weight: 500;
+    }
+}
+
+/* 3. Responsive - Móviles (≤ 768px) */
+/* Capa `base`: el @media va DENTRO de la capa. Es equivalente a tenerlo al revés (la capa
+   no cambia por estar dentro de un @media) y así todas las reglas de `base` quedan en el
+   primer nivel del archivo, que es lo que necesita el reparto por capas. */
+@layer base {
+    @media (max-width: 768px) {
+        body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 16px)); }
+    }
+}
+@layer components {
 
 .hidden {
     display: none !important;
@@ -348,59 +461,6 @@
 }
 
 /* ==============================================
-   CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
-   ==============================================
-   Estas reglas solo llevan etiquetas y atributos (ninguna clase ni id), así que son
-   "base" por naturaleza. En una capa, cualquier componente (`.problog-comentario-input`,
-   `#registro-form input`...) las gana por ORDEN DE CAPAS y no hace falta que le suban
-   la especificidad.
-
-   IMPORTANTE: `select` y `[data-theme="dark"] select` van JUNTAS. Si la oscura se
-   quedara fuera de la capa, ganaría a la clara y el desplegable en modo oscuro
-   perdería su flecha blanca. */
-@layer base {
-
-    /* Flecha personalizada para selects (modo claro - negra) */
-    select {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        background-size: 12px;
-        padding-right: 30px;
-    }
-
-    [data-theme="dark"] input,
-    [data-theme="dark"] select,
-    [data-theme="dark"] textarea {
-        background-color: var(--color-gray-100);
-        border-color: var(--color-border);
-        color: var(--color-ink);
-    }
-
-    /* Flecha personalizada blanca para selects en modo oscuro */
-    [data-theme="dark"] select {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        background-size: 12px;
-        padding-right: 30px;
-    }
-
-    [data-theme="dark"] input::placeholder,
-    [data-theme="dark"] textarea::placeholder {
-        color: var(--color-gray-400);
-    }
-
-    [data-theme="dark"] button {
-        color: var(--color-ink);
-    }
-
-}
-
-/* ==============================================
    CERRAR SESIÓN EN MODO OSCURO
    ==============================================
    Antes esto eran 6 reglas con `!important` y con ids escalados a mano
@@ -463,48 +523,6 @@
     color: var(--color-gray-400);
 }
 
-/* ==============================================
-   TIPOGRAFÍA GLOBAL (Nunito) — capa `base`
-   ==============================================
-   Se separa lo de ETIQUETA (va a la capa `base`) de lo que lleva clase o id (se queda
-   sin capa por ahora). Al repetir la MISMA declaración en las dos partes el resultado es
-   idéntico: para un elemento que case con ambas gana la de clase, y pone lo mismo.
-   OJO: no se pueden juntar en una sola regla, porque `font-weight: 700` es solo de los
-   títulos; si se unieran, los `.filter-controls input` saldrían en negrita. */
-@layer base {
-    body, input, button, select, textarea {
-        font-family: 'Nunito', sans-serif;
-    }
-
-    body {
-        margin: 0;
-        background-color: transparent; /* el fondo rotativo (slideshow) se ve detrás */
-        color: var(--color-text);
-        transition: background-color 0.3s ease, color 0.3s ease;
-        overflow-x: hidden; /* evita el paneo horizontal de toda la página */
-    }
-
-    /* Ocultar la barra de scroll global (lado derecho) en escritorio y móvil,
-       sin desactivar el scroll en sí */
-    html {
-        scrollbar-width: none;      /* Firefox */
-        -ms-overflow-style: none;   /* IE / Edge legacy */
-    }
-    html::-webkit-scrollbar {
-        display: none;              /* Chrome, Safari, Edge Chromium */
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Nunito', sans-serif;
-        font-weight: 700; /* Negrita para títulos */
-    }
-
-    /* Opcional: darle un peso un poco más ligero al contenido normal para mejorar la lectura */
-    p, span, label {
-        font-weight: 400;
-    }
-}
-
 /* Selectores con clase o id: misma tipografía, sin capa por ahora. */
 .filter-controls input, .filter-controls select, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
     font-family: 'Nunito', sans-serif;
@@ -512,13 +530,6 @@
 #brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
-}
-
-/* Opcional: ajuste fino para inputs (también es base: solo etiquetas) */
-@layer base {
-    input, select, textarea {
-        font-weight: 500;
-    }
 }
 
 /* ==============================================
@@ -1287,14 +1298,7 @@
     }
 }
 
-/* 3. Responsive - Móviles (≤ 768px) */
 @media (max-width: 768px) {
-    /* Capa `base`, como el resto de reglas de `body`: dentro de la capa manda el orden,
-       y esta va después, así que sigue ganando. */
-    @layer base {
-        body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 16px)); }
-    }
-
     main {
         padding: 50px 24px 0;
         padding-top: calc(60px + var(--status-bar-height, 24px));
@@ -1616,7 +1620,6 @@
    ambos modos (antes tenia fondo solido #1a1a1a en modo oscuro; el fondo
    transparente definitivo esta en la seccion RELLENOS mas abajo). */
 
-
 /* Capa solida del contenido: blanca (claro) / negra (oscuro), solo entre
    header y nav. Las franjas del header/nav quedan transparentes para que
    el vidrio (blur) muestre las imagenes rotativas de fondo. */
@@ -1818,3 +1821,5 @@
     position: relative;
     z-index: 1000;
 }
+}
+

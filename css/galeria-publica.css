@@ -1,3 +1,4 @@
+
 /* css/galeria-publica.css - Diseño de tarjetas de obras */
 /* ==============================================
    SCROLL SNAPPING — contenedor fixed como snap container
@@ -10,6 +11,7 @@
         padding: 0;
     }
 }
+@layer components {
 
 /* Contenedor: position fixed ocupa todo el espacio disponible */
 #galeria-container {
@@ -702,7 +704,6 @@
     color: #ffffff;
     border-color: #ffffff;
 }
-
 
 /* ==============================================
    MODO GRID — misma proporción que vista normal, 3 columnas
@@ -1620,4 +1621,6 @@ body.cajon-teclado .comentarios-drawer {
     bottom: -8px;
     right: 16px;
     border-top: 8px solid rgba(30, 30, 30, 0.97);
+}
+
 }

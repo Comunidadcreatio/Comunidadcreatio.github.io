@@ -1,25 +1,4 @@
-/* css/auth.css - Estilos específicos para la página de autenticación */
 
-/* ==============================================
-   VARIABLES CSS
-   ============================================== */
-:root {
-    /* === Hereda paleta global de style.css ===
-       Solo se sobreescriben las variables exclusivas de auth */
-    --color-text-light: var(--color-gray-500);
-    --color-border: var(--color-gray-300);
-    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.04);
-    --radius-xl: 1rem;
-}
-
-/* ==============================================
-   RESET Y BASE
-   ============================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
 
 /* Capa `base`: reglas de ETIQUETA de la página de acceso. Van a `base` para que los
    componentes les ganen por ORDEN DE CAPAS y no por especificidad. auth.css se carga
@@ -46,6 +25,41 @@
         margin: 0;
         padding-bottom: 100px;
     }
+}
+
+/* ==============================================
+   MODO OSCURO
+   ============================================== */
+/* Capa `base`: es una regla de ETIQUETA (body). Las de clase que vienen debajo se quedan
+   sin capa por ahora. */
+@layer base {
+    [data-theme="dark"] body {
+        background-color: transparent;
+        color: var(--color-ink);
+    }
+}
+@layer components {
+/* css/auth.css - Estilos específicos para la página de autenticación */
+
+/* ==============================================
+   VARIABLES CSS
+   ============================================== */
+:root {
+    /* === Hereda paleta global de style.css ===
+       Solo se sobreescriben las variables exclusivas de auth */
+    --color-text-light: var(--color-gray-500);
+    --color-border: var(--color-gray-300);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.04);
+    --radius-xl: 1rem;
+}
+
+/* ==============================================
+   RESET Y BASE
+   ============================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 #main-content {
@@ -330,7 +344,6 @@ form {
 
 /* Estados de validación de inputs */
 /* Por defecto: borde gris */
-
 
 /* Eliminar fondo de autocompletado - enfoque nuclear */
 input:-webkit-autofill,
@@ -1425,18 +1438,6 @@ legend {
     }
 }
 
-/* ==============================================
-   MODO OSCURO
-   ============================================== */
-/* Capa `base`: es una regla de ETIQUETA (body). Las de clase que vienen debajo se quedan
-   sin capa por ahora. */
-@layer base {
-    [data-theme="dark"] body {
-        background-color: transparent;
-        color: var(--color-ink);
-    }
-}
-
 [data-theme="dark"] .auth-container {
     background-color: transparent !important;
     border: 1px solid var(--color-border);
@@ -1920,3 +1921,5 @@ legend {
 }
 
 /* ==============================================
+
+}

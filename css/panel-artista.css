@@ -1,3 +1,5 @@
+
+@layer components {
 /* css/panel-artista.css - Estilos del panel del artista */
 
 /* ==============================================
@@ -116,7 +118,6 @@
     display: none;
 }
 
-
 /* ==============================================
    CONTROLES DE BÚSQUEDA Y FILTROS
    ============================================== */
@@ -168,7 +169,6 @@
     padding-right: 30px;
 }
 
-
 /* ==============================================
    CONTROLES DE PAGINACIÓN
    ============================================== */
@@ -217,7 +217,6 @@
     font-weight: 500;
     color: var(--color-text-muted, #666);
 }
-
 
 /* ==============================================
    TABLA DE OBRAS
@@ -375,7 +374,6 @@
     color: var(--color-white);
     border-color: var(--color-danger);
 }
-
 
 /* ==============================================
    SECCIÓN MI CUENTA
@@ -748,7 +746,6 @@
 #cuenta-password-strength[data-level="1"] .strength-bar-fill { width: 33%; background: var(--color-danger); }
 #cuenta-password-strength[data-level="2"] .strength-bar-fill { width: 66%; background: #f0ad4e; }
 #cuenta-password-strength[data-level="3"] .strength-bar-fill { width: 100%; background: var(--color-success, #28a745); }
-
 
 /* ==============================================
    SECCIÓN PERFIL DE USUARIO (ACTUALIZADA)
@@ -1163,7 +1160,6 @@
 
 }
 
-
 /* ==============================================
    DISEÑO RESPONSIVO - PANEL DE ARTISTA (general)
    ============================================== */
@@ -1511,4 +1507,5 @@
     .perfil-grid-obras {
         width: 100%;
     }
+}
 }

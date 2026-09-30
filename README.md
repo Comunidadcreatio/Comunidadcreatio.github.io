@@ -74,27 +74,36 @@ Reglas que van JUNTAS y no se pueden separar: `select` con `[data-theme="dark"] 
 Para migrar sin riesgo: foto de estilos antes → cambio → foto después → comparar.
 Si la comparación sale sin diferencias, el cambio no movió ni un valor calculado.
 
-**ANTES DE CAPAR UNA HOJA ENTERA, OJO:** lo que NO está en ninguna capa GANA a lo que
-SÍ está, así que capar una hoja hace que las reglas que seleccionen lo mismo desde otra
-hoja SIN capar le ganen, aunque sean menos específicas.
+**ESTADO ACTUAL: TODO el CSS está capado.** Cada hoja tiene su contenido dentro de
+`@layer components { ... }`, y las reglas que ya se migraron viven en `@layer base { ... }`
+(galeria-publica.css, formularios.css, style.css y auth.css).
 
-Caso real (Problogs): capar `problogs.css` se lleva por delante, como mínimo, a
-`.crear-problogs-contenido` y el `form` de `formularios.css`, a la caja de
-`#panel-artista` (panel-artista.css, que problogs reescribe para el editor) y a las
-reglas de Problogs de style.css y header.css. Cada una que se mueve destapa la
-siguiente.
+Dentro de una capa deciden la especificidad y el orden del código **igual que cuando todo
+estaba suelto**, así que el capado NO cambió nada (verificado con la foto: cero
+diferencias en 210 medidas). Lo que se gana son **dos palancas limpias**:
 
-**Método que funciona, en este orden:**
+| Capa | Efecto |
+|---|---|
+| `base` | **pierde** contra todo lo demás (por orden de capas) |
+| `components` | el cuerpo del CSS; aquí decide la especificidad |
+| `utilities` | **gana** a todo lo demás |
 
-1. `node scripts/auditar-capas.mjs` — lista las reglas SIN capa que pueden dar la
-   sorpresa (etiquetas solas como `form`, y selectores de la familia que se va a capar).
-   Detecta selectores repartidos en varias líneas, que es donde se escapan.
-2. `node scripts/foto-estilos.mjs` antes y después, y comparar. Dice exactamente qué
-   valores cambiaron.
-3. `node scripts/dbg-cascada.mjs` — cuando la foto dice QUÉ cambió pero no POR QUÉ: dice
-   qué regla gana de verdad una propiedad en un elemento (y la cadena de padres con su
-   ancho). Ojo: no ve los atajos (`padding` no aparece como `padding-left`).
-4. Repetir 1-3 hasta que la comparación dé CERO diferencias.
+Con eso, mover una familia de reglas de `components` a `base` (para que no pelee) o a
+`utilities` (para que gane sin subir la especificidad) **ya no destapa competidores**: no
+queda nada suelto que pueda sorprender.
+
+Ejemplo ya hecho (Problogs): reservar el hueco de la barra de responder era
+`#problogs #problogs-detalle.con-barra-responder` (un id de refuerzo para ganarle a
+`#problogs .problogs-detalle`); ahora es `.problogs-detalle.con-barra-responder` en
+`utilities`, sin ids.
+
+**Cómo se hizo el capado inicial:** `node scripts/capar-hojas.mjs` (deja copia
+`.antes-de-capar` de cada hoja). Mete en `components` todos los trozos de primer nivel,
+deja los `@import` y la declaración de orden arriba, y respeta los `@layer base { }` que
+ya existían.
+
+**Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
+`base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
 ## Scripts
 
@@ -102,6 +111,7 @@ siguiente.
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
 | scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre 4 vistas (index, auth, Problogs y el editor de Problogs) x 2 temas x 2 anchos = 210 medidas |
+| scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |

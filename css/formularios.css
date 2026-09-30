@@ -1,3 +1,14 @@
+
+
+/* Capa `base`: el @media va DENTRO de la capa (equivalente a tenerlo al revés). */
+@layer base {
+    @media (max-width: 768px) {
+        body, html {
+            overflow-x: hidden;
+        }
+    }
+}
+@layer components {
 /* css/formularios.css - Estilos de todos los formularios */
 
 /* ==============================================
@@ -593,7 +604,6 @@ form *,
     resize: vertical;
 }
 
-
 /* --- Grupos de inputs --- */
 .dimensiones-group,
 .name-group,
@@ -819,7 +829,6 @@ form *,
     align-items: center;
     justify-content: center;
 }
-
 
 /* --- Botones de acción del formulario --- */
 #btn-guardar,
@@ -1245,12 +1254,9 @@ form,
         margin-bottom: 12px;
     }
     
-    /* Prevenir desbordamiento horizontal global en móvil. Capa `base`: es de etiqueta. */
-    @layer base {
-        body, html {
-            overflow-x: hidden;
-        }
-    }
+    /* Prevenir desbordamiento horizontal global en móvil: se movió a un bloque `@layer
+       base` de primer nivel (con el @media dentro), para que todas las reglas de `base`
+       queden al mismo nivel y el reparto por capas sea mecánico. */
     
     /* Step Navigation móvil (ahora en #obra-step-bar fijo) */
 }
@@ -2205,3 +2211,5 @@ body.creando-problogs #crear-problogs-contenido {
     border-color: #333;
     color: #aaa;
 }
+}
+

@@ -14,3 +14,6 @@ scripts/*.png
 
 # Fotos de estilos calculados (evidencia temporal de un refactor, se regeneran)
 scripts/foto-*.json
+
+# Copias de seguridad que deja scripts/capar-hojas.mjs
+css/*.antes-de-capar

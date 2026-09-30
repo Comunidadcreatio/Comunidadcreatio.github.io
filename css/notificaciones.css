@@ -1,3 +1,5 @@
+
+@layer components {
 ﻿/* ==============================================
    NOTIFICACIONES Y TOASTS
    ============================================== */
@@ -347,3 +349,5 @@
 .confirm-btn-ok:hover {
     background: var(--color-ink-light);
 }
+}
+
