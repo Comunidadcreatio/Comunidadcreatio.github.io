@@ -118,11 +118,36 @@ golpe los 36 `!important` de los botones de la barra inferior de `formularios.cs
 dio **81 diferencias**: los `!important` ganaban a más reglas de las que parecía. Se van
 quitando **de uno en uno (o por reglas sueltas)**, con la foto después de cada uno.
 
+## Chequeo de tipos (npm run check)
+
+El JS se revisa con TypeScript **sin compilar nada**: `tsc` solo mira y avisa. No cambia
+una línea del código que se sirve ni del deploy.
+
+    npm run check          # o: node scripts/verificar-tipos.mjs
+
+**Se adopta fichero a fichero.** `checkJs` está apagado a propósito (con 27 módulos y
+~13.600 líneas, encenderlo de golpe daría miles de avisos que nadie arreglaría). Para
+vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
+Ese fichero queda protegido para siempre.
+
+Adoptados: **utils.js** (el más importado: 15 ficheros, y donde viven `escapeHtml`,
+`renderText`, `safeImgUrl`) y **etiquetas.js**.
+
+Lo que encontró al adoptar `etiquetas.js` (y se arregló): `dataset` sobre un `Element`,
+`e.target` posiblemente `null` y `closest` sobre un `EventTarget` — los tres son
+`TypeError` latentes en un manejador de clic.
+
+**Por qué no se llama a `tsc` directamente:** los imports llevan el hash de caché
+(`from './utils.js?v=abc123'`, que pone bump-version.js) y TypeScript no sabe resolver un
+módulo con `?v=`. El script hace una **copia temporal** de `js/` con esos `?v=` quitados:
+el código es idéntico, solo cambia el nombre del módulo. El repo no se toca.
+
 ## Scripts
 
 | Script | Qué hace |
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
+| scripts/verificar-tipos.mjs | Chequeo de tipos del JS (`npm run check`): copia temporal con los `?v=` quitados y `tsc --noEmit`. Solo vigila los ficheros con `// @ts-check` |
 | scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre 4 vistas (index, auth, Problogs y el editor de Problogs) x 2 temas x 2 anchos = 210 medidas |
 | scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/mover-a-base.mjs | Mueve a `base` las reglas que son de ETIQUETA (estén sueltas o dentro de un `@media`, conservando su condición). No mueve las de `:-webkit-autofill` (en `base` perderían y volvería el amarillo del autocompletado). Deja copia `.antes-de-mover` |

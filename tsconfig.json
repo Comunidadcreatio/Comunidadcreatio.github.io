@@ -1,0 +1,27 @@
+{
+  // Chequeo de tipos para JavaScript normal, SIN compilar y SIN tocar el código que se
+  // sirve: `tsc` solo mira y avisa. No genera nada (`noEmit`).
+  //
+  // ESTRATEGIA: `checkJs` está APAGADO a propósito. Con 27 módulos y ~13.600 líneas,
+  // encenderlo de golpe daría miles de avisos y no se arreglaría ninguno. Se adopta
+  // fichero a fichero: se le pone `// @ts-check` arriba y ese fichero queda vigilado para
+  // siempre (y su red de seguridad crece sola).
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "strict": true,
+    // Los avisos de "esto es any" se dejan fuera al principio: casi todo el código viene
+    // sin anotar y saldrían cientos. Se pueden activar por fichero cuando interese.
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "types": [],
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["js/**/*.js", "js/**/*.d.ts"],
+  "exclude": ["node_modules", "www", "android", "scripts"]
+}

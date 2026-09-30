@@ -1,7 +1,7 @@
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=a76a9b6092';
-import { debugLog } from './utils.js?v=8861448e13';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=cbcf130dbf';
+import { debugLog } from './utils.js?v=972ca7ff30';
 
 // Las escrituras van con fetch crudo porque llevan FormData (apiRequest fija
 // Content-Type: application/json). Eso obliga a replicar aquí el manejo del 401:

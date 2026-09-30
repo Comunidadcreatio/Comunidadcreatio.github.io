@@ -1,5 +1,12 @@
+// @ts-check
 // js/utils.js
 // Funciones auxiliares compartidas por todos los módulos
+//
+// Este fichero está VIGILADO por el chequeo de tipos (`npm run check`). Es el más
+// importado de todos (15 ficheros) y aquí viven las funciones de seguridad
+// (escapeHtml, renderText, safeImgUrl), así que es donde más renta tener tipos.
+// Para adoptar otro módulo: ponle `// @ts-check` en la primera línea y arregla lo que
+// salga. Un fichero adoptado no se puede volver a romper sin que el chequeo avise.
 
 import { showError } from './notificaciones.js?v=d2867c8ca0';
 
@@ -8,6 +15,8 @@ import { showError } from './notificaciones.js?v=d2867c8ca0';
  * El backend usa express-validator .escape() que codifica caracteres
  * especiales al guardar; esto los revierte para que el valor coincida
  * con las opciones de los <select> al editar o duplicar una obra.
+ * @param {unknown} str
+ * @returns {string}
  */
 export function decodeHTMLEntities(str) {
     if (str === null || str === undefined) return '';
@@ -98,6 +107,8 @@ export function debounce(func, wait) {
 
 /**
  * Escapa HTML para prevenir XSS al insertar datos de usuario en el DOM.
+ * @param {unknown} str  Cualquier valor; se convierte a texto.
+ * @returns {string}
  */
 export function escapeHtml(str) {
     if (!str) return '';
@@ -116,6 +127,8 @@ export function escapeHtml(str) {
  *   1) decodeHTMLEntities() revierte el escapado del backend (si existe).
  *   2) escapeHtml() vuelve a escapar para inserción en el DOM.
  * Resultado: el texto se muestra idéntico y nunca se interpreta como HTML.
+ * @param {unknown} str
+ * @returns {string}
  */
 export function renderText(str) {
     return escapeHtml(decodeHTMLEntities(str));
@@ -124,6 +137,8 @@ export function renderText(str) {
 /**
  * Normaliza texto para comparaciones: minúsculas y sin tildes/acentos.
  * Útil para etiquetas: 'Óleo' y 'oleo' deben coincidir.
+ * @param {unknown} str
+ * @returns {string}
  */
 export function normalizarTexto(str) {
     return String(str || '')
@@ -139,6 +154,8 @@ export function normalizarTexto(str) {
  *    archivo, así que no puede venir de fuera; hace falta para las vistas
  *    previas locales (las imágenes aún sin subir).
  *  - Neutraliza comillas dobles para no romper el atributo (no-op si el backend ya escapó).
+ * @param {unknown} url
+ * @returns {string}
  */
 export function safeImgUrl(url) {
     if (!url) return '';

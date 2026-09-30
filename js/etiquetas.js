@@ -1,10 +1,11 @@
+// @ts-check
 // js/etiquetas.js
 // Carrusel de etiquetas de los cavents (campo "etiquetas" separado por comas).
 // Se muestra entre el buscador y el grid: cada etiqueta en un chip de color
-// con un contador de apariciones. Selección MÚLTIPLE (AND): cada etiqueta
+// con un contador de apariciones. SelecciÃ³n MÃšLTIPLE (AND): cada etiqueta
 // activa muestra una "x"; el grid se filtra en vivo con las seleccionadas.
-import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=933672191c';
-import { escapeHtml, normalizarTexto } from './utils.js?v=8861448e13';
+import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=2ce565a0f3';
+import { escapeHtml, normalizarTexto } from './utils.js?v=972ca7ff30';
 
 // Paleta de colores para los chips (cada etiqueta un color distinto)
 const PALETA = [
@@ -53,16 +54,20 @@ export function renderEtiquetasCarrusel() {
         const activa = etiquetasActivas.has(key);
         const color = PALETA[i % PALETA.length];
         const x = activa
-            ? '<span class="tag-x" data-tag="' + escapeHtml(t.nombre) + '" title="Quitar filtro">×</span>'
+            ? '<span class="tag-x" data-tag="' + escapeHtml(t.nombre) + '" title="Quitar filtro">Ã—</span>'
             : '';
         return '<button type="button" class="tag-chip' + (activa ? ' activa' : '') + '" data-tag="' + escapeHtml(t.nombre) + '" style="background:' + color + '">' +
             '<span class="tag-nombre">' + escapeHtml(t.nombre) + '</span>' +
             '<span class="tag-count">' + t.count + '</span>' + x + '</button>';
     }).join('');
 
-    contenedor.querySelectorAll('.tag-chip').forEach(chip => {
+    // `querySelectorAll` devuelve `Element`, que no tiene `dataset`: los chips son
+    // botones, asi que se pide la lista como `HTMLElement` (lo aviso el chequeo de tipos).
+    /** @type {NodeListOf<HTMLElement>} */
+    const chips = contenedor.querySelectorAll('.tag-chip');
+    chips.forEach(chip => {
         chip.addEventListener('click', (e) => {
-            // CRÍTICO: evitar que el clic burbujee al outside-click de busqueda.js.
+            // CRÃTICO: evitar que el clic burbujee al outside-click de busqueda.js.
             e.stopPropagation();
             // Garantizar modo A al filtrar: buscador y carrusel SIEMPRE visibles
             const panel = document.getElementById('search-panel');
@@ -70,7 +75,11 @@ export function renderEtiquetasCarrusel() {
             document.body.classList.remove('search-escribiendo');
             const tag = chip.dataset.tag;
             const key = normalizarTexto(tag);
-            if (e.target.closest('.tag-x')) {
+            // `e.target` puede ser null y un EventTarget no tiene `closest`: se comprueba
+            // antes. Lo avisó el chequeo de tipos, y sin esta comprobación un clic raro
+            // (por ejemplo sobre un nodo de texto) lanzaba TypeError.
+            const objetivo = e.target instanceof Element ? e.target : null;
+            if (objetivo && objetivo.closest('.tag-x')) {
                 // La "x" desactiva SOLO esa etiqueta (el resto sigue filtrado)
                 etiquetasActivas.delete(key);
             } else {
@@ -79,17 +88,17 @@ export function renderEtiquetasCarrusel() {
                 else etiquetasActivas.add(key);
             }
             // Actualizar SOLO este chip en el sitio (sin re-render de todo el
-            // carrusel): la activación se anima con transición CSS + "pop".
+            // carrusel): la activaciÃ³n se anima con transiciÃ³n CSS + "pop".
             actualizarChipEnSitio(chip, key);
-            // Si el chip quedó fuera de la pantalla, centrarlo con scroll suave
+            // Si el chip quedÃ³ fuera de la pantalla, centrarlo con scroll suave
             centrarChipSiNecesario(chip);
             filtrarGridPorEtiqueta([...etiquetasActivas]);
         });
     });
 }
 
-// Activa/desactiva UN chip en el sitio: clase .activa + "×" de quitar filtro.
-// (Antes se re-renderizaba todo el carrusel, lo que rompía la transición fluida.)
+// Activa/desactiva UN chip en el sitio: clase .activa + "Ã—" de quitar filtro.
+// (Antes se re-renderizaba todo el carrusel, lo que rompÃ­a la transiciÃ³n fluida.)
 function actualizarChipEnSitio(chip, key) {
     const activa = etiquetasActivas.has(key);
     chip.classList.toggle('activa', activa);
@@ -99,18 +108,18 @@ function actualizarChipEnSitio(chip, key) {
         x.className = 'tag-x';
         x.dataset.tag = chip.dataset.tag;
         x.title = 'Quitar filtro';
-        x.textContent = '×';
+        x.textContent = 'Ã—';
         chip.appendChild(x);
     } else if (!activa && x) {
         x.remove();
     }
-    // "Pop" sutil de confirmación (se reinicia aunque se toque repetido)
+    // "Pop" sutil de confirmaciÃ³n (se reinicia aunque se toque repetido)
     chip.classList.remove('tag-pop');
     void chip.offsetWidth;
     chip.classList.add('tag-pop');
 }
 
-// Si el chip tocado está parcialmente fuera de la pantalla, lo centra con
+// Si el chip tocado estÃ¡ parcialmente fuera de la pantalla, lo centra con
 // scroll suave (con scroll-snap queda alineado).
 function centrarChipSiNecesario(chip) {
     const contenedor = document.getElementById('tags-carrusel');
