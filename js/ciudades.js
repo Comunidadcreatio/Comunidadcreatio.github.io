@@ -1,25 +1,25 @@
 // @ts-check
 // js/ciudades.js
-// Lista canÃ³nica de ciudades/pueblos de TÃ¡chira y sus banderas.
-// Script clÃ¡sico (no mÃ³dulo): expone window.CIUDADES_POR_PAIS y
+// Lista canónica de ciudades/pueblos de Táchira y sus banderas.
+// Script clásico (no módulo): expone window.CIUDADES_POR_PAIS y
 // window.BANDERA_POR_CIUDAD para auth-logic.js (registro) y chat.js (directorio).
-// El ?v= lo mantiene scripts/bump-version.js vÃ­a los <script> de auth.html e index.html.
+// El ?v= lo mantiene scripts/bump-version.js vía los <script> de auth.html e index.html.
 (function () {
     'use strict';
 
     window.CIUDADES_POR_PAIS = {
         'Venezuela': {
-            'TÃ¡chira': ['San CristÃ³bal', 'San Antonio del TÃ¡chira', 'San Juan de ColÃ³n', 'TÃ¡riba', 'Rubio', 'La FrÃ­a', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'UreÃ±a', 'Cordero', 'Las Mesas', 'Santa Ana del TÃ¡chira', 'San Rafael del PiÃ±al', 'San JosÃ© de BolÃ­var', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San SimÃ³n', 'Queniquea', 'Pregonero']
+            'Táchira': ['San Cristóbal', 'San Antonio del Táchira', 'San Juan de Colón', 'Táriba', 'Rubio', 'La Fría', 'San Josecito', 'Palmira', 'Capacho Nuevo', 'Capacho Viejo', 'La Grita', 'Abejales', 'Lobatera', 'Michelena', 'Ureña', 'Cordero', 'Las Mesas', 'Santa Ana del Táchira', 'San Rafael del Piñal', 'San José de Bolívar', 'El Cobre', 'Coloncito', 'Delicias', 'La Tendida', 'San Judas Tadeo', 'Seboruco', 'San Simón', 'Queniquea', 'Pregonero']
         }
     };
 
     window.BANDERA_POR_CIUDAD = {
-        'San CristÃ³bal': 'san-cristobal.webp',
-        'San Antonio del TÃ¡chira': 'bolivar.webp',
-        'San Juan de ColÃ³n': 'ayacucho.webp',
-        'TÃ¡riba': 'cardenas.webp',
+        'San Cristóbal': 'san-cristobal.webp',
+        'San Antonio del Táchira': 'bolivar.webp',
+        'San Juan de Colón': 'ayacucho.webp',
+        'Táriba': 'cardenas.webp',
         'Rubio': 'junin.webp',
-        'La FrÃ­a': 'garcia-de-hevia.webp',
+        'La Fría': 'garcia-de-hevia.webp',
         'San Josecito': 'torbes.webp',
         'Palmira': 'guasimos.webp',
         'Capacho Nuevo': 'independencia.webp',
@@ -28,54 +28,54 @@
         'Abejales': 'libertador.webp',
         'Lobatera': 'lobatera.webp',
         'Michelena': 'michelena.webp',
-        'UreÃ±a': 'pedro-maria-urena.webp',
+        'Ureña': 'pedro-maria-urena.webp',
         'Cordero': 'andres-bello.webp',
         'Las Mesas': 'antonio-romulo-costa.webp',
-        'Santa Ana del TÃ¡chira': 'cordoba.webp',
-        'San Rafael del PiÃ±al': 'fernandez-feo.webp',
-        'San JosÃ© de BolÃ­var': 'francisco-de-miranda.webp',
+        'Santa Ana del Táchira': 'cordoba.webp',
+        'San Rafael del Piñal': 'fernandez-feo.webp',
+        'San José de Bolívar': 'francisco-de-miranda.webp',
         'El Cobre': 'jose-maria-vargas.webp',
         'Coloncito': 'panamericano.webp',
         'Delicias': 'rafael-urdaneta.webp',
         'La Tendida': 'samuel-dario-maldonado.webp',
         'San Judas Tadeo': 'san-judas-tadeo.webp',
         'Seboruco': 'seboruco.webp',
-        'San SimÃ³n': 'simon-rodriguez.webp',
+        'San Simón': 'simon-rodriguez.webp',
         'Queniquea': 'sucre.webp',
         'Pregonero': 'uribante.webp'
     };
 
-    // Municipio al que pertenece cada pueblo del TÃ¡chira (las banderas del
+    // Municipio al que pertenece cada pueblo del Táchira (las banderas del
     // carrusel son de los municipios; el pueblo es la capital). Cuando el
     // municipio se llama igual que el pueblo, se omite en la UI.
     window.MUNICIPIO_POR_PUEBLO = {
-        'San CristÃ³bal': 'San CristÃ³bal',
-        'San Antonio del TÃ¡chira': 'BolÃ­var',
-        'San Juan de ColÃ³n': 'Ayacucho',
-        'TÃ¡riba': 'CÃ¡rdenas',
-        'Rubio': 'JunÃ­n',
-        'La FrÃ­a': 'GarcÃ­a de HevÃ­a',
+        'San Cristóbal': 'San Cristóbal',
+        'San Antonio del Táchira': 'Bolívar',
+        'San Juan de Colón': 'Ayacucho',
+        'Táriba': 'Cárdenas',
+        'Rubio': 'Junín',
+        'La Fría': 'García de Hevía',
         'San Josecito': 'Torbes',
-        'Palmira': 'GuÃ¡simos',
+        'Palmira': 'Guásimos',
         'Capacho Nuevo': 'Independencia',
         'Capacho Viejo': 'Libertad',
-        'La Grita': 'JÃ¡uregui',
+        'La Grita': 'Jáuregui',
         'Abejales': 'Libertador',
         'Lobatera': 'Lobatera',
         'Michelena': 'Michelena',
-        'UreÃ±a': 'Pedro MarÃ­a UreÃ±a',
-        'Cordero': 'AndrÃ©s Bello',
-        'Las Mesas': 'Antonio RÃ³mulo Costa',
-        'Santa Ana del TÃ¡chira': 'CÃ³rdoba',
-        'San Rafael del PiÃ±al': 'FernÃ¡ndez Feo',
-        'San JosÃ© de BolÃ­var': 'Francisco de Miranda',
-        'El Cobre': 'JosÃ© MarÃ­a Vargas',
+        'Ureña': 'Pedro María Ureña',
+        'Cordero': 'Andrés Bello',
+        'Las Mesas': 'Antonio Rómulo Costa',
+        'Santa Ana del Táchira': 'Córdoba',
+        'San Rafael del Piñal': 'Fernández Feo',
+        'San José de Bolívar': 'Francisco de Miranda',
+        'El Cobre': 'José María Vargas',
         'Coloncito': 'Panamericano',
         'Delicias': 'Rafael Urdaneta',
-        'La Tendida': 'Samuel DarÃ­o Maldonado',
+        'La Tendida': 'Samuel Darío Maldonado',
         'San Judas Tadeo': 'San Judas Tadeo',
         'Seboruco': 'Seboruco',
-        'San SimÃ³n': 'SimÃ³n RodrÃ­guez',
+        'San Simón': 'Simón Rodríguez',
         'Queniquea': 'Sucre',
         'Pregonero': 'Uribante'
     };

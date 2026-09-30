@@ -3,11 +3,11 @@
 // Economía: sin websockets. El cliente hace polling condicional — solo
 // mientras el chat está abierto y la pestaña visible — pidiendo
 // GET /chat/mensajes?canal=...&afterId=último (respuestas de pocos KB).
-import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=9569204c32';
-import { artistaActual } from './auth.js?v=194420f49e';
-import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=5bb3afaf60';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=5309457b18';
-import { cerrarOverlaysFlotantes } from './overlays.js?v=cd0e5cba39';
+import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=9cf48a41f5';
+import { artistaActual } from './auth.js?v=33e2f55cde';
+import { escapeHtml, debugLog, renderText, safeImgUrl } from './utils.js?v=14006ffb17';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=73995cf79d';
+import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
 const LIMITE_POLL = 50;

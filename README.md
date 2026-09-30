@@ -147,6 +147,25 @@ tienen, `e.target` posiblemente `null`, `JSON.parse` con un `string | null`,
 módulo con `?v=`. El script hace una **copia temporal** de `js/` con esos `?v=` quitados:
 el código es idéntico, solo cambia el nombre del módulo. El repo no se toca.
 
+### ⚠️ NUNCA reescribir estos ficheros con operaciones de texto de PowerShell
+
+Los ficheros del proyecto están en **UTF-8 sin BOM**. Si se leen y se reescriben con
+comandos de PowerShell (`Get-Content -Raw` + `WriteAllText`, `.replace`, etc.), la
+codificación se puede estropear y el texto queda **doblemente codificado**: `ó` pasa a
+`Ã³`. Eso ya ha pasado una vez y **rompió el chat entero**: `ciudades.js` guarda los
+pueblos con tilde (`'Táchira'`, `'San Cristóbal'`) y el chat busca exactamente
+`window.CIUDADES_POR_PAIS['Venezuela']['Táchira']`; con la clave estropeada la búsqueda no
+encontraba nada y la pantalla decía **«No hay pueblos disponibles»**.
+
+Para tocar estos ficheros, usar **Node** o la herramienta de edición (leen y escriben
+UTF-8 de verdad):
+
+| Script | Para qué |
+|---|---|
+| `scripts/adoptar-modulo.mjs js/x.js` | Pone `// @ts-check` en la primera línea sin tocar la codificación (`--quitar` para lo contrario) |
+| `scripts/arreglar-codificacion.mjs --comprobar` | Busca la doble codificación en todo `js/`. Con ficheros, la arregla (y comprueba la búsqueda del chat al terminar) |
+| `scripts/dbg-codificacion.mjs` | Comprobación a nivel de bytes (la consola de PowerShell engaña: muestra bien lo que está mal) |
+
 ## Efectos medidos y DESCARTADOS (para no volver a intentarlo a ciegas)
 
 Dos mejoras nativas que prometen mucho y que, **medidas en esta app, no cumplen**:

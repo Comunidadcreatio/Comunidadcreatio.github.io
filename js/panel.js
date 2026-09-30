@@ -1,13 +1,13 @@
 // @ts-check
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9569204c32';
-import { debugLog } from './utils.js?v=5bb3afaf60';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9cf48a41f5';
+import { debugLog } from './utils.js?v=14006ffb17';
 
 // Las escrituras van con fetch crudo porque llevan FormData (apiRequest fija
-// Content-Type: application/json). Eso obliga a replicar aquÃ­ el manejo del 401:
-// si no, una sesiÃ³n caducada dejaba la app "dentro" con un error de validaciÃ³n
-// en pantalla en vez de cerrar sesiÃ³n.
+// Content-Type: application/json). Eso obliga a replicar aquí el manejo del 401:
+// si no, una sesión caducada dejaba la app "dentro" con un error de validación
+// en pantalla en vez de cerrar sesión.
 function sesionExpirada(res) {
     if (res.status !== 401) return false;
     cerrarSesionLocal();
@@ -34,12 +34,12 @@ export async function guardarObra(formData, idEdicion = null) {
             body: formData
         });
         if (sesionExpirada(res)) {
-            return { success: false, error: "SesiÃ³n expirada. Por favor inicia sesiÃ³n nuevamente." };
+            return { success: false, error: "Sesión expirada. Por favor inicia sesión nuevamente." };
         }
         return await res.json();
     } catch (error) {
         debugLog.error("Error al guardar obra:", error);
-        return { success: false, error: "Error de conexiÃ³n" };
+        return { success: false, error: "Error de conexión" };
     }
 }
 

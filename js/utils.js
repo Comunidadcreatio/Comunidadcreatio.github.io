@@ -8,7 +8,7 @@
 // Para adoptar otro módulo: ponle `// @ts-check` en la primera línea y arregla lo que
 // salga. Un fichero adoptado no se puede volver a romper sin que el chequeo avise.
 
-import { showError } from './notificaciones.js?v=5238451892';
+import { showError } from './notificaciones.js?v=d2867c8ca0';
 
 /**
  * Decodifica entidades HTML (ej: "&#x2F;" -> "/", "&amp;" -> "&").

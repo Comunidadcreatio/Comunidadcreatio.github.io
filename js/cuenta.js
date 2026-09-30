@@ -2,11 +2,11 @@
 // Gestión de la sección "Mi Cuenta": cambiar email, cambiar contraseña,
 // eliminar cuenta y accordion de seguridad.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=9569204c32';
-import { token, artistaActual, logout } from './auth.js?v=194420f49e';
-import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=5238451892';
-import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=5bb3afaf60';
-import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=618d436baa';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=9cf48a41f5';
+import { token, artistaActual, logout } from './auth.js?v=33e2f55cde';
+import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
+import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=14006ffb17';
+import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=3643ab0fe1';
 
 /**
  * Muestra errores del backend en un elemento de error inline del formulario.

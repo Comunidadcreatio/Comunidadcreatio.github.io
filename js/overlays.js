@@ -2,26 +2,26 @@
 // js/overlays.js
 // ============================================================
 // Registro de CAPAS FLOTANTES que tapan la app y congelan el fondo
-// (vista previa de Problogs, cajÃ³n de comentarios, modal de descripciÃ³nâ€¦).
+// (vista previa de Problogs, cajón de comentarios, modal de descripción…).
 // ------------------------------------------------------------
-// Cada capa se registra aquÃ­ con su funciÃ³n de cierre, y la NAVEGACIÃ“N las
-// cierra TODAS antes de cambiar de secciÃ³n.
+// Cada capa se registra aquí con su función de cierre, y la NAVEGACIÓN las
+// cierra TODAS antes de cambiar de sección.
 //
-// Por quÃ©: antes cada capa solo se cerraba desde su propio botÃ³n âœ•. Si el
+// Por qué: antes cada capa solo se cerraba desde su propio botón ✕. Si el
 // usuario navegaba con la capa abierta (flecha del header, iconos del nav
-// inferior, `+` de crear, Chatâ€¦), la capa seguÃ­a colgada de <body> por encima
-// de la secciÃ³n nueva y su bloquearFondo() dejaba <html>, <body> y
-// #galeria-container con overflow:hidden: la app parecÃ­a rota y solo se
-// recuperaba pulsando el âœ• de una capa que ya no se veÃ­a.
+// inferior, `+` de crear, Chat…), la capa seguía colgada de <body> por encima
+// de la sección nueva y su bloquearFondo() dejaba <html>, <body> y
+// #galeria-container con overflow:hidden: la app parecía rota y solo se
+// recuperaba pulsando el ✕ de una capa que ya no se veía.
 //
-// MÃ³dulo HOJA a propÃ³sito (no importa a nadie): asÃ­ cualquier mÃ³dulo puede
-// registrar su capa sin crear ciclos de importaciÃ³n.
+// Módulo HOJA a propósito (no importa a nadie): así cualquier módulo puede
+// registrar su capa sin crear ciclos de importación.
 // ============================================================
 
 const cerradores = new Map();
 
 // nombre: para depurar. cerrar: debe ser IDEMPOTENTE (seguro aunque la capa no
-// estÃ© abierta) y sÃ­ncrono.
+// esté abierta) y síncrono.
 export function registrarOverlay(nombre, cerrar) {
     if (typeof cerrar === 'function') cerradores.set(nombre, cerrar);
 }
@@ -32,7 +32,7 @@ export function cerrarOverlaysFlotantes() {
             cerrar();
         } catch (err) {
             // Una capa que falla al cerrarse no debe impedir que se cierren las
-            // demÃ¡s ni romper la navegaciÃ³n.
+            // demás ni romper la navegación.
             console.error(`[overlays] no se pudo cerrar "${nombre}":`, err);
         }
     }

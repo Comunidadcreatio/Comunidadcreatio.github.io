@@ -1,16 +1,16 @@
 // @ts-check
 // js/auth.js
-import { ARTISTA_KEY, AUTH_TOKEN_KEY, AUTH_TOKEN_PERSIST_KEY, apiRequest } from './config.js?v=9569204c32';
-import { debugLog } from './utils.js?v=5bb3afaf60';
+import { ARTISTA_KEY, AUTH_TOKEN_KEY, AUTH_TOKEN_PERSIST_KEY, apiRequest } from './config.js?v=9cf48a41f5';
+import { debugLog } from './utils.js?v=14006ffb17';
 
-// Timestamp de Ãºltima actividad del usuario (compartido con main.js y perfil.js)
+// Timestamp de última actividad del usuario (compartido con main.js y perfil.js)
 export let lastActivityTime = Date.now();
 export function updateLastActivity() {
     lastActivityTime = Date.now();
 }
 
 // El token JWT ahora es una cookie HttpOnly (el frontend NO puede leerlo).
-// Usamos la presencia de artistaActual en localStorage como indicador de sesiÃ³n.
+// Usamos la presencia de artistaActual en localStorage como indicador de sesión.
 export let token = !!localStorage.getItem(ARTISTA_KEY);
 export let artistaActual = (() => {
     try {
@@ -26,8 +26,8 @@ export let artistaActual = (() => {
 
 // ============================================
 // ROL DEL USUARIO (artista | comprador | coleccionista | curador | galeria)
-// El backend aÃºn no guarda el rol: se elige en el registro y se recuerda por
-// email en el dispositivo (creatio_rol_<email>). Si el backend algÃºn dÃ­a
+// El backend aún no guarda el rol: se elige en el registro y se recuerda por
+// email en el dispositivo (creatio_rol_<email>). Si el backend algún día
 // devuelve data.artista.rol, ese valor tiene prioridad. Por defecto todos son
 // tratados como 'artista' (comportamiento actual: no rompe a nadie).
 // ============================================
@@ -92,7 +92,7 @@ export async function login(email, password) {
             }
             localStorage.setItem(ARTISTA_KEY, JSON.stringify(artistaActual));
             guardarRolEnSesionLocal();
-            // Token para navegador (fallback a la cookie): sessionStorage, se borra al cerrar la pestaÃ±a
+            // Token para navegador (fallback a la cookie): sessionStorage, se borra al cerrar la pestaña
             if (data.token) {
                 try { sessionStorage.setItem(AUTH_TOKEN_KEY, data.token); } catch (e) { /* silencioso */ }
             }
@@ -102,7 +102,7 @@ export async function login(email, password) {
         }
     } catch (error) {
         debugLog.error("Error en login:", error);
-        return { success: false, error: "Error de conexiÃ³n" };
+        return { success: false, error: "Error de conexión" };
     }
 }
 
@@ -130,7 +130,7 @@ export async function register(nombre_artista, nombre_real, email, password, tel
         return data;
     } catch (error) {
         debugLog.error("Error en registro:", error);
-        return { success: false, error: "Error de conexiÃ³n" };
+        return { success: false, error: "Error de conexión" };
     }
 }
 
@@ -138,10 +138,10 @@ export function logout() {
     localStorage.removeItem(ARTISTA_KEY);
     localStorage.removeItem('DEBUG');
     try { sessionStorage.removeItem(AUTH_TOKEN_KEY); } catch (e) { /* silencioso */ }
-    // Cerrar sesiÃ³n EXPLÃCITAMENTE: se olvida la sesiÃ³n persistente y se marca
-    // que NO debe reanudarse automÃ¡ticamente al reabrir (las credenciales
-    // recordadas + biometrÃ­a se conservan para que el usuario pueda entrar
-    // de nuevo con huella/patrÃ³n/PIN o contraseÃ±a desde la pÃ¡gina de login).
+    // Cerrar sesión EXPLÍCITAMENTE: se olvida la sesión persistente y se marca
+    // que NO debe reanudarse automáticamente al reabrir (las credenciales
+    // recordadas + biometría se conservan para que el usuario pueda entrar
+    // de nuevo con huella/patrón/PIN o contraseña desde la página de login).
     try {
         localStorage.removeItem(AUTH_TOKEN_PERSIST_KEY);
         localStorage.setItem('creatio_olvido_explicito', '1');
@@ -152,9 +152,9 @@ export function logout() {
 }
 
 // Los datos del artista en memoria pueden venir incompletos (por ejemplo, de una
-// sesiÃ³n guardada hace tiempo en el dispositivo). Esto los completa con lo que
+// sesión guardada hace tiempo en el dispositivo). Esto los completa con lo que
 // devuelve el servidor y los vuelve a guardar, para que el header, el perfil y
-// todo lo demÃ¡s usen los mismos datos buenos.
+// todo lo demás usen los mismos datos buenos.
 export function fusionarArtistaActual(datos) {
     if (!artistaActual || !datos) return;
     artistaActual = { ...artistaActual, ...datos };

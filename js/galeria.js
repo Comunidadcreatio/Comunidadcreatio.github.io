@@ -1,10 +1,10 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js?v=9569204c32';
-import { artistaActual } from './auth.js?v=194420f49e';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=5bb3afaf60';
-import { abrirComentarios } from './comentarios.js?v=aecf1570d6';
-import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=bd1efa26f9';
-import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
+import { API_BASE_URL, apiRequest } from './config.js?v=9cf48a41f5';
+import { artistaActual } from './auth.js?v=33e2f55cde';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=14006ffb17';
+import { abrirComentarios } from './comentarios.js?v=efeade2dcd';
+import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=4464d46b67';
+import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
 // ============================================================
 // El modal de descripción no debe dejar scrollear NADA mientras está abierto.

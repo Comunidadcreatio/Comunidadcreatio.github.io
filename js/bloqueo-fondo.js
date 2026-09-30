@@ -3,31 +3,31 @@
 // ============================================================
 // BLOQUEO DEL SCROLL DEL FONDO (compartido)
 // ============================================================
-// Lo usan la hoja de comentarios y el modal de descripciÃ³n. Se lleva un
+// Lo usan la hoja de comentarios y el modal de descripción. Se lleva un
 // CONTADOR DE MOTIVOS: si los dos piden el bloqueo a la vez, el fondo no se
-// libera hasta que el Ãºltimo lo suelte. Sin esto, cerrar uno de los dos
-// descongelarÃ­a el fondo mientras el otro sigue abierto.
+// libera hasta que el último lo suelte. Sin esto, cerrar uno de los dos
+// descongelaría el fondo mientras el otro sigue abierto.
 //
 // Hay DOS mecanismos, y hacen falta los dos:
 //
 // 1) CONGELAR CONTENEDORES (`overflow: hidden`). Se aplica a
-//    #galeria-container â€”el scroller de la galerÃ­a, que es position: fixed con
-//    overflow-y: autoâ€” y tambiÃ©n a <html> y <body>, porque el DOCUMENTO
+//    #galeria-container —el scroller de la galería, que es position: fixed con
+//    overflow-y: auto— y también a <html> y <body>, porque el DOCUMENTO
 //    asimismo scrollea: body tiene `min-height: 100vh` + `padding-bottom: 100px`.
 //    Se guarda y se devuelve el valor previo de cada uno para no pisar a otros
-//    mÃ³dulos (por ejemplo el pull-to-refresh).
+//    módulos (por ejemplo el pull-to-refresh).
 //
 // 2) BLOQUEAR EL GESTO (`touchmove` + preventDefault). Este es el importante y
-//    el que costÃ³ dar con Ã©l: enumerar scrollers NO basta, porque el modal de
-//    descripciÃ³n es `pointer-events: none` A PROPÃ“SITO (deja pasar los toques al
-//    header, al nav y a la tarjeta de detrÃ¡s). El dedo puede caer entonces en
-//    cualquier elemento de debajo y arrastrar, y como no hay un Ãºnico scroller
-//    siempre queda uno sin enumerar. Cancelando el GESTO da igual quÃ© haya
+//    el que costó dar con él: enumerar scrollers NO basta, porque el modal de
+//    descripción es `pointer-events: none` A PROPÓSITO (deja pasar los toques al
+//    header, al nav y a la tarjeta de detrás). El dedo puede caer entonces en
+//    cualquier elemento de debajo y arrastrar, y como no hay un único scroller
+//    siempre queda uno sin enumerar. Cancelando el GESTO da igual qué haya
 //    debajo.
 //
-// El listener de touchmove se aÃ±ade y se quita junto con el bloqueo: un
-// touchmove no-pasivo a nivel de documento desactiva el camino rÃ¡pido de scroll
-// del navegador, asÃ­ que no debe quedarse puesto de forma permanente.
+// El listener de touchmove se añade y se quita junto con el bloqueo: un
+// touchmove no-pasivo a nivel de documento desactiva el camino rápido de scroll
+// del navegador, así que no debe quedarse puesto de forma permanente.
 // ============================================================
 const motivos = new Set();
 
@@ -47,8 +47,8 @@ function objetivos() {
     ].filter((el) => el !== null);
 }
 
-// Â¿Hay que cancelar este gesto? SÃ­, salvo que empiece en un Ã¡rea que SÃ debe
-// poder scrollear (el texto de la descripciÃ³n, si es largo).
+// ¿Hay que cancelar este gesto? Sí, salvo que empiece en un área que SÍ debe
+// poder scrollear (el texto de la descripción, si es largo).
 /**
  * @param {EventTarget | null} target
  * @param {string} [selectorPermitido]
@@ -90,7 +90,7 @@ export function bloquearFondo(motivo) {
 
 export function liberarFondo(motivo) {
     motivos.delete(motivo);
-    if (motivos.size > 0) return;    // todavÃ­a hay alguien que lo bloquea
+    if (motivos.size > 0) return;    // todavía hay alguien que lo bloquea
     if (previos) {
         for (const [el, valor] of previos) el.style.overflow = valor;
         previos = null;

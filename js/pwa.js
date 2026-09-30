@@ -1,5 +1,5 @@
 // @ts-check
-// js/pwa.js â€” Registro del Service Worker (PWA).
+// js/pwa.js — Registro del Service Worker (PWA).
 // Solo en contexto seguro (https o localhost). Falla silencioso si no aplica.
 (function () {
     if (!('serviceWorker' in navigator)) return;

@@ -2,10 +2,10 @@
 // js/etiquetas.js
 // Carrusel de etiquetas de los cavents (campo "etiquetas" separado por comas).
 // Se muestra entre el buscador y el grid: cada etiqueta en un chip de color
-// con un contador de apariciones. SelecciÃ³n MÃšLTIPLE (AND): cada etiqueta
+// con un contador de apariciones. Seleccií³n MíšLTIPLE (AND): cada etiqueta
 // activa muestra una "x"; el grid se filtra en vivo con las seleccionadas.
-import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=7084526f91';
-import { escapeHtml, normalizarTexto } from './utils.js?v=5bb3afaf60';
+import { getObrasGrid, filtrarGridPorEtiqueta } from './galeria.js?v=1ba06afc20';
+import { escapeHtml, normalizarTexto } from './utils.js?v=14006ffb17';
 
 // Paleta de colores para los chips (cada etiqueta un color distinto)
 const PALETA = [
@@ -54,7 +54,7 @@ export function renderEtiquetasCarrusel() {
         const activa = etiquetasActivas.has(key);
         const color = PALETA[i % PALETA.length];
         const x = activa
-            ? '<span class="tag-x" data-tag="' + escapeHtml(t.nombre) + '" title="Quitar filtro">Ã—</span>'
+            ? '<span class="tag-x" data-tag="' + escapeHtml(t.nombre) + '" title="Quitar filtro">í—</span>'
             : '';
         return '<button type="button" class="tag-chip' + (activa ? ' activa' : '') + '" data-tag="' + escapeHtml(t.nombre) + '" style="background:' + color + '">' +
             '<span class="tag-nombre">' + escapeHtml(t.nombre) + '</span>' +
@@ -67,7 +67,7 @@ export function renderEtiquetasCarrusel() {
     const chips = contenedor.querySelectorAll('.tag-chip');
     chips.forEach(chip => {
         chip.addEventListener('click', (e) => {
-            // CRÃTICO: evitar que el clic burbujee al outside-click de busqueda.js.
+            // CRíTICO: evitar que el clic burbujee al outside-click de busqueda.js.
             e.stopPropagation();
             // Garantizar modo A al filtrar: buscador y carrusel SIEMPRE visibles
             const panel = document.getElementById('search-panel');
@@ -88,17 +88,17 @@ export function renderEtiquetasCarrusel() {
                 else etiquetasActivas.add(key);
             }
             // Actualizar SOLO este chip en el sitio (sin re-render de todo el
-            // carrusel): la activaciÃ³n se anima con transiciÃ³n CSS + "pop".
+            // carrusel): la activacií³n se anima con transicií³n CSS + "pop".
             actualizarChipEnSitio(chip, key);
-            // Si el chip quedÃ³ fuera de la pantalla, centrarlo con scroll suave
+            // Si el chip quedí³ fuera de la pantalla, centrarlo con scroll suave
             centrarChipSiNecesario(chip);
             filtrarGridPorEtiqueta([...etiquetasActivas]);
         });
     });
 }
 
-// Activa/desactiva UN chip en el sitio: clase .activa + "Ã—" de quitar filtro.
-// (Antes se re-renderizaba todo el carrusel, lo que rompÃ­a la transiciÃ³n fluida.)
+// Activa/desactiva UN chip en el sitio: clase .activa + "í—" de quitar filtro.
+// (Antes se re-renderizaba todo el carrusel, lo que rompí­a la transicií³n fluida.)
 function actualizarChipEnSitio(chip, key) {
     const activa = etiquetasActivas.has(key);
     chip.classList.toggle('activa', activa);
@@ -108,18 +108,18 @@ function actualizarChipEnSitio(chip, key) {
         x.className = 'tag-x';
         x.dataset.tag = chip.dataset.tag;
         x.title = 'Quitar filtro';
-        x.textContent = 'Ã—';
+        x.textContent = 'í—';
         chip.appendChild(x);
     } else if (!activa && x) {
         x.remove();
     }
-    // "Pop" sutil de confirmaciÃ³n (se reinicia aunque se toque repetido)
+    // "Pop" sutil de confirmacií³n (se reinicia aunque se toque repetido)
     chip.classList.remove('tag-pop');
     void chip.offsetWidth;
     chip.classList.add('tag-pop');
 }
 
-// Si el chip tocado estÃ¡ parcialmente fuera de la pantalla, lo centra con
+// Si el chip tocado está parcialmente fuera de la pantalla, lo centra con
 // scroll suave (con scroll-snap queda alineado).
 function centrarChipSiNecesario(chip) {
     const contenedor = document.getElementById('tags-carrusel');

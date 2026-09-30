@@ -1,11 +1,11 @@
 // js/comentarios.js
-// Drawer de comentarios â€” se desliza desde la parte inferior.
-import { apiRequest } from './config.js?v=9569204c32';
-import { renderText, safeImgUrl } from './utils.js?v=5bb3afaf60';
+// Drawer de comentarios — se desliza desde la parte inferior.
+import { apiRequest } from './config.js?v=9cf48a41f5';
+import { renderText, safeImgUrl } from './utils.js?v=14006ffb17';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
-import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=bd1efa26f9';
-import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
+import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
 let obraIdActual = null;
 // Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el
@@ -128,7 +128,7 @@ let alturaGaleriaPin = 0;
 // Fija el ALTO del contenedor de la galería en PÍXELES mientras la hoja está
 // abierta. Hace falta porque la tarjeta mide `height: 100%` del contenedor: si
 // el teclado encoge el layout, el contenedor se encoge, la tarjeta se encoge con
-// él y con `object-fit: cover` el recorte de la imagen cambia â€” se vería
+// él y con `object-fit: cover` el recorte de la imagen cambia — se vería
 // distinta de como la subió el usuario. Con el alto fijado, no cambia nada.
 //
 // Solo se MIDE cuando el layout está completo (sin teclado); si ya lo está, la
@@ -447,7 +447,7 @@ function timeAgoShort(dateStr) {
     return new Date(dateStr).toLocaleDateString('es-VE');
 }
 
-// Event listeners â€” se ejecutan al cargar el módulo (DOM ya está listo)
+// Event listeners — se ejecutan al cargar el módulo (DOM ya está listo)
 init();
 
 btnEnviar?.addEventListener('click', () => enviarComentario());
