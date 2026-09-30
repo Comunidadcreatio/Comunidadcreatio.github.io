@@ -7,8 +7,7 @@
 // esos módulos las tendrán tipadas en cuanto se les ponga `// @ts-check`.
 
 /** El puente que inyecta Capacitor en el WebView de la app nativa (no existe en el navegador). */
-interface CapacitorGlobal {
-    /** ¿Estamos dentro de la app nativa? (en el navegador no existe o devuelve false). */
+interface CapacitorGlobal {    /** ¿Estamos dentro de la app nativa? (en el navegador no existe o devuelve false). */
     isNativePlatform?: () => boolean;
     /** 'ios' | 'android' | 'web'. */
     getPlatform?: () => string;
@@ -37,4 +36,35 @@ interface Window {
     _canalChatActivo?: string | number | null;
     /** Diagnóstico de push para depurar desde la consola. */
     __diagnosticoPush?: any;
+    /** Estadísticas de un artista (lo expone perfil.js en window para otros módulos). */
+    actualizarEstadisticas?: (userId?: number | string | null, statsData?: Artista | null) => Promise<void>;
+    /** Abre la galería y se coloca en una obra (lo expone main.js en window). */
+    abrirObraDesdePerfil?: (obraId: number | string) => void;
+}
+
+/**
+ * Los datos de un artista que manda el backend. Casi todo es opcional porque cada pantalla
+ * pide unos campos distintos (el perfil público, el mío, el directorio del chat...). La
+ * firma de índice deja pasar los campos que hoy no se usan aquí sin tener que listarlos
+ * todos, pero los que SÍ se usan están declarados: así el chequeo avisa si alguien escribe
+ * `usuario.nombre_artisa` (con una letra de menos) en vez de callarse.
+ */
+interface Artista {
+    id?: number | string;
+    nombre_artista?: string;
+    nombre_real?: string;
+    foto_perfil?: string;
+    ciudad?: string;
+    rol?: string;
+    cavents?: number;
+    problogs?: number;
+    comcons?: number;
+    total_obras_activas?: number;
+    seguidores?: number;
+    siguiendo?: number;
+    activo?: boolean;
+    online?: boolean;
+    en_linea?: boolean;
+    ultima_actividad?: string;
+    [clave: string]: any;
 }

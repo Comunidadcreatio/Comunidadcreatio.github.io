@@ -1,3 +1,4 @@
+// @ts-check
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
 import { apiRequest } from './config.js?v=5bcbc68289';
@@ -7,10 +8,12 @@ import { renderText, safeImgUrl } from './utils.js?v=8dd55e77e7';
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
+/** @type {string | number | null} */
 let obraIdActual = null;
 // Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el
 // MISMO para los dos; solo cambia la ruta de la API.
 let tipoRecurso = 'obras';
+/** @type {HTMLElement | null} */
 let cardActual = null;
 let drawer, lista, input, btnEnviar, nav, bloqueoEl;
 
@@ -70,8 +73,10 @@ let altoBase = 0;                   // alto real de la pantalla (el teclado no l
 let anchoBase = 0;                  // para detectar rotacion
 let escuchandoTeclado = false;
 // Gesto en curso: { tipo: 'mover' | 'cerrar' | 'esperar', startY, startTopPantalla }
+/** @type {{ tipo?: string, startY?: number, startTopPantalla?: number } | null} */
 let gesto = null;
 let topAplicado = 0;                // top actual en px (coords de layout)
+/** @type {number | null} */
 let posUsuario = null;              // altura elegida por el usuario (coords de PANTALLA)
 let panActual = 0;                  // desplazamiento del viewport visual
 let rangoTopMin = 0;                // limite superior (lo mas alto posible)
@@ -122,6 +127,7 @@ function actualizarAltoBase() {
 // podia mover el fondo con la lista congelada y los toques bloqueados (lo hace
 // el navegador al enfocar el input y desplegar el teclado).
 // ============================================================
+/** @type {string | null} */
 let transformFondoPrev = null;
 let alturaGaleriaPin = 0;
 
@@ -377,10 +383,11 @@ function renderizarComentario(c, todosReplies) {
         </div>`;
 }
 
+/** @param {number|string|null} [parentId] */
 async function enviarComentario(parentId = null) {
     const isReply = parentId !== null;
     const texto = isReply
-        ? document.querySelector(`.comentario-reply-input[data-parent="${parentId}"] .comentario-reply-field`)?.value.trim()
+        ? /** @type {HTMLInputElement | null} */ (document.querySelector(`.comentario-reply-input[data-parent="${parentId}"] .comentario-reply-field`))?.value.trim()
         : input.value.trim();
     if (!texto || !obraIdActual) return;
     btnEnviar.disabled = true;
@@ -508,7 +515,7 @@ drawer?.addEventListener('touchmove', (e) => {
     const y = e.touches[0].clientY;
 
     if (gesto.tipo === 'esperar') {
-        if ((y - gesto.startY) > 0 && lista.scrollTop <= 0) {
+        if ((y - (gesto.startY ?? 0)) > 0 && lista.scrollTop <= 0) {
             // La lista ya esta arriba y el dedo sigue bajando: la hoja toma el
             // relevo DESDE AQUI. Se reinicia la referencia de Y para que la hoja
             // no de un salto con todo el recorrido acumulado del scroll.
@@ -520,11 +527,11 @@ drawer?.addEventListener('touchmove', (e) => {
     }
 
     if (gesto.tipo === 'mover') {
-        const dy = y - gesto.startY;
+        const dy = y - (gesto.startY ?? 0);
         // Se permite pasarse un poco por abajo: ese exceso es la intencion de
         // cerrar, y se resuelve al soltar.
         const topPantalla = Math.min(
-            Math.max(gesto.startTopPantalla + dy, rangoTopMin),
+            Math.max((gesto.startTopPantalla ?? 0) + dy, rangoTopMin),
             rangoTopMax + EXCESO_ARRASTRE
         );
         topAplicado = Math.round(topPantalla + panActual);
@@ -533,7 +540,7 @@ drawer?.addEventListener('touchmove', (e) => {
     }
 
     // tipo 'cerrar'
-    const dy = y - gesto.startY;
+    const dy = y - (gesto.startY ?? 0);
     if (dy > 6) {
         // Resistencia suave: la hoja acompana al dedo pero menos que el.
         swipeDist = Math.min(dy * RESISTENCIA, 160);

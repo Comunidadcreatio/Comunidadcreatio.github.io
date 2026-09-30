@@ -1,3 +1,4 @@
+// @ts-check
 // js/perfil.js
 // Gestión del perfil de usuario, estadísticas, foto de perfil,
 // visualización de perfiles externos y resultados de búsqueda.
@@ -8,7 +9,7 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=8dd55e77e7';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=acf5906f74';
+import { setupViewTracking } from './galeria.js?v=e8ab70708b';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
@@ -45,6 +46,7 @@ export function guardarFotoPerfil(dataUrl) {
             canvas.width = img.naturalWidth * ratio;
             canvas.height = img.naturalHeight * ratio;
             const ctx = canvas.getContext('2d');
+            if (!ctx) return;
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             const thumbDataUrl = canvas.toDataURL('image/jpeg', 0.7);
             try {
@@ -82,7 +84,8 @@ export function guardarFotoPerfil(dataUrl) {
 // viniera sin nombre o sin foto, se completa con el perfil público por id, que
 // es el mismo que alimenta el feed y ya trae ambos.
 async function refrescarDatosPropios() {
-    let datos = null;
+    /** @type {Artista | null} */
+let datos = null;
     try {
         const data = await apiRequest('/api/artistas/perfil');
         if (data && data.success && data.artista) datos = data.artista;
@@ -110,20 +113,20 @@ async function refrescarDatosPropios() {
 
     const src = datos.foto_perfil || AVATAR_DEFAULT;
     ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
-        const img = document.getElementById(elId);
+        const img = /** @type {HTMLImageElement | null} */ (document.getElementById(elId));
         if (img) img.src = src;
     });
     document.querySelectorAll('.perfil-avatar-img, .perfil-avatar-img-seccion')
-        .forEach((img) => { img.src = src; });
+        .forEach((img) => { /** @type {HTMLImageElement} */ (img).src = src; });
     document.querySelectorAll('.perfil-nombre-artista-seccion')
         .forEach((el) => { el.textContent = datos.nombre_artista || 'Artista'; });
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
-            .forEach((el) => { el.textContent = datos.nombre_real; });
+            .forEach((el) => { el.textContent = datos.nombre_real || ''; });
     }
     if (datos.ciudad) {
         document.querySelectorAll('.perfil-ciudad')
-            .forEach((el) => { el.textContent = datos.ciudad; });
+            .forEach((el) => { el.textContent = datos.ciudad || ''; });
     }
     const ponerCuenta = (elId, valor) => {
         const el = document.getElementById(elId);
@@ -134,6 +137,7 @@ async function refrescarDatosPropios() {
     ponerCuenta('stats-comcons', datos.comcons);
 }
 
+/** @param {null | (() => boolean)} [verificarActividadFn] */
 export function actualizarPerfilUI(verificarActividadFn = null) {
     const onlineIndicator = document.getElementById('perfil-online-indicator');
     const perfilUsuario = document.getElementById('perfil-usuario');
@@ -143,7 +147,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
     if (!viendoPerfilExterno) {
         const src = getFotoPerfil() || AVATAR_DEFAULT;
         ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
-            const img = document.getElementById(id);
+            const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
             if (img) img.src = src;
         });
         const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
@@ -222,6 +226,10 @@ export async function refrescarPerfilDesdeServidor() {
 // ============================================
 // ESTADÍSTICAS DEL PERFIL (Cavents, Problogs, Comcons)
 // ============================================
+/**
+ * @param {number|string|null} [userId]
+ * @param {Artista | null} [statsData]
+ */
 export async function actualizarEstadisticas(userId = null, statsData = null) {
     const statsCavents = document.getElementById('stats-cavents');
     const statsProblogs = document.getElementById('stats-problogs');
@@ -258,7 +266,7 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
                 const activas = obrasUsuario.filter(obra =>
                     obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
                 ).length;
-                statsCavents.textContent = activas;
+                statsCavents.textContent = String(activas);
             } else {
                 statsCavents.textContent = fallbackCavents;
             }
@@ -276,12 +284,13 @@ export async function actualizarEstadisticas(userId = null, statsData = null) {
                     obra.status && obra.status.trim() === 'Activo (Visible en Galería)'
                 ).length;
             }
-            statsCavents.textContent = activas;
+            statsCavents.textContent = String(activas);
         }
         // null = "no hay dato": se respeta lo que ya está pintado.
         if (statsProblogs && fallbackProblogs !== null) statsProblogs.textContent = fallbackProblogs;
         if (statsComcons && fallbackComcons !== null) statsComcons.textContent = fallbackComcons;
     } catch (error) {
+        const err = /** @type {{ response?: { status?: number } }} */ (error);
         debugLog.error('Error al cargar estadísticas:', error);
         statsCavents.textContent = fallbackCavents;
         if (statsProblogs && fallbackProblogs !== null) statsProblogs.textContent = fallbackProblogs;
@@ -377,7 +386,7 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             if (actualizarEstadoNavFn) actualizarEstadoNavFn();
 
             // Poblar datos del perfil
-            const avatarImg = document.getElementById('perfil-avatar-seccion');
+            const avatarImg = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
             const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
             const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
             const ciudad = document.querySelector('.perfil-ciudad');
@@ -396,7 +405,7 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
                 ciudad.textContent = usuario.ciudad || '';
             }
 
-            const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
+            const avatarOverlay = /** @type {HTMLElement | null} */ (document.querySelector('.perfil-avatar-overlay'));
             if (avatarOverlay) {
                 avatarOverlay.style.display = 'none';
             }
@@ -456,8 +465,9 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             showError('No se pudo cargar el perfil del usuario. El usuario puede no existir o el servicio no está disponible.');
         }
     } catch (error) {
+        const err = /** @type {{ response?: { status?: number } }} */ (error);
         debugLog.error('Error al cargar perfil:', error);
-        if (error.response && error.response.status === 500) {
+        if (err.response && err.response.status === 500) {
             showError('Error del servidor al cargar el perfil. Por favor, intenta nuevamente más tarde.');
         } else {
             showError('Error al cargar el perfil del usuario. Verifica tu conexión a internet.');
@@ -526,6 +536,7 @@ function marcarPerfilPropio(usuario) {
 // ============================================
 // TABS DEL PERFIL (cavents, problogs, comcons)
 // ============================================
+/** @type {string | null} */   // el data-tab de una pestaña puede faltar
 let perfilTabActual = 'cavents';
 let perfilExternoId = null; // ID del usuario externo que se está viendo
 
@@ -533,8 +544,8 @@ function setupPerfilTabs() {
     const tabs = document.querySelectorAll('.perfil-tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            if (perfilTabActual === tab.dataset.tab) return;
-            perfilTabActual = tab.dataset.tab;
+            if (perfilTabActual === /** @type {HTMLElement} */ (tab).dataset.tab) return;
+            perfilTabActual = /** @type {HTMLElement} */ (tab).dataset.tab ?? null;
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             cargarContenidoTab(perfilTabActual);
@@ -654,7 +665,7 @@ function renderizarGridObras(obras, container) {
         if (totalImagenes > 1) {
             let currentImgIndex = 0;
             let touchStartX = 0;
-            const img = card.querySelector('.perfil-card-main-img');
+            const img = /** @type {HTMLImageElement} */ (card.querySelector('.perfil-card-main-img'));
             const dots = card.querySelectorAll('.perfil-card-dot');
 
             function updateImage(index) {
@@ -689,14 +700,14 @@ function renderizarGridObras(obras, container) {
             dots.forEach(dot => {
                 dot.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    updateImage(parseInt(dot.dataset.index));
+                    updateImage(parseInt(/** @type {HTMLElement} */ (dot).dataset.index ?? '0'));
                 });
             });
         }
 
         card.addEventListener('click', (e) => {
             // No abrir si se hizo clic en un dot
-            if (e.target.classList.contains('perfil-card-dot')) return;
+            if (e.target instanceof Element && e.target.classList.contains('perfil-card-dot')) return;
             if (typeof window.abrirObraDesdePerfil === 'function') {
                 window.abrirObraDesdePerfil(obra.id);
             }
@@ -712,7 +723,7 @@ function renderizarGridObras(obras, container) {
                 if (w && h) card.style.aspectRatio = String(w / h);
             };
             probe.src = primeraImg;
-            if (probe.complete && probe.naturalWidth) probe.onload();
+            if (probe.complete && probe.naturalWidth) /** @type {() => void} */ (probe.onload)();
         }
 
         grid.appendChild(card);

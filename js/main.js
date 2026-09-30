@@ -28,22 +28,22 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=361d4d7719';
+} from './perfil.js?v=df7642766b';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView, toggleProblogs,
     abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono
-} from './galeria-ui.js?v=1b91871941';
+} from './galeria-ui.js?v=e9d0293341';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions, confirmarDescartarCambios,
     limpiarFormularioConConfirmacion
 } from './panel-ui.js?v=85c99834eb';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=acf5906f74';
-import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=dc230a57cc';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=794f96abbe';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=e8ab70708b';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=7bbf26e075';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=f7e1e707de';
 import { setupPush } from './push.js?v=4d1e11951a';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -187,7 +187,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js?v=1b91871941');
+                    const galeriaUI = await import('./galeria-ui.js?v=e9d0293341');
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -415,7 +415,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js?v=7d4e5f82eb').then(m => {
+    import('./busqueda.js?v=21d0208f84').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -626,7 +626,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js?v=1b91871941').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./galeria-ui.js?v=e9d0293341').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -816,7 +816,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js?v=1b91871941');
+            const galeriaUI = await import('./galeria-ui.js?v=e9d0293341');
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {
