@@ -47,6 +47,8 @@ interface Window {
     _vistasRegistradas: Set<number | string>;
     /** Vuelve a la pantalla de marca (lo expone auth-logic.js). */
     volverAlBranding?: () => void;
+    /** Marca los mensajes del chat como entregados (lo expone chat.js). */
+    syncChatEntregas?: () => any;
 }
 
 /**

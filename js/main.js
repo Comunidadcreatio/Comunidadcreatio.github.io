@@ -1,3 +1,4 @@
+// @ts-check
 // js/main.js
 // Orquestador principal de la aplicación Creatio.
 // Coordina todos los módulos: autenticación, galería, panel, perfil,
@@ -57,10 +58,15 @@ export function getGaleriaContainer() {
 const tablaBody = document.getElementById('tabla-obras-body');
 
 // Variables para paneles flotantes
+/** @type {HTMLElement | null} */
 let desktopLogoutModal = null;
+/** @type {HTMLButtonElement | null} */
 let desktopLogoutAllBtn = null;
+/** @type {HTMLButtonElement | null} */
 let desktopLogoutSingleBtn = null;
+/** @type {((event: MouseEvent) => void) | null} */
 let clickOutsideHandlerLogout = null;
+/** @type {((event: MouseEvent) => void) | null} */
 let mobileClickOutsideHandler = null;
 
 // Conteo de sesiones activas
@@ -177,15 +183,15 @@ async function cargarNotificaciones() {
         list.querySelectorAll('.notif-item').forEach(item => {
             item.addEventListener('click', async () => {
                 // Comentario en una publicación -> se abre su lectura.
-                const problogId = item.dataset.problog;
+                const problogId = /** @type {HTMLElement} */ (item).dataset.problog;
                 if (problogId) {
-                    document.getElementById('notif-dropdown').classList.add('hidden');
+                    /** @type {HTMLElement} */ (document.getElementById('notif-dropdown')).classList.add('hidden');
                     abrirProblogDesdeNotificacion(problogId);
                     return;
                 }
-                const obraId = item.dataset.obra;
+                const obraId = /** @type {HTMLElement} */ (item).dataset.obra;
                 if (obraId) {
-                    document.getElementById('notif-dropdown').classList.add('hidden');
+                    /** @type {HTMLElement} */ (document.getElementById('notif-dropdown')).classList.add('hidden');
                     // Mostrar galería
                     const galeriaUI = await import('./galeria-ui.js?v=d9de2e1a6f');
                     const galeriaContainer = document.getElementById('galeria-container');
@@ -460,7 +466,7 @@ function setupEvents() {
             }
         });
         document.addEventListener('click', (e) => {
-            if (!notifDropdown.contains(e.target) && e.target !== notifBtn && !notifBtn.contains(e.target)) {
+            if (e.target instanceof Node && !notifDropdown.contains(e.target) && e.target !== notifBtn && !notifBtn.contains(e.target)) {
                 notifDropdown.classList.add('hidden');
             }
         });
@@ -486,11 +492,11 @@ function setupEvents() {
                         positionMobilePanel(logoutIcon, mobileModal);
                         setTimeout(() => {
                             mobileClickOutsideHandler = function(e) {
-                                const target = e.target;
-                                const isNavButton = target.closest('#btn-galeria-sidebar') ||
-                                    target.closest('#btn-registro-sidebar') ||
-                                    target.closest('#btn-perfil-sidebar');
-                                if (!mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
+                                const objetivo = e.target instanceof Element ? e.target : null;
+                                const isNavButton = objetivo?.closest('#btn-galeria-sidebar') ||
+                                    objetivo?.closest('#btn-registro-sidebar') ||
+                                    objetivo?.closest('#btn-perfil-sidebar');
+                                if (e.target instanceof Node && !mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
                                     cerrarMobileLogoutModal();
                                 }
                             };
@@ -503,8 +509,8 @@ function setupEvents() {
             } else {
                 if (!desktopLogoutModal) {
                     desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = document.getElementById('desktop-logout-all');
-                    desktopLogoutSingleBtn = document.getElementById('desktop-logout-single');
+                    desktopLogoutAllBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('desktop-logout-all'));
+                    desktopLogoutSingleBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('desktop-logout-single'));
                     if (desktopLogoutAllBtn) {
                         desktopLogoutAllBtn.addEventListener('click', () => {
                             closeAllSessions();
@@ -518,21 +524,21 @@ function setupEvents() {
                         });
                     }
                 }
-                if (desktopLogoutModal.classList.contains('hidden')) {
+                if (desktopLogoutModal?.classList.contains('hidden')) {
                     cerrarTodosLosPaneles();
                     updateCerrarTodasSesionesButtonState();
-                    desktopLogoutModal.classList.remove('hidden');
+                    desktopLogoutModal?.classList.remove('hidden');
                     positionDesktopPanel(logoutIcon, desktopLogoutModal);
                     if (clickOutsideHandlerLogout) {
                         document.removeEventListener('click', clickOutsideHandlerLogout);
                     }
                     clickOutsideHandlerLogout = function(event) {
-                        if (desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
+                        if (event.target instanceof Node && desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
                             cerrarDesktopLogoutModal();
                         }
                     };
                     setTimeout(() => {
-                        document.addEventListener('click', clickOutsideHandlerLogout);
+                        if (clickOutsideHandlerLogout) document.addEventListener('click', clickOutsideHandlerLogout);
                     }, 0);
                 } else {
                     cerrarDesktopLogoutModal();
@@ -630,7 +636,7 @@ function setupEvents() {
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
-                    if (target) gc.scrollTop = target.offsetTop;
+                    if (target) gc.scrollTop = /** @type {HTMLElement} */ (target).offsetTop;
                 }, 400);
             });
             actualizarEstadoNavButtons();
@@ -647,7 +653,7 @@ function setupEvents() {
             const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
             if (target) {
                 clearInterval(checkInterval);
-                gc.scrollTop = target.offsetTop;
+                gc.scrollTop = /** @type {HTMLElement} */ (target).offsetTop;
             }
         }, 100);
         // Safety: dejar de buscar después de 5 segundos
@@ -660,18 +666,19 @@ function setupEvents() {
     setupPush();
 
     // ----- Cambiar foto de perfil -----
-    const inputFotoPerfil = document.getElementById('input-foto-perfil');
+    const inputFotoPerfil = /** @type {HTMLInputElement | null} */ (document.getElementById('input-foto-perfil'));
     if (inputFotoPerfil) {
         inputFotoPerfil.addEventListener('change', function() {
-            const file = this.files[0];
-            this.value = '';
+            const file = inputFotoPerfil.files ? inputFotoPerfil.files[0] : null;
+            inputFotoPerfil.value = '';
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
-                    const img = document.getElementById(id);
-                    if (img) img.src = e.target.result;
+                    const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
+                    // En el load de un FileReader el target ES el lector, y result puede venir null.
+                    if (img) img.src = String(/** @type {FileReader} */ (e.target).result || '');
                 });
             };
             reader.readAsDataURL(file);
@@ -711,7 +718,7 @@ function setupEvents() {
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
         btn.addEventListener('click', function() {
-            const modal = this.closest('.modal');
+            const modal = /** @type {HTMLElement} */ (btn).closest('.modal');
             if (modal) modal.classList.add('hidden');
         });
     });
@@ -790,7 +797,7 @@ async function init() {
         }
     }
 
-    document.getElementById('toggle-panel').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('toggle-panel')).classList.remove('hidden');
     actualizarPerfilUI(verificarActividadLocal);
     mostrarPaginaBlanca();
     setupEvents();
