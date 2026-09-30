@@ -40,7 +40,7 @@ node scripts/verificar-todo.mjs --solo <texto>   # solo los que contengan ese te
 | Commit | ver el último commit de `main` |
 | Módulos con tipos | **27 de 27** — el chequeo está **VERDE** |
 | Sin adoptar | **ninguno** |
-| Verificadores | **18** de app en `scripts/` (más el de tipos), todos en verde; el de la foto cubre 6 vistas |
+| Verificadores | **17** de app en `scripts/` (más el de tipos): **18 de 18 en verde**; el de la foto cubre 6 vistas |
 
 **Adoptados y limpios (27):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
 capacitor-native-biometric, chat, ciudades, comentarios, config, cuenta, etiquetas,
@@ -256,7 +256,7 @@ primera vez). Lo que se midió:
 |---|---|
 | Avisos de partida | **52** (29 `TS2339`, 9 `TS18047`, 6 `TS2531`, 3 `TS18046`, 2 `TS2683`, y 1 de `TS2322`/`TS2349`/`TS2345`) |
 | Cambios aplicados | **17**, en dos tandas (`scripts/arreglar-tipos-panel-ui.mjs` y `...-2.mjs`) |
-| Verificadores | **18/18 de la app en verde** (incluidos estado-panel 18/18, barras-y-validacion 21/21, cavents-crear 12/12, imagenes 14/14 y meta-obra 19/19) · foto de estilos **SIN DIFERENCIAS** |
+| Verificadores | **18 de 18 en verde** en `verificar-todo.mjs` (17 de app + el de tipos), incluidos estado-panel 18/18, barras-y-validacion 21/21, cavents-crear 12/12, imagenes 14/14 y meta-obra 19/19 · foto de estilos **SIN DIFERENCIAS** (antes/después) |
 
 **Lo que más rindió, y lo que hay que recordar:**
 
