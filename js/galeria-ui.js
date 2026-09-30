@@ -2,12 +2,13 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=78f72031d2';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=4c9288c4b3';
-import { artistaActual, token, esArtista } from './auth.js?v=bc34ffbf02';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=e1b21bd8bf';
-import { confirmarDescartarCambios } from './panel-ui.js?v=c1be5f11dd';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=7084526f91';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=59aefe540d';
+import { artistaActual, token, esArtista } from './auth.js?v=194420f49e';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=7ac4b9e54e';
+import { confirmarDescartarCambios } from './panel-ui.js?v=26465b04e6';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=cd0e5cba39';
+import { conTransicion, hayViewTransitions } from './utils.js?v=5bb3afaf60';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -75,6 +76,28 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     }
 
     isTransitioning = true;
+
+    // CON VIEW TRANSITIONS (si el navegador las trae): un solo paso. Se oculta la
+    // sección que sale y se enseña la que entra DENTRO de la transición, sin las
+    // animaciones por clase ni las esperas de `animationend`. El marco (cabecera y
+    // menú) se queda quieto porque tiene su propio `view-transition-name` en el CSS.
+    // Si el navegador no las trae, o el usuario pidió menos movimiento, se sigue por el
+    // camino de siempre (más abajo), que NO se toca.
+    if (hayViewTransitions()) {
+        conTransicion(() => {
+            for (const id of SECCIONES) {
+                const el = document.getElementById(id);
+                if (el && el !== sectionEntrante) el.classList.add('hidden');
+            }
+            sectionEntrante.classList.remove('hidden', 'section-exiting');
+            actualizarVisibilidadIconosHeader(sectionEntrante);
+            actualizarEstadoNavButtons();
+        }).then(() => {
+            isTransitioning = false;
+            if (callback) callback();
+        });
+        return;
+    }
 
     let safetyFired = false;
     const safetyTimeout = setTimeout(() => {

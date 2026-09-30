@@ -31,10 +31,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=8ca6f6755e';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion } from './utils.js?v=20b06d3d70';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9569204c32';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion } from './utils.js?v=5bb3afaf60';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=5238451892';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=75ad79f45a';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=5309457b18';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
@@ -42,7 +42,7 @@ import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=bd1efa26f9';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=bc34ffbf02';
+import { artistaActual } from './auth.js?v=194420f49e';
 
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;

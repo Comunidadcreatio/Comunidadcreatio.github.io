@@ -182,12 +182,30 @@ export const debugLog = {
 // VIEW TRANSITIONS (transición entre vistas)
 // ============================================
 /**
+ * ¿Se pueden usar View Transitions ahora mismo?
+ * Hace falta que el navegador las traiga Y que el usuario no haya pedido menos
+ * movimiento. Se usa para ELEGIR el camino: si esto es false, quien llama tiene que
+ * seguir por el camino de siempre (nunca se pierde funcionalidad, solo el efecto).
+ * @returns {boolean}
+ */
+export function hayViewTransitions() {
+    const doc = /** @type {any} */ (document);
+    if (typeof doc.startViewTransition !== 'function') return false;
+    try {
+        return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+        return true;   // sin matchMedia se sigue adelante
+    }
+}
+
+/**
  * Ejecuta un cambio del DOM dentro de una View Transition, si el navegador la trae.
  * Si no la trae (o si el usuario pidió menos movimiento), hace el cambio igual: nunca
  * se pierde funcionalidad, solo el efecto.
  *
- * Se usa para el paso feed -> lectura de Problogs (y la vuelta): el navegador
- * fotografía el antes y el después y anima el paso entre las dos, sin librerías.
+ * Se usa para el paso feed -> lectura de Problogs (y la vuelta) y para cambiar de
+ * sección: el navegador fotografía el antes y el después y anima el paso entre las dos,
+ * sin librerías.
  *
  * @param {() => void} cambio  Lo que cambia el DOM (tiene que ser SÍNCRONO).
  * @returns {Promise<void>}  Se resuelve cuando el cambio YA está aplicado en el DOM.
@@ -197,10 +215,7 @@ export const debugLog = {
  */
 export function conTransicion(cambio) {
     const doc = /** @type {any} */ (document);
-    if (typeof doc.startViewTransition !== 'function') { cambio(); return Promise.resolve(); }
-    try {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { cambio(); return Promise.resolve(); }
-    } catch (e) { /* sin matchMedia se sigue adelante */ }
+    if (!hayViewTransitions()) { cambio(); return Promise.resolve(); }
     const t = doc.startViewTransition(cambio);
     // Si la transición se salta (otra en curso, pestaña oculta...), la promesa se
     // rechaza: hay que recogerla o salta un "unhandled rejection" en consola.

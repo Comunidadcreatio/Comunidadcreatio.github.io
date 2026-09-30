@@ -1,15 +1,15 @@
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=bc34ffbf02';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=8ca6f6755e';
+import { login, register } from './auth.js?v=194420f49e';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=9569204c32';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading, showConfirmChoice } from './notificaciones.js?v=5238451892';
-import { mostrarErrores, debounce, debugLog } from './utils.js?v=20b06d3d70';
+import { mostrarErrores, debounce, debugLog } from './utils.js?v=5bb3afaf60';
 import { setupDarkModeToggle } from './theme.js?v=27de10442c'; // v67
 import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=6f4c7d0f8a';
+} from './biometric-login.js?v=fbcb7ee36e';
 
 // ============================================
 // VARIABLES GLOBALES

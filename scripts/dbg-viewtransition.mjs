@@ -103,12 +103,13 @@ await evalJs(`(() => {
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await sleep(1800);
 const antes = await evalJs(`JSON.stringify({
+    llamadas: window.__vt.llamadas,
     feed: getComputedStyle(document.querySelector('#problogs .problogs-feed')).display,
     detalle: getComputedStyle(document.getElementById('problogs-detalle')).display,
     nombreCabecera: getComputedStyle(document.getElementById('main-header')).viewTransitionName,
     nombreMenu: getComputedStyle(document.getElementById('toggle-panel')).viewTransitionName
 })`);
-console.log(`Antes del clic: ${antes}`);
+console.log(`Tras cambiar de seccion (nav -> Problogs): ${antes}`);
 await evalJs(`document.querySelector('#problogs .problog-card')?.click()`);
 await sleep(1200);
 const trasAbrir = await evalJs(`JSON.stringify({
