@@ -25,7 +25,7 @@
 @import url('header.css?v=0f47c253d1');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=af0f66c813');
+@import url('galeria-publica.css?v=9fa317b475');
 
 /* Chat global + privado */
 @import url('chat.css?v=2551013284');
@@ -153,9 +153,8 @@
 }
 @layer components {
 
-.hidden {
-    display: none !important;
-}
+/* `.hidden` se movió AL FINAL del archivo, a la capa `utilities`: es LA utilidad de la
+   app y tiene que ganar a todo lo demás. Ver el bloque «UTILIDADES» al final. */
 
 /* ==============================================
    PRELOADER (PANTALLA DE CARGA CON LOGO)
@@ -1821,5 +1820,23 @@
     position: relative;
     z-index: 1000;
 }
+} /* <- cierre de @layer components (todo el archivo) */
+
+/* ============================================================
+   UTILIDADES (capa `utilities`: la última, gana a todo lo demás)
+   ============================================================ */
+
+@layer utilities {
+
+    /* `.hidden` es LA utilidad de la app (la pone y la quita el JS en todas las vistas).
+       Está en `utilities`, así que gana por ORDEN DE CAPAS a cualquier regla de
+       `components` o `base`... pero un `!important` de otra hoja SÍ le gana (lo
+       importante va por encima de lo normal aunque la capa sea anterior). Se quitó el
+       `!important` que llevaba: se comprobó con la foto de estilos que no hace falta.
+       Si algún día vuelve a hacer falta, se le pone otra vez. */
+    .hidden {
+        display: none;
+    }
+
 }
 

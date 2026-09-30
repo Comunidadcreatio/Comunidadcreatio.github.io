@@ -20,6 +20,11 @@ const args = process.argv.slice(2);
 const iFam = args.indexOf('--familia');
 const FAMILIAS = (iFam >= 0 ? args[iFam + 1] : 'problog,problogs').split(',').map((s) => s.trim().toLowerCase());
 const SOLO_ETIQUETAS = args.includes('--solo-etiquetas');
+// Con --en-components se listan las reglas que YA están en `components` y que son de
+// ETIQUETA o un reset (`*`, `html`, `body`...): candidatas a bajar a `base`.
+const EN_COMPONENTS = args.includes('--en-components');
+// Con --important se cuenta cuántos !important hay por hoja y en qué capa están.
+const CONTAR_IMPORTANT = args.includes('--important');
 
 const ETIQUETAS = new Set(('html body main section article aside header footer nav div span p a img picture source ' +
     'ul ol li button input select textarea label form table thead tbody tr td th h1 h2 h3 h4 h5 h6 small strong ' +
@@ -28,10 +33,10 @@ const ETIQUETAS = new Set(('html body main section article aside header footer n
     .split(' '));
 
 // Devuelve true si el selector (ya recortado) es una etiqueta sola, con pseudoclases,
-// pseudoelementos o atributos, pero SIN clase ni id ni descendencia.
+// pseudoelementos o atributos, pero SIN clase ni id ni descendencia. Incluye `*`.
 function esEtiquetaSola(sel) {
     const limpio = sel.replace(/::?[a-z-]+(\([^)]*\))?/gi, '').replace(/\[[^\]]*\]/g, '').trim();
-    return ETIQUETAS.has(limpio.toLowerCase());
+    return limpio === '*' || ETIQUETAS.has(limpio.toLowerCase());
 }
 
 // Recorre el CSS manteniendo una PILA de bloques abiertos. Cuando aparece la llave de una
@@ -50,17 +55,22 @@ function analizar(css) {
             const cabecera = buf.trim();
             const esAt = cabecera.startsWith('@');
             if (!esAt) {
+                const capa = [...pila].reverse().find((p) => p.esCapa);
                 reglas.push({
                     linea,
                     selector: cabecera,
-                    capa: pila.some((p) => p.esCapa),
+                    capa: !!capa,
+                    capaNombre: capa ? capa.nombre : null,
                     media: pila.filter((p) => p.esMedia).map((p) => p.cabecera).join(' | ')
                 });
             }
+            const capaPadre = [...pila].reverse().find((p) => p.esCapa);
+            const m = cabecera.match(/^@layer\s+([\w-]+)/);
             pila.push({
                 cabecera,
                 esAt,
-                esCapa: pila.some((p) => p.esCapa) || /@layer\s+(base|components|utilities|reset)/.test(cabecera),
+                esCapa: !!capaPadre || /@layer\s+(base|components|utilities|reset)/.test(cabecera),
+                nombre: m ? m[1] : (capaPadre ? capaPadre.nombre : null),
                 esMedia: cabecera.startsWith('@media')
             });
             buf = '';
@@ -75,13 +85,21 @@ function analizar(css) {
 }
 
 const hojaDir = 'css';
-let totalEtiquetas = 0, totalFamilia = 0;
+let totalEtiquetas = 0, totalFamilia = 0, totalEnComponents = 0, totalImportant = 0;
 for (const hoja of readdirSync(hojaDir).filter((f) => f.endsWith('.css')).sort()) {
-    const reglas = analizar(readFileSync(join(hojaDir, hoja), 'utf8'));
+    const original = readFileSync(join(hojaDir, hoja), 'utf8');
+    const reglas = analizar(original);
     const avisos = [];
     for (const r of reglas) {
-        if (r.capa) continue;                       // ya está en una capa: no es el problema
         const partes = r.selector.split(',').map((s) => s.trim()).filter(Boolean);
+        if (EN_COMPONENTS) {
+            // Reglas que están en `components` y son de etiqueta o reset: candidatas a base.
+            if (r.capaNombre !== 'components') continue;
+            const soloEtiqueta = partes.length > 0 && partes.every((p) => esEtiquetaSola(p));
+            if (soloEtiqueta) { avisos.push(`  ${r.linea}: a base?  ${r.selector.slice(0, 80)}`); totalEnComponents++; }
+            continue;
+        }
+        if (r.capa) continue;                       // ya está en una capa: no es el problema
         for (const parte of partes) {
             if (esEtiquetaSola(parte)) { avisos.push(`  ${r.linea}: ETIQUETA SOLA  ${parte}`); totalEtiquetas++; }
             else if (!SOLO_ETIQUETAS && FAMILIAS.some((f) => parte.toLowerCase().includes(f))) {
@@ -89,6 +107,15 @@ for (const hoja of readdirSync(hojaDir).filter((f) => f.endsWith('.css')).sort()
             }
         }
     }
+    if (CONTAR_IMPORTANT) {
+        const n = (original.match(/!important\s*;/g) || []).length;
+        // Cuántos de esos están dentro de un bloque que empieza en `@layer` (cualquiera).
+        const enCapa = reglas.filter((r) => r.capa).length;
+        avisos.push(`  (${n} declaraciones !important · ${enCapa} reglas en capa de ${reglas.length})`);
+        totalImportant += n;
+    }
     if (avisos.length) console.log(`--- ${hoja} (${avisos.length}) ---\n${avisos.join('\n')}`);
 }
-console.log(`\nRESUMEN: ${totalEtiquetas} reglas sin capa con etiqueta sola, ${totalFamilia} con la familia ${FAMILIAS.join('/')}`);
+console.log(`\nRESUMEN: ${totalEtiquetas} reglas sin capa con etiqueta sola, ${totalFamilia} con la familia ${FAMILIAS.join('/')}` +
+    (EN_COMPONENTS ? `, ${totalEnComponents} reglas de etiqueta dentro de components (candidatas a base)` : '') +
+    (CONTAR_IMPORTANT ? `, ${totalImportant} !important en total` : ''));

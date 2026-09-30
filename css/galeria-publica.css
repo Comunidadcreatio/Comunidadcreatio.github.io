@@ -670,7 +670,12 @@
         width: 16px;
         height: 16px;
     }
-    }
+    /* AQUÍ HABÍA UNA LLAVE DE MÁS (bug previo): cerraba este @media antes de tiempo, así
+       que `.marquee-text { font-size: .75rem }` se aplicaba TAMBIÉN en escritorio. Al
+       meter todo el CSS en `@layer components` la llave de más cerraba LA CAPA, y todo lo
+       que venía después se quedaba sin capa. Quitada: el tamaño vuelve a ser solo de
+       móvil, que es lo que dice el resto del archivo (hay otro .marquee-text a 0.8rem en
+       un @media más pequeño). */
 
     .marquee-text {
         font-size: 0.75rem;
