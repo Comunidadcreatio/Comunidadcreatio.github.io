@@ -120,6 +120,32 @@ const PAGINAS = [
         ]
     },
     {
+        // El DIRECTORIO del chat. Hace falta porque el chat no tenia ninguna cobertura
+        // visual (ni verificador hasta hace poco), y ahi vive una familia entera de
+        // reglas de chat.css. Se ABRE el chat y se despliega el primer pueblo, para que la
+        // fila de usuario tambien quede medida.
+        nombre: 'chat',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            await ev(`document.getElementById('btn-chat-global')?.click()`);
+            await dormir(2200);
+            await ev(`document.querySelector('#chat-accordion .chat-pueblo-header')?.click()`);
+            await dormir(900);
+        },
+        selectores: [
+            '#chat-global', '#chat-directorio', '#chat-conversaciones',
+            '#chat-accordion', '#chat-accordion .chat-pueblo',
+            '.chat-pueblo-header', '.chat-pueblo-nombre', '.chat-pueblo-bandera',
+            '.chat-pueblo-counts', '.chat-pueblo-count', '.chat-pueblo-count.act',
+            '.chat-pueblo-count.tot', '.chat-pueblo-chevron',
+            '.chat-pueblo-cuerpo', '.chat-pueblo-cuerpo-contenido', '.chat-pueblo-vacio',
+            '.chat-user-row', '.chat-user-nombre', '.chat-user-estado',
+            '#btn-chat-global-fab', '#chat-cerrar'
+        ]
+    },
+    {
         // El EDITOR de Problogs. Hace falta porque dentro de su modal hay reglas de
         // formularios.css (una móvil con mucha especificidad) que compiten con las de
         // problogs.css: sin abrirlo, un cambio de capas ahí pasaria inadvertido.
@@ -265,6 +291,17 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (method !== 'GET') return json({ success: true, id: 9 });
             if (u.includes('heartbeat')) return json({ ok: true });
             if (u.includes('mis-reacciones')) return json({ reacciones: [] });
+            // Directorio del chat: sin esto la seccion sale vacia ("No hay pueblos") y se
+            // fotografia el estado equivocado. Un pueblo con un artista (para los
+            // contadores y la fila) y el resto vacios, que es el caso normal.
+            if (u.includes('/chat/directorio')) return json({ success: true, pueblos: {
+                'San Cristóbal': [{ id: 99, nombre_artista: 'Ana', foto_perfil: '',
+                    ultima_actividad: new Date(ahora).toISOString() }],
+                'San Antonio del Táchira': []
+            } });
+            if (u.includes('/chat/conversaciones')) return json({ success: true, conversaciones: [] });
+            if (u.includes('/chat/bloqueados')) return json({ success: true, bloqueados: [] });
+            if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 0 });
             if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/problogs/70001')) return json(pub);
             if (u.includes('/problogs')) return json({ success: true, problogs: [pub], total: 1 });
