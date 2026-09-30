@@ -2,11 +2,11 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=5bcbc68289';
-import { token, artistaActual } from './auth.js?v=936752c5bf';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=d02d6903d4';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=f2a997fedf';
+import { token, artistaActual } from './auth.js?v=fe3bd123e5';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=283916ce4a';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
-import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=8dd55e77e7';
+import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=202667b9a3';
 
 // Cache del dropdown Mis Cavents para tiempo real
 let _caventsCache = { loaded: false, data: [] };

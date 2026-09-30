@@ -2,13 +2,13 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a6b5071cac';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=aa7bf8ff21';
-import { artistaActual, token, esArtista } from './auth.js?v=936752c5bf';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=a6bbee2089';
-import { confirmarDescartarCambios } from './panel-ui.js?v=85c99834eb';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a86b5fd39f';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=109f95f10d';
+import { artistaActual, token, esArtista } from './auth.js?v=fe3bd123e5';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=983a191ca6';
+import { confirmarDescartarCambios } from './panel-ui.js?v=7b43bf0bac';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
-import { conTransicion, hayViewTransitions } from './utils.js?v=8dd55e77e7';
+import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=202667b9a3';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -77,12 +77,31 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
 
     isTransitioning = true;
 
+    // CON MENOS MOVIMIENTO: el cambio se hace DIRECTAMENTE, sin animaciones ni esperas.
+    // Hace falta este camino propio porque el de siempre espera al evento `animationend`,
+    // y con las animaciones a 0,01ms (que es lo que pide el bloque de style.css) ese evento
+    // PUEDE NO LLEGAR: la animación termina antes del primer fotograma y el navegador no lo
+    // dispara. El resultado era que la sección no se abría nunca y quien tiene activado
+    // "reducir movimiento" en su sistema se quedaba con la pantalla vacía. Lo encontró el
+    // verificador de menos movimiento (scripts/verificar-menos-movimiento.mjs).
+    if (menosMovimiento()) {
+        for (const id of SECCIONES) {
+            const el = document.getElementById(id);
+            if (el && el !== sectionEntrante) el.classList.add('hidden');
+        }
+        sectionEntrante.classList.remove('hidden', 'section-exiting', 'section-entering');
+        actualizarVisibilidadIconosHeader(sectionEntrante);
+        actualizarEstadoNavButtons();
+        isTransitioning = false;
+        if (callback) callback();
+        return;
+    }
+
     // CON VIEW TRANSITIONS (si el navegador las trae): un solo paso. Se oculta la
     // sección que sale y se enseña la que entra DENTRO de la transición, sin las
     // animaciones por clase ni las esperas de `animationend`. El marco (cabecera y
     // menú) se queda quieto porque tiene su propio `view-transition-name` en el CSS.
-    // Si el navegador no las trae, o el usuario pidió menos movimiento, se sigue por el
-    // camino de siempre (más abajo), que NO se toca.
+    // Si el navegador no las trae, se sigue por el camino de siempre (más abajo).
     if (hayViewTransitions()) {
         conTransicion(() => {
             for (const id of SECCIONES) {

@@ -179,6 +179,38 @@ export const debugLog = {
 };
 
 // ============================================
+// MOVIMIENTO Y ACCESIBILIDAD
+// ============================================
+/**
+ * ¿El usuario ha pedido MENOS MOVIMIENTO? (ajuste del sistema operativo).
+ *
+ * El CSS ya lo respeta solo: en style.css hay un bloque con `prefers-reduced-motion: reduce`
+ * que deja las animaciones y transiciones en 0,01ms. Pero eso NO alcanza a lo que se pide
+ * desde JavaScript: `scrollIntoView({ behavior: 'smooth' })` es una orden explícita y se
+ * anima igual. Por eso existe esta comprobación: para poder decidirlo en el código.
+ * @returns {boolean}
+ */
+export function menosMovimiento() {
+    try {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+        return false;   // sin matchMedia se asume que no
+    }
+}
+
+/**
+ * Lleva la vista a un elemento respetando el ajuste de menos movimiento: con él, el salto
+ * es instantáneo; sin él, suave como antes.
+ * @param {Element | null | undefined} el
+ * @param {ScrollIntoViewOptions} [opciones]  bloque, alineación... (el `behavior` lo pone él)
+ * @returns {void}
+ */
+export function desplazarA(el, opciones = {}) {
+    if (!el || typeof el.scrollIntoView !== 'function') return;
+    el.scrollIntoView({ ...opciones, behavior: menosMovimiento() ? 'auto' : 'smooth' });
+}
+
+// ============================================
 // VIEW TRANSITIONS (transición entre vistas)
 // ============================================
 /**
@@ -191,11 +223,7 @@ export const debugLog = {
 export function hayViewTransitions() {
     const doc = /** @type {any} */ (document);
     if (typeof doc.startViewTransition !== 'function') return false;
-    try {
-        return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    } catch (e) {
-        return true;   // sin matchMedia se sigue adelante
-    }
+    return !menosMovimiento();
 }
 
 /**

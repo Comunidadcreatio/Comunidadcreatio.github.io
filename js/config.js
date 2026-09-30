@@ -1,6 +1,6 @@
 // @ts-check
 // js/config.js
-import { debugLog } from './utils.js?v=8dd55e77e7';
+import { debugLog } from './utils.js?v=202667b9a3';
 
 export const API_BASE_URL = 'https://backend-fundacion-atpe.onrender.com';
 export const ARTISTA_KEY = 'artistaData';

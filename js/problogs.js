@@ -31,10 +31,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=5bcbc68289';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion } from './utils.js?v=8dd55e77e7';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=f2a997fedf';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=202667b9a3';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=27782fe1e4';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=35d602764e';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -42,7 +42,7 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=936752c5bf';
+import { artistaActual } from './auth.js?v=fe3bd123e5';
 
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
@@ -1730,7 +1730,7 @@ async function irAComentarios(id) {
         seccion = seccionComentarios(id);
     }
     if (!seccion) return;
-    seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    desplazarA(seccion, { block: 'start' });
     const input = seccion.querySelector('[data-comentario-texto]');
     if (input) setTimeout(() => input.focus({ preventScroll: true }), 450);
 }
