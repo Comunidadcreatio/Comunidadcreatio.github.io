@@ -1,3 +1,4 @@
+// @ts-check
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
 import { login, register } from './auth.js?v=c69ad117da';
@@ -18,6 +19,7 @@ let currentStep = 1;
 const totalSteps = 5;
 
 // Estado de disponibilidad de email y nombre de usuario
+/** @type {Record<string, boolean | null>} */
 const disponibilidad = {
     email: null,   // true | false | null (sin verificar)
     nombre: null
@@ -30,9 +32,9 @@ const ciudadesPorPais = window.CIUDADES_POR_PAIS || {};
 const ciudadBandera = window.BANDERA_POR_CIUDAD || {};
 
 function poblarCiudades(paisSeleccionado) {
-    const hiddenInput = document.getElementById('reg-ciudad');
-    const trigger = document.getElementById('ciudad-trigger');
-    const dropdown = document.getElementById('ciudad-dropdown');
+    const hiddenInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-ciudad'));
+    const trigger = /** @type {HTMLElement} */ (document.getElementById('ciudad-trigger'));
+    const dropdown = /** @type {HTMLElement} */ (document.getElementById('ciudad-dropdown'));
     if (!hiddenInput || !trigger || !dropdown) return;
 
     dropdown.innerHTML = '';
@@ -68,7 +70,7 @@ function poblarCiudades(paisSeleccionado) {
 }
 
 function paisChangeHandler() {
-    const paisSelect = document.getElementById('reg-pais');
+    const paisSelect = /** @type {HTMLSelectElement} */ (document.getElementById('reg-pais'));
     if (paisSelect) {
         poblarCiudades(paisSelect.value);
     }
@@ -139,7 +141,7 @@ function initCustomSelect(selectEl, placeholder) {
     }, { passive: true });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-select')) {
+        if (!(e.target instanceof Element) || !e.target.closest('.custom-select')) {
             dropdown.classList.remove('open');
         }
     });
@@ -171,8 +173,8 @@ if (document.readyState === 'loading') {
 
 // Dropdown toggle con posicionamiento fixed
 document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('ciudad-trigger');
-    const dropdown = document.getElementById('ciudad-dropdown');
+    const trigger = /** @type {HTMLElement} */ (document.getElementById('ciudad-trigger'));
+    const dropdown = /** @type {HTMLElement} */ (document.getElementById('ciudad-dropdown'));
     if (!trigger || !dropdown) return;
 
     function positionDropdown() {
@@ -199,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-select')) {
+        if (!(e.target instanceof Element) || !e.target.closest('.custom-select')) {
             dropdown.classList.remove('open');
         }
     });
@@ -400,8 +402,8 @@ function calcularFortalezaPassword(password) {
 
 // Actualiza la UI del medidor en tiempo real
 function actualizarMedidorPassword(password) {
-    const strengthEl = document.getElementById('password-strength');
-    const requirementsEl = document.getElementById('password-requirements');
+    const strengthEl = /** @type {HTMLInputElement} */ (document.getElementById('password-strength'));
+    const requirementsEl = /** @type {HTMLInputElement} */ (document.getElementById('password-requirements'));
     if (!strengthEl || !requirementsEl) return;
 
     const labelEl = strengthEl.querySelector('.strength-label');
@@ -445,9 +447,9 @@ const verificarNombreDebounced = debounce((valor, input) => {
 // ============================================
 function cargarSelectoresFecha() {
     // Guardar valores actuales antes de reconstruir (para no perderlos al volver atrás)
-    const diaSelect = document.getElementById('reg-dia');
-    const mesSelect = document.getElementById('reg-mes');
-    const anoSelect = document.getElementById('reg-ano');
+    const diaSelect = /** @type {HTMLSelectElement} */ (document.getElementById('reg-dia'));
+    const mesSelect = /** @type {HTMLSelectElement} */ (document.getElementById('reg-mes'));
+    const anoSelect = /** @type {HTMLSelectElement} */ (document.getElementById('reg-ano'));
     const diaActual = diaSelect ? diaSelect.value : '';
     const mesActual = mesSelect ? mesSelect.value : '';
     const anoActual = anoSelect ? anoSelect.value : '';
@@ -456,8 +458,8 @@ function cargarSelectoresFecha() {
         diaSelect.innerHTML = '<option value="" disabled selected>Día</option>';
         for (let i = 1; i <= 31; i++) {
             const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
+            option.value = String(i);
+            option.textContent = String(i);
             diaSelect.appendChild(option);
         }
         if (diaActual) diaSelect.value = diaActual;
@@ -467,7 +469,7 @@ function cargarSelectoresFecha() {
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         meses.forEach((nombre, i) => {
             const option = document.createElement('option');
-            option.value = i + 1;
+            option.value = String(i + 1);
             option.textContent = nombre;
             mesSelect.appendChild(option);
         });
@@ -478,8 +480,8 @@ function cargarSelectoresFecha() {
         const maxYear = new Date().getFullYear() - 18;
         for (let i = maxYear; i >= 1900; i--) {
             const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
+            option.value = String(i);
+            option.textContent = String(i);
             anoSelect.appendChild(option);
         }
         if (anoActual) anoSelect.value = anoActual;
@@ -491,8 +493,8 @@ function cargarSelectoresFecha() {
 // ============================================
 
 function showStep(step) {
-    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
-    const target = document.querySelector(`.step[data-step="${step}"]`);
+    document.querySelectorAll('.step').forEach(el => { /** @type {HTMLElement} */ (el).style.display = 'none'; });
+    const target = /** @type {HTMLElement | null} */ (document.querySelector(`.step[data-step="${step}"]`));
     if (target) target.style.display = 'block';
     currentStep = step;
 
@@ -506,19 +508,19 @@ function showStep(step) {
 
     // Cargar ciudades al llegar al paso 2
     if (step === 2) {
-        const paisSelect = document.getElementById('reg-pais');
+        const paisSelect = /** @type {HTMLSelectElement} */ (document.getElementById('reg-pais'));
         if (paisSelect && !paisSelect.value) {
             // Primera visita: resetear país y cargar ciudades
             paisSelect.value = '';
             paisChangeHandler();
         } else if (paisSelect && paisSelect.value) {
             // Volviendo atrás: repoblar dropdown de ciudades pero conservar selección
-            const ciudadActual = document.getElementById('reg-ciudad')?.value || '';
+            const ciudadActual = /** @type {HTMLInputElement | null} */ (document.getElementById('reg-ciudad'))?.value || '';
             poblarCiudades(paisSelect.value);
             // Restaurar ciudad si aún existe en el nuevo dropdown
             if (ciudadActual) {
-                const hiddenInput = document.getElementById('reg-ciudad');
-                const trigger = document.getElementById('ciudad-trigger');
+                const hiddenInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-ciudad'));
+                const trigger = /** @type {HTMLElement} */ (document.getElementById('ciudad-trigger'));
                 if (hiddenInput) hiddenInput.value = ciudadActual;
                 if (trigger) trigger.textContent = ciudadActual;
             }
@@ -531,8 +533,8 @@ function showStep(step) {
 }
 
 function mostrarPasoActual() {
-    document.querySelectorAll('.step').forEach(el => el.style.display = 'none');
-    const target = document.querySelector(`.step[data-step="${currentStep}"]`);
+    document.querySelectorAll('.step').forEach(el => { /** @type {HTMLElement} */ (el).style.display = 'none'; });
+    const target = /** @type {HTMLElement | null} */ (document.querySelector(`.step[data-step="${currentStep}"]`));
     if (target) target.style.display = 'block';
 }
 
@@ -548,7 +550,7 @@ function validateStep(step) {
     let isValid = true;
 
     for (let input of inputs) {
-        if (input.hasAttribute('required') && !input.value.trim()) {
+        if (input.hasAttribute('required') && !/** @type {HTMLInputElement} */ (input).value.trim()) {
             input.classList.add('input-error');
             isValid = false;
         }
@@ -569,8 +571,8 @@ function validateStep(step) {
     }
 
     if (step === 4) {
-        const emailInput = document.getElementById('reg-email');
-        const telefonoInput = document.getElementById('reg-telefono');
+        const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-email'));
+        const telefonoInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-telefono'));
 
         if (emailInput && !esEmailValido(emailInput.value)) {
             marcarInputError(emailInput);
@@ -598,8 +600,8 @@ function validateStep(step) {
     }
 
     if (step === 5) {
-        const nombreInput = document.getElementById('reg-nombre-artista');
-        const passInput = document.getElementById('reg-pass');
+        const nombreInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombre-artista'));
+        const passInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-pass'));
 
         if (disponibilidad.nombre !== true) {
             marcarInputError(nombreInput);
@@ -628,26 +630,26 @@ function validateStep(step) {
 // MANEJO DE VISTAS (LOGIN/REGISTRO)
 // ============================================
 function showLoginSection() {
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
-    document.getElementById('forgot-section').classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('login-section')).classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('registro-section')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('forgot-section')).classList.add('hidden');
     if (window.volverAlBranding) window.volverAlBranding();
 }
 
 function showRegistroSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.remove('hidden');
-    document.getElementById('forgot-section').classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('login-section')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('registro-section')).classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('forgot-section')).classList.add('hidden');
     showStep(1);
 }
 
 function showForgotSection() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('registro-section').classList.add('hidden');
-    document.getElementById('forgot-section').classList.remove('hidden');
-    const msgEl = document.getElementById('forgot-msg');
+    /** @type {HTMLElement} */ (document.getElementById('login-section')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('registro-section')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('forgot-section')).classList.remove('hidden');
+    const msgEl = /** @type {HTMLElement} */ (document.getElementById('forgot-msg'));
     if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
-    const emailInput = document.getElementById('forgot-email');
+    const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('forgot-email'));
     if (emailInput) emailInput.value = '';
 }
 
@@ -674,13 +676,13 @@ document.addEventListener('DOMContentLoaded', function() {
     sessionStorage.removeItem('auth_redirect_flag');
 
     // Botón para ir a registro
-    const btnIrRegistro = document.getElementById('btn-ir-registro');
+    const btnIrRegistro = /** @type {HTMLElement} */ (document.getElementById('btn-ir-registro'));
     if (btnIrRegistro) {
         btnIrRegistro.addEventListener('click', showRegistroSection);
     }
 
     // Enlace ¿Olvidaste tu contraseña? → mostrar sección de solicitud
-    const btnOlvide = document.getElementById('btn-olvide-contrasena');
+    const btnOlvide = /** @type {HTMLElement} */ (document.getElementById('btn-olvide-contrasena'));
     if (btnOlvide) {
         btnOlvide.addEventListener('click', function(e) {
             e.preventDefault();
@@ -689,19 +691,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Botón volver en la sección de olvidé contraseña
-    const btnVolverForgot = document.getElementById('btn-volver-login-from-forgot');
+    const btnVolverForgot = /** @type {HTMLElement} */ (document.getElementById('btn-volver-login-from-forgot'));
     if (btnVolverForgot) {
         btnVolverForgot.addEventListener('click', showLoginSection);
     }
 
     // Formulario de solicitud de restablecimiento
-    const forgotForm = document.getElementById('solicitar-restablecimiento-form');
+    const forgotForm = /** @type {HTMLFormElement} */ (document.getElementById('solicitar-restablecimiento-form'));
     if (forgotForm) {
         forgotForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const emailInput = document.getElementById('forgot-email');
-            const msgEl = document.getElementById('forgot-msg');
-            const btn = document.getElementById('btn-enviar-reset');
+            const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('forgot-email'));
+            const msgEl = /** @type {HTMLElement} */ (document.getElementById('forgot-msg'));
+            const btn = /** @type {HTMLElement} */ (document.getElementById('btn-enviar-reset'));
             const email = emailInput.value.trim();
 
             if (!esEmailValido(email)) {
@@ -743,9 +745,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navegación de pasos del registro (sin transición cinematográfica)
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.nav-btn')) {
-            const btn = e.target.closest('.nav-btn');
-            const step = parseInt(btn.dataset.step);
+        if (e.target instanceof Element && e.target.closest('.nav-btn')) {
+            const btn = /** @type {HTMLElement} */ (e.target.closest('.nav-btn'));
+            const step = parseInt(btn.dataset.step ?? '0');
             const isPrev = btn.classList.contains('prev-btn');
             
             if (isPrev) {
@@ -762,23 +764,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Cargar ciudades al cambiar de país
-    const regPais = document.getElementById('reg-pais');
+    const regPais = /** @type {HTMLElement} */ (document.getElementById('reg-pais'));
     if (regPais) {
         regPais.addEventListener('change', paisChangeHandler);
     }
 
     // Verificación en tiempo real de email y nombre de usuario
-    const regEmail = document.getElementById('reg-email');
+    const regEmail = /** @type {HTMLInputElement} */ (document.getElementById('reg-email'));
     if (regEmail) {
+        
+        /** @this {HTMLElement} */
+
+        
         regEmail.addEventListener('input', function() {
             const val = this.value.trim().toLowerCase();
             // Advertencia inmediata de dominio desechable
-            let msgDesechable = this.parentElement.querySelector('.msg-desechable');
+            let msgDesechable = /** @type {HTMLElement | null} */ (this.parentElement?.querySelector('.msg-desechable'));
             if (esEmailValido(val) && esDominioDesechable(val)) {
                 if (!msgDesechable) {
                     msgDesechable = document.createElement('div');
                     msgDesechable.className = 'validation-message unavailable msg-desechable';
-                    this.parentElement.appendChild(msgDesechable);
+                    this.parentElement?.appendChild(msgDesechable);
                 }
                 msgDesechable.textContent = '❌ Correos temporales no permitidos';
                 msgDesechable.style.display = 'block';
@@ -791,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const regNombreArtista = document.getElementById('reg-nombre-artista');
+    const regNombreArtista = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombre-artista'));
     if (regNombreArtista) {
         regNombreArtista.addEventListener('input', function() {
             verificarNombreDebounced(this.value, this);
@@ -800,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // El nombre de usuario se adapta al rol: para no-artistas es el nombre
     // público con el que aparecerán en la comunidad (no un "nombre artístico").
-    const regRol = document.getElementById('reg-rol');
+    const regRol = /** @type {HTMLSelectElement} */ (document.getElementById('reg-rol'));
     if (regRol && regNombreArtista) {
         const paso5 = regNombreArtista.closest('.step');
         const subtituloPaso5 = paso5 ? paso5.querySelector('.reg-step-subtitle') : null;
@@ -819,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Medidor de fortaleza de contraseña en tiempo real
-    const regPass = document.getElementById('reg-pass');
+    const regPass = /** @type {HTMLInputElement} */ (document.getElementById('reg-pass'));
     if (regPass) {
         regPass.addEventListener('input', function() {
             actualizarMedidorPassword(this.value);
@@ -829,31 +835,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Limpiar borde rojo al escribir/cambiar en cualquier input o select
     document.querySelectorAll('#login-form input, #registro-form input, #registro-form select').forEach(el => {
         const evento = el.tagName === 'SELECT' ? 'change' : 'input';
+        
         el.addEventListener(evento, function() {
-            this.classList.remove('input-error');
+            el.classList.remove('input-error');
         });
     });
 
     // Mostrar/ocultar contraseña
     document.querySelectorAll('.toggle-password').forEach(btn => {
+        
         btn.addEventListener('click', function() {
-            const targetId = this.dataset.target;
-            const input = document.getElementById(targetId);
+            const targetId = /** @type {HTMLElement} */ (btn).dataset.target ?? '';
+            const input = /** @type {HTMLInputElement | null} */ (document.getElementById(targetId));
             if (!input) return;
             const isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
-            this.classList.toggle('visible', isPassword);
-            this.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            btn.classList.toggle('visible', isPassword);
+            btn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
         });
     });
 
     // Formulario de login
-    const loginForm = document.getElementById('login-form');
+    const loginForm = /** @type {HTMLFormElement} */ (document.getElementById('login-form'));
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const emailInput = document.getElementById('login-email');
-            const passInput = document.getElementById('login-pass');
+            const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('login-email'));
+            const passInput = /** @type {HTMLInputElement} */ (document.getElementById('login-pass'));
             const email = emailInput.value;
             const password = passInput.value;
 
@@ -930,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Formulario de registro
-    const registroForm = document.getElementById('registro-form');
+    const registroForm = /** @type {HTMLFormElement} */ (document.getElementById('registro-form'));
     if (registroForm) {
         registroForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -943,38 +951,38 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!validateStep(5)) { currentStep = 5; mostrarPasoActual(); return; }
 
             // Validaciones adicionales que validateStep no cubre
-            const emailInput = document.getElementById('reg-email');
+            const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-email'));
             if (emailInput && disponibilidad.email !== true) {
                 showWarning('El correo electrónico ya está registrado o no se ha verificado aún. Usa otro.');
                 currentStep = 4; mostrarPasoActual(); return;
             }
-            const nombreInput = document.getElementById('reg-nombre-artista');
+            const nombreInput = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombre-artista'));
             if (nombreInput && disponibilidad.nombre !== true) {
                 showWarning('El nombre de artista ya está en uso o no se ha verificado aún. Elige otro.');
                 currentStep = 5; mostrarPasoActual(); return;
             }
             
-            const nombre_artista = document.getElementById('reg-nombre-artista').value;
-            const nombres = document.getElementById('reg-nombres').value;
-            const apellidos = document.getElementById('reg-apellidos').value;
+            const nombre_artista = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombre-artista')).value;
+            const nombres = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombres')).value;
+            const apellidos = /** @type {HTMLInputElement} */ (document.getElementById('reg-apellidos')).value;
             const nombre_real = `${nombres} ${apellidos}`.trim();
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-pass').value;
-            const telefono = document.getElementById('reg-telefono').value;
-            const genero = document.getElementById('reg-genero').value;
-            const dia = document.getElementById('reg-dia').value;
-            const mes = document.getElementById('reg-mes').value;
-            const ano = document.getElementById('reg-ano').value;
+            const email = /** @type {HTMLInputElement} */ (document.getElementById('reg-email')).value;
+            const password = /** @type {HTMLInputElement} */ (document.getElementById('reg-pass')).value;
+            const telefono = /** @type {HTMLInputElement} */ (document.getElementById('reg-telefono')).value;
+            const genero = /** @type {HTMLInputElement} */ (document.getElementById('reg-genero')).value;
+            const dia = /** @type {HTMLInputElement} */ (document.getElementById('reg-dia')).value;
+            const mes = /** @type {HTMLInputElement} */ (document.getElementById('reg-mes')).value;
+            const ano = /** @type {HTMLInputElement} */ (document.getElementById('reg-ano')).value;
             // Rol elegido en el registro (artista por defecto si no hay selector)
-            const rolSel = document.getElementById('reg-rol');
+            const rolSel = /** @type {HTMLSelectElement} */ (document.getElementById('reg-rol'));
             const rol = rolSel ? rolSel.value : 'artista';
             
             if (!dia || !mes || !ano) {
                 showWarning("Todos los campos de fecha son obligatorios.");
                 return;
             }
-            const fechaNac = new Date(ano, mes - 1, dia);
-            if (fechaNac.getFullYear() != ano || fechaNac.getMonth() != mes - 1 || fechaNac.getDate() != dia) {
+            const fechaNac = new Date(Number(ano), Number(mes) - 1, Number(dia));
+            if (fechaNac.getFullYear() != Number(ano) || fechaNac.getMonth() != Number(mes) - 1 || fechaNac.getDate() != Number(dia)) {
                 showWarning("La fecha seleccionada no es válida.");
                 return;
             }
@@ -988,10 +996,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const fecha_nacimiento = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-            const pais = document.getElementById('reg-pais').value;
-            const ciudad = document.getElementById('reg-ciudad').value;
+            const pais = /** @type {HTMLInputElement} */ (document.getElementById('reg-pais')).value;
+            const ciudad = /** @type {HTMLInputElement} */ (document.getElementById('reg-ciudad')).value;
 
-            const submitBtn = document.getElementById('btn-registrarse-final');
+            const submitBtn = /** @type {HTMLElement} */ (document.getElementById('btn-registrarse-final'));
             setButtonLoading(submitBtn, true);
             try {
                 const result = await register(
@@ -1028,19 +1036,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     // SLIDESHOW DE FONDO — cambia cada 15 segundos
     // ============================================
-    const slides = document.querySelectorAll('.auth-bg-slide');
+    const slides = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.auth-bg-slide'));
     const label = document.querySelector('.auth-slide-label');
     const labelName = label?.querySelector('.auth-slide-name');
     const labelMuni = label?.querySelector('.auth-slide-municipio');
-    const labelBandera = label?.querySelector('.auth-slide-bandera');
+    const labelBandera = /** @type {HTMLImageElement | null} */ (label?.querySelector('.auth-slide-bandera'));
     const counterNav = document.querySelector('.auth-slide-counter-nav');
     const labelCounter = counterNav?.querySelector('.auth-slide-counter');
     const totalSlides = slides.length;
 
     if (slides.length > 1) {
         let currentSlide = 0;
-        let slideInterval = null;
-        let labelTimeout = null;
+        /** @type {number | undefined} */
+let slideInterval;
+        /** @type {number | undefined} */
+
+        let labelTimeout;
 
         function updateLabel(index) {
             if (!label) return;
@@ -1106,15 +1117,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // y se reingresa automáticamente. Requiere: WebAuthn disponible + sesión
 // guardada + biometría registrada.
 function actualizarUIbiometrica() {
-    const wrapper = document.getElementById('login-biometrico-wrapper');
+    const wrapper = /** @type {HTMLElement} */ (document.getElementById('login-biometrico-wrapper'));
     if (!wrapper) return;
     const ident = obtenerIdentidadUsuario();
     const mostrar = biometriaDisponible() && haySesionGuardada() && biometriaRegistrada() && ident;
     wrapper.classList.toggle('hidden', !mostrar);
     if (!mostrar) return;
-    const img = document.getElementById('login-bio-avatar');
+    const img = /** @type {HTMLImageElement} */ (document.getElementById('login-bio-avatar'));
     if (img) img.src = (ident.foto && ident.foto.startsWith('http')) ? ident.foto : 'iconos/avatar-default.svg';
-    const nombre = document.getElementById('login-bio-nombre');
+    const nombre = /** @type {HTMLInputElement} */ (document.getElementById('login-bio-nombre'));
     if (nombre) nombre.textContent = ident.nombre;
 }
 
@@ -1122,7 +1133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarUIbiometrica();
 
     // Botón avatar + nombre: entra con huella/patrón/PIN
-    const btnBio = document.getElementById('btn-login-biometrico');
+    const btnBio = /** @type {HTMLElement} */ (document.getElementById('btn-login-biometrico'));
     if (btnBio) {
         btnBio.addEventListener('click', async () => {
             const ok = await desbloquearConBiometria();
