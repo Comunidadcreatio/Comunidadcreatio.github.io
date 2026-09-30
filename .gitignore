@@ -27,3 +27,5 @@ js/*.antes-de-codificar
 # Salidas temporales de verificar-todo.mjs y de las corridas de verificadores
 scripts/.tmp-*
 scripts/*.out.txt
+scripts/t[0-9].txt
+scripts/tmp-*.mjs
