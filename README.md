@@ -148,6 +148,14 @@ Quedan además los grandes: `main.js` (847), `galeria-ui.js` (1233), `panel-ui.j
 
 ### Dos trampas que han costado tiempo
 
+0. **NUNCA poner backticks dentro de un comentario que va dentro de un template literal.**
+   Los verificadores construyen el código que evalúan en la página con plantillas
+   (`` evalJs(`...`) ``), y un comentario como `// usa `box-shadow`` **cierra la plantilla**
+   y rompe el fichero con un `SyntaxError: Unexpected identifier`. Ha pasado **cuatro
+   veces**. Dentro de esas plantillas: nada de backticks en comentarios, y los `\\` de las
+   expresiones regulares van **dobles** (`\\(`), porque si no el regex que se evalúa en la
+   página queda roto y las medidas salen mal sin avisar.
+
 1. **Un error de sintaxis en UN fichero enmascara los avisos de TODOS los demás.** Pasó al
    romper un paréntesis en `biometric-login.js`: el chequeo pasó de 67 avisos (en
    `cuenta.js` y `push.js`) a 1 solo, y parecía que se habían arreglado solos. Ante un

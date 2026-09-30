@@ -56,6 +56,36 @@
    perdería su flecha blanca. */
 @layer base {
 
+    /* ============================================================
+       FOCO VISIBLE SOLO CON TECLADO (:focus-visible)
+       ============================================================
+       Había más de veinte reglas `outline: none` repartidas por las hojas (el navegador
+       dibujaba su anillo por defecto y se quitó sin poner nada en su lugar), así que quien
+       navega con el teclado NO VEÍA dónde estaba. Esto lo arregla de una vez para todos los
+       elementos, sin afectar al ratón: el anillo solo sale con teclado (o al enfocar un
+       campo de texto), que es justo lo que decide `:focus-visible`.
+
+       Va con `!important` a propósito y en la capa `base`. Motivo: hay reglas
+       `outline: none` CON `!important` (auth.css, que vive en `components`), y en las
+       declaraciones `!important` el orden de capas se INVIERTE, así que `base` le gana a
+       `components`. Es de los pocos `!important` del proyecto que están justificados: sin
+       él, el anillo desaparecería justo donde más hace falta. */
+    :focus-visible {
+        /* DOS anillos: uno oscuro pegado al elemento y otro claro por fuera. Con uno solo
+           no basta, y lo encontró el verificador: un anillo negro sobre un botón negro daba
+           contraste 1 (invisible) y un anillo amarillo sobre un enlace amarillo, 1,3. Con
+           dos colores opuestos, sobre cualquier elemento y cualquier fondo hay uno de los
+           dos que se ve. */
+        outline: 3px solid #1a1a1a !important;   /* anillo interior (oscuro) */
+        outline-offset: 0 !important;
+        box-shadow: 0 0 0 6px #ffd166 !important; /* anillo exterior (claro) */
+    }
+    /* En modo oscuro se intercambian: el interior claro y el exterior oscuro. */
+    [data-theme="dark"] :focus-visible {
+        outline-color: #ffd166 !important;
+        box-shadow: 0 0 0 6px #1a1a1a !important;
+    }
+
     /* Flecha personalizada para selects (modo claro - negra) */
     select {
         appearance: none;
