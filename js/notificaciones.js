@@ -1,20 +1,20 @@
 // js/notificaciones.js
 // Sistema de notificaciones (toasts) y estados de carga.
 
-// Crea el contenedor de notificaciones si aún no existe.
+// Crea el contenedor de notificaciones si aÃƒÂºn no existe.
 function initNotificationContainer() {
     let container = document.querySelector('.notification-container');
     if (!container) {
         container = document.createElement('div');
         container.className = 'notification-container';
-        // Forzar z-index máximo inline (no puede ser sobreescrito por CSS)
+        // Forzar z-index mÃƒÂ¡ximo inline (no puede ser sobreescrito por CSS)
         container.style.zIndex = '2147483647';
         document.body.appendChild(container);
     }
     return container;
 }
 
-// Iconos SVG por tipo (evita problemas de codificación con emojis).
+// Iconos SVG por tipo (evita problemas de codificaciÃƒÂ³n con emojis).
 const NOTIF_ICONS = {
     success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
     error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
@@ -24,7 +24,7 @@ const NOTIF_ICONS = {
 
 const CLOSE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
-// Mostrar notificación.
+// Mostrar notificaciÃƒÂ³n.
 function showNotification(message, type = 'info', duration = 5000) {
     const container = initNotificationContainer();
 
@@ -37,10 +37,10 @@ function showNotification(message, type = 'info', duration = 5000) {
     notification.innerHTML = `
         <span class="notification-icon">${icon}</span>
         <span class="notification-message"></span>
-        <button class="notification-close" type="button" aria-label="Cerrar notificación">${CLOSE_ICON}</button>
+        <button class="notification-close" type="button" aria-label="Cerrar notificaciÃƒÂ³n">${CLOSE_ICON}</button>
     `;
-    // Insertar el mensaje como texto para evitar inyección de HTML
-    // y preservar saltos de línea.
+    // Insertar el mensaje como texto para evitar inyecciÃƒÂ³n de HTML
+    // y preservar saltos de lÃƒÂ­nea.
     notification.querySelector('.notification-message').textContent = message;
 
     notification.querySelector('.notification-close').addEventListener('click', () => {
@@ -58,7 +58,7 @@ function showNotification(message, type = 'info', duration = 5000) {
     return notification;
 }
 
-// Cerrar (con animación de salida).
+// Cerrar (con animaciÃƒÂ³n de salida).
 function closeNotification(notification) {
     if (!notification || !notification.parentElement) return;
     notification.classList.add('slide-out');
@@ -116,7 +116,7 @@ export function hideLoadingOverlay() {
     }
 }
 
-// Estado de carga en un botón (spinner + deshabilitado).
+// Estado de carga en un botÃƒÂ³n (spinner + deshabilitado).
 export function setButtonLoading(button, isLoading) {
     if (!button) return;
     if (isLoading) {
@@ -135,11 +135,11 @@ export function setButtonLoading(button, isLoading) {
 }
 
 // ============================================
-// DIÁLOGO DE CONFIRMACIÓN (reemplaza confirm())
+// DIÃƒÂLOGO DE CONFIRMACIÃƒâ€œN (reemplaza confirm())
 // ============================================
 
 /**
- * Muestra un modal de confirmación con OK / Cancelar.
+ * Muestra un modal de confirmaciÃƒÂ³n con OK / Cancelar.
  * Devuelve una Promise que resuelve a true (OK) o false (Cancelar).
  */
 export function showConfirm(message) {
@@ -186,7 +186,7 @@ export function showConfirm(message) {
 }
 
 /**
- * Modal de confirmación con ETIQUETAS personalizadas (p.ej. "Sí" / "No").
+ * Modal de confirmaciÃƒÂ³n con ETIQUETAS personalizadas (p.ej. "SÃƒÂ­" / "No").
  * Devuelve una Promise que resuelve a true (okLabel) o false (cancelLabel).
  */
 export function showConfirmChoice(message, okLabel = 'Aceptar', cancelLabel = 'Cancelar') {

@@ -130,12 +130,17 @@ una línea del código que se sirve ni del deploy.
 vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
 Ese fichero queda protegido para siempre.
 
-Adoptados: **utils.js** (el más importado: 15 ficheros, y donde viven `escapeHtml`,
-`renderText`, `safeImgUrl`) y **etiquetas.js**.
+Adoptados (**11**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
+`ciudades.js`, `bloqueo-fondo.js`, `auth.js`, `panel.js`, `password-strength.js` y `pwa.js`.
 
-Lo que encontró al adoptar `etiquetas.js` (y se arregló): `dataset` sobre un `Element`,
-`e.target` posiblemente `null` y `closest` sobre un `EventTarget` — los tres son
-`TypeError` latentes en un manejador de clic.
+**Pendientes** (necesitan una pasada propia, no valen un momento): `notificaciones.js`
+(salió con 15 avisos: `getElementById` sin comprobar el null y `style` sobre un `Element`),
+`main.js`, `perfil.js`, `panel-ui.js`, `chat.js` y `problogs.js`.
+
+Lo que ha ido encontrando (y se ha arreglado): `dataset`/`closest` sobre tipos que no los
+tienen, `e.target` posiblemente `null`, `JSON.parse` con un `string | null`,
+`URLSearchParams` con números, y variables que empiezan en `null` y luego reciben otra cosa
+(TypeScript cree entonces que su tipo ES `null`). Ninguno era visible a simple vista.
 
 **Por qué no se llama a `tsc` directamente:** los imports llevan el hash de caché
 (`from './utils.js?v=abc123'`, que pone bump-version.js) y TypeScript no sabe resolver un

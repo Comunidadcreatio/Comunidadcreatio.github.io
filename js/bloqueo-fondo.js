@@ -1,53 +1,68 @@
+// @ts-check
 // js/bloqueo-fondo.js
 // ============================================================
 // BLOQUEO DEL SCROLL DEL FONDO (compartido)
 // ============================================================
-// Lo usan la hoja de comentarios y el modal de descripción. Se lleva un
+// Lo usan la hoja de comentarios y el modal de descripciÃ³n. Se lleva un
 // CONTADOR DE MOTIVOS: si los dos piden el bloqueo a la vez, el fondo no se
-// libera hasta que el último lo suelte. Sin esto, cerrar uno de los dos
-// descongelaría el fondo mientras el otro sigue abierto.
+// libera hasta que el Ãºltimo lo suelte. Sin esto, cerrar uno de los dos
+// descongelarÃ­a el fondo mientras el otro sigue abierto.
 //
 // Hay DOS mecanismos, y hacen falta los dos:
 //
 // 1) CONGELAR CONTENEDORES (`overflow: hidden`). Se aplica a
-//    #galeria-container —el scroller de la galería, que es position: fixed con
-//    overflow-y: auto— y también a <html> y <body>, porque el DOCUMENTO
+//    #galeria-container â€”el scroller de la galerÃ­a, que es position: fixed con
+//    overflow-y: autoâ€” y tambiÃ©n a <html> y <body>, porque el DOCUMENTO
 //    asimismo scrollea: body tiene `min-height: 100vh` + `padding-bottom: 100px`.
 //    Se guarda y se devuelve el valor previo de cada uno para no pisar a otros
-//    módulos (por ejemplo el pull-to-refresh).
+//    mÃ³dulos (por ejemplo el pull-to-refresh).
 //
 // 2) BLOQUEAR EL GESTO (`touchmove` + preventDefault). Este es el importante y
-//    el que costó dar con él: enumerar scrollers NO basta, porque el modal de
-//    descripción es `pointer-events: none` A PROPÓSITO (deja pasar los toques al
-//    header, al nav y a la tarjeta de detrás). El dedo puede caer entonces en
-//    cualquier elemento de debajo y arrastrar, y como no hay un único scroller
-//    siempre queda uno sin enumerar. Cancelando el GESTO da igual qué haya
+//    el que costÃ³ dar con Ã©l: enumerar scrollers NO basta, porque el modal de
+//    descripciÃ³n es `pointer-events: none` A PROPÃ“SITO (deja pasar los toques al
+//    header, al nav y a la tarjeta de detrÃ¡s). El dedo puede caer entonces en
+//    cualquier elemento de debajo y arrastrar, y como no hay un Ãºnico scroller
+//    siempre queda uno sin enumerar. Cancelando el GESTO da igual quÃ© haya
 //    debajo.
 //
-// El listener de touchmove se añade y se quita junto con el bloqueo: un
-// touchmove no-pasivo a nivel de documento desactiva el camino rápido de scroll
-// del navegador, así que no debe quedarse puesto de forma permanente.
+// El listener de touchmove se aÃ±ade y se quita junto con el bloqueo: un
+// touchmove no-pasivo a nivel de documento desactiva el camino rÃ¡pido de scroll
+// del navegador, asÃ­ que no debe quedarse puesto de forma permanente.
 // ============================================================
 const motivos = new Set();
-let previos = null;      // Map<elemento, overflow previo>
-let guardia = null;      // listener de touchmove activo (o null)
 
+// Los tipos se declaran a mano porque empiezan en `null` y luego reciben otra cosa: sin
+// esto, TypeScript cree que su tipo ES null y no deja asignarles nada (lo avisó el chequeo).
+/** @type {Map<HTMLElement, string> | null} */   // overflow previo de cada elemento
+let previos = null;
+/** @type {((e: TouchEvent) => void) | null} */  // listener de touchmove activo
+let guardia = null;
+
+/** @returns {HTMLElement[]} */
 function objetivos() {
     return [
         document.getElementById('galeria-container'),
         document.documentElement,
         document.body
-    ].filter(Boolean);
+    ].filter((el) => el !== null);
 }
 
-// ¿Hay que cancelar este gesto? Sí, salvo que empiece en un área que SÍ debe
-// poder scrollear (el texto de la descripción, si es largo).
+// Â¿Hay que cancelar este gesto? SÃ­, salvo que empiece en un Ã¡rea que SÃ debe
+// poder scrollear (el texto de la descripciÃ³n, si es largo).
+/**
+ * @param {EventTarget | null} target
+ * @param {string} [selectorPermitido]
+ * @returns {boolean}
+ */
 export function gestoBloqueado(target, selectorPermitido) {
     if (!selectorPermitido) return true;
-    if (!target || typeof target.closest !== 'function') return true;
-    return !target.closest(selectorPermitido);
+    // Se comprueba que sea un Element (un EventTarget cualquiera no tiene `closest`).
+    const el = target instanceof Element ? target : null;
+    if (!el) return true;
+    return !el.closest(selectorPermitido);
 }
 
+/** @param {string} [selectorPermitido] */
 export function activarGuardiaGesto(selectorPermitido) {
     if (guardia) return;
     guardia = (e) => {
@@ -75,7 +90,7 @@ export function bloquearFondo(motivo) {
 
 export function liberarFondo(motivo) {
     motivos.delete(motivo);
-    if (motivos.size > 0) return;    // todavía hay alguien que lo bloquea
+    if (motivos.size > 0) return;    // todavÃ­a hay alguien que lo bloquea
     if (previos) {
         for (const [el, valor] of previos) el.style.overflow = valor;
         previos = null;

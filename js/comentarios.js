@@ -1,11 +1,11 @@
 // js/comentarios.js
 // Drawer de comentarios â€” se desliza desde la parte inferior.
-import { apiRequest } from './config.js?v=cbcf130dbf';
-import { renderText, safeImgUrl } from './utils.js?v=972ca7ff30';
+import { apiRequest } from './config.js?v=83fa9be85a';
+import { renderText, safeImgUrl } from './utils.js?v=d1d5bb9603';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
-import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=dd51e51820';
-import { registrarOverlay } from './overlays.js?v=6e3a9a3bd5';
+import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=bd1efa26f9';
+import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
 
 let obraIdActual = null;
 // Recurso cuyos comentarios se muestran: 'obras' o 'problogs'. El cajón es el

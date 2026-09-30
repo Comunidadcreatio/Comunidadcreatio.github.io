@@ -2,14 +2,14 @@
 // Gestión del perfil de usuario, estadísticas, foto de perfil,
 // visualización de perfiles externos y resultados de búsqueda.
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=cbcf130dbf';
-import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=159c7e89ae';
-import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=d2867c8ca0';
-import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=972ca7ff30';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=83fa9be85a';
+import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=bb8ec46258';
+import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=5238451892';
+import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=d1d5bb9603';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=2ce565a0f3';
-import { cerrarOverlaysFlotantes } from './overlays.js?v=6e3a9a3bd5';
+import { setupViewTracking } from './galeria.js?v=4f1817742b';
+import { cerrarOverlaysFlotantes } from './overlays.js?v=cd0e5cba39';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
 
