@@ -183,6 +183,15 @@ nada.
 Lo que SÍ se quedó (y está medido): las **View Transitions** del feed a la lectura
 (`scripts/dbg-viewtransition.mjs` cuenta las llamadas y las animaciones reales).
 
+### ⚠️ Los verificadores NO se corren en paralelo
+
+Cada verificador abre su propio Chrome. Si se lanzan dos a la vez (o uno mientras otro
+sigue vivo), las medidas se contaminan y salen **fallos que no existen**: pasó con
+`verificar-aspecto-comentarios`, que dio dos fallos del nav que desaparecieron al repetirlo
+con la máquina tranquila. `verificar-todo.mjs` los corre **en serie** a propósito. Si algún
+día un verificador falla en algo que no se ha tocado, **repetirlo solo** antes de creerse el
+resultado.
+
 ## Scripts
 
 | Script | Qué hace |
@@ -207,11 +216,27 @@ mirar: al correrlos aparecieron dos avisos que llevaban ahí sin que nadie los v
 era un verificador que ya no reflejaba el comportamiento correcto, y otro una prueba de
 integración contra datos reales). `verificar-todo.mjs` los corre todos y saca el resumen.
 
-**Un aviso para interpretar el resultado:** `verificar-filtro-problogs-perfil.mjs` es la
-única prueba **de integración contra el backend real** (su mock deja pasar a propósito las
-URLs `/problog`). Depende de que en producción exista una publicación de un artista
-concreto (id 480001), así que **se pone roja cuando cambian los datos reales** — no cuando
-el código está mal. Está pendiente de rehacerlo con datos simulados, como el resto.
+**Un aviso para interpretar el resultado:** `verificar-filtro-problogs-perfil.mjs` era la
+única prueba **de integración contra el backend real** (su mock dejaba pasar a propósito
+las URLs `/problog`) y dependía de que en producción existiera una publicación concreta, así
+que **se ponía roja cuando cambiaban los datos reales**, no cuando el código estaba mal.
+**Ya está rehecha con datos simulados** (el mock filtra por `?artista=` como haría el
+servidor), así que ahora es determinista.
+
+### El chat tenía un hueco, y se notó
+
+El chat **no tenía ningún verificador**, y un fallo de codificación en `ciudades.js` (los
+nombres con tilde quedaron doblemente codificados) dejó la pantalla del chat en **«No hay
+pueblos disponibles»** sin que ninguna prueba lo viera. Ahora existe
+`scripts/verificar-chat-directorio.mjs`, que comprueba:
+
+- la búsqueda **literal** que hace `chat.js` (`window.CIUDADES_POR_PAIS['Venezuela']['Táchira']`);
+- que se pinten los **29** pueblos, con los nombres **sin doble codificación**;
+- que la **bandera cargue de verdad** (`naturalWidth > 0`, no solo que tenga `src`);
+- los contadores de activos/artistas y el acordeón (abre uno, cierra el anterior).
+
+Comprobado que **habría cazado el fallo**: estropeando `ciudades.js` a propósito, la prueba
+falla con 12 fallos y reproduce el síntoma exacto (`["TÃ¡chira"]`, 0 pueblos).
 | scripts/minify.js | Genera .min.css/.min.js (enmascara strings, valida con node --check; falla en voz alta si algo no es minificable, ej. perfil.js con templates anidados → usar Terser) |
 | scripts/add_banderas.py / fix_banderas.py | Utilidades de banderas (una vez) |
 

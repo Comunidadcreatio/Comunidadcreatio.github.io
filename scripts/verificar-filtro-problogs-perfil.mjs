@@ -56,11 +56,32 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           localStorage.setItem('artistaData', JSON.stringify({ id: 1, nombre_artista: 'T', email: 't@t.com', foto_perfil: '', rol: 'artista' }));
           localStorage.setItem('creatio_auth_token_persist', 'tok');
       } catch (_) {}
+      // El filtro ?artista= de Problogs se SIMULA aquí. Antes esta prueba iba contra el
+      // backend real y se ponía roja cuando en producción cambiaban los datos: la
+      // publicación de prueba del artista 480001 dejó de existir y el test fallaba sin que
+      // el código estuviera mal (daba un aviso falso). Lo que se comprueba es la parte de
+      // la APP: que pida el artista correcto y que pinte SOLO lo que le llega.
+      const CON_POSTS = 480001;
+      const publicacionDePrueba = () => ({
+          id: 99001, titulo: 'Publicacion de prueba del perfil', etiquetas: '', estado: 'publicado',
+          created_at: new Date(Date.now() - 3600000).toISOString(),
+          bloques: [{ tipo: 'texto', contenido: 'Texto de prueba.' }],
+          imagenes: [null,null,null,null,null,null,null,null], miniaturas: [null,null,null,null,null,null,null,null],
+          portada_slot: null, nombre_artista: 'Autor de prueba', foto_artista: '',
+          likes_count: 0, comentarios_count: 0, reblogs_count: 0, liked: false, reblogged: false
+      });
       const mockeado = ['heartbeat', 'sesiones-activas', 'artistas/perfil', 'notificaciones', 'chat', 'mis-reacciones', 'usuarios', '/obras'];
       const realFetch = window.fetch.bind(window);
       window.fetch = async (input, init) => {
           const u = String(input);
-          if (u.includes('backend-fundacion-atpe.onrender.com') && !u.includes('/problog') && mockeado.some(s => u.includes(s))) {
+          // Problogs: se filtra por ?artista= igual que hace el servidor de verdad.
+          if (u.includes('backend-fundacion-atpe.onrender.com') && u.includes('/problogs')) {
+              const m = u.match(/[?&]artista=([^&]+)/);
+              const autor = m ? decodeURIComponent(m[1]) : '';
+              const lista = (autor === String(CON_POSTS)) ? [publicacionDePrueba()] : [];
+              return { ok: true, status: 200, json: async () => ({ success: true, problogs: lista, total: lista.length }) };
+          }
+          if (u.includes('backend-fundacion-atpe.onrender.com') && mockeado.some(s => u.includes(s))) {
               return { ok: true, status: 200, json: async () => ({
                   success: true, count: 0, no_leidas: 0, reacciones: [], usuarios: [],
                   notificaciones: [], sesiones: [], seguidores: [], siguiendo: [],
