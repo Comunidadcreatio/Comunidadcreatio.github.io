@@ -1884,5 +1884,40 @@ body.creando-problogs #problog-nav-bar {
         padding-bottom: 90px;
     }
 
+    /* ============================================================
+       TRANSICIÓN ENTRE EL FEED Y LA LECTURA (View Transitions API)
+       ============================================================
+       La pone problogs.js con `conTransicion()` (en utils.js): el navegador
+       fotografía el antes y el después y anima el paso. Aquí solo se dice CÓMO.
+       La cabecera y el menú se FIJAN con su propio `view-transition-name` y sin
+       animación: así el marco se queda quieto y solo se desliza el contenido
+       (si no, se movería toda la página y parecería que tiembla).
+       Todo va bajo `prefers-reduced-motion`: quien pide menos movimiento, no la ve. */
+    @media (prefers-reduced-motion: no-preference) {
+        #main-header { view-transition-name: problog-cabecera; }
+        #toggle-panel { view-transition-name: problog-menu; }
+
+        ::view-transition-old(problog-cabecera),
+        ::view-transition-new(problog-cabecera),
+        ::view-transition-old(problog-menu),
+        ::view-transition-new(problog-menu) {
+            animation: none;
+        }
+
+        ::view-transition-old(root) {
+            animation: 170ms ease-in both problogVtSalir;
+        }
+        ::view-transition-new(root) {
+            animation: 260ms cubic-bezier(0.22, 1, 0.36, 1) both problogVtEntrar;
+        }
+    }
+
+    @keyframes problogVtSalir {
+        to { opacity: 0; transform: translateX(-20px); }
+    }
+    @keyframes problogVtEntrar {
+        from { opacity: 0; transform: translateX(20px); }
+    }
+
 }
 

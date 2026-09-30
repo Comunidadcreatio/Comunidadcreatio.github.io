@@ -179,6 +179,39 @@ export const debugLog = {
 };
 
 // ============================================
+// VIEW TRANSITIONS (transición entre vistas)
+// ============================================
+/**
+ * Ejecuta un cambio del DOM dentro de una View Transition, si el navegador la trae.
+ * Si no la trae (o si el usuario pidió menos movimiento), hace el cambio igual: nunca
+ * se pierde funcionalidad, solo el efecto.
+ *
+ * Se usa para el paso feed -> lectura de Problogs (y la vuelta): el navegador
+ * fotografía el antes y el después y anima el paso entre las dos, sin librerías.
+ *
+ * @param {() => void} cambio  Lo que cambia el DOM (tiene que ser SÍNCRONO).
+ * @returns {Promise<void>}  Se resuelve cuando el cambio YA está aplicado en el DOM.
+ *   Hay que esperarlo si después se va a escribir DENTRO de lo que se acaba de pintar:
+ *   el navegador llama al cambio de forma ASÍNCRONA, así que sin esperar se puede
+ *   escribir primero y que el cambio lo borre después (carrera).
+ */
+export function conTransicion(cambio) {
+    const doc = /** @type {any} */ (document);
+    if (typeof doc.startViewTransition !== 'function') { cambio(); return Promise.resolve(); }
+    try {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { cambio(); return Promise.resolve(); }
+    } catch (e) { /* sin matchMedia se sigue adelante */ }
+    const t = doc.startViewTransition(cambio);
+    // Si la transición se salta (otra en curso, pestaña oculta...), la promesa se
+    // rechaza: hay que recogerla o salta un "unhandled rejection" en consola.
+    if (t && t.finished && typeof t.finished.catch === 'function') t.finished.catch(() => {});
+    if (t && t.updateCallbackDone && typeof t.updateCallbackDone.catch === 'function') {
+        return t.updateCallbackDone.catch(() => {});
+    }
+    return Promise.resolve();
+}
+
+// ============================================
 // URL DE CLOUDINARY CON TRANSFORMACIONES (1080p, WebP, calidad optimizada)
 // ============================================
 /**

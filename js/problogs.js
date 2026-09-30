@@ -31,10 +31,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=83fa9be85a';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen } from './utils.js?v=d1d5bb9603';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=8ca6f6755e';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion } from './utils.js?v=20b06d3d70';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=5238451892';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=09c4db4f34';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=75ad79f45a';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
@@ -42,7 +42,7 @@ import { registrarOverlay } from './overlays.js?v=cd0e5cba39';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=bd1efa26f9';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=bb8ec46258';
+import { artistaActual } from './auth.js?v=bc34ffbf02';
 
 const MAX_IMAGENES = 8;
 const MAX_TEXTO = 20000;
@@ -1769,28 +1769,35 @@ function pintarLectura(p, conAcciones) {
 
 async function abrirLectura(id) {
     if (!detalleEl || !feedEl) return;
-    detalleEl.innerHTML = '<p class="problogs-cargando">Cargando…</p>';
-    detalleEl.classList.remove('hidden');
-    feedEl.classList.add('hidden');
+    const detalle = detalleEl, feed = feedEl;
+    // PASO 1, inmediato y sin transición: se enseña el "Cargando" y se quita el feed.
+    // (Antes esto iba DENTRO de la transición, y como el navegador llama al cambio de
+    // forma asíncrona, si la respuesta llegaba antes el cambio borraba lo ya pintado:
+    // la publicación se quedaba sin comentarios. Lo cazó el verificador.)
+    detalle.innerHTML = '<p class="problogs-cargando">Cargando…</p>';
+    detalle.classList.remove('hidden');
+    feed.classList.add('hidden');
     // El icono de volver vive en el header (junto a la campana) y solo se ve
     // mientras hay una publicación abierta.
     mostrarIconoVolver(true);
     try {
         const data = await apiRequest('/problogs/' + id);
         if (!data || data.success === false || !data.id) {
-            detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
+            detalle.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
             mostrarIconoVolver(false);
             return;
         }
         publicacionAbierta = data;
-        detalleEl.innerHTML = pintarLectura(data);
+        // PASO 2, con transición: ENTRA la publicación. Se ESPERA a que el cambio esté
+        // aplicado antes de pintar los comentarios, o el propio cambio los borraría.
+        await conTransicion(() => { detalle.innerHTML = pintarLectura(data); });
         // Los comentarios de la publicación se cargan al abrirla.
         cargarComentariosDeLaPublicacion(data.id);
         // Y se miden las cajas con línea (el cajón de escribir) al ancho real.
         ajustarAnchoCajasComentarios();
     } catch (err) {
         debugLog.error('Error abriendo problog:', err);
-        detalleEl.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
+        detalle.innerHTML = '<p class="problogs-vacio">No se pudo abrir la publicación.</p>';
         mostrarIconoVolver(false);
     }
 }
@@ -1817,13 +1824,17 @@ function mostrarIconoVolver(mostrar) {
 
 function cerrarLectura() {
     if (!detalleEl || !feedEl) return;
-    detalleEl.classList.add('hidden');
-    detalleEl.innerHTML = '';
-    feedEl.classList.remove('hidden');
+    const detalle = detalleEl, feed = feedEl;
+    // La vuelta al feed también va con la transición (mismo efecto, al revés).
+    conTransicion(() => {
+        detalle.classList.add('hidden');
+        detalle.innerHTML = '';
+        feed.classList.remove('hidden');
+        // Si se estaba respondiendo a un comentario, la barra se va con la vista.
+        dejarDeResponder();
+        mostrarIconoVolver(false);
+    });
     publicacionAbierta = null;
-    // Si se estaba respondiendo a un comentario, la barra se va con la vista.
-    dejarDeResponder();
-    mostrarIconoVolver(false);
 }
 
 // ============================================================

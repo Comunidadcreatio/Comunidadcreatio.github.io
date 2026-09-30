@@ -3,8 +3,8 @@
 // contenido remoto, así que se habla con el plugin NATIVO a través del puente
 // `window.Capacitor.Plugins.PushNotifications` (sin bundler).
 // En navegador web (sin Capacitor) esto simplemente no hace nada.
-import { apiRequest, ARTISTA_KEY } from './config.js?v=83fa9be85a';
-import { debugLog } from './utils.js?v=d1d5bb9603';
+import { apiRequest, ARTISTA_KEY } from './config.js?v=8ca6f6755e';
+import { debugLog } from './utils.js?v=20b06d3d70';
 
 const TOKEN_KEY = 'fcm_token';
 

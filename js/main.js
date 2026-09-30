@@ -15,9 +15,9 @@
 // mejor manejo errores popover
 // bump forzado v279
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=83fa9be85a';
-import { token, artistaActual, logout, updateLastActivity } from './auth.js?v=bb8ec46258';
-import { debugLog, renderText, safeImgUrl } from './utils.js?v=d1d5bb9603';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=8ca6f6755e';
+import { token, artistaActual, logout, updateLastActivity } from './auth.js?v=bc34ffbf02';
+import { debugLog, renderText, safeImgUrl } from './utils.js?v=20b06d3d70';
 import {
     showSuccess, showError, showWarning, showInfo, showConfirm
 } from './notificaciones.js?v=5238451892';
@@ -28,23 +28,23 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=425396a0c8';
+} from './perfil.js?v=e1b21bd8bf';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView, toggleProblogs,
     abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono
-} from './galeria-ui.js?v=09c4db4f34';
+} from './galeria-ui.js?v=75ad79f45a';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
     setupObraFormSubmit, setupFormAccordions, confirmarDescartarCambios,
     limpiarFormularioConConfirmacion
-} from './panel-ui.js?v=f1d828dfad';
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=4f1817742b';
-import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=a0621537e5';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=396f561738';
-import { setupPush } from './push.js?v=c7eaabef20';
+} from './panel-ui.js?v=c1be5f11dd';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=78f72031d2';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=e1ee64a9f5';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=5af1e8e82e';
+import { setupPush } from './push.js?v=8d6fd821e8';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
@@ -187,7 +187,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     document.getElementById('notif-dropdown').classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js?v=09c4db4f34');
+                    const galeriaUI = await import('./galeria-ui.js?v=75ad79f45a');
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -415,7 +415,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js?v=0cb082a917').then(m => {
+    import('./busqueda.js?v=2c1c06e0b3').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -626,7 +626,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js?v=09c4db4f34').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./galeria-ui.js?v=75ad79f45a').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -706,7 +706,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js?v=6656ed8f2a').then(m => m.setupMiCuenta());
+    import('./cuenta.js?v=bd4f02327b').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
@@ -781,7 +781,7 @@ async function init() {
     if (!sesionValida) {
         // Si el usuario marcó "Recordarme", reanudar la sesión en silencio con
         // las credenciales guardadas (la sesión JWT pudo caducar al cerrar la app).
-        const { intentarReanudarSesionRecordada } = await import('./biometric-login.js?v=a01acc860f');
+        const { intentarReanudarSesionRecordada } = await import('./biometric-login.js?v=6f4c7d0f8a');
         const reanudada = await intentarReanudarSesionRecordada();
         if (!reanudada) {
             localStorage.removeItem(ARTISTA_KEY);
@@ -816,7 +816,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js?v=09c4db4f34');
+            const galeriaUI = await import('./galeria-ui.js?v=75ad79f45a');
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {
