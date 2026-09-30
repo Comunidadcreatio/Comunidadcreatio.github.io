@@ -27,4 +27,14 @@ interface Window {
     MUNICIPIO_POR_PUEBLO: Record<string, string>;
     /** Puente de Capacitor: solo está en la app nativa (APK), no en el navegador. */
     Capacitor?: CapacitorGlobal;
+    /** Versión con prefijo del AudioContext (Safari viejo y WebView antiguos). */
+    webkitAudioContext?: typeof AudioContext;
+    /** Cierra TODAS las sesiones abiertas (lo expone main.js en window). */
+    closeAllSessions?: () => any;
+    /** Refresca el contador de notificaciones (lo expone main.js en window). */
+    refrescarNotificaciones?: () => any;
+    /** Canal de chat abierto ahora mismo (lo lleva push.js para no notificar de ese chat). */
+    _canalChatActivo?: string | number | null;
+    /** Diagnóstico de push para depurar desde la consola. */
+    __diagnosticoPush?: any;
 }

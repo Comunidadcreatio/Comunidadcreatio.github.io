@@ -44,7 +44,7 @@ import {
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=1ba06afc20';
 import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=68b79ad4fe';
 import { setupChat, refrescarChatNoLeidos } from './chat.js?v=89b300b04f';
-import { setupPush } from './push.js?v=f0c71a686a';
+import { setupPush } from './push.js?v=f78501b335';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
 
@@ -706,7 +706,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js?v=352706fd79').then(m => m.setupMiCuenta());
+    import('./cuenta.js?v=1f5ffdbc19').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {

@@ -1,3 +1,4 @@
+// @ts-check
 // js/push.js
 // Push notifications vía FCM (Capacitor). La app es una WebView que carga
 // contenido remoto, así que se habla con el plugin NATIVO a través del puente
@@ -11,6 +12,7 @@ const TOKEN_KEY = 'fcm_token';
 // ============================================
 // SONIDO DE NOTIFICACIÓN (Web Audio API — sin archivos)
 // ============================================
+/** @type {AudioContext | null} */
 let _audioCtx = null;
 
 // Desbloquea el AudioContext con el primer gesto del usuario (requisito de Android)
@@ -18,8 +20,8 @@ function desbloquearAudio() {
     try {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
-        if (!_audioCtx) _audioCtx = new AC();
-        if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
+        const ctx = _audioCtx || (_audioCtx = new AC());
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     } catch (e) { /* silencioso */ }
 }
 window.addEventListener('pointerdown', desbloquearAudio, { once: true });
@@ -30,15 +32,15 @@ function reproducirSonidoNotificacion() {
     try {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
-        if (!_audioCtx) _audioCtx = new AC();
-        if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
+        const ctx = _audioCtx || (_audioCtx = new AC());
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
-        const t0 = _audioCtx.currentTime;
+        const t0 = ctx.currentTime;
         const notas = [880, 1174.66]; // La5 → Re6
 
         notas.forEach((freq, i) => {
-            const osc = _audioCtx.createOscillator();
-            const gain = _audioCtx.createGain();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sine';
             osc.frequency.value = freq;
             const inicio = t0 + i * 0.12;
@@ -46,7 +48,7 @@ function reproducirSonidoNotificacion() {
             gain.gain.setValueAtTime(0.0001, inicio);
             gain.gain.exponentialRampToValueAtTime(0.22, inicio + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
-            osc.connect(gain).connect(_audioCtx.destination);
+            osc.connect(gain).connect(ctx.destination);
             osc.start(inicio);
             osc.stop(inicio + duracion + 0.05);
         });
@@ -81,8 +83,10 @@ window.__diagnosticoPush = function () {
     console.groupEnd();
     // Resumen rápido
     const token = localStorage.getItem(TOKEN_KEY);
-    const cap = !!window.Capacitor;
-    const push = cap && !!(window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications);
+    const capObj = window.Capacitor;
+
+    const cap = !!capObj;
+    const push = cap && !!(capObj.Plugins && capObj.Plugins.PushNotifications);
     console.log('📊 RESUMEN:', {
         capacitor: cap,
         pushPlugin: push,
@@ -345,7 +349,9 @@ async function registrarToken(token) {
         });
         diag('tokenSave', 'Backend respondió OK: ' + JSON.stringify(resp));
     } catch (e) {
-        diag('tokenSaveError', 'Error al registrar token en backend: ' + (e && (e.message || String(e))));
+        // En un catch el error es "desconocido": se comprueba antes de leer .message.
+        const err = /** @type {{ message?: string }} */ (e);
+        diag('tokenSaveError', 'Error al registrar token en backend: ' + (err && (err.message || String(err))));
         debugLog.error('registrar token push:', e);
     }
 }
@@ -374,7 +380,8 @@ function manejarPush(d) {
 // ============================================
 // BANNER EN PRIMER PLANO (mensajes de chat)
 // ============================================
-let bannerTimer = null;
+/** @type {number | undefined} */
+let bannerTimer;
 let bannerCanal = null;
 let bannerTitulo = null;
 let bannerVisible = false;

@@ -1,3 +1,4 @@
+// @ts-check
 // js/cuenta.js
 // Gestión de la sección "Mi Cuenta": cambiar email, cambiar contraseña,
 // eliminar cuenta y accordion de seguridad.
@@ -30,9 +31,10 @@ function mostrarErrorBackend(res, errorEl) {
  * Oculta (y resetea) un formulario de la sección Mi Cuenta.
  */
 function ocultarFormularioCuenta(id) {
-    const form = document.getElementById(id);
+    // `getElementById` da HTMLElement, que no tiene .reset: aqui es un formulario.
+    const form = /** @type {HTMLFormElement | null} */ (document.getElementById(id));
     if (!form) return;
-    form.reset && form.reset();
+    if (typeof form.reset === 'function') form.reset();
     form.classList.add('hidden');
     form.querySelectorAll('.cuenta-error').forEach(e => (e.textContent = ''));
     const strength = form.querySelector('#cuenta-password-strength');
@@ -53,7 +55,7 @@ export function setupMiCuenta() {
     if (accordionSeguridad && seguridadContent) {
         accordionSeguridad.addEventListener('click', () => {
             const isExpanded = accordionSeguridad.getAttribute('aria-expanded') === 'true';
-            accordionSeguridad.setAttribute('aria-expanded', !isExpanded);
+            accordionSeguridad.setAttribute('aria-expanded', String(!isExpanded));
             if (isExpanded) {
                 seguridadContent.hidden = true;
                 seguridadContent.style.maxHeight = '0';
@@ -76,7 +78,7 @@ export function setupMiCuenta() {
     if (accordionSesion && sesionContent) {
         accordionSesion.addEventListener('click', () => {
             const isExpanded = accordionSesion.getAttribute('aria-expanded') === 'true';
-            accordionSesion.setAttribute('aria-expanded', !isExpanded);
+            accordionSesion.setAttribute('aria-expanded', String(!isExpanded));
             if (isExpanded) {
                 sesionContent.hidden = true;
                 sesionContent.style.maxHeight = '0';
@@ -99,7 +101,7 @@ export function setupMiCuenta() {
     if (accordionModo && modoContent) {
         accordionModo.addEventListener('click', () => {
             const isExpanded = accordionModo.getAttribute('aria-expanded') === 'true';
-            accordionModo.setAttribute('aria-expanded', !isExpanded);
+            accordionModo.setAttribute('aria-expanded', String(!isExpanded));
             if (isExpanded) {
                 modoContent.hidden = true;
                 modoContent.style.maxHeight = '0';
@@ -115,7 +117,7 @@ export function setupMiCuenta() {
     }
 
     // Botón: Cerrar Sesión
-    const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+    const btnCerrarSesion = /** @type {HTMLButtonElement} */ (document.getElementById('btn-cerrar-sesion'));
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', async () => {
             btnCerrarSesion.disabled = true;
@@ -134,8 +136,8 @@ export function setupMiCuenta() {
     if (btnCerrarTodas) {
         btnCerrarTodas.addEventListener('click', () => {
             // closeAllSessions se define en main.js y es accesible globalmente
-            if (typeof closeAllSessions === 'function') {
-                closeAllSessions();
+            if (typeof window.closeAllSessions === 'function') {
+                window.closeAllSessions();
             }
         });
     }
@@ -144,15 +146,17 @@ export function setupMiCuenta() {
     // BOTONES "CANCELAR"
     // ============================================
     document.querySelectorAll('.btn-cuenta-cancelar[data-cancelar]').forEach(btn => {
-        btn.addEventListener('click', () => ocultarFormularioCuenta(btn.dataset.cancelar));
+        // querySelectorAll devuelve Element (sin .dataset): se dice que es un HTMLElement.
+        const el = /** @type {HTMLElement} */ (btn);
+        el.addEventListener('click', () => ocultarFormularioCuenta(String(el.dataset.cancelar)));
     });
 
     // ============================================
     // CAMBIAR CORREO ELECTRÓNICO
     // ============================================
-    const btnCambiarEmail = document.getElementById('btn-cambiar-email');
-    const formCambiarEmail = document.getElementById('form-cambiar-email');
-    const formConfirmarEmail = document.getElementById('form-confirmar-email');
+    const btnCambiarEmail = /** @type {HTMLButtonElement} */ (document.getElementById('btn-cambiar-email'));
+    const formCambiarEmail = /** @type {HTMLFormElement} */ (document.getElementById('form-cambiar-email'));
+    const formConfirmarEmail = /** @type {HTMLFormElement} */ (document.getElementById('form-confirmar-email'));
 
     if (btnCambiarEmail && formCambiarEmail) {
         btnCambiarEmail.addEventListener('click', () => {
@@ -162,8 +166,8 @@ export function setupMiCuenta() {
 
         formCambiarEmail.addEventListener('submit', (e) => {
             e.preventDefault();
-            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
-            const errorEl = document.getElementById('error-nuevo-email');
+            const nuevoEmail = /** @type {HTMLInputElement} */ (document.getElementById('nuevo-email')).value.trim();
+            const errorEl = /** @type {HTMLElement} */ (document.getElementById('error-nuevo-email'));
             errorEl.textContent = '';
             const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail);
             if (!emailValido || !esEmailValido(nuevoEmail)) {
@@ -174,7 +178,7 @@ export function setupMiCuenta() {
                 errorEl.textContent = 'No se permiten correos temporales o desechables. Usa tu correo personal.';
                 return;
             }
-            const emailActual = (document.getElementById('cuenta-email-actual').value || '').trim().toLowerCase();
+            const emailActual = (/** @type {HTMLInputElement} */ (document.getElementById('cuenta-email-actual')).value || '').trim().toLowerCase();
             if (nuevoEmail.toLowerCase() === emailActual) {
                 errorEl.textContent = 'El nuevo correo debe ser diferente al actual.';
                 return;
@@ -187,14 +191,14 @@ export function setupMiCuenta() {
     if (formConfirmarEmail) {
         formConfirmarEmail.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const password = document.getElementById('email-password').value;
-            const errorEl = document.getElementById('error-email-password');
+            const password = /** @type {HTMLInputElement} */ (document.getElementById('email-password')).value;
+            const errorEl = /** @type {HTMLElement} */ (document.getElementById('error-email-password'));
             errorEl.textContent = '';
             if (!password) {
                 errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
                 return;
             }
-            const nuevoEmail = document.getElementById('nuevo-email').value.trim();
+            const nuevoEmail = /** @type {HTMLInputElement} */ (document.getElementById('nuevo-email')).value.trim();
             const btnSubmit = formConfirmarEmail.querySelector('button[type="submit"]');
             setButtonLoading(btnSubmit, true);
 
@@ -208,7 +212,7 @@ export function setupMiCuenta() {
 
                 if (res && res.success) {
                     showSuccess(res.message);
-                    const emailInput = document.getElementById('cuenta-email-actual');
+                    const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('cuenta-email-actual'));
                     if (emailInput) emailInput.value = nuevoEmail;
                     if (artistaActual) {
                         artistaActual.email = nuevoEmail;
@@ -233,15 +237,15 @@ export function setupMiCuenta() {
     // ============================================
     // CAMBIAR CONTRASEÑA
     // ============================================
-    const btnCambiarPassword = document.getElementById('btn-cambiar-password');
-    const formCambiarPassword = document.getElementById('form-cambiar-password');
+    const btnCambiarPassword = /** @type {HTMLButtonElement} */ (document.getElementById('btn-cambiar-password'));
+    const formCambiarPassword = /** @type {HTMLFormElement} */ (document.getElementById('form-cambiar-password'));
 
     if (btnCambiarPassword && formCambiarPassword) {
         btnCambiarPassword.addEventListener('click', () => {
             formCambiarPassword.classList.toggle('hidden');
         });
 
-        const passNueva = document.getElementById('pass-nueva');
+        const passNueva = /** @type {HTMLInputElement} */ (document.getElementById('pass-nueva'));
         const strengthWidget = document.getElementById('cuenta-password-strength');
         const strengthText = strengthWidget ? strengthWidget.querySelector('.strength-text') : null;
         if (passNueva && strengthWidget) {
@@ -261,10 +265,10 @@ export function setupMiCuenta() {
 
         formCambiarPassword.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const actual = document.getElementById('pass-actual').value;
-            const nueva = document.getElementById('pass-nueva').value;
-            const confirmar = document.getElementById('pass-confirmar').value;
-            const errorEl = document.getElementById('error-pass-confirmar');
+            const actual = /** @type {HTMLInputElement} */ (document.getElementById('pass-actual')).value;
+            const nueva = /** @type {HTMLInputElement} */ (document.getElementById('pass-nueva')).value;
+            const confirmar = /** @type {HTMLInputElement} */ (document.getElementById('pass-confirmar')).value;
+            const errorEl = /** @type {HTMLElement} */ (document.getElementById('error-pass-confirmar'));
             errorEl.textContent = '';
             if (!actual || !nueva || !confirmar) {
                 errorEl.textContent = 'Completa todos los campos.';
@@ -327,8 +331,8 @@ export function setupMiCuenta() {
 
         formEliminarCuenta.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const password = document.getElementById('eliminar-password').value;
-            const errorEl = document.getElementById('error-eliminar-cuenta');
+            const password = /** @type {HTMLInputElement} */ (document.getElementById('eliminar-password')).value;
+            const errorEl = /** @type {HTMLElement} */ (document.getElementById('error-eliminar-cuenta'));
             errorEl.textContent = '';
             if (!password) {
                 errorEl.textContent = 'Ingresa tu contraseña para confirmar.';
