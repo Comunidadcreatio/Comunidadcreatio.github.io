@@ -9,7 +9,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=fd44d4a3ae';
+} from './biometric-login.js?v=3c74cf0fcc';
 
 // ============================================
 // VARIABLES GLOBALES

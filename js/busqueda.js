@@ -1,3 +1,4 @@
+// @ts-check
 // js/busqueda.js
 // Búsqueda de artistas en una sección (panel) que se abre desde el icono de la
 // lupa del header. Resultados en tiempo real con debounce.
@@ -18,7 +19,9 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     const headerLupa = document.getElementById('btn-lupa-explorar');  // header: abre el buscador (modo B)
     const panel = document.getElementById('search-panel');
     const cerrarBtn = document.getElementById('search-close');
-    const searchInput = document.getElementById('search-input');
+    // `getElementById` devuelve HTMLElement: aquí hace falta el tipo del input para leer
+    // `.value` sin que el chequeo se queje (y para que un cambio futuro no lo rompa).
+    const searchInput = /** @type {HTMLInputElement | null} */ (document.getElementById('search-input'));
     const resultados = document.getElementById('search-results-dropdown');
 
     if (!searchInput || !resultados) {
@@ -81,7 +84,8 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     // Al tocar el input se entra al "modo búsqueda" (estado B):
     // el grid queda semitransparente, aparecen los resultados
     // y se muestra la flecha < para volver al grid.
-    let timeoutResultados = null;
+    /** @type {number | undefined} */
+    let timeoutResultados;
     const entrarModoBusqueda = () => {
         if (panel) panel.classList.add('modo-busqueda');
         document.body.classList.add('search-escribiendo');
@@ -103,12 +107,15 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     const botonesModo = ['btn-dark-mode', 'config-dark-mode', 'auth-dark-mode-btn'];
     document.addEventListener('click', (e) => {
         if (!panel || panel.classList.contains('hidden')) return;
-        if (panel.contains(e.target)) return;
-        if (navLupa && navLupa.contains(e.target)) return;
-        if (headerLupa && headerLupa.contains(e.target)) return;
+        // `contains` necesita un Node: el target de un evento puede ser cualquier cosa
+        // (window, document...). Comprobarlo evita un TypeError al tocar fuera.
+        const objetivo = e.target instanceof Node ? e.target : null;
+        if (objetivo && panel.contains(objetivo)) return;
+        if (objetivo && navLupa && navLupa.contains(objetivo)) return;
+        if (objetivo && headerLupa && headerLupa.contains(objetivo)) return;
         for (const id of botonesModo) {
             const el = document.getElementById(id);
-            if (el && el.contains(e.target)) return;
+            if (el && objetivo && el.contains(objetivo)) return;
         }
         cerrarPanel();
     });
@@ -168,6 +175,9 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
     }, 400);
 
     searchInput.addEventListener('input', (e) => {
+        // El target de un input puede no ser el input (o ser null): se comprueba para no
+        // leer `.value` de algo que no lo tiene (daba TypeError).
+        if (!(e.target instanceof HTMLInputElement)) return;
         buscarConDebounce(e.target.value.trim());
     });
 

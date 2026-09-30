@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.639';
+        var currentVer = '1.0.640';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -1138,9 +1138,9 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=d5c869e830" type="module"></script>
+    <script src="js/main.js?v=4074fcfd4f" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
-    <script src="js/version-check.js?v=4adf7ca191"></script>
+    <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
     <script src="js/pwa.js?v=dc5af6fee6" defer></script>
 </body>

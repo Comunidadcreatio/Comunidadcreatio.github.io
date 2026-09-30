@@ -1,3 +1,4 @@
+// @ts-check
 // js/version-check.js
 // Detector de actualizaciones compartido entre index.html, auth.html y reset-password.html.
 // Compara version.json contra la versión guardada en localStorage y muestra
@@ -26,7 +27,10 @@
     // APK viejo = app nativa que NO expone el plugin de notificaciones (push)
     function apkSinPush() {
         if (!esAppNativa()) return false;
-        return !(window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications);
+        // `esAppNativa()` ya garantiza que estamos en la app nativa, pero el chequeo no
+        // puede saberlo: se comprueba aquí para no leer de un `undefined`.
+        var cap = window.Capacitor;
+        return !(cap && cap.Plugins && cap.Plugins.PushNotifications);
     }
 
     function apkAvisoOcultoReciente() {
@@ -99,7 +103,8 @@
     window.addEventListener('pageshow', comprobarVersion);
 
     // Pastilla de actualización web (+ botón de APK si el usuario tiene APK viejo)
-    var autoTimer = null;
+    /** @type {number | undefined} */   // empieza sin valor y luego lleva un setTimeout
+    var autoTimer;
     function mostrarPillActualizar(nuevaVersion, apkUrl, conApk) {
         // Dedupe: comprobarVersion puede dispararse varias veces seguidas
         // (llamada directa + pageshow en la carga inicial + visibilitychange
@@ -138,12 +143,14 @@
             if (btn) { btn.textContent = 'Recargando...'; btn.style.opacity = '0.6'; }
             recargar();
         }, AUTO_RELOAD_DELAY);
-        document.getElementById('btn-refresh-app').onclick = function() {
+        var btnRefresh = document.getElementById('btn-refresh-app');
+        if (btnRefresh) btnRefresh.onclick = function() {
             clearTimeout(autoTimer);
             recargar();
         };
         if (conApk) {
-            document.getElementById('btn-download-apk').onclick = function() {
+            var btnBajar = document.getElementById('btn-download-apk');
+            if (btnBajar) btnBajar.onclick = function() {
                 localStorage.setItem(APK_AVISO_KEY, String(Date.now()));
                 abrirEnlace(apkUrl);
             };
@@ -164,11 +171,13 @@
             '<button id="btn-download-apk" style="' + estiloBtn(true) + '">Descargar</button>' +
             '<button id="btn-dismiss-apk" aria-label="Cerrar" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:16px;padding:2px;">✕</button>';
         document.body.appendChild(bar);
-        document.getElementById('btn-download-apk').onclick = function() {
+        var btnDownload = document.getElementById('btn-download-apk');
+        if (btnDownload) btnDownload.onclick = function() {
             localStorage.setItem(APK_AVISO_KEY, String(Date.now()));
             abrirEnlace(apkUrl);
         };
-        document.getElementById('btn-dismiss-apk').onclick = function() {
+        var btnDismiss = document.getElementById('btn-dismiss-apk');
+        if (btnDismiss) btnDismiss.onclick = function() {
             localStorage.setItem(APK_AVISO_KEY, String(Date.now()));
             bar.remove();
         };

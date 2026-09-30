@@ -130,17 +130,32 @@ una línea del código que se sirve ni del deploy.
 vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
 Ese fichero queda protegido para siempre.
 
-Adoptados (**11**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
-`ciudades.js`, `bloqueo-fondo.js`, `auth.js`, `panel.js`, `password-strength.js` y `pwa.js`.
+Adoptados (**14**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
+`ciudades.js`, `bloqueo-fondo.js`, `auth.js`, `panel.js`, `password-strength.js`, `pwa.js`,
+`busqueda.js`, `version-check.js` y `biometric-login.js`.
 
-**Pendientes** (necesitan una pasada propia, no valen un momento): `notificaciones.js`
-(salió con 15 avisos: `getElementById` sin comprobar el null y `style` sobre un `Element`),
-`main.js`, `perfil.js`, `panel-ui.js`, `chat.js` y `problogs.js`.
+**Diferidos a propósito** (salieron con demasiados avisos para meterlos con calzador; se les
+quitó el `@ts-check` y quedan apuntados): `notificaciones.js` (15), `cuenta.js` (45),
+`push.js` (22). Con los seis grandes al final (`problogs.js`, `chat.js`, `panel-ui.js`,
+`galeria-ui.js`, `auth-logic.js`, `galeria.js`, `main.js`, `perfil.js`, `comentarios.js`).
+
+### Dos trampas que han costado tiempo
+
+1. **Un error de sintaxis en UN fichero enmascara los avisos de TODOS los demás.** Pasó al
+   romper un paréntesis en `biometric-login.js`: el chequeo pasó de 67 avisos (en
+   `cuenta.js` y `push.js`) a 1 solo, y parecía que se habían arreglado solos. Ante un
+   número de avisos que baja de golpe, mirar primero si hay un `TS1xxx` (sintaxis).
+2. **`cuenta.js` y `push.js` siguen vigilados aunque se les quite el `@ts-check`** del
+   listado: el script los vuelve a copiar y el error reaparece si no se quita bien la
+   primera línea.
 
 Lo que ha ido encontrando (y se ha arreglado): `dataset`/`closest` sobre tipos que no los
 tienen, `e.target` posiblemente `null`, `JSON.parse` con un `string | null`,
-`URLSearchParams` con números, y variables que empiezan en `null` y luego reciben otra cosa
-(TypeScript cree entonces que su tipo ES `null`). Ninguno era visible a simple vista.
+`URLSearchParams` con números, variables que empiezan en `null` y luego reciben otra cosa
+(TypeScript cree entonces que su tipo ES `null`), `.value` sobre un `HTMLElement` (que no lo
+tiene), `EventTarget` pasado donde se espera un `Node` (`.contains` lanzaría `TypeError`), y
+elementos leídos de `getElementById` sin comprobar que existan antes de tocarles `.onclick`.
+Ninguno era visible a simple vista.
 
 **Por qué no se llama a `tsc` directamente:** los imports llevan el hash de caché
 (`from './utils.js?v=abc123'`, que pone bump-version.js) y TypeScript no sabe resolver un

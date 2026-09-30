@@ -1,3 +1,4 @@
+// @ts-check
 // js/biometric-login.js
 // Guardar el inicio de sesión en este dispositivo + reingreso con los métodos
 // de seguridad del sistema Android (huella, patrón o PIN) vía WebAuthn.
@@ -184,7 +185,7 @@ export async function registrarBiometria(userName) {
     try {
         const challenge = crypto.getRandomValues(new Uint8Array(32));
         const userId = crypto.getRandomValues(new Uint8Array(16));
-        const cred = await navigator.credentials.create({
+        const cred = /** @type {PublicKeyCredential | null} */ (await navigator.credentials.create({
             publicKey: {
                 challenge,
                 rp: { id: location.hostname, name: 'Creatio' },
@@ -198,12 +199,14 @@ export async function registrarBiometria(userName) {
                     residentKey: 'preferred'
                 }
             }
-        });
+        }));
         if (!cred || !cred.rawId) return { success: false, error: 'No se pudo registrar la biometría.' };
         localStorage.setItem(BIO_CRED_KEY, JSON.stringify({ rawId: b64url(new Uint8Array(cred.rawId)) }));
         return { success: true };
     } catch (e) {
-        return { success: false, error: e && (e.name === 'NotAllowedError' || e.name === 'NotSupportedError')
+        // En un catch el error es "desconocido": se comprueba antes de leer `.name`.
+        const err = /** @type {{ name?: string }} */ (e);
+        return { success: false, error: err && (err.name === 'NotAllowedError' || err.name === 'NotSupportedError')
             ? 'Verificación cancelada o biometría no disponible en este dispositivo.'
             : 'No se pudo registrar la biometría.' };
     }

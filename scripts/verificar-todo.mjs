@@ -31,8 +31,8 @@ let scripts = readdirSync('scripts')
 const orden = ['verificar-tipos.mjs', ...scripts.filter((s) => s !== 'verificar-tipos.mjs')]
     .filter((s) => scripts.includes(s));
 
-const resultados = [];
-for (const s of orden) {
+// Corre UN verificador y devuelve su codigo de salida, su linea RESULTADO y su salida.
+async function correr(s) {
     const necesitaUrl = s !== 'verificar-tipos.mjs';
     // Estos dos escriben el resumen en un fichero (--salida), no en la salida normal.
     const conSalida = /contraste|aspecto/.test(s);
@@ -49,8 +49,31 @@ for (const s of orden) {
         try { rmSync(ficheroSalida, { force: true }); } catch (e) { /* nada */ }
     }
     const linea = (salida.split('\n').filter((l) => /RESULTADO/.test(l)).pop() || '').replace(/RESULTADO:\s*/, '').trim();
-    resultados.push({ script: s, codigo, linea, salida });
-    console.log(`${codigo === 0 ? 'OK   ' : 'FALLA'}  ${s.padEnd(38)} ${linea || '(sin RESULTADO)'}`);
+    return { codigo, linea, salida };
+}
+
+const resultados = [];
+for (const s of orden) {
+    const r = await correr(s);
+    let codigo = r.codigo;
+    let linea = r.linea;
+    let reintentado = false;
+    // SI FALLA, SE REPITE UNA VEZ Y SOLO. Motivo: cada verificador abre su propio Chrome y
+    // las medidas se contaminan si queda algun Chrome vivo de una corrida anterior (paso
+    // dos veces: fallos del nav y de aspecto que desaparecian al repetirlo). Un fallo de
+    // verdad falla tambien a la segunda; uno por carga, no.
+    if (codigo !== 0) {
+        reintentado = true;
+        console.log(`      (falla; se repite solo, por si es carga de la maquina...)`);
+        await new Promise((res) => setTimeout(res, 4000));
+        const r2 = await correr(s);
+        codigo = r2.codigo;
+        linea = r2.linea;
+        r.salida = r2.salida;
+    }
+    resultados.push({ script: s, codigo, linea, salida: r.salida, reintentado });
+    const nota = reintentado ? (codigo === 0 ? '  (OK a la segunda: era carga)' : '  (falla tambien repetido)') : '';
+    console.log(`${codigo === 0 ? 'OK   ' : 'FALLA'}  ${s.padEnd(38)} ${linea || '(sin RESULTADO)'}${nota}`);
 }
 
 const conFallo = resultados.filter((r) => r.codigo !== 0);
