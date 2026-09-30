@@ -156,8 +156,29 @@ las variables que se repiten (`msgEl` son 13 avisos de una sola anotación).
 Los globales que necesitan (`_likedObras`, `_vistasRegistradas`, `volverAlBranding`) **ya
 están declarados** en `js/tipos-globales.d.ts`, así que la pasada empieza con ventaja.
 
-Quedan además los grandes: `main.js` (847), `galeria-ui.js` (1233), `panel-ui.js` (1543),
-`chat.js` (1561) y `problogs.js` (2267).
+Ya adoptados de los grandes: `main.js`, `galeria-ui.js` y `chat.js` (los tres limpios).
+
+**Diferido**: `panel-ui.js` (quedan **52** avisos de 172). Lo que ya se hizo:
+
+- **Se encontró y quitó CÓDIGO MUERTO PELIGROSO**: `refrescarTabla()` tenía 19 líneas
+  inalcanzables (la función sale antes, porque `#page-info` ya no existe: la tabla de "Mis
+  Cavents" se eliminó). Ese bloque usaba **seis variables que no están declaradas en ningún
+  sitio** (`currentPage`, `currentLimit`, `currentSearch`, `currentSortBy`, `currentOrder`,
+  `totalObras`), así que **si alguien restaurase `#page-info`, el panel reventaba con un
+  `ReferenceError`**. Se borró el bloque (13 avisos menos).
+- 104 anotaciones puestas (59 declaraciones con el tipo del id + 41 llamadas en línea). Son
+  anotaciones y casts: **no cambian nada en ejecución**.
+
+Lo que queda son sobre todo variables que vienen de un `forEach` o son parámetros (ahí no hay
+declaración que anotar: hay que castear en el sitio) y los contextos 2D del canvas.
+
+**⚠️ Y una trampa que casi cuesta cara**: un script que buscaba el cierre de la función con
+"la primera línea que sea solo `}`" encontró el `}` del `return` temprano y **dejó el bloque
+muerto huérfano fuera de la función** — en un módulo ES eso **se ejecuta al cargar** y habría
+roto la app entera. Lo cazó `node --check` en el mismo paso. **Para borrar bloques: por
+números de línea comprobados, nunca buscando llaves.**
+
+Queda el grande: `problogs.js` (2267 líneas).
 
 ### Dos trampas que han costado tiempo
 

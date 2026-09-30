@@ -53,7 +53,7 @@ function limpiarMetaObra() {
 // A nivel de módulo porque lo usan la barra de pasos, las pestañas, el fondo y la
 // barra del desplegable de "Mis Cavents".
 function reservaInferior() {
-    const nav = document.getElementById('toggle-panel');
+    const nav = /** @type {HTMLElement} */ (document.getElementById('toggle-panel'));
     if (!nav) return 0;
     const rect = nav.getBoundingClientRect();
     if (rect.height === 0 || getComputedStyle(nav).display === 'none') return 0;
@@ -96,7 +96,7 @@ function irAlPasoDe(el) {
 // guardar, o datos cargados de una obra que se está editando/duplicando.
 export async function limpiarFormularioConConfirmacion() {
     const idEdicion = (document.getElementById('input-id-edicion') || {}).value || '';
-    const boton = document.getElementById('obra-step-crear');
+    const boton = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-crear'));
     const modoDuplicar = /Duplicar/i.test(boton ? boton.textContent : '');
     const aviso = hayCambiosNoGuardados
         ? '⚠️ Tienes cambios sin guardar en el formulario.\n\n¿Seguro que quieres vaciarlo?'
@@ -133,7 +133,7 @@ function setSelectValue(selectEl, valor) {
 let hayCambiosNoGuardados = false;
 
 export function setupFormChangeTracking() {
-    const form = document.getElementById('obra-form');
+    const form = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
     if (!form) return;
 
     const inputs = form.querySelectorAll('input, select, textarea');
@@ -163,31 +163,17 @@ function resetCambiosNoGuardados() {
 // solo invalida el cache del dropdown de cavents para forzar recarga.
 export async function refrescarTabla() {
     // Si los elementos de paginación ya no existen, solo invalidar cache
-    const pageInfo = document.getElementById('page-info');
+    const pageInfo = /** @type {HTMLElement} */ (document.getElementById('page-info'));
     if (!pageInfo) {
         invalidateCaventsCache();
         return;
     }
 
-    const result = await cargarMisObras(currentPage, currentLimit, currentSearch, currentSortBy, currentOrder);
-    if (!result.success) {
-        debugLog.error("Error al cargar obras:", result.error);
-        if (result.error && (result.error.includes("Sesión expirada") || result.error.includes("401"))) {
-            showWarning("Tu sesión ha expirado. Serás redirigido a la página principal.");
-            localStorage.removeItem(ARTISTA_KEY);
-            window.location.href = '/';
-            return;
-        }
-        mostrarErrores(result);
-        return;
-    }
-    totalObras = result.total;
-    const totalPages = Math.ceil(totalObras / currentLimit);
-    pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
-    const btnPrev = document.getElementById('btn-prev');
-    const btnNext = document.getElementById('btn-next');
-    if (btnPrev) btnPrev.disabled = currentPage <= 1;
-    if (btnNext) btnNext.disabled = currentPage >= totalPages;
+    // AQUÍ HABÍA el bloque de paginación de la tabla antigua de "Mis Cavents"
+    // (currentPage, currentLimit, totalObras...). Era INALCANZABLE: la función sale antes
+    // porque #page-info ya no existe (la tabla se eliminó), y esas variables no estaban
+    // declaradas en ningún sitio, así que restaurar ese elemento habría reventado con un
+    // ReferenceError. Lo encontró el chequeo de tipos y se quitó.
 
     // NOTA: aquí había un `if (typeof renderizarTabla === 'function')` que llamaba
     // a la tabla antigua de "Mis Cavents". Esa función ya no existe (la lista es
@@ -213,9 +199,9 @@ let guardandoObra = false;
 let imagenesEnProceso = 0;
 
 function actualizarCarrusel() {
-    const track = document.getElementById('carrusel-track');
-    const dots = document.getElementById('carrusel-dots');
-    const count = document.getElementById('carrusel-count');
+    const track = /** @type {HTMLElement} */ (document.getElementById('carrusel-track'));
+    const dots = /** @type {HTMLElement} */ (document.getElementById('carrusel-dots'));
+    const count = /** @type {HTMLElement} */ (document.getElementById('carrusel-count'));
     if (!track || !dots || !count) return;
 
     track.innerHTML = '';
@@ -298,10 +284,10 @@ function eliminarImagen(index) {
     // Guardar el slot ORIGINAL antes del splice (los índices visuales cambian)
     const slotEliminado = imagenesData[index].slot;
     imagenesData.splice(index, 1);
-    const editId = document.getElementById('input-id-edicion').value;
+    const editId = /** @type {HTMLInputElement} */ (document.getElementById('input-id-edicion')).value;
     if (editId) imagenesAEliminar.add(slotEliminado);
     // Limpiar input file correspondiente
-    const inp = document.getElementById(`input-imagen-${slotEliminado}`);
+    const inp = /** @type {HTMLInputElement} */ (document.getElementById(`input-imagen-${slotEliminado}`));
     if (inp) inp.value = '';
     if (currentSlide >= imagenesData.length) {
         currentSlide = Math.max(0, imagenesData.length - 1);
@@ -469,7 +455,7 @@ export async function cargarUrlEnInput(index, url) {
 
 export function setupImagePreviews() {
     // Botón "+ Agregar"
-    const btnAgregar = document.getElementById('btn-agregar-imagen');
+    const btnAgregar = /** @type {HTMLImageElement} */ (document.getElementById('btn-agregar-imagen'));
     if (btnAgregar) {
         btnAgregar.addEventListener('click', () => {
             // Buscar el primer slot sin usar
@@ -503,8 +489,8 @@ export function setupImagePreviews() {
     }
 
     // Touch/swipe en el carrusel (arrastre en tiempo real)
-    const viewport = document.getElementById('carrusel-viewport');
-    const track = document.getElementById('carrusel-track');
+    const viewport = /** @type {HTMLElement} */ (document.getElementById('carrusel-viewport'));
+    const track = /** @type {HTMLElement} */ (document.getElementById('carrusel-track'));
     if (viewport && track) {
         let startX = 0;
         let isDragging = false;
@@ -570,7 +556,7 @@ export function setupImagePreviews() {
 // LIMPIAR FORMULARIO
 // ============================================
 export function limpiarFormularioCompleto(restaurarArtista = true) {
-    const obraForm = document.getElementById('obra-form');
+    const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
     if (!obraForm) return;
     obraForm.reset();
     // Las opciones que se añadieron para conservar un valor guardado que no
@@ -581,12 +567,12 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
         sel.dispatchEvent(new Event('change', { bubbles: true }));
     });
     resetCambiosNoGuardados();
-    document.getElementById('input-id-edicion').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('input-id-edicion')).value = '';
     limpiarMetaObra();
-    document.getElementById('btn-guardar').textContent = 'Crear Cavent';
-    const crearBtn = document.getElementById('obra-step-crear');
+    /** @type {HTMLButtonElement} */ (document.getElementById('btn-guardar')).textContent = 'Crear Cavent';
+    const crearBtn = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-crear'));
     if (crearBtn) crearBtn.textContent = 'Crear Cavent';
-    const caventsTrigger = document.getElementById('cavents-trigger');
+    const caventsTrigger = /** @type {HTMLElement} */ (document.getElementById('cavents-trigger'));
     if (caventsTrigger) caventsTrigger.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
     imagenesAEliminar.clear();
     // Limpiar carrusel
@@ -595,11 +581,11 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
     actualizarCarrusel();
     // Limpiar inputs file
     for (let i = 0; i < 5; i++) {
-        const inputFile = document.getElementById(`input-imagen-${i}`);
+        const inputFile = /** @type {HTMLInputElement} */ (document.getElementById(`input-imagen-${i}`));
         if (inputFile) inputFile.value = '';
     }
     if (restaurarArtista && artistaActual) {
-        document.getElementById('input-artista').value = artistaActual.nombre_artista;
+        /** @type {HTMLInputElement} */ (document.getElementById('input-artista')).value = artistaActual.nombre_artista;
     }
     resetAccordionStatus();
 }
@@ -608,7 +594,7 @@ export function limpiarFormularioCompleto(restaurarArtista = true) {
 // SETUP DEL FORMULARIO DE OBRA (submit handler)
 // ============================================
 export function setupObraFormSubmit() {
-    const obraForm = document.getElementById('obra-form');
+    const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
     if (!obraForm) return;
 
     obraForm.addEventListener('submit', async (e) => {
@@ -618,27 +604,27 @@ export function setupObraFormSubmit() {
         // segundo toque creaba una segunda obra. Esta guarda + el disabled del
         // botón visible cierran las dos vías (toque doble y Enter).
         if (guardandoObra) return;
-        const titulo = document.getElementById('input-titulo').value;
-        const artista = document.getElementById('input-artista').value;
-        const precio = document.getElementById('input-precio').value;
+        const titulo = /** @type {HTMLInputElement} */ (document.getElementById('input-titulo')).value;
+        const artista = /** @type {HTMLInputElement} */ (document.getElementById('input-artista')).value;
+        const precio = /** @type {HTMLInputElement} */ (document.getElementById('input-precio')).value;
         // Se reenvían los metadatos que el formulario no muestra (si no, el PUT
         // los borraría: localizacion='', peso=0, id_personalizado='').
         const idPersonalizado = metaObra.idPersonalizado;
-        const idEdicion = document.getElementById('input-id-edicion').value;
-        const ano = document.getElementById('input-ano').value;
-        const descripcion_tecnica = document.getElementById('input-descripcion-tecnica').value;
-        const soporte = document.getElementById('input-soporte').value;
-        const descripcion_artistica = document.getElementById('input-descripcion-artistica').value;
-        const estado_obra = document.getElementById('input-estado-obra').value;
-        const procedencia = document.getElementById('input-procedencia').value;
-        const marcos = document.getElementById('input-marcos').value;
-        const certificado = document.getElementById('input-certificado').value;
-        const status = document.getElementById('input-status').value;
-        const ancho = document.getElementById('input-ancho').value;
-        const alto = document.getElementById('input-alto').value;
-        const firma = document.getElementById('input-firma').value;
-        const conservacion = document.getElementById('input-conservacion').value;
-        const etiquetas = document.getElementById('input-etiquetas').value
+        const idEdicion = /** @type {HTMLInputElement} */ (document.getElementById('input-id-edicion')).value;
+        const ano = /** @type {HTMLInputElement} */ (document.getElementById('input-ano')).value;
+        const descripcion_tecnica = /** @type {HTMLTextAreaElement} */ (document.getElementById('input-descripcion-tecnica')).value;
+        const soporte = /** @type {HTMLInputElement} */ (document.getElementById('input-soporte')).value;
+        const descripcion_artistica = /** @type {HTMLTextAreaElement} */ (document.getElementById('input-descripcion-artistica')).value;
+        const estado_obra = /** @type {HTMLInputElement} */ (document.getElementById('input-estado-obra')).value;
+        const procedencia = /** @type {HTMLInputElement} */ (document.getElementById('input-procedencia')).value;
+        const marcos = /** @type {HTMLInputElement} */ (document.getElementById('input-marcos')).value;
+        const certificado = /** @type {HTMLInputElement} */ (document.getElementById('input-certificado')).value;
+        const status = /** @type {HTMLInputElement} */ (document.getElementById('input-status')).value;
+        const ancho = /** @type {HTMLInputElement} */ (document.getElementById('input-ancho')).value;
+        const alto = /** @type {HTMLInputElement} */ (document.getElementById('input-alto')).value;
+        const firma = /** @type {HTMLInputElement} */ (document.getElementById('input-firma')).value;
+        const conservacion = /** @type {HTMLInputElement} */ (document.getElementById('input-conservacion')).value;
+        const etiquetas = /** @type {HTMLInputElement} */ (document.getElementById('input-etiquetas')).value
             .split(',')
             .map(t => t.trim())
             .filter(Boolean)
@@ -668,8 +654,8 @@ export function setupObraFormSubmit() {
 
         // El estado de carga va en los DOS botones: el visible de la barra de
         // pasos (#obra-step-crear) y el oculto del formulario (#btn-guardar).
-        const btnGuardar = document.getElementById('btn-guardar');
-        const btnCrear = document.getElementById('obra-step-crear');
+        const btnGuardar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-guardar'));
+        const btnCrear = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-crear'));
         guardandoObra = true;
         setButtonLoading(btnGuardar, true);
         setButtonLoading(btnCrear, true);
@@ -711,7 +697,7 @@ export function setupObraFormSubmit() {
             if (result.success) {
                 showSuccess("Obra guardada correctamente.");
                 invalidateCaventsCache();
-                document.getElementById('btn-guardar').textContent = 'Crear Cavent';
+                /** @type {HTMLButtonElement} */ (document.getElementById('btn-guardar')).textContent = 'Crear Cavent';
                 imagenesAEliminar.clear();
                 limpiarFormularioCompleto(true);
                 await refrescarTabla();
@@ -807,7 +793,7 @@ function initCustomSelect(selectEl, placeholder) {
 
     function elegir(indice) {
         const lista = opciones();
-        const item = lista[indice];
+        const item = /** @type {HTMLElement} */ (lista[indice]);
         if (!item) return;
         const opt = Array.from(selectEl.options).find((o) => o.value === item.dataset.value);
         selectEl.value = item.dataset.value;
@@ -931,9 +917,9 @@ function setupCustomSelects() {
 // (contenido por implementar).
 // ============================================
 function setupCrearTabs() {
-    const tabCavents = document.getElementById('tab-cavents');
-    const tabProblogs = document.getElementById('tab-problogs');
-    const proContenido = document.getElementById('crear-problogs-contenido');
+    const tabCavents = /** @type {HTMLElement} */ (document.getElementById('tab-cavents'));
+    const tabProblogs = /** @type {HTMLElement} */ (document.getElementById('tab-problogs'));
+    const proContenido = /** @type {HTMLTextAreaElement} */ (document.getElementById('crear-problogs-contenido'));
     if (!tabCavents || !tabProblogs) return;
 
     function seleccionarTipo(tipo) {
@@ -953,10 +939,10 @@ function setupCrearTabs() {
 // DROPDOWN MIS CAVENTS (sobre barra de pasos)
 // ============================================
 function setupCaventsDropdown() {
-    const caventsBar = document.getElementById('obra-cavents-bar');
-    const trigger = document.getElementById('cavents-trigger');
-    const dropdown = document.getElementById('cavents-dropdown');
-    const stepBar = document.getElementById('obra-step-bar');
+    const caventsBar = /** @type {HTMLElement} */ (document.getElementById('obra-cavents-bar'));
+    const trigger = /** @type {HTMLElement} */ (document.getElementById('cavents-trigger'));
+    const dropdown = /** @type {HTMLElement} */ (document.getElementById('cavents-dropdown'));
+    const stepBar = /** @type {HTMLElement} */ (document.getElementById('obra-step-bar'));
     if (!caventsBar || !trigger || !dropdown || !stepBar) return;
 
     const ICONS_CAVENT = {
@@ -967,11 +953,11 @@ function setupCaventsDropdown() {
 
     // Posicionar encima de la barra de pasos y de las etiquetas
     function positionBar() {
-        const togglePanel = document.getElementById('toggle-panel');
+        const togglePanel = /** @type {HTMLElement} */ (document.getElementById('toggle-panel'));
         if (!togglePanel || !stepBar) return;
         const fromBottom = reservaInferior();
         const stepBarH = stepBar.offsetHeight || 48;
-        const tabsBar = document.getElementById('crear-tabs');
+        const tabsBar = /** @type {HTMLElement} */ (document.getElementById('crear-tabs'));
         const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
         caventsBar.style.bottom = (fromBottom + stepBarH + tabsH) + 'px';
     }
@@ -998,8 +984,8 @@ function setupCaventsDropdown() {
     }
 
     function setFormMode(mode, caventName) {
-        const crearBtn = document.getElementById('obra-step-crear');
-        const guardarBtn = document.getElementById('btn-guardar');
+        const crearBtn = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-crear'));
+        const guardarBtn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-guardar'));
         if (mode === 'edit') {
             if (crearBtn) crearBtn.textContent = 'Actualizar Cavent';
             if (guardarBtn) guardarBtn.textContent = 'Actualizar Cavent';
@@ -1090,18 +1076,18 @@ function setupCaventsDropdown() {
             // id personalizado / localización / peso no tienen campo en el
             // formulario: se recuerdan para reenviarlos al guardar.
             guardarMetaObra(obra);
-            document.getElementById('input-id-edicion').value = obra.id;
+            /** @type {HTMLInputElement} */ (document.getElementById('input-id-edicion')).value = obra.id;
             // El título también se decodifica: era el ÚNICO campo sin hacerlo y,
             // al volver a guardar, el "&" de la entidad se re-escapaba en el
             // servidor ("Retrato &#x2F; Estudio" → "Retrato &amp;#x2F; Estudio"),
             // de modo que el título se corrompía un poco más en cada edición.
-            document.getElementById('input-titulo').value = decodeHTMLEntities(obra.titulo || '');
-            document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-            document.getElementById('input-ano').value = obra.ano || '';
-            document.getElementById('input-precio').value = obra.precio || '';
-            document.getElementById('input-ancho').value = obra.ancho || '';
-            document.getElementById('input-alto').value = obra.alto || '';
-            document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
+            /** @type {HTMLInputElement} */ (document.getElementById('input-titulo')).value = decodeHTMLEntities(obra.titulo || '');
+            /** @type {HTMLInputElement} */ (document.getElementById('input-artista')).value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-ano')).value = obra.ano || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-precio')).value = obra.precio || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-ancho')).value = obra.ancho || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-alto')).value = obra.alto || '';
+            /** @type {HTMLTextAreaElement} */ (document.getElementById('input-descripcion-artistica')).value = decodeHTMLEntities(obra.descripcion_artistica || '');
             setSelectValue(document.getElementById('input-status'), decodeHTMLEntities(obra.status || ''));
             setSelectValue(document.getElementById('input-estado-obra'), decodeHTMLEntities(obra.estado_obra || ''));
             setSelectValue(document.getElementById('input-descripcion-tecnica'), decodeHTMLEntities(obra.descripcion_tecnica || ''));
@@ -1111,7 +1097,7 @@ function setupCaventsDropdown() {
             setSelectValue(document.getElementById('input-certificado'), decodeHTMLEntities(obra.certificado || ''));
             setSelectValue(document.getElementById('input-firma'), decodeHTMLEntities(obra.firma || ''));
             setSelectValue(document.getElementById('input-conservacion'), decodeHTMLEntities(obra.conservacion || ''));
-            document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
+            /** @type {HTMLInputElement} */ (document.getElementById('input-etiquetas')).value = decodeHTMLEntities(obra.etiquetas || '');
             // Cargar imágenes
             const imagenes = [
                 cloudinaryUrl(obra.imagen_url), cloudinaryUrl(obra.imagen_url_1), cloudinaryUrl(obra.imagen_url_2),
@@ -1144,16 +1130,16 @@ function setupCaventsDropdown() {
             // reutilizar el código de inventario sería confuso.
             guardarMetaObra(obra);
             metaObra.idPersonalizado = '';
-            document.getElementById('input-id-edicion').value = '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-id-edicion')).value = '';
             // Igual que al editar: el título llega escapado y debe verse (y
             // volver a guardarse) con el texto real.
-            document.getElementById('input-titulo').value = decodeHTMLEntities(obra.titulo || '') + ' (copia)';
-            document.getElementById('input-artista').value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
-            document.getElementById('input-ano').value = obra.ano || '';
-            document.getElementById('input-precio').value = obra.precio || '';
-            document.getElementById('input-ancho').value = obra.ancho || '';
-            document.getElementById('input-alto').value = obra.alto || '';
-            document.getElementById('input-descripcion-artistica').value = decodeHTMLEntities(obra.descripcion_artistica || '');
+            /** @type {HTMLInputElement} */ (document.getElementById('input-titulo')).value = decodeHTMLEntities(obra.titulo || '') + ' (copia)';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-artista')).value = (artistaActual && artistaActual.nombre_artista) || obra.artista || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-ano')).value = obra.ano || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-precio')).value = obra.precio || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-ancho')).value = obra.ancho || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('input-alto')).value = obra.alto || '';
+            /** @type {HTMLTextAreaElement} */ (document.getElementById('input-descripcion-artistica')).value = decodeHTMLEntities(obra.descripcion_artistica || '');
             setSelectValue(document.getElementById('input-status'), decodeHTMLEntities(obra.status || ''));
             setSelectValue(document.getElementById('input-estado-obra'), decodeHTMLEntities(obra.estado_obra || ''));
             setSelectValue(document.getElementById('input-descripcion-tecnica'), decodeHTMLEntities(obra.descripcion_tecnica || ''));
@@ -1163,7 +1149,7 @@ function setupCaventsDropdown() {
             setSelectValue(document.getElementById('input-certificado'), decodeHTMLEntities(obra.certificado || ''));
             setSelectValue(document.getElementById('input-firma'), decodeHTMLEntities(obra.firma || ''));
             setSelectValue(document.getElementById('input-conservacion'), decodeHTMLEntities(obra.conservacion || ''));
-            document.getElementById('input-etiquetas').value = decodeHTMLEntities(obra.etiquetas || '');
+            /** @type {HTMLInputElement} */ (document.getElementById('input-etiquetas')).value = decodeHTMLEntities(obra.etiquetas || '');
             syncCustomSelects();
             resetCambiosNoGuardados();
             // Cargar imágenes para duplicar
@@ -1249,7 +1235,7 @@ function setupCaventsDropdown() {
 }
 
 export function setupFormAccordions() {
-    const obraForm = document.getElementById('obra-form');
+    const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
 
     if (obraForm) {
         const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
@@ -1275,19 +1261,19 @@ export function setupFormAccordions() {
 
 function setupStepNavigation() {
     const sections = document.querySelectorAll('.form-section');
-    const prevBtn = document.getElementById('obra-step-prev');
-    const nextBtn = document.getElementById('obra-step-next');
-    const indicator = document.getElementById('obra-step-indicator');
-    const guardarBtn = document.getElementById('btn-guardar');
-    const stepBar = document.getElementById('obra-step-bar');
+    const prevBtn = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-prev'));
+    const nextBtn = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-next'));
+    const indicator = /** @type {HTMLElement} */ (document.getElementById('obra-step-indicator'));
+    const guardarBtn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-guardar'));
+    const stepBar = /** @type {HTMLElement} */ (document.getElementById('obra-step-bar'));
     const totalSteps = sections.length;
 
     if (!prevBtn || !nextBtn || !indicator || totalSteps === 0) return;
 
     // Posicionar barra de progreso justo debajo del header (ARRIBA)
     function positionProgressBar() {
-        const mainHeader = document.getElementById('main-header');
-        const progressBar = document.getElementById('obra-progress-bar');
+        const mainHeader = /** @type {HTMLElement} */ (document.getElementById('main-header'));
+        const progressBar = /** @type {HTMLElement} */ (document.getElementById('obra-progress-bar'));
         if (!mainHeader || !progressBar) return;
         const headerBottom = mainHeader.getBoundingClientRect().bottom;
         progressBar.style.top = headerBottom + 'px';
@@ -1296,31 +1282,31 @@ function setupStepNavigation() {
     // Posicionar barra de pasos justo encima del nav, DEBAJO de las etiquetas:
     // orden desde el borde inferior: [nav][etiquetas][barra de pasos]
     function positionStepBar() {
-        const togglePanel = document.getElementById('toggle-panel');
-        const tabsBar = document.getElementById('crear-tabs');
+        const togglePanel = /** @type {HTMLElement} */ (document.getElementById('toggle-panel'));
+        const tabsBar = /** @type {HTMLElement} */ (document.getElementById('crear-tabs'));
         if (!togglePanel || !stepBar) return;
         const fromBottom = reservaInferior();
         const tabsH = tabsBar ? (tabsBar.offsetHeight || 40) : 0;
         stepBar.style.bottom = (fromBottom + tabsH) + 'px';
         // La barra de Problogs ocupa ese mismo hueco: nunca se ven las dos a la
         // vez (una u otra según la pestaña activa).
-        const problogBar = document.getElementById('problog-nav-bar');
+        const problogBar = /** @type {HTMLElement} */ (document.getElementById('problog-nav-bar'));
         if (problogBar) problogBar.style.bottom = (fromBottom + tabsH) + 'px';
     }
 
     // Posicionar las etiquetas Cavents/Problogs en el borde inferior, debajo
     // de la barra de pasos (justo encima del nav)
     function positionTabs() {
-        const togglePanel = document.getElementById('toggle-panel');
-        const tabsBar = document.getElementById('crear-tabs');
+        const togglePanel = /** @type {HTMLElement} */ (document.getElementById('toggle-panel'));
+        const tabsBar = /** @type {HTMLElement} */ (document.getElementById('crear-tabs'));
         if (!togglePanel || !tabsBar) return;
         tabsBar.style.bottom = reservaInferior() + 'px';
     }
 
     // Posicionar el carrusel fijo debajo de la barra de progreso
     function positionCarrusel() {
-        const progressBar = document.getElementById('obra-progress-bar');
-        const carrusel = document.querySelector('.imagen-carrusel');
+        const progressBar = /** @type {HTMLElement} */ (document.getElementById('obra-progress-bar'));
+        const carrusel = /** @type {HTMLElement} */ (document.querySelector('.imagen-carrusel'));
         if (!progressBar || !carrusel) return;
         const progressBottom = progressBar.getBoundingClientRect().bottom;
         carrusel.style.position = 'fixed';
@@ -1332,8 +1318,8 @@ function setupStepNavigation() {
 
     // Posicionar el formulario fijo debajo de la barra de progreso (pasos 2-5)
     function positionFormulario() {
-        const progressBar = document.getElementById('obra-progress-bar');
-        const formulario = document.getElementById('formulario-obra');
+        const progressBar = /** @type {HTMLElement} */ (document.getElementById('obra-progress-bar'));
+        const formulario = /** @type {HTMLFormElement} */ (document.getElementById('formulario-obra'));
         if (!progressBar || !formulario) return;
         const progressBottom = progressBar.getBoundingClientRect().bottom;
         formulario.style.top = progressBottom + 'px';
@@ -1343,10 +1329,10 @@ function setupStepNavigation() {
     // borde inferior de las pestañas. Se mide en vivo (si se calcula con las
     // pestañas ocultas, el alto sale 0 y queda un hueco a la vista).
     function positionFondo() {
-        const fondo = document.getElementById('crear-fondo');
-        const togglePanel = document.getElementById('toggle-panel');
-        const tabsBar = document.getElementById('crear-tabs');
-        const problogBar = document.getElementById('problog-nav-bar');
+        const fondo = /** @type {HTMLElement} */ (document.getElementById('crear-fondo'));
+        const togglePanel = /** @type {HTMLElement} */ (document.getElementById('toggle-panel'));
+        const tabsBar = /** @type {HTMLElement} */ (document.getElementById('crear-tabs'));
+        const problogBar = /** @type {HTMLElement} */ (document.getElementById('problog-nav-bar'));
         if (!fondo || !togglePanel) return;
         const fromBottom = reservaInferior();
         const altoTabs = tabsBar ? tabsBar.getBoundingClientRect().height : 0;
@@ -1378,7 +1364,7 @@ function setupStepNavigation() {
     // pestañas miden 0 y se usaba el alto de reserva, así que quedaba un hueco
     // entre la barra de crear y las pestañas (se veían como dos fondos
     // separados). Al mostrarse el panel se vuelven a colocar.
-    const panelArtista = document.getElementById('panel-artista');
+    const panelArtista = /** @type {HTMLElement} */ (document.getElementById('panel-artista'));
     if (panelArtista && typeof MutationObserver === 'function') {
         new MutationObserver(() => positionAll())
             .observe(panelArtista, { attributes: true, attributeFilter: ['class'] });
@@ -1394,7 +1380,7 @@ function setupStepNavigation() {
         'Detalles Técnicos',
         'Proveniencia y Autenticidad'
     ];
-    const stepNameEl = document.getElementById('obra-step-name');
+    const stepNameEl = /** @type {HTMLElement} */ (document.getElementById('obra-step-name'));
 
     // Se expone para que la validación del guardado pueda llevar al usuario al
     // paso del primer campo obligatorio que falte.
@@ -1419,7 +1405,7 @@ function setupStepNavigation() {
         prevBtn.disabled = index === 0;
         
         // Etiquetas visibles en Paso 2 (Información Básica)
-        const etiquetasBar = document.getElementById('obra-etiquetas-bar');
+        const etiquetasBar = /** @type {HTMLInputElement} */ (document.getElementById('obra-etiquetas-bar'));
         if (etiquetasBar) {
             etiquetasBar.classList.toggle('hidden', index !== 1);
         }
@@ -1427,7 +1413,7 @@ function setupStepNavigation() {
         // El input de etiquetas está al fondo del paso 2: el navegador tiende a
         // desplazar todo el formulario al enfocarlo y abrir el teclado. Lo
         // evitamos enfocando con preventScroll (igual que los demás inputs).
-        const inputEtiquetas = document.getElementById('input-etiquetas');
+        const inputEtiquetas = /** @type {HTMLInputElement} */ (document.getElementById('input-etiquetas'));
         if (inputEtiquetas && !inputEtiquetas.dataset.fixScroll) {
             inputEtiquetas.dataset.fixScroll = '1';
             inputEtiquetas.addEventListener('pointerdown', (e) => {
@@ -1460,7 +1446,7 @@ function setupStepNavigation() {
     });
 
     // Botón limpiar campos
-    const limpiarBtn = document.getElementById('obra-step-limpiar');
+    const limpiarBtn = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-limpiar'));
     if (limpiarBtn) {
         limpiarBtn.addEventListener('click', async () => {
             // Confirmación antes de vaciar: si no, un toque accidental se llevaba
@@ -1470,7 +1456,7 @@ function setupStepNavigation() {
             currentStep = 0;
             showStep(0);
             // Reset trigger
-            const ct = document.getElementById('cavents-trigger');
+            const ct = /** @type {HTMLElement} */ (document.getElementById('cavents-trigger'));
             if (ct) ct.innerHTML = 'Mis Cavents <span style="font-size:10px;">▴</span>';
         });
     }
@@ -1479,7 +1465,7 @@ function setupStepNavigation() {
     showStep(0);
 
     // Re-sincronizar paso y posición cuando el panel se hace visible
-    const panelCrear = document.getElementById('panel-crear');
+    const panelCrear = /** @type {HTMLElement} */ (document.getElementById('panel-crear'));
     if (panelCrear) {
         const observer = new MutationObserver(() => {
             if (!panelCrear.classList.contains('hidden')) {
@@ -1495,7 +1481,7 @@ function setupStepNavigation() {
 }
 
 export function updateFormProgress() {
-    const obraForm = document.getElementById('obra-form');
+    const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
     if (!obraForm) return;
 
     const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
@@ -1513,8 +1499,8 @@ export function updateFormProgress() {
 
     const percentage = Math.round((completedFields / totalFields) * 100);
 
-    const progressFill = document.getElementById('form-progress-fill');
-    const progressText = document.getElementById('form-progress-percentage');
+    const progressFill = /** @type {HTMLFormElement} */ (document.getElementById('form-progress-fill'));
+    const progressText = /** @type {HTMLFormElement} */ (document.getElementById('form-progress-percentage'));
 
     if (progressFill) {
         progressFill.style.width = percentage + '%';
@@ -1531,8 +1517,8 @@ function updateSectionStatus() {
 }
 
 export function resetAccordionStatus() {
-    const progressFill = document.getElementById('form-progress-fill');
-    const progressText = document.getElementById('form-progress-percentage');
+    const progressFill = /** @type {HTMLFormElement} */ (document.getElementById('form-progress-fill'));
+    const progressText = /** @type {HTMLFormElement} */ (document.getElementById('form-progress-percentage'));
 
     if (progressFill) {
         progressFill.style.width = '0%';
