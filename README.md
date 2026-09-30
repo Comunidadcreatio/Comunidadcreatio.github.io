@@ -136,12 +136,25 @@ Adoptados (**20 de 27**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`
 `cuenta.js`, `push.js`, `notificaciones.js`, `comentarios.js` y `perfil.js`.
 
 **Diferidos a propósito** (necesitan una pasada dedicada; se les quitó el `@ts-check` y
-quedan apuntados): `galeria.js` (**47** avisos) y `auth-logic.js` (**132**). Sus patrones ya
-se conocen —elementos del DOM con el tipo genérico (`value`/`style`/`dataset`), globales de
-`window` que faltan y variables que empiezan en `null`—, pero son **unos 120 sitios**: se
-hacen con tiempo, no de pasada. Los globales que necesitan (`_likedObras`,
-`_vistasRegistradas`, `volverAlBranding`) **ya están declarados**, así que la próxima pasada
-empieza con ventaja.
+quedan apuntados): `galeria.js` (**37** avisos) y `auth-logic.js` (**130**). Sus patrones ya
+se conocen y **están contados** (medidos al adoptarlos):
+
+| Patrón | Cuántos | Qué hace falta |
+|---|---|---|
+| `HTMLElement`/`Element` → `.value`, `.style`, `.dataset` | ~32 | Decir el tipo del elemento (se deduce del id: `select`, `textarea`...) |
+| «posiblemente `null`»: `msgEl` (13), `emailInput` (5), `dropdown`, `trigger`... | ~28 | **Una sola anotación por variable** arregla sus 13 usos: empezar por las que más se repiten |
+| `e.target` / `EventTarget` → `.closest`, `.value` | ~20 | Guarda `e.target instanceof Element` antes de usarlo (son `TypeError` latentes) |
+| Variables y parámetros que empiezan en `null` (`never`) | ~15 | Anotar con el tipo real |
+| `this` en manejadores (`TS2683`), asignaciones (`TS2322`) | ~15 | Uno a uno |
+
+**Se probó a hacerlo automático y NO sirve** (queda escrito para que nadie lo repita): un
+script que deduce el tipo por el nombre de la propiedad bajó los avisos de 167 a 129, pero
+(a) **destrozó la indentación** (reescribía la declaración sin conservar los espacios) y
+(b) metió un aviso nuevo. Se revirtió. **Estos dos ficheros se hacen a mano**, empezando por
+las variables que se repiten (`msgEl` son 13 avisos de una sola anotación).
+
+Los globales que necesitan (`_likedObras`, `_vistasRegistradas`, `volverAlBranding`) **ya
+están declarados** en `js/tipos-globales.d.ts`, así que la pasada empieza con ventaja.
 
 Quedan además los grandes: `main.js` (847), `galeria-ui.js` (1233), `panel-ui.js` (1543),
 `chat.js` (1561) y `problogs.js` (2267).
