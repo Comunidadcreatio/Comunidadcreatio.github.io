@@ -146,6 +146,70 @@ const PAGINAS = [
         ]
     },
     {
+        // El PERFIL de otro artista. Se llega por el CAMINO REAL (no llamando a una funcion):
+        // la galeria es la seccion inicial, su tarjeta lleva el avatar del artista con
+        // data-artista-id, y al tocarlo se abre su perfil. Antes no estaba cubierto y el
+        // perfil tiene su propia familia de reglas en galeria-publica.css / style.css.
+        nombre: 'perfil',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            // Al arrancar, la app llama a mostrarPaginaBlanca() y la galeria solo aparece
+            // al navegar. Se usa el mismo camino que la app: `abrirObraDesdePerfil` (que
+            // main.js expone en window) muestra la galeria con la obra Y conecta el clic
+            // del avatar con verPerfilArtistaDesdeGaleria.
+            await ev(`window.abrirObraDesdePerfil ? window.abrirObraDesdePerfil(55001) : null`);
+            await dormir(2600);   // que la galeria cargue su obra
+            const antes = await ev(`(() => {
+                const av = document.querySelector('.obra-avatar-clickable');
+                const ids = ['galeria-publica','panel-artista','mi-cuenta','perfil-usuario','resultados-busqueda','pagina-blanca','problogs','chat-global'];
+                const visibles = ids.filter((id) => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+                const gc = document.getElementById('galeria-container');
+                return JSON.stringify({
+                    visibles: visibles,
+                    galeriaOculta: document.getElementById('galeria-publica').classList.contains('hidden'),
+                    tarjetas: document.querySelectorAll('.obra-card').length,
+                    avatares: document.querySelectorAll('.obra-avatar-clickable').length,
+                    conDataId: document.querySelectorAll('.obra-avatar-clickable[data-artista-id]').length,
+                    dataId: av ? (av.dataset ? av.dataset.artistaId : null) : null,
+                    gcHijos: gc ? gc.children.length : -1,
+                    gcTexto: gc ? gc.textContent.trim().slice(0, 70) : '(sin contenedor)'
+                });
+            })()`);
+            console.log('   [perfil] antes del clic: ' + antes);
+            const clic = await ev(`(() => {
+                const a = document.querySelector('.obra-avatar-clickable[data-artista-id]')
+                    || document.querySelector('.obra-avatar-clickable');
+                if (!a) return null;
+                a.scrollIntoView({ block: 'center', behavior: 'instant' });
+                const r = a.getBoundingClientRect();
+                if (!r.width || !r.height) return null;
+                return JSON.stringify({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) });
+            })()`);
+            if (clic && typeof clic === 'string' && clic.charAt(0) === '{') {
+                const c = JSON.parse(clic);
+                await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+                await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+            }
+            await dormir(2600);
+            const despues = await ev(`JSON.stringify({
+                perfilOculto: document.getElementById('perfil-usuario').classList.contains('hidden'),
+                galeriaOculta: document.getElementById('galeria-publica').classList.contains('hidden')
+            })`);
+            console.log('   [perfil] despues del clic: ' + despues);
+        },
+        selectores: [
+            '#perfil-usuario', '#perfil-avatar-seccion', '.perfil-nombre-artista-seccion',
+            '.perfil-nombre-real-seccion', '.perfil-ciudad', '#perfil-avatar-btn',
+            '#perfil-online-indicator', '.perfil-avatar-overlay',
+            '#perfil-usuario .perfil-tabs', '#perfil-usuario .perfil-tab',
+            '#perfil-usuario .perfil-stats', '#perfil-usuario .perfil-grid',
+            '#galeria-publica', '#galeria-container', '.obra-card',
+            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo'
+        ]
+    },
+    {
         // El EDITOR de Problogs. Hace falta porque dentro de su modal hay reglas de
         // formularios.css (una móvil con mucha especificidad) que compiten con las de
         // problogs.css: sin abrirlo, un cambio de capas ahí pasaria inadvertido.
@@ -283,6 +347,18 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         const comentarios = [{ id: 1, problog_id: 70001, usuario_id: 10, texto: 'Un comentario de prueba',
             comentario_padre_id: null, created_at: new Date(ahora - 1800000).toISOString(),
             autor_nombre: 'Ana', autor_foto: '', likes_count: 0, liked: false }];
+        // Una obra en la galeria. Hace falta para poder ABRIR EL PERFIL por su camino real:
+        // la tarjeta pone el avatar del artista (sin foto -> un div con data-artista-id) y
+        // al tocarlo se abre su perfil.
+        const obra = { id: 55001, titulo: 'Obra de prueba', precio: '100', artista: 'Ana',
+            artista_user_id: 480002, foto_artista: '', estado_obra: 'publicada',
+            vistas: 0, imagen: '', imagenes: [], categoria: '', tecnica: '',
+            created_at: new Date(ahora - 86400000).toISOString() };
+        // El perfil de OTRO artista (id distinto del mio, para ver la variante de visita).
+        const usuarioAjeno = { id: 480002, nombre_real: 'Ana Pérez', nombre_artista: 'Ana',
+            foto_perfil: '', ciudad: 'San Cristóbal', rol: 'artista', activo: false,
+            ultima_actividad: new Date(ahora - 7200000).toISOString(),
+            cavents: 1, problogs: 1, comcons: 0, seguidores: 0, siguiendo: 0 };
         window.fetch = async (input, init) => {
             const u = String(input);
             const method = ((init && init.method) || 'GET').toUpperCase();
@@ -305,9 +381,17 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/problogs/70001')) return json(pub);
             if (u.includes('/problogs')) return json({ success: true, problogs: [pub], total: 1 });
-            if (u.includes('/obras')) return json([]);
+            if (u.includes('/obras')) return json([obra]);
+            // El perfil de un artista concreto (para el estado perfil, de mas abajo).
+            if (u.includes('artistas/perfil/480002')) return json({ success: true, usuario: usuarioAjeno });
             if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
-            if (u.includes('verificar') || u.includes('sesion')) return json({ success: false });
+            // Sesion VALIDA: si esto devuelve success:false la app cree que no hay sesion y
+            // se queda en la pagina en blanco, asi que la galeria no se pinta nunca (y sin
+            // galeria no se puede abrir el perfil por su camino real).
+            if (u.includes('verificar') || u.includes('sesion')) {
+                return json({ success: true, valido: true, activo: true,
+                    usuario: { id: 480001, nombre_artista: 'T', rol: 'artista' } });
+            }
             return json({ success: true, no_leidas: 0, count: 0, usuario: { id: 480001, nombre_artista: 'T', rol: 'artista' } });
         };
     })();`
