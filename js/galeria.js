@@ -1,3 +1,4 @@
+// @ts-check
 // js/galeria.js
 import { API_BASE_URL, apiRequest } from './config.js?v=8fb0d05879';
 import { artistaActual } from './auth.js?v=c69ad117da';
@@ -45,7 +46,9 @@ if (document.readyState === 'loading') {
 
 // Estado compartido del grid (para el carrusel de etiquetas y re-render)
 let obrasGrid = [];
+/** @type {HTMLElement | null} */
 let gridContainerEl = null;
+/** @type {{ onDetalle?: Function, onAvatarClick?: Function } | null} */
 let gridCallbacks = null;
 export function getObrasGrid() { return obrasGrid; }
 
@@ -85,7 +88,7 @@ export function filtrarGridPorEtiqueta(tags) {
         // Doble rAF: esperar a que el navegador pinte el grid nuevo y luego
         // quitar la clase para que el fade-in sea suave.
         requestAnimationFrame(() => requestAnimationFrame(() => {
-            gridContainerEl.classList.remove('grid-filtrando');
+            gridContainerEl?.classList.remove('grid-filtrando');
         }));
     }, 170); // ~duración del fade out (0.18s)
 }
@@ -354,7 +357,7 @@ function iconoMeta(label) {
 // Muestra el tooltip del icono (p.ej. "Certificado") durante ~2.5s y lo oculta.
 // Delegado: funciona para cualquier tarjeta, incluso re-renderizadas.
 document.addEventListener('click', (e) => {
-    const ico = e.target.closest('.obra-meta-ico');
+    const ico = e.target instanceof Element ? /** @type {HTMLElement} */ (e.target.closest('.obra-meta-ico')) : null;
     if (!ico) return;
     e.stopPropagation();
     if (ico.dataset.timer) clearTimeout(Number(ico.dataset.timer));
@@ -586,8 +589,8 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
                     cerrarDetalleCavent();
                 } else {
                     abrirDetalleCavent(obra.id, card);
-                    btnToggle.querySelector('.icon-lupa').style.display = 'none';
-                    btnToggle.querySelector('.icon-volver').style.display = '';
+                    /** @type {HTMLElement} */ (btnToggle.querySelector('.icon-lupa')).style.display = 'none';
+                    /** @type {HTMLElement} */ (btnToggle.querySelector('.icon-volver')).style.display = '';
                     btnToggle.setAttribute('aria-label', 'Volver');
                     btnToggle.setAttribute('title', 'Volver');
                 }
@@ -604,14 +607,17 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
 
         if (onDetalle) {
             card.addEventListener('click', (e) => {
-                if (e.target.closest('.obra-carousel-dot')) return;
-                if (e.target.closest('.btn-ver-detalles')) return;
-                if (e.target.closest('.metrica-item')) return;
+            // El target de un clic puede ser cualquier cosa (window, document): se comprueba.
+            const objetivo = e.target instanceof Element ? e.target : null;
+            if (!objetivo) return;
+                if (objetivo.closest('.obra-carousel-dot')) return;
+                if (objetivo.closest('.btn-ver-detalles')) return;
+                if (objetivo.closest('.metrica-item')) return;
                 // El icono explicativo (Certificado/Conservación) muestra su
                 // tooltip: no debe abrir el modal de descripción encima
-                if (e.target.closest('.obra-meta-ico')) return;
+                if (objetivo.closest('.obra-meta-ico')) return;
                 // El botón de acción tiene su propia acción (comprar/contactar…)
-                if (e.target.closest('.btn-accion-obra')) return;
+                if (objetivo.closest('.btn-accion-obra')) return;
                 onDetalle(obra.id);
             });
         }
@@ -640,7 +646,7 @@ const VIEW_TIMERS = new Map(); // obraId → timeout
 export function setupViewTracking(container, obras) {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            const obraId = parseInt(entry.target.dataset.obraId);
+            const obraId = parseInt(/** @type {HTMLElement} */ (entry.target).dataset.obraId ?? '0');
             if (!obraId) return;
             if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
                 // Animación del rectángulo de estado: solo cuando el cavent
@@ -743,8 +749,8 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 
     // Resetear todos los botones toggle a estado "lupa"
     document.querySelectorAll('.btn-detalles-toggle').forEach(btn => {
-        btn.querySelector('.icon-lupa').style.display = '';
-        btn.querySelector('.icon-volver').style.display = 'none';
+        /** @type {HTMLElement} */ (btn.querySelector('.icon-lupa')).style.display = '';
+        /** @type {HTMLElement} */ (btn.querySelector('.icon-volver')).style.display = 'none';
         btn.setAttribute('aria-label', 'Ver detalles');
         btn.setAttribute('title', 'Ver detalles');
     });
@@ -778,7 +784,7 @@ export async function abrirDetalleCavent(obraId, cardElement) {
         // en las franjas de la tarjeta del cavent). Aquí solo queda la
         // descripción.
         // textContent NO interpreta entidades: hay que decodificar antes.
-        document.getElementById('detalle-descripcion').textContent =
+        /** @type {HTMLElement} */ (document.getElementById('detalle-descripcion')).textContent =
             decodeHTMLEntities(o.descripcion_artistica || o.descripcion || '—');
 
     } catch (error) {
@@ -789,7 +795,9 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 // ============================================
 // POPOVER DE VISTAS (solo dueño)
 // ============================================
+/** @type {HTMLElement | null} */
 let vistasPopover = null;
+/** @type {(() => void) | null} */
 let vistasCloseHandler = null;
 
 function cerrarVistasPopover() {
@@ -872,7 +880,7 @@ async function mostrarVistas(obraId, anchorEl) {
             </div>
         `;
     } catch (err) {
-        popover.innerHTML = '<div class="vistas-popover-empty">Error: ' + (err.message || 'desconocido') + '</div>';
+        popover.innerHTML = '<div class="vistas-popover-empty">Error: ' + (/** @type {{ message?: string }} */ (err).message || 'desconocido') + '</div>';
     }
 }
 

@@ -42,10 +42,21 @@ interface Window {
     abrirObraDesdePerfil?: (obraId: number | string) => void;
     /** Obras a las que el usuario ha dado like (las lleva galeria.js en window). */
     _likedObras?: Set<number | string>;
-    /** Obras a las que ya se les contó la visita, para no repetir (galeria.js). */
-    _vistasRegistradas?: Set<number | string>;
+    /** Obras a las que ya se les contó la visita, para no repetir (galeria.js). La pone
+     *  galeria.js al cargar el módulo, así que a partir de ahí siempre está. */
+    _vistasRegistradas: Set<number | string>;
     /** Vuelve a la pantalla de marca (lo expone auth-logic.js). */
     volverAlBranding?: () => void;
+}
+
+/**
+ * Propiedades PROPIAS que la app le añade a un elemento del DOM. Declararlas aquí es mejor
+ * que ir poniendo casts por el código: así el chequeo sabe que existen y no hay que
+ * ensuciar cada uso.
+ */
+interface HTMLElement {
+    /** Temporizador del filtro del grid (lo pone galeria.js en el contenedor). */
+    _filtroTimer?: number;
 }
 
 /**
