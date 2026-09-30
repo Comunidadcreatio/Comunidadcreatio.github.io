@@ -523,8 +523,8 @@ function crearObraCard(obra) {
     // modo grid: así las tarjetas del grid (masonry) tienen alturas variadas
     // en lugar de una cuadrícula uniforme. El CSS usa 4/5 como fallback
     // mientras la imagen carga.
-    const primera = card.querySelector('.obra-carousel-slide img');
-    const viewport = card.querySelector('.obra-carousel-viewport');
+    const primera = /** @type {HTMLImageElement} */ (card.querySelector('.obra-carousel-slide img'));
+    const viewport = /** @type {HTMLElement} */ (card.querySelector('.obra-carousel-viewport'));
     if (primera && viewport) {
         const aplicarRatio = () => {
             const w = primera.naturalWidth, h = primera.naturalHeight;
@@ -550,7 +550,7 @@ export function mostrarGaleria(obras, container, onDetalle, onAvatarClick) {
 
         // Clic en el avatar del artista: abre su perfil
         if (onAvatarClick) {
-            const avatarEl = card.querySelector('.obra-avatar-clickable');
+            const avatarEl = /** @type {HTMLElement} */ (card.querySelector('.obra-avatar-clickable'));
             if (avatarEl) {
                 avatarEl.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -631,7 +631,7 @@ export function setupViewTracking(container, obras) {
             if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
                 // Animación del rectángulo de estado: solo cuando el cavent
                 // se muestra en pantalla (una sola vez por tarjeta).
-                const badge = entry.target.querySelector('.obra-estado-badge');
+                const badge = /** @type {HTMLElement} */ (entry.target.querySelector('.obra-estado-badge'));
                 if (badge && !badge.dataset.animado) {
                     badge.dataset.animado = '1';
                     badge.classList.add('estado-anim');
@@ -639,7 +639,7 @@ export function setupViewTracking(container, obras) {
                 // Animación del botón de acción (Comprar/Notificarme/...):
                 // entra con un desliz suave cuando el cavent aparece al hacer
                 // scroll (una vez).
-                const btnAccion = entry.target.querySelector('.btn-accion-obra');
+                const btnAccion = /** @type {HTMLElement} */ (entry.target.querySelector('.btn-accion-obra'));
                 if (btnAccion && !btnAccion.dataset.animado) {
                     btnAccion.dataset.animado = '1';
                     btnAccion.classList.add('accion-anim');
@@ -709,8 +709,8 @@ export function cerrarDetalleCavent() {
     const modal = document.getElementById('modal-detalles-cavent');
     if (modal) modal.classList.add('hidden');
     document.querySelectorAll('.btn-detalles-toggle').forEach(btn => {
-        const lupa = btn.querySelector('.icon-lupa');
-        const volver = btn.querySelector('.icon-volver');
+        const lupa = /** @type {HTMLElement} */ (btn.querySelector('.icon-lupa'));
+        const volver = /** @type {HTMLElement} */ (btn.querySelector('.icon-volver'));
         if (lupa) lupa.style.display = '';
         if (volver) volver.style.display = 'none';
         btn.setAttribute('aria-label', 'Ver detalles');
@@ -737,7 +737,7 @@ export async function abrirDetalleCavent(obraId, cardElement) {
 
     // Alinear el modal SOLO con el contenedor de imágenes del carrusel
     // (no con toda la tarjeta): top/bottom se toman del .obra-carousel.
-    const modalContent = modal.querySelector('.modal-cavent-detalle');
+    const modalContent = /** @type {HTMLElement} */ (modal.querySelector('.modal-cavent-detalle'));
     if (cardElement && modalContent) {
         const carousel = cardElement.querySelector('.obra-carousel');
         if (carousel) {

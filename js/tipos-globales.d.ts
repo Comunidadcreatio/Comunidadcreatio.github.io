@@ -40,6 +40,12 @@ interface Window {
     actualizarEstadisticas?: (userId?: number | string | null, statsData?: Artista | null) => Promise<void>;
     /** Abre la galería y se coloca en una obra (lo expone main.js en window). */
     abrirObraDesdePerfil?: (obraId: number | string) => void;
+    /** Obras a las que el usuario ha dado like (las lleva galeria.js en window). */
+    _likedObras?: Set<number | string>;
+    /** Obras a las que ya se les contó la visita, para no repetir (galeria.js). */
+    _vistasRegistradas?: Set<number | string>;
+    /** Vuelve a la pantalla de marca (lo expone auth-logic.js). */
+    volverAlBranding?: () => void;
 }
 
 /**

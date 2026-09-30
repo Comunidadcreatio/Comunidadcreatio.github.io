@@ -130,14 +130,21 @@ una línea del código que se sirve ni del deploy.
 vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
 Ese fichero queda protegido para siempre.
 
-Adoptados (**14**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
+Adoptados (**20 de 27**): `utils.js`, `etiquetas.js`, `config.js`, `overlays.js`, `theme.js`,
 `ciudades.js`, `bloqueo-fondo.js`, `auth.js`, `panel.js`, `password-strength.js`, `pwa.js`,
-`busqueda.js`, `version-check.js` y `biometric-login.js`.
+`busqueda.js`, `version-check.js`, `biometric-login.js`, `capacitor-native-biometric.js`,
+`cuenta.js`, `push.js`, `notificaciones.js`, `comentarios.js` y `perfil.js`.
 
-**Diferidos a propósito** (salieron con demasiados avisos para meterlos con calzador; se les
-quitó el `@ts-check` y quedan apuntados): `notificaciones.js` (15), `cuenta.js` (45),
-`push.js` (22). Con los seis grandes al final (`problogs.js`, `chat.js`, `panel-ui.js`,
-`galeria-ui.js`, `auth-logic.js`, `galeria.js`, `main.js`, `perfil.js`, `comentarios.js`).
+**Diferidos a propósito** (necesitan una pasada dedicada; se les quitó el `@ts-check` y
+quedan apuntados): `galeria.js` (**47** avisos) y `auth-logic.js` (**132**). Sus patrones ya
+se conocen —elementos del DOM con el tipo genérico (`value`/`style`/`dataset`), globales de
+`window` que faltan y variables que empiezan en `null`—, pero son **unos 120 sitios**: se
+hacen con tiempo, no de pasada. Los globales que necesitan (`_likedObras`,
+`_vistasRegistradas`, `volverAlBranding`) **ya están declarados**, así que la próxima pasada
+empieza con ventaja.
+
+Quedan además los grandes: `main.js` (847), `galeria-ui.js` (1233), `panel-ui.js` (1543),
+`chat.js` (1561) y `problogs.js` (2267).
 
 ### Dos trampas que han costado tiempo
 
