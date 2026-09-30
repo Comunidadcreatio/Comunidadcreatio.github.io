@@ -1,14 +1,31 @@
+// @ts-check
 // js/panel-ui.js
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
 import { ARTISTA_KEY, apiRequest } from './config.js?v=8fb0d05879';
 import { token, artistaActual } from './auth.js?v=c69ad117da';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=0e5ffbe6ad';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=0173a55f21';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
 import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=26b9826f0b';
 
-// Cache del dropdown Mis Cavents para tiempo real
+/**
+ * Un campo del formulario que tiene `.value`: los `[data-required="true"]` del editor son
+ * inputs (6), textareas (1) y selects (9), asi que el tipo es la union de los tres.
+ * @typedef {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} CampoConValor
+ */
+
+/**
+ * Una obra (Cavent) tal como la devuelve el backend. Solo los campos que usa este modulo;
+ * el indice deja pasar los demas sin tener que listarlos.
+ * @typedef {{ id?: number | string, titulo?: string, status?: string, precio?: number | string,
+ *             id_personalizado?: number | string, localizacion?: string, peso?: number | string,
+ *             [clave: string]: any }} ObraPanel
+ */
+
+// Cache del dropdown Mis Cavents para tiempo real. Se anota porque `data: []` se quedaba en
+// `never[]` y entonces TODO lo que se leia de una obra (id, titulo, status, precio) daba error.
+/** @type {{ loaded: boolean, data: ObraPanel[] }} */
 let _caventsCache = { loaded: false, data: [] };
 export function invalidateCaventsCache() {
     _caventsCache.loaded = false;
@@ -67,10 +84,11 @@ function reservaInferior() {
 // (se puede pulsar desde cualquier paso), así que la validación nativa del
 // navegador no protege nada: sin esto se podía guardar una obra sin título, sin
 // año, sin precio ni descripción.
+/** @type {((index: number) => void) | null} */
 let irAlPasoFn = null;   // lo rellena setupStepNavigation (showStep)
 
 function camposObligatoriosVacios() {
-    return Array.from(document.querySelectorAll('#obra-form [data-required="true"]'))
+    return Array.from(/** @type {NodeListOf<CampoConValor>} */ (document.querySelectorAll('#obra-form [data-required="true"]')))
         .filter((el) => !String(el.value || '').trim());
 }
 
@@ -95,7 +113,7 @@ function irAlPasoDe(el) {
 // Limpia el formulario pidiendo confirmación si hay algo que perder: cambios sin
 // guardar, o datos cargados de una obra que se está editando/duplicando.
 export async function limpiarFormularioConConfirmacion() {
-    const idEdicion = (document.getElementById('input-id-edicion') || {}).value || '';
+    const idEdicion = /** @type {HTMLInputElement | null} */ (document.getElementById('input-id-edicion'))?.value || '';
     const boton = /** @type {HTMLButtonElement} */ (document.getElementById('obra-step-crear'));
     const modoDuplicar = /Duplicar/i.test(boton ? boton.textContent : '');
     const aviso = hayCambiosNoGuardados
@@ -331,7 +349,7 @@ function cropearImagen(file, aspect) {
                 const canvas = document.createElement('canvas');
                 canvas.width = outW;
                 canvas.height = outH;
-                const ctx = canvas.getContext('2d');
+                const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
                 // Fondo blanco: evita fondo negro al exportar JPEG si la imagen tiene transparencia
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, outW, outH);
@@ -426,7 +444,7 @@ export async function cargarUrlEnInput(index, url) {
                 const canvas = document.createElement('canvas');
                 canvas.width = img.naturalWidth;
                 canvas.height = img.naturalHeight;
-                const ctx = canvas.getContext('2d');
+                const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
                 ctx.drawImage(img, 0, 0);
                 canvas.toBlob(blob => {
                     if (blob) resolve(blob);
@@ -460,7 +478,7 @@ export function setupImagePreviews() {
         btnAgregar.addEventListener('click', () => {
             // Buscar el primer slot sin usar
             for (let i = 0; i < MAX_IMAGENES; i++) {
-                const inp = document.getElementById(`input-imagen-${i}`);
+                const inp = /** @type {HTMLInputElement | null} */ (document.getElementById(`input-imagen-${i}`));
                 if (inp && !inp.files?.length) {
                     inp.click();
                     return;
@@ -473,14 +491,16 @@ export function setupImagePreviews() {
 
     // File inputs
     for (let i = 0; i < MAX_IMAGENES; i++) {
-        const input = document.getElementById(`input-imagen-${i}`);
+        const input = /** @type {HTMLInputElement | null} */ (document.getElementById(`input-imagen-${i}`));
         if (input) {
             input.addEventListener('change', function() {
-                const file = this.files[0];
+                // El manejador no usa `this`: se lee el propio input (que ya tiene tipo).
+                const file = input.files?.[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        agregarImagen(file, e.target.result);
+                    // Tampoco hace falta `e.target` (que puede ser null): el FileReader es `reader`.
+                    reader.onload = function() {
+                        agregarImagen(file, reader.result);
                     };
                     reader.readAsDataURL(file);
                 }
@@ -527,12 +547,14 @@ export function setupImagePreviews() {
     actualizarCarrusel();
 
     // Ratio toggle
-    document.querySelectorAll(".ratio-btn").forEach(btn => {
-        btn.addEventListener("click", async function() {
-            document.querySelectorAll(".ratio-btn").forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
-            aspectRatio = this.dataset.ratio;
-            document.getElementById("carrusel-viewport").style.aspectRatio = aspectRatio;
+    /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(".ratio-btn")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+            /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(".ratio-btn")).forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            // Los dos botones traen data-ratio; si faltara, se queda el 4/5 de partida.
+            aspectRatio = btn.dataset.ratio || '4/5';
+            const viewport = document.getElementById("carrusel-viewport");
+            if (viewport) viewport.style.aspectRatio = aspectRatio;
             // Re-recortar las imágenes ya agregadas al nuevo ratio. SIEMPRE desde
             // el archivo ORIGINAL que eligió el usuario: antes se recortaba el
             // resultado anterior, así que cada cambio de ratio volvía a recortar
@@ -887,7 +909,7 @@ function initCustomSelect(selectEl, placeholder) {
     }, { passive: true });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-select')) cerrar();
+        if (!(e.target instanceof Element) || !e.target.closest('.custom-select')) cerrar();
     });
 
     selectEl.addEventListener('change', () => {
@@ -967,7 +989,7 @@ function setupCaventsDropdown() {
 
     function syncCustomSelects() {
         try {
-            document.querySelectorAll('#obra-form .form-group select').forEach(sel => {
+            /** @type {NodeListOf<HTMLSelectElement>} */ (document.querySelectorAll('#obra-form .form-group select')).forEach(sel => {
                 sel.dispatchEvent(new Event('change', { bubbles: true }));
                 const wrapper = sel.closest('.custom-select');
                 if (wrapper) {
@@ -1033,7 +1055,7 @@ function setupCaventsDropdown() {
                               obra.status && obra.status.includes('Inactivo') ? 'Inactivo' : '—';
             const statusClass = statusText === 'Activo' ? 'status-activo' : 
                                statusText === 'Inactivo' ? 'status-inactivo' : 'status-desconocido';
-            const precio = obra.precio ? `$${parseFloat(obra.precio).toFixed(2)}` : '—';
+            const precio = obra.precio ? `$${parseFloat(String(obra.precio)).toFixed(2)}` : '—';
             
             const item = document.createElement('div');
             item.className = 'cavent-item';
@@ -1056,11 +1078,11 @@ function setupCaventsDropdown() {
             // Se ESPERAN (await): duplicar/editar cargan las imágenes de forma
             // asíncrona y sin esperar el usuario podía guardar a mitad de la
             // copia (la obra se creaba sin las imágenes que faltaban).
-            item.querySelector('.cavent-item-info').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
-            item.querySelector('.cavent-item-num').addEventListener('click', () => editarCavent(obra.id, obra.titulo));
-            item.querySelector('.btn-edit').addEventListener('click', async (e) => { e.stopPropagation(); await editarCavent(obra.id, obra.titulo); });
-            item.querySelector('.btn-dup').addEventListener('click', async (e) => { e.stopPropagation(); await duplicarCavent(obra.id, obra.titulo); });
-            item.querySelector('.btn-del').addEventListener('click', async (e) => { e.stopPropagation(); await eliminarCavent(obra.id); });
+            /** @type {HTMLElement} */ (item.querySelector('.cavent-item-info')).addEventListener('click', () => editarCavent(obra.id, obra.titulo));
+            /** @type {HTMLElement} */ (item.querySelector('.cavent-item-num')).addEventListener('click', () => editarCavent(obra.id, obra.titulo));
+            /** @type {HTMLElement} */ (item.querySelector('.btn-edit')).addEventListener('click', async (e) => { e.stopPropagation(); await editarCavent(obra.id, obra.titulo); });
+            /** @type {HTMLElement} */ (item.querySelector('.btn-dup')).addEventListener('click', async (e) => { e.stopPropagation(); await duplicarCavent(obra.id, obra.titulo); });
+            /** @type {HTMLElement} */ (item.querySelector('.btn-del')).addEventListener('click', async (e) => { e.stopPropagation(); await eliminarCavent(obra.id); });
             
             dropdown.appendChild(item);
         });
@@ -1113,8 +1135,10 @@ function setupCaventsDropdown() {
             resetCambiosNoGuardados();
             updateFormProgress();
         } catch (e) {
-            debugLog.error('Error editando cavent:', e.message, e.stack);
-            showError('Error al cargar la obra: ' + (e.message || ''));
+            // Lo capturado es `unknown`: se declara que es un Error para poder leerlo.
+            const err = /** @type {Error} */ (e);
+            debugLog.error('Error editando cavent:', err.message, err.stack);
+            showError('Error al cargar la obra: ' + (err.message || ''));
         }
     }
 
@@ -1223,7 +1247,7 @@ function setupCaventsDropdown() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('#obra-cavents-bar')) {
+        if (!(e.target instanceof Element) || !e.target.closest('#obra-cavents-bar')) {
             dropdown.classList.remove('open');
         }
     });
@@ -1238,7 +1262,7 @@ export function setupFormAccordions() {
     const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
 
     if (obraForm) {
-        const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
+        const requiredFields = /** @type {NodeListOf<CampoConValor>} */ (obraForm.querySelectorAll('[data-required="true"]'));
         requiredFields.forEach(field => {
             field.addEventListener('input', updateFormProgress);
             field.addEventListener('change', updateFormProgress);
@@ -1391,10 +1415,10 @@ function setupStepNavigation() {
             const content = s.querySelector('.form-section-content');
             if (i === index) {
                 s.classList.remove('hidden');
-                content.classList.remove('hidden');
+                if (content) content.classList.remove('hidden');
             } else {
                 s.classList.add('hidden');
-                content.classList.add('hidden');
+                if (content) content.classList.add('hidden');
             }
         });
 
@@ -1484,7 +1508,7 @@ export function updateFormProgress() {
     const obraForm = /** @type {HTMLFormElement} */ (document.getElementById('obra-form'));
     if (!obraForm) return;
 
-    const requiredFields = obraForm.querySelectorAll('[data-required="true"]');
+    const requiredFields = /** @type {NodeListOf<CampoConValor>} */ (obraForm.querySelectorAll('[data-required="true"]'));
     // Se cuenta también el paso de imágenes: la obra no se puede guardar sin al
     // menos una, así que ignorarlo dejaba el progreso mintiendo (100% sin ninguna
     // imagen y un 0% engañoso con la imagen ya puesta).

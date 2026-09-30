@@ -22,6 +22,13 @@ export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy =
 }
 
 
+/**
+ * Crea (POST) o actualiza (PUT) una obra. `idEdicion` es el id que se está editando: sin
+ * anotarlo, TypeScript deducía su tipo del valor por defecto (`null`) y el panel no podía
+ * pasarle un id de verdad.
+ * @param {FormData} formData
+ * @param {number | string | null} [idEdicion]
+ */
 export async function guardarObra(formData, idEdicion = null) {
     const url = idEdicion ? `/obras/${idEdicion}` : '/obras';
     const method = idEdicion ? 'PUT' : 'POST';

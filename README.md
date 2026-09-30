@@ -130,14 +130,15 @@ una línea del código que se sirve ni del deploy.
 vigilar un módulo: se le pone `// @ts-check` en la primera línea y se arregla lo que salga.
 Ese fichero queda protegido para siempre.
 
-Adoptados (**26 de 27**): `auth-logic.js`, `auth.js`, `biometric-login.js`,
-`bloqueo-fondo.js`, `busqueda.js`, `capacitor-native-biometric.js`, `chat.js`, `ciudades.js`,
-`comentarios.js`, `config.js`, `cuenta.js`, `etiquetas.js`, `galeria-ui.js`, `galeria.js`,
-`main.js`, `notificaciones.js`, `overlays.js`, `panel.js`, `password-strength.js`,
-`perfil.js`, `problogs.js`, `push.js`, `pwa.js`, `theme.js`, `utils.js` y `version-check.js`.
+Adoptados (**27 de 27**): no queda ninguno sin vigilar. `auth-logic.js`, `auth.js`,
+`biometric-login.js`, `bloqueo-fondo.js`, `busqueda.js`, `capacitor-native-biometric.js`,
+`chat.js`, `ciudades.js`, `comentarios.js`, `config.js`, `cuenta.js`, `etiquetas.js`,
+`galeria-ui.js`, `galeria.js`, `main.js`, `notificaciones.js`, `overlays.js`, `panel.js`,
+`panel-ui.js`, `password-strength.js`, `perfil.js`, `problogs.js`, `push.js`, `pwa.js`,
+`theme.js`, `utils.js` y `version-check.js`.
 
-**Diferido a propósito**: `panel-ui.js` (**52** avisos de 172). Los patrones que se repiten
-en esta casa ya están **contados** (medidos al adoptar los demás ficheros):
+**Los patrones que se repiten** (medidos en estos ficheros: sirven para entender cualquier
+aviso nuevo que salga):
 
 | Patrón | Cuántos | Qué hace falta |
 |---|---|---|
@@ -156,19 +157,37 @@ las variables que se repiten (`msgEl` son 13 avisos de una sola anotación).
 Los globales que necesitan (`_likedObras`, `_vistasRegistradas`, `volverAlBranding`) **ya
 están declarados** en `js/tipos-globales.d.ts`, así que la pasada empieza con ventaja.
 
-Lo que ya se hizo en `panel-ui.js` (y lo que queda):
+### Cómo se adoptó `panel-ui.js` (el último: 1530 líneas, en LF)
 
-- **Se encontró y quitó CÓDIGO MUERTO PELIGROSO**: `refrescarTabla()` tenía 19 líneas
-  inalcanzables (la función sale antes, porque `#page-info` ya no existe: la tabla de "Mis
-  Cavents" se eliminó). Ese bloque usaba **seis variables que no están declaradas en ningún
-  sitio** (`currentPage`, `currentLimit`, `currentSearch`, `currentSortBy`, `currentOrder`,
-  `totalObras`), así que **si alguien restaurase `#page-info`, el panel reventaba con un
-  `ReferenceError`**. Se borró el bloque (13 avisos menos).
-- 104 anotaciones puestas (59 declaraciones con el tipo del id + 41 llamadas en línea). Son
-  anotaciones y casts: **no cambian nada en ejecución**.
+Tenía **172 avisos** la primera vez que se miró. En aquella pasada se quitó un bloque de código
+muerto y se pusieron 104 anotaciones (59 declaraciones con el tipo del id + 41 llamadas en
+línea), y quedó **diferido con 52**. En esta pasada se han arreglado esos 52 con **17 cambios
+en dos tandas** (`scripts/arreglar-tipos-panel-ui.mjs` y `...-2.mjs`).
 
-Lo que queda son sobre todo variables que vienen de un `forEach` o son parámetros (ahí no hay
-declaración que anotar: hay que castear en el sitio) y los contextos 2D del canvas.
+**Se encontró y quitó CÓDIGO MUERTO PELIGROSO**: `refrescarTabla()` tenía 19 líneas
+inalcanzables (la función sale antes, porque `#page-info` ya no existe: la tabla de "Mis
+Cavents" se eliminó). Ese bloque usaba **seis variables que no están declaradas en ningún
+sitio** (`currentPage`, `currentLimit`, `currentSearch`, `currentSortBy`, `currentOrder`,
+`totalObras`), así que **si alguien restaurase `#page-info`, el panel reventaba con un
+`ReferenceError`**. Se borró el bloque (13 avisos menos).
+
+| Causa de los 52 avisos | Cuántos | Qué se hizo |
+|---|---|---|
+| `_caventsCache.data` estaba tipado `never[]` (todo lo que se leía de una obra) | 20 | `@typedef ObraPanel` y la caché anotada: **una anotación arregló 20 avisos** |
+| `querySelector`/`getElementById` usados sin comprobar que existan | 8 | Cast al tipo del elemento, o guarda de verdad (`if (content)`, `if (viewport)`) |
+| `.value`, `.files`, `.selectedOptions` sobre `Element` | 6 | `@typedef CampoConValor` (los `[data-required="true"]` son 6 inputs, 1 textarea y 9 selects) y `NodeListOf<...>` |
+| `e.target` → `.closest` (y `e.target.result`) | 5 | `e.target instanceof Element` antes de usarlo; en el `FileReader`, usar `reader.result` |
+| `ctx` del canvas | 4 | Cast a `CanvasRenderingContext2D` (para `'2d'` no puede ser null) |
+| `this` de los manejadores (`TS2683`) | 3 | Usar la variable que ya existe (`btn`, `input`), como manda la regla (e) |
+| Variables en `null` (`irAlPasoFn`) y un parámetro cuyo tipo era `null` (`guardarObra`) | 3 | Se anotan con su tipo de verdad |
+| `catch (e)`: lo capturado es `unknown` | 3 | `const err = /** @type {Error} */ (e)` |
+
+Y dos más que no estaban en esa cuenta: **+1** que salió al tipar la caché (`parseFloat` con un
+número, que quiere texto) y **+1** que introdujo la primera tanda (**TypeScript no admite `?.`
+en el lado izquierdo de una asignación**, `TS2779`).
+
+Este fichero es **LF** (el raro era `problogs.js`, con CRLF), así que los reemplazos de varias
+líneas van con `\n` normal.
 
 **⚠️ Y una trampa que casi cuesta cara**: un script que buscaba el cierre de la función con
 "la primera línea que sea solo `}`" encontró el `}` del `return` temprano y **dejó el bloque
@@ -176,7 +195,7 @@ muerto huérfano fuera de la función** — en un módulo ES eso **se ejecuta al
 roto la app entera. Lo cazó `node --check` en el mismo paso. **Para borrar bloques: por
 números de línea comprobados, nunca buscando llaves.**
 
-### Cómo se adoptó `problogs.js` (el último grande: 2267 líneas)
+### Cómo se adoptó `problogs.js` (2267 líneas)
 
 Empezó con **53 avisos** y quedó limpio con **30 cambios en dos tandas**
 (`scripts/arreglar-tipos-problogs.mjs` y `scripts/arreglar-tipos-problogs-2.mjs`). Son

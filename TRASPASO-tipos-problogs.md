@@ -1,10 +1,16 @@
-# Traspaso: seguir adoptando tipos en Creatio (siguiente: `panel-ui.js`)
+# Traspaso: los tipos de Creatio (COMPLETO: 27 de 27 módulos)
 
 Documento para empezar en una conversación nueva. Está todo lo que hace falta: el estado, el
 método que funciona, las trampas que ya nos han mordido y cómo se verifica.
 
-> **ACTUALIZADO tras `problogs.js`**: ese fichero ya está adoptado y limpio (ver la sección 6).
-> Lo único que queda sin `@ts-check` es `panel-ui.js`.
+> **ADOPCIÓN TERMINADA**: no queda ningún módulo sin `@ts-check`. `problogs.js` se hizo en una
+> pasada (sección 6) y `panel-ui.js` en la siguiente (sección 7). Lo que queda del proyecto NO
+> son tipos: son los `!important` del CSS, las container queries y el `srcset` (sección 8).
+>
+> **Y ojo con una trampa nueva del propio herramientas**: `verificar-todo.mjs` se incluía a sí
+> mismo en la lista y **se llamaba en recursión** (los 18 verificadores pasaban y volvía a
+> empezar, sin sacar nunca el resumen). Ya está arreglado, pero si algún día el comando no
+> termina, mirar ahí primero.
 
 ---
 
@@ -17,11 +23,11 @@ node scripts/serve-local.mjs          # dejar en segundo plano (http://127.0.0.1
 Invoke-WebRequest 'http://127.0.0.1:8099/index.html' -UseBasicParsing | Select-Object StatusCode
 
 # 2. Estado del chequeo de tipos
-node scripts/verificar-tipos.mjs      # debe decir: SIN ERRORES (26 módulos vigilados)
+node scripts/verificar-tipos.mjs      # debe decir: SIN ERRORES (27 módulos vigilados)
 
-# 3. Adoptar el siguiente fichero y medir
-node scripts/adoptar-modulo.mjs js/panel-ui.js
-node scripts/verificar-tipos.mjs      # y agrupar los avisos como se explica abajo
+# 3. Todos los verificadores de la app, en serie (tarda ~10 min)
+node scripts/verificar-todo.mjs http://127.0.0.1:8099/
+node scripts/verificar-todo.mjs --solo <texto>   # solo los que contengan ese texto
 ```
 
 ---
@@ -30,18 +36,16 @@ node scripts/verificar-tipos.mjs      # y agrupar los avisos como se explica aba
 
 | | |
 |---|---|
-| Versión desplegada | **1.0.655** |
-| Commit | `cc96afa`, árbol limpio |
-| Módulos con tipos | **26 de 27** — el chequeo está **VERDE** |
-| Sin adoptar | `panel-ui.js` (1529 líneas, **52 avisos**; su mapa está en el README) |
-| Verificadores | **19** en `scripts/`, todos en verde (el de la foto cubre 6 vistas) |
+| Versión desplegada | **1.0.656** |
+| Commit | ver el último commit de `main` |
+| Módulos con tipos | **27 de 27** — el chequeo está **VERDE** |
+| Sin adoptar | **ninguno** |
+| Verificadores | **18** de app en `scripts/` (más el de tipos), todos en verde; el de la foto cubre 6 vistas |
 
-**Adoptados y limpios (26):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
+**Adoptados y limpios (27):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
 capacitor-native-biometric, chat, ciudades, comentarios, config, cuenta, etiquetas,
-galeria-ui, galeria, main, notificaciones, overlays, panel, password-strength, perfil,
-problogs, push, pwa, theme, utils, version-check.
-
-**Diferido:** `panel-ui.js` (52 avisos de 172, con su mapa en el README).
+galeria-ui, galeria, main, notificaciones, overlays, panel, panel-ui, password-strength,
+perfil, problogs, push, pwa, theme, utils, version-check.
 
 ---
 
@@ -220,7 +224,7 @@ evitar la caché).
 
 ## 6. `problogs.js`: HECHO (53 avisos → 0)
 
-Se adoptó en esta pasada; el chequeo quedó **verde con 26 de 27** módulos. Lo que se midió:
+Se adoptó en la pasada anterior. Lo que se midió:
 
 | | |
 |---|---|
@@ -241,18 +245,37 @@ Y sigue en pie lo de antes: **ese fichero ya se había tocado este ciclo** (View
 callback de una View Transition es **asíncrono** y hay que **esperarlo** antes de escribir
 dentro de lo pintado; si no, se borra). **Respetar eso al tocarlo.**
 
-### Ahora el objetivo es `panel-ui.js`
+---
 
-- **1529 líneas** y **52 avisos** de 172 (ya se hicieron 104 anotaciones y se quitó un bloque
-  de código muerto). El mapa de lo que queda está en el README.
-- Lo que queda son sobre todo variables de `forEach` o parámetros (**no hay declaración que
-  anotar: hay que castear en el sitio**, `/** @type {HTMLElement} */ (el)`) y los contextos 2D
-  del canvas.
-- Empezar por lo de siempre: `node scripts/verificar-tipos.mjs` → agrupar avisos por
-  **código de error** y por **dueño → propiedad** (los comandos están abajo), y atacar en el
-  orden del punto 3.
+## 7. `panel-ui.js`: HECHO (52 avisos → 0)
 
-Comandos útiles para agrupar:
+Es el último que quedaba y el que más avisos tenía por delante (172 en total cuando se miró por
+primera vez). Lo que se midió:
+
+| | |
+|---|---|
+| Avisos de partida | **52** (29 `TS2339`, 9 `TS18047`, 6 `TS2531`, 3 `TS18046`, 2 `TS2683`, y 1 de `TS2322`/`TS2349`/`TS2345`) |
+| Cambios aplicados | **17**, en dos tandas (`scripts/arreglar-tipos-panel-ui.mjs` y `...-2.mjs`) |
+| Verificadores | **18/18 de la app en verde** (incluidos estado-panel 18/18, barras-y-validacion 21/21, cavents-crear 12/12, imagenes 14/14 y meta-obra 19/19) · foto de estilos **SIN DIFERENCIAS** |
+
+**Lo que más rindió, y lo que hay que recordar:**
+
+1. **La caché del dropdown** (`_caventsCache.data`) estaba tipada `never[]` porque se declaró
+   con `data: []`: **20 avisos** de una sola anotación (`@typedef ObraPanel` + la caché tipada).
+   Es el mismo patrón que `let x = null` en `problogs.js`: **el tipo que deduce TypeScript a
+   partir del valor inicial vacío es una trampa, y una anotación quita veinte avisos**.
+2. **Al tiparla salió 1 aviso nuevo** (`parseFloat` con un número pide texto: `String(...)`).
+   Eso es normal y es bueno: antes el `never` lo tapaba.
+3. **El `this` de los manejadores** (regla (e)): aquí se quitó de 3 sitios usando la variable
+   que ya existía (`input.files?.[0]` en vez de `this.files[0]`, `btn` en vez de `this`).
+4. **`?.` NO vale en el lado izquierdo de una asignación** (`TS2779`): lo introdujo la primera
+   tanda y lo cazó la medida. Se escribe la guarda (`const v = ...; if (v) v.style... = ...`).
+5. **Este fichero es LF** (el raro era `problogs.js`, con CRLF): los reemplazos de varias
+   líneas van con `\n` normal.
+
+Y el mapa por causa está en el README (sección de tipos), con los 52 avisos agrupados.
+
+Comandos útiles para agrupar (siguen valiendo para cualquier fichero nuevo):
 ```powershell
 # por código de error
 node scripts/verificar-tipos.mjs 2>&1 | Select-String 'error TS' | ForEach-Object { [regex]::Match($_.Line,'error (TS\d+)').Groups[1].Value } | Group-Object | Sort-Object Count -Descending
@@ -264,12 +287,9 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ---
 
-## 7. Lo que queda además de los tipos
+## 8. Lo que queda además de los tipos
 
-1. **`panel-ui.js`**: 52 avisos (mapa en el README). Son variables de `forEach` o parámetros
-   (no hay declaración que anotar: **castear en el sitio**) y los contextos 2D (`ctx`) del
-   canvas.
-2. **Los 165 `!important`** del CSS: **de uno en uno**, cada uno con la foto antes/después.
+1. **Los 165 `!important`** del CSS: **de uno en uno**, cada uno con la foto antes/después.
    Hay herramientas: `scripts/auditar-important.mjs --resumen` y
    `scripts/quitar-important.mjs --hoja X --selector Y`. **En bloque NO** (se intentó y salió
    con 81 diferencias).
@@ -281,7 +301,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ---
 
-## 8. Reglas de la casa (no negociables)
+## 9. Reglas de la casa (no negociables)
 
 - **Medir, no suponer**: cada cambio con la foto y/o un verificador. Si no se puede medir,
   decirlo.

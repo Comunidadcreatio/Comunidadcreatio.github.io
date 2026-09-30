@@ -23,6 +23,10 @@ const SOLO = iSolo >= 0 ? (args[iSolo + 1] || '') : '';
 
 let scripts = readdirSync('scripts')
     .filter((f) => f.startsWith('verificar-') && f.endsWith('.mjs'))
+    // ESTE fichero NO: el filtro de arriba lo incluye, asi que se llamaba a si mismo y
+    // entraba en RECURSION INFINITA (los 18 verificadores pasaban, y en vez de sacar el
+    // resumen volvia a empezar). Se descubrio porque el comando no terminaba nunca.
+    .filter((f) => f !== 'verificar-todo.mjs')
     .filter((f) => !SIN_TIPOS || f !== 'verificar-tipos.mjs')
     .filter((f) => !SOLO || f.includes(SOLO))
     .sort();
