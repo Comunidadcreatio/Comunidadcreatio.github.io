@@ -1,7 +1,10 @@
-# Traspaso: seguir adoptando tipos en Creatio (siguiente: `problogs.js`)
+# Traspaso: seguir adoptando tipos en Creatio (siguiente: `panel-ui.js`)
 
 Documento para empezar en una conversación nueva. Está todo lo que hace falta: el estado, el
 método que funciona, las trampas que ya nos han mordido y cómo se verifica.
+
+> **ACTUALIZADO tras `problogs.js`**: ese fichero ya está adoptado y limpio (ver la sección 6).
+> Lo único que queda sin `@ts-check` es `panel-ui.js`.
 
 ---
 
@@ -14,10 +17,10 @@ node scripts/serve-local.mjs          # dejar en segundo plano (http://127.0.0.1
 Invoke-WebRequest 'http://127.0.0.1:8099/index.html' -UseBasicParsing | Select-Object StatusCode
 
 # 2. Estado del chequeo de tipos
-node scripts/verificar-tipos.mjs      # debe decir: SIN ERRORES (25 módulos vigilados)
+node scripts/verificar-tipos.mjs      # debe decir: SIN ERRORES (26 módulos vigilados)
 
 # 3. Adoptar el siguiente fichero y medir
-node scripts/adoptar-modulo.mjs js/problogs.js
+node scripts/adoptar-modulo.mjs js/panel-ui.js
 node scripts/verificar-tipos.mjs      # y agrupar los avisos como se explica abajo
 ```
 
@@ -27,18 +30,18 @@ node scripts/verificar-tipos.mjs      # y agrupar los avisos como se explica aba
 
 | | |
 |---|---|
-| Versión desplegada | **1.0.654** |
-| Commit | `96d82c5`, árbol limpio |
-| Módulos con tipos | **25 de 27** — el chequeo está **VERDE** |
-| Sin adoptar | `problogs.js` (2267 líneas) y `panel-ui.js` (1529, **diferido con 52 avisos**) |
+| Versión desplegada | **1.0.655** |
+| Commit | `cc96afa`, árbol limpio |
+| Módulos con tipos | **26 de 27** — el chequeo está **VERDE** |
+| Sin adoptar | `panel-ui.js` (1529 líneas, **52 avisos**; su mapa está en el README) |
 | Verificadores | **19** en `scripts/`, todos en verde (el de la foto cubre 6 vistas) |
 
-**Adoptados y limpios (25):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
+**Adoptados y limpios (26):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
 capacitor-native-biometric, chat, ciudades, comentarios, config, cuenta, etiquetas,
-galeria-ui, galeria, main, notificaciones, overlays, panel, password-strength, perfil, push,
-pwa, theme, utils, version-check.
+galeria-ui, galeria, main, notificaciones, overlays, panel, password-strength, perfil,
+problogs, push, pwa, theme, utils, version-check.
 
-**Diferidos:** `panel-ui.js` (52 avisos, con su mapa en el README) y `problogs.js` (por medir).
+**Diferido:** `panel-ui.js` (52 avisos de 172, con su mapa en el README).
 
 ---
 
@@ -163,6 +166,22 @@ pueden leer y reescribir con `Get-Content`/`WriteAllText` (eso causó el fallo d
 `'Táchira'` → `'TÃ¡chira'` y "No hay pueblos disponibles"). Herramientas seguras:
 `scripts/adoptar-modulo.mjs`, `scripts/arreglar-codificacion.mjs`, `scripts/dbg-codificacion.mjs`.
 
+**11. `problogs.js` usa CRLF** (los demás ficheros del proyecto, no). Un script de reemplazos
+que busque textos de varias líneas escritos con `\n` **no encuentra nada**, y si escribe `\n`
+le cambia los finales de línea al fichero entero. Hay que pasar los textos a `\r\n` (el script
+`scripts/arreglar-tipos-problogs.mjs` tiene el helper `crlf()` que lo hace).
+
+**12. El cast va en la EXPRESIÓN, no en la declaración.** Esto **sigue dando `TS2322`**,
+porque la anotación no convierte el `HTMLElement` que devuelve el DOM:
+
+```js
+// MAL: error de tipos (el inicializador sigue siendo HTMLElement | null)
+/** @type {HTMLInputElement | null} */ let campo = document.getElementById('x');
+// BIEN: el cast abraza la expresión
+let campo = /** @type {HTMLInputElement | null} */ (document.getElementById('x'));
+```
+(Salió al adoptar `problogs.js`: dos avisos nuevos que cazó la medida, no la vista.)
+
 ---
 
 ## 5. Verificación (el orden que funciona)
@@ -171,9 +190,11 @@ pueden leer y reescribir con `Get-Content`/`WriteAllText` (eso causó el fallo d
 node --check js/<fichero>.js                 # SIEMPRE, tras cada tanda
 node scripts/verificar-tipos.mjs             # debe bajar; al final, 0
 
-# El verificador que cubre el fichero (para problogs.js):
+# Los verificadores que cubren el fichero. Estos son los de problogs.js (sus numeros
+# finales, ya con el fichero adoptado):
 node scripts/verificar-comentarios-problog.mjs http://127.0.0.1:8099/   # 92/92
 node scripts/verificar-problogs-editor.mjs     http://127.0.0.1:8099/   # 10/10
+# Para panel-ui.js el que toca es scripts/verificar-estado-panel.mjs.
 
 # La foto de estilos (398 medidas, 6 vistas). Dos corridas y comparar: debe dar
 # SIN DIFERENCIAS (las anotaciones no cambian nada en ejecución).
@@ -197,19 +218,39 @@ evitar la caché).
 
 ---
 
-## 6. `problogs.js` (el objetivo): lo que hay que saber
+## 6. `problogs.js`: HECHO (53 avisos → 0)
 
-- **2267 líneas.** Es el último grande y el que más se usa (el feed y la lectura de Problogs).
-- **Lo cubren dos verificadores propios**: `verificar-comentarios-problog.mjs` (**92/92**) y
-  `verificar-problogs-editor.mjs` (**10/10**), y la foto lo mide en sus estados `problogs` y
-  `editor`.
-- **Ese fichero ya se tocó este ciclo** (View Transitions: `abrirLectura`/`cerrarLectura` usan
-  `conTransicion` de `utils.js`, y ahí se descubrió que el callback de una View Transition es
-  **asíncrono** y hay que **esperarlo** antes de escribir dentro de lo pintado; si no, se
-  borra). **Respetar eso al tocarlo.**
+Se adoptó en esta pasada; el chequeo quedó **verde con 26 de 27** módulos. Lo que se midió:
+
+| | |
+|---|---|
+| Avisos de partida | **53** (40 `TS2339`, 6 `TS18047`, 6 `TS2322`, 1 `TS2345`) |
+| Cambios aplicados | **30**, en dos tandas (`scripts/arreglar-tipos-problogs.mjs` y `...-2.mjs`) |
+| Verificadores | comentarios **92/92** · editor **10/10** · foto de estilos **SIN DIFERENCIAS** (398 medidas, 6 vistas) |
+
+**Las dos cosas propias de este fichero** (están también en el README, sección de tipos):
+
+1. **Usa CRLF** (los demás del proyecto, no). Un script de reemplazos que busque textos de
+   varias líneas con `\n` **no encuentra nada**: hay que pasarlos a `\r\n`.
+2. **El cast va en la EXPRESIÓN, no en la declaración.** Esto sigue dando `TS2322`:
+   `/** @type {HTMLInputElement | null} */ let campo = document.getElementById(...)`.
+   Hace falta el paréntesis: `let campo = /** @type {HTMLInputElement | null} */ (document.getElementById(...))`.
+
+Y sigue en pie lo de antes: **ese fichero ya se había tocado este ciclo** (View Transitions:
+`abrirLectura`/`cerrarLectura` usan `conTransicion` de `utils.js`, y ahí se descubrió que el
+callback de una View Transition es **asíncrono** y hay que **esperarlo** antes de escribir
+dentro de lo pintado; si no, se borra). **Respetar eso al tocarlo.**
+
+### Ahora el objetivo es `panel-ui.js`
+
+- **1529 líneas** y **52 avisos** de 172 (ya se hicieron 104 anotaciones y se quitó un bloque
+  de código muerto). El mapa de lo que queda está en el README.
+- Lo que queda son sobre todo variables de `forEach` o parámetros (**no hay declaración que
+  anotar: hay que castear en el sitio**, `/** @type {HTMLElement} */ (el)`) y los contextos 2D
+  del canvas.
 - Empezar por lo de siempre: `node scripts/verificar-tipos.mjs` → agrupar avisos por
-  **código de error** y por **dueño → propiedad** (el comando está al final del README), y
-  atacar en el orden del punto 3.
+  **código de error** y por **dueño → propiedad** (los comandos están abajo), y atacar en el
+  orden del punto 3.
 
 Comandos útiles para agrupar:
 ```powershell
