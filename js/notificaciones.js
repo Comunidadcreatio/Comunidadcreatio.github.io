@@ -1,9 +1,10 @@
+// @ts-check
 // js/notificaciones.js
 // Sistema de notificaciones (toasts) y estados de carga.
 
 // Crea el contenedor de notificaciones si aún no existe.
 function initNotificationContainer() {
-    let container = document.querySelector('.notification-container');
+    let container = /** @type {HTMLElement} */ (document.querySelector('.notification-container'));
     if (!container) {
         container = document.createElement('div');
         container.className = 'notification-container';
@@ -26,7 +27,7 @@ const CLOSE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" 
 
 // Mostrar notificación.
 function showNotification(message, type = 'info', duration = 5000) {
-    const container = initNotificationContainer();
+    const container = /** @type {HTMLElement} */ (initNotificationContainer());
 
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -41,9 +42,9 @@ function showNotification(message, type = 'info', duration = 5000) {
     `;
     // Insertar el mensaje como texto para evitar inyección de HTML
     // y preservar saltos de línea.
-    notification.querySelector('.notification-message').textContent = message;
+    /** @type {HTMLElement} */ (notification.querySelector('.notification-message')).textContent = message;
 
-    notification.querySelector('.notification-close').addEventListener('click', () => {
+    /** @type {HTMLElement} */ (notification.querySelector('.notification-close')).addEventListener('click', () => {
         closeNotification(notification);
     });
 
@@ -92,7 +93,7 @@ export function showInfo(message, duration = 5000) {
 
 // Overlay de carga a pantalla completa.
 export function showLoadingOverlay(text = 'Cargando...') {
-    let overlay = document.querySelector('.loading-overlay');
+    let overlay = /** @type {HTMLElement} */ (document.querySelector('.loading-overlay'));
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.className = 'loading-overlay';
@@ -104,13 +105,13 @@ export function showLoadingOverlay(text = 'Cargando...') {
         `;
         document.body.appendChild(overlay);
     }
-    overlay.querySelector('.loading-text').textContent = text;
+    /** @type {HTMLElement} */ (overlay.querySelector('.loading-text')).textContent = text;
     overlay.style.display = 'flex';
     return overlay;
 }
 
 export function hideLoadingOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
+    const overlay = /** @type {HTMLElement} */ (document.querySelector('.loading-overlay'));
     if (overlay) {
         overlay.style.display = 'none';
     }
@@ -144,7 +145,7 @@ export function setButtonLoading(button, isLoading) {
  */
 export function showConfirm(message) {
     return new Promise((resolve) => {
-        const overlay = document.createElement('div');
+        const overlay = /** @type {HTMLElement} */ (document.createElement('div'));
         overlay.className = 'confirm-overlay';
         overlay.innerHTML = `
             <div class="confirm-dialog">
@@ -155,18 +156,18 @@ export function showConfirm(message) {
                 </div>
             </div>
         `;
-        overlay.querySelector('.confirm-message').textContent = message;
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-message')).textContent = message;
 
         const cleanup = () => {
             overlay.classList.add('confirm-closing');
             setTimeout(() => overlay.remove(), 200);
         };
 
-        overlay.querySelector('.confirm-btn-ok').addEventListener('click', () => {
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-ok')).addEventListener('click', () => {
             cleanup();
             resolve(true);
         });
-        overlay.querySelector('.confirm-btn-cancel').addEventListener('click', () => {
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-cancel')).addEventListener('click', () => {
             cleanup();
             resolve(false);
         });
@@ -191,7 +192,7 @@ export function showConfirm(message) {
  */
 export function showConfirmChoice(message, okLabel = 'Aceptar', cancelLabel = 'Cancelar') {
     return new Promise((resolve) => {
-        const overlay = document.createElement('div');
+        const overlay = /** @type {HTMLElement} */ (document.createElement('div'));
         overlay.className = 'confirm-overlay';
         overlay.innerHTML = `
             <div class="confirm-dialog">
@@ -202,20 +203,20 @@ export function showConfirmChoice(message, okLabel = 'Aceptar', cancelLabel = 'C
                 </div>
             </div>
         `;
-        overlay.querySelector('.confirm-message').textContent = message;
-        overlay.querySelector('.confirm-btn-cancel').textContent = cancelLabel;
-        overlay.querySelector('.confirm-btn-ok').textContent = okLabel;
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-message')).textContent = message;
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-cancel')).textContent = cancelLabel;
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-ok')).textContent = okLabel;
 
         const cleanup = () => {
             overlay.classList.add('confirm-closing');
             setTimeout(() => overlay.remove(), 200);
         };
 
-        overlay.querySelector('.confirm-btn-ok').addEventListener('click', () => {
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-ok')).addEventListener('click', () => {
             cleanup();
             resolve(true);
         });
-        overlay.querySelector('.confirm-btn-cancel').addEventListener('click', () => {
+        /** @type {HTMLElement} */ (overlay.querySelector('.confirm-btn-cancel')).addEventListener('click', () => {
             cleanup();
             resolve(false);
         });

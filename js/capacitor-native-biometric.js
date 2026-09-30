@@ -1,3 +1,4 @@
+// @ts-check
 // js/capacitor-native-biometric.js
 // Proxy del plugin @capgo/capacitor-native-biometric, vendored para la app
 // estática (sin bundler). Registra "NativeBiometric" en el runtime de

@@ -1,8 +1,8 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js?v=9cf48a41f5';
-import { artistaActual } from './auth.js?v=33e2f55cde';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=14006ffb17';
-import { abrirComentarios } from './comentarios.js?v=efeade2dcd';
+import { API_BASE_URL, apiRequest } from './config.js?v=5bcbc68289';
+import { artistaActual } from './auth.js?v=936752c5bf';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=8dd55e77e7';
+import { abrirComentarios } from './comentarios.js?v=93d8202923';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=4464d46b67';
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
