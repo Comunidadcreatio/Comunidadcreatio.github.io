@@ -71,6 +71,86 @@ const PAGINAS = [
             '#login-form', '#login-email', '#login-pass', '.auth-container',
             'button[type="submit"]', '#auth-dark-mode-btn'
         ]
+    },
+    {
+        // La vista de Problogs: se ABRE (feed + publicacion) en vez de solo cargar la
+        // pagina. Sin esto, cualquier cambio en problogs.css se quedaria sin cubrir.
+        nombre: 'problogs',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            await ev(`document.getElementById('btn-problogs-nav')?.click()`);
+            await dormir(1800);
+            for (let intento = 0; intento < 6; intento++) {
+                await ev(`document.querySelector('#problogs .problog-card')?.click()`);
+                await dormir(1500);
+                const abierta = await ev(`!!document.getElementById('problogs-detalle') && !document.getElementById('problogs-detalle').classList.contains('hidden')`);
+                if (abierta === true) break;
+                await ev(`document.getElementById('btn-problogs-nav')?.click()`);
+                await dormir(1200);
+            }
+            await dormir(1000);
+            // Y se pulsa «Responder» para que la barra de responder este de verdad en
+            // pantalla (no oculta) y su sitio se pueda medir.
+            const centro = await ev(`(() => {
+                const b = document.querySelector('#problogs-detalle [data-comentario-responder]');
+                if (!b) return null;
+                b.scrollIntoView({ block: 'center', behavior: 'instant' });
+                const r = b.getBoundingClientRect();
+                return JSON.stringify({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) });
+            })()`);
+            if (centro && typeof centro === 'string') {
+                const c = JSON.parse(centro);
+                await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+                await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+            }
+            await dormir(1000);
+        },
+        selectores: [
+            '#problogs', '#problogs .problogs-feed', '#problogs .problog-card',
+            '#problogs-detalle', '#problogs-detalle .problog-titulo',
+            '#problogs-detalle .problog-contenido', '[data-problog-comentarios]',
+            '.problog-comentario', '.problog-comentario-avatar', '.problog-comentario-texto',
+            '.problog-comentario-input', '.problog-comentario-enviar',
+            '.problog-social-btn', '.problog-marcadores',
+            '#problog-responder-barra', '#problog-responder-texto', '.problog-responder-icono'
+        ]
+    },
+    {
+        // El EDITOR de Problogs. Hace falta porque dentro de su modal hay reglas de
+        // formularios.css (una móvil con mucha especificidad) que compiten con las de
+        // problogs.css: sin abrirlo, un cambio de capas ahí pasaria inadvertido.
+        nombre: 'editor',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            await ev(`document.getElementById('btn-crear-cavent')?.click()`);
+            await dormir(1600);
+            await ev(`document.getElementById('tab-problogs')?.click()`);
+            await dormir(1600);
+            // Se anade un parrafo para que aparezcan los botones de accion del bloque.
+            const centro = await ev(`(() => {
+                const b = document.querySelector('#crear-problogs-contenido .problog-anadir-btn')
+                    || document.querySelector('.problog-anadir-btn');
+                if (!b) return null;
+                const r = b.getBoundingClientRect();
+                return JSON.stringify({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) });
+            })()`);
+            if (centro && typeof centro === 'string') {
+                const c = JSON.parse(centro);
+                await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+                await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+            }
+            await dormir(1400);
+        },
+        selectores: [
+            '#crear-problogs-contenido', '#problog-form', '#problog-nav-bar',
+            '.problog-anadir-btn', '.problog-btn-icono', '.problog-bloque',
+            '#crear-problogs-contenido button', '.problog-anadir-btn:not(.hidden)',
+            '#problog-nav-bar .nav-btn', '#problog-nav-bar .crear-btn'
+        ]
     }
 ];
 
@@ -159,14 +239,30 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         } catch (_) {}
         const json = async (d) => ({ ok: true, status: 200, json: async () => d });
         const realFetch = window.fetch.bind(window);
+        // Datos falsos: una publicacion larga con un comentario, para poder abrir la
+        // vista de Problogs de verdad.
+        const ahora = Date.now();
+        const bloques = [];
+        for (let i = 1; i <= 25; i++) bloques.push({ tipo: 'texto', contenido: 'Parrafo ' + i + ' de la publicacion de prueba.' });
+        const pub = { id: 70001, titulo: 'Publicacion de prueba', etiquetas: '', estado: 'publicado',
+            created_at: new Date(ahora - 3600000).toISOString(), bloques,
+            imagenes: [null,null,null,null,null,null,null,null], miniaturas: [null,null,null,null,null,null,null,null],
+            portada_slot: null, nombre_artista: 'T', foto_artista: '', likes_count: 0,
+            comentarios_count: 1, reblogs_count: 0, liked: false, reblogged: false };
+        const comentarios = [{ id: 1, problog_id: 70001, usuario_id: 10, texto: 'Un comentario de prueba',
+            comentario_padre_id: null, created_at: new Date(ahora - 1800000).toISOString(),
+            autor_nombre: 'Ana', autor_foto: '', likes_count: 0, liked: false }];
         window.fetch = async (input, init) => {
             const u = String(input);
             const method = ((init && init.method) || 'GET').toUpperCase();
             if (!u.includes('backend-fundacion-atpe.onrender.com')) return realFetch(input, init);
+            if (u.includes('/comentarios')) return json({ success: true, comentarios });
             if (method !== 'GET') return json({ success: true, id: 9 });
             if (u.includes('heartbeat')) return json({ ok: true });
             if (u.includes('mis-reacciones')) return json({ reacciones: [] });
-            if (u.includes('/problogs')) return json({ success: true, problogs: [], total: 0 });
+            if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
+            if (u.includes('/problogs/70001')) return json(pub);
+            if (u.includes('/problogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/obras')) return json([]);
             if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
             if (u.includes('verificar') || u.includes('sesion')) return json({ success: false });
@@ -222,6 +318,8 @@ for (const pag of PAGINAS) {
             const ok = await evalJs(FIXTURE);
             if (ok !== 'ok') { console.error(`No se pudo montar la muestra en ${pag.nombre}:`, ok); salir(2); }
         }
+        // Algunas vistas hay que ABRIRLAS (Problogs: feed + publicacion + barra).
+        if (pag.abrir) await pag.abrir(evalJs, sleep);
         for (const tema of TEMAS) {
             // El tema se fija Y SE COMPRUEBA (theme.js lo elige por la hora del dia).
             for (let intento = 0; intento < 4; intento++) {

@@ -74,12 +74,19 @@ Reglas que van JUNTAS y no se pueden separar: `select` con `[data-theme="dark"] 
 Para migrar sin riesgo: foto de estilos antes → cambio → foto después → comparar.
 Si la comparación sale sin diferencias, el cambio no movió ni un valor calculado.
 
+**ANTES DE CAPAR UNA HOJA ENTERA, OJO:** lo que NO está en ninguna capa GANA a lo que
+SÍ está, así que capar `problogs.css` a secas hace que las reglas de Problogs que viven
+en otras hojas (el editor está en `formularios.css`: `#panel-artista …`,
+`.crear-problogs-contenido`) le ganen y el editor se descuadre en móvil. Hay que mover
+la familia COMPLETA (todas las hojas que toquen esos elementos) en el mismo paso.
+La foto cubre el editor justo para cazar esto.
+
 ## Scripts
 
 | Script | Qué hace |
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
-| scripts/foto-estilos.mjs | Foto de estilos calculados (2 temas x 2 anchos) y comparación antes/después para refactorizar CSS con red |
+| scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre 4 vistas (index, auth, Problogs y el editor de Problogs) x 2 temas x 2 anchos = 210 medidas |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/minify.js | Genera .min.css/.min.js (enmascara strings, valida con node --check; falla en voz alta si algo no es minificable, ej. perfil.js con templates anidados → usar Terser) |
 | scripts/add_banderas.py / fix_banderas.py | Utilidades de banderas (una vez) |
