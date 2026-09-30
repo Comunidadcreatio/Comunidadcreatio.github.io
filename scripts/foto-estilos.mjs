@@ -151,7 +151,10 @@ const PAGINAS = [
             '#crear-problogs-contenido', '#problog-form', '#problog-nav-bar',
             '.problog-anadir-btn', '.problog-btn-icono', '.problog-bloque',
             '#crear-problogs-contenido button', '.problog-anadir-btn:not(.hidden)',
-            '#problog-nav-bar .nav-btn', '#problog-nav-bar .crear-btn'
+            '#problog-nav-bar .nav-btn', '#problog-nav-bar .crear-btn',
+            '#problog-nav-bar .limpiar-btn', '#obra-step-bar', '#obra-step-bar .crear-btn',
+            '#obra-step-bar .limpiar-btn', '#obra-etiquetas-bar',
+            '#obra-etiquetas-bar .input-etiquetas-subtle'
         ]
     }
 ];

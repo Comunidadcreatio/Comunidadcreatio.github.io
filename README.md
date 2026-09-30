@@ -105,6 +105,19 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
+### `!important`: quitar de uno en uno, no en bloque
+
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. Con las capas,
+un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo importante va
+por encima de lo normal aunque la capa sea anterior); si solo peleaba contra reglas
+normales, muchas veces basta con subir la regla a `utilities` o bajar la competidora a
+`base`.
+
+**Lo que NO hay que hacer** (medido y revertido): mover la competidora a `base` y quitar de
+golpe los 36 `!important` de los botones de la barra inferior de `formularios.css`. La foto
+dio **81 diferencias**: los `!important` ganaban a más reglas de las que parecía. Se van
+quitando **de uno en uno (o por reglas sueltas)**, con la foto después de cada uno.
+
 ## Scripts
 
 | Script | Qué hace |
@@ -113,6 +126,8 @@ ya existían.
 | scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre 4 vistas (index, auth, Problogs y el editor de Problogs) x 2 temas x 2 anchos = 210 medidas |
 | scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/mover-a-base.mjs | Mueve a `base` las reglas que son de ETIQUETA (estén sueltas o dentro de un `@media`, conservando su condición). No mueve las de `:-webkit-autofill` (en `base` perderían y volvería el amarillo del autocompletado). Deja copia `.antes-de-mover` |
+| scripts/auditar-important.mjs | Lista los `!important` con su selector, su propiedad y su capa (`--hoja`, `--resumen`) |
+| scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
