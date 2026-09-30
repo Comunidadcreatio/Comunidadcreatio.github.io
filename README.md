@@ -75,11 +75,26 @@ Para migrar sin riesgo: foto de estilos antes → cambio → foto después → c
 Si la comparación sale sin diferencias, el cambio no movió ni un valor calculado.
 
 **ANTES DE CAPAR UNA HOJA ENTERA, OJO:** lo que NO está en ninguna capa GANA a lo que
-SÍ está, así que capar `problogs.css` a secas hace que las reglas de Problogs que viven
-en otras hojas (el editor está en `formularios.css`: `#panel-artista …`,
-`.crear-problogs-contenido`) le ganen y el editor se descuadre en móvil. Hay que mover
-la familia COMPLETA (todas las hojas que toquen esos elementos) en el mismo paso.
-La foto cubre el editor justo para cazar esto.
+SÍ está, así que capar una hoja hace que las reglas que seleccionen lo mismo desde otra
+hoja SIN capar le ganen, aunque sean menos específicas.
+
+Caso real (Problogs): capar `problogs.css` se lleva por delante, como mínimo, a
+`.crear-problogs-contenido` y el `form` de `formularios.css`, a la caja de
+`#panel-artista` (panel-artista.css, que problogs reescribe para el editor) y a las
+reglas de Problogs de style.css y header.css. Cada una que se mueve destapa la
+siguiente.
+
+**Método que funciona, en este orden:**
+
+1. `node scripts/auditar-capas.mjs` — lista las reglas SIN capa que pueden dar la
+   sorpresa (etiquetas solas como `form`, y selectores de la familia que se va a capar).
+   Detecta selectores repartidos en varias líneas, que es donde se escapan.
+2. `node scripts/foto-estilos.mjs` antes y después, y comparar. Dice exactamente qué
+   valores cambiaron.
+3. `node scripts/dbg-cascada.mjs` — cuando la foto dice QUÉ cambió pero no POR QUÉ: dice
+   qué regla gana de verdad una propiedad en un elemento (y la cadena de padres con su
+   ancho). Ojo: no ve los atajos (`padding` no aparece como `padding-left`).
+4. Repetir 1-3 hasta que la comparación dé CERO diferencias.
 
 ## Scripts
 
@@ -87,6 +102,8 @@ La foto cubre el editor justo para cazar esto.
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
 | scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre 4 vistas (index, auth, Problogs y el editor de Problogs) x 2 temas x 2 anchos = 210 medidas |
+| scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
+| scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/minify.js | Genera .min.css/.min.js (enmascara strings, valida con node --check; falla en voz alta si algo no es minificable, ej. perfil.js con templates anidados → usar Terser) |
 | scripts/add_banderas.py / fix_banderas.py | Utilidades de banderas (una vez) |
