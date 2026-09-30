@@ -19,3 +19,11 @@ scripts/foto-*.json
 css/*.antes-de-capar
 css/*.antes-de-mover
 css/*.antes-de-quitar
+
+# Copias de seguridad de los scripts de codificacion/adopcion
+js/*.antes-de-adoptar
+js/*.antes-de-codificar
+
+# Salidas temporales de verificar-todo.mjs y de las corridas de verificadores
+scripts/.tmp-*
+scripts/*.out.txt
