@@ -28,6 +28,7 @@ if (args.includes('--comparar')) {
     const despues = JSON.parse(readFileSync(args[i + 2], 'utf8'));
     const claves = new Set([...Object.keys(antes.datos), ...Object.keys(despues.datos)]);
     const diferencias = [];
+    const inestables = [];
     for (const clave of claves) {
         const a = antes.datos[clave];
         const b = despues.datos[clave];
@@ -35,14 +36,23 @@ if (args.includes('--comparar')) {
         const props = new Set([...Object.keys(a), ...Object.keys(b)]);
         for (const prop of props) {
             if (a[prop] === b[prop]) continue;
+            // Una propiedad que falta en una de las dos fotos es una medida INESTABLE que
+            // se descarto al capturar (transicion, animacion, fuente a medio cargar): no es
+            // un cambio del CSS. Se informa aparte para no confundirlo con una regresion.
+            if (!(prop in a) || !(prop in b)) { inestables.push({ clave, propiedad: prop }); continue; }
             diferencias.push({ clave, propiedad: prop, antes: a[prop], despues: b[prop] });
         }
     }
     console.log(`Foto A: ${antes.cuando}  ·  ${Object.keys(antes.datos).length} elementos`);
     console.log(`Foto B: ${despues.cuando}  ·  ${Object.keys(despues.datos).length} elementos`);
+    if (inestables.length) {
+        console.log(`\nAVISO: ${inestables.length} valores no se pudieron comparar (quedaron inestables al capturar):`);
+        for (const d of inestables.slice(0, 10)) console.log(`  ${d.clave} · ${d.propiedad}`);
+        if (inestables.length > 10) console.log(`  ... y ${inestables.length - 10} mas`);
+    }
     if (!diferencias.length) {
         console.log('\nSIN DIFERENCIAS: el cambio de CSS no movio ni un valor calculado.');
-        process.exit(0);
+        process.exit(inestables.length ? 1 : 0);
     }
     console.log(`\nDIFERENCIAS: ${diferencias.length}`);
     for (const d of diferencias.slice(0, 60)) console.log(`  ${d.clave} · ${d.propiedad}: "${d.antes}" -> "${d.despues}"`);
@@ -129,6 +139,20 @@ for (const ancho of ANCHOS) {
         // Se espera a que la app este montada (el menu principal es lo primero que aparece).
         for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel')`) === true) break; await sleep(300); }
         await sleep(1500);
+        // SE APAGAN LAS TRANSICIONES: la app tiene `transition` de 300 ms en muchos
+        // sitios y al cambiar de tema los valores van cambiando, asi que las dos
+        // lecturas no coincidian y se descartaban propiedades (eso dio un falso
+        // positivo). Sin transiciones, el valor se asienta al instante.
+        await evalJs(`(() => {
+            const st = document.createElement('style');
+            st.id = 'foto-sin-transiciones';
+            st.textContent = '*, *::before, *::after { transition: none !important; }';
+            document.head.appendChild(st);
+        })()`);
+        // Y se espera a la FUENTE WEB (Nunito): si carga despues de medir, cambian los
+        // altos y los anchos y la comparacion se llena de ruido.
+        await evalJs(`document.fonts ? document.fonts.ready.then(() => 'ok') : 'ok'`);
+        await sleep(600);
         // Muestra de elementos basicos SIN clases, fuera de pantalla pero renderizada:
         // aisla las reglas de BASE (las que dependen solo de la etiqueta) del resto.
         const montado = await evalJs(`(() => {
@@ -158,8 +182,22 @@ for (const ancho of ANCHOS) {
         if (montado !== 'ok') { console.error('No se pudo montar la muestra:', montado); salir(2); }
     }
     for (const tema of TEMAS) {
-        await evalJs(`document.documentElement.setAttribute('data-theme', '${tema}')`);
-        await sleep(500);
+        // El tema se FIJA y se COMPRUEBA. La app lo elige por la HORA del dia
+        // (theme.js: 6-18 claro, si no oscuro) y lo guarda en localStorage['theme']:
+        // si solo se cambiara el atributo, su inicializacion podia revertirlo a mitad
+        // de la captura y se medía el tema equivocado (eso fue el falso positivo).
+        for (let intento = 0; intento < 4; intento++) {
+            await evalJs(`(() => {
+                try { localStorage.setItem('theme', '${tema}'); } catch (_) {}
+                document.documentElement.setAttribute('data-theme', '${tema}');
+            })()`);
+            await sleep(400);
+            const puesto = await evalJs(`document.documentElement.getAttribute('data-theme')`);
+            if (puesto === tema) break;
+        }
+        const temaReal = await evalJs(`document.documentElement.getAttribute('data-theme')`);
+        if (temaReal !== tema) { console.error(`No se pudo fijar el tema ${tema} (quedo ${temaReal})`); salir(2); }
+        await sleep(400);
         const lectura = `(() => {
             const props = ${JSON.stringify(PROPIEDADES)};
             const ids = ['fx-input','fx-email','fx-pass','fx-textarea','fx-select','fx-button','fx-submit',
@@ -167,7 +205,14 @@ for (const ancho of ANCHOS) {
             const reales = { 'body': document.body, '#main-header': document.getElementById('main-header'),
                 '#toggle-panel': document.getElementById('toggle-panel'),
                 '.nav-btn': document.querySelector('#toggle-panel .nav-btn'),
-                '#btn-notificaciones': document.getElementById('btn-notificaciones') };
+                '#btn-notificaciones': document.getElementById('btn-notificaciones'),
+                // Los botones de cerrar sesión: son <button> con clase, así que sirven para
+                // vigilar los choques entre reglas de ETIQUETA (button) y de CLASE. Están
+                // dentro de un contenedor oculto, pero el color calculado se puede leer.
+                '#desktop-logout-all': document.getElementById('desktop-logout-all'),
+                '#desktop-logout-single': document.getElementById('desktop-logout-single'),
+                '#mobile-logout-all': document.getElementById('mobile-logout-all'),
+                '#mobile-logout-single': document.getElementById('mobile-logout-single') };
             const salida = {};
             const medir = (nombre, el) => {
                 if (!el) return;
@@ -177,6 +222,9 @@ for (const ancho of ANCHOS) {
                 // Solo lo que ocupa sitio: asi se ve si un cambio lo saca del flujo.
                 const r = el.getBoundingClientRect();
                 o.__ancho = String(Math.round(r.width)); o.__alto = String(Math.round(r.height));
+                // Se guarda el tema REAL de cada medida: si una captura se hiciera con el
+                // tema equivocado, la comparacion lo canta en vez de parecer un cambio.
+                o.__tema = document.documentElement.getAttribute('data-theme');
                 salida[nombre] = o;
             };
             for (const id of ids) medir('#' + id, document.getElementById(id));
@@ -184,21 +232,22 @@ for (const ancho of ANCHOS) {
             return JSON.stringify(salida);
         })()`;
         const a = await evalJs(lectura);
-        await sleep(200);
+        await sleep(400);
         const b = await evalJs(lectura);
         if (a === 'EXC' || typeof a !== 'string' || a.startsWith('EXC')) { console.error('Fallo al leer:', String(a).slice(0, 200)); salir(2); }
         const uno = JSON.parse(a), dos = JSON.parse(b);
+        let inestables = 0;
         for (const [nombre, props] of Object.entries(uno)) {
             const clave = `${tema} · ${ancho}px · ${nombre}`;
             const filtrado = {};
             for (const [prop, valor] of Object.entries(props)) {
                 // Se descarta lo que baila entre las dos lecturas (animaciones, transiciones).
-                if (dos[nombre] && dos[nombre][prop] !== valor) continue;
+                if (dos[nombre] && dos[nombre][prop] !== valor) { inestables++; continue; }
                 filtrado[prop] = valor;
             }
             datos[clave] = filtrado;
         }
-        console.log(`   leido ${tema} · ${ancho}px (${Object.keys(uno).length} elementos)`);
+        console.log(`   leido ${tema} · ${ancho}px (${Object.keys(uno).length} elementos, ${inestables} valores inestables descartados)`);
     }
 }
 

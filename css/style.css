@@ -400,24 +400,24 @@
 
 }
 
+/* ==============================================
+   CERRAR SESIÓN EN MODO OSCURO
+   ==============================================
+   Antes esto eran 6 reglas con `!important` y con ids escalados a mano
+   (`[data-theme="dark"] #mobile-logout-all.logout-option.disabled`...) para poder
+   ganarle a reglas de la parte clara que llevaban id, como
+   `#mobile-main-menu .logout-option { color: white }` (especificidad 1,1,0, que gana
+   a cualquier regla de clase por muchas clases que se le añadan).
+
+   Eso ya no hace falta: las reglas de la parte clara que llevaban id ahora usan
+   `:where()`, que vale 0 de especificidad (ver más abajo). Así que basta con las
+   reglas de clase, en su orden natural, y SIN `!important`. */
 [data-theme="dark"] .logout-option {
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .logout-option.disabled {
-    color: var(--color-gray-400) !important;
-}
-
-[data-theme="dark"] #header-logout-all.logout-option.disabled {
-    color: var(--color-gray-400) !important;
-}
-
-[data-theme="dark"] #desktop-logout-all.logout-option.disabled {
-    color: var(--color-gray-400) !important;
-}
-
-[data-theme="dark"] #mobile-logout-all.logout-option.disabled {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .logout-option.enabled {
@@ -460,7 +460,7 @@
 
 [data-theme="dark"] .desktop-logout-panel .logout-option.disabled,
 [data-theme="dark"] .mobile-logout-panel .logout-option.disabled {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
 }
 
 /* ==============================================
@@ -1122,8 +1122,11 @@ p, span, label {
     pointer-events: auto;
 }
 
-#desktop-logout-single.logout-option,
-#mobile-logout-single.logout-option {
+/* `:where()` vale CERO de especificidad: así estas dos reglas son equivalentes a
+   `.logout-option` (0,1,0) y las de modo oscuro pueden ganarles por clase, sin
+   `!important` y sin repetir el id a mano. El resultado visual es el mismo (van
+   después en el archivo, así que siguen ganando por orden a `.logout-option`). */
+:where(#desktop-logout-single, #mobile-logout-single).logout-option {
     color: var(--color-white);
     font-weight: 600;
 }
@@ -1352,8 +1355,11 @@ p, span, label {
     }
     #mobile-main-menu .mobile-logout-panel.speech-bubble { width: 160px; }
 
-    #mobile-main-menu button,
-    #mobile-main-menu .logout-option {
+    /* `:where()` otra vez: sin el id, la especificidad es la de la clase, así que las
+       reglas de modo oscuro (.logout-option.disabled, .logout-option.enabled) pueden
+       ganarle sin `!important`. */
+    :where(#mobile-main-menu) button,
+    :where(#mobile-main-menu) .logout-option {
         color: var(--color-white);
         pointer-events: auto;
         background: transparent;
@@ -1364,8 +1370,8 @@ p, span, label {
         font-size: 13px;
         cursor: pointer;
     }
-    #mobile-main-menu button:active,
-    #mobile-main-menu .logout-option:active { background-color: var(--color-gray-dark); }
+    :where(#mobile-main-menu) button:active,
+    :where(#mobile-main-menu) .logout-option:active { background-color: var(--color-gray-dark); }
 
     .mobile-logout-panel .logout-option,
     .logout-option {
