@@ -1,3 +1,4 @@
+// @ts-check
 // js/chat.js
 // Chat global + privado de Creatio.
 // Economía: sin websockets. El cliente hace polling condicional — solo
@@ -14,15 +15,17 @@ const LIMITE_POLL = 50;
 
 // ---- Estado del chat ----
 let chatAbierto = false;
+/** @type {string | null} */
 let canalActivo = null;     // 'global' | 'priv:a:b'
 let lastId = 0;             // último id renderizado (cursor del poll)
-let pollTimer = null;
+/** @type {number | null | undefined} */
+let pollTimer;
 let polling = false;        // evita polls superpuestos (ej. cold start de Render)
 
 // El cluster flotante (sala global + círculos de conversaciones) solo es
 // visible dentro del directorio del chat.
 function setFabVisible(visible) {
-    const cluster = document.getElementById('chat-cluster');
+    const cluster = /** @type {HTMLElement} */ (document.getElementById('chat-cluster'));
     if (cluster) cluster.classList.toggle('hidden', !visible);
 }
 
@@ -104,7 +107,7 @@ function formatHora(fecha) {
     return d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
 }
 function scrollMensajes() {
-    const cont = document.getElementById('chat-mensajes');
+    const cont = /** @type {HTMLInputElement} */ (document.getElementById('chat-mensajes'));
     if (cont) cont.scrollTop = cont.scrollHeight;
 }
 
@@ -112,7 +115,7 @@ function scrollMensajes() {
 // TOAST (aviso breve)
 // ============================================
 function mostrarToast(msg) {
-    let t = document.getElementById('chat-toast');
+    let t = /** @type {HTMLElement} */ (document.getElementById('chat-toast'));
     if (!t) {
         t = document.createElement('div');
         t.id = 'chat-toast';
@@ -238,7 +241,9 @@ function abrirPickerReacciones(div, m, esPropio) {
 // MENÚ DE ACCIONES DE UN MENSAJE (pulsación larga / clic derecho)
 // ============================================
 function setupMsgMenu(div, m, esPropio) {
-    let timer = null, sx = 0, sy = 0, activado = false;
+    /** @type {number | null | undefined} */
+    let timer;
+    let sx = 0, sy = 0, activado = false;
     const UMBRAL = 450, MOVER = 10;
     function cancelar() { if (timer) { clearTimeout(timer); timer = null; } activado = false; }
     div.addEventListener('pointerdown', (e) => {
@@ -286,19 +291,19 @@ function iniciarRespuesta(m) {
         contenido: m.tipo_mensaje === 'imagen' ? '📷 Imagen' : (m.contenido || ''),
         tipo: m.tipo_mensaje
     };
-    const bar = document.getElementById('chat-reply-bar');
+    const bar = /** @type {HTMLElement} */ (document.getElementById('chat-reply-bar'));
     if (bar) {
         bar.classList.remove('hidden');
-        const info = document.getElementById('chat-reply-info');
-        if (info) info.textContent = `Respondiendo a ${replyTo.autor}: ${replyTo.contenido.slice(0, 60)}`;
+        const info = /** @type {HTMLElement} */ (document.getElementById('chat-reply-info'));
+        if (info) info.textContent = `Respondiendo a ${replyTo.autor}: ${(replyTo.contenido || '').slice(0, 60)}`;
     }
-    const input = document.getElementById('chat-input');
+    const input = /** @type {HTMLInputElement} */ (document.getElementById('chat-input'));
     if (input) input.focus();
 }
 
 function cancelarRespuesta() {
     replyTo = null;
-    const bar = document.getElementById('chat-reply-bar');
+    const bar = /** @type {HTMLElement} */ (document.getElementById('chat-reply-bar'));
     if (bar) bar.classList.add('hidden');
 }
 
@@ -377,7 +382,7 @@ async function borrarMensaje(div, m) {
 // INDICADOR "ESCRIBIENDO…"
 // ============================================
 function setupTypingInput() {
-    const input = document.getElementById('chat-input');
+    const input = /** @type {HTMLInputElement} */ (document.getElementById('chat-input'));
     if (!input) return;
     input.addEventListener('input', () => {
         const ahora = Date.now();
@@ -389,10 +394,11 @@ function setupTypingInput() {
 }
 
 function mostrarTyping(ids) {
-    const el = document.getElementById('chat-typing');
+    const el = /** @type {HTMLElement} */ (document.getElementById('chat-typing'));
     if (!el) return;
     if (!ids || !ids.length || !canalActivo) { el.classList.add('hidden'); return; }
-    let texto = null;
+    /** @type {string | null} */
+let texto = null;
     if (!canalEsPriv) {
         texto = 'Alguien está escribiendo…';
     } else if (canalOtroId && ids.includes(canalOtroId)) {
@@ -410,7 +416,7 @@ function actualizarTicksLeidos(hasta, entregadoHasta) {
     leidoHastaLocal = hasta || 0;
     entregadoHastaLocal = entregadoHasta || 0;
     document.querySelectorAll('#chat-mensajes .chat-msg.own[data-id]').forEach(el => {
-        const id = parseInt(el.dataset.id, 10);
+        const id = parseInt(/** @type {HTMLElement} */ (el).dataset.id ?? '0', 10);
         const t = el.querySelector('.chat-msg-leido');
         if (!t || id <= 0) return;
         if (id <= leidoHastaLocal) { t.className = 'chat-msg-leido visto'; t.textContent = '✓✓'; }
@@ -441,6 +447,7 @@ function comprimirImagen(file) {
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
+            if (!ctx) return;
             ctx.drawImage(img, 0, 0, w, h);
             URL.revokeObjectURL(url);
             canvas.toBlob((blob) => {
@@ -454,8 +461,8 @@ function comprimirImagen(file) {
 }
 
 function setupImagenBtn() {
-    const btn = document.getElementById('chat-imagen-btn');
-    const fileInput = document.getElementById('chat-imagen-input');
+    const btn = /** @type {HTMLButtonElement} */ (document.getElementById('chat-imagen-btn'));
+    const fileInput = /** @type {HTMLInputElement} */ (document.getElementById('chat-imagen-input'));
     if (!btn || !fileInput) return;
     btn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', async () => {
@@ -466,7 +473,7 @@ function setupImagenBtn() {
             mostrarToast('La imagen es demasiado grande (máx. 8 MB)');
             return;
         }
-        const caption = document.getElementById('chat-input').value.trim();
+        const caption = /** @type {HTMLInputElement} */ (document.getElementById('chat-input')).value.trim();
         btn.disabled = true;
         btn.textContent = '⏳';
         try {
@@ -484,10 +491,11 @@ function setupImagenBtn() {
                 headers: authToken ? { Authorization: 'Bearer ' + authToken } : {},
                 body: fd
             });
-            let data = null;
+            /** @type {any} */   // respuesta del backend: cada endpoint trae lo suyo
+let data = null;
             try { data = await res.json(); } catch (e) { /* no JSON */ }
             if (data && data.success && data.url) {
-                document.getElementById('chat-input').value = '';
+                /** @type {HTMLInputElement} */ (document.getElementById('chat-input')).value = '';
                 const envio = await apiRequest('/chat/mensajes', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -547,7 +555,7 @@ async function estaBloqueado(uid) {
 }
 
 function setupSalaMenu() {
-    const btn = document.getElementById('chat-sala-menu-btn');
+    const btn = /** @type {HTMLButtonElement} */ (document.getElementById('chat-sala-menu-btn'));
     if (!btn) return;
     btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -607,7 +615,9 @@ async function denunciarUsuario(uid, nombre) {
 
 // Menú de bloqueo/desbloqueo/denuncia en las filas del directorio (pulsación larga)
 function setupUsuarioRowMenu(row, u) {
-    let timer = null, sx = 0, sy = 0, activado = false;
+    /** @type {number | null | undefined} */
+    let timer;
+    let sx = 0, sy = 0, activado = false;
     const UMBRAL = 450, MOVER = 10;
     function cancelar() { if (timer) { clearTimeout(timer); timer = null; } activado = false; }
     row.addEventListener('pointerdown', (e) => {
@@ -644,8 +654,8 @@ function setupUsuarioRowMenu(row, u) {
 // ============================================
 function setupKeyboardHandling() {
     if (!window.visualViewport) return;
-    const chat = document.getElementById('chat-global');
-    const header = document.getElementById('main-header');
+    const chat = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
+    const header = /** @type {HTMLElement} */ (document.getElementById('main-header'));
     let ultimaAltura = -1;
     const ajustar = () => {
         const vv = window.visualViewport;
@@ -661,7 +671,7 @@ function setupKeyboardHandling() {
                         // Primera vez: la altura salta al instante (sin hueco) pero
                         // el formulario se desliza hacia arriba a la misma velocidad
                         // del teclado usando transform (no afecta el layout).
-                        const form = document.querySelector('.chat-form');
+                        const form = /** @type {HTMLElement | null} */ (document.querySelector('.chat-form'));
                         const vieja = chat.offsetHeight;
                         const gap = Math.max(0, vieja - nueva);
                         chat.style.height = nueva + 'px';
@@ -680,7 +690,7 @@ function setupKeyboardHandling() {
             } else {
                 chat.style.height = '';
                 ultimaAltura = -1;
-                const form = document.querySelector('.chat-form');
+                const form = /** @type {HTMLElement | null} */ (document.querySelector('.chat-form'));
                 if (form) { form.style.transform = ''; form.style.transition = ''; }
             }
         }
@@ -694,8 +704,8 @@ function setupKeyboardHandling() {
 // APERTURA / CIERRE DEL PANEL
 // ============================================
 export function setupChat() {
-    const btn = document.getElementById('btn-chat-global');
-    const seccion = document.getElementById('chat-global');
+    const btn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-chat-global'));
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     if (!btn || !seccion) return;
 
     btn.addEventListener('click', () => {
@@ -704,25 +714,25 @@ export function setupChat() {
         abrirChat();
     });
     // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
-    const fab = document.getElementById('btn-chat-global-fab');
+    const fab = /** @type {HTMLButtonElement} */ (document.getElementById('btn-chat-global-fab'));
     if (fab) fab.addEventListener('click', abrirChatGlobal);
-    const cerrarBtn = document.getElementById('chat-cerrar');
+    const cerrarBtn = /** @type {HTMLButtonElement} */ (document.getElementById('chat-cerrar'));
     if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarChat);
-    document.getElementById('chat-form').addEventListener('submit', enviarMensaje);
+    /** @type {HTMLFormElement} */ (document.getElementById('chat-form')).addEventListener('submit', enviarMensaje);
     setupDragEliminar();
     setupImagenBtn();
     setupTypingInput();
     setupSalaMenu();
-    const replyCancel = document.getElementById('chat-reply-cancel');
+    const replyCancel = /** @type {HTMLElement} */ (document.getElementById('chat-reply-cancel'));
     if (replyCancel) replyCancel.addEventListener('click', cancelarRespuesta);
     setupKeyboardHandling();
 
     // Icono de conversaciones del header: abre la lista, o "vuelve atrás" si ya
     // estamos en la lista o en una sala (el icono se convierte en flecha).
-    const convBtn = document.getElementById('btn-conversaciones');
+    const convBtn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-conversaciones'));
     if (convBtn) convBtn.addEventListener('click', () => {
-        const salaVisible = !document.getElementById('chat-sala').classList.contains('hidden');
-        const listaVisible = !document.getElementById('chat-conversaciones').classList.contains('hidden');
+        const salaVisible = !/** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.contains('hidden');
+        const listaVisible = !/** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.contains('hidden');
         if (!salaVisible && !listaVisible) {
             abrirConversaciones();
             return;
@@ -738,7 +748,7 @@ export function setupChat() {
     document.querySelectorAll('.chat-sala-fab.cerrada').forEach(btn => {
         btn.addEventListener('click', () => {
             const wrap = btn.closest('.chat-sala-wrap');
-            const sala = wrap ? wrap.dataset.sala : '';
+            const sala = wrap ? /** @type {HTMLElement} */ (wrap).dataset.sala ?? '' : '';
             mostrarToast(sala === 'jurado1'
                 ? 'Sala de Jurado 1: próximamente'
                 : 'Sala de Jurado 2: próximamente');
@@ -747,7 +757,7 @@ export function setupChat() {
 
     // Abrir una conversación desde una notificación push (evento de js/push.js)
     window.addEventListener('chat-abrir-canal', (e) => {
-        const detail = (e && e.detail) || {};
+        const detail = (/** @type {CustomEvent} */ (e) && /** @type {CustomEvent} */ (e).detail) || {};
         if (!detail.canal) return;
         abrirChat();
         abrirSala(detail.canal, detail.titulo || 'Conversación', null);
@@ -774,7 +784,7 @@ function abrirChat() {
         window.location.href = 'auth.html';
         return;
     }
-    const seccion = document.getElementById('chat-global');
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     const actual = encontrarSeccionActual();
     // El chat no pasa por switchSection: sin esto, una vista previa o el cajón
     // de comentarios abiertos seguirían por encima del chat con el fondo fijo.
@@ -783,9 +793,9 @@ function abrirChat() {
     seccion.classList.remove('hidden');
     actualizarVisibilidadIconosHeader(seccion); // el chat no pasa por mostrarSeccion
     // Siempre arranca en el directorio (sala y conversaciones cerradas)
-    document.getElementById('chat-sala').classList.add('hidden');
-    document.getElementById('chat-conversaciones').classList.add('hidden');
-    document.getElementById('chat-directorio').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.remove('hidden');
     actualizarFlechaConversaciones(false); // en el directorio el icono es el original
     chatAbierto = true;
     cargarDirectorio();
@@ -800,13 +810,13 @@ function abrirChatGlobal() {
         window.location.href = 'auth.html';
         return;
     }
-    const seccion = document.getElementById('chat-global');
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     if (seccion.classList.contains('hidden')) abrirChat();
     abrirSala('global', 'Chat Global');
 }
 
 function cerrarChat() {
-    const seccion = document.getElementById('chat-global');
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     if (seccion) seccion.classList.add('hidden');
     actualizarVisibilidadIconosHeader(null); // sin sección visible → iconos ocultos
     chatAbierto = false;
@@ -823,12 +833,12 @@ function volverDirectorio() {
     canalActivo = null;
     window._canalChatActivo = null;
     cancelarRespuesta();
-    const typ = document.getElementById('chat-typing');
+    const typ = /** @type {HTMLElement} */ (document.getElementById('chat-typing'));
     if (typ) typ.classList.add('hidden');
     cerrarMenusFlotantes();
-    document.getElementById('chat-sala').classList.add('hidden');
-    document.getElementById('chat-conversaciones').classList.add('hidden');
-    document.getElementById('chat-directorio').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.remove('hidden');
     actualizarFlechaConversaciones(false);
     setFabVisible(true); // de vuelta al directorio
     cargarDirectorio(); // refresca conversaciones recientes
@@ -840,18 +850,18 @@ function abrirConversaciones() {
         window.location.href = 'auth.html';
         return;
     }
-    const seccion = document.getElementById('chat-global');
+    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     if (seccion && seccion.classList.contains('hidden')) abrirChat();
     detenerPoll();
     canalActivo = null;
     window._canalChatActivo = null;
     cancelarRespuesta();
     cerrarMenusFlotantes();
-    const typ = document.getElementById('chat-typing');
+    const typ = /** @type {HTMLElement} */ (document.getElementById('chat-typing'));
     if (typ) typ.classList.add('hidden');
-    document.getElementById('chat-sala').classList.add('hidden');
-    document.getElementById('chat-directorio').classList.add('hidden');
-    document.getElementById('chat-conversaciones').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.remove('hidden');
     actualizarFlechaConversaciones(true); // el icono pasa a flecha de volver
     refrescarConversaciones(); // lista fresca de chats privados
     setFabVisible(false); // las salas (Global/Jurado) solo se muestran en el directorio
@@ -864,11 +874,11 @@ function volverALaLista() {
     window._canalChatActivo = null;
     cancelarRespuesta();
     cerrarMenusFlotantes();
-    const typ = document.getElementById('chat-typing');
+    const typ = /** @type {HTMLElement} */ (document.getElementById('chat-typing'));
     if (typ) typ.classList.add('hidden');
-    document.getElementById('chat-sala').classList.add('hidden');
-    document.getElementById('chat-directorio').classList.add('hidden');
-    document.getElementById('chat-conversaciones').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.remove('hidden');
     actualizarFlechaConversaciones(true); // seguimos en la lista → flecha
     setFabVisible(false); // las salas solo se muestran en el directorio
 }
@@ -878,8 +888,8 @@ function volverDeConversaciones() {
     detenerPoll();
     canalActivo = null;
     window._canalChatActivo = null;
-    document.getElementById('chat-conversaciones').classList.add('hidden');
-    document.getElementById('chat-directorio').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.remove('hidden');
     actualizarFlechaConversaciones(false);
     setFabVisible(true); // las salas vuelven a mostrarse en el directorio
     cargarDirectorio();
@@ -887,7 +897,7 @@ function volverDeConversaciones() {
 
 // GET /chat/conversaciones → renderiza la lista (el cluster ya no se toca).
 async function refrescarConversaciones() {
-    const cont = document.getElementById('chat-conversaciones-lista');
+    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones-lista'));
     if (!cont) return;
     try {
         const convRes = await apiRequest('/chat/conversaciones');
@@ -909,17 +919,22 @@ function actualizarFlechaConversaciones(esFlecha) {
 let ultimosPueblos = {}; // último directorio recibido (para volver al grid desde un pueblo)
 
 // ---- Estado de las funciones nuevas ----
-let replyTo = null;           // mensaje que se está respondiendo {id, autor, contenido, tipo}
+/** @type {{ id?: any, autor?: string, contenido?: string, tipo?: string } | null} */
+let replyTo = null;           // mensaje que se está respondiendo
 let leidoHastaLocal = 0;      // hasta qué id leyó el otro participante (priv) → ✓✓ visto
 let entregadoHastaLocal = 0;  // hasta qué id recibió el otro (priv) → ✓✓ entregado
 let canalEsPriv = false;
+/** @type {number | string | null} */
 let canalOtroId = null;
 let canalOtroNombre = '';
-let canalOtroActividad = null; // ultima_actividad del otro (para presencia en el header)
+/** @type {string | null} */
+let canalOtroActividad = null; // ultima_actividad del otro
 let bloqueadosSet = new Set(); // IDs de usuarios bloqueados por el usuario actual
 let ultimoTypingEnvio = 0;    // throttle del POST /chat/typing
-let menuActual = null;        // {menu, velo} del menú flotante abierto
-let toastTimer = null;
+/** @type {{ menu: HTMLElement, velo: HTMLElement } | null} */
+let menuActual = null;
+/** @type {number | null | undefined} */
+let toastTimer;
 
 const EMOJIS_REACCION = ['❤️', '👍', '😂', '😮', '🎉', '😢', '🔥'];
 const API_BASE_URL_CHAT = API_BASE_URL || '';
@@ -941,10 +956,10 @@ const ICONOS = {
 // de la sala global y en cada círculo de conversación.
 function aplicarNoLeidos() {
     const total = Object.values(noLeidos).reduce((s, n) => s + n, 0);
-    const nav = document.getElementById('chat-nav-badge');
+    const nav = /** @type {HTMLElement} */ (document.getElementById('chat-nav-badge'));
     if (nav) nav.classList.toggle('hidden', total === 0);
 
-    const fabBadge = document.getElementById('chat-fab-badge');
+    const fabBadge = /** @type {HTMLElement} */ (document.getElementById('chat-fab-badge'));
     if (fabBadge) {
         const n = noLeidos['global'] || 0;
         fabBadge.textContent = n > 99 ? '99+' : String(n);
@@ -954,7 +969,7 @@ function aplicarNoLeidos() {
     document.querySelectorAll('.chat-conv-item').forEach(item => {
         const badge = item.querySelector('.chat-conv-item-badge');
         if (!badge) return;
-        const n = noLeidos[item.dataset.canal] || 0;
+        const n = noLeidos[/** @type {HTMLElement} */ (item).dataset.canal ?? ''] || 0;
         badge.textContent = n > 99 ? '99+' : String(n);
         badge.classList.toggle('hidden', n === 0);
     });
@@ -976,7 +991,7 @@ window.refrescarChatNoLeidos = refrescarChatNoLeidos;
 // DIRECTORIO: sala global + acordeón de pueblos
 // ============================================
 async function cargarDirectorio() {
-    const cont = document.getElementById('chat-accordion');
+    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-accordion'));
     cont.innerHTML = '<div class="chat-cargando">Cargando usuarios…</div>';
     try {
         const [dirRes, convRes] = await Promise.all([
@@ -996,7 +1011,7 @@ async function cargarDirectorio() {
 // se despliega (tipo acordeón) la lista de sus usuarios.
 function renderAcordeon(pueblos) {
     ultimosPueblos = pueblos || {};
-    const cont = document.getElementById('chat-accordion');
+    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-accordion'));
     cont.innerHTML = '';
     const lista = pueblosTachira();
     if (!lista.length) {
@@ -1069,8 +1084,8 @@ function municipioDe(ciudad) {
 
 // Lista de usuarios del municipio seleccionado en el carrusel
 function renderUsuariosPueblo(ciudad) {
-    const panel = document.getElementById('chat-pueblo-panel');
-    const info = document.getElementById('chat-pueblo-info');
+    const panel = /** @type {HTMLElement} */ (document.getElementById('chat-pueblo-panel'));
+    const info = /** @type {HTMLElement} */ (document.getElementById('chat-pueblo-info'));
     const users = ultimosPueblos[ciudad] || [];
     const activos = users.filter(esOnline).length;
     // Barra superior: nombre a la izquierda, contadores a la derecha
@@ -1111,7 +1126,7 @@ function renderUsuariosPueblo(ciudad) {
 // en la vista "Conversaciones" (se abre desde el icono del header, visible solo
 // en la sección Chat). La más reciente queda arriba.
 function renderConversaciones(convs) {
-    const cont = document.getElementById('chat-conversaciones-lista');
+    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones-lista'));
     if (!cont) return;
     cont.innerHTML = '';
     if (!convs || !convs.length) {
@@ -1120,7 +1135,7 @@ function renderConversaciones(convs) {
         return;
     }
     const ordenadas = [...convs].sort((a, b) =>
-        new Date((b.ultimo && b.ultimo.created_at) || 0) - new Date((a.ultimo && a.ultimo.created_at) || 0)
+        new Date((b.ultimo && b.ultimo.created_at) || 0).getTime() - new Date((a.ultimo && a.ultimo.created_at) || 0).getTime()
     ); // la más reciente arriba
     const frag = document.createDocumentFragment();
     ordenadas.forEach(c => {
@@ -1172,7 +1187,7 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     lastId = 0;
     setFabVisible(false); // al entrar a una sala (global o privada) se oculta
     // Recordar de dónde se abrió la sala para que la flecha del header vuelva atrás
-    vistaAnterior = document.getElementById('chat-conversaciones').classList.contains('hidden') ? 'directorio' : 'conversaciones';
+    vistaAnterior = /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.contains('hidden') ? 'directorio' : 'conversaciones';
     actualizarFlechaConversaciones(true); // el icono del header pasa a flecha
 
     // Estado del canal privado (para ✓✓, typing y el menú ⋯)
@@ -1183,15 +1198,15 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     leidoHastaLocal = 0;
     entregadoHastaLocal = 0;
     cancelarRespuesta();
-    const menuBtn = document.getElementById('chat-sala-menu-btn');
+    const menuBtn = /** @type {HTMLButtonElement} */ (document.getElementById('chat-sala-menu-btn'));
     if (menuBtn) menuBtn.style.display = canalEsPriv ? '' : 'none';
 
-    document.getElementById('chat-directorio').classList.add('hidden');
-    document.getElementById('chat-conversaciones').classList.add('hidden');
-    document.getElementById('chat-sala').classList.remove('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
+    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.remove('hidden');
 
     // Avatar del otro usuario (después de la flecha de volver), con punto de presencia
-    const avatarEl = document.getElementById('chat-sala-avatar');
+    const avatarEl = /** @type {HTMLImageElement} */ (document.getElementById('chat-sala-avatar'));
     if (avatarEl) {
         if (canalEsPriv) {
             const online = esOnline({ ultima_actividad: canalOtroActividad });
@@ -1200,7 +1215,7 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
             avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
         }
     }
-    const tituloEl = document.getElementById('chat-sala-titulo');
+    const tituloEl = /** @type {HTMLElement} */ (document.getElementById('chat-sala-titulo'));
     if (canalEsPriv && canalOtroActividad) {
         const online = esOnline({ ultima_actividad: canalOtroActividad });
         const pres = online ? 'Activo ahora' : `Activo hace ${tiempoActivoHace(canalOtroActividad)}`;
@@ -1209,7 +1224,7 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
         tituloEl.innerHTML = `<span>${escapeHtml(titulo)}</span>`;
     }
 
-    const cont = document.getElementById('chat-mensajes');
+    const cont = /** @type {HTMLInputElement} */ (document.getElementById('chat-mensajes'));
     cont.innerHTML = '<div class="chat-cargando">Cargando mensajes…</div>';
     try {
         const data = await apiRequest(`/chat/mensajes?canal=${encodeURIComponent(canal)}`);
@@ -1241,7 +1256,7 @@ function otroDeCanal(canal) {
 }
 
 function appendMensaje(m, esPropio) {
-    const cont = document.getElementById('chat-mensajes');
+    const cont = /** @type {HTMLInputElement} */ (document.getElementById('chat-mensajes'));
     if (!cont) return;
     const vacio = cont.querySelector('.chat-sin-mensajes');
     if (vacio) vacio.remove();
@@ -1287,7 +1302,7 @@ function appendMensaje(m, esPropio) {
     setupMsgMenu(div, m, esPropio);
     // Click en imagen para ver a tamaño completo
     if (!m.eliminado && m.tipo_mensaje === 'imagen' && m.imagen_url) {
-        const img = div.querySelector('.chat-msg-imagen');
+        const img = /** @type {HTMLImageElement | null} */ (div.querySelector('.chat-msg-imagen'));
         if (img) {
             img.style.cursor = 'pointer';
             img.addEventListener('click', () => abrirVisorImagen(m.imagen_url));
@@ -1299,7 +1314,7 @@ function appendMensaje(m, esPropio) {
 // Visor de imagen a pantalla completa
 function abrirVisorImagen(url) {
     // Eliminar visor previo si existe
-    const prev = document.getElementById('chat-visor-img');
+    const prev = /** @type {HTMLImageElement} */ (document.getElementById('chat-visor-img'));
     if (prev) prev.remove();
 
     const overlay = document.createElement('div');
@@ -1376,7 +1391,7 @@ async function marcarLeido(canal) {
 async function enviarMensaje(e) {
     e.preventDefault();
     if (!canalActivo) return;
-    const input = document.getElementById('chat-input');
+    const input = /** @type {HTMLInputElement} */ (document.getElementById('chat-input'));
     const texto = input.value.trim();
     if (!texto) return;
     input.value = '';
@@ -1405,18 +1420,20 @@ async function enviarMensaje(e) {
 // y arrastrarlo hacia arriba hasta la papelera
 // ============================================
 function setupDragEliminar() {
-    const trash = document.getElementById('chat-trash');
-    const veil = document.getElementById('chat-trash-veil');
-    const cont = document.getElementById('chat-cluster-convs');
+    const trash = /** @type {HTMLElement} */ (document.getElementById('chat-trash'));
+    const veil = /** @type {HTMLElement} */ (document.getElementById('chat-trash-veil'));
+    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-cluster-convs'));
     if (!trash || !veil || !cont) return;
 
     const UMBRAL = 450;   // ms de pulsación para activar el arrastre
     const MOVER_ANTES = 10; // px de movimiento que cancela la pulsación (es scroll)
 
-    const cluster = cont.closest('.chat-cluster');
+    const cluster = /** @type {HTMLElement | null} */ (cont.closest('.chat-cluster'));
 
-    let timer = null;
-    let circle = null;     // círculo en modo arrastre
+    /** @type {number | null | undefined} */
+let timer;
+    /** @type {HTMLElement | null} */
+let circle = null;     // círculo en modo arrastre
     let activo = false;    // arrastre en curso
     let startX = 0, startY = 0;
 
@@ -1489,7 +1506,7 @@ function setupDragEliminar() {
     // --- Touch (móvil) ---
     cont.addEventListener('touchstart', (e) => {
         const t = e.touches[0];
-        const el = e.target.closest('.chat-conv-circle');
+        const el = e.target instanceof Element ? e.target.closest('.chat-conv-circle') : null;
         if (!el) return;
         startX = t.clientX;
         startY = t.clientY;
@@ -1516,7 +1533,7 @@ function setupDragEliminar() {
 
     // --- Mouse (escritorio) ---
     cont.addEventListener('mousedown', (e) => {
-        const el = e.target.closest('.chat-conv-circle');
+        const el = e.target instanceof Element ? e.target.closest('.chat-conv-circle') : null;
         if (!el) return;
         startX = e.clientX;
         startY = e.clientY;

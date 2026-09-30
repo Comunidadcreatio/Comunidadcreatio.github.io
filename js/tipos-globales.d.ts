@@ -49,6 +49,8 @@ interface Window {
     volverAlBranding?: () => void;
     /** Marca los mensajes del chat como entregados (lo expone chat.js). */
     syncChatEntregas?: () => any;
+    /** Refresca el contador de mensajes sin leer del chat (lo expone chat.js). */
+    refrescarChatNoLeidos?: () => any;
 }
 
 /**
