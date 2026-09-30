@@ -7,7 +7,7 @@ import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a6924cbcfa';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=2f0642de28';
 import { artistaActual, token, esArtista } from './auth.js?v=c69ad117da';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=67cfb304fb';
-import { confirmarDescartarCambios } from './panel-ui.js?v=430adaceda';
+import { confirmarDescartarCambios } from './panel-ui.js?v=49cd0fae5d';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=26b9826f0b';
 
