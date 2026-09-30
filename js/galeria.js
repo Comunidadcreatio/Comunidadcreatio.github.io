@@ -1,8 +1,8 @@
 // js/galeria.js
-import { API_BASE_URL, apiRequest } from './config.js?v=f2a997fedf';
-import { artistaActual } from './auth.js?v=fe3bd123e5';
-import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra } from './utils.js?v=202667b9a3';
-import { abrirComentarios } from './comentarios.js?v=d5d1407d9d';
+import { API_BASE_URL, apiRequest } from './config.js?v=8fb0d05879';
+import { artistaActual } from './auth.js?v=c69ad117da';
+import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra, srcsetCloudinary } from './utils.js?v=26b9826f0b';
+import { abrirComentarios } from './comentarios.js?v=f28de505af';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=4464d46b67';
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
@@ -137,25 +137,36 @@ const ICON_COMENTARIO = '<svg xmlns="http://www.w3.org/2000/svg" width="16" heig
  * Acepta avatarHTML para insertarlo dentro del carrusel (posición esquina).
  */
 function crearCarruselHTML(obra, overlayHTML = '') {
-    const urls = [
-        cloudinaryUrl(obra.imagen_url || obra.imagen_thumbnail_url || ''),
-        cloudinaryUrl(obra.imagen_url_1 || ''),
-        cloudinaryUrl(obra.imagen_url_2 || ''),
-        cloudinaryUrl(obra.imagen_url_3 || ''),
-        cloudinaryUrl(obra.imagen_url_4 || '')
+    // Se guardan las URLs ORIGINALES (sin transformar) para poder ofrecer varios anchos con
+    // `srcset`: antes se pedía todo a 1080px aunque el hueco sea de 500.
+    const urlsOriginales = [
+        obra.imagen_url || obra.imagen_thumbnail_url || '',
+        obra.imagen_url_1 || '',
+        obra.imagen_url_2 || '',
+        obra.imagen_url_3 || '',
+        obra.imagen_url_4 || ''
     ].filter(url => !!url);
+
+    const ANCHOS_CARRUSEL = [320, 480, 640, 800, 1080, 1440];
+    // En móvil la tarjeta ocupa todo el ancho; en escritorio está limitada a 500px.
+    const SIZES_CARRUSEL = '(max-width: 768px) 100vw, 500px';
 
     function crearDotsHTML(index, total) {
         return `<button class="obra-carousel-dot${index === 0 ? ' active' : ''}" data-index="${index}"></button>`;
     }
 
-    const slides = urls.map((url, i) => `
+    const slides = urlsOriginales.map((url, i) => `
         <div class="obra-carousel-slide">
-            <img src="${url}" alt="Imagen ${i + 1} de obra" loading="eager">
+            <img src="${cloudinaryUrl(url)}"
+                 srcset="${srcsetCloudinary(url, ANCHOS_CARRUSEL)}"
+                 sizes="${SIZES_CARRUSEL}"
+                 alt="Imagen ${i + 1} de obra"
+                 decoding="async"
+                 ${i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}>
         </div>
     `).join('');
 
-    const dots = urls.map((_, i) => crearDotsHTML(i, urls.length)).join('');
+    const dots = urlsOriginales.map((_, i) => crearDotsHTML(i, urlsOriginales.length)).join('');
 
     return `
         <div class="obra-carousel">
@@ -400,7 +411,10 @@ function crearObraCard(obra) {
 
     const artistaUserId = obra.artista_user_id !== undefined && obra.artista_user_id !== null ? obra.artista_user_id : '';
     const avatarHTML = tieneAvatar 
-        ? `<img src="${safeImgUrl(fotoArtista)}" alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
+        ? `<img src="${cloudinaryUrl(safeImgUrl(fotoArtista), 120)}"
+                 srcset="${srcsetCloudinary(safeImgUrl(fotoArtista), [40, 80, 120, 240])}"
+                 sizes="36px" decoding="async" loading="lazy"
+                 alt="${nombreArtista}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
         : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
     const gridOverlayHTML = `
@@ -845,7 +859,9 @@ async function mostrarVistas(obraId, anchorEl) {
             ${vistas.map(v => {
                 const inicial = (v.nombre_artista || '?')[0].toUpperCase();
                 const avatarHTML = v.foto_perfil
-                    ? `<img src="${safeImgUrl(v.foto_perfil)}" class="vistas-avatar">`
+                    ? `<img src="${cloudinaryUrl(safeImgUrl(v.foto_perfil), 120)}"
+                           srcset="${srcsetCloudinary(safeImgUrl(v.foto_perfil), [40, 80, 120, 240])}"
+                           sizes="36px" decoding="async" loading="lazy" class="vistas-avatar">`
                     : `<div class="vistas-avatar vistas-avatar-default">${inicial}</div>`;
                 return `<div class="vistas-item">
                     ${avatarHTML}

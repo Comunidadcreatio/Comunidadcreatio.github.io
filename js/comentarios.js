@@ -1,8 +1,8 @@
 // @ts-check
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest } from './config.js?v=f2a997fedf';
-import { renderText, safeImgUrl } from './utils.js?v=202667b9a3';
+import { apiRequest } from './config.js?v=8fb0d05879';
+import { renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=26b9826f0b';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
@@ -349,7 +349,9 @@ async function cargarComentarios(obraId) {
 function renderizarComentario(c, todosReplies) {
     const inicial = (c.autor_nombre || '?')[0].toUpperCase();
     const avatarHTML = c.autor_foto
-        ? `<img src="${safeImgUrl(c.autor_foto)}" class="comentario-avatar" alt="">`
+        ? `<img src="${cloudinaryUrl(safeImgUrl(c.autor_foto), 96)}"
+                srcset="${srcsetCloudinary(safeImgUrl(c.autor_foto), [48, 96, 144])}"
+                sizes="44px" decoding="async" loading="lazy" class="comentario-avatar" alt="">`
         : `<div class="comentario-avatar comentario-avatar-default">${inicial}</div>`;
 
     const fecha = timeAgoShort(c.created_at || c.fecha);

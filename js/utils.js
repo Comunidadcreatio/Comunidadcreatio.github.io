@@ -270,6 +270,25 @@ export function cloudinaryUrl(url, width = 1080) {
     return `${parts[0]}/upload/w_${width},c_limit,f_auto,q_auto:good/${parts[1]}`;
 }
 
+/**
+ * Arma el `srcset` de una imagen de Cloudinary con VARIOS anchos, para que el navegador
+ * baje solo el que necesita.
+ *
+ * POR QUÉ HACE FALTA: `cloudinaryUrl` pide 1080px por defecto, y como casi ninguna llamada
+ * pasaba ancho, TODO se pedía a 1080: la tarjeta de la galería (hueco de hasta 500px) y
+ * hasta los avatares de 36px. Con `srcset` el navegador elige: en un móvil de pantalla
+ * densa (3x) pide el grande, y en un escritorio normal el pequeño. La diferencia se nota
+ * en datos y en tiempo, sobre todo en los avatares.
+ *
+ * @param {string} url  URL original (la de Cloudinary, sin transformar)
+ * @param {number[]} anchos  los anchos a ofrecer, de menor a mayor
+ * @returns {string} el valor del atributo `srcset` (vacío si la URL no es de Cloudinary)
+ */
+export function srcsetCloudinary(url, anchos) {
+    if (!url || url.indexOf('/upload/') === -1) return '';
+    return anchos.map((w) => `${cloudinaryUrl(url, w)} ${w}w`).join(', ');
+}
+
 // ============================================
 // VALIDACIÓN DE EMAIL (compartida con registro y cambio de email)
 // ============================================

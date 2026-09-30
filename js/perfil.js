@@ -3,13 +3,13 @@
 // Gestión del perfil de usuario, estadísticas, foto de perfil,
 // visualización de perfiles externos y resultados de búsqueda.
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=f2a997fedf';
-import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=fe3bd123e5';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=8fb0d05879';
+import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=c69ad117da';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
-import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl } from './utils.js?v=202667b9a3';
+import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary } from './utils.js?v=26b9826f0b';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=a86b5fd39f';
+import { setupViewTracking } from './galeria.js?v=01756aa818';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
@@ -114,10 +114,10 @@ let datos = null;
     const src = datos.foto_perfil || AVATAR_DEFAULT;
     ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
         const img = /** @type {HTMLImageElement | null} */ (document.getElementById(elId));
-        if (img) img.src = src;
+        if (img) { img.src = src; img.sizes = '48px'; img.srcset = srcsetCloudinary(src, [48, 96, 144]); }
     });
     document.querySelectorAll('.perfil-avatar-img, .perfil-avatar-img-seccion')
-        .forEach((img) => { /** @type {HTMLImageElement} */ (img).src = src; });
+        .forEach((img) => { const el = /** @type {HTMLImageElement} */ (img); el.src = src; el.sizes = '48px'; el.srcset = srcsetCloudinary(src, [48, 96, 144]); });
     document.querySelectorAll('.perfil-nombre-artista-seccion')
         .forEach((el) => { el.textContent = datos.nombre_artista || 'Artista'; });
     if (datos.nombre_real) {
@@ -148,7 +148,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         const src = getFotoPerfil() || AVATAR_DEFAULT;
         ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
             const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
-            if (img) img.src = src;
+            if (img) { img.src = src; img.sizes = '48px'; img.srcset = srcsetCloudinary(src, [48, 96, 144]); }
         });
         const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
         const nombreReal = (artistaActual && artistaActual.nombre_real) || '';

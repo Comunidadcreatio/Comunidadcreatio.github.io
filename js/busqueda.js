@@ -3,10 +3,10 @@
 // Búsqueda de artistas en una sección (panel) que se abre desde el icono de la
 // lupa del header. Resultados en tiempo real con debounce.
 
-import { apiRequest } from './config.js?v=f2a997fedf';
-import { debounce, escapeHtml, debugLog, safeImgUrl } from './utils.js?v=202667b9a3';
+import { apiRequest } from './config.js?v=8fb0d05879';
+import { debounce, escapeHtml, debugLog, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=26b9826f0b';
 import { showWarning, showError } from './notificaciones.js?v=a2dfb905a6';
-import { triggerRefreshGrid } from './galeria-ui.js?v=35d602764e';
+import { triggerRefreshGrid } from './galeria-ui.js?v=ec1f68a71c';
 
 /**
  * Configura el buscador de artistas.
@@ -133,7 +133,7 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
 
             let avatarHTML = '';
             if (usuario.foto_perfil) {
-                avatarHTML = `<img src="${safeImgUrl(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
+                avatarHTML = `<img src="${cloudinaryUrl(safeImgUrl(usuario.foto_perfil), 96)}" srcset="${srcsetCloudinary(safeImgUrl(usuario.foto_perfil), [48, 96, 144])}" sizes="44px" decoding="async" loading="lazy" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
             } else {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
                 avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;
