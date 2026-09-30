@@ -105,18 +105,47 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: quitar de uno en uno, no en bloque
+### `!important`: por FAMILIAS y con DOS instrumentos (quedan 162)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. Con las capas,
-un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo importante va
-por encima de lo normal aunque la capa sea anterior); si solo peleaba contra reglas
-normales, muchas veces basta con subir la regla a `utilities` o bajar la competidora a
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 162**:
+por hoja, `formularios.css` 65, `auth.css` 39, `style.css` 30, `panel-artista.css` 12,
+`galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
+`components` 153 y `base` 9.
+
+Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
+importante va por encima de lo normal aunque la capa sea anterior); si solo peleaba contra
+reglas normales, muchas veces basta con subir la regla a `utilities` o bajar la competidora a
 `base`.
 
 **Lo que NO hay que hacer** (medido y revertido): mover la competidora a `base` y quitar de
 golpe los 36 `!important` de los botones de la barra inferior de `formularios.css`. La foto
-dio **81 diferencias**: los `!important` ganaban a más reglas de las que parecía. Se van
-quitando **de uno en uno (o por reglas sueltas)**, con la foto después de cada uno.
+dio **81 diferencias**: los `!important` ganaban a más reglas de las que parecía.
+
+**El piloto que sí sirvió** (familia de estados del formulario de auth: `:invalid`, `:valid` y
+sus gemelas de tema oscuro; 10 declaraciones):
+
+1. Quitar el `!important` de **las 10** → **NO es inocuo**. La foto vio **2 diferencias** (el
+   borde del campo vacío en claro) y el verificador de estados vio **4 más que la foto no puede
+   ver** (el verde del campo relleno en oscuro y un select obligatorio que se ponía rojo). Se
+   revirtió.
+2. Quitarlo solo de **las 6 que no son el borde** (3 `box-shadow`, 1 `outline`, 2
+   `background-color`) → foto **sin diferencias** y los **12 valores** medidos idénticos. Esas 6
+   se quedaron fuera (`auth.css`: 45 → 39).
+3. Las **4 de borde son portantes**: la de `:valid` en oscuro pierde contra
+   `[data-theme="dark"] .form-group input { border-color: … !important }`. Solo se pueden tocar
+   **en pareja** con esa competidora, y eso ya es otro paso.
+
+**Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
+`#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un
+campo **válido** marcado con error se veía **verde**. Arreglado moviendo la regla del error
+**después** de las de `:valid` y nombrándola también en oscuro: el error es la única regla que
+no puede perder nunca. La foto: **sin diferencias** (hoy ningún flujo marca un campo válido, así
+que se arregla la intención, no lo que se ve).
+
+**La lección de método**: la foto sola **no basta**. Mide los campos **vacíos**, no los
+rellenos ni los de error. Para esas familias hace falta además un verificador de estados
+(`verificar-estados-inputs-auth.mjs`, **16** comprobaciones). Los dos instrumentos juntos son
+los que dijeron la verdad — y ninguno de los dos la decía solo.
 
 ## Chequeo de tipos (npm run check)
 
@@ -317,6 +346,7 @@ resultado.
 | scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
 | scripts/verificar-todo.mjs | **Corre TODOS los verificadores** (los que empiecen por `verificar-`, menos él mismo) y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
+| scripts/verificar-estados-inputs-auth.mjs | Los estados de los campos de auth (`:invalid`, `:valid`, `.input-error`) en los dos temas: lo que la foto de estilos **no** puede ver (solo mide los campos vacíos) |
 
 ### Antes de publicar: `node scripts/verificar-todo.mjs`
 

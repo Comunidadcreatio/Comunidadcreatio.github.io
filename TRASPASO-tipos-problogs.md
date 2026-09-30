@@ -289,14 +289,20 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los 165 `!important`** del CSS: **de uno en uno**, cada uno con la foto antes/después.
-   Hay herramientas: `scripts/auditar-important.mjs --resumen` y
-   `scripts/quitar-important.mjs --hoja X --selector Y`. **En bloque NO** (se intentó y salió
-   con 81 diferencias).
-3. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
+1. **Los `!important`** del CSS: **quedan 162**. Herramientas: `scripts/auditar-important.mjs
+   --resumen` (los lista con selector, propiedad y capa) y `scripts/quitar-important.mjs --hoja
+   X --selector Y`. **En bloque NO** (se intentó y salió con 81 diferencias).
+   **Lo aprendido en el primer intento serio (2026-09-30, familia de estados del formulario de
+   auth)**: se quitaron 6 de 10 (`auth.css` 45 → 39) porque **la foto y el verificador de
+   estados coincidieron**; las 4 de borde **no** se pueden tocar solas (su competidora es
+   `[data-theme="dark"] .form-group input { border-color: … !important }`: van en pareja). Y
+   **la foto sola no basta**: mide los campos vacíos, no el relleno ni el de error; para eso
+   está `scripts/verificar-estados-inputs-auth.mjs` (16 comprobaciones). El detalle está en el
+   README, sección de `!important`.
+2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.
-4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
+3. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 
 ---

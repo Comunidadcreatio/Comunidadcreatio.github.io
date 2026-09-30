@@ -60,8 +60,8 @@ form {
 input:invalid:not(.input-error),
 select:invalid:not(.input-error) {
     border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-    box-shadow: none !important;
-    outline: none !important;
+    box-shadow: none;
+    outline: none;
 }
 
 
@@ -417,20 +417,13 @@ select:-webkit-autofill:active {
     transition: background-color 9999s ease-in-out 0s !important;
 }
 
-/* .input-error: rojo */
-.input-error,
-input.input-error,
-select.input-error {
-    border: 1.5px solid #e74c3c !important;
-}
-
 input:valid,
 select:valid,
 #login-form input:valid,
 #forgot-section input:valid {
     border: 1.5px solid var(--color-success) !important;
-    box-shadow: none !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="dark"] input:valid,
@@ -438,8 +431,24 @@ select:valid,
 [data-theme="dark"] #login-form input:valid,
 [data-theme="dark"] #forgot-section input:valid {
     border: 1.5px solid #22c55e !important;
-    box-shadow: none !important;
-    background-color: rgba(0, 0, 0, 0.15) !important;
+    box-shadow: none;
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* .input-error: rojo. Va DESPUES de las reglas de :valid y con los selectores del formulario
+   delante, a proposito: `#login-form input:valid` tiene la MISMA especificidad (un id, una
+   clase, una etiqueta) que `#login-form input.input-error`, asi que en el empate gana la
+   ULTIMA. En oscuro hay que nombrarlo tambien, porque `[data-theme="dark"]` aporta un nivel
+   mas de especificidad. Y el error tiene que verse siempre, aunque el campo este relleno y
+   sea valido: se descubrio midiendo (el campo con error y valido se quedaba verde). */
+.input-error,
+input.input-error,
+select.input-error,
+#login-form input.input-error,
+#forgot-section input.input-error,
+[data-theme="dark"] #login-form input.input-error,
+[data-theme="dark"] #forgot-section input.input-error {
+    border: 1.5px solid #e74c3c !important;
 }
 
 .form-group input:focus,
