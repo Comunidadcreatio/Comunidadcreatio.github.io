@@ -147,6 +147,23 @@ tienen, `e.target` posiblemente `null`, `JSON.parse` con un `string | null`,
 módulo con `?v=`. El script hace una **copia temporal** de `js/` con esos `?v=` quitados:
 el código es idéntico, solo cambia el nombre del módulo. El repo no se toca.
 
+## Efectos medidos y DESCARTADOS (para no volver a intentarlo a ciegas)
+
+Dos mejoras nativas que prometen mucho y que, **medidas en esta app, no cumplen**:
+
+| Se probó | Qué dijo la medida | Decisión |
+|---|---|---|
+| `content-visibility: auto` + `contain-intrinsic-size` en las tarjetas del feed | La propiedad se aplica (el estilo calculado lo confirma) pero **el navegador no se salta nada**: los hijos de una tarjeta que queda a 6.000px siguen maquetados, con su alto real. Se probó también quitando la animación por si era ella la que lo impedía: tampoco | **Fuera.** No se puede demostrar que ahorre algo y añade contención de pintura (puede recortar lo que se salga de la tarjeta) |
+| `animation-timeline: view()` para que las tarjetas entren al scrollear | La animación **sí queda atada a una `ViewTimeline`**, pero **no sigue el scroll**: una tarjeta que está 4.385px por debajo ya aparece al **100%** (debería estar al 0%) | **Fuera.** El efecto no se ve, así que no se pone |
+
+Las dos pruebas están en `scripts/dbg-feed-rendimiento.mjs` (con un feed de 30
+publicaciones). Si algún día se retoman, **hay que medir el efecto de verdad** antes de
+darlas por buenas: las dos son propiedades que "suenan" a mejora pero que aquí no hacen
+nada.
+
+Lo que SÍ se quedó (y está medido): las **View Transitions** del feed a la lectura
+(`scripts/dbg-viewtransition.mjs` cuenta las llamadas y las animaciones reales).
+
 ## Scripts
 
 | Script | Qué hace |
