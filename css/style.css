@@ -1,5 +1,26 @@
 /* css/style.css - Archivo principal */
 
+/* ==============================================
+   ORDEN DE CAPAS (CASCADE LAYERS)
+   ==============================================
+   Se declara UNA vez y manda para toda la app, aunque las reglas vivan en otros
+   ficheros: el orden lo fija la PRIMERA vez que aparece el nombre de la capa.
+
+       reset      -> puesta a cero de elementos (aún no se usa)
+       base       -> estilos de etiqueta: tipografía, inputs, selects... (genérico)
+       components -> piezas con nombre: .problog-*, .chat-*, #panel-artista...
+       utilities  -> lo último, gana a todo (aún no se usa)
+
+   PARA QUÉ SIRVE: dentro de una capa manda el ORDEN DE CAPAS, no la especificidad.
+   Así una pieza de `components` gana a `base` SIN tener que subirle la especificidad
+   a base de añadir ids (que es lo que obligaba a escribir selectores como
+   `#problogs #problogs-detalle.con-barra-responder`).
+
+   OJO AL MIGRAR: lo que NO esté en ninguna capa gana a lo que SÍ esté. Por eso se
+   migra poco a poco y midiendo, no de golpe: mover una regla a una capa puede
+   hacerle perder contra otra que antes perdía por orden o por especificidad. */
+@layer reset, base, components, utilities;
+
 /* 1. Estilos globales, reset y tipografía */
 @import url('header.css?v=f1336e0915');
 
@@ -326,42 +347,57 @@
     background-color: var(--color-gray-200);
 }
 
-/* Flecha personalizada para selects (modo claro - negra) */
-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-    padding-right: 30px;
-}
+/* ==============================================
+   CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
+   ==============================================
+   Estas reglas solo llevan etiquetas y atributos (ninguna clase ni id), así que son
+   "base" por naturaleza. En una capa, cualquier componente (`.problog-comentario-input`,
+   `#registro-form input`...) las gana por ORDEN DE CAPAS y no hace falta que le suban
+   la especificidad.
 
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
-    color: var(--color-ink);
-}
+   IMPORTANTE: `select` y `[data-theme="dark"] select` van JUNTAS. Si la oscura se
+   quedara fuera de la capa, ganaría a la clara y el desplegable en modo oscuro
+   perdería su flecha blanca. */
+@layer base {
 
-/* Flecha personalizada blanca para selects en modo oscuro */
-[data-theme="dark"] select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-    padding-right: 30px;
-}
+    /* Flecha personalizada para selects (modo claro - negra) */
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px;
+        padding-right: 30px;
+    }
 
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-    color: var(--color-gray-400);
-}
+    [data-theme="dark"] input,
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea {
+        background-color: var(--color-gray-100);
+        border-color: var(--color-border);
+        color: var(--color-ink);
+    }
 
-[data-theme="dark"] button {
-    color: var(--color-ink);
+    /* Flecha personalizada blanca para selects en modo oscuro */
+    [data-theme="dark"] select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px;
+        padding-right: 30px;
+    }
+
+    [data-theme="dark"] input::placeholder,
+    [data-theme="dark"] textarea::placeholder {
+        color: var(--color-gray-400);
+    }
+
+    [data-theme="dark"] button {
+        color: var(--color-ink);
+    }
+
 }
 
 [data-theme="dark"] .logout-option {
@@ -462,9 +498,11 @@ p, span, label {
     font-weight: 400;
 }
 
-/* Opcional: ajuste fino para inputs */
-input, select, textarea {
-    font-weight: 500;
+/* Opcional: ajuste fino para inputs (también es base: solo etiquetas) */
+@layer base {
+    input, select, textarea {
+        font-weight: 500;
+    }
 }
 
 /* ==============================================

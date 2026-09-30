@@ -47,11 +47,40 @@ Cada release sigue este flujo (automatizado en subir-a-git.bat):
 SIEMPRE corre bump-version.js antes de commitear. El CI lo valida:
 si el repo llega con hashes/versión desactualizados, falla con un mensaje claro.
 
+## CSS: orden de capas (CASCADE LAYERS)
+
+`css/style.css` declara UNA vez el orden de capas, y ese orden manda para toda la
+app aunque las reglas vivan en otras hojas:
+
+    @layer reset, base, components, utilities;
+
+| Capa | Qué va aquí |
+|---|---|
+| reset | puesta a cero de elementos (aún sin usar) |
+| base | estilos de ETIQUETA: tipografía, `input`, `select`, `textarea`, `button`... |
+| components | piezas con nombre: `.problog-*`, `.chat-*`, `#panel-artista`... |
+| utilities | lo último, gana a todo (aún sin usar) |
+
+Dentro de una capa manda el ORDEN DE CAPAS, no la especificidad: un componente gana
+a `base` sin necesidad de subirle especificidad añadiendo ids (que es lo que obligaba
+a escribir selectores como `#problogs #problogs-detalle.con-barra-responder`).
+
+**CÓMO MIGRAR (importante):** lo que NO está en ninguna capa GANA a lo que SÍ está.
+Por eso se migra poco a poco y midiendo, nunca de golpe: mover una regla a una capa
+puede hacerle perder contra otra que antes perdía por orden o por especificidad.
+Reglas que van JUNTAS y no se pueden separar: `select` con `[data-theme="dark"] select`
+(si la oscura se queda fuera, gana la clara y se pierde la flecha blanca).
+
+Para migrar sin riesgo: foto de estilos antes → cambio → foto después → comparar.
+Si la comparación sale sin diferencias, el cambio no movió ni un valor calculado.
+
 ## Scripts
 
 | Script | Qué hace |
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
+| scripts/foto-estilos.mjs | Foto de estilos calculados (2 temas x 2 anchos) y comparación antes/después para refactorizar CSS con red |
+| scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/minify.js | Genera .min.css/.min.js (enmascara strings, valida con node --check; falla en voz alta si algo no es minificable, ej. perfil.js con templates anidados → usar Terser) |
 | scripts/add_banderas.py / fix_banderas.py | Utilidades de banderas (una vez) |
 
