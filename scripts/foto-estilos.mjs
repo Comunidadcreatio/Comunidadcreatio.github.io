@@ -56,6 +56,8 @@ const PAGINAS = [
         selectores: [
             '#fx-input', '#fx-email', '#fx-pass', '#fx-textarea', '#fx-select', '#fx-button',
             '#fx-submit', '#fx-p', '#fx-h2', '#fx-label', '#fx-a', '#fx-span', '#fx-div',
+            '#fx-main', '#fx-picture', '#fx-img', '#fx-form', '#fx-fieldset', '#fx-legend',
+            '#fx-invalid', '#fx-invalid-select',
             'html', 'body', '#main-header', '#toggle-panel', '#toggle-panel .nav-btn',
             '#btn-notificaciones', '#desktop-logout-all', '#desktop-logout-single',
             '#mobile-logout-all', '#mobile-logout-single', '#problog-responder-barra'
@@ -275,6 +277,7 @@ const FIXTURE = `(() => {
     const f = document.createElement('div');
     f.id = 'fixture-foto';
     f.style.cssText = 'position:absolute;left:-9000px;top:0;width:320px;height:auto;';
+    const gif = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
     f.innerHTML = [
         '<input id="fx-input" type="text" value="texto">',
         '<input id="fx-email" type="email" value="a@b.c">',
@@ -288,7 +291,16 @@ const FIXTURE = `(() => {
         '<label id="fx-label">etiqueta</label>',
         '<a id="fx-a" href="#">enlace</a>',
         '<span id="fx-span">span</span>',
-        '<div id="fx-div">div</div>'
+        '<div id="fx-div">div</div>',
+        // Elementos que faltaban por cubrir: hay reglas de etiqueta sobre ellos, y sin
+        // tenerlos aquí no se podía comprobar si moverlos de capa cambia algo.
+        '<main id="fx-main">principal</main>',
+        '<picture id="fx-picture"><source srcset="' + gif + '"><img id="fx-img" src="' + gif + '" alt=""></picture>',
+        // Pseudo-clase :invalid de verdad: un email mal formado y un select requerido vacio.
+        '<form id="fx-form"><fieldset id="fx-fieldset"><legend id="fx-legend">leyenda</legend>' +
+            '<input id="fx-invalid" type="email" value="no-es-email" required>' +
+            '<select id="fx-invalid-select" required><option value="">elige</option></select>' +
+        '</fieldset></form>'
     ].join('');
     document.body.appendChild(f);
     return 'ok';

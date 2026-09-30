@@ -1,5 +1,48 @@
 
+
+
+
+@layer base {
+/* Contenedor picture para el logo */
+picture {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 40px;
+    max-height: 40px ;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+    @media (max-width: 768px){
+        picture {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    }
+
+    @media (max-width: 480px){
+        picture {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+    }
+
+    @media (min-width: 1024px){
+        picture {
+        height: 36px;
+        max-height: 36px;
+    }
+    }
+}
+
 @layer components {
+
 /* css/header.css - Estilos del encabezado */
 
 /* ==============================================
@@ -40,19 +83,6 @@
     margin: 0;            /* Eliminar cualquier margen */
     padding: 0;           /* Eliminar cualquier padding */
     transform: translateY(0);
-}
-
-/* Contenedor picture para el logo */
-picture {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    height: 40px;
-    max-height: 40px ;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
 }
 
 /* Logo en modo oscuro */
@@ -819,24 +849,12 @@ body.search-escribiendo #galeria-publica::before {
         top: 0;
         max-height: calc(100vh - 60px);
     }
-}
-
-/* ==============================================
-   RESPONSIVE - MÓVIL
-   ============================================== */
-@media (max-width: 768px) {
+}@media (max-width: 768px){
     #main-header {
         height: calc(60px + var(--status-bar-height, 24px));
         padding: 0 0.5rem;
         padding-top: var(--status-bar-height, 24px);
         gap: 0.5rem;
-    }
-
-    picture {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
     }
 
     /* Logo wordmark "Creatio" completo, horizontal, a la izquierda */
@@ -919,20 +937,12 @@ body.search-escribiendo #galeria-publica::before {
     .search-result-real-name {
         font-size: 13px;
     }
-}
-
-@media (max-width: 480px) {
+}@media (max-width: 480px){
     #main-header {
         height: calc(60px + var(--status-bar-height, 24px));
         padding: 0 0.5rem;
         padding-top: var(--status-bar-height, 24px);
         gap: 0.25rem;
-    }
-
-    picture {
-        height: 100%;
-        display: flex;
-        align-items: center;
     }
 
     .header__logo {
@@ -1004,16 +1014,7 @@ body.search-escribiendo #galeria-publica::before {
     .search-result-real-name {
         font-size: 12px;
     }
-}
-
-/* ==============================================
-   DESKTOP: Logo más grande
-   ============================================== */
-@media (min-width: 1024px) {
-    picture {
-        height: 36px;
-        max-height: 36px;
-    }
+}@media (min-width: 1024px){
 
     .header__logo {
         height: 30px;
@@ -1022,4 +1023,7 @@ body.search-escribiendo #galeria-publica::before {
         transform: translateY(0);
     }
 }
+
 }
+
+

@@ -1,5 +1,6 @@
 
 
+
 /* Capa `base`: reglas de ETIQUETA de la página de acceso. Van a `base` para que los
    componentes les ganen por ORDEN DE CAPAS y no por especificidad. auth.css se carga
    DESPUÉS de style.css en auth.html/reset-password.html, así que dentro de la capa sigue
@@ -27,6 +28,7 @@
     }
 }
 
+
 /* ==============================================
    MODO OSCURO
    ============================================== */
@@ -38,7 +40,64 @@
         color: var(--color-ink);
     }
 }
+
+@layer base {
+/* ==============================================
+   RESET Y BASE
+   ============================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/* ==============================================
+   FORMULARIOS
+   ============================================== */
+form {
+    width: 100%;
+}
+/* :invalid sin interacción: mismo gris que normal */
+input:invalid:not(.input-error),
+select:invalid:not(.input-error) {
+    border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+
+[data-theme="dark"] input:invalid:not(.input-error),
+[data-theme="dark"] select:invalid:not(.input-error) {
+    border: 1.5px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+
+
+button[type="submit"]:not(.nav-btn) {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+}
+/* Quitar borde de fieldset */
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+legend {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 6px;
+    display: block;
+}
+}
+
 @layer components {
+
 /* css/auth.css - Estilos específicos para la página de autenticación */
 
 /* ==============================================
@@ -51,15 +110,6 @@
     --color-border: var(--color-gray-300);
     --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.04);
     --radius-xl: 1rem;
-}
-
-/* ==============================================
-   RESET Y BASE
-   ============================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 #main-content {
@@ -303,13 +353,6 @@
     margin-bottom: 16px;
 }
 
-/* ==============================================
-   FORMULARIOS
-   ============================================== */
-form {
-    width: 100%;
-}
-
 .form-group {
     width: 100%;
 }
@@ -374,24 +417,11 @@ select:-webkit-autofill:active {
     transition: background-color 9999s ease-in-out 0s !important;
 }
 
-/* :invalid sin interacción: mismo gris que normal */
-input:invalid:not(.input-error),
-select:invalid:not(.input-error) {
-    border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
 /* .input-error: rojo */
 .input-error,
 input.input-error,
 select.input-error {
     border: 1.5px solid #e74c3c !important;
-}
-
-[data-theme="dark"] input:invalid:not(.input-error),
-[data-theme="dark"] select:invalid:not(.input-error) {
-    border: 1.5px solid rgba(255, 255, 255, 0.10) !important;
 }
 
 input:valid,
@@ -649,12 +679,6 @@ button[type="submit"]:not(.nav-btn),
     font-family: inherit;
     position: relative;
     overflow: hidden;
-}
-
-button[type="submit"]:not(.nav-btn) {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 14px;
 }
 
 button[type="submit"]:not(.nav-btn):hover,
@@ -931,21 +955,6 @@ button[type="submit"]:not(.nav-btn):active,
     display: flex;
     gap: 8px;
     flex-wrap: nowrap;
-}
-
-/* Quitar borde de fieldset */
-fieldset {
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-legend {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text);
-    margin-bottom: 6px;
-    display: block;
 }
 
 .date-group select {
@@ -1922,4 +1931,7 @@ legend {
 
 /* ==============================================
 
+
 }
+
+
