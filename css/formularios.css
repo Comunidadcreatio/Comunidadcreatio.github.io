@@ -1245,9 +1245,11 @@ form,
         margin-bottom: 12px;
     }
     
-    /* Prevenir desbordamiento horizontal global en móvil */
-    body, html {
-        overflow-x: hidden;
+    /* Prevenir desbordamiento horizontal global en móvil. Capa `base`: es de etiqueta. */
+    @layer base {
+        body, html {
+            overflow-x: hidden;
+        }
     }
     
     /* Step Navigation móvil (ahora en #obra-step-bar fijo) */

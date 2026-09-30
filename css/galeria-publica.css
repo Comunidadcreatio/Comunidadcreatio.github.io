@@ -2,9 +2,13 @@
 /* ==============================================
    SCROLL SNAPPING — contenedor fixed como snap container
    ============================================== */
-html, body {
-    margin: 0;
-    padding: 0;
+/* Capa `base`: son estilos de ETIQUETA. Van a `base` para no competir por especificidad
+   con los componentes (dentro de una capa manda el orden de las capas). */
+@layer base {
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
 }
 
 /* Contenedor: position fixed ocupa todo el espacio disponible */
