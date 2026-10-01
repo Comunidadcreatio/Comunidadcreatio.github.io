@@ -131,9 +131,24 @@ sus gemelas de tema oscuro; 10 declaraciones):
 2. Quitarlo solo de **las 6 que no son el borde** (3 `box-shadow`, 1 `outline`, 2
    `background-color`) → foto **sin diferencias** y los **12 valores** medidos idénticos. Esas 6
    se quedaron fuera (`auth.css`: 45 → 39).
-3. Las **4 de borde son portantes**: la de `:valid` en oscuro pierde contra
-   `[data-theme="dark"] .form-group input { border-color: … !important }`. Solo se pueden tocar
-   **en pareja** con esa competidora, y eso ya es otro paso.
+3. Las **4 de borde son portantes**. Se intentó el paso **en pareja** (subir la especificidad de
+   las reglas de estado copiando lo que ya hacía la de `:valid`, que nombra `#login-form` y
+   `#forgot-section`, y quitar 3 `!important`) → **15/16**: el select obligatorio vacío se ponía
+   **rojo**. Revertido. La razón, con la cascada real delante (`dbg-cascada-real.mjs`), es que la
+   pareja **no está en esta familia**, está repartida por otras dos hojas:
+
+   | Quién compite | Dónde | Por qué gana |
+   |---|---|---|
+   | `#registro-form input[type=…], #login-form input[type=…], …, #panel-artista input { border: 1px solid var(--color-border) }` — **el estilo base de TODOS los campos de la app** | `formularios.css` (lo importa `style.css`) | Lleva ids: (1,1,1) le gana a `input:valid` (0,1,1) por especificidad |
+   | `[data-theme="dark"] .form-group input/select { background-color, border-color, color !important }` | `auth.css` | Necesita el `!important` para ganarle al `background`/`border` de esa misma regla base en oscuro. Es lo que obliga a que el `:valid` oscuro también lo lleve |
+   | `[data-required="true"]:invalid:not(:placeholder-shown) { border-color: var(--color-danger) !important }` | `formularios.css` | Pinta ROJO cualquier select obligatorio vacío (en un `<select>`, `:placeholder-shown` nunca casa). El `!important` de la familia era lo que lo tapaba |
+
+   **Conclusión**: esta familia no se limpia con un paso en pareja, sino **rediseñando la
+   jerarquía del estilo de los formularios** (lo natural es mover esa regla base a `@layer base`,
+   que es su sitio: es el estilo de ETIQUETA). El radio de acción es **todos los formularios de
+   la app** (el panel incluido), así que antes hay que **ampliar la foto a esos campos**: hoy
+   cubre `auth.html` (ya con `#reg-rol`, `#forgot-email` y `#forgot-section`: **404 medidas**),
+   pero no los del panel.
 
 **Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
 `#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un
@@ -146,6 +161,13 @@ que se arregla la intención, no lo que se ve).
 rellenos ni los de error. Para esas familias hace falta además un verificador de estados
 (`verificar-estados-inputs-auth.mjs`, **16** comprobaciones). Los dos instrumentos juntos son
 los que dijeron la verdad — y ninguno de los dos la decía solo.
+
+**Y para saber QUIÉN gana, `dbg-cascada-real.mjs`**: le pregunta al navegador por la cascada
+real (`CSS.getMatchedStylesForNode`) y marca la candidata que gana. Hace falta porque
+`dbg-cascada.mjs` es **orientativo** y tiene dos puntos ciegos que costaron una tarde: no
+resuelve las **capas** (`@layer`) y no ve las reglas que declaran el **atajo** `border` cuando
+se pregunta por `border-top-color` (devuelve vacío y la salta). El estilo base de los campos se
+escondía justo por eso.
 
 ## Chequeo de tipos (npm run check)
 
@@ -341,6 +363,7 @@ resultado.
 | scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/mover-a-base.mjs | Mueve a `base` las reglas que son de ETIQUETA (estén sueltas o dentro de un `@media`, conservando su condición). No mueve las de `:-webkit-autofill` (en `base` perderían y volvería el amarillo del autocompletado). Deja copia `.antes-de-mover` |
 | scripts/auditar-important.mjs | Lista los `!important` con su selector, su propiedad y su capa (`--hoja`, `--resumen`) |
+| scripts/dbg-cascada-real.mjs | **Quién gana una propiedad, de verdad**: pregunta al navegador por la cascada real (`--pagina`, `--tema`, `--elemento`, `--propiedad`, `--valor`, `--input-error`). Es el que hay que usar cuando `dbg-cascada.mjs` no encuentra al culpable |
 | scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |

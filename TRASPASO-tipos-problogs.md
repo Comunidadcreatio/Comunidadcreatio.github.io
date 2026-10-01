@@ -294,11 +294,15 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    X --selector Y`. **En bloque NO** (se intentó y salió con 81 diferencias).
    **Lo aprendido en el primer intento serio (2026-09-30, familia de estados del formulario de
    auth)**: se quitaron 6 de 10 (`auth.css` 45 → 39) porque **la foto y el verificador de
-   estados coincidieron**; las 4 de borde **no** se pueden tocar solas (su competidora es
-   `[data-theme="dark"] .form-group input { border-color: … !important }`: van en pareja). Y
-   **la foto sola no basta**: mide los campos vacíos, no el relleno ni el de error; para eso
-   está `scripts/verificar-estados-inputs-auth.mjs` (16 comprobaciones). El detalle está en el
-   README, sección de `!important`.
+   estados coincidieron**. El **paso en pareja** (subir la especificidad de las reglas de estado
+   y quitar 3 más) dio **15/16** —el select obligatorio vacío se ponía rojo— y se **revirtió**:
+   la pareja no está en esa familia, está en `formularios.css` (el estilo base de todos los
+   campos de la app, con ids, que `style.css` importa) y en el tema oscuro de `.form-group
+   input` de `auth.css`. **Para seguir por aquí hay que rediseñar esa jerarquía** (mover la
+   regla base a `@layer base`) y, antes, **ampliar la foto a los campos del panel**: hoy cubre
+   `auth.html` (404 medidas) pero no los formularios del panel. El mapa completo está en el
+   README, sección de `!important`, y quien gana se pregunta con
+   `scripts/dbg-cascada-real.mjs` (`dbg-cascada.mjs` es orientativo: no ve capas ni atajos).
 2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.

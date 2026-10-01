@@ -10,6 +10,10 @@
 // Uso:
 //   node scripts/dbg-cascada.mjs http://127.0.0.1:8099/ --estado editor \
 //        --elemento "#problog-form" --propiedades width,padding-top,font-size
+//
+// Y para la pantalla de auth (auth.html), que no tiene sesion ni nav:
+//   node scripts/dbg-cascada.mjs --pagina auth.html --tema dark --elemento "#login-email" \
+//        --propiedades border-color,border-width --valor "a@b.com" --input-error
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -23,6 +27,12 @@ const ESTADO = arg('--estado', 'editor');
 const ELEMENTO = arg('--elemento', '#problog-form');
 const PROPIEDADES = arg('--propiedades', 'width,padding-top,font-size,overflow-x').split(',').map((s) => s.trim());
 const ANCHO = Number(arg('--ancho', '393'));
+// Modo auth.html: se abre esa pagina, se fuerza el tema y (si se pide) se le pone al elemento
+// un valor y/o la clase .input-error, para poder medir los estados que la foto no ve.
+const PAGINA = arg('--pagina', '');
+const TEMA = arg('--tema', '');
+const VALOR = arg('--valor', null);
+const CON_ERROR = args.includes('--input-error');
 
 const perfil = mkdtempSync(join(tmpdir(), 'casc-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
@@ -84,21 +94,40 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         };
     })();`
 });
-await send('Page.navigate', { url: URL_BASE });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel')`) === true) break; await sleep(300); }
-await sleep(1500);
+await send('Page.navigate', { url: URL_BASE + PAGINA });
+if (PAGINA) {
+    // Pantalla de auth: se espera al formulario y se abre como lo abre el usuario.
+    for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('login-form')`) === true) break; await sleep(300); }
+    await sleep(800);
+    await evalJs(`document.getElementById('btn-mostrar-login')?.click()`);
+    if (TEMA) await evalJs(`(() => { try { localStorage.setItem('theme', '${TEMA}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${TEMA}'); })()`);
+    if (VALOR !== null) await evalJs(`(() => {
+        const el = document.querySelector(${JSON.stringify(ELEMENTO)});
+        if (!el) return 'no-existe';
+        const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+        Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, ${JSON.stringify(VALOR)});
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        return el.value;
+    })()`);
+    if (CON_ERROR) await evalJs(`document.querySelector(${JSON.stringify(ELEMENTO)})?.classList.add('input-error')`);
+    await sleep(600);
+} else {
+    for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel')`) === true) break; await sleep(300); }
+    await sleep(1500);
 
-// Se abre el estado pedido, igual que hace la foto de estilos.
-if (ESTADO === 'editor') {
-    await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-    await sleep(1600);
-    await evalJs(`document.getElementById('tab-problogs')?.click()`);
-    await sleep(1800);
-} else if (ESTADO === 'problogs') {
-    await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-    await sleep(1800);
-    await evalJs(`document.querySelector('#problogs .problog-card')?.click()`);
-    await sleep(2200);
+    // Se abre el estado pedido, igual que hace la foto de estilos.
+    if (ESTADO === 'editor') {
+        await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
+        await sleep(1600);
+        await evalJs(`document.getElementById('tab-problogs')?.click()`);
+        await sleep(1800);
+    } else if (ESTADO === 'problogs') {
+        await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+        await sleep(1800);
+        await evalJs(`document.querySelector('#problogs .problog-card')?.click()`);
+        await sleep(2200);
+    }
 }
 
 const analisis = await evalJs(`(() => {

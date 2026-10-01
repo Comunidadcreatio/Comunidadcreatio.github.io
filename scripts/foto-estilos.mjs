@@ -71,7 +71,11 @@ const PAGINAS = [
         selectores: [
             'html', 'body', '#main-content', '#login-section', '#login-landing',
             '#login-form', '#login-email', '#login-pass', '.auth-container',
-            'button[type="submit"]', '#auth-dark-mode-btn'
+            'button[type="submit"]', '#auth-dark-mode-btn',
+            // Los estados de estos campos los gobiernan las reglas de :invalid / :valid de
+            // auth.css, y su competidora es el estilo base de los campos (formularios.css).
+            // Sin ellos en la lista, ese trozo de cascada se quedaba sin red.
+            '#forgot-section', '#forgot-email', '#reg-rol'
         ]
     },
     {
