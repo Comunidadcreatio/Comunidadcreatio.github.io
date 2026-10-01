@@ -8,6 +8,54 @@
         }
     }
 }
+
+/* Aspecto BASE de los campos de TODA la app (inputs de los formularios y selects del
+   registro): ancho, relleno, borde, radio, fondo. Va en `base` a proposito: es el estilo de
+   etiqueta, y en `components` le ganaba por especificidad (lleva ids) a las reglas de estado
+   de auth.css, que se defendian con `!important`. Movido el 2026-10-01. */
+@layer base {
+    #registro-form input[type="text"],
+    #registro-form input[type="email"],
+    #registro-form input[type="password"],
+    #login-form input[type="email"],
+    #login-form input[type="password"],
+    #solicitar-restablecimiento-form input[type="email"],
+    #confirmar-eliminacion-form input[type="password"],
+    #panel-artista input {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-size: 16px;
+        background: var(--color-white);
+        color: var(--color-text);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Selects: padding-right amplio para la flecha, heredan resto de estilos de inputs */
+    #registro-form select {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 40px 12px 14px;
+        margin-bottom: 16px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-size: 16px;
+        background: var(--color-white);
+        color: var(--color-text);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+}
 @layer components {
 /* css/formularios.css - Estilos de todos los formularios */
 
@@ -397,7 +445,11 @@
     border-color: var(--color-success) !important;
 }
 
-[data-required="true"]:invalid:not(:placeholder-shown) {
+/* Solo el PANEL: en las pantallas de auth los campos obligatorios los pinta auth.css (gris
+   neutro hasta que se tocan) y esta regla se los ponia ROJOS sin tocarlos, porque en un
+   <select> casa siempre (:placeholder-shown no se aplica a los selects). Aqui si necesita el
+   `!important`: su competidora en el panel es mas especifica. */
+#panel-artista [data-required="true"]:invalid:not(:placeholder-shown) {
     border-color: var(--color-danger) !important;
 }
 
@@ -547,47 +599,9 @@ form *,
     overflow-x: hidden;
 }
 
-#registro-form input[type="text"],
-#registro-form input[type="email"],
-#registro-form input[type="password"],
-#login-form input[type="email"],
-#login-form input[type="password"],
-#solicitar-restablecimiento-form input[type="email"],
-#confirmar-eliminacion-form input[type="password"],
-#panel-artista input {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 16px;
-    background: var(--color-white);
-    color: var(--color-text);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Selects: padding-right amplio para la flecha, heredan resto de estilos de inputs */
-#registro-form select {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 40px 12px 14px;
-    margin-bottom: 16px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 16px;
-    background: var(--color-white);
-    color: var(--color-text);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
+/* El aspecto BASE de los campos (inputs y selects de los formularios) se movio a
+   `@layer base`, al principio del fichero: es estilo de ETIQUETA y ahi no le gana por
+   especificidad a las reglas de estado. */
 
 #registro-form input[type="text"]:focus,
 #registro-form input[type="email"]:focus,

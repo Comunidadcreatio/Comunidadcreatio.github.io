@@ -124,6 +124,32 @@ const PAGINAS = [
         ]
     },
     {
+        // El PANEL del artista: el formulario de la OBRA (Cavents) tal cual se ve. Faltaba
+        // por completo, y es justo donde vive el estilo BASE de los campos
+        // (`#panel-artista input` en formularios.css, que style.css importa) que compite con
+        // las reglas de estado de auth.css. Sin esta vista, mover ese estilo de capa se hacia
+        // a ciegas. Se abre el panel y se deja la pestaña de Cavents activa (la de por
+        // defecto), para medir los campos VISIBLES.
+        nombre: 'panel',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            await ev(`document.getElementById('btn-crear-cavent')?.click()`);
+            await dormir(1600);
+            await ev(`document.getElementById('tab-cavents')?.click()`);
+            await dormir(1200);
+        },
+        selectores: [
+            '#obra-form', '#obra-form .form-section', '#obra-form .form-group',
+            '#input-titulo', '#input-artista', '#input-ano', '#input-precio',
+            '#input-ancho', '#input-alto', '#input-etiquetas', '#obra-etiquetas-bar',
+            '#input-status', '#input-estado-obra', '#input-descripcion-tecnica',
+            '.custom-select', '.custom-select-trigger', '#obra-step-bar',
+            '#obra-form .form-section-content'
+        ]
+    },
+    {
         // El DIRECTORIO del chat. Hace falta porque el chat no tenia ninguna cobertura
         // visual (ni verificador hasta hace poco), y ahi vive una familia entera de
         // reglas de chat.css. Se ABRE el chat y se despliega el primer pueblo, para que la

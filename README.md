@@ -105,17 +105,18 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS y con DOS instrumentos (quedan 162)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 159)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 162**:
-por hoja, `formularios.css` 65, `auth.css` 39, `style.css` 30, `panel-artista.css` 12,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 159**:
+por hoja, `formularios.css` 65, `auth.css` 36, `style.css` 30, `panel-artista.css` 12,
 `galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 153 y `base` 9.
+`components` 152 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
-importante va por encima de lo normal aunque la capa sea anterior); si solo peleaba contra
-reglas normales, muchas veces basta con subir la regla a `utilities` o bajar la competidora a
-`base`.
+importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
+otra hoja con más especificidad**. Y en ese segundo caso la solución casi nunca es subir la
+especificidad: es **mover la regla a su capa**, porque entre capas no manda la especificidad.
+Eso es lo que pasó aquí (ver «el rediseño», abajo).
 
 **Lo que NO hay que hacer** (medido y revertido): mover la competidora a `base` y quitar de
 golpe los 36 `!important` de los botones de la barra inferior de `formularios.css`. La foto
@@ -143,12 +144,37 @@ sus gemelas de tema oscuro; 10 declaraciones):
    | `[data-theme="dark"] .form-group input/select { background-color, border-color, color !important }` | `auth.css` | Necesita el `!important` para ganarle al `background`/`border` de esa misma regla base en oscuro. Es lo que obliga a que el `:valid` oscuro también lo lleve |
    | `[data-required="true"]:invalid:not(:placeholder-shown) { border-color: var(--color-danger) !important }` | `formularios.css` | Pinta ROJO cualquier select obligatorio vacío (en un `<select>`, `:placeholder-shown` nunca casa). El `!important` de la familia era lo que lo tapaba |
 
-   **Conclusión**: esta familia no se limpia con un paso en pareja, sino **rediseñando la
-   jerarquía del estilo de los formularios** (lo natural es mover esa regla base a `@layer base`,
-   que es su sitio: es el estilo de ETIQUETA). El radio de acción es **todos los formularios de
-   la app** (el panel incluido), así que antes hay que **ampliar la foto a esos campos**: hoy
-   cubre `auth.html` (ya con `#reg-rol`, `#forgot-email` y `#forgot-section`: **404 medidas**),
-   pero no los del panel.
+   **Conclusión**: esta familia no se limpiaba con un paso en pareja, sino **rediseñando la
+   jerarquía del estilo de los formularios**.
+
+**El rediseño que sí funcionó** (mismo día, con la foto ya ampliada: **476 medidas, 7 vistas** —
+se añadió la vista `panel`, el formulario de la obra, que era el hueco de cobertura):
+
+1. `mover-base-campos.mjs`: el **aspecto base de los campos** (ancho, relleno, borde, radio,
+   fondo… de los inputs y selects de los formularios) pasa de `components` a **`@layer base`**,
+   que es su sitio (es estilo de etiqueta). Al bajar de capa deja de ganarle por especificidad a
+   las reglas de estado de `auth.css`.
+2. `rediseno-campos-auth.mjs`:
+   - La regla de los campos de `auth.css` pasa a decir **lo que se ve** (radio 8px, fuente 16px,
+     fondo blanco). Antes decía otra cosa (6px, 14px, translúcido) porque perdía y no se notaba;
+     desde que gana, tiene que decir la verdad. La fuente se queda en **16px** además por un
+     motivo práctico: por debajo de 16px **iOS hace zoom automático** al enfocar un campo.
+   - Se quitan **3 `!important`** (los bordes de `:invalid` claro/oscuro y el de `:valid` claro) y
+     el `:invalid` pasa a nombrar los formularios que son suyos, como ya hacía el `:valid`.
+   - El rojo de `[data-required="true"]:invalid:not(:placeholder-shown)` se **acota a
+     `#panel-artista`**, que es de quien es (los 16 campos con `data-required` de `index.html`
+     están todos en el formulario de la obra). Conserva su `!important`, que en el panel sí
+     necesita. En las pantallas de auth ese rojo se llevaba por delante el gris neutro **por
+     capa** (`:invalid` vive en `base`, el rojo en `components`) y, como `:placeholder-shown` no
+     se aplica a los `select`, pintaba rojos los selects obligatorios **sin tocarlos**.
+3. Medido: **foto SIN DIFERENCIAS** contra la de antes del rediseño (476 medidas), estados
+   **16/16** y suite completa en verde. Es decir: **el rediseño no cambia nada de lo que se ve**,
+   solo quién manda. `auth.css`: 39 → 36 `!important` (el total del proyecto: 168 → 159).
+
+**Lo que sigue con `!important` y por qué** (el mapa para la próxima): los 3 del **tema oscuro**
+de `.form-group input/select` de `auth.css` (su selector pierde por especificidad contra
+`#login-form input`, que ahora gana, y el fondo de oscuro tiene que seguir ganando: van en
+pareja con esa regla) y el **rojo del panel** (su competidora ahí es más específica).
 
 **Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
 `#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un
@@ -359,7 +385,7 @@ resultado.
 |---|---|
 | scripts/bump-version.js | Cache-busting + versión + sync www/android (correr SIEMPRE antes de commit) |
 | scripts/verificar-tipos.mjs | Chequeo de tipos del JS (`npm run check`): copia temporal con los `?v=` quitados y `tsc --noEmit`. Solo vigila los ficheros con `// @ts-check` |
-| scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre **6 vistas** (index, auth, Problogs, **el directorio del chat**, **el perfil de otro artista** y el editor de Problogs) x 2 temas x 2 anchos = **398 medidas** |
+| scripts/foto-estilos.mjs | Foto de estilos calculados y comparación antes/después para refactorizar CSS con red. Cubre **7 vistas** (index, auth, **el formulario del panel**, Problogs, **el directorio del chat**, **el perfil de otro artista** y el editor de Problogs) x 2 temas x 2 anchos = **476 medidas** |
 | scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/mover-a-base.mjs | Mueve a `base` las reglas que son de ETIQUETA (estén sueltas o dentro de un `@media`, conservando su condición). No mueve las de `:-webkit-autofill` (en `base` perderían y volvería el amarillo del autocompletado). Deja copia `.antes-de-mover` |
 | scripts/auditar-important.mjs | Lista los `!important` con su selector, su propiedad y su capa (`--hoja`, `--resumen`) |

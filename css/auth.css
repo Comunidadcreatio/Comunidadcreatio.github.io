@@ -58,8 +58,13 @@ form {
 }
 /* :invalid sin interacción: mismo gris que normal */
 input:invalid:not(.input-error),
-select:invalid:not(.input-error) {
-    border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+select:invalid:not(.input-error),
+#login-form input:invalid:not(.input-error),
+#login-form select:invalid:not(.input-error),
+#forgot-section input:invalid:not(.input-error),
+#registro-form input:invalid:not(.input-error),
+#registro-form select:invalid:not(.input-error) {
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
     box-shadow: none;
     outline: none;
 }
@@ -67,8 +72,13 @@ select:invalid:not(.input-error) {
 
 
 [data-theme="dark"] input:invalid:not(.input-error),
-[data-theme="dark"] select:invalid:not(.input-error) {
-    border: 1.5px solid rgba(255, 255, 255, 0.10) !important;
+[data-theme="dark"] select:invalid:not(.input-error),
+[data-theme="dark"] #login-form input:invalid:not(.input-error),
+[data-theme="dark"] #login-form select:invalid:not(.input-error),
+[data-theme="dark"] #forgot-section input:invalid:not(.input-error),
+[data-theme="dark"] #registro-form input:invalid:not(.input-error),
+[data-theme="dark"] #registro-form select:invalid:not(.input-error) {
+    border: 1.5px solid rgba(255, 255, 255, 0.10);
 }
 
 
@@ -367,6 +377,11 @@ legend {
     letter-spacing: -0.01em;
 }
 
+/* OJO con los valores: son LOS QUE SE VEN (medidos con la foto de estilos el 2026-10-01).
+   Esta regla gana por CAPA desde que el aspecto base de los campos esta en `@layer base`, y
+   lo que gana tiene que decir lo mismo que decia el que ganaba antes (radio 8px, fuente 16px,
+   fondo blanco). La fuente se queda en 16px ademas por un motivo practico: por debajo de 16px
+   iOS hace zoom automatico al enfocar un campo. */
 .form-group input,
 .form-group select,
 .date-group select,
@@ -375,9 +390,9 @@ legend {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid rgba(0, 0, 0, 0.12);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: var(--color-white);
     color: var(--color-text);
     transition: all 0.2s ease;
     font-family: inherit;
@@ -421,7 +436,7 @@ input:valid,
 select:valid,
 #login-form input:valid,
 #forgot-section input:valid {
-    border: 1.5px solid var(--color-success) !important;
+    border: 1.5px solid var(--color-success);
     box-shadow: none;
     background-color: rgba(255, 255, 255, 0.05);
 }

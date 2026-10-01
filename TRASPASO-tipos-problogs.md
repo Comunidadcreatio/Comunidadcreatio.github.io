@@ -40,7 +40,7 @@ node scripts/verificar-todo.mjs --solo <texto>   # solo los que contengan ese te
 | Commit | ver el último commit de `main` |
 | Módulos con tipos | **27 de 27** — el chequeo está **VERDE** |
 | Sin adoptar | **ninguno** |
-| Verificadores | **17** de app en `scripts/` (más el de tipos): **18 de 18 en verde**; el de la foto cubre 6 vistas |
+| Verificadores | **17** de app en `scripts/` (más el de tipos): **18 de 18 en verde**; el de la foto cubre **7 vistas** (476 medidas) |
 
 **Adoptados y limpios (27):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
 capacitor-native-biometric, chat, ciudades, comentarios, config, cuenta, etiquetas,
@@ -200,7 +200,7 @@ node scripts/verificar-comentarios-problog.mjs http://127.0.0.1:8099/   # 92/92
 node scripts/verificar-problogs-editor.mjs     http://127.0.0.1:8099/   # 10/10
 # Para panel-ui.js el que toca es scripts/verificar-estado-panel.mjs.
 
-# La foto de estilos (398 medidas, 6 vistas). Dos corridas y comparar: debe dar
+# La foto de estilos (476 medidas, 7 vistas). Dos corridas y comparar: debe dar
 # SIN DIFERENCIAS (las anotaciones no cambian nada en ejecución).
 node scripts/foto-estilos.mjs http://127.0.0.1:8099/ --salida scripts/f1.json
 node scripts/foto-estilos.mjs http://127.0.0.1:8099/ --salida scripts/f2.json
@@ -230,7 +230,7 @@ Se adoptó en la pasada anterior. Lo que se midió:
 |---|---|
 | Avisos de partida | **53** (40 `TS2339`, 6 `TS18047`, 6 `TS2322`, 1 `TS2345`) |
 | Cambios aplicados | **30**, en dos tandas (`scripts/arreglar-tipos-problogs.mjs` y `...-2.mjs`) |
-| Verificadores | comentarios **92/92** · editor **10/10** · foto de estilos **SIN DIFERENCIAS** (398 medidas, 6 vistas) |
+| Verificadores | comentarios **92/92** · editor **10/10** · foto de estilos **SIN DIFERENCIAS** (476 medidas, 7 vistas) |
 
 **Las dos cosas propias de este fichero** (están también en el README, sección de tipos):
 
@@ -292,17 +292,20 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 1. **Los `!important`** del CSS: **quedan 162**. Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y `scripts/quitar-important.mjs --hoja
    X --selector Y`. **En bloque NO** (se intentó y salió con 81 diferencias).
-   **Lo aprendido en el primer intento serio (2026-09-30, familia de estados del formulario de
-   auth)**: se quitaron 6 de 10 (`auth.css` 45 → 39) porque **la foto y el verificador de
-   estados coincidieron**. El **paso en pareja** (subir la especificidad de las reglas de estado
-   y quitar 3 más) dio **15/16** —el select obligatorio vacío se ponía rojo— y se **revirtió**:
-   la pareja no está en esa familia, está en `formularios.css` (el estilo base de todos los
-   campos de la app, con ids, que `style.css` importa) y en el tema oscuro de `.form-group
-   input` de `auth.css`. **Para seguir por aquí hay que rediseñar esa jerarquía** (mover la
-   regla base a `@layer base`) y, antes, **ampliar la foto a los campos del panel**: hoy cubre
-   `auth.html` (404 medidas) pero no los formularios del panel. El mapa completo está en el
-   README, sección de `!important`, y quien gana se pregunta con
-   `scripts/dbg-cascada-real.mjs` (`dbg-cascada.mjs` es orientativo: no ve capas ni atajos).
+   **Lo aprendido (2026-09-30/10-01, familia de estados del formulario de auth)**: se quitaron 6
+   de 10 (`auth.css` 45 → 39) porque **la foto y el verificador de estados coincidieron**. El
+   **paso en pareja** (solo especificidad) dio **15/16** y se revirtió… y de ahí salió el
+   **rediseño**, que sí funcionó: el **aspecto base de los campos** pasó de `components` a
+   **`@layer base`** (`scripts/mover-base-campos.mjs`), la regla de los campos de `auth.css`
+   pasó a decir lo que se ve, el `:invalid` nombró sus formularios y el rojo del obligatorio se
+   acotó a `#panel-artista` (`scripts/rediseno-campos-auth.mjs`): **3 `!important` menos** y
+   **foto sin diferencias** (476 medidas, 7 vistas: se añadió la vista `panel`). Total del
+   proyecto: **168 → 159**.
+   **Queda con `!important`**: los 3 del tema oscuro de `.form-group input/select` (van en
+   pareja con la regla de los campos, que ahora gana) y el rojo del panel (su competidora ahí es
+   más específica). El mapa está en el README, sección de `!important`, y **quién gana se
+   pregunta con `scripts/dbg-cascada-real.mjs`** (`dbg-cascada.mjs` es orientativo: no ve capas
+   ni atajos como `border`).
 2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.
