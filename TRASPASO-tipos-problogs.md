@@ -289,11 +289,11 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 111** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 96** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
-   (`--hoja`, `--selector`, `--quitar` / `--devolver --props "a,b"`): quita el `!important` de las
-   declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que hacían falta.
-   **En bloque NO** (se intentó y salió con 81 diferencias).
+   (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
+   `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
+   hacían falta. **En bloque NO** (se intentó y salió con 81 diferencias).
    **El método de un lote** (está en el README): quitar todas las de una regla → foto → **agrupar las
    diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el `!important` solo a esas
    → foto otra vez (**sin diferencias**) → siguiente regla.
@@ -313,8 +313,14 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    **Sutileza a respetar**: un token muerto dentro de `:not(...)` NO hace inmirable la parte
    (`.vivo:not(.muerto)` casa); los de `:is()`/`:where()`/`:has()` sí la hacen inmirable.
    **Hecho**: la familia de estados del formulario de auth completa → **27 menos**; los **lotes 1 a 5**
-   → **21 más**; y el CSS muerto → **18 más**. **168 → 115**, foto sin diferencias y suite **19/19** en
-   cada paso.
+   → **21 más**; el CSS muerto → **18 más**; y los **lotes 6, 7 y 8** (carrusel de la obra, desplegable
+   de Mis Cavents y campos del formulario: **15 declaraciones**) → **15 más**. **168 → 96**, foto sin
+   diferencias y suite **19/19** en cada paso.
+   **Fallo de herramienta que hay que recordar**: `importantes-lote.mjs --linea` se estrenó mal
+   (buscaba la llave hacia atrás y acababa en la del `@layer`, así que le quitó los 36 `!important` a
+   `formularios.css` de una vez). Se vio en el recuento que imprime el script, se restauró con
+   `git checkout -- css/formularios.css` y ahora localiza la regla con el parser y **dice qué regla
+   toca y en qué línea**.
    **Se quedan por diseño**: los 7 de `base` (accesibilidad) y los 8 `-webkit-autofill` de `auth.css`.
    **Pendiente**: los 7 portantes del lote 1 dependen del reset del panel
    (`#panel-artista button[type="submit"] { border: none }`); y quedan ~60 reglas (1 regla = 1 lote),

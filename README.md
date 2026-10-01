@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 111)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 96)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 111**:
-por hoja, `formularios.css` 45, `auth.css` 32, `style.css` 24 y `galeria-publica.css` 10; por capa,
-`components` 104 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 96**:
+por hoja, `formularios.css` 36, `auth.css` 32, `style.css` 18 y `galeria-publica.css` 10; por capa,
+`components` 89 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -196,9 +196,9 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 111)
+## La campaña de los `!important`, lote a lote (168 → 96)
 
-Con la jerarquía de los campos ya arreglada, lo que queda son **76 reglas** repartidas por las
+Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
 
     node scripts/importantes-lote.mjs --hoja css/formularios.css --selector "…" --quitar
@@ -224,6 +224,19 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 3 | `.ratio-btn.active` y `.ratio-btn:not(.active)` (+ sus gemelas de tema oscuro) | 6 | **4 fuera** (`background`, `border-color`); `color` es portante en oscuro |
 | 4 | `#perfil-usuario .perfil-seccion` | 4 | **4 fuera** (`border`, `background`, `padding`, `box-shadow`) |
 | 5 | `[data-theme="dark"] button[type="submit"], .nav-btn` | 3 | **0 fuera**: las 3 son portantes (en oscuro el botón blanco pierde fondo, color y borde) |
+| 6 | `.imagen-carrusel` (solo escritorio) | 5 | **5 fuera** (`left`, `right`, `margin`, `width`, `max-width`) |
+| 7 | `.cavents-dropdown` (dos reglas) y `.cavents-dropdown.open` | 7 | **6 fuera**; `border-top` es portante en oscuro |
+| 8 | `.form-block .form-group input/select/textarea` y `.input-etiquetas-subtle` (+ su gemela oscura) | 8 | **4 fuera**; `border-bottom` y `margin-bottom` son portantes |
+
+**Y un fallo de la herramienta que hay que contar** (porque se vio en su propio recuento): para los
+lotes 6-8 hacía falta tocar reglas cuyo selector a secas es ambiguo (hay tres `.cavents-dropdown`),
+así que se añadió `--linea N`. La primera versión **estaba mal**: buscaba hacia atrás la primera llave
+sin cerrar, y en un CSS con `@layer components { … }` esa llave es la del **`@layer`**, no la de la
+regla → el "bloque" era el `@layer` entero y de golpe le quitó **los 36 `!important` a
+`formularios.css`** (el recuento que imprime el script lo cantó: `36 -> 0`). Se restauró el fichero
+(`git checkout -- css/formularios.css`), se rehízo el lote y la herramienta ahora **localiza la regla
+con el parser de reglas** (la que contiene esa línea) y **dice qué regla toca y en qué línea**, para
+que un fallo así se vea en la salida y no en el navegador.
 
 **Un aviso del instrumento que costó un rato** (y que ahora está arreglado): con los lotes 3-5
 puestos, la foto acusó cambios en los campos del **fixture** (`#fx-input` de 155px a 150px) y de

@@ -162,6 +162,15 @@ const PAGINAS = [
                 await dormir(300);
             }
             await dormir(800);
+            // Y se ABRE el desplegable de "Mis Cavents" (la clase .open la pone el JS): su familia
+            // de `!important` en style.css solo se puede medir con el abierto.
+            await ev(`document.getElementById('cavents-trigger')?.click()`);
+            for (let i = 0; i < 20; i++) {
+                const abierto = await ev(`!!document.querySelector('.cavents-dropdown.open')`);
+                if (abierto === true) break;
+                await dormir(300);
+            }
+            await dormir(800);
         },
         selectores: [
             '#obra-form', '#obra-form .form-section', '#obra-form .form-group',
@@ -172,7 +181,12 @@ const PAGINAS = [
             '#obra-form .form-section-content',
             // Los botones de ratio y el carrusel de imagenes del editor de la obra: tienen su
             // propia familia de `!important` en style.css/formularios.css.
-            '.ratio-btn', '.ratio-btn.active', '#carrusel-viewport', '.imagen-carrusel'
+            '.ratio-btn', '.ratio-btn.active', '#carrusel-viewport', '.imagen-carrusel',
+            // El desplegable de Mis Cavents (abierto arriba) y la familia de la barra de pasos.
+            '.cavents-dropdown', '.cavents-dropdown.open', '.cavents-trigger',
+            '#obra-step-bar .crear-btn', '#obra-step-bar .limpiar-btn',
+            '#obra-etiquetas-bar .input-etiquetas-subtle',
+            '.form-block .form-group input', '.form-block .form-group select'
         ]
     },
     {

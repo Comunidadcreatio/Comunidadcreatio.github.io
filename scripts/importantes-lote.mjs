@@ -20,24 +20,69 @@ const args = process.argv.slice(2);
 const arg = (n, def) => { const i = args.indexOf(n); return i >= 0 && args[i + 1] ? args[i + 1] : def; };
 const HOJA = arg('--hoja', '');
 const SELECTOR = arg('--selector', '');
+const LINEA = Number(arg('--linea', '0')) || 0;
 const QUITAR = args.includes('--quitar');
 const DEVOLVER = args.includes('--devolver');
 const PROPS = arg('--props', '').split(',').map((s) => s.trim()).filter(Boolean);
 
-if (!HOJA || !SELECTOR || (QUITAR === DEVOLVER)) {
-    console.error('Uso: node scripts/importantes-lote.mjs --hoja css/x.css --selector "..." --quitar|--devolver [--props "a,b"]');
+if (!HOJA || (!SELECTOR && !LINEA) || (QUITAR === DEVOLVER)) {
+    console.error('Uso: node scripts/importantes-lote.mjs --hoja css/x.css (--selector "..." | --linea N) --quitar|--devolver [--props "a,b"]');
+    console.error('  --linea N sirve cuando el selector a secas es ambiguo (hay varias reglas que empiezan igual).');
     process.exit(2);
 }
 
 const original = readFileSync(HOJA, 'utf8');
-const iSel = original.indexOf(SELECTOR);
-if (iSel < 0) { console.error('NO SE ENCUENTRA el selector en ' + HOJA); process.exit(2); }
-if (original.indexOf(SELECTOR, iSel + 1) >= 0) console.log('AVISO: el selector aparece mas de una vez; se toca el primero.');
 
-const iLlave = original.indexOf('{', iSel);
-const iFin = original.indexOf('}', iLlave);
-if (iLlave < 0 || iFin < 0) { console.error('No se pudo delimitar el bloque de la regla.'); process.exit(2); }
+// Localizacion de la regla: por SELECTOR (el texto tal cual esta escrito) o por LINEA (cualquier
+// linea de la regla: el selector o una declaracion). Con --linea se usan las REGLAS que saca el
+// parser (selector + bloque que cuadra) y se elige la que CONTIENE esa linea.
+//
+// OJO: antes esto se hacia buscando hacia atras la primera llave sin cerrar, y estaba MAL: en un
+// CSS con `@layer components { ... }` esa busqueda acaba en la llave del @layer, no en la de la
+// regla, y el "bloque" era el @layer ENTERO. Paso el 2026-10-01: le quito los 36 `!important` a
+// formularios.css de una vez (se restauro el fichero desde git y se rehizo).
+const reglasDe = (css) => {
+    const limpio = css.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length));
+    const out = [];
+    const pila = [];
+    let inicioSel = 0;
+    for (let i = 0; i < limpio.length; i++) {
+        const c = limpio[i];
+        if (c === '{') {
+            let s = inicioSel;
+            while (s < i && /\s/.test(css[s])) s++;
+            pila.push({ sel: limpio.slice(inicioSel, i).trim(), selInicio: s, inicio: i });
+            inicioSel = i + 1;
+        } else if (c === '}') {
+            const ctx = pila.pop();
+            if (ctx && !ctx.sel.startsWith('@')) out.push({ selector: ctx.sel, selInicio: ctx.selInicio, inicio: ctx.inicio, fin: i });
+            inicioSel = i + 1;
+        }
+    }
+    return out;
+};
+
+let iLlave, iFin, iInicioRegla;
+if (LINEA) {
+    const pos = original.split('\n').slice(0, LINEA).join('\n').length;
+    // La regla mas interna que contiene esa linea (el selector empieza en selInicio y el bloque
+    // acaba en fin, asi que una linea de declaracion tambien cae dentro).
+    const candidatas = reglasDe(original).filter((r) => pos >= r.selInicio && pos <= r.fin);
+    if (!candidatas.length) { console.error(`La linea ${LINEA} no cae dentro de ninguna regla con declaraciones.`); process.exit(2); }
+    const r = candidatas.sort((a, b) => (a.fin - a.selInicio) - (b.fin - b.selInicio))[0];
+    iLlave = r.inicio; iFin = r.fin; iInicioRegla = r.selInicio;
+} else {
+    const iSel = original.indexOf(SELECTOR);
+    if (iSel < 0) { console.error('NO SE ENCUENTRA el selector en ' + HOJA); process.exit(2); }
+    if (original.indexOf(SELECTOR, iSel + 1) >= 0) console.log('AVISO: el selector aparece mas de una vez; se toca el primero (o usa --linea).');
+    iLlave = original.indexOf('{', iSel);
+    iFin = original.indexOf('}', iLlave);
+    if (iLlave < 0 || iFin < 0) { console.error('No se pudo delimitar el bloque de la regla.'); process.exit(2); }
+    iInicioRegla = iSel;
+}
 const bloque = original.slice(iLlave + 1, iFin);
+const cabecera = original.slice(iInicioRegla, iLlave).replace(/\s+/g, ' ').trim();
+console.log(`regla: ${cabecera || '(sin selector)'}   [linea ${original.slice(0, iInicioRegla).split('\n').length}]`);
 
 const tocadas = [];
 const nuevoBloque = bloque.replace(/^(\s*)([a-zA-Z-]+):([^;\n]*?)(\s*!important)?;/gm, (todo, sangria, prop, valor, imp) => {

@@ -38,7 +38,7 @@
 @import url('modales.css?v=cda8f6e1f8');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=5bdd5f8171');
+@import url('formularios.css?v=253e2d28c2');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -1712,14 +1712,14 @@
 
 /* Mis Cavents: despliegue fluido (max-height animado) */
 .cavents-dropdown {
-    display: block !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .cavents-dropdown.open {
-    max-height: 60vh !important;
-    overflow-y: auto !important;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 /* ==============================================
