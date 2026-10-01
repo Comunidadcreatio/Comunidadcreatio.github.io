@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 72** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 64** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
    `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
@@ -301,8 +301,14 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    acción del formulario» se partió en dos, las 6 propiedades del «aspecto grande» llevan
    `:not(:where(.crear-btn))` (**`:where()` para no subir la especificidad**) y la tipografía se queda
    con la lista de siempre, así que no se movió ni un píxel. 14 `!important` menos.
-   **De `auth.css`** (lotes 10-12): fuera la familia de tema oscuro y los `.secondary-btn` (10 menos).
-   Los 3 del `button[type="submit"]` oscuro son **portantes** (el botón pierde fondo, color y borde).
+   **De `auth.css`** (lotes 10-14): fuera la familia de tema oscuro, los `.secondary-btn` y los
+   estados de campo (18 menos). Son **portantes** los 3 del `button[type="submit"]` oscuro (el botón
+   pierde fondo, color y borde) y los 2 de `.input-error` (un campo con error **y** válido se ponía
+   verde). La **vista `auth` ahora monta los estados** (`:valid`, `.input-error`, `.input-available`,
+   `:focus`): rellena los campos y pone las clases **en dos fases**, porque la validación de la app
+   las borra al dispararse un `input`.
+   **Apuntado sin tocar** (cambia el color): el rojo de los campos con error es `#e74c3c`, un hex a
+   mano de una regla vieja, y no el `var(--color-danger)` de la paleta (`#dc2626`).
    **Trampa que hay que recordar**: quitar un `!important` **cambia quién gana en OTRAS reglas** — el
    botón de volver casaba con dos reglas y, al perder una su `!important`, la otra le ganó y se puso
    blanco. Se arregló **partiendo el selector**.

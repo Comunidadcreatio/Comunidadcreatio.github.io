@@ -739,7 +739,7 @@ button[type="submit"]:not(.nav-btn):active,
 
 .password-wrapper input {
     padding-right: 44px;
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
 }
 
 .toggle-password {
@@ -971,7 +971,7 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 .step-navigation .nav-btn {
-    box-sizing: border-box !important;
+    box-sizing: border-box;
     width: 100%;
     padding: 12px 20px;
     font-size: 14px;
@@ -990,8 +990,8 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 .input-available {
-    border: 1.5px solid var(--color-success) !important;
-    box-shadow: none !important;
+    border: 1.5px solid var(--color-success);
+    box-shadow: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
@@ -1560,22 +1560,22 @@ button[type="submit"]:not(.nav-btn):active,
    ============================================== */
 #registro-form input,
 #registro-form select {
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
 }
 
 #registro-form input.input-error,
 #registro-form select.input-error {
-    border: 1.5px solid var(--color-danger) !important;
+    border: 1.5px solid var(--color-danger);
 }
 
 #registro-form input[data-required="true"]:focus,
 #registro-form select[data-required="true"]:focus {
-    border-color: var(--color-ink) !important;
+    border-color: var(--color-ink);
 }
 
 #registro-form input[data-required="true"]:valid,
 #registro-form select[data-required="true"]:valid {
-    border-color: var(--color-success) !important;
+    border-color: var(--color-success);
 }
 
 /* ==============================================

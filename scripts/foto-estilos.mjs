@@ -75,6 +75,52 @@ const PAGINAS = [
         ruta: 'auth.html',
         esperar: `!!document.getElementById('login-form')`,
         fixture: false,
+        abrir: async (ev, dormir) => {
+            // Se montan los ESTADOS de los campos: sin esto la foto solo mide el REPOSO, y las reglas
+            // de :valid / :invalid / .input-error / .input-available / :focus de auth.css (varias con
+            // `!important`) se quedaban sin red. Los campos llevan `required data-required="true"`,
+            // asi que vacios son :invalid y rellenos :valid.
+            //
+            // En DOS FASES a proposito: al poner un valor se disparan los eventos y la validacion de
+            // la app RECALCULA y borra las clases que hubiera; si se anaden `.input-error` /
+            // `.input-available` en la misma tacada, la app se las lleva por delante y esos selectores
+            // acaban sin medir nada (paso en el primer intento: no aparecian en la foto).
+            await ev(`(() => {
+                const poner = (sel, valor) => {
+                    const el = document.querySelector(sel);
+                    if (!el) return null;
+                    const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+                    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, valor);
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    return el;
+                };
+                // 1) El formulario de login se abre como lo abre el usuario.
+                document.getElementById('btn-mostrar-login')?.click();
+                // 2) Los valores: login relleno y registro relleno (asi pasan a :valid).
+                poner('#login-email', 'persona@ejemplo.com');
+                poner('#login-pass', 'ClaveDePrueba123');
+                poner('#reg-nombres', 'Nombre de prueba');
+                poner('#reg-email', 'persona@ejemplo.com');
+                poner('#reg-pass', 'ClaveDePrueba123');
+                document.getElementById('btn-ir-registro')?.click();
+                return 'ok';
+            })()`);
+            await dormir(900);
+            // 3) Ahora que la app ya ha validado, se ponen las CLASES de estado y el foco.
+            await ev(`(() => {
+                document.querySelector('#login-email')?.classList.add('input-available');
+                document.querySelector('#login-pass')?.classList.add('input-error');
+                const rol = document.getElementById('reg-rol');
+                if (rol) { rol.focus(); }
+                return JSON.stringify({
+                    error: !!document.querySelector('.input-error'),
+                    disponible: !!document.querySelector('.input-available'),
+                    foco: document.activeElement ? document.activeElement.id : null
+                });
+            })()`);
+            await dormir(500);
+        },
         selectores: [
             'html', 'body', '#main-content', '#login-section', '#login-landing',
             '#login-form', '#login-email', '#login-pass', '.auth-container',
@@ -86,10 +132,11 @@ const PAGINAS = [
             // Campos del REGISTRO: el tema oscuro de los campos (auth.css) los pinta con
             // selectores con id, y sin medirlos un cambio de esa regla se hacia a ciegas.
             '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais',
-            // La familia de tema oscuro de auth.css (contenedor, seccion, titulos, etiquetas) y los
-            // botones secundarios: sus `!important` no se podian medir sin estos elementos.
-            '.auth-section', '.auth-section h1', '.auth-section p', '.form-group label',
-            '.secondary-btn', '.nav-btn', '.password-wrapper', '.password-wrapper input'
+            // Estados montados arriba y la familia de tema oscuro de auth.css (contenedor, seccion,
+            // titulos, etiquetas), mas los botones secundarios y la navegacion por pasos.
+            '.input-error', '.input-available', '.auth-section', '.auth-section h1',
+            '.auth-section p', '.form-group label', '.secondary-btn', '.nav-btn',
+            '.password-wrapper', '.password-wrapper input', '.step-navigation .nav-btn'
         ]
     },
     {

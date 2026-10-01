@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 72)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 64)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 72**:
-por hoja, `formularios.css` 24, `auth.css` 22, `style.css` 16 y `galeria-publica.css` 10; por capa,
-`components` 65 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 64**:
+por hoja, `formularios.css` 24, `style.css` 16, `auth.css` 14 y `galeria-publica.css` 10; por capa,
+`components` 57 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 72)
+## La campaña de los `!important`, lote a lote (168 → 64)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -231,6 +231,33 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 10 | `auth.css`: familia de tema oscuro (`.auth-container`, `.auth-section`, `h1`, `p`, `label`) | 5 | **5 fuera** |
 | 11 | `auth.css`: `[data-theme="dark"] .secondary-btn` y sus `:hover` | 5 | **5 fuera** |
 | 12 | `auth.css`: `[data-theme="dark"] button[type="submit"], .nav-btn` | 3 | **0 fuera** (portantes) + **selector partido** (ver abajo) |
+| 13 | `auth.css`: estados de campo (`.input-available`, `.password-wrapper`, `.step-navigation`, `#registro-form` ×4) | 8 | **8 fuera** |
+| 14 | `auth.css`: `.input-error` (dos reglas) | 2 | **0 fuera**: portantes (ver abajo) |
+
+#### La vista `auth` ahora MONTA los estados (y por qué hacía falta)
+
+La foto medía el **reposo**, así que las reglas de `:valid`, `:invalid`, `.input-error`,
+`.input-available` y `:focus` de `auth.css` no tenían red. La vista `auth` ahora **rellena** los
+campos (llevan `required data-required="true"`, o sea que vacíos son `:invalid` y rellenos `:valid`),
+abre el login y el registro como lo hace el usuario, pone `.input-error` y `.input-available` y deja
+el foco en un campo obligatorio **vacío** (el `:focus` sin que lo tape el `:valid`). Pasa de 18 a
+**25 elementos** medidos.
+
+**Y hay un truco que costó un intento**: la validación de la app **borra** esas clases en cuanto se
+dispara un evento `input`, así que hay que hacerlo en **dos fases** — primero los valores, esperar a
+que la app valide, y **después** poner las clases. En el primer intento, `.input-error` y
+`.input-available` no aparecían en la foto (no se estaban midiendo).
+
+**Lo que apareció al medir**: los 2 `!important` de `.input-error` **son portantes**. Al quitarlos, un
+campo con error **y** válido se ponía **verde** (`rgb(231,76,60) -> rgb(22,163,74)`, en 12 de los 36
+valores que cambiaron). El propio CSS ya lo avisaba en un comentario: «el error tiene que verse
+siempre, aunque el campo esté relleno y sea válido: se descubrió midiendo». Ahora esa razón está
+**protegida por el instrumento** y no solo por el comentario.
+
+**Una cosa que queda apuntada** (no tocada, porque cambia el color): el rojo que se ve en los campos
+con error es `#e74c3c`, un **hex a mano** en una regla vieja, y **no** el `var(--color-danger)` de la
+paleta (`#dc2626`). Esa regla vieja gana por especificidad. Unificarlo es un cambio visible de una
+línea: cuando se decida, se hace y se mide.
 
 #### La trampa del `!important` que «armaba» a otra regla
 
