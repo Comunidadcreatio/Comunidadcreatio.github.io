@@ -289,27 +289,26 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 154**. Herramientas: `scripts/auditar-important.mjs
-   --resumen` (los lista con selector, propiedad y capa) y `scripts/quitar-important.mjs --hoja
-   X --selector Y`. **En bloque NO** (se intentó y salió con 81 diferencias).
-   **Lo aprendido (2026-09-30/10-01, familia de estados del formulario de auth)**: se quitaron 6
-   de 10 (`auth.css` 45 → 39) porque **la foto y el verificador de estados coincidieron**. El
-   **paso en pareja** (solo especificidad) dio **15/16** y se revirtió… y de ahí salió el
-   **rediseño**, que sí funcionó: el **aspecto base de los campos** pasó de `components` a
-   **`@layer base`** (`scripts/mover-base-campos.mjs`), la regla de los campos de `auth.css`
-   pasó a decir lo que se ve, el `:invalid` nombró sus formularios y el rojo del obligatorio se
-   acotó a `#panel-artista` (`scripts/rediseno-campos-auth.mjs`). Después el **tema oscuro**
-   (`scripts/rediseno-campos-oscuro.mjs`): se le dieron los selectores con id que le faltaban
-   (el del REGISTRO, comprobado **provocando el fallo**: sin él, 16 diferencias) y soltó sus 3
-   `!important`, lo que dejó soltar también el del `:valid` oscuro. Y por último el **rojo del
-   panel** (`scripts/rediseno-rojo-panel.mjs`): al estar acotado a `#panel-artista` su
-   especificidad es (1,3,0) y le gana a la del select personalizado (1,1,1), así que soltó el
-   suyo. **8 `!important` menos en total** (`auth.css` 45 → 32, `formularios.css` 65 → 64),
-   **foto sin diferencias** (484 medidas, 7 vistas) y suite **19/19**. Proyecto: **168 → 154**.
-   **Queda con `!important`**: el resto de familias (`formularios.css` 64 y las otras hojas 90).
-   El mapa está en el README, sección de `!important`, y **quién gana se pregunta con
-   `scripts/dbg-cascada-real.mjs`** (`--panel` para el formulario de la obra; `dbg-cascada.mjs`
-   es orientativo: no ve capas ni atajos como `border`).
+1. **Los `!important`** del CSS: **quedan 141** (eran 168). Herramientas: `scripts/auditar-important.mjs
+   --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
+   (`--hoja`, `--selector`, `--quitar` / `--devolver --props "a,b"`): quita el `!important` de las
+   declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que hacían falta.
+   **En bloque NO** (se intentó y salió con 81 diferencias).
+   **El método de un lote** (el que funciona, está en el README): quitar todas las de una regla →
+   foto → **agrupar las diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el
+   `!important` solo a esas → foto otra vez (**sin diferencias**) → siguiente regla.
+   **Hecho**: la familia de estados del formulario de auth completa (aspecto base de los campos a
+   `@layer base`, la regla de los campos alineada con lo que se ve, `:invalid` nombrando sus
+   formularios, rojo acotado al panel, tema oscuro con sus selectores con id, y el rojo del panel) →
+   **27 `!important` menos**; y de la campaña por reglas, los **lotes 1 y 2** (los dos botones de la
+   barra inferior: 6 y 7 declaraciones fuera) → **13 más**. **168 → 141**, con **foto sin
+   diferencias** en cada paso y la suite **19/19**.
+   **Se quedan por diseño**: los 7 de la capa `base` (anillos de foco + `prefers-reduced-motion`:
+   overrides de accesibilidad, con verificador propio).
+   **Pendiente**: los 7 portantes del lote 1 dependen del reset del panel
+   (`#panel-artista button[type="submit"] { border: none }`, `(1,1,1)` contra `(1,1,0)`): habría que
+   estrechar ese reset. Y quedan 74 reglas más (el plan sale de agrupar el auditor por regla: 1
+   regla = 1 lote).
 2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.

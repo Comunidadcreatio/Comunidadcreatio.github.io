@@ -149,22 +149,27 @@
     cursor: not-allowed;
 }
 
+/* Los 7 `!important` que quedan son PORTANTES: el reset del panel
+   (`#panel-artista button[type="submit"] { border: none }`) tiene (1,1,1) contra (1,1,0) de
+   esta regla, asi que sin el `!important` se pierde el borde (y con el, el relleno, el radio y
+   la letra). Los otros 6 se quedaron sin el tras medirlo: height, max-height, background, color,
+   margin y box-sizing no cambian en ninguna de las 484 medidas de la foto. */
 #obra-step-bar .crear-btn,
 #problog-nav-bar .crear-btn {
-    height: 32px !important;
+    height: 32px;
     min-height: 32px !important;
-    max-height: 32px !important;
+    max-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent !important;
-    color: var(--color-ink) !important;
+    background: transparent;
+    color: var(--color-ink);
     border: 1.5px solid var(--color-gray-300) !important;
     width: auto !important;
     min-width: auto !important;
     border-radius: 16px !important;
     padding: 0 22px !important;
-    margin: 0 !important;
+    margin: 0;
     font-size: 11px !important;
     font-weight: 700;
     white-space: nowrap;
@@ -173,7 +178,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: 'Nunito', sans-serif;
-    box-sizing: border-box !important;
+    box-sizing: border-box;
     align-self: center;
     -webkit-appearance: none;
     appearance: none;
@@ -194,15 +199,15 @@
 
 #obra-step-bar .limpiar-btn,
 #problog-nav-bar .limpiar-btn {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50% !important;
-    font-size: 14px !important;
-    background: transparent !important;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    background: transparent;
     border: 1.5px solid var(--color-gray-300) !important;
     color: var(--color-gray-500) !important;
-    padding: 0 !important;
-    min-width: auto !important;
+    padding: 0;
+    min-width: auto;
 }
 
 #obra-step-bar .limpiar-btn:hover,

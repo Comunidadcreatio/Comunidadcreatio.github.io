@@ -32,15 +32,22 @@ const args = process.argv.slice(2);
 
 const PROPIEDADES = [
     'display', 'position', 'top', 'right', 'bottom', 'left', 'zIndex', 'width', 'height',
+    'minWidth', 'maxWidth', 'minHeight', 'maxHeight',
     'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
     'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-    'backgroundColor', 'backgroundImage', 'color', 'opacity', 'visibility', 'overflow',
-    'overflowX', 'overflowY', 'borderTopWidth', 'borderTopStyle', 'borderTopColor',
-    'borderLeftWidth', 'borderLeftStyle', 'borderRadius', 'boxShadow', 'backdropFilter',
-    'transform', 'boxSizing', 'appearance', 'fontFamily', 'fontSize', 'fontWeight',
-    'lineHeight', 'letterSpacing', 'textAlign', 'textDecorationLine', 'cursor',
-    'outlineWidth', 'outlineStyle', 'pointerEvents', 'flexDirection', 'minHeight',
-    'scrollbarWidth', 'msOverflowStyle'
+    'backgroundColor', 'backgroundImage', 'backgroundPosition', 'backgroundSize',
+    'color', 'opacity', 'visibility', 'overflow', 'overflowX', 'overflowY', 'textOverflow',
+    'borderTopWidth', 'borderTopStyle', 'borderTopColor',
+    'borderLeftWidth', 'borderLeftStyle',
+    'borderRightWidth', 'borderRightStyle', 'borderRightColor',
+    'borderBottomWidth', 'borderBottomStyle', 'borderBottomColor',
+    'borderRadius', 'boxShadow', 'backdropFilter',
+    'transform', 'boxSizing', 'appearance', 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle',
+    'lineHeight', 'letterSpacing', 'textAlign', 'textTransform', 'textDecorationLine', 'whiteSpace',
+    'cursor', 'outlineWidth', 'outlineStyle', 'outlineColor', 'outlineOffset', 'pointerEvents',
+    'flexDirection', 'flexWrap', 'alignItems', 'alignSelf', 'justifyContent', 'gap', 'rowGap',
+    'columnGap', 'gridTemplateColumns', 'gridTemplateRows', 'aspectRatio', 'objectFit',
+    'order', 'scrollbarWidth', 'msOverflowStyle'
 ];
 
 // Elementos que se vigilan en cada pagina. Son SELECTORES: `querySelector` sirve igual

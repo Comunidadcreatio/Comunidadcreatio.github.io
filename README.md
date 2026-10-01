@@ -105,12 +105,12 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 154)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 141)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 154**:
-por hoja, `formularios.css` 64, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 141**:
+por hoja, `formularios.css` 51, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
 `galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 147 y `base` 7.
+`components` 134 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -190,10 +190,57 @@ del select personalizado (`#obra-form .form-group select`, que pone `border: non
 el `!important`. El inspector (`dbg-cascada-real.mjs --panel`) fue el que lo dejó claro. Foto
 **sin diferencias** (484 medidas) y estados **16/16**.
 
-**Lo que sigue con `!important`**: el resto de las familias (`formularios.css` tiene 64, y las
+**Lo que sigue con `!important`**: el resto de las familias (`formularios.css` tiene 51, y las
 otras hojas suman 90). El método ya está probado: medir con **dos instrumentos**, preguntar
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
+
+## La campaña de los `!important`, lote a lote (168 → 141)
+
+Con la jerarquía de los campos ya arreglada, lo que queda son **76 reglas** repartidas por las
+hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
+
+    node scripts/importantes-lote.mjs --hoja css/formularios.css --selector "…" --quitar
+    node scripts/importantes-lote.mjs --hoja css/formularios.css --selector "…" --devolver --props "border,color"
+
+**El método de un lote** (cada paso medido, nada a ojo):
+
+1. **Quitar** el `!important` de TODAS las declaraciones de la regla (la herramienta solo toca esa
+   regla: ni reordena ni cambia valores).
+2. **Foto** y, si hay diferencias, **agruparlas POR PROPIEDAD**. Eso dice exactamente qué
+   declaraciones hacían falta: si `borderRadius` cambió, la de `border-radius` era portante.
+3. **Devolver** el `!important` solo a esas (`--props`), dejar fuera las demás y **volver a pasar
+   la foto**: tiene que dar **SIN DIFERENCIAS**.
+4. Las que se quedan fuera siguen **declaradas** (solo pierden la importancia), así que el valor
+   se sigue viendo en el CSS: lo que desaparece es el grito.
+
+**Lo ya hecho en la campaña:**
+
+| Lote | Regla | Declaraciones | Resultado |
+|---|---|---|---|
+| 1 | `#obra-step-bar .crear-btn, #problog-nav-bar .crear-btn` | 13 | **6 fuera**, 7 portantes: `min-height`, `border`, `width`, `min-width`, `border-radius`, `padding`, `font-size` |
+| 2 | `#obra-step-bar .limpiar-btn, #problog-nav-bar .limpiar-btn` | 9 | **7 fuera**, 2 portantes: `border` y `color` (`outlineColor` cambiaba solo porque hereda de `color`) |
+
+**Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
+día): el reset del panel
+
+```css
+#btn-guardar, #btn-limpiar-campos, #panel-artista button[type="submit"], #panel-artista .btn-aplicar { border: none }
+```
+
+Misma capa (`components`) y **un selector de tipo más**: `(1,1,1)` contra `(1,1,0)`. Quitarle el
+`!important` a esos 7 exige estrechar ese reset (o bajarlo de capa), y eso es otro paso con su
+propia medida.
+
+**Y hay 7 que se quedan POR DISEÑO** (los de la capa `base`): los **anillos de foco** (3) y los 4
+de **`@media (prefers-reduced-motion: reduce)`**. Son overrides de accesibilidad: ahí el
+`!important` es la herramienta correcta (tienen verificador propio: `verificar-foco-visible.mjs` y
+`verificar-menos-movimiento.mjs`), y el que estén en `base` es justo lo que les da la fuerza.
+
+**Instrumento mejorado para esta campaña**: la foto ahora mide también `min/max-width/height`, los
+**cuatro** bordes (antes solo arriba e izquierda), `outlineColor`/`offset`, `gap`, rejillas,
+`backgroundPosition/Size`, `textOverflow`, `objectFit`… Sin eso, media docena de lotes se habrían
+hecho a ciegas (un `max-height` portante no se veía).
 
 **Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
 `#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un
