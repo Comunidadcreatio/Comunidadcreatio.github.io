@@ -11,7 +11,8 @@
 // pista, nunca una prueba.
 //
 // Uso: node scripts/auditar-css-muerto.mjs [--hojas css/a.css,css/b.css]
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+const RUTA_TOKENS = 'scripts/_tokens-muertos.txt';
 
 const args = process.argv.slice(2);
 const iHojas = args.indexOf('--hojas');
@@ -47,26 +48,45 @@ const reglasDe = (css) => {
 
 const candidatas = [], parciales = [];
 let total = 0, totalImportantes = 0;
+const tokensMuertos = new Set();
+// Un SELECTOR (una parte de la lista por comas) solo se puede dar por muerto si TIENE tokens y
+// TODOS estan muertos. Un selector sin tokens (solo etiqueta o atributo, como `input` o
+// `[type="text"]`) NO se puede juzgar: cuenta como vivo. Si no se hace asi, una regla
+// `.muerto, input { ... }` se borraria entera y se llevaria los estilos de `input`.
+const analizarParte = (parte) => {
+    const tokens = [...new Set([...parte.matchAll(/[#.]([A-Za-z][\w-]*)/g)].map((m) => m[1]))];
+    const faltan = tokens.filter((t) => !existeToken(t));
+    return { tokens, faltan, muerta: tokens.length > 0 && faltan.length === tokens.length };
+};
 for (const hoja of HOJAS) {
     const css = readFileSync(hoja, 'utf8');
     for (const r of reglasDe(css)) {
-        const tokens = [...new Set([...r.selector.matchAll(/[#.]([A-Za-z][\w-]*)/g)].map((m) => m[1]))];
-        if (!tokens.length) continue;
-        const faltan = tokens.filter((t) => !existeToken(t));
+        const partes = r.selector.split(',').map((s) => s.trim()).filter(Boolean);
+        if (!partes.length) continue;
+        const infos = partes.map(analizarParte);
+        if (!infos.some((i) => i.faltan.length)) continue;   // ninguna parte nombra tokens que falten
         const importantes = (css.slice(r.inicio, r.fin).replace(/\/\*[\s\S]*?\*\//g, '').match(/!important/g) || []).length;
         total++; totalImportantes += importantes;
-        if (faltan.length === tokens.length) candidatas.push({ hoja, selector: r.selector.replace(/\s+/g, ' '), faltan, importantes });
-        else if (faltan.length) parciales.push({ hoja, selector: r.selector.replace(/\s+/g, ' '), faltan, existen: tokens.filter((t) => !faltan.includes(t)), importantes });
+        const faltan = [...new Set(infos.flatMap((i) => i.faltan))];
+        for (const t of faltan) tokensMuertos.add(t);
+        if (infos.every((i) => i.muerta)) candidatas.push({ hoja, selector: r.selector.replace(/\s+/g, ' '), faltan, importantes });
+        else parciales.push({
+            hoja, selector: r.selector.replace(/\s+/g, ' '), faltan, importantes,
+            vivas: partes.filter((_, k) => !infos[k].muerta)
+        });
     }
 }
-console.log(`reglas analizadas: ${total} (${totalImportantes} !important en ellas)`);
-console.log(`\n=== CANDIDATAS A MUERTAS: NINGUN token del selector existe (${candidatas.length}) ===`);
+console.log(`reglas con algun token que no existe: ${total} (${totalImportantes} !important en ellas)`);
+console.log(`\n=== CANDIDATAS A MUERTAS: TODAS las partes de la regla son de tokens que no existen (${candidatas.length}) ===`);
 for (const c of candidatas.sort((a, b) => b.importantes - a.importantes)) {
     console.log(`  ${c.importantes ? `(${c.importantes} !important) ` : ''}${c.hoja}: ${c.selector.slice(0, 90)}`);
-    console.log(`        tokens que no existen: ${c.faltan.join(', ')}`);
 }
-console.log(`\n=== PARCIALES: algunos tokens no existen (${parciales.length}) — revisar ===`);
+console.log(`\n=== PARCIALES: mezclan partes vivas y muertas (${parciales.length}) — se hacen a mano ===`);
 for (const p of parciales) {
     console.log(`  ${p.importantes ? `(${p.importantes} !important) ` : ''}${p.hoja}: ${p.selector.slice(0, 84)}`);
-    console.log(`        NO existen: ${p.faltan.join(', ')}   |   SI existen: ${p.existen.join(', ')}`);
+    console.log(`        sin tocar: ${p.vivas.join(' | ').slice(0, 70)}`);
 }
+writeFileSync(RUTA_TOKENS, [...tokensMuertos].sort().join('\n') + '\n', 'utf8');
+writeFileSync('scripts/_selectores-candidatos.txt', candidatas.map((c) => c.selector).join('\n') + '\n', 'utf8');
+console.log(`\ntokens muertos escritos en ${RUTA_TOKENS} (${tokensMuertos.size})`);
+console.log(`selectores candidatos escritos en scripts/_selectores-candidatos.txt (${candidatas.length})`);

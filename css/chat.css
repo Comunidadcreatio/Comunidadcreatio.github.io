@@ -218,53 +218,6 @@ body.teclado-abierto .chat-enviar-btn {
     color: #d4d4d4;
 }
 
-/* ==============================================
-   CARRUSEL DE BANDERAS (coverflow)
-   ============================================== */
-.chat-pueblos-carrusel {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* vecinas más juntas */
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    /* Padding lateral calculado para que la primera y la última bandera
-       también puedan quedar centradas (slide de 200px -> 100px a cada lado) */
-    padding: 14px calc(50% - 100px) 18px;
-    /* Solo gestos horizontales sobre el carrusel; el padre sigue en vertical */
-    touch-action: pan-x;
-}
-.chat-pueblos-carrusel::-webkit-scrollbar {
-    display: none;
-}
-.chat-pueblo-slide {
-    flex: 0 0 200px; /* carrusel más pequeño */
-    scroll-snap-align: center;
-    border: none;
-    background: none;
-    padding: 0;
-    cursor: pointer;
-    font-family: inherit;
-    transform-origin: center;
-    transition: transform 0.18s ease, opacity 0.18s ease;
-}
-.chat-pueblo-slide-bandera {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 14px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-    pointer-events: none; /* el clic va al botón, no a la imagen */
-}
-.chat-pueblo-slide-bandera-vacia {
-    aspect-ratio: 3 / 2;
-    background: linear-gradient(135deg, #ececec, #d6d6d6);
-    border-radius: 14px;
-    display: block;
-}
-
 /* Barra de información superior: nombre y contadores centrados */
 .chat-pueblo-info {
     display: flex;
@@ -627,12 +580,7 @@ body.teclado-abierto .chat-enviar-btn {
 [data-theme="dark"] .chat-pueblo-info-contador {
     background: #2a2a2a;
 }
-[data-theme="dark"] .chat-pueblo-slide-bandera {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-}
-[data-theme="dark"] .chat-pueblo-slide-bandera-vacia {
-    background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
-}
+
 /* Panel de la lista de usuarios del municipio seleccionado */
 .chat-pueblo-panel {
     padding: 6px 4px 0;
@@ -1164,15 +1112,6 @@ body.teclado-abierto .chat-enviar-btn {
     border-color: rgba(255, 255, 255, 0.35);
     color: #fff;
 }
-.chat-reaccion-mas {
-    border: none;
-    background: none;
-    font-size: 12px;
-    cursor: pointer;
-    opacity: 0.7;
-    padding: 2px;
-    line-height: 1;
-}
 
 /* Menú flotante + velo + picker de emojis */
 .chat-menu-velo {
@@ -1293,28 +1232,6 @@ body.teclado-abierto .chat-enviar-btn {
 }
 .chat-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Buscador de artistas */
-.chat-buscador { padding: 8px 8px 0; }
-.chat-buscar {
-    width: 100%;
-    border: 1px solid var(--color-gray-300, #ccc);
-    border-radius: 20px;
-    padding: 9px 14px;
-    font-size: 13.5px;
-    font-family: inherit;
-    outline: none;
-    background: var(--color-bg, #fff);
-    color: var(--color-text, #1a1a1a);
-    box-sizing: border-box;
-}
-.chat-buscar:focus { border-color: var(--color-primary, #c0392b); }
-.chat-buscar-titulo {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--color-text-muted, #888);
-    padding: 4px 6px 6px;
-}
-
 /* Ajustes de modo oscuro para las funciones nuevas */
 [data-theme="dark"] .chat-imagen-btn,
 [data-theme="dark"] .chat-reply-bar { background: #2a2a2a; }
@@ -1323,11 +1240,6 @@ body.teclado-abierto .chat-enviar-btn {
 [data-theme="dark"] .chat-menu-item:hover,
 [data-theme="dark"] .chat-picker-emoji:hover { background: #2a2a2a; }
 [data-theme="dark"] .chat-msg-reply { background: rgba(255, 255, 255, 0.10); }
-[data-theme="dark"] .chat-buscar {
-    background: #1e1e1e;
-    border-color: #3a3a3a;
-    color: #f0f0f0;
-}
 
 /* ==============================================
    VISTA CONVERSACIONES (lista de chats privados)

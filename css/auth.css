@@ -1,6 +1,5 @@
 
 
-
 /* Capa `base`: reglas de ETIQUETA de la página de acceso. Van a `base` para que los
    componentes les ganen por ORDEN DE CAPAS y no por especificidad. auth.css se carga
    DESPUÉS de style.css en auth.html/reset-password.html, así que dentro de la capa sigue
@@ -27,7 +26,6 @@
         padding-bottom: 100px;
     }
 }
-
 
 /* ==============================================
    MODO OSCURO
@@ -69,8 +67,6 @@ select:invalid:not(.input-error),
     outline: none;
 }
 
-
-
 [data-theme="dark"] input:invalid:not(.input-error),
 [data-theme="dark"] select:invalid:not(.input-error),
 [data-theme="dark"] #login-form input:invalid:not(.input-error),
@@ -80,8 +76,6 @@ select:invalid:not(.input-error),
 [data-theme="dark"] #registro-form select:invalid:not(.input-error) {
     border: 1.5px solid rgba(255, 255, 255, 0.10);
 }
-
-
 
 button[type="submit"]:not(.nav-btn) {
     width: 100%;
@@ -94,8 +88,6 @@ fieldset {
     padding: 0;
     margin: 0;
 }
-
-
 
 legend {
     font-size: 13px;
@@ -225,33 +217,6 @@ legend {
 /* Registro section */
 #registro-section {
     margin-bottom: 0;
-}
-
-/* ==============================================
-   LOGO Y BRANDING
-   ============================================== */
-.auth-logo {
-    display: block;
-    margin: 0 auto 24px auto;
-    width: 100%;
-    height: auto;
-    opacity: 0.95;
-    transition: opacity 0.3s ease;
-}
-
-/* Desktop: logo completo */
-.auth-logo-full {
-    max-width: 200px;
-}
-
-/* Mobile: logo icono (C) — oculto en desktop */
-.auth-logo-icon {
-    display: none;
-    max-width: 80px;
-}
-
-.auth-logo:hover {
-    opacity: 1;
 }
 
 .auth-tagline {
@@ -736,28 +701,6 @@ button[type="submit"]:not(.nav-btn):active,
     color: var(--color-ink);
 }
 
-.back-btn {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    background: var(--color-gray-100);
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-    background: var(--color-gray-200);
-    transform: translateX(-2px);
-}
-
-.back-btn img {
-    width: 20px;
-    height: 20px;
-}
-
 /* ==============================================
    ENLACES
    ============================================== */
@@ -1220,18 +1163,11 @@ button[type="submit"]:not(.nav-btn):active,
         padding: 24px 16px 8px;
     }
 
-    .auth-logo {
-        margin-bottom: 16px;
-    }
+    
 
-    .auth-logo-full {
-        display: none;
-    }
+    
 
-    .auth-logo-icon {
-        display: block;
-        max-width: 90px;
-    }
+    
 
     .auth-tagline {
         font-size: 70px;
@@ -1291,10 +1227,7 @@ button[type="submit"]:not(.nav-btn):active,
         font-size: 14px;
     }
 
-    .back-btn {
-        top: 12px;
-        left: 12px;
-    }
+    
 
     /* Formulario centrado cuando branding oculto */
     .auth-layout-centered {
@@ -1320,18 +1253,11 @@ button[type="submit"]:not(.nav-btn):active,
         padding: 16px 12px 4px;
     }
 
-    .auth-logo {
-        margin-bottom: 12px;
-    }
+    
 
-    .auth-logo-full {
-        display: none;
-    }
+    
 
-    .auth-logo-icon {
-        display: block;
-        max-width: 70px;
-    }
+    
 
     .auth-tagline {
         font-size: 62px;
@@ -1569,10 +1495,6 @@ button[type="submit"]:not(.nav-btn):active,
     background: rgba(255, 255, 255, 0.12) !important;
 }
 
-[data-theme="dark"] .auth-logo {
-    filter: brightness(0) invert(1);
-}
-
 [data-theme="dark"] .auth-section {
     background: rgba(0, 0, 0, 0.47) !important;
     border: none;
@@ -1588,15 +1510,6 @@ button[type="submit"]:not(.nav-btn):active,
 
 [data-theme="dark"] .forgot-password a:hover {
     color: var(--color-ink-light);
-}
-
-[data-theme="dark"] .back-btn {
-    background-color: #121212;
-    border-color: #e5e5e5;
-}
-
-[data-theme="dark"] .back-btn:hover {
-    background-color: #1a1a1a;
 }
 
 [data-theme="dark"] .toggle-password {
@@ -1960,7 +1873,5 @@ button[type="submit"]:not(.nav-btn):active,
 
 /* ==============================================
 
-
 }
-
 

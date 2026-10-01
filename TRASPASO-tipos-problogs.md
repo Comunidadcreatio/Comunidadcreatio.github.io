@@ -299,13 +299,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    → foto otra vez (**sin diferencias**) → siguiente regla.
    **Antes de nada, comprobar que el elemento EXISTE**: gran parte de lo que queda es **CSS MUERTO**
    (la tabla de "Mis Cavents" y otras pantallas se eliminaron y sus reglas se quedaron). El cribador
-   es `scripts/auditar-css-muerto.mjs` (**210 candidatas**), y el borrado,
-   `scripts/borrar-css-muerto.mjs --tokens "…"`. Ya se han borrado **42 reglas muertas y 18
-   `!important`** así (`panel-artista.css` y `notificaciones.css` están a **cero**).
+   es `scripts/auditar-css-muerto.mjs` y hay **dos** comprobaciones antes de borrar:
+   `scripts/dbg-selectores-existen.mjs` (pregunta AL NAVEGADOR por cada selector candidato, en las dos
+   páginas y con el panel abierto) y la foto antes/después con `git stash push -- css/`.
+   **Hecho**: 42 reglas muertas al principio y **202 más en la dieta grande** (1.386 líneas: modales,
+   panel-artista, search-results, skeleton, header, auth, chat, style…). `panel-artista.css` y
+   `notificaciones.css` están a **cero** `!important`.
    **Trampa que mordió (2026-10-01)**: una regla era `.mobile-logout-modal, #mobile-main-menu {
    display: none }`; al borrarla entera se perdieron los estilos de `.mobile-logout-modal`, que SÍ
    existe. **La foto no lo vio** (ese modal está oculto). Ahora el script **parte la lista por comas y
    conserva los selectores vivos**; y la norma es **leer siempre la lista de lo que se borra**.
+   **Quedan 79 reglas PARCIALES** (mezclan selectores vivos y muertos): se hacen a mano, quitando los
+   selectores muertos de la lista y dejando los vivos.
    **Hecho**: la familia de estados del formulario de auth completa → **27 menos**; los **lotes 1 a 5**
    → **21 más**; y el CSS muerto → **18 más**. **168 → 115**, foto sin diferencias y suite **19/19** en
    cada paso.

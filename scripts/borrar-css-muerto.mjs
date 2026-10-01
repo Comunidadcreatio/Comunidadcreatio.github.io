@@ -23,8 +23,24 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 const args = process.argv.slice(2);
 const BORRAR = args.includes('--borrar');
 const iTok = args.indexOf('--tokens');
-const TOKENS = iTok >= 0 && args[iTok + 1] ? args[iTok + 1].split(',').map((s) => s.trim()).filter(Boolean) : [];
-if (!TOKENS.length) { console.error('Falta --tokens "a,b". Uso: node scripts/borrar-css-muerto.mjs --tokens "btn-eliminar" [--borrar]'); process.exit(2); }
+const iArc = args.indexOf('--tokens-archivo');
+const iSel = args.indexOf('--selectores-archivo');
+// Los tokens pueden venir en la linea de comandos o en un fichero (uno por linea), que es lo
+// comodo cuando son muchos: `auditar-css-muerto.mjs` los deja en scripts/_tokens-muertos.txt.
+const deArchivo = iArc >= 0 && args[iArc + 1] ? readFileSync(args[iArc + 1], 'utf8').split('\n') : [];
+const TOKENS = [...new Set([
+    ...(iTok >= 0 && args[iTok + 1] ? args[iTok + 1].split(',').map((s) => s.trim()) : []),
+    ...deArchivo.map((s) => s.trim())
+])].filter(Boolean);
+// Modo SELECTORES: se borran exactamente las reglas cuyo selector (normalizado) este en la lista.
+// Esa lista la produce `dbg-selectores-existen.mjs` tras comprobar EN EL NAVEGADOR que no casan
+// con ningun elemento. Aqui no hace falta partir por comas: la lista solo lleva reglas cuyas
+// PARTES son todas muertas (asi las escribe el cribador).
+const SELECTORES = iSel >= 0 && args[iSel + 1]
+    ? new Set(readFileSync(args[iSel + 1], 'utf8').split('\n').map((s) => s.trim().replace(/\s+/g, ' ')).filter(Boolean))
+    : null;
+if (!TOKENS.length && !SELECTORES) { console.error('Falta --tokens "a,b", --tokens-archivo <ruta> o --selectores-archivo <ruta>.'); process.exit(2); }
+console.log(SELECTORES ? `selectores en la lista: ${SELECTORES.size}` : `tokens: ${TOKENS.length}`);
 
 const HOJAS = readdirSync('css').filter((f) => f.endsWith('.css')).map((f) => 'css/' + f);
 const escapar = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -58,6 +74,11 @@ for (const hoja of HOJAS) {
     const css = readFileSync(hoja, 'utf8');
     const plan = [];   // { tipo: 'borrar' | 'limpiar', regla, vivos }
     for (const r of reglasDe(css)) {
+        if (SELECTORES) {
+            // Modo lista de selectores: se borra la regla entera si su selector esta en la lista.
+            if (SELECTORES.has(r.selector.replace(/\s+/g, ' '))) plan.push({ tipo: 'borrar', regla: r, vivos: [], muertos: [r.selector.replace(/\s+/g, ' ')] });
+            continue;
+        }
         const partes = partirSelectores(r.selector);
         const muertos = partes.filter((s) => SEL_MUERTO.test(s));
         if (!muertos.length) continue;

@@ -279,6 +279,31 @@ y conservar los selectores vivos** (`LIMPIAR (solo la lista)`), que es lo que ah
 que **leer la lista de lo que se borra**. Y los tokens que son prefijo de otros vivos se buscan con
 límites (si no, `.btn-eliminar` se lleva `#btn-eliminar-cuenta`).
 
+#### La dieta grande: 202 reglas y **1.386 líneas** de CSS muerto
+
+Con el cribador afinado (una regla solo es candidata si **todas** sus partes por comas llevan tokens
+y **todos** están muertos; un selector sin tokens —`input`, `[type="text"]`— cuenta como vivo, que si
+no una regla `.muerto, input { … }` se llevaría los estilos de `input`) salieron **202 candidatas**.
+
+Antes de borrarlas se pasó la prueba **empírica**, que es la que de verdad vale:
+`scripts/dbg-selectores-existen.mjs` pregunta **al navegador** (`querySelectorAll(sel).length`) por
+cada candidata, en las dos páginas y con el panel abierto. Resultado: **164 selectores únicos, todos
+con CERO elementos** (y 0 inválidos). Entonces sí: `borrar-css-muerto.mjs --selectores-archivo …`
+borró las 202 reglas, y la foto (antes/después) dio **SIN DIFERENCIAS** en 512 medidas.
+
+**Lo que se ha ido**: 1.386 líneas (modales 235, panel-artista 218, search-results 178, skeleton 116,
+header 115, auth 103, chat 90, style 66, formularios y notificaciones el resto). Los `!important` no
+bajaron de 115 porque estas reglas ya no tenían ninguno: es grasa, no deuda.
+
+**Dos remates del mismo paso:**
+
+- `scripts/limpiar-bloques-vacios.mjs`: los `@media` que quedaron **vacíos** se quitan. Los `@layer`
+  vacíos **no**: un `@layer base { }` no pinta nada, pero **fija el orden de capas**, y quitarlo
+  cambiaría la cascada.
+- La vista `panel` de la foto ahora **espera un estado determinista** (pestaña de Cavents activa y la
+  caja de Problogs oculta) antes de medir: sin eso, los valores del panel bailaban entre corridas
+  (el radio del select salía 10px o 0px) y salían diferencias que no existían.
+
 **Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
 día): el reset del panel
 

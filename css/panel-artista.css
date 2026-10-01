@@ -17,13 +17,6 @@
     margin-bottom: 24px;
 }
 
-.panel-nav-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
 .panel-nav-btn {
     display: flex;
     flex-direction: column;
@@ -50,17 +43,6 @@
     transform: scale(0.95);
 }
 
-.panel-nav-icon {
-    font-size: 36px;
-    margin-bottom: 8px;
-}
-
-.panel-nav-label {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--color-ink);
-}
-
 .panel-back-btn {
     background: none;
     border: none;
@@ -84,11 +66,6 @@
 
 [data-theme="dark"] .panel-nav-btn:hover {
     border-color: var(--color-ink);
-}
-
-[data-theme="dark"] .panel-nav-icon,
-[data-theme="dark"] .panel-nav-label {
-    color: var(--color-ink);
 }
 
 [data-theme="dark"] .panel-back-btn {
@@ -118,47 +95,6 @@
     display: none;
 }
 
-/* ==============================================
-   CONTROLES DE BÚSQUEDA Y FILTROS
-   ============================================== */
-.filter-controls {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 1.5rem;
-    align-items: center;
-    padding: 0;
-    border: none;
-}
-
-.filter-controls input[type="text"],
-.filter-controls select {
-    width: 100%;
-    height: 48px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 10px;
-    font-size: 13px;
-    background: var(--color-white);
-    box-sizing: border-box;
-    padding: 8px 30px 8px 12px;
-    line-height: 1.2;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.filter-controls input[type="text"] {
-    padding-left: 38px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 12px center;
-}
-
-.filter-controls input[type="text"]:focus,
-.filter-controls select:focus {
-    outline: none;
-    border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
-}
-
 /* Asegurar que las flechas de los selects se posicionen correctamente */
 #panel-artista .filter-controls select {
     background-repeat: no-repeat;
@@ -167,45 +103,6 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     padding-right: 30px;
-}
-
-/* ==============================================
-   CONTROLES DE PAGINACIÓN
-   ============================================== */
-.pagination-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin: 1rem 0 2rem;
-}
-
-.pagination-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-/* Columnas compactas */
-.col-id {
-    width: 80px;
-    font-weight: 600;
-    font-size: 12px;
-}
-
-.col-precio {
-    width: 70px;
-    text-align: right;
-    font-weight: 500;
-}
-
-.col-imagen {
-    width: 52px;
-    text-align: center;
-}
-
-.col-acciones {
-    width: 100px;
 }
 
 /* ==============================================
@@ -402,31 +299,6 @@
 }
 
 .cuenta-item-valor:focus {
-    outline: none;
-    border-color: var(--color-gray-400);
-}
-
-.cuenta-campo {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.cuenta-campo input[readonly] {
-    flex: 1;
-    min-width: 250px;
-    padding: 12px 16px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 8px;
-    background: var(--color-gray-100);
-    color: var(--color-text);
-    font-size: 14px;
-    cursor: default;
-    transition: border-color 0.2s ease;
-}
-
-.cuenta-campo input[readonly]:focus {
     outline: none;
     border-color: var(--color-gray-400);
 }
@@ -938,38 +810,6 @@
     background: var(--color-gray-200);
 }
 
-.perfil-obra-card-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 6px 8px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.6));
-    pointer-events: none;
-}
-
-.perfil-obra-card-titulo {
-    font-size: 10px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.75);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 70%;
-}
-
-.perfil-obra-card-precio {
-    font-size: 10px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.75);
-    flex-shrink: 0;
-}
-
 .perfil-grid-loading {
     text-align: center;
     padding: 20px;
@@ -1032,35 +872,16 @@
         padding-top: calc(60px + var(--status-bar-height, 24px) + 52px);
     }
 
-    /* Controles de filtro en una fila */
-    .filter-controls {
-        width: 100%;
-        padding: 0;
-        gap: 6px;
-        grid-template-columns: 1fr;
-    }
-    .filter-controls input[type="text"],
-    .filter-controls select {
-        font-size: 11px;
-        padding: 6px 24px 6px 8px;
-        height: 42px;
-    }
-    .filter-controls input[type="text"] {
-        padding-left: 30px;
-        background-position: 8px center;
-        background-size: 14px;
-    }
-    .pagination-controls {
-        flex-wrap: wrap;
-    }
     
     
     
     
     
-    .imagenes-contenedor {
-        justify-content: center;
-    }
+    
+    
+    
+    
+    
 
     /* Sección Seguridad / Mi Cuenta: apilar info y botón */
     .cuenta-item-header {
@@ -1120,26 +941,6 @@
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .filter-controls input[type="text"],
-[data-theme="dark"] .filter-controls select {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
-    color: var(--color-ink);
-}
-
-/* Flecha blanca para selects en modo oscuro (mayor especificidad) */
-[data-theme="dark"] .filter-controls select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-}
-
-[data-theme="dark"] .filter-controls input[type="text"]::placeholder {
-    color: var(--color-gray-400);
-}
-
-[data-theme="dark"] .filter-controls input[type="text"] {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
-}
-
 [data-theme="dark"] .status-badge.status-activo {
     background: #0d2818;
     color: #4caf50;
@@ -1158,10 +959,6 @@
 [data-theme="dark"] .cuenta-item {
     background-color: transparent;
     border-color: var(--color-border);
-}
-
-[data-theme="dark"] .cuenta-item-label {
-    color: var(--color-ink);
 }
 
 [data-theme="dark"] .cuenta-item-valor {
@@ -1240,11 +1037,6 @@
         width: 100vw;
         margin-left: calc(-50vw + 50%);
     }
-}
-
-/* Ocultar overlay de título y precio en el grid del perfil */
-.perfil-obra-card-overlay {
-    display: none;
 }
 
 /* Contador de vistas */

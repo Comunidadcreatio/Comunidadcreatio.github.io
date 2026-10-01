@@ -148,7 +148,20 @@ const PAGINAS = [
             await ev(`document.getElementById('btn-crear-cavent')?.click()`);
             await dormir(1600);
             await ev(`document.getElementById('tab-cavents')?.click()`);
-            await dormir(1200);
+            // La vista tiene que quedar en un estado DETERMINISTA. Si no, la medida del panel baila
+            // entre corridas: se vio el 2026-10-01 (el radio del select del panel salia 10px o 0px
+            // segun en que pestaña se hubiera quedado), y eso son diferencias que no existen.
+            for (let i = 0; i < 20; i++) {
+                const listo = await ev(`(() => {
+                    const t = document.getElementById('tab-cavents');
+                    const p = document.getElementById('crear-problogs-contenido');
+                    const o = document.getElementById('obra-form');
+                    return !!t && t.classList.contains('activa') && !!p && p.classList.contains('hidden') && !!o;
+                })()`);
+                if (listo === true) break;
+                await dormir(300);
+            }
+            await dormir(800);
         },
         selectores: [
             '#obra-form', '#obra-form .form-section', '#obra-form .form-group',

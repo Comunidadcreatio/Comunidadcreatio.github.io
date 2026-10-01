@@ -22,23 +22,23 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=d20ece4f4d');
+@import url('header.css?v=3b75acbb8e');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=9fa317b475');
 
 /* Chat global + privado */
-@import url('chat.css?v=2551013284');
+@import url('chat.css?v=f8f35e5426');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=c21208db45');
+@import url('panel-artista.css?v=edd3eb472f');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
-@import url('modales.css?v=c5640ff8ae');
+@import url('modales.css?v=1593bf28c7');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=04fcdefa03');
+@import url('formularios.css?v=96e7644107');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -505,11 +505,6 @@
     color: var(--color-gray-400);
 }
 
-[data-theme="dark"] .search-dropdown {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
-}
-
 [data-theme="dark"] .search-result-item {
     border-bottom-color: var(--color-border);
     color: var(--color-ink);
@@ -739,13 +734,6 @@
 
 .toggle-label { display: none !important; }
 
-.toggle-icon {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
 /* ===== Botón de perfil circular — DENTRO de la barra, centrado ===== */
 .btn-perfil-circular {
     pointer-events: auto;
@@ -928,11 +916,7 @@
 .notif-item.leida {
     opacity: 0.5;
 }
-.notif-icon {
-    font-size: 20px;
-    flex-shrink: 0;
-    margin-top: 2px;
-}
+
 .notif-body {
     flex: 1;
     min-width: 0;
@@ -1157,18 +1141,7 @@
 /* Mobile: ajustar gap del header */
 @media (max-width: 768px) {
 }
-.config-dark-icon-svg {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 6px;
-}
-/* Iconos en opciones del menú hamburguesa */
-.menu-icon-svg {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
-    flex-shrink: 0;
-}
+
 /* Iconos en headers de acordeón de Mi Cuenta */
 .accordion-header-left {
     display: flex;
@@ -1252,30 +1225,6 @@
     }
 }
 
-/* ==============================================
-   SECCIÓN PROBLOGS (placeholder — contenido por implementar)
-   ============================================== */
-.problogs-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    text-align: center;
-    gap: 8px;
-    color: var(--color-text-muted);
-    padding: 0 1.5rem;
-}
-.problogs-placeholder h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--color-ink);
-}
-.problogs-placeholder p {
-    margin: 0;
-    font-size: 0.95rem;
-}
-
 /* Las secciones obtienen animación solo cuando JS lo activa */
 #galeria-publica.section-entering,
 #panel-artista.section-entering,
@@ -1341,11 +1290,7 @@
         display: none;
     }
 
-    .desktop-panel-container {
-        position: fixed;
-        z-index: 2000;
-        pointer-events: none;
-    }
+    
     .desktop-logout-panel {
         pointer-events: auto;
     }
@@ -1361,10 +1306,7 @@
         top: calc(60px + var(--status-bar-height, 24px));
     }
 
-    .toggle-icon {
-        width: 20px;
-        height: 20px;
-    }
+    
 
     .toggle-nav-btn svg {
         width: 20px;

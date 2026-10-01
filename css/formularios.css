@@ -324,17 +324,6 @@
     line-height: 1;
 }
 
-/* ==============================================
-   PROGRESS INDICATOR DEL FORMULARIO (base)
-   ============================================== */
-.form-progress-container {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: var(--color-gray-50);
-    border-radius: 8px;
-    border: 1px solid var(--color-gray-200);
-}
-
 .form-progress-bar {
     width: 100%;
     height: 8px;
@@ -352,17 +341,6 @@
     transition: width 0.3s ease;
 }
 
-.form-progress-text {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    text-align: center;
-}
-
-.form-progress-text span {
-    font-weight: 700;
-    color: var(--color-ink);
-}
-
 /* ==============================================
    SECCIONES DEL FORMULARIO (estilo carrusel)
    ============================================== */
@@ -371,76 +349,9 @@
     background: var(--color-white);
 }
 
-.form-section-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 16px 0;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--color-gray-200);
-}
-
 .form-section-content {
     /* contenido siempre visible, controlado por step nav */
     padding: 0 16px;
-}
-
-/* ==============================================
-   TOOLTIPS EXPLICATIVOS
-   ============================================== */
-.has-tooltip {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.tooltip-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: help;
-    transition: background 0.2s ease;
-}
-
-.tooltip-icon:hover {
-    background: var(--color-ink-light);
-}
-
-.tooltip-icon[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--color-ink);
-    color: var(--color-white);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 400;
-    white-space: nowrap;
-    z-index: 1000;
-    box-shadow: var(--shadow-lg);
-    pointer-events: none;
-}
-
-.tooltip-icon[data-tooltip]:hover::before {
-    content: '';
-    position: absolute;
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: var(--color-ink);
-    z-index: 1000;
 }
 
 /* ==============================================
@@ -508,81 +419,6 @@ form *,
     background: var(--color-white);
     z-index: 0;
     -webkit-overflow-scrolling: touch;
-}
-
-/* Formularios en modales */
-.modal-content form {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 10px 0;
-}
-
-/* Modal de login */
-#modal-login .modal-content {
-    max-width: 400px;
-    width: 90%;
-    padding: 32px 20px;
-    text-align: center;
-    margin: 0 auto;
-}
-
-#modal-login form {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    overflow-x: hidden;
-    padding: 0;
-}
-
-#modal-login input[type="email"],
-#modal-login input[type="password"] {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    padding: 14px 16px;
-}
-
-#modal-login button {
-    width: 100%;
-    max-width: 100%;
-    padding: 14px 20px;
-    margin-bottom: 10px;
-}
-
-#modal-login button[type="submit"] {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-}
-
-#modal-login button[type="submit"]:hover {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-1px);
-}
-
-#modal-login button[type="submit"]:active {
-    transform: translateY(0);
-}
-
-/* Modal de registro */
-#modal-registro .modal-content {
-    max-width: 600px;
-    width: 90%;
-    padding: 32px 24px;
-    margin: 0 auto;
-    overflow-x: hidden;
-}
-
-#modal-registro form {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
 }
 
 /* Contenedor de pasos del registro */
@@ -1029,19 +865,6 @@ form,
     overflow-x: hidden;
 }
 
-/* 2. Rediseñamos el título para que deje un canal libre a la izquierda para la flecha */
-#modal-registro .modal-content h2,
-#modal-login .modal-content h2 {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 25px;
-}
-
-#modal-registro .modal-content h2 {
-    text-align: left;
-    padding-left: 45px; 
-}
-
 /* 3. Clavamos la flecha en la esquina superior izquierda */
 #modal-registro button.nav-btn.prev-btn {
     position: absolute;
@@ -1071,201 +894,6 @@ form,
 /* ==============================================
    MEJORAS PARA MÓVIL (MODALES Y PANELES)
    ============================================== */
-
-@media (max-width: 768px) {
-    
-    /* ----------------------------------------------
-       ESPACIADO GLOBAL DE PANTALLAS Y MODALES 
-       ---------------------------------------------- */
-    /* Forzamos al fondo del modal y al panel general a tener padding lateral exacto */
-    .modal,
-    .modal-fullscreen,
-    #panel-artista {
-        padding-left: 20px;
-        padding-right: 20px;
-        box-sizing: border-box;
-        width: 100%;
-    }
-
-    .modal,
-    .modal-fullscreen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 20px;
-    }
-
-    /* ----------------------------------------------
-       CAJAS INTERNAS (MODALES, FORMULARIOS DEL PANEL)
-       ---------------------------------------------- */
-       
-    /* LOGIN: Centrado y angosto para respetar el diseño de la Mesa de Trabajo */
-    #modal-login .modal-content {
-        width: 100%;
-        max-width: 200px;
-        margin: 0 auto;
-        padding: 8px 12px;
-        border-radius: 12px;
-        box-sizing: border-box;
-        box-shadow: none;
-    }
-
-    /* REGISTRO Y PANELES: Mantienen el 100% del ancho permitido */
-    #modal-registro .modal-content,
-    #formulario-obra,
-    #panel-artista form {
-        width: 100%;
-        max-width: 100%;
-        margin: 0 auto;
-        padding: 24px 20px;
-        border-radius: 16px;
-        box-sizing: border-box;
-        box-shadow: none;
-    }
-
-    /* Para el panel específicamente: que las tablas tampoco se desborden ni choquen */
-    #panel-artista table,
-    #panel-artista .table-responsive {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        margin: 0;
-    }
-
-    /* Aseguramos que inputs y botones respeten esta nueva regla estricta */
-    #modal-login form,
-    #modal-registro form,
-    #panel-artista form {
-        width: 100%;
-        margin: 0;
-        box-sizing: border-box;
-    }
-
-    #modal-registro input,
-    #modal-registro select,
-    #modal-registro button,
-    /* Los botones del editor de Problogs se excluyen: son iconos cuadrados
-       (añadir párrafo/imagen y las acciones de cada bloque) y con width:100%
-       salían estirados a lo ancho. */
-    #panel-artista button:not(.ratio-btn):not(#btn-agregar-imagen):not(.carrusel-dot):not(.btn-eliminar-slide):not(.nav-btn):not(.crear-tab):not(.problog-anadir-btn):not(.problog-btn-icono) {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 14px 12px; /* Mejor área táctil */
-        font-size: 16px;
-        border-radius: 10px;
-    }
-
-    /* Inputs específicos del login - más bajos y con texto más pequeño */
-    #modal-login input {
-        width: 85%;
-        box-sizing: border-box;
-        padding: 10px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        margin: 0 auto 6px auto;
-        display: block;
-    }
-
-    /* Botones del login - mantener tamaño normal */
-    #modal-login button {
-        width: 85%;
-        box-sizing: border-box;
-        padding: 10px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        margin: 0 auto 6px auto;
-        display: block;
-    }
-    
-    /* Evitamos que el enlace de "Olvidaste tu contraseña" empuje la caja */
-    .modal-content a {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        margin-bottom: 10px;
-        text-align: center;
-        font-size: 13px;
-    }
-    
-    /* Labels más legibles */
-    .form-group label {
-        font-size: 15px;
-        margin-bottom: 10px;
-        margin-top: 8px;
-    }
-    
-    /* Labels compactos en el formulario de obra */
-    #obra-form .form-group label {
-        margin-bottom: 6px;
-        margin-top: 0;
-    }
-    
-    /* Grupos en columna en móvil */
-    .dimensiones-group,
-    .name-group,
-    .date-group,
-    .form-row {
-        flex-direction: column;
-        gap: 16px;
-    }
-    
-    /* Filas del formulario de obra: gap compacto al apilar */
-    #obra-form .form-row {
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-    
-    
-
-    /* Botones de acción del formulario apilados y del mismo ancho en móvil */
-    .form-actions {
-        flex-direction: column;
-    }
-    .form-actions button {
-        width: 100%;
-    }
-    
-    /* Modal scroll */
-    .modal {
-        max-height: 100vh;
-        overflow-y: auto;
-    }
-    
-    .modal-content h2 {
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
-    
-    /* Selects con padding extra para el icono nativo */
-    #panel-artista select {
-        padding-right: 40px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        appearance: none;
-    }
-    
-    #obra-form textarea {
-        min-height: 120px;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 14px 12px;
-        border-radius: 10px;
-    }
-    
-    #obra-form > div,
-    #obra-form > input,
-    #obra-form > select,
-    #obra-form > textarea {
-        margin-bottom: 12px;
-    }
-    
-    /* Prevenir desbordamiento horizontal global en móvil: se movió a un bloque `@layer
-       base` de primer nivel (con el @media dentro), para que todas las reglas de `base`
-       queden al mismo nivel y el reparto por capas sea mecánico. */
-    
-    /* Step Navigation móvil (ahora en #obra-step-bar fijo) */
-}
 
 @media (max-width: 480px) {
     #obra-form textarea {
@@ -1315,52 +943,6 @@ form,
 [data-theme="dark"] #formulario-obra button[type="submit"] {
     background-color: var(--color-ink);
     color: var(--color-white);
-}
-
-[data-theme="dark"] .modal-content {
-    background-color: #121212;
-    border-color: #e5e5e5;
-}
-
-[data-theme="dark"] .modal-content h2 {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .modal-content label {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .modal-content input[type="text"],
-[data-theme="dark"] .modal-content input[type="email"],
-[data-theme="dark"] .modal-content input[type="password"],
-[data-theme="dark"] .modal-content select,
-[data-theme="dark"] .modal-content textarea {
-    background-color: #121212;
-    border-color: #e5e5e5;
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .modal-content input::placeholder,
-[data-theme="dark"] .modal-content textarea::placeholder {
-    color: var(--color-gray-400);
-}
-
-[data-theme="dark"] .modal-content button {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .modal-content button[type="submit"] {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-}
-
-[data-theme="dark"] #modal-login button[type="submit"] {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-}
-
-[data-theme="dark"] #modal-login button[type="submit"]:hover {
-    background-color: var(--color-ink-light);
 }
 
 [data-theme="dark"] #obra-step-bar,
@@ -1431,12 +1013,6 @@ form,
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .step-number {
-    background-color: #121212;
-    border-color: #e5e5e5;
-    color: var(--color-ink);
-}
-
 [data-theme="dark"] .step-number.active {
     background-color: var(--color-ink);
     color: var(--color-white);
@@ -1471,13 +1047,6 @@ form,
 [data-theme="dark"] #formulario-obra select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-}
-
-/* ==============================================
-   NAVEGACIÓN DE PASOS (ESTILOS BASE - heredados por barra superior)
-   ============================================== */
-#obra-step-nav {
-    /* DEPRECATED: este ID fue reemplazado por #obra-step-bar */
 }
 
 .step-indicator {
@@ -1539,11 +1108,6 @@ form,
 
 [data-theme="dark"] .step-buttons .nav-btn:hover:not(:disabled) {
     border-color: var(--color-ink);
-}
-
-/* DEPRECATED */
-[data-theme="dark"] #obra-step-nav {
-    border-color: var(--color-border);
 }
 
 /* (duplicado removido) */

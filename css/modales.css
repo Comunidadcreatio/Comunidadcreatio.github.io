@@ -23,40 +23,6 @@
 }
 
 /* ==============================================
-   CONTENIDO DEL MODAL
-   ============================================== */
-.modal-content {
-    position: relative;
-    max-width: 450px;
-    width: 90%;
-    height: auto;
-    max-height: 90vh;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 2rem;
-    background: var(--color-white);
-    overflow-y: auto;
-}
-
-.modal-content h2 {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    color: var(--color-gray-dark);
-}
-
-/* Las imágenes dentro de modales nunca deben desbordar su contenedor
-   (se excluye el logo del login, que tiene su propio tamaño) */
-.modal-content img:not(.modal__logo) {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-/* ==============================================
    BOTÓN DE CERRAR (X)
    ============================================== */
 .modal-content .cerrar-modal {
@@ -102,36 +68,6 @@
     color: var(--color-ink);
 }
 
-.modal-content select {
-    width: 100%;
-    padding: 10px 36px 10px 10px;
-    margin-bottom: 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-    background: var(--color-white);
-    color: var(--color-ink);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-.modal-content button[type="submit"] {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.modal-content button[type="submit"]:hover {
-    background: var(--color-ink-light);
-}
-
 .modal-content .secondary-btn {
     background: var(--color-white);
     color: var(--color-ink);
@@ -161,37 +97,6 @@
     text-decoration: underline;
 }
 
-.form-message {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.error-message {
-    color: var(--color-danger);
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* ==============================================
-   MODAL A PANTALLA COMPLETA (Login y Registro)
-   ============================================== */
-.modal-fullscreen {
-    background-color: var(--color-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-fullscreen .modal-content {
-    border: none;
-    border-radius: 0;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: none;
-    padding: 2rem;
-}
-
 /* Ocultar la 'X' de cerrar en modo pantalla completa */
 .modal-fullscreen .cerrar-modal {
     display: none;
@@ -202,55 +107,18 @@
     display: none;
 }
 
-.modal-fullscreen h2 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-}
-
-/* ==============================================
-   ESTILO DEL LOGO EN EL LOGIN
-   ============================================== */
-.modal__logo {
-    display: block;
-    margin: 0 auto 20px auto; /* Centrado y con margen inferior */
-    max-width: 250px;         /* Tamaño máximo en escritorio */
-    width: 100%;
-    height: auto;
-}
-
 /* Logo más pequeño en móvil */
 @media (max-width: 768px) {
-    #modal-login .modal__logo {
-        max-width: 100px;
-        margin-bottom: 8px;
-    }
+    
 
-    #modal-login .modal-content h2 {
-        font-size: 12px;
-        margin-bottom: 8px;
-    }
-}
-
-/* Ajuste para que el modal no quede muy alto con el logo */
-.modal-content {
-    padding-top: 30px; /* Espacio extra para el logo */
+    
 }
 
 /* ==============================================
    DISEÑO RESPONSIVO - MODALES
    ============================================== */
 @media (max-width: 768px) {
-    /* El modal de registro debe ocupar toda la pantalla y centrar su contenido */
-    #modal-registro .modal-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;       /* Ocupa toda la altura */
-        padding: 2rem 1.5rem;
-        box-sizing: border-box;
-    }
+    
 
     /* Cada paso individual */
     #modal-registro .step {
@@ -295,11 +163,7 @@
         margin-top: 10px;
     }
 
-    /* Ajuste para el logo (si está en el modal de registro) */
-    #modal-registro .modal__logo {
-        max-width: 150px;
-        margin-bottom: 20px;
-    }
+    
 
     /* Contenedores flex para filas (ej. Nombres y Apellidos, Fecha) */
     #modal-registro .form-row {
@@ -327,44 +191,7 @@
 }
 
 @media (max-width: 480px) {
-    .modal-content {
-        padding: 1.5rem;
-    }
-}
-
-/* ==============================================
-   MODAL ELIMINAR CUENTA (layout limpio)
-   ============================================== */
-#modal-confirmar-eliminacion .modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 2rem;
-    max-width: 420px;
-    text-align: left;
-}
-
-#modal-confirmar-eliminacion .modal-content h2 {
-    margin: 8px 0 0 0;
-    padding-right: 32px;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#modal-confirmar-eliminacion .modal-content > p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    line-height: 1.5;
-}
-
-#modal-confirmar-eliminacion #confirmar-eliminacion-form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin: 0;
+    
 }
 
 #modal-confirmar-eliminacion #confirmar-password {
@@ -380,41 +207,6 @@
     outline: none;
     border-color: var(--color-ink);
     box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.10);
-}
-
-#modal-confirmar-eliminacion #confirmar-eliminacion-form button[type="submit"] {
-    width: 100%;
-    margin: 0;
-    padding: 12px 16px;
-    border: none;
-    border-radius: 8px;
-    background: var(--color-ink);
-    color: var(--color-white);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-#modal-confirmar-eliminacion #confirmar-eliminacion-form button[type="submit"]:hover {
-    background: var(--color-danger);
-}
-
-#modal-confirmar-eliminacion #mensaje-error {
-    margin: 0;
-    min-height: 0;
-}
-
-/* ==============================================
-   MODO OSCURO
-   ============================================== */
-[data-theme="dark"] .modal-content {
-    background-color: #121212;
-    border-color: #e5e5e5;
-}
-
-[data-theme="dark"] .modal-content h2 {
-    color: var(--color-ink);
 }
 
 [data-theme="dark"] .modal-content .cerrar-modal {
@@ -435,25 +227,12 @@
     color: var(--color-ink);
 }
 
-[data-theme="dark"] .modal-content input::placeholder {
-    color: var(--color-gray-400);
-}
-
 [data-theme="dark"] .modal-content button:not(.cerrar-modal) {
     background-color: #121212;
 }
 
 [data-theme="dark"] .modal-content button:not(.cerrar-modal):hover {
     background-color: #1a1a1a;
-}
-
-[data-theme="dark"] .modal-content button[type="submit"] {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-}
-
-[data-theme="dark"] #modal-confirmar-eliminacion .modal-content > p {
-    color: var(--color-ink);
 }
 
 [data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password {
@@ -466,9 +245,5 @@
     color: var(--color-gray-400);
 }
 
-/* Flecha blanca para selects en modales en modo oscuro */
-[data-theme="dark"] .modal-content select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-}
 }
 

@@ -1,7 +1,5 @@
 
 
-
-
 @layer base {
 /* Contenedor picture para el logo */
 picture {
@@ -309,21 +307,6 @@ picture {
     animation: hamburguesaOculta 0.26s ease-in forwards;
 }
 
-/* ==============================================
-   BUSCADOR (escritorio)
-   ============================================== */
-.header-search {
-    display: flex;
-    flex-direction: column;      /* Para el dropdown */
-    align-items: center;
-    flex: 1;
-    max-width: 400px;
-    margin: 0;
-    position: relative;
-    justify-content: center;
-    height: 100%;                /* Ocupa toda la altura del header */
-}
-
 .search-input-wrapper {
     display: flex;
     position: relative;          /* para posicionar el icono de lupa dentro */
@@ -359,43 +342,6 @@ picture {
     line-height: 40px;           /* Asegura que el placeholder también se centre */
 }
 
-.search-button {
-    background: transparent;
-    border: none;
-    color: var(--color-gray-400);
-    padding: 0 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-    flex-shrink: 0;
-    height: 100%;
-}
-
-.search-button:hover {
-    color: var(--color-ink);
-}
-
-/* ==============================================
-   DROPDOWN DE BÚSQUEDA
-   ============================================== */
-.search-dropdown {
-    position: fixed;
-    width: 100%;
-    max-width: 400px;
-    max-height: 500px;
-    overflow-y: auto;
-    background: var(--color-white);
-    border: 1px solid var(--color-gray-300);
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 99998;
-    padding: 50px 0 12px 0;
-    display: none;
-    margin-top: 0px;
-}
-
 .search-input-wrapper {
     position: relative;
     z-index: 99999;
@@ -412,25 +358,8 @@ picture {
     }
 }
 
-.search-dropdown {
-    animation: fadeInDropdown 0.2s ease-out;
-}
-
 .search-dropdown:not(.hidden) {
     display: block !important;
-}
-
-.search-dropdown::-webkit-scrollbar {
-    width: 6px;
-}
-
-.search-dropdown::-webkit-scrollbar-thumb {
-    background: var(--color-gray-300);
-    border-radius: 10px;
-}
-
-.search-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray-400);
 }
 
 .search-result-item {
@@ -892,28 +821,12 @@ body.search-escribiendo #galeria-publica::before {
         line-height: 38px;
     }
 
-    .search-button {
-        padding: 0 8px;
-        display: flex;
-        align-items: center;
-    }
-    .search-button svg {
-        width: 18px;
-        height: 18px;
-    }
+    
+    
 
-    .header-search {
-        flex: 1;
-        max-width: none;
-        min-width: 0;
-    }
+    
 
-    .search-dropdown {
-        max-height: 250px;
-        left: 0;
-        right: 0;
-        width: auto;
-    }
+    
 
     .search-result-item {
         padding: 8px 12px;
@@ -974,23 +887,12 @@ body.search-escribiendo #galeria-publica::before {
         line-height: 38px;
     }
 
-    .search-button {
-        padding: 0 6px;
-    }
-    .search-button svg {
-        width: 16px;
-        height: 16px;
-    }
+    
+    
 
-    .header-search {
-        flex: 1;
-        max-width: none;
-        min-width: 0;
-    }
+    
 
-    .search-dropdown {
-        max-height: 200px;
-    }
+    
 
     .search-result-item {
         padding: 6px 10px;
@@ -1025,5 +927,4 @@ body.search-escribiendo #galeria-publica::before {
 }
 
 }
-
 
