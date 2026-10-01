@@ -32,13 +32,13 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=3390f68999');
+@import url('panel-artista.css?v=2c4b62ea48');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=c5640ff8ae');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=ce7dfb2d8b');
+@import url('formularios.css?v=89f20318c3');
 
 
 
@@ -590,8 +590,10 @@
     color: var(--color-gray-400);
 }
 
-/* Selectores con clase o id: misma tipografía, sin capa por ahora. */
-.filter-controls input, .filter-controls select, .filter-controls button, .pagination-btn, #btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
+/* Selectores con clase o id: misma tipografía, sin capa por ahora.
+   (Los `.filter-controls …` y `.pagination-btn` que había aquí eran de la tabla de "Mis Cavents"
+   y de los filtros "Todas / Mías", que ya no existen: se quitaron el 2026-10-01.) */
+#btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
     font-family: 'Nunito', sans-serif;
 }
 #brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {

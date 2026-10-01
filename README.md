@@ -105,12 +105,12 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 133)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 124)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 133**:
-por hoja, `formularios.css` 51, `auth.css` 32, `style.css` 26, `galeria-publica.css` 10,
-`panel-artista.css` 8, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 126 y `base` 7.
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 124**:
+por hoja, `formularios.css` 46, `auth.css` 32, `style.css` 26, `galeria-publica.css` 10,
+`panel-artista.css` 4, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
+`components` 117 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -234,6 +234,28 @@ esperando a `document.fonts.check('16px Nunito')` (no basta con `fonts.ready`).
 **La regla que sale de ahí**: antes de creerse una diferencia, **repetir la foto con el mismo CSS**.
 Si también sale, es del instrumento, no del cambio (igual que la norma de no fiarse de un verificador
 que falla en algo que no se ha tocado).
+
+### Y un hallazgo que ahorró trabajo: CSS MUERTO (31 reglas, 9 `!important`)
+
+Tres de los lotes que venían (`#panel-artista .acciones-obra .btn-accion`, `.pagination-btn`,
+`.acciones-obra`, `.btn-accion`) resultaron ser **CSS de la tabla de "Mis Cavents", que se eliminó**.
+A código muerto no se le quita la importancia (no sirve de nada): **se borran las reglas**, con
+`scripts/borrar-css-muerto-tabla.mjs` (**31 reglas y 9 `!important` menos**).
+
+Se comprobó **por partida doble**, y las dos cosas hacen falta:
+
+1. **Estático y en el navegador**: ni el HTML ni ningún `.js` crean esos elementos
+   (`#page-info`, `#tabla-obras-container`, `.pagination-btn`, `.acciones-obra`, `.btn-accion`); y
+   `dbg-cascada-real.mjs --panel --elemento "#tabla-obras-container"` responde «Existe en el DOM?
+   false». (El único `.btn-accion*` vivo es `.btn-accion-obra`, de `galeria.js`: **no se toca**.)
+2. **La foto del estado ANTERIOR contra el actual**: se guardaron los cambios con
+   `git stash push -- <hojas>`, se midió, se restauró con `git stash pop` y se comparó →
+   **SIN DIFERENCIAS** en 512 medidas. Eso es a la vez la prueba de que el borrado es inocuo y de
+   que el CSS estaba muerto de verdad.
+
+**Ojo con las reglas MIXTAS**: una de `style.css` tenía selectores muertos
+(`.filter-controls …`, `.pagination-btn`) **y vivos** (`#btn-guardar`) en la misma lista. Ahí se
+quitaron solo los muertos de la lista, no la regla (el script se niega a borrarla: `NO_BORRAR`).
 
 **Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
 día): el reset del panel

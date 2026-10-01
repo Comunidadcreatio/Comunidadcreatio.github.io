@@ -186,87 +186,6 @@
     gap: 10px;
 }
 
-#panel-artista .pagination-btn {
-    width: auto !important;
-    flex: 0 0 auto;
-    padding: 8px 20px !important;
-    border: 1.5px solid var(--color-gray-300);
-    border-radius: 50px !important;
-    background: var(--color-white);
-    cursor: pointer;
-    font-size: 13px !important;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.pagination-btn:hover:not(:disabled) {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
-}
-
-.pagination-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-#page-info {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-muted, #666);
-}
-
-/* ==============================================
-   TABLA DE OBRAS
-   ============================================== */
-#tabla-obras-container {
-    border: 1px solid var(--color-gray-300);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-
-#tabla-obras-container table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--color-white);
-}
-
-#tabla-obras-container th,
-#tabla-obras-container td {
-    padding: 10px 8px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-gray-200);
-    vertical-align: middle;
-}
-
-#tabla-obras-container th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--color-text-muted, #888);
-    border-bottom: 2px solid var(--color-gray-300);
-}
-
-#tabla-obras-container tbody tr:hover {
-    background: var(--color-gray-50, #f5f5f5);
-}
-
-#tabla-obras-container td img {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-#tabla-obras-container tr:last-child td {
-    border-bottom: none;
-}
-
 /* Columnas compactas */
 .col-id {
     width: 80px;
@@ -319,50 +238,9 @@
     color: #856404;
 }
 
-/* ==============================================
-   BOTONES DE ACCIÓN (iconos)
-   ============================================== */
-.acciones-obra {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
-#tabla-obras-container td .btn-accion {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--color-text-muted, #888);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-#tabla-obras-container td .btn-accion:hover {
-    background: var(--color-gray-100);
-    color: var(--color-ink);
-}
-
 .btn-eliminar:hover {
     color: #e74c3c !important;
     background: #fde8e8 !important;
-}
-
-.btn-accion svg {
-    display: block;
-}
-
-.btn-accion.btn-editar:hover,
-.btn-accion.btn-duplicar:hover {
-    background: var(--color-ink);
-    color: var(--color-white);
-    border-color: var(--color-ink);
 }
 
 .btn-accion.btn-eliminar {
@@ -1191,17 +1069,9 @@
         flex-wrap: wrap;
     }
     
-    /* Scroll horizontal en la tabla de obras */
-    #tabla-obras-container {
-        overflow-x: auto;
-    }
-    #tabla-obras-container::-webkit-scrollbar {
-        height: 6px;
-    }
-    #tabla-obras-container::-webkit-scrollbar-thumb {
-        background-color: #ccc;
-        border-radius: 4px;
-    }
+    
+    
+    
     
     .imagenes-contenedor {
         justify-content: center;
@@ -1285,53 +1155,6 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
 }
 
-[data-theme="dark"] #panel-artista .pagination-btn {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-border);
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .pagination-btn:hover:not(:disabled) {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-}
-
-[data-theme="dark"] #page-info {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] #tabla-obras-container {
-    border-color: #333;
-}
-
-[data-theme="dark"] #tabla-obras-container table {
-    background-color: #0a0a0a;
-}
-
-[data-theme="dark"] #tabla-obras-container th,
-[data-theme="dark"] #tabla-obras-container td {
-    border-bottom-color: #333;
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] #tabla-obras-container th {
-    background-color: #111;
-    border-bottom-color: #444;
-}
-
-[data-theme="dark"] #tabla-obras-container tbody tr:hover {
-    background: #1a1a1a;
-}
-
-[data-theme="dark"] #tabla-obras-container td .btn-accion {
-    color: #888;
-}
-
-[data-theme="dark"] #tabla-obras-container td .btn-accion:hover {
-    background: #222;
-    color: #fff;
-}
-
 [data-theme="dark"] .btn-eliminar:hover {
     color: #e74c3c !important;
     background: #2a1010 !important;
@@ -1350,10 +1173,6 @@
 [data-theme="dark"] .status-badge.status-desconocido {
     background: #2a2000;
     color: #ffc107;
-}
-
-[data-theme="dark"] #tabla-obras-container td img {
-    border-color: #333;
 }
 
 [data-theme="dark"] .cuenta-item {
