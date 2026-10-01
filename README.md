@@ -105,12 +105,12 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 155)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 154)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 155**:
-por hoja, `formularios.css` 65, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 154**:
+por hoja, `formularios.css` 64, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
 `galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 148 y `base` 7.
+`components` 147 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -163,10 +163,10 @@ se añadió la vista `panel`, el formulario de la obra, que era el hueco de cobe
      el `:invalid` pasa a nombrar los formularios que son suyos, como ya hacía el `:valid`.
    - El rojo de `[data-required="true"]:invalid:not(:placeholder-shown)` se **acota a
      `#panel-artista`**, que es de quien es (los 16 campos con `data-required` de `index.html`
-     están todos en el formulario de la obra). Conserva su `!important`, que en el panel sí
-     necesita. En las pantallas de auth ese rojo se llevaba por delante el gris neutro **por
-     capa** (`:invalid` vive en `base`, el rojo en `components`) y, como `:placeholder-shown` no
-     se aplica a los `select`, pintaba rojos los selects obligatorios **sin tocarlos**.
+     están todos en el formulario de la obra). En las pantallas de auth ese rojo se llevaba por
+     delante el gris neutro **por capa** (`:invalid` vive en `base`, el rojo en `components`) y,
+     como `:placeholder-shown` no se aplica a los `select`, pintaba rojos los selects
+     obligatorios **sin tocarlos**.
 3. Medido: **foto SIN DIFERENCIAS** contra la de antes del rediseño (476 medidas), estados
    **16/16** y suite completa en verde. Es decir: **el rediseño no cambia nada de lo que se ve**,
    solo quién manda. `auth.css`: 39 → 36 `!important` (el total del proyecto: 168 → 159).
@@ -183,10 +183,17 @@ Y el selector añadido se comprobó **provocando el fallo**: quitándolo, los ca
 pierden el fondo oscuro (**16 diferencias**). Para poder verlo, la foto tuvo que medirlos: se
 añadieron `#reg-nombres`, `#reg-email`, `#reg-pass` y `#reg-pais`.
 
-**Lo que sigue con `!important`**: el **rojo del panel** (1: su competidora ahí es más
-específica) y el resto de familias (`formularios.css` tiene 65). El método ya está probado: medir
-con **dos instrumentos**, preguntar **quién gana** con `dbg-cascada-real.mjs` y arreglar la
-**capa** antes que la especificidad.
+**Y el rojo del panel** (el último de esta familia, 1 más): el mismo movimiento. Al acotarlo a
+`#panel-artista` su especificidad pasó a **`(1,3,0)`**, y su competidora en el panel es la regla
+del select personalizado (`#obra-form .form-group select`, que pone `border: none`), con
+**`(1,1,1)`**: le gana sin `!important`. Antes, sin el id, era `(0,3,0)` y perdía — de ahí venía
+el `!important`. El inspector (`dbg-cascada-real.mjs --panel`) fue el que lo dejó claro. Foto
+**sin diferencias** (484 medidas) y estados **16/16**.
+
+**Lo que sigue con `!important`**: el resto de las familias (`formularios.css` tiene 64, y las
+otras hojas suman 90). El método ya está probado: medir con **dos instrumentos**, preguntar
+**quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
+nombrar lo que la regla ya pinta) antes que la importancia.
 
 **Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
 `#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un

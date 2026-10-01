@@ -447,10 +447,12 @@
 
 /* Solo el PANEL: en las pantallas de auth los campos obligatorios los pinta auth.css (gris
    neutro hasta que se tocan) y esta regla se los ponia ROJOS sin tocarlos, porque en un
-   <select> casa siempre (:placeholder-shown no se aplica a los selects). Aqui si necesita el
-   `!important`: su competidora en el panel es mas especifica. */
+   <select> casa siempre (:placeholder-shown no se aplica a los selects).
+   Sin `!important`: al nombrar `#panel-artista` su especificidad es (1,3,0) y le gana a la del
+   select personalizado (`#obra-form .form-group select`, que pone `border: none`), que es
+   (1,1,1). Antes, sin el id, era (0,3,0) y perdia: de ahi venia el `!important`. */
 #panel-artista [data-required="true"]:invalid:not(:placeholder-shown) {
-    border-color: var(--color-danger) !important;
+    border-color: var(--color-danger);
 }
 
 [data-required="true"]:focus {

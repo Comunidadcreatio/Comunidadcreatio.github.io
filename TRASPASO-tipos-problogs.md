@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 155**. Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 154**. Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y `scripts/quitar-important.mjs --hoja
    X --selector Y`. **En bloque NO** (se intentó y salió con 81 diferencias).
    **Lo aprendido (2026-09-30/10-01, familia de estados del formulario de auth)**: se quitaron 6
@@ -298,16 +298,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    **rediseño**, que sí funcionó: el **aspecto base de los campos** pasó de `components` a
    **`@layer base`** (`scripts/mover-base-campos.mjs`), la regla de los campos de `auth.css`
    pasó a decir lo que se ve, el `:invalid` nombró sus formularios y el rojo del obligatorio se
-   acotó a `#panel-artista` (`scripts/rediseno-campos-auth.mjs`). Y después el **tema oscuro**
+   acotó a `#panel-artista` (`scripts/rediseno-campos-auth.mjs`). Después el **tema oscuro**
    (`scripts/rediseno-campos-oscuro.mjs`): se le dieron los selectores con id que le faltaban
    (el del REGISTRO, comprobado **provocando el fallo**: sin él, 16 diferencias) y soltó sus 3
-   `!important`, lo que dejó soltar también el del `:valid` oscuro. **7 `!important` menos en
-   total** (`auth.css` 45 → 32), **foto sin diferencias** (484 medidas, 7 vistas: se añadieron
-   la vista `panel` y los campos del registro) y suite **19/19**. Proyecto: **168 → 155**.
-   **Queda con `!important`**: el rojo del panel (1: su competidora ahí es más específica) y el
-   resto de familias (`formularios.css` tiene 65). El mapa está en el README, sección de
-   `!important`, y **quién gana se pregunta con `scripts/dbg-cascada-real.mjs`**
-   (`dbg-cascada.mjs` es orientativo: no ve capas ni atajos como `border`).
+   `!important`, lo que dejó soltar también el del `:valid` oscuro. Y por último el **rojo del
+   panel** (`scripts/rediseno-rojo-panel.mjs`): al estar acotado a `#panel-artista` su
+   especificidad es (1,3,0) y le gana a la del select personalizado (1,1,1), así que soltó el
+   suyo. **8 `!important` menos en total** (`auth.css` 45 → 32, `formularios.css` 65 → 64),
+   **foto sin diferencias** (484 medidas, 7 vistas) y suite **19/19**. Proyecto: **168 → 154**.
+   **Queda con `!important`**: el resto de familias (`formularios.css` 64 y las otras hojas 90).
+   El mapa está en el README, sección de `!important`, y **quién gana se pregunta con
+   `scripts/dbg-cascada-real.mjs`** (`--panel` para el formulario de la obra; `dbg-cascada.mjs`
+   es orientativo: no ve capas ni atajos como `border`).
 2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.

@@ -30,6 +30,8 @@ const ELEMENTO = arg('--elemento', '#login-email');
 const PROPIEDAD = arg('--propiedad', 'border-top-color');
 const VALOR = arg('--valor', null);
 const CON_ERROR = args.includes('--input-error');
+// Para analizar elementos del PANEL (el formulario de la obra): hay que abrirlo.
+const ABRIR_PANEL = args.includes('--panel');
 
 const perfil = mkdtempSync(join(tmpdir(), 'casc-real-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
@@ -59,21 +61,48 @@ await send('Runtime.enable'); await send('Page.enable'); await send('DOM.enable'
 await send('Emulation.setDeviceMetricsOverride', { width: ANCHO, height: 900, deviceScaleFactor: 1, mobile: ANCHO < 500 });
 await send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(() => {
-        try { localStorage.removeItem('artistaData'); localStorage.removeItem('creatio_auth_token_persist'); } catch (_) {}
         const json = async (d) => ({ ok: true, status: 200, json: async () => d });
         const realFetch = window.fetch.bind(window);
+        try {
+            if (${PAGINA ? 'true' : 'false'}) {
+                // Pantalla de auth: sin sesion, que es como se ve el formulario.
+                localStorage.removeItem('artistaData');
+                localStorage.removeItem('creatio_auth_token_persist');
+            } else {
+                // La app: con sesion de artista, o el panel no se monta y el elemento no existe.
+                localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', email: 't@t.com', rol: 'artista' }));
+                localStorage.setItem('creatio_auth_token_persist', 'tok');
+            }
+        } catch (_) {}
         window.fetch = async (input, init) => {
             const u = String(input);
+            const method = ((init && init.method) || 'GET').toUpperCase();
             if (!u.includes('backend-fundacion-atpe.onrender.com')) return realFetch(input, init);
+            if (method !== 'GET') return json({ success: true, id: 9 });
             if (u.includes('heartbeat')) return json({ ok: true });
-            return json({ success: true, no_leidas: 0, count: 0, usuario: null });
+            if (u.includes('mis-reacciones')) return json({ reacciones: [] });
+            if (u.includes('/obras')) return json([]);
+            if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
+            return json({ success: true, no_leidas: 0, count: 0, usuario: { id: 480001, nombre_artista: 'T', rol: 'artista' } });
         };
     })();`
 });
 await send('Page.navigate', { url: URL_BASE + PAGINA });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('login-form')`) === true) break; await sleep(300); }
-await sleep(900);
-await evalJs(`document.getElementById('btn-mostrar-login')?.click()`);
+if (PAGINA) {
+    for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('login-form')`) === true) break; await sleep(300); }
+    await sleep(900);
+    await evalJs(`document.getElementById('btn-mostrar-login')?.click()`);
+} else {
+    for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel')`) === true) break; await sleep(300); }
+    await sleep(1500);
+    if (ABRIR_PANEL) {
+        // El formulario de la obra (y sus selects) solo existe con el panel abierto.
+        await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
+        await sleep(1600);
+        await evalJs(`document.getElementById('tab-cavents')?.click()`);
+        await sleep(1200);
+    }
+}
 if (TEMA) await evalJs(`(() => { try { localStorage.setItem('theme', '${TEMA}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${TEMA}'); })()`);
 if (VALOR !== null) await evalJs(`(() => {
     const el = document.querySelector(${JSON.stringify(ELEMENTO)});
