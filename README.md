@@ -105,12 +105,13 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 124)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 115)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 124**:
-por hoja, `formularios.css` 46, `auth.css` 32, `style.css` 26, `galeria-publica.css` 10,
-`panel-artista.css` 4, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 117 y `base` 7.
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 115**:
+por hoja, `formularios.css` 45, `auth.css` 32, `style.css` 24, `galeria-publica.css` 10,
+`skeleton.css` 3 y `header.css` 1; por capa, `components` 108 y `base` 7. **Dos hojas ya están a
+cero** (`panel-artista.css` y `notificaciones.css`, todas sus reglas `!important` eran de código
+muerto: se borraron).
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -235,7 +236,7 @@ esperando a `document.fonts.check('16px Nunito')` (no basta con `fonts.ready`).
 Si también sale, es del instrumento, no del cambio (igual que la norma de no fiarse de un verificador
 que falla en algo que no se ha tocado).
 
-### Y un hallazgo que ahorró trabajo: CSS MUERTO (31 reglas, 9 `!important`)
+### Y un hallazgo que ahorró trabajo: CSS MUERTO (31 reglas y 9 `!important`, y 11 más después)
 
 Tres de los lotes que venían (`#panel-artista .acciones-obra .btn-accion`, `.pagination-btn`,
 `.acciones-obra`, `.btn-accion`) resultaron ser **CSS de la tabla de "Mis Cavents", que se eliminó**.
@@ -256,6 +257,27 @@ Se comprobó **por partida doble**, y las dos cosas hacen falta:
 **Ojo con las reglas MIXTAS**: una de `style.css` tenía selectores muertos
 (`.filter-controls …`, `.pagination-btn`) **y vivos** (`#btn-guardar`) en la misma lista. Ahí se
 quitaron solo los muertos de la lista, no la regla (el script se niega a borrarla: `NO_BORRAR`).
+
+#### El cribador, y una trampa que mordió
+
+Para no ir familia por familia, `scripts/auditar-css-muerto.mjs` **criba todo el CSS**: busca reglas
+cuyos selectores nombran ids o clases que no existen en ningún HTML ni `.js`. Da **210 candidatas**
+(con los límites de palabra bien puestos: `.btn-eliminar` no cuenta porque exista
+`#btn-eliminar-cuenta`). De ahí salieron 4 familias más, con `!important`:
+`.btn-eliminar`, `#mobile-main-menu`, `.imagen-carrusel-wrapper` y `.input-valid`/`.input-invalid`
+(**11 reglas, 9 `!important`**), borradas con `scripts/borrar-css-muerto.mjs --tokens "…"` (el
+genérico).
+
+**Y aquí mordió una trampa de verdad**: una regla era `.mobile-logout-modal, #mobile-main-menu {
+display: none }`. El cribador vio el token muerto, el script borró la regla **entera**… y se llevó
+por delante los estilos de `.mobile-logout-modal`, que **sí existe** (`#mobile-logout-options` lo
+lleva). Lo cazó la **revisión de qué se borra**, no la foto: ese modal está oculto, así que la foto
+**no lo mide**. Se restauró el selector vivo y el script se arregló para **partir la lista por comas
+y conservar los selectores vivos** (`LIMPIAR (solo la lista)`), que es lo que ahora informa.
+
+**La regla que sale de ahí**: la foto es la red, pero **no ve lo oculto**; cuando se borra algo, hay
+que **leer la lista de lo que se borra**. Y los tokens que son prefijo de otros vivos se buscan con
+límites (si no, `.btn-eliminar` se lleva `#btn-eliminar-cuenta`).
 
 **Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
 día): el reset del panel

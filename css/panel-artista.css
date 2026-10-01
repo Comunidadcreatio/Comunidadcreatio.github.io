@@ -238,21 +238,6 @@
     color: #856404;
 }
 
-.btn-eliminar:hover {
-    color: #e74c3c !important;
-    background: #fde8e8 !important;
-}
-
-.btn-accion.btn-eliminar {
-    color: var(--color-danger);
-}
-
-.btn-accion.btn-eliminar:hover {
-    background: var(--color-danger);
-    color: var(--color-white);
-    border-color: var(--color-danger);
-}
-
 /* ==============================================
    SECCIÓN MI CUENTA
    ============================================== */
@@ -1153,11 +1138,6 @@
 
 [data-theme="dark"] .filter-controls input[type="text"] {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
-}
-
-[data-theme="dark"] .btn-eliminar:hover {
-    color: #e74c3c !important;
-    background: #2a1010 !important;
 }
 
 [data-theme="dark"] .status-badge.status-activo {

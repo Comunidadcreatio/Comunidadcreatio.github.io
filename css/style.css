@@ -32,16 +32,13 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=2c4b62ea48');
+@import url('panel-artista.css?v=c21208db45');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=c5640ff8ae');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=89f20318c3');
-
-
-
+@import url('formularios.css?v=04fcdefa03');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -126,7 +123,6 @@
 
 }
 
-
 /* ==============================================
    TIPOGRAFÍA GLOBAL (Nunito) — capa `base`
    ==============================================
@@ -169,14 +165,12 @@
     }
 }
 
-
 /* Opcional: ajuste fino para inputs (también es base: solo etiquetas) */
 @layer base {
     input, select, textarea {
         font-weight: 500;
     }
 }
-
 
 /* 3. Responsive - Móviles (≤ 768px) */
 /* Capa `base`: el @media va DENTRO de la capa. Es equivalente a tenerlo al revés (la capa
@@ -219,7 +213,6 @@
 }
 
 @layer components {
-
 
 /* `.hidden` se movió AL FINAL del archivo, a la capa `utilities`: es LA utilidad de la
    app y tiene que ganar a todo lo demás. Ver el bloque «UTILIDADES» al final. */
@@ -590,10 +583,9 @@
     color: var(--color-gray-400);
 }
 
-/* Selectores con clase o id: misma tipografía, sin capa por ahora.
-   (Los `.filter-controls …` y `.pagination-btn` que había aquí eran de la tabla de "Mis Cavents"
-   y de los filtros "Todas / Mías", que ya no existen: se quitaron el 2026-10-01.) */
-#btn-guardar, .btn-editar, .btn-eliminar, .btn-duplicar {
+#btn-guardar,
+.btn-editar,
+.btn-duplicar {
     font-family: 'Nunito', sans-serif;
 }
 #brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
@@ -1343,8 +1335,9 @@
         max-width: 100%;
     }
 
-    .mobile-logout-modal,
-    #mobile-main-menu {
+    /* OJO: aqui estaba tambien `#mobile-main-menu`, que ya no existe (se quito el 2026-10-01);
+       este selector SI se queda: `#mobile-logout-options` lleva la clase `mobile-logout-modal`. */
+    .mobile-logout-modal {
         display: none;
     }
 
@@ -1427,29 +1420,11 @@
         filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
     }
 
-    #mobile-main-menu {
-        pointer-events: auto !important;
-        z-index: 2000 !important;
-    }
-    #mobile-main-menu .mobile-logout-panel.speech-bubble { width: 160px; }
+    
+    
 
-    /* `:where()` otra vez: sin el id, la especificidad es la de la clase, así que las
-       reglas de modo oscuro (.logout-option.disabled, .logout-option.enabled) pueden
-       ganarle sin `!important`. */
-    :where(#mobile-main-menu) button,
-    :where(#mobile-main-menu) .logout-option {
-        color: var(--color-white);
-        pointer-events: auto;
-        background: transparent;
-        border: none;
-        width: 100%;
-        text-align: left;
-        padding: 8px 14px;
-        font-size: 13px;
-        cursor: pointer;
-    }
-    :where(#mobile-main-menu) button:active,
-    :where(#mobile-main-menu) .logout-option:active { background-color: var(--color-gray-dark); }
+    
+    
 
     .mobile-logout-panel .logout-option,
     .logout-option {

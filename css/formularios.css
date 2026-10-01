@@ -704,12 +704,6 @@ form *,
     margin-bottom: 6px;
 }
 
-/* --- Carrusel de imágenes edge-to-edge 4:5 --- */
-.imagen-carrusel-wrapper {
-    padding: 0 !important;
-    overflow: visible;
-}
-
 .imagen-carrusel {
     width: 100%;
     margin-bottom: 8px;

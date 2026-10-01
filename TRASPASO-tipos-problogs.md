@@ -289,28 +289,30 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 124** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 115** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja`, `--selector`, `--quitar` / `--devolver --props "a,b"`): quita el `!important` de las
    declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que hacían falta.
    **En bloque NO** (se intentó y salió con 81 diferencias).
-   **El método de un lote** (el que funciona, está en el README): quitar todas las de una regla →
-   foto → **agrupar las diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el
-   `!important` solo a esas → foto otra vez (**sin diferencias**) → siguiente regla.
+   **El método de un lote** (está en el README): quitar todas las de una regla → foto → **agrupar las
+   diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el `!important` solo a esas
+   → foto otra vez (**sin diferencias**) → siguiente regla.
+   **Antes de nada, comprobar que el elemento EXISTE**: gran parte de lo que queda es **CSS MUERTO**
+   (la tabla de "Mis Cavents" y otras pantallas se eliminaron y sus reglas se quedaron). El cribador
+   es `scripts/auditar-css-muerto.mjs` (**210 candidatas**), y el borrado,
+   `scripts/borrar-css-muerto.mjs --tokens "…"`. Ya se han borrado **42 reglas muertas y 18
+   `!important`** así (`panel-artista.css` y `notificaciones.css` están a **cero**).
+   **Trampa que mordió (2026-10-01)**: una regla era `.mobile-logout-modal, #mobile-main-menu {
+   display: none }`; al borrarla entera se perdieron los estilos de `.mobile-logout-modal`, que SÍ
+   existe. **La foto no lo vio** (ese modal está oculto). Ahora el script **parte la lista por comas y
+   conserva los selectores vivos**; y la norma es **leer siempre la lista de lo que se borra**.
    **Hecho**: la familia de estados del formulario de auth completa → **27 menos**; los **lotes 1 a 5**
-   (botones de la barra inferior, de ratio, secciones del perfil, botones de auth en oscuro) → **21
-   más**; y el **CSS muerto de la tabla de "Mis Cavents"** (31 reglas, **9 `!important`**) que se
-   **borró** con `scripts/borrar-css-muerto-tabla.mjs` (no se le quita la importancia al código
-   muerto: se borra). **168 → 124**, foto sin diferencias y suite **19/19** en cada paso.
-   **Antes de creerse una diferencia, repetir la foto con el mismo CSS**: los lotes 3-5 acusaron
-   cambios en el fixture (`#fx-input`, 5px) que eran **ruido de la fuente** (arreglado con
-   `document.fonts.check('16px Nunito')`). Y para probar que un borrado de CSS es inocuo: foto del
-   estado anterior con `git stash push -- <hojas>` y comparar.
+   → **21 más**; y el CSS muerto → **18 más**. **168 → 115**, foto sin diferencias y suite **19/19** en
+   cada paso.
    **Se quedan por diseño**: los 7 de `base` (accesibilidad) y los 8 `-webkit-autofill` de `auth.css`.
    **Pendiente**: los 7 portantes del lote 1 dependen del reset del panel
-   (`#panel-artista button[type="submit"] { border: none }`, `(1,1,1)` contra `(1,1,0)`); y quedan ~65
-   reglas (1 regla = 1 lote), varias de las cuales habrá que **verificar antes que nada** que no sean
-   también CSS muerto.
+   (`#panel-artista button[type="submit"] { border: none }`); y quedan ~60 reglas (1 regla = 1 lote),
+   varias de las cuales son también candidatas a muertas.
 2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
    `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
    porque **un contenedor no puede consultarse a sí mismo**.

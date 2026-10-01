@@ -193,17 +193,6 @@
     animation: spin 0.6s linear infinite;
 }
 
-/* Feedback visual en inputs */
-.input-valid {
-    border-color: var(--color-success) !important;
-    background-color: rgba(40, 167, 69, 0.05);
-}
-
-.input-invalid {
-    border-color: var(--color-danger) !important;
-    background-color: rgba(220, 53, 69, 0.05);
-}
-
 /* Toast de éxito/confirmación */
 .toast {
     position: fixed;
