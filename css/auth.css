@@ -445,7 +445,7 @@ select:valid,
 [data-theme="dark"] select:valid,
 [data-theme="dark"] #login-form input:valid,
 [data-theme="dark"] #forgot-section input:valid {
-    border: 1.5px solid #22c55e !important;
+    border: 1.5px solid #22c55e;
     box-shadow: none;
     background-color: rgba(0, 0, 0, 0.15);
 }
@@ -1527,13 +1527,18 @@ button[type="submit"]:not(.nav-btn):active,
     color: var(--color-ink) !important;
 }
 
+/* Sin `!important`: gana por especificidad. Lleva los selectores con id porque la regla
+   que da el aspecto a los campos nombra `#login-form input` y `#registro-form input`, y una
+   regla con id gana a una sin el. El del REGISTRO faltaba: sin el, en oscuro esos campos se
+   pondrian blancos (el fondo lo pone esta regla). */
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .date-group select,
-[data-theme="dark"] #login-form input {
-    background-color: rgba(0, 0, 0, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: var(--color-ink) !important;
+[data-theme="dark"] #login-form input,
+[data-theme="dark"] #registro-form input {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .form-group input::placeholder {

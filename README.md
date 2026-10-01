@@ -105,12 +105,12 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 159)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 155)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 159**:
-por hoja, `formularios.css` 65, `auth.css` 36, `style.css` 30, `panel-artista.css` 12,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 155**:
+por hoja, `formularios.css` 65, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
 `galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 152 y `base` 7.
+`components` 148 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -171,10 +171,22 @@ se añadió la vista `panel`, el formulario de la obra, que era el hueco de cobe
    **16/16** y suite completa en verde. Es decir: **el rediseño no cambia nada de lo que se ve**,
    solo quién manda. `auth.css`: 39 → 36 `!important` (el total del proyecto: 168 → 159).
 
-**Lo que sigue con `!important` y por qué** (el mapa para la próxima): los 3 del **tema oscuro**
-de `.form-group input/select` de `auth.css` (su selector pierde por especificidad contra
-`#login-form input`, que ahora gana, y el fondo de oscuro tiene que seguir ganando: van en
-pareja con esa regla) y el **rojo del panel** (su competidora ahí es más específica).
+**Y el tema OSCURO de los campos** (mismo día, 4 más): la regla `[data-theme="dark"] .form-group
+input/select, .date-group select, #login-form input` llevaba 3 `!important` para ganarle a la
+regla de los campos, que nombra `#login-form input` y `#registro-form input`. Se hizo al revés:
+**se le dieron a la regla oscura los selectores con id que le faltaban** (el del **registro**,
+que es el único que la otra nombra y esta no) y se le quitaron los 3. Con eso el `:valid` oscuro
+(el borde verde) pudo soltar el suyo: **4 menos**, `auth.css` 36 → 32, foto **sin diferencias**
+(484 medidas) y estados **16/16**.
+
+Y el selector añadido se comprobó **provocando el fallo**: quitándolo, los campos del registro
+pierden el fondo oscuro (**16 diferencias**). Para poder verlo, la foto tuvo que medirlos: se
+añadieron `#reg-nombres`, `#reg-email`, `#reg-pass` y `#reg-pais`.
+
+**Lo que sigue con `!important`**: el **rojo del panel** (1: su competidora ahí es más
+específica) y el resto de familias (`formularios.css` tiene 65). El método ya está probado: medir
+con **dos instrumentos**, preguntar **quién gana** con `dbg-cascada-real.mjs` y arreglar la
+**capa** antes que la especificidad.
 
 **Y un fallo latente que salió de aquí**: `.input-error` no le ganaba a
 `#login-form input:valid` (misma especificidad, y en el empate ganaba la última), así que un

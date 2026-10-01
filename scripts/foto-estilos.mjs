@@ -75,7 +75,10 @@ const PAGINAS = [
             // Los estados de estos campos los gobiernan las reglas de :invalid / :valid de
             // auth.css, y su competidora es el estilo base de los campos (formularios.css).
             // Sin ellos en la lista, ese trozo de cascada se quedaba sin red.
-            '#forgot-section', '#forgot-email', '#reg-rol'
+            '#forgot-section', '#forgot-email', '#reg-rol',
+            // Campos del REGISTRO: el tema oscuro de los campos (auth.css) los pinta con
+            // selectores con id, y sin medirlos un cambio de esa regla se hacia a ciegas.
+            '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais'
         ]
     },
     {
