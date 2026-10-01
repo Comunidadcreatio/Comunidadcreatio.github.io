@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=3b66376f08');
+@import url('panel-artista.css?v=3390f68999');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=c5640ff8ae');
@@ -1766,15 +1766,15 @@
 /* Boton de ratio seleccionado: circulo blanco + texto NEGRO siempre (contraste) */
 .ratio-btn.active,
 [data-theme="dark"] .ratio-btn.active {
-    background: #fff !important;
+    background: #fff;
     color: #000 !important;
-    border-color: #fff !important;
+    border-color: #fff;
 }
 .ratio-btn:not(.active),
 [data-theme="dark"] .ratio-btn:not(.active) {
-    background: rgba(0, 0, 0, 0.45) !important;
+    background: rgba(0, 0, 0, 0.45);
     color: #fff !important;
-    border-color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* Mis Cavents: cada cavent con relleno solido (tarjetas) */

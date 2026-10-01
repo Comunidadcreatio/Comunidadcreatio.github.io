@@ -105,12 +105,12 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 141)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 133)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 141**:
-por hoja, `formularios.css` 51, `auth.css` 32, `style.css` 30, `panel-artista.css` 12,
-`galeria-publica.css` 10, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
-`components` 134 y `base` 7.
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 133**:
+por hoja, `formularios.css` 51, `auth.css` 32, `style.css` 26, `galeria-publica.css` 10,
+`panel-artista.css` 8, `skeleton.css` 3, `notificaciones.css` 2 y `header.css` 1; por capa,
+`components` 126 y `base` 7.
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -220,6 +220,20 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 |---|---|---|---|
 | 1 | `#obra-step-bar .crear-btn, #problog-nav-bar .crear-btn` | 13 | **6 fuera**, 7 portantes: `min-height`, `border`, `width`, `min-width`, `border-radius`, `padding`, `font-size` |
 | 2 | `#obra-step-bar .limpiar-btn, #problog-nav-bar .limpiar-btn` | 9 | **7 fuera**, 2 portantes: `border` y `color` (`outlineColor` cambiaba solo porque hereda de `color`) |
+| 3 | `.ratio-btn.active` y `.ratio-btn:not(.active)` (+ sus gemelas de tema oscuro) | 6 | **4 fuera** (`background`, `border-color`); `color` es portante en oscuro |
+| 4 | `#perfil-usuario .perfil-seccion` | 4 | **4 fuera** (`border`, `background`, `padding`, `box-shadow`) |
+| 5 | `[data-theme="dark"] button[type="submit"], .nav-btn` | 3 | **0 fuera**: las 3 son portantes (en oscuro el botón blanco pierde fondo, color y borde) |
+
+**Un aviso del instrumento que costó un rato** (y que ahora está arreglado): con los lotes 3-5
+puestos, la foto acusó cambios en los campos del **fixture** (`#fx-input` de 155px a 150px) y de
+**1/64 de píxel** en `.perfil-ciudad`. Antes de tocar nada se repitió la foto **con el mismo CSS**:
+dio **40 diferencias**, las mismas. Era **ruido**: el ancho intrínseco de un `<input>` sin clase
+depende de la fuente, y si Nunito no había llegado del todo se medía con la de reserva. Arreglado
+esperando a `document.fonts.check('16px Nunito')` (no basta con `fonts.ready`).
+
+**La regla que sale de ahí**: antes de creerse una diferencia, **repetir la foto con el mismo CSS**.
+Si también sale, es del instrumento, no del cambio (igual que la norma de no fiarse de un verificador
+que falla en algo que no se ha tocado).
 
 **Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
 día): el reset del panel

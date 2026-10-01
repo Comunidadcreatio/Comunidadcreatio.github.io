@@ -156,7 +156,10 @@ const PAGINAS = [
             '#input-ancho', '#input-alto', '#input-etiquetas', '#obra-etiquetas-bar',
             '#input-status', '#input-estado-obra', '#input-descripcion-tecnica',
             '.custom-select', '.custom-select-trigger', '#obra-step-bar',
-            '#obra-form .form-section-content'
+            '#obra-form .form-section-content',
+            // Los botones de ratio y el carrusel de imagenes del editor de la obra: tienen su
+            // propia familia de `!important` en style.css/formularios.css.
+            '.ratio-btn', '.ratio-btn.active', '#carrusel-viewport', '.imagen-carrusel'
         ]
     },
     {
@@ -246,7 +249,9 @@ const PAGINAS = [
             '#perfil-usuario .perfil-tabs', '#perfil-usuario .perfil-tab',
             '#perfil-usuario .perfil-stats', '#perfil-usuario .perfil-grid',
             '#galeria-publica', '#galeria-container', '.obra-card',
-            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo'
+            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo',
+            // Las secciones del perfil llevan su propia familia de `!important` en panel-artista.css.
+            '#perfil-usuario .perfil-seccion', '.perfil-seccion-layout', '.perfil-seccion-info'
         ]
     },
     {
@@ -489,6 +494,15 @@ for (const pag of PAGINAS) {
         })()`);
         // Y se espera a la fuente web (Nunito): cambia altos y anchos si llega tarde.
         await evalJs(`document.fonts ? document.fonts.ready.then(() => 'ok') : 'ok'`);
+        // ADEMAS se COMPRUEBA que la fuente esta de verdad disponible. `fonts.ready` no basta:
+        // si Nunito no ha llegado, los campos del fixture (que son etiquetas SIN clase) miden su
+        // ancho intrinseco con la fuente de reserva y el ancho baila 5px entre corridas: la
+        // comparacion acusaba un cambio que no existia (paso el 2026-10-01 con #fx-input).
+        for (let i = 0; i < 12; i++) {
+            const cargada = await evalJs(`document.fonts && document.fonts.check ? document.fonts.check('16px Nunito') : true`);
+            if (cargada === true) break;
+            await sleep(300);
+        }
         await sleep(400);
         if (pag.fixture) {
             const ok = await evalJs(FIXTURE);

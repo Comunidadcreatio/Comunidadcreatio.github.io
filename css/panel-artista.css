@@ -765,10 +765,10 @@
 }
 
 #perfil-usuario .perfil-seccion {
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    box-shadow: none !important;
+    border: none;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
 }
 
 .perfil-seccion {
