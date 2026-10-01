@@ -73,7 +73,7 @@ const PAGINAS = [
     {
         nombre: 'auth',
         ruta: 'auth.html',
-        esperar: `!!document.getElementById('login-form') || !!document.getElementById('main-content')`,
+        esperar: `!!document.getElementById('login-form')`,
         fixture: false,
         selectores: [
             'html', 'body', '#main-content', '#login-section', '#login-landing',
@@ -85,7 +85,11 @@ const PAGINAS = [
             '#forgot-section', '#forgot-email', '#reg-rol',
             // Campos del REGISTRO: el tema oscuro de los campos (auth.css) los pinta con
             // selectores con id, y sin medirlos un cambio de esa regla se hacia a ciegas.
-            '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais'
+            '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais',
+            // La familia de tema oscuro de auth.css (contenedor, seccion, titulos, etiquetas) y los
+            // botones secundarios: sus `!important` no se podian medir sin estos elementos.
+            '.auth-section', '.auth-section h1', '.auth-section p', '.form-group label',
+            '.secondary-btn', '.nav-btn', '.password-wrapper', '.password-wrapper input'
         ]
     },
     {
@@ -371,6 +375,10 @@ if (iSalida < 0) { console.error('Falta --salida <ruta.json>'); process.exit(2);
 const rutaSalida = args[iSalida + 1];
 const URL_BASE = args.find((a) => a.startsWith('http')) || 'http://127.0.0.1:8099/';
 const BASE = URL_BASE.replace(/\/[^/]*$/, '/');
+// --vistas a,b: mide SOLO esas vistas. Sirve para aislar una vista cuando da un resultado raro
+// (por ejemplo, si sospechas que el problema es el estado que deja la vista anterior).
+const iVistas = args.indexOf('--vistas');
+const SOLO_VISTAS = iVistas >= 0 && args[iVistas + 1] ? args[iVistas + 1].split(',').map((s) => s.trim()) : null;
 
 const perfil = mkdtempSync(join(tmpdir(), 'foto-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
@@ -515,6 +523,7 @@ const datos = {};
 console.log(`Foto de estilos: ${BASE}`);
 
 for (const pag of PAGINAS) {
+    if (SOLO_VISTAS && !SOLO_VISTAS.includes(pag.nombre)) continue;
     for (const ancho of ANCHOS) {
         await send('Emulation.setDeviceMetricsOverride', { width: ancho, height: ancho < 500 ? 852 : 900, deviceScaleFactor: 1, mobile: ancho < 500 });
         await send('Page.navigate', { url: BASE + pag.ruta });

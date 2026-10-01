@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 82** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 72** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
    `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
@@ -301,6 +301,14 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    acción del formulario» se partió en dos, las 6 propiedades del «aspecto grande» llevan
    `:not(:where(.crear-btn))` (**`:where()` para no subir la especificidad**) y la tipografía se queda
    con la lista de siempre, así que no se movió ni un píxel. 14 `!important` menos.
+   **De `auth.css`** (lotes 10-12): fuera la familia de tema oscuro y los `.secondary-btn` (10 menos).
+   Los 3 del `button[type="submit"]` oscuro son **portantes** (el botón pierde fondo, color y borde).
+   **Trampa que hay que recordar**: quitar un `!important` **cambia quién gana en OTRAS reglas** — el
+   botón de volver casaba con dos reglas y, al perder una su `!important`, la otra le ganó y se puso
+   blanco. Se arregló **partiendo el selector**.
+   **Y si una vista mide de repente mucho menos**: mira antes el **servidor local**
+   (`scripts/servidor-local.mjs`; si está caído, el navegador mide una página de error y parece un
+   fallo del CSS). La foto tiene `--vistas a,b` para medir una sola vista y aislar el problema.
    **El método de un lote** (está en el README): quitar todas las de una regla → foto → **agrupar las
    diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el `!important` solo a esas
    → foto otra vez (**sin diferencias**) → siguiente regla.

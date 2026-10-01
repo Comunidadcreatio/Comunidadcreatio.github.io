@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 82)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 72)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 82**:
-por hoja, `auth.css` 32, `formularios.css` 24, `style.css` 16 y `galeria-publica.css` 10; por capa,
-`components` 75 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 72**:
+por hoja, `formularios.css` 24, `auth.css` 22, `style.css` 16 y `galeria-publica.css` 10; por capa,
+`components` 65 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 82)
+## La campaña de los `!important`, lote a lote (168 → 72)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -227,6 +227,35 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 6 | `.imagen-carrusel` (solo escritorio) | 5 | **5 fuera** (`left`, `right`, `margin`, `width`, `max-width`) |
 | 7 | `.cavents-dropdown` (dos reglas) y `.cavents-dropdown.open` | 7 | **6 fuera**; `border-top` es portante en oscuro |
 | 8 | `.form-block .form-group input/select/textarea` y `.input-etiquetas-subtle` (+ su gemela oscura) | 8 | **4 fuera**; `border-bottom` y `margin-bottom` son portantes |
+| 9 | **el reset del panel** (ver abajo) + la familia de la barra | 14 | **14 fuera** |
+| 10 | `auth.css`: familia de tema oscuro (`.auth-container`, `.auth-section`, `h1`, `p`, `label`) | 5 | **5 fuera** |
+| 11 | `auth.css`: `[data-theme="dark"] .secondary-btn` y sus `:hover` | 5 | **5 fuera** |
+| 12 | `auth.css`: `[data-theme="dark"] button[type="submit"], .nav-btn` | 3 | **0 fuera** (portantes) + **selector partido** (ver abajo) |
+
+#### La trampa del `!important` que «armaba» a otra regla
+
+El lote 12 dejó un caso que merece quedar escrito. En `auth.css` había dos reglas en modo oscuro:
+
+```css
+[data-theme="dark"] button[type="submit"], [data-theme="dark"] .nav-btn { background: …0.90 !important }
+[data-theme="dark"] .secondary-btn, [data-theme="dark"] .nav-btn.prev-btn { background: …0.06 }  /* sin !important */
+```
+
+El botón **volver** (`.nav-btn.prev-btn`) casa con **las dos**. Mientras las dos llevaban `!important`
+ganaba la de abajo (más específica). Al quitarle el `!important` a la de abajo, **la de arriba le ganó
+y el botón de volver se puso blanco** (la foto lo cazó: `rgba(255,255,255,0.06) -> rgba(255,255,255,0.9)`).
+Quitar un `!important` **cambia quién gana en otras reglas**, no solo en la suya.
+
+La solución fue **partir el selector**: `.nav-btn` sale de la regla de arriba (donde el `!important`
+solo hace falta para el botón de enviar, medido) y el de volver se queda con su regla de abajo.
+
+#### Cuando el instrumento se cae (y parece un fallo del CSS)
+
+La vista `auth` pasó a medir **3 elementos** de golpe. No era el CSS: **el servidor local se había
+caído** (`ECONNREFUSED` en 8099) y el navegador estaba midiendo una **página de error**. Ahora el
+servidor es `scripts/servidor-local.mjs` (se arranca como trabajo en segundo plano) y la foto tiene
+`--vistas a,b` para medir **una sola vista** y aislar este tipo de cosas. Con el servidor en pie, la
+vista `auth` mide **24 elementos** (18 + los que se añadieron para esta campaña).
 
 #### El RESET del panel (el pendiente estructural del lote 1)
 

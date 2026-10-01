@@ -1398,7 +1398,7 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 [data-theme="dark"] .auth-container {
-    background-color: transparent !important;
+    background-color: transparent;
     border: 1px solid var(--color-border);
     padding: 0;
 }
@@ -1442,15 +1442,15 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 [data-theme="dark"] .auth-section h1 {
-    color: var(--color-ink) !important;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .auth-section p {
-    color: var(--color-ink) !important;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .form-group label {
-    color: var(--color-ink) !important;
+    color: var(--color-ink);
 }
 
 /* Sin `!important`: gana por especificidad. Lleva los selectores con id porque la regla
@@ -1471,32 +1471,36 @@ button[type="submit"]:not(.nav-btn):active,
     color: var(--color-gray-400);
 }
 
-[data-theme="dark"] button[type="submit"],
-[data-theme="dark"] .nav-btn {
+/* OJO con el segundo selector: `.nav-btn` a secas tambien pilla al boton de VOLVER
+   (`.nav-btn.prev-btn`), que tiene su propio aspecto mas abajo (fondo blanco al 6%). Cuando las dos
+   reglas llevaban `!important` ganaba la de abajo por especificidad; al quitarle el `!important` a la
+   de abajo, la de aqui arriba le ganaba y el boton de volver se ponia BLANCO. Por eso `.nav-btn`
+   sale de este selector: aqui el `!important` es solo para el boton de enviar, que si lo necesita
+   (medido: sin el, en modo oscuro el boton pierde fondo, color y borde). */
+[data-theme="dark"] button[type="submit"] {
     background: rgba(255, 255, 255, 0.90) !important;
     color: #000 !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-[data-theme="dark"] button[type="submit"]:hover,
-[data-theme="dark"] .nav-btn:hover {
-    background: rgba(255, 255, 255, 1) !important;
+[data-theme="dark"] button[type="submit"]:hover {
+    background: rgba(255, 255, 255, 1);
 }
 
 [data-theme="dark"] .secondary-btn,
 [data-theme="dark"] .nav-btn.prev-btn {
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: none !important;
-    color: var(--color-ink) !important;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] .secondary-btn:hover,
 [data-theme="dark"] .nav-btn.prev-btn:hover {
-    background: rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .auth-section {
-    background: rgba(0, 0, 0, 0.47) !important;
+    background: rgba(0, 0, 0, 0.47);
     border: none;
 }
 
