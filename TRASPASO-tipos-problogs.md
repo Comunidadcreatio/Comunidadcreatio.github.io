@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 115** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 111** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja`, `--selector`, `--quitar` / `--devolver --props "a,b"`): quita el `!important` de las
    declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que hacían falta.
@@ -302,15 +302,16 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    es `scripts/auditar-css-muerto.mjs` y hay **dos** comprobaciones antes de borrar:
    `scripts/dbg-selectores-existen.mjs` (pregunta AL NAVEGADOR por cada selector candidato, en las dos
    páginas y con el panel abierto) y la foto antes/después con `git stash push -- css/`.
-   **Hecho**: 42 reglas muertas al principio y **202 más en la dieta grande** (1.386 líneas: modales,
-   panel-artista, search-results, skeleton, header, auth, chat, style…). `panel-artista.css` y
-   `notificaciones.css` están a **cero** `!important`.
+   **Hecho**: 42 reglas muertas al principio, **202 más en la dieta grande** (1.386 líneas) y las
+   **reglas parciales** (5 borradas + 15 listas limpiadas). Y **`skeleton.css` eliminado entero**
+   (nada crea `.skeleton-card`/`.skeleton-galeria`). `panel-artista.css`, `notificaciones.css` y
+   `skeleton.css` ya no tienen ningún `!important`.
    **Trampa que mordió (2026-10-01)**: una regla era `.mobile-logout-modal, #mobile-main-menu {
    display: none }`; al borrarla entera se perdieron los estilos de `.mobile-logout-modal`, que SÍ
    existe. **La foto no lo vio** (ese modal está oculto). Ahora el script **parte la lista por comas y
    conserva los selectores vivos**; y la norma es **leer siempre la lista de lo que se borra**.
-   **Quedan 79 reglas PARCIALES** (mezclan selectores vivos y muertos): se hacen a mano, quitando los
-   selectores muertos de la lista y dejando los vivos.
+   **Sutileza a respetar**: un token muerto dentro de `:not(...)` NO hace inmirable la parte
+   (`.vivo:not(.muerto)` casa); los de `:is()`/`:where()`/`:has()` sí la hacen inmirable.
    **Hecho**: la familia de estados del formulario de auth completa → **27 menos**; los **lotes 1 a 5**
    → **21 más**; y el CSS muerto → **18 más**. **168 → 115**, foto sin diferencias y suite **19/19** en
    cada paso.

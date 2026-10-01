@@ -20,7 +20,6 @@
     #login-form input[type="email"],
     #login-form input[type="password"],
     #solicitar-restablecimiento-form input[type="email"],
-    #confirmar-eliminacion-form input[type="password"],
     #panel-artista input {
         width: 100%;
         max-width: 100%;
@@ -376,12 +375,7 @@
     border-color: var(--color-ink) !important;
 }
 
-/* ==============================================
-   RESETEO GLOBAL DE CAJAS PARA FORMULARIOS Y PANELES
-   ============================================== */
-/* Esto garantiza que el padding y el borde no sumen ancho extra al 100% en ningún contenedor */
-#formulario-obra *, 
-.modal-content *, 
+#formulario-obra *,
 form *,
 #panel-artista * {
     box-sizing: border-box !important;
@@ -429,12 +423,10 @@ form *,
     padding: 20px 0;
 }
 
-/* --- Estilos generales para inputs, selects y textareas --- */
 #obra-form,
 #registro-form,
 #login-form,
 #solicitar-restablecimiento-form,
-#confirmar-eliminacion-form,
 #panel-artista form {
     width: 100%;
     max-width: 100%;
@@ -461,9 +453,6 @@ form *,
     resize: vertical;
 }
 
-/* --- Grupos de inputs --- */
-.dimensiones-group,
-.name-group,
 .date-group {
     display: flex;
     gap: 12px;
@@ -509,9 +498,6 @@ form *,
     line-height: inherit;
 }
 
-/* Títulos de secciones del formulario (ya no se usa h3 principal) */
-.dimensiones-group input,
-.name-group input,
 .date-group select {
     flex: 1; 
     min-width: 0; 
@@ -786,11 +772,9 @@ form *,
     display: block;
 }
 
-/* --- Botones de formularios en modales --- */
 #login-form button[type="submit"],
 #registro-form button[type="submit"],
-#solicitar-restablecimiento-form button[type="submit"],
-#confirmar-eliminacion-form button[type="submit"] {
+#solicitar-restablecimiento-form button[type="submit"] {
     background: var(--color-ink);
     color: var(--color-white);
     border: none;
@@ -801,8 +785,7 @@ form *,
 
 #login-form button[type="submit"]:hover,
 #registro-form button[type="submit"]:hover,
-#solicitar-restablecimiento-form button[type="submit"]:hover,
-#confirmar-eliminacion-form button[type="submit"]:hover {
+#solicitar-restablecimiento-form button[type="submit"]:hover {
     background: var(--color-ink-light);
 }
 
@@ -851,14 +834,6 @@ form *,
     color: var(--color-danger);
 }
 
-/* ==============================================
-   SOLUCIÓN DEFINITIVA: ALINEACIÓN Y SCROLLBAR
-   ============================================== */
-
-/* 1. Eliminamos por completo el scrollbar horizontal de todos los modales y contenedores */
-.modal-content,
-#modal-registro,
-#modal-login,
 form,
 .step,
 #panel-artista {

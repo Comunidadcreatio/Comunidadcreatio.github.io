@@ -22,23 +22,23 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=3b75acbb8e');
+@import url('header.css?v=97f65efbb6');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=9fa317b475');
 
 /* Chat global + privado */
-@import url('chat.css?v=f8f35e5426');
+@import url('chat.css?v=25afa5e30d');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 @import url('panel-artista.css?v=edd3eb472f');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
-@import url('modales.css?v=1593bf28c7');
+@import url('modales.css?v=cda8f6e1f8');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=96e7644107');
+@import url('formularios.css?v=5bdd5f8171');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -578,12 +578,11 @@
     color: var(--color-gray-400);
 }
 
-#btn-guardar,
-.btn-editar,
-.btn-duplicar {
+#btn-guardar {
     font-family: 'Nunito', sans-serif;
 }
-#brand-name, .modal-content h2, #panel-artista h2, .obra-card h3 {
+#panel-artista h2,
+.obra-card h3 {
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
 }
@@ -767,15 +766,12 @@
     pointer-events: none;
 }
 
-/* Paneles flotantes (bocadillos) */
-.desktop-logout-modal,
-.desktop-main-menu {
+.desktop-logout-modal {
     position: fixed;
     z-index: 9999;
     display: none;
 }
-.desktop-logout-modal:not(.hidden),
-.desktop-main-menu:not(.hidden) {
+.desktop-logout-modal:not(.hidden) {
     display: block;
 }
 
@@ -1318,8 +1314,7 @@
         display: none;
     }
 
-    .desktop-logout-modal,
-    .desktop-main-menu {
+    .desktop-logout-modal {
         display: none;
     }
 

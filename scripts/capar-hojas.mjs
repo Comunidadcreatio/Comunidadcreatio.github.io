@@ -33,8 +33,10 @@ const DIR = 'css';
 // Como todo va a la MISMA capa, este orden solo sirve para informar: dentro de la capa
 // manda el orden real de carga, que no cambia.
 const ORDEN = ['header.css', 'galeria-publica.css', 'chat.css', 'panel-artista.css', 'modales.css',
-    'formularios.css', 'style.css', 'notificaciones.css', 'search-results.css', 'skeleton.css',
+    'formularios.css', 'style.css', 'notificaciones.css', 'search-results.css',
     'problogs.css', 'auth.css'];
+// (aqui estaba 'skeleton.css': se elimino el 2026-10-01 porque no quedaba ni un elemento que usara
+//  sus clases .skeleton-card / .skeleton-galeria)
 
 // Trocea el CSS en trozos de primer nivel, respetando comentarios y comillas para no
 // confundir llaves de dentro.

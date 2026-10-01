@@ -47,6 +47,32 @@ const escapar = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Un SELECTOR suelto es muerto si nombra alguno de los tokens muertos (con limites de palabra).
 const SEL_MUERTO = new RegExp(TOKENS.map((t) => `[#.]${escapar(t)}(?![\\w-])`).join('|'));
 const partirSelectores = (sel) => sel.split(',').map((s) => s.trim()).filter(Boolean);
+// Un token muerto DENTRO de `:not(...)` NO hace inmirable la parte: `.vivo:not(.muerto)` casa con
+// todos los `.vivo` que no lleven `.muerto`. Asi que SOLO se quitan los argumentos de `:not(...)`
+// antes de mirar los tokens: queda `.vivo` -> viva.
+// Los de `:is()`, `:where()` y `:has()` SI se dejan: `.vivo:is(.muerto)` o `.vivo:has(.muerto)`
+// exigen que exista `.muerto`, o sea que no pueden casar nunca -> muertas.
+// Y `.vivo .muerto` (descendiente) tambien es muerta: exige un elemento con `.muerto`.
+const sinPseudoFuncional = (parte) => {
+    let out = '', i = 0;
+    while (i < parte.length) {
+        const m = /^:not\(/i.exec(parte.slice(i));
+        if (!m) { out += parte[i++]; continue; }
+        i += m[0].length;
+        let nivel = 1;
+        while (i < parte.length && nivel > 0) {
+            if (parte[i] === '(') nivel++;
+            else if (parte[i] === ')') nivel--;
+            i++;
+        }
+    }
+    return out;
+};
+const parteMuerta = (parte) => {
+    const limpia = sinPseudoFuncional(parte);
+    const tokens = [...new Set([...limpia.matchAll(/[#.]([A-Za-z][\w-]*)/g)].map((m) => m[1]))];
+    return tokens.length > 0 && tokens.every((t) => SEL_MUERTO.test('.' + t) || SEL_MUERTO.test('#' + t));
+};
 
 const reglasDe = (css) => {
     const limpio = css.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length));
@@ -80,9 +106,9 @@ for (const hoja of HOJAS) {
             continue;
         }
         const partes = partirSelectores(r.selector);
-        const muertos = partes.filter((s) => SEL_MUERTO.test(s));
+        const muertos = partes.filter((s) => parteMuerta(s));
         if (!muertos.length) continue;
-        const vivos = partes.filter((s) => !SEL_MUERTO.test(s));
+        const vivos = partes.filter((s) => !parteMuerta(s));
         plan.push({ tipo: vivos.length ? 'limpiar' : 'borrar', regla: r, vivos, muertos });
     }
     if (!plan.length) continue;

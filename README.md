@@ -105,13 +105,13 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 115)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 111)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 115**:
-por hoja, `formularios.css` 45, `auth.css` 32, `style.css` 24, `galeria-publica.css` 10,
-`skeleton.css` 3 y `header.css` 1; por capa, `components` 108 y `base` 7. **Dos hojas ya están a
-cero** (`panel-artista.css` y `notificaciones.css`, todas sus reglas `!important` eran de código
-muerto: se borraron).
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 111**:
+por hoja, `formularios.css` 45, `auth.css` 32, `style.css` 24 y `galeria-publica.css` 10; por capa,
+`components` 104 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
+entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 141)
+## La campaña de los `!important`, lote a lote (168 → 111)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **76 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -303,6 +303,23 @@ bajaron de 115 porque estas reglas ya no tenían ninguno: es grasa, no deuda.
 - La vista `panel` de la foto ahora **espera un estado determinista** (pestaña de Cavents activa y la
   caja de Problogs oculta) antes de medir: sin eso, los valores del panel bailaban entre corridas
   (el radio del select salía 10px o 0px) y salían diferencias que no existían.
+
+#### Las reglas PARCIALES (mezclan selectores vivos y muertos)
+
+Quedaban 72 reglas con la lista de selectores mezclada. `borrar-css-muerto.mjs` las trata **parte por
+parte**: quita de la lista los selectores muertos y **deja los vivos** (`LIMPIAR (solo la lista)`).
+Resultado: **5 reglas borradas, 15 listas limpiadas y 1 `!important`** menos, con la foto
+**sin diferencias**.
+
+**La sutileza que hay que respetar** (y que está en el código): un token muerto **dentro de
+`:not(...)`** NO hace inmirable la parte —`.vivo:not(.muerto)` casa con todos los `.vivo` que no
+lleven `.muerto`—, así que solo se quitan los argumentos de `:not()`. Los de `:is()`, `:where()` y
+`:has()` **sí** se dejan: `.vivo:is(.muerto)` o `.vivo:has(.muerto)` exigen que exista `.muerto`, o
+sea que no pueden casar nunca. Y `.vivo .muerto` (descendiente) también es muerta.
+
+**Y de ahí salió un archivo entero**: `skeleton.css` solo hablaba de `.skeleton-card` y
+`.skeleton-galeria`, y **nada en el HTML ni en el JS crea esos elementos** → se ha **eliminado el
+fichero** (y su `<link>` en `index.html`): −3 `!important` y una petición menos.
 
 **Quién obliga a los 7 del lote 1** (esto es lo que hay que arreglar para poder quitarlos algún
 día): el reset del panel

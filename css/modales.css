@@ -50,24 +50,6 @@
     color: var(--color-gray-dark);
 }
 
-/* ==============================================
-   FORMULARIOS DENTRO DE MODALES
-   ============================================== */
-.modal-content input[type="text"],
-.modal-content input[type="email"],
-.modal-content input[type="password"],
-.modal-content button:not(.cerrar-modal) {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-    background: var(--color-white);
-    color: var(--color-ink);
-}
-
 .modal-content .secondary-btn {
     background: var(--color-white);
     color: var(--color-ink);
@@ -215,24 +197,6 @@
 
 [data-theme="dark"] .modal-content .cerrar-modal:hover {
     color: var(--color-gray-400);
-}
-
-[data-theme="dark"] .modal-content input[type="text"],
-[data-theme="dark"] .modal-content input[type="email"],
-[data-theme="dark"] .modal-content input[type="password"],
-[data-theme="dark"] .modal-content select,
-[data-theme="dark"] .modal-content button:not(.cerrar-modal) {
-    background-color: #121212;
-    border-color: #e5e5e5;
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .modal-content button:not(.cerrar-modal) {
-    background-color: #121212;
-}
-
-[data-theme="dark"] .modal-content button:not(.cerrar-modal):hover {
-    background-color: #1a1a1a;
 }
 
 [data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password {

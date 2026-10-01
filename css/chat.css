@@ -771,8 +771,7 @@ body.teclado-abierto .chat-enviar-btn {
 .chat-fab {
     position: relative;
 }
-.chat-fab-badge,
-.chat-circle-badge {
+.chat-fab-badge {
     position: absolute;
     top: -3px;
     right: -3px;
@@ -792,8 +791,7 @@ body.teclado-abierto .chat-enviar-btn {
     pointer-events: none;
 }
 [data-theme="dark"] .chat-nav-badge,
-[data-theme="dark"] .chat-fab-badge,
-[data-theme="dark"] .chat-circle-badge {
+[data-theme="dark"] .chat-fab-badge {
     border-color: #0a0a0a;
 }
 
