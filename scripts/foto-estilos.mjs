@@ -401,8 +401,17 @@ await send('Runtime.enable'); await send('Page.enable');
 await send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(() => {
         try {
-            localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', email: 't@t.com', rol: 'artista' }));
-            localStorage.setItem('creatio_auth_token_persist', 'tok');
+            // La SESION depende de la pagina: en auth.html/reset-password.html NO puede haber
+            // sesion, o la app redirige y la vista "auth" acaba midiendo elementos del INDICE
+            // (pasaba: el boton de auth daba los mismos cambios que el del panel de crear).
+            const enAuth = /(auth|reset-password)\\.html$/.test(location.pathname);
+            if (enAuth) {
+                localStorage.removeItem('artistaData');
+                localStorage.removeItem('creatio_auth_token_persist');
+            } else {
+                localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', email: 't@t.com', rol: 'artista' }));
+                localStorage.setItem('creatio_auth_token_persist', 'tok');
+            }
         } catch (_) {}
         const json = async (d) => ({ ok: true, status: 200, json: async () => d });
         const realFetch = window.fetch.bind(window);

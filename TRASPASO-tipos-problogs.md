@@ -289,11 +289,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 96** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 82** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
    `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
-   hacían falta. **En bloque NO** (se intentó y salió con 81 diferencias).
+   hacían falta. **En bloque NO** (se intentó y salió con 81 diferencias). El **hover** lo cubre
+   `scripts/verificar-hover-botones.mjs` (12 comprobaciones, validado por provocación): la foto solo
+   mide el estado de reposo, y ahí se escondía un `!important` **portante** (el que impide que los
+   botones de la barra se rellenen de gris al pasar el ratón).
+   **El reset del panel** (el pendiente estructural del lote 1) ya está hecho: la regla de «Botones de
+   acción del formulario» se partió en dos, las 6 propiedades del «aspecto grande» llevan
+   `:not(:where(.crear-btn))` (**`:where()` para no subir la especificidad**) y la tipografía se queda
+   con la lista de siempre, así que no se movió ni un píxel. 14 `!important` menos.
    **El método de un lote** (está en el README): quitar todas las de una regla → foto → **agrupar las
    diferencias por PROPIEDAD** (eso dice cuáles eran portantes) → devolver el `!important` solo a esas
    → foto otra vez (**sin diferencias**) → siguiente regla.

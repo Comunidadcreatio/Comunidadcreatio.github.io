@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 96)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 82)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 96**:
-por hoja, `formularios.css` 36, `auth.css` 32, `style.css` 18 y `galeria-publica.css` 10; por capa,
-`components` 89 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 82**:
+por hoja, `auth.css` 32, `formularios.css` 24, `style.css` 16 y `galeria-publica.css` 10; por capa,
+`components` 75 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 96)
+## La campaña de los `!important`, lote a lote (168 → 82)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -228,6 +228,47 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 7 | `.cavents-dropdown` (dos reglas) y `.cavents-dropdown.open` | 7 | **6 fuera**; `border-top` es portante en oscuro |
 | 8 | `.form-block .form-group input/select/textarea` y `.input-etiquetas-subtle` (+ su gemela oscura) | 8 | **4 fuera**; `border-bottom` y `margin-bottom` son portantes |
 
+#### El RESET del panel (el pendiente estructural del lote 1)
+
+El lote 1 dejó 7 `!important` que no se podían quitar porque les ganaba **otra** regla:
+`#panel-artista button[type="submit"]` —la de «Botones de acción del formulario»— con `(1,1,1)`
+contra `(1,1,0)`, y esos botones **sí** son `submit` (llevan `form="obra-form"` / `form="problog-form"`).
+
+Lo que parecía un simple «estrechar el selector» tenía una trampa: la regla del formulario también
+aportaba la **tipografía** de esos botones (600 / 1.2 / 6px), y los `.crear-btn` que son `type="button"`
+(«Vista previa») la tomaban de la regla del lote 1 (700 / 1) → o sea que **hoy la barra tiene los
+botones con tipografía distinta**, según cuál gane. Estrechar el selector sin más movía la letra.
+
+La solución fue **partir la regla en dos**:
+
+- las **6 propiedades del «aspecto grande»** (`width`, `min-height`, `padding`, `border`,
+  `border-radius`, `font-size`) llevan `:not(:where(.crear-btn))` y así dejan de pisar a la barra;
+- **la tipografía y el resto siguen con la lista de siempre**, incluidos los botones de la barra, que
+  es lo que se veía.
+
+El `:where()` no es decorativo: **no suma especificidad**, así que la regla sigue siendo `(1,1,1)`
+para los botones que sí coge (con un `:not(.crear-btn)` normal subiría a `(1,2,1)` y podría ganarle a
+reglas que hoy ganan).
+
+**Resultado**: 14 `!important` menos (los 7 del lote 1 y 7 más de la familia de la barra), con la foto
+**SIN DIFERENCIAS** antes y después. Y apareció un `!important` que **sí es portante**, con su
+verificador detrás: `#obra-step-bar .crear-btn:hover { background: transparent !important }` — sin él,
+el botón **se rellena de gris al pasar el ratón**.
+
+#### `verificar-hover-botones.mjs`: el punto ciego del hover
+
+La foto mide el estado de **reposo**, así que un `!important` dentro de un `:hover` se podía quitar
+sin que nada lo notara. Este verificador (12 comprobaciones) mueve el ratón **de verdad** (eventos
+CDP, y así se comprueba también que el navegador activa `:hover`) y en los dos temas comprueba:
+el **borde** y el **color** cambian al pasar por encima, el **fondo sigue transparente** (el
+`!important` portante de arriba) y al salir **vuelve todo al estado de reposo**.
+
+Está validado por **provocación**: quitando ese `!important`, el fondo pasa a `rgb(245,245,245)`
+(claro) y `rgb(31,31,31)` (oscuro) y el verificador **falla**. Dos detalles que costaron un rato y
+están en el código: hay que leer **hasta que el valor se estabilice** (el botón tiene
+`transition: all 0.2s ease` y a tiempo fijo se pillaba el borde a medio camino, `rgb(211)` en vez de
+`rgb(212)`) y por eso los botones se miden después de quitarles la clase `hidden`.
+
 **Y un fallo de la herramienta que hay que contar** (porque se vio en su propio recuento): para los
 lotes 6-8 hacía falta tocar reglas cuyo selector a secas es ambiguo (hay tres `.cavents-dropdown`),
 así que se añadió `--linea N`. La primera versión **estaba mal**: buscaba hacia atrás la primera llave
@@ -237,6 +278,12 @@ regla → el "bloque" era el `@layer` entero y de golpe le quitó **los 36 `!imp
 (`git checkout -- css/formularios.css`), se rehízo el lote y la herramienta ahora **localiza la regla
 con el parser de reglas** (la que contiene esa línea) y **dice qué regla toca y en qué línea**, para
 que un fallo así se vea en la salida y no en el navegador.
+
+**Y otro fallo, este del INSTRUMENTO, que también hay que contar**: la vista `auth` de la foto llevaba
+**sesión** puesta (el mismo `localStorage` que las demás vistas), así que la app **redirigía** y esa
+vista acababa midiendo elementos del **índice** (el botón de auth daba exactamente los mismos cambios
+que el del panel). Ahora la sesión **depende de la página**: en `auth.html` y `reset-password.html` se
+borra, y la vista pasó de medir 4 elementos en móvil a **18 en todos los anchos**.
 
 **Un aviso del instrumento que costó un rato** (y que ahora está arreglado): con los lotes 3-5
 puestos, la foto acusó cambios en los campos del **fixture** (`#fx-input` de 155px a 150px) y de

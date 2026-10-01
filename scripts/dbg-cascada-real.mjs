@@ -119,6 +119,14 @@ await sleep(700);
 const doc = await send('DOM.getDocument', { depth: -1 });
 if (doc.error) console.error('DOM.getDocument:', JSON.stringify(doc.error));
 let nodo = await send('DOM.querySelector', { nodeId: doc.result.root.nodeId, selector: ELEMENTO });
+// --hover: se FUERZA el pseudo-estado :hover (CSS.forcePseudoState). Sin esto la herramienta solo
+// ve el estado de reposo, y un `!important` dentro de un `:hover` no lo comprobaba nadie (la foto
+// de estilos mide reposo).
+if (args.includes('--hover') && nodo.result?.nodeId) {
+    const forzado = await send('CSS.forcePseudoState', { nodeId: nodo.result.nodeId, forcedPseudoClasses: ['hover'] });
+    if (forzado.error) console.error('CSS.forcePseudoState:', JSON.stringify(forzado.error));
+    await sleep(500);
+}
 let estilos = await send('CSS.getMatchedStylesForNode', { nodeId: nodo.result?.nodeId || 0 });
 if (estilos.error) {
     // El nodeId puede quedarse viejo si la pagina se ha vuelto a pintar: se pide otra vez.

@@ -156,20 +156,24 @@
 #obra-step-bar .crear-btn,
 #problog-nav-bar .crear-btn {
     height: 32px;
-    min-height: 32px !important;
+    min-height: 32px;
     max-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
     color: var(--color-ink);
-    border: 1.5px solid var(--color-gray-300) !important;
-    width: auto !important;
-    min-width: auto !important;
-    border-radius: 16px !important;
-    padding: 0 22px !important;
+    /* Estas 6 declaraciones llevaban `!important` porque la regla de "Botones de accion del
+       formulario" (mas abajo) les ganaba con (1,1,1) contra (1,1,0) — y estos botones SON submit.
+       Ya no hace falta: esa regla ahora excluye `.crear-btn` SOLO para estas 6 propiedades (las del
+       aspecto "grande"), y sigue aplicandoles la tipografia y el resto, que es lo que se veia. */
+    border: 1.5px solid var(--color-gray-300);
+    width: auto;
+    min-width: auto;
+    border-radius: 16px;
+    padding: 0 22px;
     margin: 0;
-    font-size: 11px !important;
+    font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
@@ -668,9 +672,20 @@ form *,
 }
 
 /* --- Botones de acción del formulario --- */
+/* Esta regla estaba toda junta y su tercer selector, `#panel-artista button[type="submit"]` (1,1,1),
+   le ganaba a `#obra-step-bar .crear-btn` / `#problog-nav-bar .crear-btn` (1,1,0) — que SON submit
+   porque llevan `form="…"`. Por eso esas dos reglas necesitaban `!important` en width, min-height,
+   padding, border, border-radius y font-size.
+   Ahora está PARTIDA en dos, y solo la primera excluye a los botones de la barra:
+     - el ASPECTO GRANDE (ancho completo, sin borde, 16px) es solo para los botones del formulario;
+     - la TIPOGRAFÍA y el resto siguen aplicándose a TODOS los submit del panel, incluidos los de la
+       barra (que es lo que se veía: 600 / 1.2 / 6px), así que el cambio no mueve nada.
+   El `:not` va con `:where()` a propósito: `:where()` no suma especificidad, así que esta regla
+   sigue siendo (1,1,1) para los botones que sí coge (si no, subiría a (1,2,1) y podría ganarle a
+   reglas que hoy ganan). */
 #btn-guardar,
 #btn-limpiar-campos,
-#panel-artista button[type="submit"],
+#panel-artista button[type="submit"]:not(:where(.crear-btn)),
 #panel-artista .btn-aplicar {
     width: 100%;
     min-height: 48px;
@@ -678,6 +693,13 @@ form *,
     border: none;
     border-radius: var(--radius-md);
     font-size: 16px;
+}
+
+/* La tipografía y el resto, con la lista de SIEMPRE (sin excluir `.crear-btn`). */
+#btn-guardar,
+#btn-limpiar-campos,
+#panel-artista button[type="submit"],
+#panel-artista .btn-aplicar {
     line-height: 1.2;
     font-weight: 600;
     cursor: pointer;
@@ -942,14 +964,14 @@ form,
 
 [data-theme="dark"] #obra-step-bar .crear-btn,
 [data-theme="dark"] #problog-nav-bar .crear-btn {
-    background: transparent !important;
-    border: 1.5px solid var(--color-border) !important;
-    color: var(--color-ink) !important;
+    background: transparent;
+    border: 1.5px solid var(--color-border);
+    color: var(--color-ink);
 }
 
 [data-theme="dark"] #obra-step-bar .crear-btn:hover {
-    border-color: var(--color-ink) !important;
-    background: var(--color-gray-100) !important;
+    border-color: var(--color-ink);
+    background: var(--color-gray-100);
 }
 
 [data-theme="dark"] #obra-progress-bar .step-name {
