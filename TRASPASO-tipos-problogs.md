@@ -362,12 +362,17 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    `git checkout -- css/formularios.css` y ahora localiza la regla con el parser y **dice qué regla
    toca y en qué línea**.
    **Se quedan por diseño**: los 7 de `base` (accesibilidad) y los 8 `-webkit-autofill` de `auth.css`.
-   **Pendiente**: los 7 portantes del lote 1 dependen del reset del panel
-   (`#panel-artista button[type="submit"] { border: none }`); y quedan ~60 reglas (1 regla = 1 lote),
-   varias de las cuales son también candidatas a muertas.
-2. **Container queries**: falta pasar el reparto de columnas de `.problogs-feed-perfil` a
-   `@container` — necesita declarar el contenedor en su **padre** (la pestaña del perfil),
-   porque **un contenedor no puede consultarse a sí mismo**.
+   **La campaña está CERRADA**: 168 → 50 (70 %), el reset del panel está hecho y los 50 que quedan
+   están justificados (7 de `base`, 8 `-webkit-autofill`, 5 de animación transitoria y 30 portantes
+   medidos uno a uno). El resumen, con las 7 reglas que dejó el camino, está en el README
+   («Cierre de la campaña»).
+2. **Container queries**: HECHO. El reparto de columnas de `.problogs-feed-perfil` ya es
+   `@container perfil-feed (max-width: 560px)`, con el contenedor declarado en su **padre**
+   (`.perfil-tab-content`), porque **un contenedor no puede consultarse a sí mismo**. Lo prueba
+   `verificar-container-queries.mjs` (8/8) con el contenedor a 530px y la pantalla ancha: antes
+   daban 2 pistas y ahora 1. Y los instrumentos (`foto-estilos.mjs` y `verificar-todo.mjs`) ahora
+   **comprueban el servidor local antes de arrancar**: dos veces midieron una página de error sin
+   avisar (una vista con 3 elementos en vez de 18, y un verificador con `display: block`).
 3. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 

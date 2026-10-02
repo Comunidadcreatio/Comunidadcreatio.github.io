@@ -127,6 +127,53 @@ check('y la tarjeta NO gana padding lateral (el texto va de borde a borde)',
     parseFloat(m.normal.paddingIzq) === 0 && parseFloat(m.estrecha.paddingIzq) === 0,
     `${m.estrecha.paddingIzq} / ${m.normal.paddingIzq}`);
 
+// ---------------------------------------------------------------------------
+// EL REPARTO DE COLUMNAS DEL FEED DEL PERFIL. El feed ES el contenedor, asi que no puede
+// consultarse a si mismo: la consulta va contra su PADRE (`.perfil-tab-content`). Se prueba con el
+// contenedor a 530px y la PANTALLA ancha: antes esto daba DOS columnas (media query que miraba la
+// pantalla) y ahora tiene que dar UNA (mira su contenedor).
+// ---------------------------------------------------------------------------
+const trozoPerfil = (ancho) => '<div class="perfil-tab-content" data-ancho="' + ancho + '" style="width:' + ancho + 'px">' +
+    '<div class="problogs-feed problogs-feed-perfil">' +
+    '<article class="problog-card"><h3 class="problog-card-titulo">Uno</h3></article>' +
+    '<article class="problog-card"><h3 class="problog-card-titulo">Dos</h3></article>' +
+    '</div></div>';
+await evalJs(`(() => {
+    const viejo = document.getElementById('prueba-cq-perfil');
+    if (viejo) viejo.remove();
+    const cont = document.createElement('div');
+    cont.id = 'prueba-cq-perfil';
+    cont.style.cssText = 'position:absolute;left:0;top:1200px;z-index:9;background:#fff;';
+    cont.innerHTML = ${JSON.stringify(trozoPerfil(530) + trozoPerfil(800))};
+    document.body.appendChild(cont);
+    return 'ok';
+})()`);
+await sleep(700);
+const col = JSON.parse(await evalJs(`(() => {
+    const pistas = (ancho) => {
+        const caja = document.querySelector('#prueba-cq-perfil .perfil-tab-content[data-ancho="' + ancho + '"]');
+        if (!caja) return null;
+        const feed = caja.querySelector('.problogs-feed-perfil');
+        if (!feed) return null;
+        const cs = getComputedStyle(feed);
+        const valor = cs.gridTemplateColumns;
+        return {
+            valor, pistas: valor.split(' ').filter(Boolean).length,
+            anchoCaja: Math.round(caja.getBoundingClientRect().width),
+            display: cs.display, containerType: cs.containerType, hijos: feed.children.length,
+            // La declaracion del contenedor va en el PADRE: se lee tambien para saber si llega.
+            contenedorPadre: getComputedStyle(caja).containerType + '/' + getComputedStyle(caja).containerName
+        };
+    };
+    return JSON.stringify({ estrecho: pistas(530), ancho: pistas(800) });
+})()`));
+console.log('   contenedor del perfil a 530px: ' + JSON.stringify(col.estrecho));
+console.log('   contenedor del perfil a 800px: ' + JSON.stringify(col.ancho));
+check('el feed del perfil con su contenedor a 530px y la PANTALLA ancha se queda en UNA columna',
+    !!col.estrecho && col.estrecho.pistas === 1, col.estrecho ? `${col.estrecho.pistas} pista(s): ${col.estrecho.valor}` : 'no se midio');
+check('y con el contenedor a 800px reparte en varias (control)',
+    !!col.ancho && col.ancho.pistas >= 2, col.ancho ? `${col.ancho.pistas} pista(s): ${col.ancho.valor}` : 'no se midio');
+
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 if (logs.length) fallos++;
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);

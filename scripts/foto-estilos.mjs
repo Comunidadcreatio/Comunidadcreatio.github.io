@@ -544,6 +544,19 @@ const BASE = URL_BASE.replace(/\/[^/]*$/, '/');
 const iVistas = args.indexOf('--vistas');
 const SOLO_VISTAS = iVistas >= 0 && args[iVistas + 1] ? args[iVistas + 1].split(',').map((s) => s.trim()) : null;
 
+// PREFLIGHT: sin servidor local el navegador mide una PAGINA DE ERROR y la foto sale con medidas
+// vacias o de elementos que no existen (paso el 2026-10-01: la vista `auth` midio 3 elementos en vez
+// de 18 y parecia un fallo de la vista). Se comprueba ANTES de abrir Chrome.
+try {
+    const r = await fetch(URL_BASE);
+    const html = await r.text();
+    if (!r.ok || !html.includes('<link')) throw new Error('respuesta rara (HTTP ' + r.status + ')');
+} catch (e) {
+    console.error(`NO HAY SERVIDOR en ${URL_BASE} (${e.message}).`);
+    console.error('Levantalo antes con:  node scripts/servidor-local.mjs 8099');
+    process.exit(2);
+}
+
 const perfil = mkdtempSync(join(tmpdir(), 'foto-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
     '--headless=new', '--disable-gpu', '--no-sandbox', `--remote-debugging-port=${PUERTO}`,

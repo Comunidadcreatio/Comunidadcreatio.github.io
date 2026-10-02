@@ -1677,7 +1677,19 @@ body.responder-subida .problog-responder-barra {
     padding: 0 0 20px;
 }
 
-@media (max-width: 560px) {
+/* El reparto de columnas va contra el CONTENEDOR, no contra la pantalla. El feed NO puede
+   consultarse a si mismo (un contenedor no se ve a si mismo), asi que el contenedor se declara en
+   su PADRE, la pestaña del perfil. Ese padre no tiene padding lateral (`width: 100%`), asi que el
+   umbral de 560px se traslada tal cual.
+   POR QUE: antes esto era `@media (max-width: 560px)`, y en el perfil la columna puede ser estrecha
+   con la PANTALLA ancha (al lado hay barra lateral): la media query no se enteraba y dejaba dos
+   columnas de 257px donde cabia una. */
+.perfil-tab-content {
+    container-type: inline-size;
+    container-name: perfil-feed;
+}
+
+@container perfil-feed (max-width: 560px) {
     .problogs-feed-perfil {
         grid-template-columns: 1fr;
     }

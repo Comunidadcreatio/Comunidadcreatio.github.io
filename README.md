@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 59)
+## La campaña de los `!important`, lote a lote (168 → 50)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -641,6 +641,36 @@ real (`CSS.getMatchedStylesForNode`) y marca la candidata que gana. Hace falta p
 resuelve las **capas** (`@layer`) y no ve las reglas que declaran el **atajo** `border` cuando
 se pregunta por `border-top-color` (devuelve vacío y la salta). El estilo base de los campos se
 escondía justo por eso.
+
+## Container queries: la pieza mira SU contenedor, no la pantalla
+
+La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de
+pantalla) y la **pestaña de Problogs del perfil** (una columna, porque al lado hay barra lateral). Con
+media queries eso no se puede saber: miran la pantalla. Con container queries sí.
+
+**Lo que hay montado**:
+
+- `.problogs-feed` y `.problogs-feed-perfil` son contenedores (`container-type: inline-size`,
+  `container-name: feed`), y `@container feed (max-width: 320px)` aprieta la tipografía de la tarjeta.
+  Lo verifica `verificar-container-queries.mjs`, que mete **dos tarjetas idénticas en dos contenedores
+  de ancho distinto en la misma pantalla**: si miraran la pantalla saldrían iguales.
+- El **reparto de columnas** del feed del perfil va contra su **padre**. El feed no puede consultarse
+  a sí mismo (un contenedor no se ve a sí mismo), así que el contenedor se declara en
+  `.perfil-tab-content` y la regla es `@container perfil-feed (max-width: 560px)`.
+
+**Antes** eso era `@media (max-width: 560px)` y tenía el fallo clásico: con la pantalla ancha y la
+columna estrecha (el caso del perfil en escritorio) **no se enteraba** y dejaba dos columnas de 257 px
+donde cabía una. El verificador lo demuestra: con el contenedor a **530 px** y la pantalla ancha, antes
+daban **2 pistas** y ahora **1**.
+
+### Y el servidor local tiene que estar en pie (o todo miente)
+
+Dos veces en la misma sesión los instrumentos midieron una **página de error** porque el servidor local
+se había caído: la vista `auth` midió 3 elementos en vez de 18, y el verificador de container queries
+falló con `display: block` en un elemento que debería ser `grid`. Ninguno de los dos avisó.
+
+Ahora **`foto-estilos.mjs` y `verificar-todo.mjs` comprueban el servidor antes de arrancar** y, si no
+responde, lo dicen y se salen. Levantarlo: `node scripts/servidor-local.mjs 8099`.
 
 ## Chequeo de tipos (npm run check)
 

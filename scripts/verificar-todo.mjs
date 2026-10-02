@@ -21,6 +21,23 @@ const SIN_TIPOS = args.includes('--sin-tipos');
 const iSolo = args.indexOf('--solo');
 const SOLO = iSolo >= 0 ? (args[iSolo + 1] || '') : '';
 
+// PREFLIGHT OBLIGATORIO: si el servidor local no responde, los verificadores miden una PAGINA DE
+// ERROR y salen fallos que no son del CSS (paso el 2026-10-01 dos veces: la vista `auth` midio 3
+// elementos y el verificador de container queries fallo con "display: block"). Antes de gastar
+// minutos, se comprueba y se dice claramente.
+try {
+    const r = await fetch(URL);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const html = await r.text();
+    if (!html.includes('<link')) { console.error(`El servidor responde en ${URL} pero no parece la app (sin <link>).`); process.exit(2); }
+    console.log(`Servidor local OK en ${URL}\n`);
+} catch (e) {
+    console.error(`NO HAY SERVIDOR en ${URL} (${e.message}).`);
+    console.error('Levantalo antes con:  node scripts/servidor-local.mjs 8099');
+    console.error('Sin el, los verificadores miden una pagina de error y los fallos son falsos.');
+    process.exit(2);
+}
+
 let scripts = readdirSync('scripts')
     .filter((f) => f.startsWith('verificar-') && f.endsWith('.mjs'))
     // ESTE fichero NO: el filtro de arriba lo incluye, asi que se llamaba a si mismo y
