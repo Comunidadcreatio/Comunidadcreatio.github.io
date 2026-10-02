@@ -121,6 +121,8 @@ const PAGINAS = [
             })()`);
             await dormir(500);
         },
+        // El `:focus` de un campo obligatorio del registro, forzado por CDP.
+        forzarPseudo: { '#reg-rol': ['focus'] },
         selectores: [
             'html', 'body', '#main-content', '#login-section', '#login-landing',
             '#login-form', '#login-email', '#login-pass', '.auth-container',
@@ -250,13 +252,29 @@ const PAGINAS = [
                 // esa regla (si no lo estuviera ya).
                 const artista = document.getElementById('input-artista');
                 if (artista) artista.readOnly = true;
-                // Y el foco en un campo obligatorio VACIO, para ver el :focus sin que lo tape el :valid.
-                const ano = document.getElementById('input-ano');
-                if (ano) ano.focus();
                 return 'ok';
             })()`);
+            await dormir(400);
+            // El FOCO, con un CLIC DE VERDAD (eventos por CDP). Con `el.focus()` no aterrizaba y las
+            // reglas de :focus de formularios.css se quedaban sin medir; con el clic si entra.
+            const centroAno = await ev(`(() => {
+                const el = document.getElementById('input-ano');
+                if (!el) return null;
+                const r = el.getBoundingClientRect();
+                if (!r.width || !r.height) return null;
+                return JSON.stringify({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) });
+            })()`);
+            if (centroAno && typeof centroAno === 'string' && centroAno.charAt(0) === '{') {
+                const c = JSON.parse(centroAno);
+                await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+                await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
+            }
             await dormir(500);
+            const dondeEstaElFoco = await ev(`document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : null`);
+            console.log('   [panel] foco en: ' + dondeEstaElFoco);
         },
+        // El `:focus` de un campo obligatorio VACIO (:invalid + :focus), forzado por CDP.
+        forzarPseudo: { '#input-ano': ['focus'] },
         selectores: [
             '#obra-form', '#obra-form .form-section', '#obra-form .form-group',
             '#input-titulo', '#input-artista', '#input-ano', '#input-precio',
@@ -547,6 +565,10 @@ const evalJs = async (expr) => {
     return r.result?.result?.value;
 };
 await send('Runtime.enable'); await send('Page.enable');
+// DOM + CSS: hacen falta para FORZAR pseudo-estados (`CSS.forcePseudoState`), que es la unica forma
+// fiable de medir `:focus`: con `el.focus()` no aterriza (y con un clic, menos: en el panel el
+// desplegable abierto tapa el formulario y el clic se lo come el).
+await send('DOM.enable'); await send('CSS.enable');
 
 // Respuestas falsas del backend + sesion, para que las dos paginas monten sin servidor.
 await send('Page.addScriptToEvaluateOnNewDocument', {
@@ -698,6 +720,21 @@ for (const pag of PAGINAS) {
         }
         // Algunas vistas hay que ABRIRLAS (Problogs: feed + publicacion + barra).
         if (pag.abrir) await pag.abrir(evalJs, sleep);
+        // Y los pseudo-estados que la vista pida (normalmente `:focus`): se fuerzan por CDP sobre el
+        // nodo, que es lo unico que funciona de verdad (ver el comentario de DOM.enable arriba).
+        if (pag.forzarPseudo) {
+            const docPseudo = await send('DOM.getDocument', { depth: -1 });
+            for (const [sel, pseudos] of Object.entries(pag.forzarPseudo)) {
+                const nodo = await send('DOM.querySelector', { nodeId: docPseudo.result.root.nodeId, selector: sel });
+                if (nodo.result?.nodeId) {
+                    const r = await send('CSS.forcePseudoState', { nodeId: nodo.result.nodeId, forcedPseudoClasses: pseudos });
+                    if (r.error) console.error(`   no se pudo forzar ${pseudos.join(',')} en ${sel}: ${JSON.stringify(r.error)}`);
+                } else {
+                    console.error(`   no se encontro ${sel} para forzar ${pseudos.join(',')}`);
+                }
+            }
+            await sleep(400);
+        }
         for (const tema of TEMAS) {
             // El tema se fija Y SE COMPRUEBA (theme.js lo elige por la hora del dia).
             for (let intento = 0; intento < 4; intento++) {

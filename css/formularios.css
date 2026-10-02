@@ -376,7 +376,7 @@
 
 [data-required="true"]:focus {
     outline: none;
-    border-color: var(--color-ink) !important;
+    border-color: var(--color-ink);
 }
 
 #formulario-obra *,

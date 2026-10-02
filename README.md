@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 51)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 50)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 51**:
-por hoja, `formularios.css` 19, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 5; por capa,
-`components` 44 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 50**:
+por hoja, `formularios.css` 18, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 5; por capa,
+`components` 43 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -236,6 +236,24 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 15-18 | `formularios.css`: la barra (`.limpiar-btn` y su `:hover`), la maquetación de filas, `#input-descripcion-artistica` y las etiquetas del oscuro | 13 | **8 fuera**, **6 devueltos** (ver abajo) |
 | 19-21 | `style.css`: `.toggle-label`, el relleno del carrusel y el de la barra inferior, más tres re-pruebas | 8 | **3 fuera**, **5 devueltos** (ver abajo) |
 | 22 | `galeria-publica.css`: `#galeria-container.modo-grid .obra-card` | 5 | **5 fuera** (todas redundantes) |
+| 23 | **el `:focus`**: `[data-required="true"]:focus` y los `:focus`/`:read-only` del formulario de la obra | 4 | **1 fuera**, **3 devueltos** (ver abajo) |
+
+#### El `:focus` ya se mide (`CSS.forcePseudoState`)
+
+Era el último hueco del instrumento: la foto **no conseguía** que el foco aterrizara, así que las
+reglas de `:focus` se podían quitar sin que nada lo notara. Se intentó con `el.focus()` (no entra) y
+con un **clic de verdad** por CDP (tampoco: en el panel el desplegable de Mis Cavents está abierto y
+**tapa el formulario**, así que el clic se lo come él).
+
+La forma que funciona es **forzar el pseudo-estado** por CDP (`CSS.forcePseudoState`), la misma que
+se usó para el hover en `dbg-cascada-real.mjs --hover`. La foto ahora acepta `forzarPseudo: { '#input-ano': ['focus'] }`
+por vista (y ya tenía `DOM.enable`/`CSS.enable`).
+
+**Lo que destapó**: de las 4 que se probaron, **3 son portantes** — el campo con foco pierde el borde
+de tinta y los 2 px del `:focus`, y el campo de solo lectura pierde el verde. Solo la de
+`[data-required="true"]:focus` era redundante. Y de paso quedó **verificado** un cambio del turno
+anterior que estaba **sin comprobar**: el `:focus` de `#registro-form` en `auth.css` (se había quitado
+cuando el foco no se medía).
 
 #### La vista `grid`: por fin se miden las tarjetas de la galería
 
@@ -306,9 +324,9 @@ foto no podía verlo (mide el reposo) y el `verificar-hover-botones.mjs` **fall�
 Se devolvieron los dos y volvió a **12/12**. El balance de la familia queda en **5 declaraciones
 fuera de 13 probadas**: poco, pero es la verdad.
 
-**Un hueco del instrumento que queda apuntado**: el `:focus` **no aterriza** en la foto (el estado
-`[data-required="true"]:focus` y los `input:focus` de `formularios.css` no se están midiendo). Lo
-cubre `verificar-foco-visible.mjs` para el anillo de foco, pero no estas reglas de borde.
+**Un hueco que ESTUVO abierto y ya no**: el `:focus` no aterrizaba en la foto (el estado
+`[data-required="true"]:focus` y los `input:focus` de `formularios.css` no se medían). Está resuelto
+más abajo, en «El `:focus` ya se mide (`CSS.forcePseudoState`)».
 
 #### La vista `auth` ahora MONTA los estados (y por qué hacía falta)
 
