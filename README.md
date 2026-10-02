@@ -464,8 +464,49 @@ motivo, que es de accesibilidad, no de gusto:
 
 La píldora es de **11 px en mayúsculas** (texto pequeño), así que necesita 4,5:1. Los roles de la
 paleta que existen están pensados para **bordes y señales**, no para texto sobre fondo suave: **faltan
-roles «on-soft»** (`--color-success-on-soft`, etc.). Eso ya no es sustituir un hex por una variable, es
-**elegir colores nuevos**, y por eso no se hace a ciegas: queda apuntado.
+roles «on-soft»** (`--color-success-on-soft`, etc.).
+
+**Ojo, que esto se malinterpretó una vez**: los valores que se ven HOY **sí cumplen** (el activo claro
+está en 6,99:1 y el desconocido claro en ~5,9:1). Lo que da 4,04:1 y 2,88:1 es **el rol de la paleta
+aplicado a ese fondo**, o sea lo que pasaría si se unificara sin más. O dicho al revés: los hex a mano
+**no son un fallo de accesibilidad**, son un hex fuera de sitio; y el rol que debería sustituirlos
+**no existe todavía**.
+
+#### Los roles «on-soft» y el verificador de contraste (front E)
+
+Se crearon los tres roles que faltaban (`--color-success-on-soft`, `--color-warning-on-soft`,
+`--color-neutral-on-soft`, en los dos temas) **con los valores que ya se veían** → la píldora deja de
+tener hex sueltos y **no se mueve nada** (verificado: la foto, con el antes/después, da diferencias
+solo en el fixture, que es el arreglo del propio instrumento, no el CSS).
+
+Y sobre todo se montó el instrumento que hacía falta para E: **`verificar-contraste-superficies.mjs`**.
+Hasta ahora solo había contraste medido en los **comentarios**; el resto de la interfaz no tenía red.
+El verificador, para cada par (elemento, etiqueta):
+
+1. lee el **color** del texto y su **tamaño y peso**;
+2. busca el **primer fondo no transparente subiendo por los padres** (el fondo efectivo, que casi
+   nunca es el del propio elemento);
+3. calcula el contraste WCAG y exige **4,5:1** (o **3:1** si el texto es grande).
+
+Cubre **16 pares en los dos temas** (auth: título, párrafo, campos, botón principal y secundario;
+panel: etiquetas, campos, tarjeta de Cavent, píldoras de estado y botón de ratio). Los elementos
+**ocultos no cuentan** como fallo (un elemento con tamaño cero no se pinta, y su "fondo efectivo"
+sería el de un padre que tampoco se ve): se informan aparte.
+
+**Está validado por provocación**: poniendo el texto del botón de ratio en gris claro sobre blanco,
+el verificador falla con **1,16:1** en los dos temas. Con el CSS de verdad: **16/16**.
+
+**Y las dos inestabilidades que aparecieron al montarlo** (las dos arregladas):
+
+- La vista `panel` de la foto podía medir el panel **a medio colocar** (la app lo posiciona por JS):
+  salieron **294 diferencias de ancho y alto entre dos corridas del MISMO CSS**. Ahora, además de
+  esperar a las clases, **espera a que la caja de `#obra-form` se asiente** (dos lecturas seguidas
+  iguales).
+- Los campos del **fixture** tenían **ancho intrínseco** (155 ↔ 150 px según cómo hubiera cargado la
+  fuente): 48 diferencias que no existían. Ahora llevan un **ancho en línea**: ahí se mide el estilo
+  calculado de una etiqueta desnuda, no su ancho intrínseco.
+
+Con las dos, la foto es **determinista de verdad** (dos corridas del mismo CSS: **sin diferencias**).
 
 #### La trampa del `!important` que «armaba» a otra regla
 

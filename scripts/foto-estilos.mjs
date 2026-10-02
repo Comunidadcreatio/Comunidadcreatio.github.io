@@ -272,6 +272,22 @@ const PAGINAS = [
             await dormir(500);
             const dondeEstaElFoco = await ev(`document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : null`);
             console.log('   [panel] foco en: ' + dondeEstaElFoco);
+            // Y se espera a que la GEOMETRIA se ASIENTE. La clase puede estar ya puesta mientras el
+            // panel sigue colocandose (la app lo posiciona por JS), y entonces la foto pilla un
+            // fotograma a medias: paso el 2026-10-02, con 294 diferencias de puro ancho/alto entre dos
+            // corridas del MISMO CSS. Se lee la caja hasta que dos lecturas seguidas coinciden.
+            let cajaAnterior = '';
+            for (let i = 0; i < 20; i++) {
+                const caja = await ev(`(() => {
+                    const o = document.getElementById('obra-form');
+                    if (!o) return '';
+                    const r = o.getBoundingClientRect();
+                    return Math.round(r.width) + 'x' + Math.round(r.height) + '@' + Math.round(r.top);
+                })()`);
+                if (caja && caja === cajaAnterior) break;
+                cajaAnterior = caja;
+                await dormir(300);
+            }
         },
         // El `:focus` de un campo obligatorio VACIO (:invalid + :focus), forzado por CDP.
         forzarPseudo: { '#input-ano': ['focus'] },
@@ -683,12 +699,17 @@ const FIXTURE = `(() => {
     f.id = 'fixture-foto';
     f.style.cssText = 'position:absolute;left:-9000px;top:0;width:320px;height:auto;';
     const gif = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    // OJO con el ANCHO de los campos de texto: sin el, el navegador les da su ancho INTRINSECO, que
+    // depende de la FUENTE, y entre dos corridas baila 5px (155 <-> 150) aunque el CSS sea el mismo.
+    // Eso llenaba la comparacion de diferencias que no existen. Se fija con un ancho en linea: lo que
+    // se mide aqui es el ESTILO calculado de una etiqueta desnuda, no su ancho intrinseco.
+    const ANCHO = ' style="width:150px"';
     f.innerHTML = [
-        '<input id="fx-input" type="text" value="texto">',
-        '<input id="fx-email" type="email" value="a@b.c">',
-        '<input id="fx-pass" type="password" value="secreta">',
-        '<textarea id="fx-textarea">texto</textarea>',
-        '<select id="fx-select"><option>uno</option><option>dos</option></select>',
+        '<input id="fx-input" type="text" value="texto"' + ANCHO + '>',
+        '<input id="fx-email" type="email" value="a@b.c"' + ANCHO + '>',
+        '<input id="fx-pass" type="password" value="secreta"' + ANCHO + '>',
+        '<textarea id="fx-textarea"' + ANCHO + '>texto</textarea>',
+        '<select id="fx-select"' + ANCHO + '><option>uno</option><option>dos</option></select>',
         '<button id="fx-button">boton</button>',
         '<button id="fx-submit" type="submit">enviar</button>',
         '<p id="fx-p">parrafo</p>',
