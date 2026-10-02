@@ -1,8 +1,8 @@
 // CASCADA REAL: quien gana una propiedad en un elemento, segun EL NAVEGADOR.
 //
-// POR QUE EXISTE: `dbg-cascada.mjs` recorre las hojas a mano y ordena por especificidad, pero
-// avisa de que es ORIENTATIVO: no conoce las capas (@layer) y se le escapan las reglas
-// anidadas (CSS nesting). En el piloto de `!important` de auth.css eso no bastaba: sabiamos
+// POR QUE EXISTE: el antiguo `dbg-cascada.mjs` (RETIRADO el 2026-10-02) recorria las hojas a mano y
+// ordenaba por especificidad: no conocia las capas (@layer) ni los atajos (`padding` cuando se
+// preguntaba por `padding-top`). En el piloto de `!important` de auth.css eso no bastaba: sabiamos
 // QUE valor cambiaba (#d4d4d4) pero no QUE regla lo ponia.
 //
 // Este pregunta por el protocolo del navegador (CSS.getMatchedStylesForNode), que devuelve las

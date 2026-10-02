@@ -679,11 +679,15 @@ rellenos ni los de error. Para esas familias hace falta además un verificador d
 los que dijeron la verdad — y ninguno de los dos la decía solo.
 
 **Y para saber QUIÉN gana, `dbg-cascada-real.mjs`**: le pregunta al navegador por la cascada
-real (`CSS.getMatchedStylesForNode`) y marca la candidata que gana. Hace falta porque
-`dbg-cascada.mjs` es **orientativo** y tiene dos puntos ciegos que costaron una tarde: no
-resuelve las **capas** (`@layer`) y no ve las reglas que declaran el **atajo** `border` cuando
-se pregunta por `border-top-color` (devuelve vacío y la salta). El estilo base de los campos se
-escondía justo por eso.
+real (`CSS.getMatchedStylesForNode`) y marca la candidata que gana.
+
+**Aquí había otro inspector, `dbg-cascada.mjs`, y se retiró el 2026-10-02.** Tenía dos puntos
+ciegos que costaron una tarde: no resolvía las **capas** (`@layer`) y no veía las reglas que
+declaran el **atajo** `border` cuando se preguntaba por `border-top-color` (devolvía vacío y la
+saltaba). El estilo base de los campos se escondía justo por eso. Además **se anunciaba a sí mismo
+como si resolviera las capas**, que es lo peor que puede hacer un instrumento: dar una respuesta
+segura y equivocada. Si vuelve a hacer falta un inspector, se usa el real; y si alguna vez se
+escribe otro, que **diga lo que NO ve** en su propia salida.
 
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
@@ -909,10 +913,9 @@ resultado.
 | scripts/capar-hojas.mjs | Mete TODO el CSS suelto en `@layer components` de una vez (capado inicial). Deja copia `.antes-de-capar` |
 | scripts/mover-a-base.mjs | Mueve a `base` las reglas que son de ETIQUETA (estén sueltas o dentro de un `@media`, conservando su condición). No mueve las de `:-webkit-autofill` (en `base` perderían y volvería el amarillo del autocompletado). Deja copia `.antes-de-mover` |
 | scripts/auditar-important.mjs | Lista los `!important` con su selector, su propiedad y su capa (`--hoja`, `--resumen`) |
-| scripts/dbg-cascada-real.mjs | **Quién gana una propiedad, de verdad**: pregunta al navegador por la cascada real (`--pagina`, `--tema`, `--elemento`, `--propiedad`, `--valor`, `--input-error`). Es el que hay que usar cuando `dbg-cascada.mjs` no encuentra al culpable |
+| scripts/dbg-cascada-real.mjs | **Quién gana una propiedad, de verdad**: pregunta al navegador por la cascada real (`--pagina`, `--tema`, `--elemento`, `--propiedad`, `--valor`, `--input-error`, `--hover`) |
 | scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
-| scripts/dbg-cascada.mjs | Inspector de cascada: dice qué regla gana de verdad una propiedad en un elemento, y la cadena de padres con su ancho. No ve los atajos (`padding`) |
 | scripts/verificar-todo.mjs | **Corre TODOS los verificadores** (los que empiecen por `verificar-`, menos él mismo) y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/verificar-estados-inputs-auth.mjs | Los estados de los campos de auth (`:invalid`, `:valid`, `.input-error`) en los dos temas: lo que la foto de estilos **no** puede ver (solo mide los campos vacíos) |
