@@ -50,6 +50,12 @@ const evalJs = async (expr) => {
     return r.result?.result?.value;
 };
 const MOCK = `(() => {
+    // SIN SERVICE WORKER: la app es una PWA y, en cuanto su SW se activa, las navegaciones entre sus
+    // dos paginas dejan de ser de fiar (servia el indice al pedir auth.html y la medicion acababa en
+    // la pagina equivocada, sin avisar). Paso el 2026-10-02.
+    try {
+        if (navigator.serviceWorker) { navigator.serviceWorker.register = () => Promise.reject(new Error('SW desactivado en las pruebas')); }
+    } catch (_) {}
     try {
         const enAuth = /(auth|reset-password)\\.html$/.test(location.pathname);
         if (enAuth) { localStorage.removeItem('artistaData'); localStorage.removeItem('creatio_auth_token_persist'); }
@@ -139,6 +145,15 @@ const PARES = {
 
 for (const [vista, pares] of Object.entries(PARES)) {
     await send('Page.navigate', { url: URL_BASE + (vista === 'auth' ? 'auth.html' : '') });
+    // OJO: esperar a `#login-form` NO basta para la vista de auth, porque index.html tambien tiene un
+    // `#login-form` oculto (del modal viejo): la espera se daba por buena antes de que la navegacion
+    // terminara y esa mitad de las comprobaciones medía index.html sin avisar. Primero la RUTA.
+    for (let i = 0; i < 60; i++) {
+        const ruta = await evalJs(`location.pathname`);
+        const esperada = vista === 'auth' ? 'auth.html' : 'index.html';
+        if (String(ruta).endsWith(esperada) || (vista !== 'auth' && String(ruta).endsWith('/'))) break;
+        await sleep(300);
+    }
     const listo = vista === 'auth' ? `!!document.getElementById('login-form')` : `!!document.getElementById('toggle-panel')`;
     for (let i = 0; i < 60; i++) { if (await evalJs(listo) === true) break; await sleep(300); }
     await sleep(1500);

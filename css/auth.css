@@ -248,7 +248,7 @@ legend {
 
 /* Cursor parpadeante del typewriter (via JS .typing-cursor) */
 .typing-cursor {
-    animation: blink 1.2s step-end infinite !important;
+    animation: blink 1.2s step-end infinite;
     color: var(--color-ink);
     font-weight: 400;
 }

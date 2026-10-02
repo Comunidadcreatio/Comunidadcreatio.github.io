@@ -53,10 +53,31 @@ const check = (nombre, ok, detalle) => {
 };
 
 await send('Runtime.enable'); await send('Page.enable');
+await send('DOM.enable'); await send('CSS.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
 await send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(() => {
-        try { localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', rol: 'artista' })); localStorage.setItem('creatio_auth_token_persist', 'tok'); } catch (_) {}
+        // SIN SERVICE WORKER. La app es una PWA y, en cuanto su SW se activa, las navegaciones entre
+        // sus dos paginas dejan de ser de fiar: al pedir auth.html servia o redirigia al indice, y la
+        // medicion acababa haciendose sobre index.html sin avisar (paso el 2026-10-02: se creia que
+        // auth.css no se cargaba y el problema era que la pagina no era la de auth).
+        try {
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.register = () => Promise.reject(new Error('SW desactivado en las pruebas'));
+            }
+        } catch (_) {}
+        try {
+            // La SESION depende de la pagina: en auth.html no puede haberla, o la app redirige al
+            // indice y la medicion acaba en la pagina equivocada (paso el 2026-10-02).
+            const enAuth = /(auth|reset-password)\\.html$/.test(location.pathname);
+            if (enAuth) {
+                localStorage.removeItem('artistaData');
+                localStorage.removeItem('creatio_auth_token_persist');
+            } else {
+                localStorage.setItem('artistaData', JSON.stringify({ id: 480001, nombre_artista: 'T', rol: 'artista' }));
+                localStorage.setItem('creatio_auth_token_persist', 'tok');
+            }
+        } catch (_) {}
         const json = async (d) => ({ ok: true, status: 200, json: async () => d });
         const realFetch = window.fetch.bind(window);
         window.fetch = async (input, init) => {
@@ -142,7 +163,25 @@ check('cada tarjeta tiene su retardo (0 / 0.04 / 0.08 / 0.12 / 0.12)',
 // ninguna hoja, asi que falta averiguar quien lo resetea (con `dbg-cascada-real.mjs --pagina auth.html
 // --elemento ".typing-cursor" --propiedad animation-name`, cuando el elemento exista en la pagina).
 // Se INFORMA, no se cuenta como fallo: hasta saberlo, no se toca ese `!important`.
-await send('Page.navigate', { url: URL_BASE + 'auth.html' });
+const nav = await send('Page.navigate', { url: URL_BASE + 'auth.html' });
+if (nav.error) console.log('   AVISO Page.navigate dio error: ' + JSON.stringify(nav.error));
+// OJO: esperar solo a `#login-form` NO basta, porque index.html tambien tiene un `#login-form`
+// (oculto, del modal viejo) y la espera se daba por buena ANTES de que la navegacion terminara: la
+// medicion se hacia sobre index.html, donde auth.css no esta cargada. Se espera a la RUTA primero, y
+// si no cambia, se navega por JS (que es lo que funciona en esta app).
+let enAuth = false;
+for (let i = 0; i < 40; i++) {
+    if (String(await evalJs(`location.pathname`)).endsWith('auth.html')) { enAuth = true; break; }
+    await sleep(300);
+}
+if (!enAuth) {
+    await evalJs(`location.href = 'auth.html'`);
+    for (let i = 0; i < 40; i++) {
+        if (String(await evalJs(`location.pathname`)).endsWith('auth.html')) { enAuth = true; break; }
+        await sleep(300);
+    }
+    console.log('   (se navego por JS: ' + (enAuth ? 'funciono' : 'TAMPOCO') + ')');
+}
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('login-form')`) === true) break; await sleep(300); }
 await sleep(1500);
 const cursor = await evalJs(`(() => {
@@ -151,15 +190,58 @@ const cursor = await evalJs(`(() => {
     const cs = getComputedStyle(c);
     return JSON.stringify({
         esDelApp: !!delApp, nombre: cs.animationName, duracion: cs.animationDuration,
+        curva: cs.animationTimingFunction, repeticiones: cs.animationIterationCount,
         color: cs.color, peso: cs.fontWeight
     });
 })()`);
-console.log('   cursor del typewriter (informativo, ver la nota del codigo): ' + cursor);
+console.log('   cursor del typewriter: ' + cursor);
+const paginaCursor = String(await evalJs(`location.pathname`));
+// SI LA MEDICION NO ES EN auth.html, SE FALLA Y SE DICE. Este fue el fallo que costo una tarde: la
+// navegacion no llegaba (la app redirigia por la sesion, y ademas habia un service worker sirviendo el
+// indice), la medicion se hacia sobre index.html —donde auth.css no esta cargada— y se concluyo que la
+// regla del cursor no aplicaba. Ahora, si la pagina no es la que toca, esto se pone en rojo.
+check('la medicion del cursor se hace en auth.html (no en el indice)',
+    paginaCursor.endsWith('auth.html'), 'pagina medida: ' + paginaCursor);
 const cu = JSON.parse(cursor);
-if (cu.nombre === 'blink') {
-    check('el cursor parpadea con `blink`', cu.duracion === '1.2s', cu.duracion);
-} else {
-    console.log(`   AVISO el cursor tiene animation-name "${cu.nombre}" en vez de "blink" (su regla si aplica: color ${cu.color}, peso ${cu.peso})`);
+if (paginaCursor.endsWith('auth.html')) {
+    check('el cursor parpadea con `blink`', cu.nombre === 'blink', cu.nombre);
+    // OJO: `step-end` y `steps(1)` son LO MISMO (`steps(1, end)`), y el navegador devuelve `steps(1)`.
+    check('durante 1.2s, sin parar (infinite) y a saltos (step-end = steps(1))',
+        cu.duracion === '1.2s' && cu.repeticiones === 'infinite' && (cu.curva === 'steps(1)' || cu.curva === 'step-end'),
+        `${cu.duracion} / ${cu.repeticiones} / ${cu.curva}`);
+}
+if (cu.nombre !== 'blink') {
+    // ¿QUIEN se lo quita? Se le pregunta al navegador por la cascada real del elemento (esto es lo
+    // que hace `dbg-cascada-real.mjs`, pero para un elemento que creamos aqui y que puede no existir
+    // en la pagina). Se listan las declaraciones de animacion que casan, en orden de cascada.
+    const doc = await send('DOM.getDocument', { depth: -1 });
+    const nodo = await send('DOM.querySelector', { nodeId: doc.result.root.nodeId, selector: '.typing-cursor' });
+    const estilos = await send('CSS.getMatchedStylesForNode', { nodeId: nodo.result?.nodeId || 0 });
+    if (estilos.error) {
+        console.log('   (no se pudo pedir la cascada: ' + JSON.stringify(estilos.error) + ')');
+    } else {
+        const filas = [];
+        for (const m of estilos.result.matchedCSSRules || []) {
+            const props = (m.rule.style?.cssProperties || []).filter((p) => p.name.startsWith('animation') || p.name === 'all');
+            if (!props.length) continue;
+            filas.push({
+                selector: m.rule.selectorList.text.replace(/\s+/g, ' ').slice(0, 70),
+                origen: (m.rule.origin || '?') + (m.rule.media ? ' @media ' + (m.rule.media.text || '').slice(0, 40) : ''),
+                props: props.map((p) => p.name + ': ' + (p.value || '') + (p.important ? ' !important' : '')).join(' | ')
+            });
+        }
+        console.log('   --- reglas que declaran animacion en ese elemento (' + filas.length + '):');
+        for (const f of filas) console.log(`       ${f.selector}  [${f.origen}]  ${f.props}`);
+        // Y los estilos heredados/por defecto, por si el culpable esta ahi.
+        const inlineYHojas = (estilos.result.matchedCSSRules || []).length;
+        console.log('   (reglas que casan con el elemento: ' + inlineYHojas + ')');
+        for (const m of estilos.result.matchedCSSRules || []) {
+            console.log('       casa: ' + m.rule.selectorList.text.replace(/\s+/g, ' ').slice(0, 80) +
+                '  [' + (m.rule.origin || '?') + ']  ' +
+                (m.rule.style?.cssProperties || []).map((p) => p.name).join(', ').slice(0, 90));
+        }
+        console.log('   hojas cargadas: ' + await evalJs(`JSON.stringify([...document.styleSheets].map((s) => (s.href || '(inline)').split('/').pop()))`));
+    }
 }
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

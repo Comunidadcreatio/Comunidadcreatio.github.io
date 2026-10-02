@@ -322,7 +322,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    `rgb(22,163,74)`), y luego el cambio, una línea. Claro `rgb(22,163,74)`, oscuro
    `rgb(34,197,94)`. El verificador de hover pasa a **24/24** y la foto sigue sin diferencias
    (el cambio está dentro de un `:hover`). **Este sí cambia lo que se ve** al pasar el ratón.
-   **La campaña queda CERRADA**: 168 → 45 (73 %), y todo lo que queda está justificado con medición.
+   **La campaña queda CERRADA**: 168 → 44 (74 %), y todo lo que queda está justificado con medición.
    **Las animaciones de salida (front D), HECHAS**: los cinco `!important` de `.obra-card.modo-grid-exit`
    eran el último trozo sin red (una animación de 300 ms no sale en una foto). Se cerró con
    `verificar-animaciones-tarjetas.mjs` (lee la animación **calculada**: nombre, duración, curva,

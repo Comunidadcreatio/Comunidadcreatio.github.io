@@ -105,10 +105,10 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 45)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 44)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 45**:
-por hoja, `formularios.css` 18, `auth.css` 14 y `style.css` 13; por capa, `components` 38 y `base` 7.
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 44**:
+por hoja, `formularios.css` 18, `auth.css` 13 y `style.css` 13; por capa, `components` 37 y `base` 7.
 **CUATRO hojas ya no tienen ninguno**: `panel-artista.css`, `notificaciones.css` (**borradas sus reglas
 muertas**), `skeleton.css` (que se ha **eliminado** entero: solo hablaba de `.skeleton-card`/
 `.skeleton-galeria`, y nada crea esos elementos) y `galeria-publica.css` (sus cinco eran de una
@@ -197,7 +197,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 45)
+## La campaña de los `!important`, lote a lote (168 → 44)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -262,12 +262,24 @@ en cualquier momento): el nombre, la duración, la curva, el relleno y **el reta
 la salida pasa a ser la de entrada (`gridCardEnter`, 0.35s, ease-out, con los retardos de la entrada).
 Con el `id`, **5/5** y los valores idénticos a los de antes de quitar los `!important`.
 
-**Lo que queda abierto y se dice**: el `!important` de `.typing-cursor` (el cursor del typewriter en
-auth) **no se ha tocado**, porque al medirlo salió algo raro: su regla **sí llega** al elemento (el
-color y el `font-weight` salen de ella) pero su `animation` **no se aplica** (`animation-name: none`,
-`animation-duration: 0s`), y no hay ningún `animation: none` que case con ese selector en ninguna hoja.
-Falta averiguar quién lo resetea, y hasta saberlo no se toca. El verificador lo **informa** en vez de
-contarlo como fallo.
+**Lo que quedó abierto con el cursor, y cómo se cerró** (era un fallo MÍO, no de la app): el
+`!important` de `.typing-cursor` se dejó sin tocar porque al medirlo salía `animation-name: none`
+—como si su regla no aplicara— y no había ningún `animation: none` que le casara por selector. La
+explicación era **el instrumento**:
+
+1. El verificador navegaba a `auth.html` y **la app lo devolvía al índice**, porque el mock le ponía
+   sesión también ahí (faltaba la lógica condicional que sí tiene la foto). Y la espera
+   (`#login-form`) **no lo detectaba**, porque **index.html también tiene un `#login-form`** (oculto,
+   del modal viejo): la medición se hacía sobre index.html, **donde `auth.css` no está cargada**, y el
+   `none` era lo normal.
+2. De propina: la app es una **PWA** y su **service worker** servía el índice al pedir `auth.html`.
+
+Arreglado en los tres instrumentos (foto y los dos verificadores): **sesión condicional**, **service
+worker bloqueado** en las pruebas, y —lo más importante— **si la medición no ocurre en la página que
+toca, el verificador FALLA y lo dice** en vez de medir en silencio la página equivocada.
+
+Con eso, el cursor **sí** aplica su animación (`blink`, 1.2s, `steps(1)`, `infinite`) y su
+`!important` **sobraba**: se quitó y el verificador lo comprueba (8/8).
 
 #### Cierre de la campaña (168 → 50)
 

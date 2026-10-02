@@ -606,6 +606,12 @@ await send('DOM.enable'); await send('CSS.enable');
 // Respuestas falsas del backend + sesion, para que las dos paginas monten sin servidor.
 await send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(() => {
+        // SIN SERVICE WORKER: la app es una PWA y, en cuanto su SW se activa, las navegaciones entre
+        // sus dos paginas dejan de ser de fiar (el indice se servia al pedir auth.html y la medida
+        // acababa en la pagina equivocada). Paso el 2026-10-02.
+        try {
+            if (navigator.serviceWorker) { navigator.serviceWorker.register = () => Promise.reject(new Error('SW desactivado en las pruebas')); }
+        } catch (_) {}
         try {
             // La SESION depende de la pagina: en auth.html/reset-password.html NO puede haber
             // sesion, o la app redirige y la vista "auth" acaba midiendo elementos del INDICE
