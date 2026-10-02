@@ -309,9 +309,16 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    las borra al dispararse un `input`.
    **El rojo del error, UNIFICADO y medido**: era `#e74c3c` a mano en una regla vieja (que gana por
    especificidad) en vez de `var(--color-danger)`. Ahora claro = `rgb(220,38,38)` y oscuro =
-   `rgb(239,68,68)`, y las 36 diferencias de la foto son solo ese borde. Quedan dos `#e74c3c` en el
-   **hover del botón de borrar de un Cavent** (`formularios.css`): no se tocan porque el verificador
-   de hover solo cubre la barra de pasos y **hoy no hay con qué medirlos**.
+   `rgb(239,68,68)`, y las 36 diferencias de la foto son solo ese borde.
+   **Y el segundo rojo también**: el del **hover del botón de borrar de una tarjeta de Cavent**
+   (`formularios.css`). Para poder medirlo hubo que **extender el verificador de hover**: el mock
+   devolvía lista vacía porque el endpoint es `/api/artistas/mis-obras` y `'mis-obras'` **no
+   contiene** `'/obras'`. Las comprobaciones nuevas resuelven `var(--color-danger)` con una sonda y
+   exigen que el fondo y el borde en hover **sean** esa variable: **antes fallaba**
+   (`rgb(231,76,60)` vs `rgb(220,38,38)`) y ahora pasa (**18/18**). La foto mide ya las tarjetas en
+   reposo (680 medidas). Queda **un `#4caf50`** en el gemelo de duplicar: cambia de tono y no se
+   toca sin decidirlo.
+   **La campaña queda CERRADA**: 168 → 50 (70 %), y todo lo que queda está justificado con medición.
    **De `formularios.css`** (lotes 15-18): 13 fuera y **8 devueltos** (los 2 ultimos los cazo el verificador de hover: el color del .limpiar-btn:hover no cambiaba) (portantes: el `:valid` verde, la
    etiqueta, `.form-row-tight`, el `min-height` del textarea y el `.limpiar-btn` en oscuro). La vista
    `panel` también **monta estados** (rellena campos, `read-only` y foco) y mide 35 elementos.

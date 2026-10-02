@@ -297,7 +297,10 @@ const PAGINAS = [
             '.form-block .form-group textarea',
             // La familia del carrusel y el boton de ratio inactivo (los `!important` de style.css),
             // y las etiquetas del encabezado, que se pintan u ocultan con `display`.
-            '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label'
+            '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label',
+            // Las tarjetas del desplegable de Mis Cavents (con los botones de duplicar y borrar).
+            '.cavent-item', '.cavent-item-titulo', '.cavent-item-actions .btn-del',
+            '.cavent-item-actions .btn-dup'
         ]
     },
     {
@@ -621,6 +624,16 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (method !== 'GET') return json({ success: true, id: 9 });
             if (u.includes('heartbeat')) return json({ ok: true });
             if (u.includes('mis-reacciones')) return json({ reacciones: [] });
+            // Las OBRAS del artista: son las que pintan las tarjetas del desplegable "Mis Cavents"
+            // (ahi viven los botones de duplicar y borrar). OJO: 'mis-obras' NO contiene '/obras',
+            // asi que necesita su propia rama.
+            if (u.includes('mis-obras')) return json({
+                success: true,
+                obras: [
+                    { id: 9001, titulo: 'Cavent de prueba', precio: '100', estado: 'disponible' },
+                    { id: 9002, titulo: 'Otro Cavent', precio: '200', estado: 'reservado' }
+                ]
+            });
             // Directorio del chat: sin esto la seccion sale vacia ("No hay pueblos") y se
             // fotografia el estado equivocado. Un pueblo con un artista (para los
             // contadores y la fila) y el resto vacios, que es el caso normal.

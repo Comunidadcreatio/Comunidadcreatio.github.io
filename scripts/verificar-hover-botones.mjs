@@ -99,6 +99,16 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (method !== 'GET') return json({ success: true, id: 9 });
             if (u.includes('heartbeat')) return json({ ok: true });
             if (u.includes('mis-reacciones')) return json({ reacciones: [] });
+            // Las OBRAS del artista: son las que pintan las tarjetas del desplegable "Mis Cavents",
+            // que es donde viven los botones de duplicar y borrar (con su :hover de color).
+            // OJO con el orden: 'mis-obras' NO contiene '/obras', asi que necesita su propia rama.
+            if (u.includes('mis-obras')) return json({
+                success: true,
+                obras: [
+                    { id: 9001, titulo: 'Cavent de prueba', precio: '100', estado: 'disponible' },
+                    { id: 9002, titulo: 'Otro Cavent', precio: '200', estado: 'reservado' }
+                ]
+            });
             if (u.includes('/obras')) return json([]);
             if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
             return json({ success: true, no_leidas: 0, count: 0, usuario: { id: 480001, nombre_artista: 'T', rol: 'artista' } });
@@ -155,6 +165,50 @@ await probar('light', '#obra-step-crear', 'boton Crear', ['borde']);
 await probar('dark', '#obra-step-crear', 'boton Crear', ['borde']);
 await probar('light', '#obra-step-limpiar', 'boton Limpiar', ['color']);
 await probar('dark', '#obra-step-limpiar', 'boton Limpiar', ['color']);
+
+// ---------------------------------------------------------------------------
+// Los botones de las TARJETAS de "Mis Cavents" (duplicar y borrar). Estos SI se rellenan al pasar el
+// raton, y su color estaba escrito a mano (`#e74c3c`) en vez de salir de la paleta. Aqui no se
+// comprueba "cambia": se comprueba que el color en hover ES el de la variable de la paleta. Asi,
+// mientras quede un hex a mano, esto FALLA.
+// ---------------------------------------------------------------------------
+// Resuelve una variable de la paleta al color que pinta de verdad (con una sonda en el DOM).
+const colorDePaleta = async (variable, tema) => {
+    await evalJs(`document.documentElement.setAttribute('data-theme', ${JSON.stringify(tema)})`);
+    await sleep(150);
+    return await evalJs(`(() => {
+        const sonda = document.createElement('div');
+        sonda.style.color = 'var(${variable})';
+        document.body.appendChild(sonda);
+        const c = getComputedStyle(sonda).color;
+        sonda.remove();
+        return c;
+    })()`);
+};
+const probarColorDePaleta = async (tema, sel, etiqueta, variable) => {
+    const esperado = await colorDePaleta(variable, tema);
+    const c = await centroDe(sel);
+    if (!c) { apunta(`${etiqueta} (${tema}): existe y se puede medir`, false, 'no se encontro el elemento'); return; }
+    const r = JSON.parse(await estadoEstable(sel));
+    await mover(c.x, c.y);
+    const e = JSON.parse(await estadoEstable(sel));
+    apunta(`${etiqueta} (${tema}): el fondo en hover es ${variable}`, e.fondo === esperado, `${e.fondo} · ${variable} = ${esperado} (en reposo ${r.fondo})`);
+    apunta(`${etiqueta} (${tema}): el borde en hover es ${variable}`, e.borde === esperado, `${e.borde} · ${variable} = ${esperado}`);
+    await mover(4, 4);
+    const f = JSON.parse(await estadoEstable(sel));
+    apunta(`${etiqueta} (${tema}): al salir vuelve el estado de reposo`, f.fondo === r.fondo && f.borde === r.borde, `fondo ${r.fondo} -> ${f.fondo}`);
+};
+
+// Las tarjetas necesitan el desplegable ABIERTO (los botones viven dentro).
+await evalJs(`document.getElementById('cavents-trigger')?.click()`);
+for (let i = 0; i < 25; i++) {
+    const listo = await evalJs(`!!document.querySelector('.cavent-item-actions .btn-del')`);
+    if (listo === true) break;
+    await sleep(300);
+}
+await sleep(500);
+await probarColorDePaleta('light', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
+await probarColorDePaleta('dark', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
 
 const fallos = checks.filter((c) => !c.ok);
 console.log(`\nRESULTADO: ${checks.length - fallos.length}/${checks.length} comprobaciones OK — ${fallos.length ? fallos.length + ' fallos' : 'sin fallos'}`);

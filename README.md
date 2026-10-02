@@ -238,6 +238,44 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 22 | `galeria-publica.css`: `#galeria-container.modo-grid .obra-card` | 5 | **5 fuera** (todas redundantes) |
 | 23 | **el `:focus`**: `[data-required="true"]:focus` y los `:focus`/`:read-only` del formulario de la obra | 4 | **1 fuera**, **3 devueltos** (ver abajo) |
 
+#### Cierre de la campaña (168 → 50)
+
+**Qué se ha hecho**: **118 `!important` menos** (70 %), con **la foto sin diferencias en cada paso** y
+la suite en verde. Por el camino se fueron además **~1.470 líneas de CSS muerto y 46 reglas** que no
+pintaban nada, y **tres hojas quedaron a cero** (`panel-artista.css`, `notificaciones.css` y
+`skeleton.css`, esta última eliminada entera).
+
+**Los 50 que quedan están todos justificados, con medición detrás**:
+
+| Cuántos | Por qué se quedan |
+|---|---|
+| 7 | **Por diseño**: el anillo de foco y `prefers-reduced-motion` (capa `base`, con verificadores propios) |
+| 8 | **`-webkit-autofill`**: la técnica obligatoria de Chrome para el autocompletado |
+| 5 | **Animación transitoria** (`.modo-grid-exit`, `.typing-cursor`): duran 300 ms y la foto no mide estados transitorios |
+| 30 | **Portantes, medidos uno a uno** (contrastes en modo oscuro, estados de error y válido, transparencias, bordes de foco) |
+
+**Lo que ha quedado montado** (y vale más que el número):
+
+- **`foto-estilos.mjs`**: 680 medidas, 8 vistas, los dos temas y los dos anchos. Monta **estados**
+  (campos rellenos, `.input-error`, `.input-available`), **fuerza `:focus` y `:hover` por CDP**
+  (`CSS.forcePseudoState`) y tiene `--vistas` para aislar una vista.
+- **21 verificadores** (`verificar-todo.mjs`), entre ellos el de **hover**, el de **estados de los
+  campos de auth** y el de **foco visible**, todos validados provocando el fallo.
+- **`auditar-css-muerto.mjs`** + **`borrar-css-muerto.mjs`**: criban y borran CSS muerto con doble
+  comprobación (navegador + foto del estado anterior).
+- **`dbg-cascada-real.mjs`** (`--hover`) y **`importantes-lote.mjs`** (`--linea`, `--props`).
+
+**Las reglas que ha dejado el camino** (todas aprendidas a golpes, están contadas arriba):
+
+1. **Medir antes y después**, y **repetir la foto con el mismo CSS** antes de creerse una diferencia.
+2. **No medir en paralelo** con la suite (salieron 44 diferencias falsas).
+3. Si una vista mide de repente mucho menos, mirar **el servidor local** antes que el CSS.
+4. Al **borrar**, leer la lista de lo que se borra: la foto **no ve lo oculto** (el botón de volver se
+   quedó sin estilos sin que la foto lo notara).
+5. Quitar un `!important` **cambia quién gana en otras reglas**, no solo en la suya.
+6. Para `:hover` y `:focus` **no basta con simular**: hay que forzar el pseudo-estado por CDP.
+7. `:where()` en un `:not()` cuando no se quiere subir la especificidad.
+
 #### El `:focus` ya se mide (`CSS.forcePseudoState`)
 
 Era el último hueco del instrumento: la foto **no conseguía** que el foco aterrizara, así que las
@@ -366,9 +404,25 @@ Las 36 diferencias de la foto son **solo** el borde de error de ese campo (`#log
 sigue a la paleta, también en oscuro.
 
 **Quedan dos `#e74c3c` más** en `formularios.css`, en el **hover del botón de borrar de un Cavent**
-(`.cavent-item-actions .btn-del:hover`) junto a un `#4caf50` de su gemelo de duplicar. No se tocan
-aquí por una razón concreta: son un **estado `:hover`** y el verificador de hover solo cubre los
-botones de la barra de pasos, así que **hoy no hay con qué medirlos**.
+(`.cavent-item-actions .btn-del:hover`) junto a un `#4caf50` de su gemelo de duplicar. **Ya está
+resuelto el rojo** (ver abajo): se extendió el verificador de hover a esos botones y se unificó.
+
+#### El hover de las tarjetas: el verificador, extendido
+
+El verificador de hover solo cubría los botones de la barra de pasos. Para poder tocar el rojo del
+botón de borrar de una tarjeta hacía falta **medirlo**, y para eso hacían falta **tarjetas**: el mock
+devolvía lista vacía porque el endpoint es `/api/artistas/mis-obras` y `'mis-obras'` **no contiene**
+`'/obras'`, así que ninguna de las dos condiciones de los mocks lo cogía. Añadida la rama (con dos
+obras), las tarjetas existen y el desplegable se puede abrir en la prueba.
+
+Las comprobaciones nuevas **no dicen «cambia»**: dicen que el fondo y el borde en hover **son
+`var(--color-danger)`** (resolviendo la variable con una sonda en el DOM, para comparar contra el
+color de la paleta y no contra un hex copiado). **Antes de unificar, el verificador fallaba** —
+`rgb(231,76,60)` frente a `rgb(220,38,38)`— y después pasa: **18/18**. La foto, mientras tanto, mide
+ya las tarjetas en reposo (680 medidas).
+
+Queda **un `#4caf50`** en el gemelo de duplicar (`.btn-dup:hover`): es un verde a mano cuyo sitio
+natural también sería la paleta (`--color-success`), pero **cambia de tono** y no se toca sin decidirlo.
 
 #### La trampa del `!important` que «armaba» a otra regla
 

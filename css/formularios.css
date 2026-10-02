@@ -1743,10 +1743,14 @@ body.creando-problogs #crear-problogs-contenido {
     border-color: #4caf50;
 }
 
+/* El rojo estaba a mano (#e74c3c) cuando aun no existia la paleta: el 2026-10-01 se cambio por
+   `var(--color-danger)`, que es la fuente de verdad (#dc2626 en claro, #ef4444 en oscuro). Lo mide
+   `verificar-hover-botones.mjs`, que comprueba que el fondo y el borde en hover SON esa variable
+   (antes fallaba: daba rgb(231,76,60) frente a la paleta). */
 .cavent-item-actions .btn-del:hover {
-    background: #e74c3c;
+    background: var(--color-danger);
     color: #fff;
-    border-color: #e74c3c;
+    border-color: var(--color-danger);
 }
 
 /* Dark mode */
