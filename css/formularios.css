@@ -1737,10 +1737,14 @@ body.creando-problogs #crear-problogs-contenido {
     border-color: var(--color-ink);
 }
 
+/* El verde tambien estaba a mano (#4caf50), como el rojo del boton de al lado: ahora sale de la
+   paleta (`var(--color-success)`: #16a34a en claro y #22c55e en oscuro). Lo mide
+   verificar-hover-botones.mjs igual que el rojo: antes fallaba (rgb(76,175,80) frente a la paleta)
+   y despues pasa. OJO: esto SI cambia el tono del boton al pasar el raton. */
 .cavent-item-actions .btn-dup:hover {
-    background: #4caf50;
+    background: var(--color-success);
     color: #fff;
-    border-color: #4caf50;
+    border-color: var(--color-success);
 }
 
 /* El rojo estaba a mano (#e74c3c) cuando aun no existia la paleta: el 2026-10-01 se cambio por

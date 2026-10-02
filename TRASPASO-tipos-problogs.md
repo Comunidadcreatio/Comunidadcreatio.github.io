@@ -315,9 +315,13 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    devolvía lista vacía porque el endpoint es `/api/artistas/mis-obras` y `'mis-obras'` **no
    contiene** `'/obras'`. Las comprobaciones nuevas resuelven `var(--color-danger)` con una sonda y
    exigen que el fondo y el borde en hover **sean** esa variable: **antes fallaba**
-   (`rgb(231,76,60)` vs `rgb(220,38,38)`) y ahora pasa (**18/18**). La foto mide ya las tarjetas en
-   reposo (680 medidas). Queda **un `#4caf50`** en el gemelo de duplicar: cambia de tono y no se
-   toca sin decidirlo.
+   (`rgb(231,76,60)` vs `rgb(220,38,38)`) y ahora pasa. La foto mide ya las tarjetas en
+   reposo (680 medidas).
+   **Y el verde del gemelo de duplicar, también** (decisión tomada): primero la comprobación
+   (fondo y borde en hover = `var(--color-success)`), que **falló** (`rgb(76,175,80)` vs
+   `rgb(22,163,74)`), y luego el cambio, una línea. Claro `rgb(22,163,74)`, oscuro
+   `rgb(34,197,94)`. El verificador de hover pasa a **24/24** y la foto sigue sin diferencias
+   (el cambio está dentro de un `:hover`). **Este sí cambia lo que se ve** al pasar el ratón.
    **La campaña queda CERRADA**: 168 → 50 (70 %), y todo lo que queda está justificado con medición.
    **De `formularios.css`** (lotes 15-18): 13 fuera y **8 devueltos** (los 2 ultimos los cazo el verificador de hover: el color del .limpiar-btn:hover no cambiaba) (portantes: el `:valid` verde, la
    etiqueta, `.form-row-tight`, el `min-height` del textarea y el `.limpiar-btn` en oscuro). La vista

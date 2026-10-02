@@ -424,6 +424,21 @@ ya las tarjetas en reposo (680 medidas).
 Queda **un `#4caf50`** en el gemelo de duplicar (`.btn-dup:hover`): es un verde a mano cuyo sitio
 natural también sería la paleta (`--color-success`), pero **cambia de tono** y no se toca sin decidirlo.
 
+#### Y el verde, también (decisión tomada)
+
+Se decidió unificarlo, y se hizo con el mismo método: **primero la comprobación** (el fondo y el borde
+en hover deben **ser** `var(--color-success)`), que **falló** —`rgb(76,175,80)` frente a
+`rgb(22,163,74)`— y después el cambio, una línea. Ahora:
+
+| | antes | después |
+|---|---|---|
+| Claro | `rgb(76, 175, 80)` | **`rgb(22, 163, 74)`** (`#16a34a`) |
+| Oscuro | `rgb(76, 175, 80)` | **`rgb(34, 197, 94)`** (`#22c55e`) |
+
+El verificador de hover pasa a **24/24** y la foto sigue **sin diferencias** (680 medidas): el cambio
+está dentro de un `:hover`, así que el estado de reposo no se toca. **Este sí cambia lo que se ve** al
+pasar el ratón por el botón de duplicar: el verde pasa a ser el de la paleta.
+
 #### La trampa del `!important` que «armaba» a otra regla
 
 El lote 12 dejó un caso que merece quedar escrito. En `auth.css` había dos reglas en modo oscuro:

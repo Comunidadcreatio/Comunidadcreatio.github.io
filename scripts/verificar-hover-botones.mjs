@@ -209,6 +209,9 @@ for (let i = 0; i < 25; i++) {
 await sleep(500);
 await probarColorDePaleta('light', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
 await probarColorDePaleta('dark', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
+// Y el gemelo de DUPLICAR, que tenia el mismo problema con un verde a mano (`#4caf50`).
+await probarColorDePaleta('light', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success');
+await probarColorDePaleta('dark', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success');
 
 const fallos = checks.filter((c) => !c.ok);
 console.log(`\nRESULTADO: ${checks.length - fallos.length}/${checks.length} comprobaciones OK — ${fallos.length ? fallos.length + ' fallos' : 'sin fallos'}`);
