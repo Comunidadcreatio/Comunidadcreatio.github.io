@@ -329,6 +329,40 @@ const PAGINAS = [
         ]
     },
     {
+        // La GALERIA en modo EXPLORAR (rejilla). Hace falta una vista propia porque las reglas
+        // `#galeria-container.modo-grid .obra-card` (galeria-publica.css, cinco `!important`) solo
+        // aplican con la clase `modo-grid` puesta, y esa clase la pone el boton de Explorar.
+        nombre: 'grid',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            // La obra se carga por el camino real (el mismo que usa el perfil), y luego se entra en
+            // Explorar con su boton, que es quien pone la clase.
+            await ev(`window.abrirObraDesdePerfil ? window.abrirObraDesdePerfil(55001) : null`);
+            await dormir(2600);
+            await ev(`document.getElementById('btn-buscar')?.click()`);
+            // Estado determinista: la rejilla puesta, la tarjeta dentro y SIN la animacion de salida
+            // (`.modo-grid-exit` es transitoria: si se mide mientras dura, el alto y el ancho bailan).
+            for (let i = 0; i < 25; i++) {
+                const listo = await ev(`(() => {
+                    const gc = document.getElementById('galeria-container');
+                    if (!gc || !gc.classList.contains('modo-grid')) return false;
+                    if (document.querySelector('.obra-card.modo-grid-exit')) return false;
+                    return !!gc.querySelector('.obra-card');
+                })()`);
+                if (listo === true) break;
+                await dormir(300);
+            }
+            await dormir(900);
+        },
+        selectores: [
+            '#galeria-container', '#galeria-container.modo-grid', '.obra-card',
+            '.obra-card-titulo', '.obra-avatar-clickable', '.obra-card .obra-imagen',
+            '#galeria-publica'
+        ]
+    },
+    {
         // El PERFIL de otro artista. Se llega por el CAMINO REAL (no llamando a una funcion):
         // la galeria es la seccion inicial, su tarjeta lleva el avatar del artista con
         // data-artista-id, y al tocarlo se abre su perfil. Antes no estaba cubierto y el

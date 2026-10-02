@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 56)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 51)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 56**:
-por hoja, `formularios.css` 19, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 10; por capa,
-`components` 49 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 51**:
+por hoja, `formularios.css` 19, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 5; por capa,
+`components` 44 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -235,6 +235,20 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 14 | `auth.css`: `.input-error` (dos reglas) | 2 | **0 fuera**: portantes (ver abajo) |
 | 15-18 | `formularios.css`: la barra (`.limpiar-btn` y su `:hover`), la maquetación de filas, `#input-descripcion-artistica` y las etiquetas del oscuro | 13 | **8 fuera**, **6 devueltos** (ver abajo) |
 | 19-21 | `style.css`: `.toggle-label`, el relleno del carrusel y el de la barra inferior, más tres re-pruebas | 8 | **3 fuera**, **5 devueltos** (ver abajo) |
+| 22 | `galeria-publica.css`: `#galeria-container.modo-grid .obra-card` | 5 | **5 fuera** (todas redundantes) |
+
+#### La vista `grid`: por fin se miden las tarjetas de la galería
+
+Las cinco reglas de `#galeria-container.modo-grid .obra-card` solo aplican con la clase `modo-grid`
+puesta, así que hacía falta una vista que **entrara en Explorar**. La vista `grid` carga una obra por
+el camino real (`window.abrirObraDesdePerfil`), pulsa el botón de Explorar (`#btn-buscar`) y **espera
+un estado determinista**: la rejilla puesta, la tarjeta dentro y **sin** `.modo-grid-exit` (esa clase
+es transitoria: midiendo durante la animación de salida, el alto y el ancho bailan). Mide la tarjeta
+a 209×261 px.
+
+**Las 5 resultaron redundantes**: quitarlas no movió ni un valor. Quedan en esa hoja **5**, todas de
+`.obra-card.modo-grid-exit` (`animation` y sus `animation-delay`), que son un **estado transitorio**
+que la foto no puede medir (como `.typing-cursor`): ahí no se toca nada a ciegas.
 
 #### `style.css`: casi todo lo que queda ahí es portante
 

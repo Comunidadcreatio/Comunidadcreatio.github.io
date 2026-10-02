@@ -757,11 +757,11 @@
 
 /* Las tarjetas se animan al entrar en modo grid */
 #galeria-container.modo-grid .obra-card {
-    max-width: 100% !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    max-height: none;
     scroll-snap-align: none;
     scroll-snap-stop: normal;
     align-self: auto;
