@@ -786,15 +786,26 @@
 #galeria-container.modo-grid .obra-card:nth-child(6) { animation-delay: 0.30s; }
 #galeria-container.modo-grid .obra-card:nth-child(n+7) { animation-delay: 0.35s; }
 
-/* Animación de salida al quitar modo grid */
-.obra-card.modo-grid-exit {
-    animation: gridCardExit 0.3s ease-in forwards !important;
+/* Animación de salida al quitar modo grid.
+   Dos cosas aprendidas midiendo (lo prueba `verificar-animaciones-tarjetas.mjs`):
+   1. Se declaran los LONGHANDS en vez del atajo: un `animation` con `!important` marca importantes
+      TODOS sus longhands (incluido `animation-delay: 0`), y por eso los cuatro retardos de abajo
+      necesitaban `!important` para ganarle. Sin el atajo, el delay no se resetea.
+   2. El selector lleva el mismo `#galeria-container` que la animación de ENTRADA
+      (`#galeria-container.modo-grid .obra-card`, que con el id le ganaba a `.obra-card.modo-grid-exit`
+      por especificidad). Con el id, las dos son (1,2,0) y gana esta por ORDEN, que va más abajo.
+      Quitando el id, el verificador se pone en 0/5: la salida pasa a ser la de entrada. */
+#galeria-container .obra-card.modo-grid-exit {
+    animation-name: gridCardExit;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
 }
 
-.obra-card.modo-grid-exit:nth-child(1)  { animation-delay: 0s !important; }
-.obra-card.modo-grid-exit:nth-child(2)  { animation-delay: 0.04s !important; }
-.obra-card.modo-grid-exit:nth-child(3)  { animation-delay: 0.08s !important; }
-.obra-card.modo-grid-exit:nth-child(n+4) { animation-delay: 0.12s !important; }
+#galeria-container .obra-card.modo-grid-exit:nth-child(1)  { animation-delay: 0s; }
+#galeria-container .obra-card.modo-grid-exit:nth-child(2)  { animation-delay: 0.04s; }
+#galeria-container .obra-card.modo-grid-exit:nth-child(3)  { animation-delay: 0.08s; }
+#galeria-container .obra-card.modo-grid-exit:nth-child(n+4) { animation-delay: 0.12s; }
 
 /* Animación de entrada para el modo normal (flex) */
 @keyframes flexCardEnter {

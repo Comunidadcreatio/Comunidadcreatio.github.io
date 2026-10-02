@@ -322,7 +322,19 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    `rgb(22,163,74)`), y luego el cambio, una línea. Claro `rgb(22,163,74)`, oscuro
    `rgb(34,197,94)`. El verificador de hover pasa a **24/24** y la foto sigue sin diferencias
    (el cambio está dentro de un `:hover`). **Este sí cambia lo que se ve** al pasar el ratón.
-   **La campaña queda CERRADA**: 168 → 50 (70 %), y todo lo que queda está justificado con medición.
+   **La campaña queda CERRADA**: 168 → 45 (73 %), y todo lo que queda está justificado con medición.
+   **Las animaciones de salida (front D), HECHAS**: los cinco `!important` de `.obra-card.modo-grid-exit`
+   eran el último trozo sin red (una animación de 300 ms no sale en una foto). Se cerró con
+   `verificar-animaciones-tarjetas.mjs` (lee la animación **calculada**: nombre, duración, curva,
+   relleno y el retardo de cada tarjeta). Dos cosas medidas: (1) el atajo `animation: … !important`
+   marca importantes **todos sus longhands**, incluido `animation-delay: 0`, así que los cuatro
+   retardos necesitaban `!important` a su vez; ahora se declaran los **longhands**. (2) El `!important`
+   del atajo hacía falta porque la animación de **entrada** lleva el `id` (`(1,2,0)` contra `(0,2,0)`);
+   ahora el selector de salida lleva el mismo `id` y **gana por orden**. El verificador se validó
+   provocando el fallo: sin el `id` se pone **0/5** (gana la entrada); con él, **5/5**.
+   **Abierto y dicho**: el `!important` de `.typing-cursor` no se toca, porque su regla **sí llega**
+   (color y peso) pero su `animation` **no se aplica** (`animation-name: none`), y no hay ningún
+   `animation: none` que le case por selector. Hay que averiguar quién lo resetea antes de tocarlo.
    **La píldora de estado (`.status-badge`)**: tenía **12 colores a mano** (3 estados × 2 temas ×
    fondo+texto). Los **fondos** ya salen de tokens nuevos de la paleta (`--color-success-soft`,
    `--color-warning-soft`, `--color-neutral-soft`) **creados con los valores que ya estaban**, así que

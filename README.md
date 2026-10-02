@@ -105,13 +105,14 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 50)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 45)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 50**:
-por hoja, `formularios.css` 18, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 5; por capa,
-`components` 43 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
-`notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
-entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 45**:
+por hoja, `formularios.css` 18, `auth.css` 14 y `style.css` 13; por capa, `components` 38 y `base` 7.
+**CUATRO hojas ya no tienen ninguno**: `panel-artista.css`, `notificaciones.css` (**borradas sus reglas
+muertas**), `skeleton.css` (que se ha **eliminado** entero: solo hablaba de `.skeleton-card`/
+`.skeleton-galeria`, y nada crea esos elementos) y `galeria-publica.css` (sus cinco eran de una
+animación que ahora gana por **orden**, no por `!important`).
 
 Con las capas, un `!important` solo hace falta si tiene que ganarle a OTRO `!important` (lo
 importante va por encima de lo normal aunque la capa sea anterior) **o a una regla normal de
@@ -196,7 +197,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 50)
+## La campaña de los `!important`, lote a lote (168 → 45)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -237,6 +238,36 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 19-21 | `style.css`: `.toggle-label`, el relleno del carrusel y el de la barra inferior, más tres re-pruebas | 8 | **3 fuera**, **5 devueltos** (ver abajo) |
 | 22 | `galeria-publica.css`: `#galeria-container.modo-grid .obra-card` | 5 | **5 fuera** (todas redundantes) |
 | 23 | **el `:focus`**: `[data-required="true"]:focus` y los `:focus`/`:read-only` del formulario de la obra | 4 | **1 fuera**, **3 devueltos** (ver abajo) |
+| 24 | **las animaciones de salida** de las tarjetas (`galeria-publica.css`) | 5 | **5 fuera** (ver abajo) |
+
+#### Las animaciones transitorias: el último trozo sin red (front D)
+
+Los cinco `!important` de `.obra-card.modo-grid-exit` (la animación con la que las tarjetas **salen**
+del modo grid) eran el último trozo de la campaña sin cobertura: la foto mide estados de reposo y una
+animación que dura 300 ms no se ve en una foto. Se cerró con
+**`verificar-animaciones-tarjetas.mjs`**, que lee la animación **calculada** (que sí se puede consultar
+en cualquier momento): el nombre, la duración, la curva, el relleno y **el retardo de cada tarjeta**.
+
+**Lo que había detrás** (dos cosas, las dos medidas):
+
+1. El atajo `animation: … !important` marca importantes **todos sus longhands**, incluido
+   `animation-delay: 0`. Por eso los cuatro retardos por tarjeta necesitaban `!important` **a su vez**:
+   era una cadena. Ahora se declaran los **longhands** y el delay no se resetea.
+2. El `!important` del atajo hacía falta porque la animación de **entrada** se declara con el `id`
+   (`#galeria-container.modo-grid .obra-card` = `(1,2,0)`) y le ganaba a `.obra-card.modo-grid-exit`
+   (`(0,2,0)`). Ahora el selector de salida **lleva el mismo `id`**, así que empatan y **gana por orden**
+   (va más abajo).
+
+**Y el verificador se validó provocando el fallo**: quitando el `id` del selector, se pone **0/5** —
+la salida pasa a ser la de entrada (`gridCardEnter`, 0.35s, ease-out, con los retardos de la entrada).
+Con el `id`, **5/5** y los valores idénticos a los de antes de quitar los `!important`.
+
+**Lo que queda abierto y se dice**: el `!important` de `.typing-cursor` (el cursor del typewriter en
+auth) **no se ha tocado**, porque al medirlo salió algo raro: su regla **sí llega** al elemento (el
+color y el `font-weight` salen de ella) pero su `animation` **no se aplica** (`animation-name: none`,
+`animation-duration: 0s`), y no hay ningún `animation: none` que case con ese selector en ninguna hoja.
+Falta averiguar quién lo resetea, y hasta saberlo no se toca. El verificador lo **informa** en vez de
+contarlo como fallo.
 
 #### Cierre de la campaña (168 → 50)
 
