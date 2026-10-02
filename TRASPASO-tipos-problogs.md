@@ -323,6 +323,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    `rgb(34,197,94)`. El verificador de hover pasa a **24/24** y la foto sigue sin diferencias
    (el cambio está dentro de un `:hover`). **Este sí cambia lo que se ve** al pasar el ratón.
    **La campaña queda CERRADA**: 168 → 50 (70 %), y todo lo que queda está justificado con medición.
+   **La píldora de estado (`.status-badge`)**: tenía **12 colores a mano** (3 estados × 2 temas ×
+   fondo+texto). Los **fondos** ya salen de tokens nuevos de la paleta (`--color-success-soft`,
+   `--color-warning-soft`, `--color-neutral-soft`) **creados con los valores que ya estaban**, así que
+   no cambia nada (la foto lo confirma: en las 20 diferencias no hay ni un `backgroundColor`). Y el
+   **texto del activo en oscuro** pasa de `#4caf50` a `var(--color-success)`, que además sube el
+   contraste de 5,66:1 a 6,91:1.
+   **Lo que NO se puede unificar**: los otros cinco textos. Está **medido**: `--color-success-dark`
+   sobre el fondo activo claro da 4,04:1 y `--color-warning` sobre el desconocido claro da 2,88:1, por
+   debajo del 4,5 que necesita una píldora de 11px en mayúsculas. A la paleta le faltan roles
+   **«on-soft»**, y elegirlos es una decisión de diseño: queda apuntado, no hecho a ciegas.
+   Para medirla hizo falta que el mock devolviera obras con `status: 'Activo'` / `'Inactivo'`
+   (el mapeo lee `obra.status`, no `obra.estado`).
    **De `formularios.css`** (lotes 15-18): 13 fuera y **8 devueltos** (los 2 ultimos los cazo el verificador de hover: el color del .limpiar-btn:hover no cambiaba) (portantes: el `:valid` verde, la
    etiqueta, `.form-row-tight`, el `min-height` del textarea y el `.limpiar-btn` en oscuro). La vista
    `panel` también **monta estados** (rellena campos, `read-only` y foco) y mide 35 elementos.

@@ -439,6 +439,34 @@ El verificador de hover pasa a **24/24** y la foto sigue **sin diferencias** (68
 está dentro de un `:hover`, así que el estado de reposo no se toca. **Este sí cambia lo que se ve** al
 pasar el ratón por el botón de duplicar: el verde pasa a ser el de la paleta.
 
+#### La píldora de estado: los fondos sí, los textos NO (y está medido por qué)
+
+`.status-badge` (la píldora «Activo / Inactivo / —» de las tarjetas de Cavent) tenía **12 colores a
+mano**: 3 estados × 2 temas × (fondo + texto). Se hizo el barrido con la foto ya midiendo la píldora
+(hizo falta que el mock devolviera obras con `status: 'Activo'` / `'Inactivo'`).
+
+**Lo que se unificó**:
+
+- Los **fondos**, con tokens nuevos en la paleta (`--color-success-soft`, `--color-warning-soft`,
+  `--color-neutral-soft` en los dos temas) **creados con los valores que ya estaban** → cero cambio
+  visual, y lo confirma la foto: en las 20 diferencias **no hay ni un `backgroundColor`**.
+- El **texto del estado activo en oscuro**: era `#4caf50` a mano y ahora es `var(--color-success)`.
+  Además **sube el contraste** de 5,66:1 a **6,91:1**.
+
+**Lo que NO se puede unificar (y por eso queda a mano)**: los otros cinco textos. Al medirlo salió el
+motivo, que es de accesibilidad, no de gusto:
+
+| Texto | Rol de paleta | Contraste resultante | Mínimo |
+|---|---|---|---|
+| activo claro | `--color-success-dark` | **4,04:1** ✗ | 4,5 |
+| desconocido claro | `--color-warning` | **2,88:1** ✗ | 4,5 |
+| inactivo claro | `--color-text-muted` | ~3,5:1 ✗ | 4,5 |
+
+La píldora es de **11 px en mayúsculas** (texto pequeño), así que necesita 4,5:1. Los roles de la
+paleta que existen están pensados para **bordes y señales**, no para texto sobre fondo suave: **faltan
+roles «on-soft»** (`--color-success-on-soft`, etc.). Eso ya no es sustituir un hex por una variable, es
+**elegir colores nuevos**, y por eso no se hace a ciegas: queda apuntado.
+
 #### La trampa del `!important` que «armaba» a otra regla
 
 El lote 12 dejó un caso que merece quedar escrito. En `auth.css` había dos reglas en modo oscuro:

@@ -108,7 +108,12 @@
 /* ==============================================
    COLUMNA STATUS (texto simple de color)
    ============================================== */
-/* Status badges tipo píldora */
+/* Status badges tipo píldora.
+   Los FONDOS salen de la paleta (`--color-*-soft`, creados con estos mismos valores, así que no
+   cambia nada de lo que se ve). Los TEXTOS no pueden salir de `--color-success` / `--color-warning`:
+   sobre estos fondos darían 4.04:1 (activo claro) y 2.88:1 (desconocido claro), por debajo del 4.5
+   que pide el texto pequeño, y esta píldora es de 11px en mayúsculas. Quedan a mano hasta que la
+   paleta tenga roles "on-soft" propios (decisión de diseño). Lo mide la foto. */
 .status-badge {
     display: inline-block;
     padding: 4px 12px;
@@ -121,17 +126,17 @@
 }
 
 .status-badge.status-activo {
-    background: #d4edda;
+    background: var(--color-success-soft);
     color: #155724;
 }
 
 .status-badge.status-inactivo {
-    background: #e2e3e5;
+    background: var(--color-neutral-soft);
     color: #383d41;
 }
 
 .status-badge.status-desconocido {
-    background: #fff3cd;
+    background: var(--color-warning-soft);
     color: #856404;
 }
 
@@ -941,18 +946,23 @@
     color: var(--color-ink);
 }
 
+/* Píldoras de estado en modo oscuro: los fondos pasan a la paleta (mismos valores) y el TEXTO del
+   estado activo tambien: era `#4caf50` a mano y ahora es `var(--color-success)`, que ademas SUBE el
+   contraste de 5.66:1 a 6.91:1. Los otros dos textos se quedan como estaban: sus roles de paleta
+   (`--color-text-muted`, `--color-warning`) darian 3.5:1 y 2.88:1 sobre estos fondos, por debajo del
+   minimo. */
 [data-theme="dark"] .status-badge.status-activo {
-    background: #0d2818;
-    color: #4caf50;
+    background: var(--color-success-soft);
+    color: var(--color-success);
 }
 
 [data-theme="dark"] .status-badge.status-inactivo {
-    background: #1a1a1a;
+    background: var(--color-neutral-soft);
     color: #888;
 }
 
 [data-theme="dark"] .status-badge.status-desconocido {
-    background: #2a2000;
+    background: var(--color-warning-soft);
     color: #ffc107;
 }
 

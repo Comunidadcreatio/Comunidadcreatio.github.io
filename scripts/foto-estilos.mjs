@@ -298,9 +298,10 @@ const PAGINAS = [
             // La familia del carrusel y el boton de ratio inactivo (los `!important` de style.css),
             // y las etiquetas del encabezado, que se pintan u ocultan con `display`.
             '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label',
-            // Las tarjetas del desplegable de Mis Cavents (con los botones de duplicar y borrar).
+            // Las tarjetas del desplegable de Mis Cavents (con los botones y la pildora de estado).
             '.cavent-item', '.cavent-item-titulo', '.cavent-item-actions .btn-del',
-            '.cavent-item-actions .btn-dup'
+            '.cavent-item-actions .btn-dup', '.status-badge',
+            '.status-badge.status-activo', '.status-badge.status-inactivo'
         ]
     },
     {
@@ -643,8 +644,8 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (u.includes('mis-obras')) return json({
                 success: true,
                 obras: [
-                    { id: 9001, titulo: 'Cavent de prueba', precio: '100', estado: 'disponible' },
-                    { id: 9002, titulo: 'Otro Cavent', precio: '200', estado: 'reservado' }
+                    { id: 9001, titulo: 'Cavent de prueba', precio: '100', status: 'Activo' },
+                    { id: 9002, titulo: 'Otro Cavent', precio: '200', status: 'Inactivo' }
                 ]
             });
             // Directorio del chat: sin esto la seccion sale vacia ("No hay pueblos") y se

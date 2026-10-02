@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=edd3eb472f');
+@import url('panel-artista.css?v=23a6da4fd2');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=cda8f6e1f8');
@@ -406,6 +406,14 @@
     --color-danger-dark: #b91c1c;
     --color-warning: #d97706;
     --color-warning-dark: #b45309;
+    /* Fondos "suaves" de las píldoras de estado (`.status-badge`). Se crearon el 2026-10-02 con los
+       valores que ya estaban escritos a mano en panel-artista.css, para que dejen de ser hex sueltos.
+       OJO: el TEXTO de esas píldoras NO puede salir de `--color-success` / `--color-warning`, porque
+       sobre estos fondos daría 4.04:1 y 2.88:1 (mínimo 4.5 para texto pequeño): hacen falta roles
+       "on-soft" propios, y eso es una decisión de diseño, no un reemplazo. */
+    --color-success-soft: #d4edda;
+    --color-warning-soft: #fff3cd;
+    --color-neutral-soft: #e2e3e5;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
@@ -458,6 +466,10 @@
     --color-danger-dark: #dc2626;
     --color-warning: #f59e0b;
     --color-warning-dark: #d97706;
+    /* Los mismos fondos "suaves", en su version oscura (valores que ya estaban a mano). */
+    --color-success-soft: #0d2818;
+    --color-warning-soft: #2a2000;
+    --color-neutral-soft: #1a1a1a;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
