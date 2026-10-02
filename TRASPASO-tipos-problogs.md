@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 64** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 59** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
    `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
@@ -309,9 +309,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    las borra al dispararse un `input`.
    **Apuntado sin tocar** (cambia el color): el rojo de los campos con error es `#e74c3c`, un hex a
    mano de una regla vieja, y no el `var(--color-danger)` de la paleta (`#dc2626`).
+   **De `formularios.css`** (lotes 15-18): 13 fuera y **8 devueltos** (los 2 ultimos los cazo el verificador de hover: el color del .limpiar-btn:hover no cambiaba) (portantes: el `:valid` verde, la
+   etiqueta, `.form-row-tight`, el `min-height` del textarea y el `.limpiar-btn` en oscuro). La vista
+   `panel` también **monta estados** (rellena campos, `read-only` y foco) y mide 35 elementos.
+   **Hueco apuntado**: el `:focus` **no aterriza** en la foto, así que las reglas de borde en foco no
+   están cubiertas (solo el anillo, por `verificar-foco-visible.mjs`).
    **Trampa que hay que recordar**: quitar un `!important` **cambia quién gana en OTRAS reglas** — el
    botón de volver casaba con dos reglas y, al perder una su `!important`, la otra le ganó y se puso
    blanco. Se arregló **partiendo el selector**.
+   **Y otra, de la herramienta**: `importantes-lote.mjs --devolver` **sin `--props`** pone `!important`
+   en TODAS las declaraciones de la regla (se colaron `resize` y `line-height` en un textarea) y **la
+   foto no lo ve**, porque un `!important` de más no cambia nada: se detectó comparando con
+   `git show HEAD:`. Ahora el script **exige `--props`** para devolver.
    **Y si una vista mide de repente mucho menos**: mira antes el **servidor local**
    (`scripts/servidor-local.mjs`; si está caído, el navegador mide una página de error y parece un
    fallo del CSS). La foto tiene `--vistas a,b` para medir una sola vista y aislar el problema.

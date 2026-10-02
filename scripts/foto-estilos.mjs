@@ -222,6 +222,40 @@ const PAGINAS = [
                 await dormir(300);
             }
             await dormir(800);
+            // Y se montan los ESTADOS de los campos del formulario de la obra, que es lo que miden
+            // las reglas de :valid, :read-only y :focus de formularios.css (varias con `!important`).
+            // En DOS FASES, como en la vista `auth`: la validacion de la app reacciona a los eventos
+            // `input` y puede reescribir el estado, asi que primero los valores y luego el resto.
+            await ev(`(() => {
+                const poner = (sel, valor) => {
+                    const el = document.querySelector(sel);
+                    if (!el) return null;
+                    const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype
+                        : (el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype);
+                    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, valor);
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    return el;
+                };
+                poner('#input-titulo', 'Obra de prueba');
+                poner('#input-precio', '1234');
+                poner('#input-ancho', '40');
+                poner('#input-alto', '50');
+                poner('#input-descripcion-artistica', 'Una descripcion de prueba para medir el area.');
+                return 'ok';
+            })()`);
+            await dormir(900);
+            await ev(`(() => {
+                // El nombre del artista lo rellena la app y no se toca: se marca read-only para medir
+                // esa regla (si no lo estuviera ya).
+                const artista = document.getElementById('input-artista');
+                if (artista) artista.readOnly = true;
+                // Y el foco en un campo obligatorio VACIO, para ver el :focus sin que lo tape el :valid.
+                const ano = document.getElementById('input-ano');
+                if (ano) ano.focus();
+                return 'ok';
+            })()`);
+            await dormir(500);
         },
         selectores: [
             '#obra-form', '#obra-form .form-section', '#obra-form .form-group',
@@ -237,7 +271,12 @@ const PAGINAS = [
             '.cavents-dropdown', '.cavents-dropdown.open', '.cavents-trigger',
             '#obra-step-bar .crear-btn', '#obra-step-bar .limpiar-btn',
             '#obra-etiquetas-bar .input-etiquetas-subtle',
-            '.form-block .form-group input', '.form-block .form-group select'
+            '.form-block .form-group input', '.form-block .form-group select',
+            // Lo que miden las reglas de formularios.css de la obra (estados montados arriba y la
+            // maquetacion por filas): sin estos elementos, esos `!important` no tenian red.
+            '#formulario-obra', '.form-block .form-group label', '.form-row-tight',
+            '.form-block .form-row-3', '#input-descripcion-artistica', '#obra-progress-bar',
+            '.form-block .form-group textarea'
         ]
     },
     {

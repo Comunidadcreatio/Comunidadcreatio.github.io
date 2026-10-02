@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 64)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 59)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 64**:
-por hoja, `formularios.css` 24, `style.css` 16, `auth.css` 14 y `galeria-publica.css` 10; por capa,
-`components` 57 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 59**:
+por hoja, `formularios.css` 19, `style.css` 16, `auth.css` 14 y `galeria-publica.css` 10; por capa,
+`components` 52 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -196,7 +196,7 @@ otras hojas suman 90). El método ya está probado: medir con **dos instrumentos
 **quién gana** con `dbg-cascada-real.mjs` y arreglar la **capa** (o la especificidad, si es solo
 nombrar lo que la regla ya pinta) antes que la importancia.
 
-## La campaña de los `!important`, lote a lote (168 → 64)
+## La campaña de los `!important`, lote a lote (168 → 59)
 
 Con la jerarquía de los campos ya arreglada, lo que queda son **~50 reglas** repartidas por las
 hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramienta:
@@ -233,6 +233,43 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 12 | `auth.css`: `[data-theme="dark"] button[type="submit"], .nav-btn` | 3 | **0 fuera** (portantes) + **selector partido** (ver abajo) |
 | 13 | `auth.css`: estados de campo (`.input-available`, `.password-wrapper`, `.step-navigation`, `#registro-form` ×4) | 8 | **8 fuera** |
 | 14 | `auth.css`: `.input-error` (dos reglas) | 2 | **0 fuera**: portantes (ver abajo) |
+| 15-18 | `formularios.css`: la barra (`.limpiar-btn` y su `:hover`), la maquetación de filas, `#input-descripcion-artistica` y las etiquetas del oscuro | 13 | **8 fuera**, **6 devueltos** (ver abajo) |
+
+#### La vista `panel` también monta estados (y esta familia resultó ser mostly portante)
+
+Igual que en `auth`, la vista `panel` ahora **rellena** los campos del formulario de la obra
+(`#input-titulo`, `#input-precio`, … → `:valid`), marca el nombre del artista como `read-only` y deja
+el foco en un campo obligatorio vacío. Pasa de 29 a **35 elementos** medidos (628 medidas en total).
+
+**Y el resultado de la campaña aquí es honesto y poco lucido**: de las 13 declaraciones que se
+quitaron, **6 hubo que devolverlas** porque son portantes:
+
+- `[data-required="true"]:valid` (el borde verde del campo relleno),
+- `.form-block .form-group label` y `.form-row-tight` (el margen que las pone a cero),
+- `#input-descripcion-artistica` (`min-height: 140px`, que si no se queda en 80),
+- y `#obra-step-bar .limpiar-btn` (`border` y `color`, que en modo oscuro sí cambian).
+
+Se quedaron fuera 8 (los `:hover` del `.limpiar-btn` —cubiertos por el verificador de hover—, el
+`gap` de `.form-row-3`, el `flex-direction` móvil de `.form-row-tight`, el fondo del
+`[data-theme="dark"] #obra-etiquetas-bar` y el `display: none` de `body.creando-problogs`).
+
+**Una trampa de la herramienta, que ya no puede repetirse**: estos 6 se devolvieron con
+`importantes-lote.mjs --devolver` **sin `--props`**, y eso pone `!important` en **todas** las
+declaraciones de la regla, incluidas las que nunca lo tuvieron (se colaron `resize` y `line-height`
+en el textarea). **La foto no lo ve**: un `!important` de más no cambia ni un valor calculado, así
+que el «sin diferencias» pasaba igual. Se detectó **comparando las reglas con `git show HEAD:`** y
+ahora el script **exige `--props`** para devolver.
+
+**Y lo que cazó el verificador de hover** (que se escribió justamente para esto): de las 8 que se
+dejaron fuera, los dos `:color`/`:border-color` del `.limpiar-btn:hover` **también eran portantes** —
+al quitarlos, el color ya no cambiaba al pasar el ratón (`rgb(115,115,115)` en los dos estados). La
+foto no podía verlo (mide el reposo) y el `verificar-hover-botones.mjs` **falló en cuanto se quitó**.
+Se devolvieron los dos y volvió a **12/12**. El balance de la familia queda en **5 declaraciones
+fuera de 13 probadas**: poco, pero es la verdad.
+
+**Un hueco del instrumento que queda apuntado**: el `:focus` **no aterriza** en la foto (el estado
+`[data-required="true"]:focus` y los `input:focus` de `formularios.css` no se están midiendo). Lo
+cubre `verificar-foco-visible.mjs` para el anillo de foco, pero no estas reglas de borde.
 
 #### La vista `auth` ahora MONTA los estados (y por qué hacía falta)
 

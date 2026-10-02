@@ -215,7 +215,7 @@
 
 #obra-step-bar .limpiar-btn:hover,
 #problog-nav-bar .limpiar-btn:hover {
-    background: var(--color-gray-100) !important;
+    background: var(--color-gray-100);
     border-color: var(--color-ink) !important;
     color: var(--color-ink) !important;
 }
@@ -987,8 +987,8 @@ form,
 }
 
 [data-theme="dark"] #obra-etiquetas-bar {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: transparent;
+    background-color: transparent;
 }
 
 [data-theme="dark"] #obra-etiquetas-bar .input-etiquetas-subtle {
@@ -1315,7 +1315,7 @@ form,
 }
 
 .form-block .form-row-3 {
-    gap: 0 !important;
+    gap: 0;
     padding-top: 11px;
     margin-bottom: 4px;
 }
@@ -1606,7 +1606,7 @@ body.creando-problogs #obra-progress-bar,
 body.creando-problogs #obra-step-bar,
 body.creando-problogs #obra-cavents-bar,
 body.creando-problogs #formulario-obra {
-    display: none !important;
+    display: none;
 }
 body.creando-problogs #crear-problogs-contenido {
     display: flex;

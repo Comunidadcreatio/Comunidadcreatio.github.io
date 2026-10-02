@@ -30,6 +30,14 @@ if (!HOJA || (!SELECTOR && !LINEA) || (QUITAR === DEVOLVER)) {
     console.error('  --linea N sirve cuando el selector a secas es ambiguo (hay varias reglas que empiezan igual).');
     process.exit(2);
 }
+// OJO: `--devolver` SIN `--props` pone `!important` en TODAS las declaraciones de la regla, incluidas
+// las que nunca lo tuvieron. Paso el 2026-10-01: en el textarea de la descripcion se colaron dos
+// (`resize` y `line-height`) y la foto NO lo vio, porque un `!important` de mas no cambia nada. Para
+// devolver hay que decir QUE propiedades: asi solo se toca lo que se habia quitado.
+if (DEVOLVER && !PROPS.length) {
+    console.error('Para --devolver hace falta --props "a,b": sin eso se le pondria `!important` a TODA la regla.');
+    process.exit(2);
+}
 
 const original = readFileSync(HOJA, 'utf8');
 
