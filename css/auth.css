@@ -420,7 +420,11 @@ select:valid,
    clase, una etiqueta) que `#login-form input.input-error`, asi que en el empate gana la
    ULTIMA. En oscuro hay que nombrarlo tambien, porque `[data-theme="dark"]` aporta un nivel
    mas de especificidad. Y el error tiene que verse siempre, aunque el campo este relleno y
-   sea valido: se descubrio midiendo (el campo con error y valido se quedaba verde). */
+   sea valido: se descubrio midiendo (el campo con error y valido se quedaba verde).
+   El color se puso a mano (#e74c3c) cuando aun no existia la paleta; el 2026-10-01 se cambio
+   por `var(--color-danger)`, que es la fuente de verdad (#dc2626 en claro y #ef4444 en oscuro).
+   Medido antes y despues: los campos con error pasan de rgb(231,76,60) a los dos tonos de la
+   paleta, y no se mueve nada mas. */
 .input-error,
 input.input-error,
 select.input-error,
@@ -428,7 +432,7 @@ select.input-error,
 #forgot-section input.input-error,
 [data-theme="dark"] #login-form input.input-error,
 [data-theme="dark"] #forgot-section input.input-error {
-    border: 1.5px solid #e74c3c !important;
+    border: 1.5px solid var(--color-danger) !important;
 }
 
 .form-group input:focus,

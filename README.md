@@ -348,10 +348,27 @@ valores que cambiaron). El propio CSS ya lo avisaba en un comentario: «el error
 siempre, aunque el campo esté relleno y sea válido: se descubrió midiendo». Ahora esa razón está
 **protegida por el instrumento** y no solo por el comentario.
 
-**Una cosa que queda apuntada** (no tocada, porque cambia el color): el rojo que se ve en los campos
-con error es `#e74c3c`, un **hex a mano** en una regla vieja, y **no** el `var(--color-danger)` de la
-paleta (`#dc2626`). Esa regla vieja gana por especificidad. Unificarlo es un cambio visible de una
-línea: cuando se decida, se hace y se mide.
+#### El rojo del error, unificado (y medido)
+
+El rojo que se veía en los campos con error era `#e74c3c`, un **hex a mano** en una regla vieja, y
+**no** el `var(--color-danger)` de la paleta. Esa regla vieja gana por especificidad, así que el color
+estaba **duplicado y desincronizado**: en modo oscuro tampoco cambiaba.
+
+Se cambió el hex por la variable (**una línea**) y se midió antes y después:
+
+| | antes | después |
+|---|---|---|
+| Claro | `rgb(231, 76, 60)` | **`rgb(220, 38, 38)`** (`#dc2626`) |
+| Oscuro | `rgb(231, 76, 60)` | **`rgb(239, 68, 68)`** (`#ef4444`) |
+
+Las 36 diferencias de la foto son **solo** el borde de error de ese campo (`#login-pass` = `.input-error`
+= `.password-wrapper input`, 12 combinaciones × 3 lados): **nada más se movió**. Ahora el rojo del error
+sigue a la paleta, también en oscuro.
+
+**Quedan dos `#e74c3c` más** en `formularios.css`, en el **hover del botón de borrar de un Cavent**
+(`.cavent-item-actions .btn-del:hover`) junto a un `#4caf50` de su gemelo de duplicar. No se tocan
+aquí por una razón concreta: son un **estado `:hover`** y el verificador de hover solo cubre los
+botones de la barra de pasos, así que **hoy no hay con qué medirlos**.
 
 #### La trampa del `!important` que «armaba» a otra regla
 

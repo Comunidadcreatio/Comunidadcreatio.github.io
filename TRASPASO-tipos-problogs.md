@@ -307,8 +307,11 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    verde). La **vista `auth` ahora monta los estados** (`:valid`, `.input-error`, `.input-available`,
    `:focus`): rellena los campos y pone las clases **en dos fases**, porque la validación de la app
    las borra al dispararse un `input`.
-   **Apuntado sin tocar** (cambia el color): el rojo de los campos con error es `#e74c3c`, un hex a
-   mano de una regla vieja, y no el `var(--color-danger)` de la paleta (`#dc2626`).
+   **El rojo del error, UNIFICADO y medido**: era `#e74c3c` a mano en una regla vieja (que gana por
+   especificidad) en vez de `var(--color-danger)`. Ahora claro = `rgb(220,38,38)` y oscuro =
+   `rgb(239,68,68)`, y las 36 diferencias de la foto son solo ese borde. Quedan dos `#e74c3c` en el
+   **hover del botón de borrar de un Cavent** (`formularios.css`): no se tocan porque el verificador
+   de hover solo cubre la barra de pasos y **hoy no hay con qué medirlos**.
    **De `formularios.css`** (lotes 15-18): 13 fuera y **8 devueltos** (los 2 ultimos los cazo el verificador de hover: el color del .limpiar-btn:hover no cambiaba) (portantes: el `:valid` verde, la
    etiqueta, `.form-row-tight`, el `min-height` del textarea y el `.limpiar-btn` en oscuro). La vista
    `panel` también **monta estados** (rellena campos, `read-only` y foco) y mide 35 elementos.
