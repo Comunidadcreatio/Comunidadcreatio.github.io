@@ -105,11 +105,11 @@ ya existían.
 **Para mover una familia, el método es:** `auditar-capas.mjs` → foto antes → mover a
 `base`/`utilities` → foto después → comparar. Si sale sin diferencias, adelante.
 
-### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 59)
+### `!important`: por FAMILIAS, con DOS instrumentos y con CAPAS (quedan 56)
 
-`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 59**:
-por hoja, `formularios.css` 19, `style.css` 16, `auth.css` 14 y `galeria-publica.css` 10; por capa,
-`components` 52 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
+`auditar-important.mjs` los lista con su selector, su propiedad y su capa. **Hoy quedan 56**:
+por hoja, `formularios.css` 19, `auth.css` 14, `style.css` 13 y `galeria-publica.css` 10; por capa,
+`components` 49 y `base` 7. **Tres hojas ya no tienen ninguno**: `panel-artista.css`,
 `notificaciones.css` (**borradas sus reglas muertas**) y `skeleton.css` (que se ha **eliminado**
 entero: solo hablaba de `.skeleton-card`/`.skeleton-galeria`, y nada crea esos elementos).
 
@@ -234,6 +234,31 @@ hojas. Se atacan **de regla en regla** (una regla = un lote), con esta herramien
 | 13 | `auth.css`: estados de campo (`.input-available`, `.password-wrapper`, `.step-navigation`, `#registro-form` ×4) | 8 | **8 fuera** |
 | 14 | `auth.css`: `.input-error` (dos reglas) | 2 | **0 fuera**: portantes (ver abajo) |
 | 15-18 | `formularios.css`: la barra (`.limpiar-btn` y su `:hover`), la maquetación de filas, `#input-descripcion-artistica` y las etiquetas del oscuro | 13 | **8 fuera**, **6 devueltos** (ver abajo) |
+| 19-21 | `style.css`: `.toggle-label`, el relleno del carrusel y el de la barra inferior, más tres re-pruebas | 8 | **3 fuera**, **5 devueltos** (ver abajo) |
+
+#### `style.css`: casi todo lo que queda ahí es portante
+
+Se probaron 8 declaraciones y **5 hubo que devolverlas**:
+
+- `#obra-step-bar { background: transparent }` — sin el `!important`, en modo oscuro vuelve el fondo
+  `rgba(10,10,10,0.35)` de la regla anterior (la barra dejaría de ser transparente).
+- `.carrusel-viewport, .carrusel-slide, .carrusel-slide-empty { background: transparent }` — igual:
+  vuelve `rgb(18,18,18)`.
+- `.ratio-btn.active { color: #000 }` y `.ratio-btn:not(.active) { color: #fff }` — en oscuro el texto
+  pasa de blanco puro a `rgb(245,245,245)` (contraste).
+- `.cavents-trigger, .cavents-dropdown { border-top: none }` — vuelve la línea gris.
+
+Se quedaron fuera **3**: el `display: none` de `.toggle-label` (las etiquetas «Chat», «cavents»,
+«Buscar» del encabezado) y los dos `backdrop-filter: none` de la barra.
+
+**Y una lección de la herramienta**: al tocar `style.css` a mano (el `.toggle-label`, que es de una
+línea y el script no sabe partir) **se movieron los números de línea**, y dos devoluciones fallaron
+con «La linea N no cae dentro de ninguna regla» — que es justo lo que tiene que hacer: **negarse en
+vez de tocar la regla equivocada**. Se volvieron a buscar las líneas y se rehicieron.
+
+**Instrumento**: la vista `chat` **no era determinista** (614 medidas en una corrida y 644 en la
+siguiente: elementos que aparecían y desaparecían). Ahora espera a que el chat esté abierto **y** a
+que el pueblo esté desplegado (con alto), y las dos corridas dan 644 sin diferencias.
 
 #### La vista `panel` también monta estados (y esta familia resultó ser mostly portante)
 

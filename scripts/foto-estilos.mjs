@@ -276,7 +276,10 @@ const PAGINAS = [
             // maquetacion por filas): sin estos elementos, esos `!important` no tenian red.
             '#formulario-obra', '.form-block .form-group label', '.form-row-tight',
             '.form-block .form-row-3', '#input-descripcion-artistica', '#obra-progress-bar',
-            '.form-block .form-group textarea'
+            '.form-block .form-group textarea',
+            // La familia del carrusel y el boton de ratio inactivo (los `!important` de style.css),
+            // y las etiquetas del encabezado, que se pintan u ocultan con `display`.
+            '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label'
         ]
     },
     {
@@ -290,9 +293,29 @@ const PAGINAS = [
         fixture: false,
         abrir: async (ev, dormir) => {
             await ev(`document.getElementById('btn-chat-global')?.click()`);
-            await dormir(2200);
+            // Se ESPERA a que el chat este abierto de verdad: con un `dormir` fijo, la mitad de las
+            // corridas median otro estado y salian elementos que aparecian y desaparecian entre
+            // fotos (paso el 2026-10-01: 614 medidas en una corrida y 644 en la siguiente).
+            for (let i = 0; i < 25; i++) {
+                const abierto = await ev(`(() => {
+                    const c = document.getElementById('chat-global');
+                    return !!c && !c.classList.contains('hidden');
+                })()`);
+                if (abierto === true) break;
+                await dormir(300);
+            }
+            await dormir(700);
             await ev(`document.querySelector('#chat-accordion .chat-pueblo-header')?.click()`);
-            await dormir(900);
+            // Y a que el pueblo este desplegado (con alto: si no, la fila de usuario no se mide).
+            for (let i = 0; i < 20; i++) {
+                const desplegado = await ev(`(() => {
+                    const c = document.querySelector('.chat-pueblo-cuerpo');
+                    return !!c && c.getBoundingClientRect().height > 0;
+                })()`);
+                if (desplegado === true) break;
+                await dormir(300);
+            }
+            await dormir(700);
         },
         selectores: [
             '#chat-global', '#chat-directorio', '#chat-conversaciones',

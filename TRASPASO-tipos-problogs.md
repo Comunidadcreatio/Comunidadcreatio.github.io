@@ -289,7 +289,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ## 8. Lo que queda además de los tipos
 
-1. **Los `!important`** del CSS: **quedan 59** (eran 168). Herramientas: `scripts/auditar-important.mjs
+1. **Los `!important`** del CSS: **quedan 56** (eran 168). Herramientas: `scripts/auditar-important.mjs
    --resumen` (los lista con selector, propiedad y capa) y, para atacar, **`scripts/importantes-lote.mjs`**
    (`--hoja` + `--selector` **o `--linea N`**, con `--quitar` / `--devolver --props "a,b"`): quita el
    `!important` de las declaraciones de UNA regla, o lo devuelve solo a las que la foto demuestre que
