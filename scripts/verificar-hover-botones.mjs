@@ -185,6 +185,12 @@ const colorDePaleta = async (variable, tema) => {
         return c;
     })()`);
 };
+const aRgb = (t) => { const m = String(t).match(/rgba?\(([^)]+)\)/); if (!m) return [0, 0, 0]; return m[1].split(',').map((x) => parseFloat(x)); };
+const lum = ([r, g, b]) => {
+    const f = (v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+};
+const contraste = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 const probarColorDePaleta = async (tema, sel, etiqueta, variable) => {
     const esperado = await colorDePaleta(variable, tema);
     const c = await centroDe(sel);
@@ -194,6 +200,11 @@ const probarColorDePaleta = async (tema, sel, etiqueta, variable) => {
     const e = JSON.parse(await estadoEstable(sel));
     apunta(`${etiqueta} (${tema}): el fondo en hover es ${variable}`, e.fondo === esperado, `${e.fondo} · ${variable} = ${esperado} (en reposo ${r.fondo})`);
     apunta(`${etiqueta} (${tema}): el borde en hover es ${variable}`, e.borde === esperado, `${e.borde} · ${variable} = ${esperado}`);
+    // Y lo que faltaba: el TEXTO (blanco) tiene que LEERSE sobre ese fondo. Comprobar que el color sale
+    // de la paleta no dice nada del contraste: blanco sobre `--color-success` es la paleta y da 3.30:1.
+    const ratio = contraste(aRgb(e.color), aRgb(e.fondo));
+    apunta(`${etiqueta} (${tema}): el texto se lee sobre el fondo en hover (>= 4.5:1)`, ratio >= 4.5,
+        `${ratio.toFixed(2)}:1 · texto ${e.color} sobre ${e.fondo}`);
     await mover(4, 4);
     const f = JSON.parse(await estadoEstable(sel));
     apunta(`${etiqueta} (${tema}): al salir vuelve el estado de reposo`, f.fondo === r.fondo && f.borde === r.borde, `fondo ${r.fondo} -> ${f.fondo}`);
@@ -207,11 +218,13 @@ for (let i = 0; i < 25; i++) {
     await sleep(300);
 }
 await sleep(500);
-await probarColorDePaleta('light', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
-await probarColorDePaleta('dark', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger');
+// Los botones de las tarjetas llevan TEXTO BLANCO sobre el fondo en hover, asi que sus colores tienen
+// que ser los roles SOLIDOS (los unicos medidos con blanco encima), no los de "señal".
+await probarColorDePaleta('light', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger-solid');
+await probarColorDePaleta('dark', '.cavent-item-actions .btn-del', 'boton Borrar de una tarjeta', '--color-danger-solid');
 // Y el gemelo de DUPLICAR, que tenia el mismo problema con un verde a mano (`#4caf50`).
-await probarColorDePaleta('light', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success');
-await probarColorDePaleta('dark', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success');
+await probarColorDePaleta('light', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success-solid');
+await probarColorDePaleta('dark', '.cavent-item-actions .btn-dup', 'boton Duplicar de una tarjeta', '--color-success-solid');
 
 const fallos = checks.filter((c) => !c.ok);
 console.log(`\nRESULTADO: ${checks.length - fallos.length}/${checks.length} comprobaciones OK — ${fallos.length ? fallos.length + ' fallos' : 'sin fallos'}`);

@@ -571,6 +571,33 @@ sería el de un padre que tampoco se ve): se informan aparte.
 **Está validado por provocación**: poniendo el texto del botón de ratio en gris claro sobre blanco,
 el verificador falla con **1,16:1** en los dos temas. Con el CSS de verdad: **25/25**.
 
+#### Los roles «solid»: para poner texto BLANCO encima
+
+Los dos hallazgos de arriba (la píldora y los contadores del chat) eran **el mismo hueco**, así que se
+crearon los roles que faltaban, con **contraste medido con blanco encima**:
+
+| Rol | Valor | Blanco encima | Para qué |
+|---|---|---|---|
+| `--color-success-solid` | `#2e7d32` | **5,13:1** | Insignias y botones con texto blanco |
+| `--color-danger-solid` | `#b91c1c` | **6,47:1** | Ídem en rojo |
+| `--color-info-solid` | `#1976d2` | **4,60:1** | Ídem en azul |
+
+**Por qué no valen los semánticos**: `--color-success` está afinado para **bordes y señales**, y el
+blanco encima da **3,30:1** en claro y **2,28:1** en oscuro; el rojo oscuro (`#ef4444`) da **3,76:1**.
+Los tres roles «solid» son **los mismos en los dos temas**, a propósito: un fondo sólido tiene que
+aguantar el blanco sobre cualquier cosa que tenga detrás.
+
+**Y esto no era teórico: destapó cuatro declaraciones que estaban mal.** Los dos botones de las
+tarjetas de Cavent (`:hover`) llevaban texto blanco **sobre los colores de señal** — o sea, el verde
+daba 3,30:1 y el rojo, en oscuro, 3,76:1. Ni la foto (mide reposo) ni el verificador de hover (que
+comprobaba que el color *fuera* la variable de la paleta, no que el texto se leyera) lo veían. Ahora
+los dos usan los roles «solid» y **el verificador de hover comprueba también el contraste del texto**
+(con su provocación correspondiente: devolviéndolo a `--color-success`, falla con 3,30:1 y 2,28:1).
+El hover sí cambia de tono — se oscurece —, y eso **es** el arreglo.
+
+Queda apuntado otro consumidor del mismo tipo, sin tocar: `style.css` pinta un fondo `#5BA0D9` con
+texto blanco, y eso da **2,81:1**.
+
 **Y las dos inestabilidades que aparecieron al montarlo** (las dos arregladas):
 
 - La vista `panel` de la foto podía medir el panel **a medio colocar** (la app lo posiciona por JS):

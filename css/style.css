@@ -28,7 +28,7 @@
 @import url('galeria-publica.css?v=ce67e604c4');
 
 /* Chat global + privado */
-@import url('chat.css?v=4707aa94f9');
+@import url('chat.css?v=f32ec8b177');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -38,7 +38,7 @@
 @import url('modales.css?v=cda8f6e1f8');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=05b46a6974');
+@import url('formularios.css?v=6a4fb8920a');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -417,6 +417,15 @@
     --color-warning-on-soft: #856404;
     --color-neutral-on-soft: #383d41;
 
+    /* Fondos SÓLIDOS: para poner TEXTO BLANCO encima (insignias de estado con datos, botones en
+       hover). NO valen `--color-success` / `--color-danger` para esto: están afinados para bordes y
+       señales, y el blanco encima de ellos da 3.30:1 (#16a34a) y 2.28:1 (#22c55e en oscuro): falla.
+       Estos están medidos con blanco encima: 5.13:1, 6.47:1 y 4.60:1. Son los MISMOS en los dos temas
+       a propósito: un fondo sólido tiene que aguantar el blanco sobre cualquier cosa que tenga detrás. */
+    --color-success-solid: #2e7d32;
+    --color-danger-solid: #b91c1c;
+    --color-info-solid: #1976d2;
+
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
     --color-primary-dark: var(--color-ink-light);
@@ -476,6 +485,8 @@
     --color-success-on-soft: var(--color-success);
     --color-warning-on-soft: #ffc107;
     --color-neutral-on-soft: #888;
+    /* Los fondos SÓLIDOS no se repiten: valen los mismos que en claro (un fondo sólido tiene que
+       aguantar el blanco encima sobre cualquier cosa que tenga detrás). */
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);

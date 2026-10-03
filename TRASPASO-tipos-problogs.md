@@ -427,6 +427,20 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    de textos de la tarjeta mide 0×0, y en el perfil los elementos están ocultos), el resto de
    superficies, y decidir si los hex a mano que quedan (359 fuera de la paleta) se van pasando por
    tandas.
+   **Roles «SOLID» (HECHO, 2026-10-03)**: los dos hallazgos anteriores eran el mismo hueco, así que se
+   crearon `--color-success-solid` (`#2e7d32`), `--color-danger-solid` (`#b91c1c`) e
+   `--color-info-solid` (`#1976d2`), **con el contraste medido con blanco encima**: 5,13:1, 6,47:1 y
+   4,60:1, y **los mismos en los dos temas** (un fondo sólido tiene que aguantar el blanco sobre
+   cualquier cosa). No valen los semánticos: `--color-success` da 3,30:1 en claro y 2,28:1 en oscuro, y
+   el rojo oscuro 3,76:1.
+   **Y destapó cuatro declaraciones mal**: los dos botones `:hover` de las tarjetas de Cavent llevaban
+   texto blanco sobre los colores de señal (3,30:1 y, en oscuro, 3,76:1). No lo veían **ni la foto**
+   (mide reposo) **ni el verificador de hover** (comprobaba que el color *fuera* la variable, no que el
+   texto se leyera), así que se le añadió esa comprobación: **28/28** con provocación (devolviendo el
+   verde a `--color-success`, falla con 3,30:1 y 2,28:1). Los contadores del chat se migraron **sin
+   cambio visual** (los valores ya eran esos).
+   Queda apuntado, sin tocar, otro consumidor igual: `style.css` pinta `#5BA0D9` con texto blanco
+   (**2,81:1**).
 4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 

@@ -1737,24 +1737,23 @@ body.creando-problogs #crear-problogs-contenido {
     border-color: var(--color-ink);
 }
 
-/* El verde tambien estaba a mano (#4caf50), como el rojo del boton de al lado: ahora sale de la
-   paleta (`var(--color-success)`: #16a34a en claro y #22c55e en oscuro). Lo mide
-   verificar-hover-botones.mjs igual que el rojo: antes fallaba (rgb(76,175,80) frente a la paleta)
-   y despues pasa. OJO: esto SI cambia el tono del boton al pasar el raton. */
+/* El verde y el rojo de estos dos botones salen de la paleta desde el 2026-10-01, pero al medir su
+   CONTRASTE (2026-10-03) salio que el TEXTO BLANCO no aguanta encima de un color de "señal": blanco
+   sobre `--color-success` da 3.30:1 en claro y 2.28:1 en oscuro, y el rojo oscuro (#ef4444) 3.76:1.
+   Ahora usan los roles SOLIDOS (`--color-*-solid`), que son los que estan medidos con blanco encima:
+   5.13:1 y 6.47:1. Cambia el tono en hover (mas oscuro), y eso es justo el arreglo.
+   Lo miden `verificar-hover-botones.mjs` (que sean la variable) y `verificar-contraste-superficies.mjs`
+   (que el blanco encima pase de 4.5:1). */
 .cavent-item-actions .btn-dup:hover {
-    background: var(--color-success);
+    background: var(--color-success-solid);
     color: #fff;
-    border-color: var(--color-success);
+    border-color: var(--color-success-solid);
 }
 
-/* El rojo estaba a mano (#e74c3c) cuando aun no existia la paleta: el 2026-10-01 se cambio por
-   `var(--color-danger)`, que es la fuente de verdad (#dc2626 en claro, #ef4444 en oscuro). Lo mide
-   `verificar-hover-botones.mjs`, que comprueba que el fondo y el borde en hover SON esa variable
-   (antes fallaba: daba rgb(231,76,60) frente a la paleta). */
 .cavent-item-actions .btn-del:hover {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
     color: #fff;
-    border-color: var(--color-danger);
+    border-color: var(--color-danger-solid);
 }
 
 /* Dark mode */
