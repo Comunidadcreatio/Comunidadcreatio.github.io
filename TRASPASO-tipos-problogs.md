@@ -471,8 +471,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    cambio** (4 diferencias: el contador azul del chat, `#1976d2` → `#1565c0`). Y el verificador de
    contraste ahora **comprueba el servidor antes de arrancar**: al medir esto estaba caído (cuarta vez)
    y Chrome cargaba su página de error, que se ve como «todo gris y 0 medidas».
-4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
-   imágenes del editor y en las de la lectura.
+4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
+   `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
+   14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se
+   arreglaron: la **imagen de lectura** de un Problogs (se pedía SIEMPRE a 1080 para una columna de
+   ~720: un móvil de 360 se bajaba el triple), la **portada** de la tarjeta (fija a 600), las
+   **miniaturas del selector de portada**, los avatares del **feed**, los **comentarios**, las
+   **notificaciones**, la **conversación** del chat y los **resultados de búsqueda**, y la **imagen de
+   un mensaje** del chat. Se añadió una **sección 5 al verificador de imágenes que revisa el CÓDIGO**
+   (todo `<img>` de Cloudinary en las plantillas tiene que llevar `srcset`; se saltan los locales) —
+   es una revisión de código, no una medida del navegador, y así se dice. Encontró **dos huecos más**
+   (el selector de portada y los resultados de búsqueda), o sea que la provocación vino sola: falló con
+   ellos y ahora pasa (15/15). 15 imágenes de Cloudinary en plantillas, todas con `srcset`.
 
 ---
 

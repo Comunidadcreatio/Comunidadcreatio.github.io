@@ -903,6 +903,39 @@ como si resolviera las capas**, que es lo peor que puede hacer un instrumento: d
 segura y equivocada. Si vuelve a hacer falta un inspector, se usa el real; y si alguna vez se
 escribe otro, que **diga lo que NO ve** en su propia salida.
 
+## `srcset`/`sizes`: casi todo estaba hecho, y los huecos eran otros (front C)
+
+Al ir a por esto apareció que **la mayor parte ya estaba**: `utils.js` tiene `cloudinaryUrl(url, width)`
+y `srcsetCloudinary(url, anchos)`, y los usan la galería (la foto del carrusel, con `eager` y
+`fetchpriority="high"` en la primera y `lazy` en el resto), los avatares del chat, los comentarios, la
+búsqueda y el perfil. `verificar-imagenes.mjs` ya lo vigilaba con 14 comprobaciones. **La nota del
+traspaso estaba vieja.**
+
+Lo que **sí** faltaba, y se arregló:
+
+| Dónde | Antes | Ahora |
+|---|---|---|
+| Imagen de **lectura** de un Problogs | `cloudinaryUrl(url, 1080)`, sin `srcset` | `srcset` 480/720/1080/1440 + `sizes` |
+| **Portada** de la tarjeta del feed | fijo a 600 | `srcset` 320/480/640/960 + `sizes` |
+| **Miniaturas del selector de portada** (editor) | la original | `srcset` 96/192/384 + `sizes` |
+| Avatar del **feed** de Problogs y de los **comentarios** | la original | `srcset` 48/96/144 + `sizes` |
+| Avatar de las **notificaciones** | la original | `srcset` 48/96/144 + `sizes` |
+| Avatar de la **conversación** del chat | la original | `srcset` 48/96/144 + `sizes` |
+| Avatar de los **resultados de búsqueda** del perfil | la original | `srcset` 48/96/144 + `sizes` |
+| **Imagen de un mensaje** del chat | la original | `srcset` 256/512/768 + `sizes` |
+
+**El caso gordo era el primero**: la imagen de lectura se pedía **siempre a 1080** aunque su columna mida
+~720 en escritorio — o sea, un móvil de 360px se bajaba el triple de lo que ve.
+
+**Y por qué se coló**: las secciones 1-4 del verificador de imágenes solo miran **la galería**. Así que se
+añadió una **sección 5 que revisa el CÓDIGO**: recorre las plantillas de `galeria.js`, `problogs.js`,
+`chat.js`, `main.js`, `perfil.js`, `comentarios.js` y `busqueda.js` y exige que **todo `<img>` de
+Cloudinary lleve `srcset`** (se saltan los locales, como las banderas). **Es una revisión de código, no
+una medida del navegador**, y se dice: las otras cuatro secciones sí miden en el navegador. Encontró
+**dos huecos más** que se me habían escapado (la miniatura del selector de portada y el avatar de los
+resultados de búsqueda), así que la provocación vino sola: **falló con ellos y ahora pasa** (15/15).
+Hay **15 imágenes de Cloudinary en plantillas** y todas llevan `srcset`.
+
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
 La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de

@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=8fb0d05879';
 import { artistaActual } from './auth.js?v=c69ad117da';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=26b9826f0b';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=666f1903de';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=83b79fcf1a';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -1147,7 +1147,9 @@ function renderConversaciones(convs) {
         const inicial = (c.otro_nombre || '?').charAt(0).toUpperCase();
         const online = esOnline(c);
         const avatar = c.otro_foto
-            ? `<img src="${safeImgUrl(c.otro_foto)}" alt="">`
+            ? `<img src="${safeImgUrl(cloudinaryUrl(c.otro_foto, 96))}"
+                    srcset="${srcsetCloudinary(c.otro_foto, [48, 96, 144])}"
+                    sizes="44px" decoding="async" loading="lazy" alt="">`
             : `<span class="chat-conv-item-inicial">${inicial}</span>`;
         const preview = c.ultimo && c.ultimo.contenido
             ? escapeHtml(c.ultimo.contenido)
@@ -1280,7 +1282,9 @@ function appendMensaje(m, esPropio) {
     if (m.eliminado) {
         html += '<span class="chat-msg-eliminado-texto">🗑️ Mensaje eliminado</span>';
     } else if (m.tipo_mensaje === 'imagen' && m.imagen_url) {
-        html += `<img class="chat-msg-imagen" src="${safeImgUrl(m.imagen_url)}" alt="Imagen" loading="lazy">`;
+        html += `<img class="chat-msg-imagen" src="${safeImgUrl(cloudinaryUrl(m.imagen_url, 512))}"
+            srcset="${srcsetCloudinary(m.imagen_url, [256, 512, 768])}"
+            sizes="256px" alt="Imagen" loading="lazy" decoding="async">`;
         if (m.contenido) html += `<div class="chat-msg-texto">${escapeHtml(m.contenido)}</div>`;
     } else {
         html += `<span class="chat-msg-texto">${escapeHtml(m.contenido || '')}</span>`;

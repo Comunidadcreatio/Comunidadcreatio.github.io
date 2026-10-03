@@ -33,9 +33,9 @@
 // quedaría imposible de encontrar y de editar.
 // ============================================================
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=8fb0d05879';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=26b9826f0b';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=26b9826f0b';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=666f1903de';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=83b79fcf1a';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -44,6 +44,13 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
 import { artistaActual } from './auth.js?v=c69ad117da';
+
+// Anchos que se ofrecen en el `srcset` de las imagenes de Problogs. El navegador elige uno segun el
+// hueco (`sizes`) y la densidad de pantalla, asi que en un movil normal NO se baja el grande:
+//   - LECTURA: la imagen ocupa el ancho de su columna (hasta ~720px en escritorio).
+//   - PORTADA: la tarjeta del feed (hasta ~520px en escritorio, franja 16/10).
+const ANCHOS_LECTURA = [480, 720, 1080, 1440];
+const ANCHOS_PORTADA = [320, 480, 640, 960];
 
 /**
  * Una publicacion de Problogs tal como la devuelve el backend: solo los campos que usa
@@ -120,7 +127,9 @@ function avatarHTML(p, clase) {
     const autor = decodeHTMLEntities((p && p.nombre_artista) || 'Artista');
     const inicial = autor.trim().charAt(0).toUpperCase() || '?';
     return (p && p.foto_artista)
-        ? `<img class="${clase}" src="${safeImgUrl(p.foto_artista)}" alt="">`
+        ? `<img class="${clase}" src="${safeImgUrl(cloudinaryUrl(p.foto_artista, 96))}"
+                srcset="${srcsetCloudinary(p.foto_artista, [48, 96, 144])}"
+                sizes="44px" decoding="async" loading="lazy" alt="">`
         : `<span class="${clase} problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
 }
 
@@ -270,7 +279,10 @@ function pintarPortadas() {
             ' data-portada="' + escapeHtml(img.nombre) + '"' +
             ' aria-pressed="' + (elegida ? 'true' : 'false') + '"' +
             ' title="' + (elegida ? 'Portada elegida' : 'Usar como portada') + '">' +
-            '<img src="' + safeImgUrl(img.url) + '" alt="">' +
+            // Miniatura del selector: un cuadro pequeno, asi que se ofrecen anchos pequenos.
+            '<img src="' + safeImgUrl(cloudinaryUrl(img.url, 192)) + '"' +
+            ' srcset="' + srcsetCloudinary(img.url, [96, 192, 384]) + '"' +
+            ' sizes="120px" alt="" loading="lazy" decoding="async">' +
             '</button>';
     }
     portadasEl.innerHTML = html;
@@ -896,7 +908,9 @@ function tarjetaProblog(p, conAcciones) {
                 <span class="problog-card-fecha">${escapeHtml(tiempoTranscurrido(p.created_at))}</span>
                 ${accionesHTML}
             </div>
-            ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}" alt="" loading="lazy"></div>` : ''}
+            ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}"
+                srcset="${srcsetCloudinary(portada, ANCHOS_PORTADA)}"
+                sizes="(max-width: 600px) 100vw, 520px" alt="" loading="lazy" decoding="async"></div>` : ''}
             <div class="problog-card-cuerpo">
                 <div class="problog-card-cabecera">
                     <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>
@@ -1183,9 +1197,14 @@ function pintarCuerpo(bloques, imagenes) {
     const figura = (b) => {
         const url = imagenes[b.slot];
         if (!url) return '';   // el backend ya filtra estos, pero por si acaso
+        // La imagen de lectura ocupaba TODO el ancho de su columna y se pedia SIEMPRE a 1080: en un
+        // movil de 360px eso es bajar el triple de lo que se ve. Con `srcset` el navegador elige, y
+        // `sizes` le dice el hueco real (la columna de lectura, que en escritorio esta limitada).
         return `
             <figure class="problog-lectura-figura">
-                <img src="${safeImgUrl(cloudinaryUrl(url, 1080))}" alt="" loading="lazy">
+                <img src="${safeImgUrl(cloudinaryUrl(url, 1080))}"
+                     srcset="${srcsetCloudinary(url, ANCHOS_LECTURA)}"
+                     sizes="(max-width: 900px) 100vw, 720px" alt="" loading="lazy" decoding="async">
                 ${b.pie ? `<figcaption>${renderText(b.pie)}</figcaption>` : ''}
             </figure>`;
     };
@@ -1262,7 +1281,9 @@ function comentarioHTML(c, respuestas) {
     const autor = c.autor_nombre || 'Artista';
     const inicial = autor.trim().charAt(0).toUpperCase() || '?';
     const avatar = c.autor_foto
-        ? `<img class="problog-comentario-avatar" src="${safeImgUrl(c.autor_foto)}" alt="">`
+        ? `<img class="problog-comentario-avatar" src="${safeImgUrl(cloudinaryUrl(c.autor_foto, 96))}"
+                srcset="${srcsetCloudinary(c.autor_foto, [48, 96, 144])}"
+                sizes="44px" decoding="async" loading="lazy" alt="">`
         : `<span class="problog-comentario-avatar">${escapeHtml(inicial)}</span>`;
     const liked = !!c.liked;
     // Mismo corazón que el like de la publicación (y misma regla: relleno si ya

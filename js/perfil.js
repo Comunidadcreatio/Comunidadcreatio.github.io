@@ -329,7 +329,9 @@ export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
             <div class="resultado-item" data-user-id="${escapeHtml(String(usuario.id))}">
                 <div class="resultado-avatar">
                     ${usuario.foto_perfil
-                        ? `<img src="${safeImgUrl(usuario.foto_perfil)}" alt="${escapeHtml(usuario.nombre_artista)}">`
+                        ? `<img src="${safeImgUrl(cloudinaryUrl(usuario.foto_perfil, 96))}"
+                                srcset="${srcsetCloudinary(usuario.foto_perfil, [48, 96, 144])}"
+                                sizes="44px" decoding="async" loading="lazy" alt="${escapeHtml(usuario.nombre_artista)}">`
                         : `<div class="avatar-placeholder">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
                     }
                 </div>

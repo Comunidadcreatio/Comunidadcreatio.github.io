@@ -176,6 +176,36 @@ check('en movil denso el navegador pide una foto mayor (es lo correcto)',
     movil.fotoElegido !== null && movil.fotoElegido >= 800, movil.fotoElegido);
 check('y el avatar sigue ofreciendo solo tamaños pequeños', movil.avatarMaxOfrecido !== null && movil.avatarMaxOfrecido <= 240, movil.avatarMaxOfrecido);
 
+console.log('\n=== 5. Revision del CODIGO: ningun <img> de Cloudinary se queda sin srcset ===');
+// Esto NO es una medida del navegador (las otras secciones si lo son): es una revision del codigo, y
+// esta aqui porque el hueco que se colo el 2026-10-03 no se veia de otra forma — la imagen de lectura
+// de Problogs y la portada de la tarjeta se pintaban con un ancho FIJO (1080 y 600) y sin srcset, asi
+// que un movil se bajaba 1080px para un hueco de 360. Las secciones 1-4 solo miran la galeria.
+{
+    const fs = await import('node:fs');
+    const ficheros = ['js/galeria.js', 'js/problogs.js', 'js/chat.js', 'js/main.js', 'js/perfil.js', 'js/comentarios.js', 'js/busqueda.js'];
+    const sospechosos = [];
+    let imagenesCloudinary = 0;
+    for (const f of ficheros) {
+        const texto = fs.readFileSync(f, 'utf8');
+        // Cada <img ...> del fichero, con lo que le sigue en la misma plantilla (el srcset puede estar
+        // en la linea siguiente: por eso se mira el bloque hasta el cierre del `>`).
+        for (const m of texto.matchAll(/<img\b[^>]*>/g)) {
+            const etiqueta = m[0];
+            const local = etiqueta.includes('iconos/') || etiqueta.includes('data:');
+            const deCloudinary = etiqueta.includes('safeImgUrl') || etiqueta.includes('cloudinaryUrl');
+            if (local || !deCloudinary) continue;
+            imagenesCloudinary++;
+            if (!etiqueta.includes('srcset')) {
+                const linea = texto.slice(0, m.index).split('\n').length;
+                sospechosos.push(`${f}:${linea} ${etiqueta.replace(/\s+/g, ' ').slice(0, 60)}`);
+            }
+        }
+    }
+    console.log('   imagenes de Cloudinary en plantillas: ' + imagenesCloudinary);
+    check('todas llevan srcset', sospechosos.length === 0, sospechosos.length ? JSON.stringify(sospechosos) : 'ninguna pendiente');
+}
+
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 if (logs.length) fallos++;
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
