@@ -21,6 +21,17 @@ import { join } from 'node:path';
 const PUERTO = 9802;
 const args = process.argv.slice(2);
 const URL_BASE = args.find((a) => a.startsWith('http')) || 'http://127.0.0.1:8099/';
+
+// PREFLIGHT: si el servidor no esta en pie, la pagina que carga Chrome es SU PAGINA DE ERROR, y todo
+// sale gris y con "0 medidas" — que parece un fallo de CSS y no lo es. Paso cuatro veces (2026-10-03).
+try {
+    const r = await fetch(URL_BASE);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+} catch (e) {
+    console.error(`NO HAY SERVIDOR en ${URL_BASE} (${e.message}).`);
+    console.error('Arrancalo con: node scripts/servidor-local.mjs 8099');
+    process.exit(2);
+}
 const perfil = mkdtempSync(join(tmpdir(), 'contraste-'));
 const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
     '--headless=new', '--disable-gpu', '--no-sandbox', `--remote-debugging-port=${PUERTO}`,
@@ -351,6 +362,31 @@ for (const tema of ['light', 'dark']) {
         })()`);
         const ratio = contraste(aRgb(valor), [255, 255, 255]);
         check(`${rol} aguanta el texto blanco [${tema}]`, ratio >= 4.5, `${ratio.toFixed(2)}:1 · blanco sobre ${valor}`);
+    }
+}
+
+// EL CONTRATO DE LOS TINTES: son colores de TEXTO, así que su contrato es leerse sobre la superficie
+// de la tarjeta, que cambia con el tema (por eso hay dos valores). Se mide contra el color de tarjeta
+// de la paleta, que es el caso MÁS AJUSTADO en los dos temas: en claro, la tarjeta (#f5f5f5) es peor
+// que el blanco de la página; en oscuro, la tarjeta (#1f1f1f) es peor que el fondo (#0a0a0a).
+console.log('\n--- contrato de los tintes (texto sobre la tarjeta >= 4.5:1)');
+const ROLES_TINTE = ['--color-gold-ink', '--color-info-ink', '--color-teal-ink', '--color-artist-ink'];
+const leerRol = async (rol) => evalJs(`(() => {
+    const sonda = document.createElement('span');
+    sonda.style.color = 'var(${rol})';
+    document.body.appendChild(sonda);
+    const c = getComputedStyle(sonda).color;
+    sonda.remove();
+    return c;
+})()`);
+for (const tema of ['light', 'dark']) {
+    await evalJs(`(() => { try { localStorage.setItem('theme', '${tema}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${tema}'); })()`);
+    await sleep(300);
+    const fondo = await leerRol('--color-gray-100');
+    for (const rol of ROLES_TINTE) {
+        const valor = await leerRol(rol);
+        const ratio = contraste(aRgb(valor), aRgb(fondo));
+        check(`${rol} se lee sobre la tarjeta [${tema}]`, ratio >= 4.5, `${ratio.toFixed(2)}:1 · ${valor} sobre ${fondo}`);
     }
 }
 

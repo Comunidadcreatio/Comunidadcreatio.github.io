@@ -424,10 +424,33 @@
        a propósito: un fondo sólido tiene que aguantar el blanco sobre cualquier cosa que tenga detrás. */
     --color-success-solid: #2e7d32;
     --color-danger-solid: #b91c1c;
-    --color-info-solid: #1976d2;
+    /* El azul bajó de #1976d2 a #1565c0: el primero daba 4.60:1 con el blanco (al filo) y 4.22:1 como
+       texto sobre tarjeta gris (#f5f5f5), o sea FALLABA en cuanto la tarjeta no era blanca pura. */
+    --color-info-solid: #1565c0;
     /* Y el turquesa del botón «Contactar» de la tarjeta de obra: se queda en su color (no se cambia por
        el verde, que le quitaría la identidad) pero OSCURECIDO hasta que el blanco se lee: 5.47:1. */
     --color-teal-solid: #0f766e;
+
+    /* El ORO de la acción «Comprar» y del indicador de la rejilla. Es un color de marca y se mantiene
+       para RELLENO e ICONOS, que es donde funciona: sobre él va tinta oscura (`#1a1a1a`), no blanca
+       (blanco sobre #F5C542 daría 1.62:1: el oro NUNCA lleva texto blanco).
+       Pero como TEXTO sobre la tarjeta clara el oro daba 1.62:1, así que hace falta su pareja oscura:
+       el mismo tono oscurecido lo mínimo para leerse (`#8a6a00` = 5.07:1), que es lo que se usa como
+       texto y como borde en tema claro. En oscuro no hace falta: el oro sobre el fondo oscuro ya se lee,
+       así que `--color-gold-ink` pasa a ser el propio oro (comportamiento de siempre). */
+    --color-gold-fill: #F5C542;
+    --color-gold-ink: #8a6a00;
+
+    /* TINTES de las acciones de la tarjeta de obra (texto y borde). Aquí está la distinción que costó
+       ver: el RELLENO que lleva blanco o tinta encima es el mismo en los dos temas (`--color-*-solid`),
+       pero el TINTA del texto SÍ depende del tema, porque tiene que leerse sobre la superficie, y esa
+       superficie cambia: en claro la tarjeta es clara y en oscuro es oscura. Por eso hay dos familias.
+       Medidos sobre la tarjeta clara (#f5f5f5, que es el caso más ajustado): 5.75:1 el azul, 5.27:1 el
+       turquesa, 4.83:1 el oro y 5.61:1 el morado. */
+    --color-info-ink: #1565c0;
+    --color-teal-ink: #0f766e;
+    --color-artist-ink: #8e44ad;
+    --color-artist-solid: #8e44ad;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
@@ -489,7 +512,18 @@
     --color-warning-on-soft: #ffc107;
     --color-neutral-on-soft: #888;
     /* Los fondos SÓLIDOS no se repiten: valen los mismos que en claro (un fondo sólido tiene que
-       aguantar el blanco encima sobre cualquier cosa que tenga detrás). */
+       aguantar el blanco encima sobre cualquier cosa que tenga detrás).
+       El oro cambia de papel: en oscuro el texto puede ser el oro mismo, porque sobre el fondo oscuro
+       ya se lee (es el comportamiento que ya tenía).
+       Y los TINTES en su versión oscura: son los claros de siempre, con un matiz —el turquesa sube a
+       #14b8a6 porque #16a085 se quedaba en 4.38:1 sobre la tarjeta oscura (#2a2a2a)—. Medidos sobre esa
+       tarjeta: 8.85:1 el oro, 5.11:1 el azul y 5.77:1 el turquesa. */
+    --color-gold-ink: var(--color-gold-fill);
+    --color-info-ink: #5BA0D9;
+    --color-teal-ink: #14b8a6;
+    /* El morado era el peor de todos en oscuro: #8e44ad como texto sobre la tarjeta oscura daba 2.45:1.
+       Se sube a su versión clara de la misma familia. */
+    --color-artist-ink: #bb8fce;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
@@ -739,19 +773,20 @@
     background: var(--color-ink);
 }
 
-/* Estado grid (amarillo): SVG con relleno amarillo, indicador amarillo */
+/* Estado grid (amarillo): SVG con relleno amarillo, indicador amarillo.
+   Aquí el oro es un ICONO y una MARCA, no texto: se queda como está (mismo valor, ahora con nombre). */
 .toggle-nav-btn.nav-btn-grid {
-    color: #F5C542;
+    color: var(--color-gold-fill);
 }
 
 .toggle-nav-btn.nav-btn-grid svg {
-    fill: #F5C542;
+    fill: var(--color-gold-fill);
     stroke: none;
 }
 
 .toggle-nav-btn.nav-btn-grid::after {
     transform: translateX(-50%) scaleX(1);
-    background: #F5C542;
+    background: var(--color-gold-fill);
 }
 
 /* Efecto de pulso al hacer clic */
@@ -1091,21 +1126,23 @@
    ellos también el texto/borde en reposo, que sobre la tarjeta clara daba lo mismo—, y el badge por
    `--color-danger-solid` (6.47:1). OJO: el turquesa se mantiene (no se cambia por el verde, que le
    quitaría la identidad), solo se oscurece hasta que el blanco se lee.
-   El amarillo de «Comprar» NO se toca aquí: su hover pasa de sobra (#1a1a1a sobre #F5C542 = 10.73:1),
-   pero su TEXTO en reposo sobre la tarjeta clara da 1.6:1; eso pide una decisión sobre el amarillo de
-   marca, y queda apuntado. */
+   El amarillo de «Comprar» es el ORO de marca, y la decisión (2026-10-03) es: se queda para RELLENO
+   (su hover pasa de sobra: #1a1a1a sobre #F5C542 = 10.73:1, y el oro NUNCA lleva texto blanco, daría
+   1.62:1), pero como TEXTO y BORDE en tema claro usa su pareja oscura (`--color-gold-ink`, 5.07:1),
+   porque el oro a pelo sobre la tarjeta clara daba 1.62:1. En oscuro el texto vuelve a ser el oro
+   (ahí ya se lee), y eso lo resuelve el propio rol, sin reglas de más. */
 .btn-accion-comprar {
-    color: #F5C542;
-    border-color: #F5C542;
+    color: var(--color-gold-ink);
+    border-color: var(--color-gold-ink);
 }
 .btn-accion-comprar:hover {
-    background: #F5C542;
+    background: var(--color-gold-fill);
     color: #1a1a1a;
     box-shadow: 0 4px 14px rgba(245, 197, 66, 0.4);
 }
 .btn-accion-notificar {
-    color: var(--color-info-solid);
-    border-color: var(--color-info-solid);
+    color: var(--color-info-ink);
+    border-color: var(--color-info-ink);
 }
 .btn-accion-notificar:hover {
     background: var(--color-info-solid);
@@ -1113,8 +1150,8 @@
     box-shadow: 0 4px 14px rgba(25, 118, 210, 0.4);
 }
 .btn-accion-contactar {
-    color: var(--color-teal-solid);
-    border-color: var(--color-teal-solid);
+    color: var(--color-teal-ink);
+    border-color: var(--color-teal-ink);
 }
 .btn-accion-contactar:hover {
     background: var(--color-teal-solid);
@@ -1122,11 +1159,11 @@
     box-shadow: 0 4px 14px rgba(15, 118, 110, 0.4);
 }
 .btn-accion-artista {
-    color: #8e44ad;
-    border-color: #8e44ad;
+    color: var(--color-artist-ink);
+    border-color: var(--color-artist-ink);
 }
 .btn-accion-artista:hover {
-    background: #8e44ad;
+    background: var(--color-artist-solid);
     color: #fff;
     box-shadow: 0 4px 14px rgba(142, 68, 173, 0.4);
 }
@@ -1145,15 +1182,18 @@
     display: none;
 }
 /* En modo oscuro la regla global [data-theme="dark"] button { color: ink }
-   pisa el color del outline: se restaura el color de cada acción */
-[data-theme="dark"] .btn-accion-comprar { color: #F5C542; }
-[data-theme="dark"] .btn-accion-comprar:hover { background: #F5C542; color: #1a1a1a; }
-[data-theme="dark"] .btn-accion-notificar { color: #5BA0D9; }
-[data-theme="dark"] .btn-accion-notificar:hover { background: #5BA0D9; color: #fff; }
-[data-theme="dark"] .btn-accion-contactar { color: #16a085; }
-[data-theme="dark"] .btn-accion-contactar:hover { background: #16a085; color: #fff; }
-[data-theme="dark"] .btn-accion-artista { color: #8e44ad; }
-[data-theme="dark"] .btn-accion-artista:hover { background: #8e44ad; color: #fff; }
+   pisa el color del outline: se restaura el color de cada acción.
+   Estas reglas eran las que quedaban con los hex a mano, y por eso el arreglo de arriba NO llegaba al
+   modo oscuro: el hover de «Notificar» seguía pintando blanco sobre #5BA0D9 (2.81:1). Ahora usan las
+   dos familias: el TINTE (depende del tema) para el texto, y el SÓLIDO (no depende) para el relleno. */
+[data-theme="dark"] .btn-accion-comprar { color: var(--color-gold-ink); }
+[data-theme="dark"] .btn-accion-comprar:hover { background: var(--color-gold-fill); color: #1a1a1a; }
+[data-theme="dark"] .btn-accion-notificar { color: var(--color-info-ink); }
+[data-theme="dark"] .btn-accion-notificar:hover { background: var(--color-info-solid); color: #fff; }
+[data-theme="dark"] .btn-accion-contactar { color: var(--color-teal-ink); }
+[data-theme="dark"] .btn-accion-contactar:hover { background: var(--color-teal-solid); color: #fff; }
+[data-theme="dark"] .btn-accion-artista { color: var(--color-artist-ink); }
+[data-theme="dark"] .btn-accion-artista:hover { background: var(--color-artist-solid); color: #fff; }
 /* Like animado */
 .metrica-like.liked svg {
     fill: #ef4444;

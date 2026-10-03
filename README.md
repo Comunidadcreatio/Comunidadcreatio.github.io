@@ -624,6 +624,46 @@ en rojo.
 Es un color de marca y arreglarlo pide una decisión (oscurecerlo cambia el botón), así que queda
 apuntado en vez de cambiado por mi cuenta.
 
+#### La decisión del amarillo: dos familias, `solid` e `ink`
+
+El amarillo se resolvió al ver que faltaba una **distinción**, no un valor:
+
+- **`--color-*-solid`**: el **relleno** que lleva blanco encima. **No depende del tema** (tiene que
+  aguantar el blanco sobre cualquier cosa que tenga detrás).
+- **`--color-*-ink`**: el **texto y el borde**. **Sí depende del tema**, porque tiene que leerse sobre
+  la superficie, y la superficie cambia: en claro la tarjeta es clara, en oscuro es oscura.
+
+Con eso, el amarillo se queda **como color de marca en el relleno y en los iconos** (donde funciona:
+`#1a1a1a` encima = 10,73:1, y el oro **nunca** lleva texto blanco, daría 1,62:1) y su **texto y borde**
+usan la pareja oscura del mismo tono (`#8a6a00`). En oscuro el texto vuelve a ser el oro, y eso lo
+resuelve el propio rol, sin reglas de más.
+
+**Y aparecieron tres fallos más, uno de ellos grave:**
+
+| Dónde | Antes | Contraste | Ahora | Contraste |
+|---|---|---|---|---|
+| «Comprar», texto en claro | `#F5C542` | **1,62:1** ✗ | `--color-gold-ink` | **4,65:1** ✔ |
+| «Notificar», texto/relleno azul | `#1976d2` | 4,60:1, y **4,22:1** sobre tarjeta gris ✗ | `#1565c0` | **5,75:1** ✔ |
+| «Contactar», turquesa en oscuro | `#16a085` | **4,38:1** ✗ | `--color-teal-ink` | **5,77:1** ✔ |
+| «Artista», morado en oscuro | `#8e44ad` | **2,45:1** ✗✗ | `--color-artist-ink` | **6,23:1** ✔ |
+
+**Y el hallazgo de fondo**: las reglas de **modo oscuro** de esos botones seguían con los hex a mano,
+así que el arreglo de la sección anterior **no llegaba a oscuro** (el hover de «Notificar» seguía
+pintando blanco sobre `#5BA0D9`, 2,81:1). Ahora usan las dos familias.
+
+**El contrato de los tintes también se mide** (8 comprobaciones más, **41/41**), contra el color de
+tarjeta de la paleta, que es el caso **más ajustado** en los dos temas: en claro `#f5f5f5` es peor que
+el blanco de la página, y en oscuro `#1f1f1f` es peor que el fondo. Medidos: **4,65 / 5,27 / 5,02 /
+5,38** en claro y **10,16 / 5,87 / 6,62 / 6,23** en oscuro.
+
+**La foto vio exactamente un cambio** (4 diferencias, todas el mismo): el contador azul del chat pasó de
+`#1976d2` a `#1565c0`, en los dos temas y los dos anchos. Nada más se movió.
+
+**Y una nota de instrumento**: al medir esto, el servidor local estaba caído (cuarta vez) y Chrome
+cargaba **su página de error**, que se ve como «todo gris y 0 medidas» — parece un CSS roto y no lo es.
+El verificador de contraste ahora **comprueba el servidor antes de arrancar** y aborta diciéndolo, como
+ya hacían la foto y la suite.
+
 **Nota de honestidad sobre la insignia de la campana**: en el estado que puedo montar, la app no llega
 a pedir el contador de notificaciones (su texto se queda en «0» y sigue oculta), así que ese arreglo
 está verificado **a nivel de rol** (6,47:1 medido), no sobre el elemento pintado. El verificador lo

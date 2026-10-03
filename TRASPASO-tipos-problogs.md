@@ -454,6 +454,23 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    dice **por qué** (clases, display, caja y texto). **Sin tocar y apuntado**: el amarillo `#F5C542` de
    «Comprar» pasa como fondo (10,73:1) pero **como texto sobre la tarjeta clara da 1,62:1**: es color de
    marca, y arreglarlo es una decisión (oscurecerlo cambia el botón).
+   **DECISIÓN TOMADA (2026-10-03) y familia nueva**: el amarillo se resuelve al ver que faltaba una
+   **distinción**, no un valor — `--color-*-solid` es el **relleno** que lleva blanco encima y **no
+   depende del tema**; `--color-*-ink` es el **texto y el borde** y **sí depende** (tiene que leerse
+   sobre la superficie, que cambia con el tema). El oro se queda de marca en relleno e iconos (con
+   `#1a1a1a` encima: 10,73:1; el oro **nunca** lleva blanco, daría 1,62:1) y su texto/borde usa la
+   pareja oscura `#8a6a00` (4,65:1 sobre la tarjeta).
+   **Y aparecieron tres fallos más**: el azul de «Notificar» (`#1976d2`: 4,60:1 con blanco y **4,22:1**
+   como texto sobre tarjeta gris) → `#1565c0` (5,75:1); el turquesa de «Contactar» **en oscuro**
+   (`#16a085`: **4,38:1**) → `#14b8a6` (5,77:1); y el morado de «Artista» **en oscuro** (`#8e44ad`:
+   **2,45:1**) → `#bb8fce` (6,23:1). **El hallazgo de fondo**: las reglas de **modo oscuro** seguían con
+   los hex a mano, así que el arreglo anterior **no llegaba a oscuro** (el hover de «Notificar» seguía
+   con blanco sobre `#5BA0D9`, 2,81:1).
+   **El contrato de los tintes también se mide** (8 comprobaciones más → **41/41**), contra el color de
+   tarjeta de la paleta, que es el caso más ajustado en los dos temas. La foto vio **exactamente un
+   cambio** (4 diferencias: el contador azul del chat, `#1976d2` → `#1565c0`). Y el verificador de
+   contraste ahora **comprueba el servidor antes de arrancar**: al medir esto estaba caído (cuarta vez)
+   y Chrome cargaba su página de error, que se ve como «todo gris y 0 medidas».
 4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 
