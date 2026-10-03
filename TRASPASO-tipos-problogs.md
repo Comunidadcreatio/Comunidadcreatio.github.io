@@ -401,16 +401,23 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    daban 2 pistas y ahora 1. Y los instrumentos (`foto-estilos.mjs` y `verificar-todo.mjs`) ahora
    **comprueban el servidor local antes de arrancar**: dos veces midieron una página de error sin
    avisar (una vista con 3 elementos en vez de 18, y un verificador con `display: block`).
-3. **Contraste (front E)**: HECHO el primer trozo. Se crearon los roles **«on-soft»** que faltaban
-   (`--color-*-on-soft`, en los dos temas) **con los valores que ya se veían**, así que la píldora de
-   estado ya no tiene hex sueltos y **no se mueve nada** (verificado con la foto). Y se montó
-   **`verificar-contraste-superficies.mjs`**: 16 pares (elementos de auth y del panel) en los dos
-   temas, con el fondo **efectivo** (sube por los padres hasta el primer fondo no transparente) y el
-   mínimo de WCAG (4,5:1, o 3:1 si el texto es grande). Validado por provocación: el botón de ratio en
-   gris claro da **1,16:1** y falla; con el CSS de verdad, **16/16**. Los elementos ocultos no cuentan
-   como fallo (un elemento de tamaño cero no se pinta). **Pendiente de E**: más superficies (chat,
-   galería, formularios) y decidir si los hex a mano que quedan (359 fuera de la paleta) se van
-   pasando por tandas.
+3. **Contraste (front E)**: HECHO el primer trozo y AMPLIADO. Se crearon los roles **«on-soft»** que
+   faltaban (`--color-*-on-soft`, en los dos temas) **con los valores que ya se veían**, así que la
+   píldora de estado ya no tiene hex sueltos y **no se mueve nada**. Y `verificar-contraste-superficies.mjs`
+   cubre **25 comprobaciones en tres vistas y los dos temas** (auth, panel y **chat**), con el fondo
+   **efectivo** (sube por los padres hasta el primer fondo no transparente) y el mínimo de WCAG (4,5:1,
+   o 3:1 si el texto es grande). Validado por provocación (el botón de ratio en gris claro da **1,16:1**
+   y falla).
+   **Tres reglas que salieron de usarlo**: (a) si **no hay fondo pintado no se inventa uno** —la app no
+   pinta fondo, detrás hay un slideshow, y suponer blanco dio un «blanco sobre blanco» de 1,09:1 en el
+   chat oscuro que no existía—; (b) **una vista que no mide nada es un FALLO**, y eso cazó las vistas de
+   **perfil** y **galería** (quitadas, apuntadas como pendientes: sus elementos existen pero ocultos o
+   con caja 0×0); (c) la primera pasada encontró **dos fallos reales**: los contadores del chat daban
+   **4,35:1** (mínimo 4,5) con `--color-text-muted` sobre `gray-100` → con `gray-600` suben a **7,17:1**.
+   La foto no los veía (no mide esos contadores), que es justo para lo que hacía falta.
+   **Pendiente de E**: las vistas de galería y perfil (cuando se sepa llegar a su estado visible), el
+   resto de superficies, y decidir si los hex a mano que quedan (359 fuera de la paleta) se van pasando
+   por tandas.
 4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 

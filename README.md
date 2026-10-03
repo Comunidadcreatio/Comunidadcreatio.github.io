@@ -531,13 +531,31 @@ El verificador, para cada par (elemento, etiqueta):
    nunca es el del propio elemento);
 3. calcula el contraste WCAG y exige **4,5:1** (o **3:1** si el texto es grande).
 
-Cubre **16 pares en los dos temas** (auth: título, párrafo, campos, botón principal y secundario;
-panel: etiquetas, campos, tarjeta de Cavent, píldoras de estado y botón de ratio). Los elementos
+Cubre **25 comprobaciones en tres vistas y los dos temas** (auth: título, párrafo, campos, botón
+principal y secundario; panel: etiquetas, campos, tarjeta de Cavent, píldoras de estado, botones de
+ratio y campo de etiquetas; **chat: nombre del pueblo, contadores y usuarios**). Los elementos
 **ocultos no cuentan** como fallo (un elemento con tamaño cero no se pinta, y su "fondo efectivo"
 sería el de un padre que tampoco se ve): se informan aparte.
 
+**Tres reglas que salieron de usarlo, y que son la mitad de su valor:**
+
+1. **Si no hay fondo pintado, no se inventa uno.** La app no pinta color de fondo: detrás hay un
+   **slideshow** (`body` es transparente a propósito). Suponer blanco produjo un "blanco sobre blanco"
+   de 1,09:1 en el chat oscuro **que no existía**. Si no hay fondo, o hay imagen, el contraste **no es
+   medible** y se dice.
+2. **Una vista que no mide nada es un FALLO**, no un verde vacío. Eso cazó dos vistas seguidas: la de
+   **perfil** (elementos que existen pero ocultos) y la de **galería** (las tarjetas con caja 0×0).
+   Las dos se han **quitado** en vez de dejarlas ahí pasando desapercibidas, y quedan apuntadas como
+   pendientes. Además, cuando una vista se queda vacía se imprime el estado de cada par (¿no existe?
+   ¿está oculto? ¿qué color?) para no tener que instrumentarlo a mano.
+3. **La primera pasada encontró dos fallos reales de contraste**, y se arreglaron: los **contadores del
+   directorio del chat** usaban `--color-text-muted` (gray-500, `#737373`) sobre `gray-100`, que da
+   **4,35:1** cuando el mínimo para 11 px en negrita es 4,5:1. Con `gray-600` (`#525252`) suben a
+   **7,17:1** (y 9,68:1 en oscuro). La foto **no vio ese cambio**: no mide los contadores del chat —
+   que es exactamente por lo que hacía falta este verificador.
+
 **Está validado por provocación**: poniendo el texto del botón de ratio en gris claro sobre blanco,
-el verificador falla con **1,16:1** en los dos temas. Con el CSS de verdad: **16/16**.
+el verificador falla con **1,16:1** en los dos temas. Con el CSS de verdad: **25/25**.
 
 **Y las dos inestabilidades que aparecieron al montarlo** (las dos arregladas):
 
