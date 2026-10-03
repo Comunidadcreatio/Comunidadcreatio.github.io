@@ -425,6 +425,9 @@
     --color-success-solid: #2e7d32;
     --color-danger-solid: #b91c1c;
     --color-info-solid: #1976d2;
+    /* Y el turquesa del botón «Contactar» de la tarjeta de obra: se queda en su color (no se cambia por
+       el verde, que le quitaría la identidad) pero OSCURECIDO hasta que el blanco se lee: 5.47:1. */
+    --color-teal-solid: #0f766e;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
@@ -849,7 +852,9 @@
     min-width: 16px;
     height: 16px;
     padding: 0 3px;
-    background: #ef4444;
+    /* Rol sólido: el blanco encima de #ef4444 daba 3.76:1 y con `--color-danger-solid` da 6.47:1.
+       Es una insignia de 9px, o sea texto pequeño y con más motivo. */
+    background: var(--color-danger-solid);
     color: #fff;
     font-size: 9px;
     font-weight: 700;
@@ -1079,7 +1084,16 @@
 .btn-accion-obra:active {
     transform: scale(0.95);
 }
-/* Colores por acción (outline): texto/borde del color, hover rellena */
+/* Colores por acción: texto/borde del color, hover RELLENA con el mismo color y texto blanco.
+   Al medir el contraste (2026-10-03) salió que tres de estos colores no aguantan el blanco encima:
+   #5BA0D9 daba 2.81:1, #16a085 3.28:1 y el badge de la campana (#ef4444) 3.76:1. Los dos primeros se
+   cambian por los roles SÓLIDOS de la paleta (que están medidos con blanco: 4.60:1 y 5.47:1) —y con
+   ellos también el texto/borde en reposo, que sobre la tarjeta clara daba lo mismo—, y el badge por
+   `--color-danger-solid` (6.47:1). OJO: el turquesa se mantiene (no se cambia por el verde, que le
+   quitaría la identidad), solo se oscurece hasta que el blanco se lee.
+   El amarillo de «Comprar» NO se toca aquí: su hover pasa de sobra (#1a1a1a sobre #F5C542 = 10.73:1),
+   pero su TEXTO en reposo sobre la tarjeta clara da 1.6:1; eso pide una decisión sobre el amarillo de
+   marca, y queda apuntado. */
 .btn-accion-comprar {
     color: #F5C542;
     border-color: #F5C542;
@@ -1090,22 +1104,22 @@
     box-shadow: 0 4px 14px rgba(245, 197, 66, 0.4);
 }
 .btn-accion-notificar {
-    color: #5BA0D9;
-    border-color: #5BA0D9;
+    color: var(--color-info-solid);
+    border-color: var(--color-info-solid);
 }
 .btn-accion-notificar:hover {
-    background: #5BA0D9;
+    background: var(--color-info-solid);
     color: #fff;
-    box-shadow: 0 4px 14px rgba(91, 160, 217, 0.4);
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.4);
 }
 .btn-accion-contactar {
-    color: #16a085;
-    border-color: #16a085;
+    color: var(--color-teal-solid);
+    border-color: var(--color-teal-solid);
 }
 .btn-accion-contactar:hover {
-    background: #16a085;
+    background: var(--color-teal-solid);
     color: #fff;
-    box-shadow: 0 4px 14px rgba(22, 160, 133, 0.4);
+    box-shadow: 0 4px 14px rgba(15, 118, 110, 0.4);
 }
 .btn-accion-artista {
     color: #8e44ad;

@@ -82,6 +82,9 @@ const MOCK = `(() => {
         if (u.includes('/chat/conversaciones')) return json({ success: true, conversaciones: [] });
         if (u.includes('/chat/bloqueados')) return json({ success: true, bloqueados: [] });
         if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 0 });
+        // Notificaciones SIN LEER: son las que hacen aparecer la insignia de la campana, que es uno de
+        // los sitios que llevan texto blanco sobre un color solido.
+        if (u.includes('no-leidas') || u.includes('notificaciones')) return json({ success: true, no_leidas: 2, notificaciones: [] });
         // La OBRA de ejemplo: sin ella la galeria sale vacia y la vista de Explorar no mide nada.
         if (u.includes('/obras')) return json([{ id: 55001, titulo: 'Obra de prueba', precio: '100', artista: 'Ana',
             artista_user_id: 480002, foto_artista: '', estado_obra: 'publicada', vistas: 0, imagen: '', imagenes: [],
@@ -191,7 +194,8 @@ const VISTAS = [
             ['.status-badge.status-inactivo', 'pildora de estado inactivo'],
             ['.ratio-btn.active', 'texto del boton de ratio'],
             ['.ratio-btn:not(.active)', 'texto del boton de ratio inactivo'],
-            ['#obra-etiquetas-bar .input-etiquetas-subtle', 'texto del campo de etiquetas']
+            ['#obra-etiquetas-bar .input-etiquetas-subtle', 'texto del campo de etiquetas'],
+            ['.notif-badge', 'insignia de notificaciones (campana)']
         ]
     },
     {
@@ -258,8 +262,20 @@ for (const vista of VISTAS) {
             if (!crudo || typeof crudo !== 'string' || crudo[0] !== '{') { console.log(`  --    ${etiqueta}: no esta en esta vista`); continue; }
             const m = JSON.parse(crudo);
             // Un elemento con tamaño CERO no se pinta: su "fondo efectivo" seria el de un padre que
-            // tampoco se ve, y el contraste calculado no significa nada. Se informa y NO cuenta.
-            if (!m.visible) { console.log(`  --    ${etiqueta}: el elemento esta oculto (no se mide)`); continue; }
+            // tampoco se ve, y el contraste calculado no significa nada. Se informa y NO cuenta, y se
+            // dice POR QUE esta oculto (clases y contenido): casi siempre es que falta un estado.
+            if (!m.visible) {
+                const porque = await evalJs(`(() => {
+                    const el = document.querySelector(${JSON.stringify(sel)});
+                    if (!el) return '';
+                    const r = el.getBoundingClientRect();
+                    return 'clases [' + el.className + '], display ' + getComputedStyle(el).display
+                        + ', caja ' + Math.round(r.width) + 'x' + Math.round(r.height)
+                        + ', texto "' + (el.textContent || '').trim().slice(0, 20) + '"';
+                })()`);
+                console.log(`  --    ${etiqueta}: el elemento esta oculto (no se mide) → ${porque}`);
+                continue;
+            }
             // Fondo con IMAGEN (el slideshow de la app) o sin fondo pintado: el contraste no se puede
             // calcular, y suponer un color seria inventarse un fallo. Se informa y NO cuenta.
             if (m.fondoImagen) { console.log(`  --    ${etiqueta}: el fondo es una imagen (no se puede medir el contraste)`); continue; }
@@ -314,5 +330,29 @@ for (const vista of VISTAS) {
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 if (logs.length) fallos++;
+
+// EL CONTRATO DE LOS ROLES SÓLIDOS: son los que se usan para poner TEXTO BLANCO encima, así que su
+// contrato es que el blanco se lea. Esto no depende de ninguna vista (se lee el valor del rol del
+// propio documento, en los dos temas), y protege a CUALQUIER consumidor futuro: si alguien crea o
+// cambia un rol sólido con un valor que no aguanta el blanco, esto se pone en rojo.
+console.log('\n--- contrato de los roles solidos (blanco encima >= 4.5:1)');
+const ROLES_SOLIDOS = ['--color-success-solid', '--color-danger-solid', '--color-info-solid', '--color-teal-solid'];
+for (const tema of ['light', 'dark']) {
+    await evalJs(`(() => { try { localStorage.setItem('theme', '${tema}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${tema}'); })()`);
+    await sleep(300);
+    for (const rol of ROLES_SOLIDOS) {
+        const valor = await evalJs(`(() => {
+            const sonda = document.createElement('span');
+            sonda.style.color = 'var(${rol})';
+            document.body.appendChild(sonda);
+            const c = getComputedStyle(sonda).color;
+            sonda.remove();
+            return c;
+        })()`);
+        const ratio = contraste(aRgb(valor), [255, 255, 255]);
+        check(`${rol} aguanta el texto blanco [${tema}]`, ratio >= 4.5, `${ratio.toFixed(2)}:1 · blanco sobre ${valor}`);
+    }
+}
+
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 salir(fallos ? 1 : 0);

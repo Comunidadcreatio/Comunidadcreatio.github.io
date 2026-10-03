@@ -441,6 +441,19 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    cambio visual** (los valores ya eran esos).
    Queda apuntado, sin tocar, otro consumidor igual: `style.css` pinta `#5BA0D9` con texto blanco
    (**2,81:1**).
+   **Y `style.css` (HECHO, 2026-10-03)**: al ir a por ese azul aparecieron **tres fallos reales** — el
+   mismo patrón — en los botones de acción de la tarjeta de obra y en la insignia de la campana:
+   `.btn-accion-notificar:hover` (`#5BA0D9` + blanco = 2,81:1) → `--color-info-solid` (4,60:1);
+   `.btn-accion-contactar:hover` (`#16a085` + blanco = 3,28:1) → `--color-teal-solid` (5,47:1); y
+   `.notif-badge` (`#ef4444` + blanco = 3,76:1) → `--color-danger-solid` (6,47:1). El **turquesa** es el
+   cuarto rol sólido y se creó **conservando el tono** (el botón «Contactar» no se cambia por el verde,
+   solo se oscurece hasta que el blanco se lee); en los dos botones se cambió también el texto/borde en
+   reposo, que usaban el mismo hex sobre la tarjeta clara.
+   **El contrato de los roles se mide solo**: 8 comprobaciones nuevas (cada rol sólido × 2 temas, blanco
+   encima ≥ 4,5:1) → **33/33** en el verificador de contraste. Y el aviso de «elemento oculto» ahora
+   dice **por qué** (clases, display, caja y texto). **Sin tocar y apuntado**: el amarillo `#F5C542` de
+   «Comprar» pasa como fondo (10,73:1) pero **como texto sobre la tarjeta clara da 1,62:1**: es color de
+   marca, y arreglarlo es una decisión (oscurecerlo cambia el botón).
 4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 

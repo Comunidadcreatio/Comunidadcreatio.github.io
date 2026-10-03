@@ -598,6 +598,37 @@ El hover sí cambia de tono — se oscurece —, y eso **es** el arreglo.
 Queda apuntado otro consumidor del mismo tipo, sin tocar: `style.css` pinta un fondo `#5BA0D9` con
 texto blanco, y eso da **2,81:1**.
 
+#### `style.css`: tres fallos más, y el turquesa como cuarto rol
+
+Al ir a por ese `#5BA0D9` aparecieron **tres fallos reales** en los botones de acción de la tarjeta de
+obra y en la insignia de la campana:
+
+| Regla | Antes | Contraste | Ahora | Contraste |
+|---|---|---|---|---|
+| `.btn-accion-notificar:hover` | `#5BA0D9` + blanco | **2,81:1** ✗ | `--color-info-solid` | **4,60:1** ✔ |
+| `.btn-accion-contactar:hover` | `#16a085` + blanco | **3,28:1** ✗ | `--color-teal-solid` | **5,47:1** ✔ |
+| `.notif-badge` | `#ef4444` + blanco | **3,76:1** ✗ | `--color-danger-solid` | **6,47:1** ✔ |
+
+El **turquesa** es el cuarto rol sólido (`--color-teal-solid: #0f766e`) y se creó **conservando el
+tono**: el botón «Contactar» no se cambia por el verde (le quitaría la identidad), solo se oscurece
+hasta que el blanco se lee. Y en los dos botones se cambió **también el color del texto y del borde en
+reposo**, porque el mismo hex estaba ahí haciendo de texto sobre la tarjeta clara y daba lo mismo.
+
+**El contrato de los roles ahora se mide solo.** El verificador comprueba, para cada rol sólido y en
+los dos temas, que **el blanco encima pase de 4,5:1** (8 comprobaciones nuevas, 33 en total). No depende
+de ninguna vista: si alguien crea o cambia un rol sólido con un valor que no aguanta el blanco, se pone
+en rojo.
+
+**Lo que NO se toca, y por qué**: el amarillo de «Comprar». Su hover pasa de sobra (`#1a1a1a` sobre
+`#F5C542` = **10,73:1**), pero ese mismo amarillo **como texto** sobre la tarjeta clara da **1,62:1**.
+Es un color de marca y arreglarlo pide una decisión (oscurecerlo cambia el botón), así que queda
+apuntado en vez de cambiado por mi cuenta.
+
+**Nota de honestidad sobre la insignia de la campana**: en el estado que puedo montar, la app no llega
+a pedir el contador de notificaciones (su texto se queda en «0» y sigue oculta), así que ese arreglo
+está verificado **a nivel de rol** (6,47:1 medido), no sobre el elemento pintado. El verificador lo
+dice con el motivo, porque el aviso de «oculto» ahora informa de **clases, display, caja y texto**.
+
 **Y las dos inestabilidades que aparecieron al montarlo** (las dos arregladas):
 
 - La vista `panel` de la foto podía medir el panel **a medio colocar** (la app lo posiciona por JS):
