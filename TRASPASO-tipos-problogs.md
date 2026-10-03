@@ -471,6 +471,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    cambio** (4 diferencias: el contador azul del chat, `#1976d2` → `#1565c0`). Y el verificador de
    contraste ahora **comprueba el servidor antes de arrancar**: al medir esto estaba caído (cuarta vez)
    y Chrome cargaba su página de error, que se ve como «todo gris y 0 medidas».
+   **La campaña de colores (abierta el 2026-10-03, tanda 1: `chat.css`)**: al contarlos bien hay que
+   separar **respaldos** (`var(--color-x, #hex)`, 109: no son deuda) de **sueltos** (**142**, que son el
+   objetivo real). Herramientas nuevas: `contar-color-a-mano.mjs` (cuenta) y `migrar-color.mjs` (migra
+   una tanda por línea, con un mapa a mano, y **aborta sin escribir** si la línea no cuadra). **Tanda 1
+   hecha**: 28 declaraciones de `chat.css` (25 de las reglas **oscuras**, a sus tokens oscuros exactos →
+   cambio cero **por construcción**; y 3 claras). **La foto dio SIN DIFERENCIAS en los dos temas** en
+   las dos mitades. Lo que queda en el chat (30) son **decisiones, no migraciones**: 13 `#fff` (texto
+   blanco sobre sólidos → roles `solid`), 13 `#888` (gris apagado que **la paleta no tiene**) y sueltos
+   (`#e5e5e5`, `#e53935`, `#242424`…). Orden por tamaño para las siguientes tandas:
+   `formularios.css` 36, `chat.css` 30, `style.css` 24, `problogs.css` 14, `galeria-publica.css` 10,
+   `header.css` 10, `auth.css` 8, `panel-artista.css` 5, `notificaciones.css` 2, `modales.css` 2,
+   `search-results.css` 1.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

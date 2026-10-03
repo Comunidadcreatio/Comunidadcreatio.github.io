@@ -936,6 +936,38 @@ una medida del navegador**, y se dice: las otras cuatro secciones sí miden en e
 resultados de búsqueda), así que la provocación vino sola: **falló con ellos y ahora pasa** (15/15).
 Hay **15 imágenes de Cloudinary en plantillas** y todas llevan `srcset`.
 
+## La campaña de los colores a mano (tanda 1: `chat.css`)
+
+**Cuánto queda de verdad**: al contar los hex «a mano» hay que separar dos cosas, y la primera versión de
+este número las mezclaba:
+
+- **109 son RESPALDO** dentro de `var(--color-x, #hex)`. Eso **no es deuda**: es una red de seguridad
+  deliberada. (En `chat.css` había 74, y por eso la primera cuenta daba un tamaño falso.)
+- **142 son valores SUELTOS** (lo que la campaña va a por ellos): `formularios.css` 36, `chat.css` 30,
+  `style.css` 24, `problogs.css` 14, `galeria-publica.css` 10, `header.css` 10, `auth.css` 8,
+  `panel-artista.css` 5, `notificaciones.css` 2, `modales.css` 2, `search-results.css` 1.
+
+**Dos herramientas nuevas** (el método, con la lección del incidente de `importantes-lote.mjs --linea`
+incorporada):
+
+- **`contar-color-a-mano.mjs`**: cuenta respaldos y sueltos por hoja (sin argumento, todas), y con hoja
+  dice además el detalle por valor.
+- **`migrar-color.mjs`**: migra **una** tanda, **por línea** y con el token escrito a mano en un mapa
+  JSON. **No adivina**: si la línea no tiene el valor esperado —o ya lleva un token— **aborta sin
+  escribir nada**. Después, siempre: foto antes/después (**debe dar SIN DIFERENCIAS**) y la suite.
+
+**Tanda 1, hecha: `chat.css` (28 declaraciones).** Primero las **reglas de modo oscuro** (25 valores) a
+sus tokens **oscuros exactos** — cambio cero **por construcción**, porque el token vale en oscuro justo
+lo que valía el hex. Después las claras que tenían token exacto en claro (3). **La foto dio SIN
+DIFERENCIAS en los dos temas** en las dos mitades de la tanda, que es la prueba de que sobraban los
+hex (las reglas oscuras ya cubrían esos elementos, así que hacerlas sensibles al tema no movió nada).
+
+**Lo que queda en `chat.css`** son 30 sueltos, y son **decisiones, no migraciones**: 13 son `#fff`
+(texto blanco sobre colores sólidos, o sea territorio de los roles `solid`), 13 son `#888` (un gris
+apagado que **la paleta no tiene**: `--color-text-muted` vale `#737373` en claro y `#a3a3a3` en oscuro,
+no `#888`), y el resto sueltos (`#e5e5e5` de bordes, `#e53935`, `#242424`…). Eso va en la tanda
+siguiente, con la medición de contraste delante.
+
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
 La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de
@@ -1163,6 +1195,8 @@ resultado.
 | scripts/dbg-cascada-real.mjs | **Quién gana una propiedad, de verdad**: pregunta al navegador por la cascada real (`--pagina`, `--tema`, `--elemento`, `--propiedad`, `--valor`, `--input-error`, `--hover`) |
 | scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
+| scripts/migrar-color.mjs | **Migra UNA tanda de color a tokens, por línea y con el token escrito a mano** (mapa JSON). Aborta sin escribir nada si la línea no tiene el valor esperado |
+| scripts/contar-color-a-mano.mjs | Cuántos colores a mano quedan, **separando los respaldos** (`var(--color-x, #hex)`, que no son deuda) de los **sueltos** (que son la campaña). Sin argumento recorre todas las hojas |
 | scripts/verificar-todo.mjs | **Corre TODOS los verificadores** (los que empiecen por `verificar-`, menos él mismo) y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/verificar-estados-inputs-auth.mjs | Los estados de los campos de auth (`:invalid`, `:valid`, `.input-error`) en los dos temas: lo que la foto de estilos **no** puede ver (solo mide los campos vacíos) |

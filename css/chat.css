@@ -220,8 +220,8 @@ body.teclado-abierto .chat-enviar-btn {
     background: #242424;
 }
 [data-theme="dark"] .chat-pueblo-count {
-    background: #2a2a2a;
-    color: #d4d4d4;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 /* Barra de información superior: nombre y contadores centrados */
@@ -353,7 +353,7 @@ body.teclado-abierto .chat-enviar-btn {
     text-overflow: ellipsis;
 }
 .chat-user-estado .online-text {
-    color: #16a34a;
+    color: var(--color-success);
     font-weight: 600;
 }
 .chat-user-flecha {
@@ -436,7 +436,7 @@ body.teclado-abierto .chat-enviar-btn {
     line-height: 1.2;
 }
 .chat-sala-presencia.on {
-    color: #16a34a;
+    color: var(--color-success);
 }
 
 /* Avatar del otro usuario en el header (con punto de presencia) */
@@ -577,14 +577,14 @@ body.teclado-abierto .chat-enviar-btn {
     color: #e5e5e5;
 }
 [data-theme="dark"] .chat-msg.own {
-    background: #525252;
-    color: #f5f5f5;
+    background: var(--color-gray-300);
+    color: var(--color-ink);
 }
 [data-theme="dark"] .chat-user-row:hover {
     background: #242424;
 }
 [data-theme="dark"] .chat-pueblo-info-contador {
-    background: #2a2a2a;
+    background: var(--color-gray-200);
 }
 
 /* Panel de la lista de usuarios del municipio seleccionado */
@@ -592,27 +592,27 @@ body.teclado-abierto .chat-enviar-btn {
     padding: 6px 4px 0;
 }
 [data-theme="dark"] .chat-input {
-    background: #1f1f1f;
-    color: #e5e5e5;
-    border-color: #404040;
+    background: var(--color-gray-100);
+    color: var(--color-ink-light);
+    border-color: var(--color-border);
 }
 [data-theme="dark"] .chat-enviar-btn {
     /* En oscuro --color-primary es blanco; usar gris medio con icono claro */
-    background: #525252;
-    color: #f5f5f5;
+    background: var(--color-gray-300);
+    color: var(--color-ink);
 }
 [data-theme="dark"] .chat-sala-header {
-    border-bottom-color: #2a2a2a;
+    border-bottom-color: var(--color-gray-200);
 }
 [data-theme="dark"] .chat-form {
-    border-top-color: #2a2a2a;
+    border-top-color: var(--color-gray-200);
 }
 [data-theme="dark"] .chat-user-dot {
-    border-color: #0a0a0a;
+    border-color: var(--color-bg);
 }
 [data-theme="dark"] .chat-sin-mensajes,
 [data-theme="dark"] .chat-cargando {
-    color: #a3a3a3;
+    color: var(--color-text-muted);
 }
 
 /* Escritorio */
@@ -694,7 +694,7 @@ body.teclado-abierto .chat-enviar-btn {
     line-height: 1.2;
 }
 [data-theme="dark"] .chat-conv-nombre {
-    color: #a3a3a3;
+    color: var(--color-text-muted);
 }
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;
@@ -745,7 +745,7 @@ body.teclado-abierto .chat-enviar-btn {
     background-color: #22c55e;
 }
 [data-theme="dark"] .chat-conv-dot {
-    border-color: #0a0a0a;
+    border-color: var(--color-bg);
 }
 .chat-conv-circle:hover {
     transform: scale(1.06);
@@ -798,7 +798,7 @@ body.teclado-abierto .chat-enviar-btn {
 }
 [data-theme="dark"] .chat-nav-badge,
 [data-theme="dark"] .chat-fab-badge {
-    border-color: #0a0a0a;
+    border-color: var(--color-bg);
 }
 
 /* ==============================================
@@ -837,7 +837,7 @@ body.teclado-abierto .chat-enviar-btn {
     transform: none;
 }
 [data-theme="dark"] .chat-sala-fab.cerrada {
-    background: #2a2a2a;
+    background: var(--color-gray-200);
     color: #8a8a8a;
 }
 [data-theme="dark"] .chat-cluster {
@@ -850,11 +850,11 @@ body.teclado-abierto .chat-enviar-btn {
         rgba(0, 0, 0, 0) 85%);
 }
 [data-theme="dark"] .chat-conv-circle {
-    border-color: #0a0a0a;
+    border-color: var(--color-bg);
 }
 [data-theme="dark"] .chat-fab {
-    background: #f5f5f5;
-    color: #0a0a0a;
+    background: var(--color-gray-700);
+    color: var(--color-bg);
 }
 @media (min-width: 769px) {
     .chat-cluster {
@@ -918,7 +918,7 @@ body.teclado-abierto .chat-enviar-btn {
     transform: translateX(-50%) translateY(0);
 }
 .chat-trash.hover {
-    background: #dc2626; /* rojo al pasar el círculo encima */
+    background: var(--color-danger); /* rojo al pasar el círculo encima */
     transform: translateX(-50%) translateY(0) scale(1.1);
 }
 .chat-trash svg {
@@ -930,11 +930,11 @@ body.teclado-abierto .chat-enviar-btn {
     display: none; /* solo el icono */
 }
 [data-theme="dark"] .chat-trash {
-    background: #f5f5f5;
-    color: #0a0a0a;
+    background: var(--color-gray-700);
+    color: var(--color-bg);
 }
 [data-theme="dark"] .chat-trash.hover {
-    background: #ef4444;
+    background: var(--color-danger);
     color: #fff;
 }
 
@@ -1283,7 +1283,7 @@ body.teclado-abierto .chat-enviar-btn {
     background: var(--color-gray-100, #f3f4f6);
 }
 [data-theme="dark"] .chat-conv-item:hover {
-    background: #1f1f1f;
+    background: var(--color-gray-100);
 }
 .chat-conv-item-avatar {
     position: relative; /* para el punto de presencia .chat-conv-dot */
