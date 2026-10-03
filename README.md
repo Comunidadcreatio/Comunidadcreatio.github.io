@@ -554,6 +554,20 @@ sería el de un padre que tampoco se ve): se informan aparte.
    **7,17:1** (y 9,68:1 en oscuro). La foto **no vio ese cambio**: no mide los contadores del chat —
    que es exactamente por lo que hacía falta este verificador.
 
+**Dos hallazgos más de la misma pasada, los dos con número:**
+
+- **Los contadores del chat «con datos»** (la variante verde/azul) van con **texto blanco** sobre hex a
+  mano: `#2e7d32` da **5,13:1** ✔ y `#1976d2` da **4,60:1** ✔ — este último **al filo** del mínimo.
+  Y aquí está lo importante: **no se pueden unificar a la paleta**. Blanco sobre `--color-success` daría
+  **3,30:1** en claro y **2,28:1** en oscuro, o sea **falla**. Es **la segunda vez** que aparece lo
+  mismo (pasó con la píldora de estado): los colores semánticos de la paleta están afinados para
+  **bordes y señales**, no para ser **fondo sólido con texto blanco encima**. La petición de diseño ya
+  no es una intuición, son dos casos medidos: faltan roles **«solid»** (`--color-success-solid`, …).
+- **Los nombres de pueblo y de usuario del chat se pintan directamente sobre el slideshow** (la app no
+  pinta fondo de color: `body` es transparente a propósito). Ahí el contraste **no es medible** —y, más
+  importante, **no está garantizado**: texto sobre una imagen que rota puede quedar ilegible en
+  cualquier momento—. Queda apuntado como riesgo, no como fallo medido.
+
 **Está validado por provocación**: poniendo el texto del botón de ratio en gris claro sobre blanco,
 el verificador falla con **1,16:1** en los dos temas. Con el CSS de verdad: **25/25**.
 

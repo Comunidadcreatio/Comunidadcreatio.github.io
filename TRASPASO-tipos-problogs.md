@@ -415,9 +415,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    con caja 0×0); (c) la primera pasada encontró **dos fallos reales**: los contadores del chat daban
    **4,35:1** (mínimo 4,5) con `--color-text-muted` sobre `gray-100` → con `gray-600` suben a **7,17:1**.
    La foto no los veía (no mide esos contadores), que es justo para lo que hacía falta.
-   **Pendiente de E**: las vistas de galería y perfil (cuando se sepa llegar a su estado visible), el
-   resto de superficies, y decidir si los hex a mano que quedan (359 fuera de la paleta) se van pasando
-   por tandas.
+   **Dos hallazgos más de la misma pasada**: (d) los contadores del chat **«con datos»** (variante
+   verde/azul, texto blanco) van con hex a mano: `#2e7d32` da 5,13:1 y `#1976d2` **4,60:1** (al filo), y
+   **no se pueden unificar a la paleta** porque blanco sobre `--color-success` daría **3,30:1** (claro) y
+   **2,28:1** (oscuro): la **segunda vez** que aparece el mismo hueco —los semánticos están afinados para
+   bordes y señales, no para fondo sólido con texto blanco—, así que la petición de diseño son roles
+   **«solid»**, y ya son dos casos medidos; (e) los nombres de pueblo y usuario del chat se pintan
+   **sobre el slideshow** (la app no pinta fondo), así que su contraste **no está garantizado**: queda
+   como riesgo apuntado.
+   **Pendiente de E**: las vistas de galería y perfil (el diagnóstico dice por qué: en rejilla la fila
+   de textos de la tarjeta mide 0×0, y en el perfil los elementos están ocultos), el resto de
+   superficies, y decidir si los hex a mano que quedan (359 fuera de la paleta) se van pasando por
+   tandas.
 4. **Idea pendiente de decidir con el usuario**: un `srcset`/`sizes` más fino en las
    imágenes del editor y en las de la lectura.
 

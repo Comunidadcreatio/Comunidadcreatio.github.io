@@ -73,6 +73,15 @@ const MOCK = `(() => {
         if (u.includes('mis-obras')) return json({ success: true, obras: [
             { id: 9001, titulo: 'Cavent de prueba', precio: '100', status: 'Activo' },
             { id: 9002, titulo: 'Otro Cavent', precio: '200', status: 'Inactivo' }] });
+        // Directorio del chat CON una usuaria: sin ella la lista de usuarios sale vacia y sus pares no
+        // existen (el pueblo se despliega, pero no hay filas que medir).
+        if (u.includes('/chat/directorio')) return json({ success: true, pueblos: {
+            'San Cristóbal': [{ id: 99, nombre_artista: 'Ana', foto_perfil: '', ultima_actividad: new Date().toISOString() }],
+            'San Antonio del Tachira': []
+        } });
+        if (u.includes('/chat/conversaciones')) return json({ success: true, conversaciones: [] });
+        if (u.includes('/chat/bloqueados')) return json({ success: true, bloqueados: [] });
+        if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 0 });
         // La OBRA de ejemplo: sin ella la galeria sale vacia y la vista de Explorar no mide nada.
         if (u.includes('/obras')) return json([{ id: 55001, titulo: 'Obra de prueba', precio: '100', artista: 'Ana',
             artista_user_id: 480002, foto_artista: '', estado_obra: 'publicada', vistas: 0, imagen: '', imagenes: [],
@@ -205,12 +214,16 @@ const VISTAS = [
     }
 ];
 
-// PENDIENTE: la vista de la GALERIA (Explorar). Se quito el 2026-10-02 porque no se consigue un estado
-// en el que las tarjetas se pinten: con la clase `modo-grid` puesta y la tarjeta en el DOM, sus cinco
-// textos tienen caja 0x0 (la rejilla no queda visible por este camino). Y la vista del PERFIL, por lo
-// mismo: sus elementos existen pero ocultos. Las dos se pueden anadir cuando se sepa como llegar a su
-// estado visible; mientras tanto, la regla de "una vista que no mide nada es un fallo" impide que
-// entren aqui dando un verde vacio.
+// PENDIENTE: la vista de la GALERIA (Explorar) y la del PERFIL. Las dos se han intentado y quitado
+// (2026-10-02) porque no se consigue un estado en el que sus textos se pinten. Lo que dijo el
+// diagnostico de ancestros, para el siguiente intento:
+//   - GALERIA: con `#galeria-container.modo-grid` visible (1280x739) y la tarjeta con caja (209x262),
+//     la FILA DE TEXTOS de la tarjeta (`.obra-artista-row`, con el titulo, el artista y el precio) mide
+//     0x0: en rejilla la cabecera se colapsa, y la tarjeta arrastra la clase `modo-flex-enter`. Habria
+//     que medir otra cosa (la imagen, o abrir antes el boton de detalles) o esperar a que la tarjeta
+//     salga de ese estado.
+//   - PERFIL: sus elementos existen pero ocultos.
+// La regla de "una vista que no mide nada es un fallo" impide que entren aqui dando un verde vacio.
 
 for (const vista of VISTAS) {
     await send('Page.navigate', { url: URL_BASE + vista.ruta });
@@ -277,6 +290,23 @@ for (const vista of VISTAS) {
                     + ', visibility ' + cs.visibility + ', color ' + cs.color;
             })()`));
         }
+        // Y la CADENA DE ANCESTROS del primer par: si el elemento tiene caja 0x0, el culpable es alguno
+        // de sus padres, y esto dice cual (con su tamano y su display) sin instrumentar nada a mano.
+        console.log('   [cadena] ' + await evalJs(`(() => {
+            const el = document.querySelector(${JSON.stringify(vista.pares[0][0])});
+            if (!el) return 'el primer par no existe';
+            const out = [];
+            let n = el;
+            while (n && n.tagName !== 'HTML') {
+                const r = n.getBoundingClientRect();
+                out.push(n.tagName.toLowerCase() + (n.id ? '#' + n.id : '')
+                    + (typeof n.className === 'string' && n.className ? '.' + n.className.split(' ').slice(0, 2).join('.') : '')
+                    + ' ' + Math.round(r.width) + 'x' + Math.round(r.height)
+                    + (n.classList.contains('hidden') ? ' HIDDEN' : ''));
+                n = n.parentElement;
+            }
+            return out.join('  <-  ');
+        })()`));
     }
     check(`la vista "${vista.nombre}" mide algo (no se queda vacia)`,
         !vacia, `medidas: claro ${medidasDeLaVista.light}, oscuro ${medidasDeLaVista.dark}`);
