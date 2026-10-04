@@ -5,10 +5,10 @@
 // Uso: node scripts/contar-color-a-mano.mjs [css/hoja.css]   (sin argumento, recorre todas)
 import { readFileSync, readdirSync } from 'node:fs';
 const hojas = process.argv[2] ? [process.argv[2]] : readdirSync('css').filter((f) => f.endsWith('.css')).map((f) => 'css/' + f);
-let totRespaldos = 0, totSueltos = 0, totByn = 0;
+let totRespaldos = 0, totSueltos = 0, totByn = 0, totDelib = 0;
 for (const hoja of hojas) {
 const lineas = readFileSync(hoja, 'utf8').split('\n');
-let respaldo = 0, sueltos = 0, byn = 0;
+let respaldo = 0, sueltos = 0, byn = 0, delib = 0;
 const porValor = {};
 for (const l of lineas) {
     if (/^\s*(\/\*|\*)/.test(l) || l.includes('data:image') || /^\s*--color-/.test(l)) continue;
@@ -20,22 +20,29 @@ for (const l of lineas) {
     const sinVars = valor.replace(/var\([^)]*\)/g, '');
     for (const h of sinVars.match(/#[0-9a-fA-F]{3,8}\b/g) || []) {
         if (props[1] === 'box-shadow') continue;
+        // Una MASCARA no lleva un color: lleva un canal alfa (`mask: linear-gradient(#000 0 0)`). No es
+        // deuda de paleta, y contarla inflaba el numero (header.css tenia 4 asi).
+        if (props[1] === 'mask' || props[1] === '-webkit-mask') continue;
         // BLANCO Y NEGRO LITERALES NO SON DEUDA DE PALETA: `--color-white` / `--color-black` son tokens
         // de SUPERFICIE y se INVIERTEN en modo oscuro (`--color-white` vale #0a0a0a ahi), asi que
         // cambiar un `#fff` de texto por el token pondria el texto NEGRO sobre un fondo solido. Se
         // cuentan aparte para que el numero de la campana no enganie.
         const v = h.toLowerCase();
         if (v === '#fff' || v === '#ffffff' || v === '#000' || v === '#000000') { byn++; continue; }
+        // Y un color DELIBERADO se marca en el propio CSS con `color-a-mano: deliberado` (una franja
+        // arcoiris, por ejemplo, no puede salir de una paleta). Se cuenta aparte en vez de fingir que
+        // es deuda.
+        if (/color-a-mano:\s*deliberado/.test(l)) { delib++; continue; }
         sueltos++;
         porValor[v] = (porValor[v] || 0) + 1;
     }
 }
-totRespaldos += respaldo; totSueltos += sueltos; totByn += byn;
-console.log(`${hoja}: respaldos ${respaldo} | blanco/negro literales ${byn} | SUELTOS DE PALETA ${sueltos}`);
+totRespaldos += respaldo; totSueltos += sueltos; totByn += byn; totDelib += delib;
+console.log(`${hoja}: respaldos ${respaldo} | blanco/negro ${byn} | deliberados ${delib} | SUELTOS DE PALETA ${sueltos}`);
 const detalle = process.argv[2];
 if (detalle) {
     console.log('los sueltos, por valor:');
     for (const [v, n] of Object.entries(porValor).sort((a, b) => b[1] - a[1])) console.log(`  ${v.padEnd(9)} x${n}`);
 }
 }
-console.log(`\nTOTAL: respaldos ${totRespaldos} | blanco/negro literales ${totByn} | SUELTOS DE PALETA ${totSueltos}`);
+console.log(`\nTOTAL: respaldos ${totRespaldos} | blanco/negro ${totByn} | deliberados ${totDelib} | SUELTOS DE PALETA ${totSueltos}`);

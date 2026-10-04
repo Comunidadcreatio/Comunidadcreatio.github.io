@@ -572,7 +572,9 @@ body.search-escribiendo #toggle-panel {
     inset: 0;
     border-radius: inherit;      /* mismo radio del input (20px) */
     padding: 1px;                /* grosor del borde visible */
-    background: linear-gradient(90deg, #ff0033 0%, #33ff00 25%, #0033ff 50%, #ff00ff 75%, #ff0033 100%);
+    /* El arcoiris es DELIBERADO: una franja de neon por definicion no sale de una paleta. La marca
+       `color-a-mano: deliberado` hace que `contar-color-a-mano.mjs` lo cuente aparte y no como deuda. */
+    background: linear-gradient(90deg, #ff0033 0%, #33ff00 25%, #0033ff 50%, #ff00ff 75%, #ff0033 100%); /* color-a-mano: deliberado */
     background-size: 200% 100%;
     animation: bordeNeon 2.5s linear infinite;
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);

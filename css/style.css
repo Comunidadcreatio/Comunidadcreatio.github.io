@@ -22,7 +22,7 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=97f65efbb6');
+@import url('header.css?v=fe9702b189');
 
 /* 2. Galería pública (tarjetas de obras) */
 @import url('galeria-publica.css?v=76968ffaa8');

@@ -555,6 +555,14 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    con números. Se añadieron esos selectores y la repetición del par midió **12 diferencias, todas la
    buscada** (los dos puntos claros y las dos insignias en los dos temas). La foto pasa de 700 a **720
    medidas**.
+   **TANDA 8 (2026-10-04) — `header.css`, y el contador aprendió dos cosas.** Su «deuda» eran 4 máscaras
+   y un arcoíris: los `#000` de `-webkit-mask`/`mask` **no son un color**, son el **canal alfa** (contarlos
+   inflaba el número), y la **franja arcoíris** del borde neón es **deliberada** (una franja así no sale
+   de una paleta). Así que `contar-color-a-mano.mjs` ahora **excluye las máscaras** y respeta una marca
+   `color-a-mano: deliberado` **en el propio CSS**, contándolos en una cuarta categoría en vez de fingir
+   que son deuda. Queda **1 suelto** (`#333`, el extremo claro de un degradado en un hover: se mueve 23, o
+   sea a la lista corta). **Serie completa: 109 respaldos | 44 blanco/negro | 5 deliberados | 30 SUELTOS
+   DE PALETA.** Foto SIN DIFERENCIAS (720 = 720, el cambio era un comentario).
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

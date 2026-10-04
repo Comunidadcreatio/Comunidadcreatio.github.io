@@ -1022,8 +1022,20 @@ insignias, así que la primera comparación dio SIN DIFERENCIAS y el cambio se e
 con números**. Añadidos esos selectores, la repetición del par midió **12 diferencias, todas la
 buscada**; la foto pasa de 700 a **720 medidas**.
 
-**Y esto cierra el círculo del método**: cuando la foto dice «SIN DIFERENCIAS» en un cambio que **sí**
-debe notarse, la pregunta correcta no es «¿habré acertado?» sino **«¿lo estará midiendo?»**.
+**Tanda 8: `header.css`, y el contador aprendió dos cosas.** La «deuda» de esa hoja eran 4 máscaras y un
+arcoíris:
+
+- Los `#000` de `-webkit-mask` / `mask` **no son un color: son el canal alfa** de una máscara. Contarlos
+  inflaba el número, así que el contador ahora los **excluye**.
+- La **franja arcoíris** del borde neón es **deliberada**: una franja así no sale de una paleta. Ahora el
+  CSS puede marcarla con `color-a-mano: deliberado` y el contador la cuenta en su **propia categoría** en
+  vez de fingir que es deuda.
+
+Queda **1 suelto**: `#333`, el extremo claro de un degradado en un hover (se mueve 23 → lista corta).
+
+**Y el contador tiene ya cuatro categorías honestas**: respaldos (109), blanco/negro literales (44, que
+no son deuda porque los tokens de superficie **se invierten** en oscuro), **deliberados** (5) y **sueltos
+de paleta (30)**, que es lo que la campaña persigue.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
