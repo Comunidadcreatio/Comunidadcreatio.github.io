@@ -103,11 +103,26 @@ function check(nombre, condicion, detalle) {
     else { fallos++; console.log(`  FALLO ${nombre}${detalle !== undefined ? ' → ' + detalle : ''}`); }
 }
 
+// Lectura ROBUSTA de la pagina. `evalJs` puede devolver algo que no es JSON (null, undefined o el
+// resultado de una expresion que fallo) en un momento de transicion, y `JSON.parse` de eso TUMBABA el
+// verificador entero con un error sin contexto: una de cada cinco corridas moria asi (no fallaba una
+// comprobacion: se caia el proceso). Ahora se reintenta y, si no hay forma, se dice QUE se intentaba leer.
+async function leer(expr, intentos = 8) {
+    for (let i = 0; i < intentos; i++) {
+        const crudo = await evalJs(expr);
+        if (typeof crudo === 'string' && /^[[{]/.test(crudo.trim())) {
+            try { return JSON.parse(crudo); } catch { /* se reintenta */ }
+        }
+        await sleep(300);
+    }
+    throw new Error('no se pudo leer de la pagina: ' + String(expr).replace(/\s+/g, ' ').slice(0, 70));
+}
+
 // ------------------------------------------------------------
 // 1. Los DATOS que usa el chat (la búsqueda literal de chat.js)
 // ------------------------------------------------------------
 console.log('=== 1. Datos de los pueblos (window.CIUDADES_POR_PAIS) ===');
-const datos = JSON.parse(await evalJs(`(() => {
+const datos = await leer(`(() => {
     const p = window.CIUDADES_POR_PAIS;
     const lista = (p && p['Venezuela'] && p['Venezuela']['Táchira']) || [];
     const b = window.BANDERA_POR_CIUDAD || {};
@@ -120,7 +135,7 @@ const datos = JSON.parse(await evalJs(`(() => {
         clavesDeVenezuela: claves,
         conMojibake: claves.filter((k) => /Ã|Â/.test(k)).length
     });
-})()`));
+})()`);
 console.log('   ' + JSON.stringify(datos));
 check('la búsqueda del chat encuentra los pueblos de Táchira', datos.cuantos === 29, datos.cuantos);
 check('el estado se llama "Táchira", con su tilde (si no, el chat dice "No hay pueblos")',
@@ -133,8 +148,31 @@ check('la bandera de San Cristóbal está definida', datos.banderaSanCristobal =
 // ------------------------------------------------------------
 console.log('\n=== 2. El directorio en pantalla ===');
 await evalJs(`document.getElementById('btn-chat-global')?.click()`);
-await sleep(2000);
-const dir = JSON.parse(await evalJs(`(() => {
+// ESPERA DETERMINISTA, no un tiempo fijo. Con `sleep(2000)` este verificador era INESTABLE: una corrida
+// dio 9 fallos (`items: 0`, el directorio a medio cargar) y la siguiente 17/17. Se espera a que los 29
+// pueblos esten pintados de verdad (y con caja), que es la condicion que las comprobaciones dan por hecha.
+// El margen es amplio (30 s) porque la primera carga de la app es la mas lenta; y si se agota, se dice
+// AQUI (una comprobacion clara) en vez de dejar nueve fallos en cadena que no explican nada.
+let pueblosListos = false;
+for (let i = 0; i < 100; i++) {
+    pueblosListos = await evalJs(`(() => {
+        const acc = document.getElementById('chat-accordion');
+        if (!acc) return false;
+        const items = [...acc.querySelectorAll('.chat-pueblo')];
+        if (items.length < 29) return false;
+        const r = items[0].getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+    })()`) === true;
+    if (pueblosListos) break;
+    await sleep(300);
+}
+await sleep(300);
+// El timeout de la espera se reporta AQUI y con nombre: si la app tarda mas de la cuenta, esto lo dice
+// en una linea, en vez de dejar nueve fallos en cadena ("items: 0", "no hay San Cristobal"...) que
+// parecen fallos de la app y son una carga lenta.
+check('el directorio llega a pintarse (29 pueblos con caja)', pueblosListos === true,
+    pueblosListos ? '' : 'se agoto la espera de 30 s: la app no llego a pintar el directorio');
+const dir = await leer(`(() => {
     const acc = document.getElementById('chat-accordion');
     const items = acc ? [...acc.querySelectorAll('.chat-pueblo')] : [];
     const nombres = items.map((i) => (i.querySelector('.chat-pueblo-nombre') || {}).textContent || '');
@@ -158,7 +196,7 @@ const dir = JSON.parse(await evalJs(`(() => {
         hayFilaDeUsuario: !!conUsers,
         hayAvisoDeVacio: !!sinUsers
     });
-})()`));
+})()`);
 console.log('   ' + JSON.stringify(dir));
 check('el chat abre en el directorio', dir.seccionVisible === true && dir.directorioVisible === true, JSON.stringify(dir));
 check('se pintan los 29 pueblos', dir.items === 29, dir.items);
@@ -175,8 +213,22 @@ check('un pueblo sin artistas avisa de que no hay ninguno', dir.hayAvisoDeVacio 
 // 3. El acordeón
 // ------------------------------------------------------------
 console.log('\n=== 3. El acordeón ===');
-const trasAbrir1 = JSON.parse(await evalJs(`(() => {
+// Antes de cada interaccion se ESPERA a que la lista este otra vez entera: la app repinta el acordeon
+// (hay polling) y una lectura a mitad de repintado encontraba la lista VACIA y reventaba con
+// "items[0] is undefined". Eso es lo que hacia que una de cada cinco corridas muriera.
+async function esperarPueblos() {
+    for (let i = 0; i < 20; i++) {
+        const n = await evalJs(`document.querySelectorAll('#chat-accordion .chat-pueblo').length`);
+        if (n >= 29) return true;
+        await sleep(250);
+    }
+    return false;
+}
+
+await esperarPueblos();
+const trasAbrir1 = await leer(`(() => {
     const items = [...document.querySelectorAll('#chat-accordion .chat-pueblo')];
+    if (!items.length) return JSON.stringify({ abiertos: 0, esElPrimero: false, aria: null, vacio: true });
     items[0].querySelector('.chat-pueblo-header').click();
     const abiertos = items.filter((i) => i.classList.contains('open'));
     return JSON.stringify({
@@ -184,12 +236,14 @@ const trasAbrir1 = JSON.parse(await evalJs(`(() => {
         esElPrimero: abiertos[0] === items[0],
         aria: items[0].querySelector('.chat-pueblo-header').getAttribute('aria-expanded')
     });
-})()`));
+})()`);
 console.log('   ' + JSON.stringify(trasAbrir1));
 check('al tocar un pueblo se abre (uno solo)', trasAbrir1.abiertos === 1 && trasAbrir1.esElPrimero === true, JSON.stringify(trasAbrir1));
 
-const trasAbrir2 = JSON.parse(await evalJs(`(() => {
+await esperarPueblos();
+const trasAbrir2 = await leer(`(() => {
     const items = [...document.querySelectorAll('#chat-accordion .chat-pueblo')];
+    if (items.length < 2) return JSON.stringify({ abiertos: 0, esElSegundo: false, primeroCerrado: false, vacio: true });
     items[1].querySelector('.chat-pueblo-header').click();
     const abiertos = items.filter((i) => i.classList.contains('open'));
     return JSON.stringify({
@@ -197,17 +251,19 @@ const trasAbrir2 = JSON.parse(await evalJs(`(() => {
         esElSegundo: abiertos[0] === items[1],
         primeroCerrado: !items[0].classList.contains('open')
     });
-})()`));
+})()`);
 console.log('   ' + JSON.stringify(trasAbrir2));
 check('al tocar otro, se abre ese y se cierra el anterior',
     trasAbrir2.abiertos === 1 && trasAbrir2.esElSegundo === true && trasAbrir2.primeroCerrado === true,
     JSON.stringify(trasAbrir2));
 
-const trasCerrar = JSON.parse(await evalJs(`(() => {
+await esperarPueblos();
+const trasCerrar = await leer(`(() => {
     const items = [...document.querySelectorAll('#chat-accordion .chat-pueblo')];
+    if (items.length < 2) return JSON.stringify({ abiertos: -1, vacio: true });
     items[1].querySelector('.chat-pueblo-header').click();
     return JSON.stringify({ abiertos: items.filter((i) => i.classList.contains('open')).length });
-})()`));
+})()`);
 check('al volver a tocar el mismo, se cierra', trasCerrar.abiertos === 0, JSON.stringify(trasCerrar));
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

@@ -611,6 +611,24 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    que no eran del CSS**). Ya tiene su espera (`opacity` 1 y caja) y su guardián de `exigidos`, y el par
    volvió a SIN DIFERENCIAS. **Lección**: el recuento de medidas **no basta** para detectar un estado a
    medias (720 salía igual con el editor invisible).
+   **FASE B (2026-10-04) — los instrumentos, a punto. Lo hecho:**
+   (1) **La inestabilidad de `verificar-chat-directorio.mjs`, ARREGLADA.** No era un fallo de las
+   comprobaciones: **una de cada cinco corridas moría con un `JSON.parse` sin contexto** porque `evalJs`
+   devolvía algo que no era JSON en un momento de transición, y además la app **repinta el acordeón**
+   (hay polling), así que una lectura a mitad de repintado encontraba la lista vacía (`items[0] is
+   undefined`). Tres arreglos: una **lectura robusta** (`leer()`, que reintenta y si no puede dice QUÉ
+   intentaba leer en vez de reventar), una **espera de 29 pueblos con caja** antes de cada interacción, y
+   el timeout reportado como **una** comprobación con nombre (antes dejaba nueve fallos en cadena que
+   parecían de la app y eran una carga lenta). **Resultado: 18/18 en cuatro corridas seguidas.**
+   (2) **El verificador de contraste ya no mide el elemento equivocado.** La app **repite ids y clases
+   entre pantallas** (el formulario de acceso vive en `index.html` y en `auth.html`), así que
+   `querySelector` devolvía el **oculto** y el par se reportaba como "no se mide" para siempre. Ahora
+   elige el primero que **ocupa sitio** (41 comprobaciones medidas, antes 39).
+   (3) **Esperas de tema 300 → 800 ms** (la app transiciona el fondo en 0.3 s: se medía a mitad).
+   **Lo que queda de la Fase B**: la insignia de la campana y los campos del panel siguen sin medirse en
+   el verificador de contraste porque su vista del panel **no monta el estado completo** que sí monta la
+   foto (que **sí** los mide: son 720 medidas y las dos vistas se solapan a medias). Y faltan las vistas
+   de **galería** y **perfil** en ese verificador. Las dos cosas son trabajo de estado, no parches.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

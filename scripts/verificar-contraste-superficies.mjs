@@ -107,7 +107,12 @@ const MOCK = `(() => {
 
 // La medida se hace EN LA PAGINA: el navegador es el unico que sabe el fondo efectivo.
 const MEDIR = (sel, pseudo) => `(() => {
-    const el = document.querySelector(${JSON.stringify(sel)});
+    // NO se coge el primero que aparezca: esta app REPITE ids y clases entre pantallas (el mismo
+    // formulario de acceso vive en index.html y en auth.html, y hay mas de una campana), asi que
+    // querySelector devolvia el elemento OCULTO y el par se reportaba como "no se mide" para siempre.
+    // Se elige el primero que de verdad ocupa sitio; si ninguno lo ocupa, el primero (para el diagnostico).
+    const todos = [...document.querySelectorAll(${JSON.stringify(sel)})];
+    const el = todos.find((n) => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; }) || todos[0];
     if (!el) return null;
     // El pseudo es opcional: sirve para medir el PLACEHOLDER de un campo (::placeholder), que es texto
     // y tiene que leerse igual que el resto. Sin esto, ese color no lo miraba nadie.
@@ -298,6 +303,19 @@ const VISTAS = [
                 if (artista) artista.readOnly = true;
             })()`);
             await sleep(400);
+            // El badge de la campana lo llena el POLLING de notificaciones (main.js), unos segundos despues
+            // de cargar: sin esperarlo, la vista lo medía como "oculto" y la insignia se quedaba sin
+            // verificar. Espera BLANDA (si no aparece, el par lo dira, pero no se aborta la vista).
+            for (let i = 0; i < 12; i++) {
+                const visible = await ev(`(() => {
+                    const b = document.querySelector('.notif-badge');
+                    if (!b) return false;
+                    const r = b.getBoundingClientRect();
+                    return !b.classList.contains('hidden') && r.width > 0 && r.height > 0;
+                })()`);
+                if (visible === true) break;
+                await sleep(300);
+            }
         },
         pares: [
             ['.form-block .form-group label', 'etiqueta de campo (panel)'],
