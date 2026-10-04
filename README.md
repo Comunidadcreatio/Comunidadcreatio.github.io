@@ -1478,6 +1478,35 @@ resultado.
 > Todo lo borrado sigue en el historial de git: recuperar cualquiera es un `git show`. **Después de
 > borrar: suite 22/22, tipos sin errores y las herramientas que quedan funcionando.**
 
+### Cuánto tarda la suite y por qué
+
+Medido el 2026-10-04 (23 verificadores): **6,8 minutos**, media 17,7 s por verificador, mediana 12,4 s. Y el
+**tercio más lento se lleva el 68%** del tiempo.
+
+**De dónde sale el tiempo**, y son tres cosas:
+
+1. **Son 23 procesos y 21 abren su propio Chrome.** Cada uno paga el arranque del navegador y el de la app
+   entera (que no es ligera). Eso es estructural: la suite los lanza **de uno en uno** a propósito, porque
+   en paralelo las medidas se contaminan (hay un comentario en el propio script: dos verificadores mirando
+   el mismo navegador dan fallos que desaparecen al repetir).
+2. **252 de los 408 segundos (62%) son `sleep()` a reloj**: 266 esperas fijas repartidas por los
+   verificadores. Los tres más lentos son, exactamente, los que más duermen (33,2 s, 27,3 s y 26,4 s de
+   espera fija). **Esta es la parte que se puede quitar**, y quitarla los hace además más fiables: es el
+   mismo cambio que arregló el verificador del chat y la vista `editor` de la foto (esperar una condición
+   en vez de un tiempo).
+3. Lo que queda es trabajo real de medida.
+
+**Y dos verificadores son estáticos** (0,1 s cada uno, y eso es correcto): `verificar-recursos-servidos`
+(lee los HTML) y **`verificar-contraste-comentarios`**. Ojo con el segundo: lee `css/problogs.css` **como
+texto** y calcula el contraste en Node, así que verifica los colores **declarados**, no los que el
+navegador **pinta**. Es honesto pero **más débil de lo que parece**: un token que resuelve distinto en tema
+oscuro —justo la forma del fallo del placeholder— no lo cazaría. Su contraste **renderizado** lo mide el
+**barrido** (`verificar-contraste-superficies --barrido`), que hoy cubre `auth`, `panel` y `chat`: la
+vista de comentarios está pendiente de añadir ahí.
+
+**El cronómetro está puesto**: la suite imprime el tiempo de cada verificador, el total y los 5 más lentos,
+para que la próxima vez no haya que suponerlo.
+
 ### Los recursos que se sirven en cada página, vigilados
 
 `verificar-recursos-servidos.mjs` (dentro de la suite) descubre **todas** las páginas HTML de la raíz —no

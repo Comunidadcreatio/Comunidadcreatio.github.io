@@ -74,8 +74,16 @@ async function correr(s) {
 }
 
 const resultados = [];
+// CRONÓMETRO por verificador. La suite tarda minutos y conviene saber DÓNDE se va el tiempo: cada
+// verificador abre su propio Chrome, navega la app y espera estados, así que el total es la suma de 23
+// arranques. Se guarda el tiempo de cada uno para poder decir cuáles son los caros (y si merece la pena
+// un subconjunto rápido para el día a día).
+const tiempos = [];
 for (const s of orden) {
+    const t0 = Date.now();
     const r = await correr(s);
+    const ms = Date.now() - t0;
+    tiempos.push({ s, ms });
     let codigo = r.codigo;
     let linea = r.linea;
     let reintentado = false;
@@ -94,8 +102,20 @@ for (const s of orden) {
     }
     resultados.push({ script: s, codigo, linea, salida: r.salida, reintentado });
     const nota = reintentado ? (codigo === 0 ? '  (OK a la segunda: era carga)' : '  (falla tambien repetido)') : '';
-    console.log(`${codigo === 0 ? 'OK   ' : 'FALLA'}  ${s.padEnd(38)} ${linea || '(sin RESULTADO)'}${nota}`);
+    // El tiempo de cada uno, en la misma línea: así se ve de un vistazo quién se lleva los minutos.
+    console.log(`${codigo === 0 ? 'OK   ' : 'FALLA'}  ${s.padEnd(38)} ${linea || '(sin RESULTADO)'}${nota}  ${(ms / 1000).toFixed(1)}s`);
 }
+
+const total = tiempos.reduce((s, t) => s + t.ms, 0);
+console.log(`\nTIEMPO TOTAL: ${(total / 1000 / 60).toFixed(1)} min en ${tiempos.length} verificadores ` +
+    `(media ${(total / tiempos.length / 1000).toFixed(1)}s; mediana ${(tiempos.map((t) => t.ms).sort((a, b) => a - b)[Math.floor(tiempos.length / 2)] / 1000).toFixed(1)}s)`);
+console.log('Los 5 mas lentos:');
+for (const t of [...tiempos].sort((a, b) => b.ms - a.ms).slice(0, 5)) {
+    console.log(`   ${(t.ms / 1000).toFixed(1)}s  ${t.s}`);
+}
+const lentos = [...tiempos].sort((a, b) => b.ms - a.ms);
+const mitad = lentos.slice(0, Math.ceil(lentos.length / 3)).reduce((s, t) => s + t.ms, 0);
+console.log(`   (el tercio mas lento se lleva ${(mitad / total * 100).toFixed(0)}% del tiempo)`);
 
 const conFallo = resultados.filter((r) => r.codigo !== 0);
 console.log(`\n${resultados.length - conFallo.length} de ${resultados.length} verificadores en verde.`);
