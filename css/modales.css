@@ -200,7 +200,7 @@
 }
 
 [data-theme="dark"] #modal-confirmar-eliminacion #confirmar-password {
-    background-color: #121212;
+    background-color: var(--color-gray-50);
     border-color: var(--color-border-soft);
     color: var(--color-ink);
 }

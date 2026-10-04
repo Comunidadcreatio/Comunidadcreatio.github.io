@@ -574,7 +574,7 @@ form *,
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: var(--color-gray-400);
     font-size: 14px;
     gap: 8px;
     cursor: pointer;
@@ -915,7 +915,7 @@ form,
    MODO OSCURO
    ============================================== */
 [data-theme="dark"] #formulario-obra {
-    background-color: #0a0a0a;
+    background-color: var(--color-bg);
     border-color: var(--color-border-soft);
 }
 
@@ -1099,7 +1099,7 @@ form,
 
 [data-theme="dark"] .step-buttons .nav-btn.next-btn {
     background: var(--color-ink);
-    color: #1a1a1a;
+    color: var(--color-gray-50);
     border-color: var(--color-ink);
 }
 
@@ -1278,7 +1278,7 @@ form,
 
 [data-theme="dark"] #obra-form .form-group input::placeholder,
 [data-theme="dark"] #obra-form .form-group textarea::placeholder {
-    color: #555;
+    color: var(--color-gray-300);
 }
 
 [data-theme="dark"] #obra-form .form-group input:read-only {
@@ -1488,7 +1488,7 @@ form,
 }
 
 [data-theme="dark"] #obra-form .custom-select-option:hover {
-    background: #262626;
+    background: var(--color-gray-200);
 }
 
 /* ==============================================
@@ -1759,17 +1759,17 @@ body.creando-problogs #crear-problogs-contenido {
 /* Dark mode */
 [data-theme="dark"] .cavents-trigger {
     background: var(--color-bg);
-    border-color: #333;
+    border-color: var(--color-gray-200);
     color: var(--color-ink);
 }
 
 [data-theme="dark"] .cavents-dropdown {
     background: rgba(20, 20, 20, 0.95);
-    border-color: #333;
+    border-color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .cavent-item {
-    border-color: #222;
+    border-color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .cavent-item:hover {
@@ -1782,8 +1782,8 @@ body.creando-problogs #crear-problogs-contenido {
 
 [data-theme="dark"] .cavent-item-actions button {
     background: var(--color-neutral-soft);
-    border-color: #333;
-    color: #aaa;
+    border-color: var(--color-gray-200);
+    color: var(--color-gray-400);
 }
 }
 

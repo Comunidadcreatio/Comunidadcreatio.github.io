@@ -506,6 +506,19 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    re-basada por rol** (en los dos temas 50 = superficie, 800 = tinta). Estado: 109 respaldos + 49
    blanco/negro literales + **76 sueltos de paleta** (eran 85). Lo que queda en `formularios.css` (15) y
    `chat.css` (15) son **grises intermedios** que piden decidir **cuántos pasos** tiene la escala.
+   **TANDA 4 (2026-10-04): opción (b), los intermedios se ACERCAN al paso más próximo** (30
+   declaraciones, 8 hojas). Se hizo con una tabla previa por línea (a qué paso y cuánto se mueve,
+   `acercar-grises.mjs`) y solo donde el desplazamiento es **≤ 17** (imperceptible). Los `#0a0a0a` de
+   reglas oscuras no son grises intermedios sino **el lienzo**: van a `--color-bg` (cambio cero). No se
+   acercó nada que se moviera ≥ 20. **Deuda: 76 → 46**; `auth.css` 1, `modales.css` 0 y
+   `search-results.css` 0 quedan prácticamente cerradas. La foto dio **100 diferencias, todas la
+   buscada**, más **una** que no es un desplazamiento pequeño: el fondo base de `auth` en oscuro, que era
+   `#f5f5f5` (casi blanco) y ahora es `#1f1f1f` (misma familia que los bordes brillantes de la tanda 3:
+   una regla clara sin equivalente oscuro).
+   **AVISO DE INSTRUMENTO (pendiente)**: la foto **no es determinista** en `chat`, `perfil` y `problogs`
+   —dos corridas del MISMO CSS dieron 692, 656 y 676 medidas, con 602 diferencias entre dos de ellas—.
+   La comparación fiable se hace **exigiendo 692 medidas** y repitiendo si sale corta; a esas tres vistas
+   les falta la espera determinista que ya tienen `panel` y `chat`.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

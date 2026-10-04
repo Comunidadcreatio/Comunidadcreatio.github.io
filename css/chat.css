@@ -573,8 +573,8 @@ body.teclado-abierto .chat-enviar-btn {
    explícitos para las superficies del chat.
    ============================================== */
 [data-theme="dark"] .chat-msg.other {
-    background: #1f1f1f;
-    color: #e5e5e5;
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
 }
 [data-theme="dark"] .chat-msg.own {
     background: var(--color-gray-300);
@@ -906,8 +906,8 @@ body.teclado-abierto .chat-enviar-btn {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #1f1f1f;
-    color: #f5f5f5;
+    background: var(--color-gray-800);
+    color: var(--color-gray-100);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     opacity: 0;
     pointer-events: none;
@@ -1327,7 +1327,7 @@ body.teclado-abierto .chat-enviar-btn {
     text-overflow: ellipsis;
 }
 [data-theme="dark"] .chat-conv-item-nombre {
-    color: #f0f0f0;
+    color: var(--color-gray-700);
 }
 .chat-conv-item-preview {
     font-size: 12px;

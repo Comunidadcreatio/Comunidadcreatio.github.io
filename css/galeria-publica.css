@@ -692,7 +692,7 @@
 }
 
 [data-theme="dark"] .obra-metricas-bar {
-    background: #1a1a1a;           /* Fondo siempre oscuro en modo oscuro */
+    background: var(--color-gray-50);           /* Fondo siempre oscuro en modo oscuro */
 }
 
 [data-theme="dark"] .obra-metricas-bar .metrica-item {

@@ -44,7 +44,11 @@ for (let i = 0; i < lineas.length; i++) {
             if (lineas[j].includes('}') || j === 0) break;
             j--;
         }
-        pila.push(sel.split('{')[0].replace(/\s+/g, ' ').trim().slice(0, 60));
+        // OJO: se quitan los COMENTARIOS antes de recortar. Si no, un comentario largo se come los 60
+        // caracteres, el selector (con su `[data-theme="dark"]`) queda fuera y una regla OSCURA pasa por
+        // clara: eso ya provoco una conclusion falsa (creer que un gris oscuro se podia acercar a un paso
+        // claro). Si hace falta el contexto exacto, `acercar-grises.mjs` lo saca caracter a caracter.
+        pila.push(sel.split('{')[0].replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60));
     }
     const props = l.match(/^\s*([a-z-]+):\s*(.*?);/);
     if (props && !/^\s*(\/\*|\*)/.test(l) && !l.includes('data:image') && !/^\s*--color-/.test(l)) {

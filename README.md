@@ -998,6 +998,35 @@ temas**, y así está medido). La escala de la paleta **no está invertida sino 
 dos temas 50 es la superficie y 800 la tinta), así que añadir estos intermedios pide decidir **cuántos
 pasos** quiere tener la escala; o se quedan como están.
 
+**Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
+añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
+previa que dice, por línea, **a qué paso va y cuánto se mueve** (`acercar-grises.mjs`), y se aplicó solo
+donde el desplazamiento es pequeño (**≤ 17**, imperceptible o casi): `#999`/`#aaa`/`#a0a0a0` →
+`gray-400`, `#333` → `gray-200`, `#222` → `gray-100`, `#555` → `gray-300`, `#f0f0f0` → `gray-700`,
+`#1f1f1f` → `gray-100`… Además, los `#0a0a0a` que aparecían en reglas oscuras **no son grises
+intermedios: son el lienzo de la app**, así que van a `--color-bg` (que en oscuro vale exactamente eso:
+**cambio cero**).
+
+**Lo que NO se acercó**: los que se movían ≥ 20 (sobre todo `#444`, `#888`, `#8a8a8a` y algunos `#0a0a0a`
+en reglas claras). En esos, «el paso más próximo» ya no es el mismo color, y prefiero dejarlos a la vista
+que disfrazarlos.
+
+**Resultado**: la deuda de paleta baja de **76 a 46** sueltos. `auth.css` (1), `modales.css` (0) y
+`search-results.css` (0) quedan prácticamente cerradas.
+
+**La foto midió 100 diferencias, todas del cambio buscado**, y **una sola que no es un desplazamiento
+pequeño**: el fondo base de `auth` en modo oscuro, que era `#f5f5f5` (**casi blanco**) y ahora es
+`#1f1f1f`. Era de la misma familia que los bordes brillantes de la tanda anterior: una regla clara sin
+equivalente oscuro, así que en tema oscuro la página quedaba con base clara. Ahora sigue al tema.
+
+**Y una advertencia de instrumento, importante**: al medir esto salió que **la foto no es determinista en
+las vistas `chat`, `perfil` y `problogs`** — dos corridas del **mismo CSS** dieron 692, 656 y 676 medidas
+(602 diferencias entre dos de ellas), porque esas vistas a veces miden un estado a medio montar. La
+comparación buena se hace **exigiendo las 692 medidas** en cada foto (y repitiendo si sale corta). Los
+veredictos anteriores de «SIN DIFERENCIAS» siguen valiendo (una corrida incompleta no puede dar cero
+diferencias), pero **queda pendiente** darles a esas tres vistas la espera determinista que ya tienen
+`panel` y `chat`.
+
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
 La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de
@@ -1227,6 +1256,7 @@ resultado.
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/migrar-color.mjs | **Migra UNA tanda de color a tokens, por línea y con el token escrito a mano** (mapa JSON). Aborta sin escribir nada si la línea no tiene el valor esperado |
 | scripts/analizar-color.mjs | Para cada color a mano de una hoja: línea, propiedad, si la regla es clara u oscura, y si el valor **coincide exactamente** con un token (primer paso de cada tanda) |
+| scripts/acercar-grises.mjs | Para cada gris intermedio: **a qué paso de la escala queda más cerca** y **cuánto se mueve**, en el tema de su regla. Contexto por escáner carácter a carácter (los selectores se reparten en varias líneas) |
 | scripts/contar-color-a-mano.mjs | Cuántos colores a mano quedan, separando **respaldos** (`var(--color-x, #hex)`), **blanco/negro literales** y **sueltos de paleta** (que son la campaña). Sin argumento recorre todas las hojas |
 | scripts/verificar-todo.mjs | **Corre TODOS los verificadores** (los que empiecen por `verificar-`, menos él mismo) y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
