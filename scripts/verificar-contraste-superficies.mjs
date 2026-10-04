@@ -274,6 +274,11 @@ const VISTAS = [
         esperar: `!!document.getElementById('toggle-panel')`,
         preparar: async (ev, esperar) => {
             await ev(`document.getElementById('btn-crear-cavent')?.click()`);
+            await sleep(1600);
+            // Se pulsa la PESTAÑA de Cavents, igual que la vista de la foto: sin este clic el estado no
+            // es el mismo y los campos del formulario de la obra se quedaban con caja 0x0 (el par se
+            // reportaba como "oculto" y ni el campo de solo lectura ni su placeholder se median nunca).
+            await ev(`document.getElementById('tab-cavents')?.click()`);
             await esperar(`(() => {
                 const t = document.getElementById('tab-cavents');
                 const p = document.getElementById('crear-problogs-contenido');
@@ -331,6 +336,16 @@ const VISTAS = [
             ['.ratio-btn:not(.active)', 'texto del boton de ratio inactivo'],
             ['#obra-etiquetas-bar .input-etiquetas-subtle', 'texto del campo de etiquetas'],
             ['.notif-badge', 'insignia de notificaciones (campana)']
+            // OJO, dos cosas que NO se pueden medir en esta vista y esta escrito aqui para que nadie lo
+            // intente otra vez (se probo el 2026-10-04):
+            //  1) Los campos del formulario de obra salen como "oculto" porque su estado pide la
+            //     navegacion completa de la foto (pestaña, secciones desplegadas, foco por CDP). Los mide
+            //     la FOTO, que tiene su propia vista del panel con 720 medidas.
+            //  2) La vista de PERFIL se probo y se quito: se monta bien (los elementos tienen caja), pero
+            //     el perfil FLOTA SOBRE EL SLIDESHOW, asi que no hay fondo pintado detras y el contraste
+            //     no es medible por este metodo (es la misma razon por la que este verificador cubre
+            //     auth, panel y chat, que si tienen superficie solida). Los colores del perfil los mide
+            //     la foto, y el barrido (`--barrido`) mide el contraste donde la superficie es solida.
         ]
     },
     {
@@ -404,9 +419,24 @@ for (const vista of VISTAS) {
                     const el = document.querySelector(${JSON.stringify(sel)});
                     if (!el) return '';
                     const r = el.getBoundingClientRect();
+                    // La CADENA de ancestros sin caja o sin display: si el elemento mide 0x0, el culpable
+                    // es alguno de ellos, y antes habia que buscarlo a mano. Queda dicho aqui.
+                    const cadena = [];
+                    let n = el.parentElement, saltos = 0;
+                    while (n && saltos < 8) {
+                        const cs = getComputedStyle(n);
+                        const rn = n.getBoundingClientRect();
+                        if (cs.display === 'none' || cs.visibility === 'hidden' || !rn.height) {
+                            const nom = (n.id ? '#' + n.id : n.tagName.toLowerCase())
+                                + (typeof n.className === 'string' && n.className.trim() ? '.' + n.className.trim().split(/\\s+/)[0] : '');
+                            cadena.push(nom + ' [display ' + cs.display + ', caja ' + Math.round(rn.width) + 'x' + Math.round(rn.height) + ']');
+                        }
+                        n = n.parentElement; saltos++;
+                    }
                     return 'clases [' + el.className + '], display ' + getComputedStyle(el).display
                         + ', caja ' + Math.round(r.width) + 'x' + Math.round(r.height)
-                        + ', texto "' + (el.textContent || '').trim().slice(0, 20) + '"';
+                        + ', texto "' + (el.textContent || '').trim().slice(0, 20) + '"'
+                        + (cadena.length ? ' | lo esconde: ' + cadena.join(' > ') : ' | ningun ancestro con caja 0');
                 })()`);
                 console.log(`  --    ${etiqueta}: el elemento esta oculto (no se mide) → ${porque}`);
                 continue;

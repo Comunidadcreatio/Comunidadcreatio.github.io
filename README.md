@@ -1067,6 +1067,42 @@ de presencia** del perfil: `#9ca3af` ×2 (apagado) → `--color-gray-400`, y `#2
 **mejora** el gráfico de 2,28:1 a 3,30:1, mientras que en oscuro es exacto. Foto con **4 diferencias,
 todas la buscada**; la variante «en línea» va verificada con números porque el fixture está desconectado.
 
+## Fase B — los instrumentos, a punto
+
+| Cabo | Resultado |
+|---|---|
+| **Inestabilidad de `verificar-chat-directorio.mjs`** | **Arreglada** (18/18 en cuatro corridas seguidas) |
+| **El verificador de contraste medía el elemento equivocado** | **Arreglado** (41 comprobaciones, antes 39) |
+| **La insignia de la campana y los campos del panel** | **No son medibles en ese verificador** — ver abajo |
+| **Las vistas de galería y perfil** | **No son medibles en ese verificador** — ver abajo |
+
+**El verificador del chat no fallaba: se caía.** Una de cada cinco corridas moría con un `JSON.parse` sin
+contexto, y la app **repinta el acordeón** (hay polling), así que una lectura a mitad de repintado
+encontraba la lista vacía (`items[0] is undefined`). Tres arreglos: **lectura robusta** (`leer()`, que
+reintenta y si no puede dice *qué* intentaba leer), **espera de 29 pueblos con caja** antes de cada
+interacción, y el timeout reportado como **una** comprobación con nombre (antes dejaba nueve fallos en
+cadena que parecían de la app y eran una carga lenta).
+
+**Y en el de contraste, la app repite ids y clases entre pantallas** (el formulario de acceso vive en
+`index.html` *y* en `auth.html`), así que `querySelector` devolvía el **oculto** y el par se reportaba
+como «no se mide» para siempre. Ahora elige el primero que **ocupa sitio**. Las esperas de tema suben de
+300 a **800 ms** (la app transiciona el fondo en 0,3 s).
+
+**Y las dos piezas que quedaban no se pueden medir ahí, y ahora está escrito por qué:**
+
+1. **Los campos del formulario de obra**: su estado pide la navegación completa de la foto (pestaña,
+   secciones desplegadas, foco por CDP). Los mide **la foto**, que para eso tiene su vista del panel.
+2. **La vista de perfil**: se probó y se quitó. **Se monta bien** (los elementos tienen caja), pero el
+   perfil **flota sobre el slideshow**, así que **no hay fondo pintado detrás** y el contraste no es
+   medible por este método. Es la misma razón por la que este verificador cubre `auth`, `panel` y `chat`
+   —las tres con superficie sólida—.
+
+> **La conclusión de la Fase B no es «faltan cosas», es que los dos instrumentos son complementarios por
+> construcción**: la **foto** mide estilos calculados en cualquier sitio (720 medidas, incluidas las
+> vistas que flotan), y el **verificador de contraste** mide contraste donde la superficie es sólida (con
+> el **barrido** para lo que no está en la lista curada). Duplicar el uno en el otro sería trabajo sin
+> medida nueva.
+
 ## La campaña de los colores a mano — CERRADA
 
 **Serie final: 109 respaldos · 44 blanco/negro literales · 21 deliberados · 0 sueltos de paleta.** Las
