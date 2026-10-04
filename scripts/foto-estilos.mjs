@@ -148,6 +148,9 @@ const PAGINAS = [
         ruta: '',
         esperar: `!!document.getElementById('toggle-panel')`,
         fixture: false,
+        // Si falta alguno de estos, la vista no llego a su estado y la foto ABORTA (ver el comentario
+        // del bloque `exigidos` en la captura). Esta vista era una de las tres inestables.
+        exigidos: ['#problogs-detalle', '.problog-comentario', '#problog-responder-barra'],
         abrir: async (ev, dormir) => {
             await ev(`document.getElementById('btn-problogs-nav')?.click()`);
             await dormir(1800);
@@ -329,6 +332,9 @@ const PAGINAS = [
         ruta: '',
         esperar: `!!document.getElementById('toggle-panel')`,
         fixture: false,
+        // Una de las tres vistas inestables: a veces medía el pueblo sin desplegar (50 elementos en vez
+        // de 80). Con esto, o esta desplegado con su fila de usuario, o la foto no se escribe.
+        exigidos: ['.chat-pueblo-cuerpo', '.chat-user-row', '.chat-user-nombre'],
         abrir: async (ev, dormir) => {
             await ev(`document.getElementById('btn-chat-global')?.click()`);
             // Se ESPERA a que el chat este abierto de verdad: con un `dormir` fijo, la mitad de las
@@ -409,6 +415,9 @@ const PAGINAS = [
         ruta: '',
         esperar: `!!document.getElementById('toggle-panel')`,
         fixture: false,
+        // Una de las tres vistas inestables: a veces medía el perfil sin sus secciones (58 elementos en
+        // vez de 64). Si no estan, la foto no se escribe.
+        exigidos: ['#perfil-usuario', '.perfil-nombre-artista-seccion'],
         abrir: async (ev, dormir) => {
             // Al arrancar, la app llama a mostrarPaginaBlanca() y la galeria solo aparece
             // al navegar. Se usa el mismo camino que la app: `abrirObraDesdePerfil` (que
@@ -448,22 +457,52 @@ const PAGINAS = [
                 await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
             }
             await dormir(2600);
+            // Y se ESPERA a que el perfil termine de montarse: sus secciones y sus estadisticas se
+            // pintan cuando llega la respuesta, y sin esperarlas la vista medía 14 elementos unos veces
+            // y 16 otras (el recuento bailaba entre 58 y 64 medidas y la comparacion acusaba elementos
+            // que "aparecian y desaparecian").
+            for (let i = 0; i < 25; i++) {
+                const montado = await ev(`(() => {
+                    const p = document.getElementById('perfil-usuario');
+                    const e = document.getElementById('perfil-estadisticas');
+                    return !!p && !p.classList.contains('hidden') && !!e && !!document.querySelector('.perfil-seccion');
+                })()`);
+                if (montado === true) break;
+                await dormir(300);
+            }
+            await dormir(600);
             const despues = await ev(`JSON.stringify({
                 perfilOculto: document.getElementById('perfil-usuario').classList.contains('hidden'),
                 galeriaOculta: document.getElementById('galeria-publica').classList.contains('hidden')
             })`);
             console.log('   [perfil] despues del clic: ' + despues);
+            // DIAGNOSTICO: que hay DENTRO del perfil. Hace falta porque dos selectores de esta vista
+            // (`.perfil-tabs`, `.perfil-stats`) aparecen y desaparecen entre corridas, y eso movia el
+            // recuento (58 elementos en vez de 64). Con esto se ve si es un estado a medias o si de
+            // verdad son condicionales.
+            console.log('   [perfil] dentro: ' + await ev(`(() => {
+                const p = document.getElementById('perfil-usuario');
+                if (!p) return 'sin perfil';
+                const clases = new Set();
+                for (const el of p.querySelectorAll('*')) {
+                    if (typeof el.className === 'string') for (const c of el.className.split(' ')) if (c) clases.add(c);
+                }
+                const interesantes = [...clases].filter((c) => c.startsWith('perfil-')).sort();
+                return JSON.stringify({ hijos: p.children.length, clasesPerfil: interesantes });
+            })()`));
         },
         selectores: [
             '#perfil-usuario', '#perfil-avatar-seccion', '.perfil-nombre-artista-seccion',
             '.perfil-nombre-real-seccion', '.perfil-ciudad', '#perfil-avatar-btn',
             '#perfil-online-indicator', '.perfil-avatar-overlay',
-            '#perfil-usuario .perfil-tabs', '#perfil-usuario .perfil-tab',
-            '#perfil-usuario .perfil-stats', '#perfil-usuario .perfil-grid',
+            // OJO: aqui habia tres selectores MUERTOS (`#perfil-usuario .perfil-tabs`,
+            // `#perfil-usuario .perfil-tab` y `#perfil-usuario .perfil-stats`): las clases de verdad son
+            // `.perfil-tab-btn` y `.perfil-estadisticas`, y las secciones van sin el prefijo. No
+            // encontraban nada nunca, asi que esas partes del perfil se median a ciegas.
+            '.perfil-tab-btn', '#perfil-estadisticas', '.perfil-seccion',
+            '.perfil-seccion-layout', '.perfil-seccion-info',
             '#galeria-publica', '#galeria-container', '.obra-card',
-            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo',
-            // Las secciones del perfil llevan su propia familia de `!important` en panel-artista.css.
-            '#perfil-usuario .perfil-seccion', '.perfil-seccion-layout', '.perfil-seccion-info'
+            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo'
         ]
     },
     {
@@ -519,10 +558,16 @@ if (args.includes('--comparar')) {
     const claves = new Set([...Object.keys(antes.datos), ...Object.keys(despues.datos)]);
     const diferencias = [];
     const inestables = [];
+    const parciales = [];
     for (const clave of claves) {
         const a = antes.datos[clave];
         const b = despues.datos[clave];
-        if (!a || !b) { diferencias.push({ clave, propiedad: '(elemento)', antes: a ? 'existe' : 'NO', despues: b ? 'existe' : 'NO' }); continue; }
+        // OJO, y esto importaba mucho: un elemento que solo aparece en UNA de las dos fotos NO es un
+        // cambio de CSS. Es una corrida que midio un estado a medio montar (la foto no es determinista
+        // en algunas vistas: dos corridas del MISMO CSS llegaron a dar 602 "diferencias" asi). Se
+        // aparta, se dice en voz alta y NO se cuenta como diferencia; pero el comando termina en error,
+        // porque una comparacion con elementos sueltos no es de fiar.
+        if (!a || !b) { parciales.push({ clave, enA: !!a, enB: !!b }); continue; }
         const props = new Set([...Object.keys(a), ...Object.keys(b)]);
         for (const prop of props) {
             if (a[prop] === b[prop]) continue;
@@ -535,14 +580,24 @@ if (args.includes('--comparar')) {
     }
     console.log(`Foto A: ${antes.cuando}  ·  ${Object.keys(antes.datos).length} medidas`);
     console.log(`Foto B: ${despues.cuando}  ·  ${Object.keys(despues.datos).length} medidas`);
+    if (parciales.length) {
+        console.log(`\nAVISO GORDO: ${parciales.length} elementos estan SOLO en una de las dos fotos.`);
+        console.log('Eso no es un cambio de CSS: es una corrida que midio un estado a medio montar.');
+        console.log('Se excluyen de la comparacion, pero la foto NO es de fiar: repitela.');
+        for (const d of parciales.slice(0, 8)) console.log(`  ${d.clave} (${d.enA ? 'solo en A' : 'solo en B'})`);
+        if (parciales.length > 8) console.log(`  ... y ${parciales.length - 8} mas`);
+        console.log('Truco: repite la foto hasta que cada vista diga el numero de elementos de siempre.');
+    }
     if (inestables.length) {
         console.log(`\nAVISO: ${inestables.length} valores no se pudieron comparar (inestables al capturar):`);
         for (const d of inestables.slice(0, 10)) console.log(`  ${d.clave} · ${d.propiedad}`);
         if (inestables.length > 10) console.log(`  ... y ${inestables.length - 10} mas`);
     }
     if (!diferencias.length) {
-        console.log('\nSIN DIFERENCIAS: el cambio de CSS no movio ni un valor calculado.');
-        process.exit(inestables.length ? 1 : 0);
+        console.log(parciales.length
+            ? '\nSIN DIFERENCIAS DE VALOR, pero con elementos sueltos: la foto NO es de fiar (ver el aviso gordo).'
+            : '\nSIN DIFERENCIAS: el cambio de CSS no movio ni un valor calculado.');
+        process.exit(parciales.length || inestables.length ? 1 : 0);
     }
     console.log(`\nDIFERENCIAS: ${diferencias.length}`);
     for (const d of diferencias.slice(0, 60)) console.log(`  ${d.clave} · ${d.propiedad}: "${d.antes}" -> "${d.despues}"`);
@@ -774,6 +829,29 @@ for (const pag of PAGINAS) {
         }
         // Algunas vistas hay que ABRIRLAS (Problogs: feed + publicacion + barra).
         if (pag.abrir) await pag.abrir(evalJs, sleep);
+        // Y si la vista declara selectores EXIGIDOS, se comprueba que el estado llego de verdad. Es la
+        // otra mitad del arreglo de la inestabilidad: la lectura salta en silencio los selectores que no
+        // encuentra, asi que una vista a medio montar producia una foto COJA que parecia buena (paso el
+        // 2026-10-03: chat con 50 elementos en vez de 80, perfil 58 en vez de 64, problogs 40 en vez de
+        // 56, y 602 "diferencias" entre dos corridas del mismo CSS). Se reintenta la apertura y, si
+        // sigue faltando algo, la foto ABORTA en vez de escribir un JSON enganoso.
+        if (pag.exigidos) {
+            let faltan = [];
+            for (let intento = 0; intento < 3; intento++) {
+                faltan = [];
+                for (const sel of pag.exigidos) {
+                    if (await evalJs(`!!document.querySelector(${JSON.stringify(sel)})`) !== true) faltan.push(sel);
+                }
+                if (!faltan.length) break;
+                console.log(`   ${pag.nombre}: faltan ${faltan.join(', ')} — se reintenta la apertura (${intento + 1}/3)`);
+                if (pag.abrir) await pag.abrir(evalJs, sleep);
+            }
+            if (faltan.length) {
+                console.error(`La vista ${pag.nombre} no llego a su estado: faltan ${faltan.join(', ')}`);
+                console.error('No se escribe la foto (una foto coja parece buena y arruina la comparacion).');
+                salir(2);
+            }
+        }
         // Y los pseudo-estados que la vista pida (normalmente `:focus`): se fuerzan por CDP sobre el
         // nodo, que es lo unico que funciona de verdad (ver el comentario de DOM.enable arriba).
         if (pag.forzarPseudo) {

@@ -1027,6 +1027,29 @@ veredictos anteriores de «SIN DIFERENCIAS» siguen valiendo (una corrida incomp
 diferencias), pero **queda pendiente** darles a esas tres vistas la espera determinista que ya tienen
 `panel` y `chat`.
 
+**Tanda 5: la inestabilidad de la foto, arreglada.** La causa de raíz estaba en **la lectura**: al medir
+cada selector, la foto **saltaba en silencio** los que no encontraba (`if (!el) continue`), así que una
+vista a medio montar producía una foto **corta que parecía buena**; y la comparación contaba esos
+elementos ausentes como **diferencias** (de ahí las 602 fantasma). Tres arreglos, uno por cada capa:
+
+1. **`exigidos` por vista**: después de abrir la vista, la foto comprueba sus selectores imprescindibles
+   —**reintenta la apertura** hasta 3 veces y, si siguen faltando, **aborta sin escribir el JSON**—.
+   Nunca más una foto coja.
+2. **La comparación separa los elementos que están SOLO en una de las dos fotos**: los informa en voz
+   alta («eso no es un cambio de CSS: es una corrida a medias»), los **excluye** del recuento de
+   diferencias y termina en error, para que no puedan disfrazarse de regresión.
+3. **La vista `perfil`**, que era la peor: le faltaba **esperar** a que el perfil se montara (sus
+   secciones y estadísticas llegan con la respuesta), y además medía **tres selectores muertos**
+   (`#perfil-usuario .perfil-tabs`, `#perfil-usuario .perfil-tab`, `#perfil-usuario .perfil-stats`: las
+   clases reales son `.perfil-tab-btn` y `.perfil-estadisticas`, y las secciones van sin prefijo), así que
+   esas partes del perfil **se medían a ciegas**.
+
+**Resultado**: el perfil pasa de 14-16 elementos (variable) a **18 estables**, la foto de 692 a **700
+medidas**, y **tres corridas seguidas dan 700 = 700 = 700 con SIN DIFERENCIAS en las tres comparaciones
+cruzadas**. El guardián de `exigidos` se estrenó cazando justo el problema del perfil (abortó la foto en
+vez de escribirla corta): el instrumento comprobando sus propias condiciones, que es la lección que ya
+había salido tres veces en esta campaña.
+
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
 La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de

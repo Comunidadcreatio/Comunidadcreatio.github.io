@@ -519,6 +519,19 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    —dos corridas del MISMO CSS dieron 692, 656 y 676 medidas, con 602 diferencias entre dos de ellas—.
    La comparación fiable se hace **exigiendo 692 medidas** y repitiendo si sale corta; a esas tres vistas
    les falta la espera determinista que ya tienen `panel` y `chat`.
+   **TANDA 5 (2026-10-04): la inestabilidad de la foto, ARREGLADA.** La causa estaba en **la lectura**:
+   saltaba en silencio los selectores que no encontraba (`if (!el) continue`), así que una vista a medio
+   montar daba una foto **corta que parecía buena**, y la comparación contaba esos elementos como
+   diferencias (las 602 fantasma). Tres arreglos: (1) **`exigidos` por vista** —la foto comprueba sus
+   selectores imprescindibles, **reintenta la apertura** 3 veces y, si faltan, **aborta sin escribir el
+   JSON**—; (2) **la comparación separa los elementos que están SOLO en una foto** (aviso en voz alta, los
+   excluye de las diferencias y termina en error); (3) la vista **`perfil`**: le faltaba esperar a que el
+   perfil se montara y medía **tres selectores MUERTOS** (`.perfil-tabs`, `.perfil-tab`, `.perfil-stats`;
+   las clases reales son `.perfil-tab-btn` y `.perfil-estadisticas`), o sea que esas partes se medían a
+   ciegas. **Resultado**: perfil de 14-16 elementos variables a **18 estables**, la foto de 692 a **700
+   medidas**, y **tres corridas seguidas 700 = 700 = 700 con SIN DIFERENCIAS en las tres comparaciones**.
+   El guardián de `exigidos` se estrenó cazando el problema del perfil (abortó la foto en vez de
+   escribirla corta).
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se
