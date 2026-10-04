@@ -544,6 +544,17 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    5.96:1 y 9.46:1 sobre tarjeta oscura) y `#8a8a8a` (el color de los controles de comentarios). La
    decisión de la Fase A es si se mapean a los roles de la paleta (`--color-danger`, `--color-warning`,
    `--color-success`, grises) —con un cambio de tono visible pero medido— o se quedan como están.
+   **TANDA 7 (2026-10-04) — `chat.css` (7 declaraciones)**, y aquí no todo era cosmético: las tres
+   insignias rojas (`#e53935`) llevan **texto blanco encima**, y eso daba **4.23:1** (no llega a 4.5);
+   ahora usan `--color-danger-solid` → **6.47:1**. Y los puntos de presencia (`#22c55e`) daban **2.28:1**
+   sobre blanco para un gráfico (mínimo 3) → `--color-success` (`#16a34a` en claro = 3.30:1; en oscuro el
+   token vale `#22c55e`, o sea **cero cambio**). El gris de «desconectado» (`#9ca3af`) va a
+   `--color-gray-400`. **`chat.css` baja de 10 a 3 sueltos** y la deuda total a **35**.
+   **Y se tapó una laguna de cobertura**: la vista del chat del foto **no medía** los puntos ni las
+   insignias, así que la primera comparación dio SIN DIFERENCIAS y el cambio se estaba verificando solo
+   con números. Se añadieron esos selectores y la repetición del par midió **12 diferencias, todas la
+   buscada** (los dos puntos claros y las dos insignias en los dos temas). La foto pasa de 700 a **720
+   medidas**.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

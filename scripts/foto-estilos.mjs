@@ -369,6 +369,13 @@ const PAGINAS = [
             '.chat-pueblo-count.tot', '.chat-pueblo-chevron',
             '.chat-pueblo-cuerpo', '.chat-pueblo-cuerpo-contenido', '.chat-pueblo-vacio',
             '.chat-user-row', '.chat-user-nombre', '.chat-user-estado',
+            // Los PUNTOS de presencia y las INSIGNIAS rojas: son texto blanco sobre un color solido (o un
+            // grafico de estado) y hasta el 2026-10-04 no los medía nadie, asi que migrarlos a un token
+            // era invisible para la foto (se comprobaba solo con numeros).
+            '.chat-user-dot', '.chat-user-dot.online',
+            '.chat-nav-badge', '.chat-fab-badge', '.chat-conv-item-badge',
+            '.chat-conv-dot', '.chat-conv-dot.online', '.chat-sala-fab.cerrada',
+            '.chat-msg-leido.visto',
             '#btn-chat-global-fab', '#chat-cerrar'
         ]
     },

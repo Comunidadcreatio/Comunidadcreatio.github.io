@@ -1010,10 +1010,20 @@ rojo/verde a `--color-danger-dark` (`#b3261e` → `#b91c1c`, delta 12) y `--colo
 La decisión de cierre de la Fase A es si se **mapean a los roles de la paleta** (`--color-danger`,
 `--color-warning`, `--color-success`, grises) —con un cambio de tono visible pero medido— o se quedan.
 
-**Y un aviso que salió de esta tanda**: `verificar-contraste-comentarios.mjs` **fijaba los literales**
-(`--comentario-rojo: #b3261e`) en vez de medir el color resuelto, así que la migración a un token lo puso
-en rojo aunque el contraste fuera el mismo (6,54 → 6,47:1). Se actualizó el contrato para que compruebe
-**el token** y quede claro que esos dos colores ya salen de la paleta.
+**Tanda 7: `chat.css` (7 declaraciones), y aquí no todo era cosmético.** Las tres insignias rojas
+(`#e53935`) llevan **texto blanco encima**, y eso daba **4,23:1** (no llega al mínimo): ahora usan
+`--color-danger-solid` → **6,47:1**. Los puntos de presencia (`#22c55e`) daban **2,28:1** sobre blanco
+para un gráfico (mínimo 3) → `--color-success`, que en claro vale `#16a34a` (3,30:1) y en oscuro
+`#22c55e` (**cero cambio**, que es justo lo que debe hacer un token por rol). El gris de «desconectado»
+(`#9ca3af`) va a `--color-gray-400`. **`chat.css` baja de 10 a 3 sueltos.**
+
+**Y se tapó una laguna de cobertura**: la vista del chat del foto **no medía** los puntos ni las
+insignias, así que la primera comparación dio SIN DIFERENCIAS y el cambio se estaba verificando **solo
+con números**. Añadidos esos selectores, la repetición del par midió **12 diferencias, todas la
+buscada**; la foto pasa de 700 a **720 medidas**.
+
+**Y esto cierra el círculo del método**: cuando la foto dice «SIN DIFERENCIAS» en un cambio que **sí**
+debe notarse, la pregunta correcta no es «¿habré acertado?» sino **«¿lo estará midiendo?»**.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
