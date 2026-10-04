@@ -1083,10 +1083,18 @@ reintenta y si no puede dice *qué* intentaba leer), **espera de 29 pueblos con 
 interacción, y el timeout reportado como **una** comprobación con nombre (antes dejaba nueve fallos en
 cadena que parecían de la app y eran una carga lenta).
 
-**Y en el de contraste, la app repite ids y clases entre pantallas** (el formulario de acceso vive en
-`index.html` *y* en `auth.html`), así que `querySelector` devolvía el **oculto** y el par se reportaba
-como «no se mide» para siempre. Ahora elige el primero que **ocupa sitio**. Las esperas de tema suben de
-300 a **800 ms** (la app transiciona el fondo en 0,3 s).
+**Y en el de contraste, el `querySelector` devolvía a veces el elemento equivocado.** El diagnóstico de
+«oculto» (que ahora dice **qué ancestro** lo esconde) dejó claro el caso real: en esa vista el
+**formulario de obra está plegado** (`div.form-group` con caja 0×0), y hay clases que se repiten en la
+misma página (dos campanas). Ahora el instrumento elige el primero que **ocupa sitio**. Las esperas de
+tema suben de 300 a **800 ms** (la app transiciona el fondo en 0,3 s).
+
+> **Corrección honesta (2026-10-04).** Aquí decía que «la app repite ids y clases entre pantallas y el
+> formulario de acceso vive en `index.html` y en `auth.html`». **Es falso y lo medí**: las dos páginas
+> comparten exactamente **dos ids** (`main-content` y `preloader`) y **67 líneas** idénticas de cabecera y
+> preloader; el formulario de acceso **no** está duplicado. Era una hipótesis que yo mismo había refutado
+> a mitad de sesión y que quedó escrita como hecho. Lo que sí existe, y ahora está vigilado, es otra cosa
+> (ver «recursos servidos» más abajo).
 
 **Y las dos piezas que quedaban no se pueden medir ahí, y ahora está escrito por qué:**
 
@@ -1470,13 +1478,30 @@ resultado.
 > Todo lo borrado sigue en el historial de git: recuperar cualquiera es un `git show`. **Después de
 > borrar: suite 22/22, tipos sin errores y las herramientas que quedan funcionando.**
 
-### Cuidado con la copia de Android
+### Los recursos que se sirven en cada página, vigilados
 
-`android/` está en `.gitignore` (es un artefacto de build) pero contiene una **copia de los ficheros
-servidos** en `android/app/src/main/assets/public/`. Esa copia **se rellena con `npx cap copy android`
-y no hay ningún script que lo haga solo**: si se compila el APK después de tocar `css/` o `js/` sin
-copiar, **el APK sirve los ficheros viejos**. Hoy está en sincronía (comprobado byte a byte: mismo MD5
-que `css/header.css`).
+`verificar-recursos-servidos.mjs` (dentro de la suite) descubre **todas** las páginas HTML de la raíz —no
+una lista escrita a mano— y comprueba, para cada una:
+
+- que cada `css/…` y `js/…` que carga **exista**;
+- que lleve **`?v=`** y que ese hash **coincida con el MD5 real del fichero** (si no, falta el bump);
+- que la página esté en las **dos listas** del actualizador (`HTML_FILES` y `filesToCopy`), para que no se
+  quede fuera del APK.
+
+**Nace de dos huecos reales**, los dos de la misma familia: *una página o un recurso nuevo se queda fuera
+y nadie se entera*.
+
+1. **`auth.html` y `reset-password.html` cargaban `js/version-check.js` SIN `?v=`** (mientras
+   `index.html` sí lo llevaba), así que se servían de caché para siempre. La causa era del propio
+   actualizador: su patrón **exigía** el `?v=` (`…\?v=([^"']+)`), de modo que una referencia nueva sin
+   hash le resultaba **invisible**. Ya **añade** el hash cuando falta (y el guardián lo vigila).
+2. **Las dos listas del `bump-version.js` están escritas a mano**: una página nueva no se versiona ni se
+   copia a `www/` y `android/`. Antes eso era invisible; ahora el guardián lo dice.
+3. **Y una nota corregida**: aquí decía que la copia de `android/` se rellenaba a mano con `npx cap
+   copy`. **También era falso**: el paso 5 del `bump-version.js` copia a `www/` y de ahí a
+   `android/app/src/main/assets/public/`, así que la sincronización **es automática** (por eso
+   `css/header.css` estaba byte a byte idéntico). Lo que hay que recordar es lo obvio: **hay que ejecutar
+   el bump**, y por eso la suite ahora falla si un `?v=` no cuadra. *(Flujo: bump → verificar → commit.)*
 
 | Script | Qué hace |
 |---|---|

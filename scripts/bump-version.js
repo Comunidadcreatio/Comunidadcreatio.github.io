@@ -29,18 +29,23 @@ function hashFile(filePath) {
 }
 
 /**
- * Encuentra todas las referencias a CSS/JS con ?v=... en un HTML.
- * Retorna [{ fullMatch, filePath, oldVer }].
+ * Encuentra todas las referencias a CSS/JS en un HTML, CON o SIN `?v=`.
+ * Retorna [{ fullMatch, filePath, oldVer }]; `oldVer` es null si la referencia no llevaba hash.
+ *
+ * OJO: antes el patrón EXIGÍA el `?v=` (`...\?v=([^"']+)`), así que una referencia nueva SIN hash era
+ * INVISIBLE para este script y se servía de caché para siempre. Pasó de verdad:
+ * `auth.html` cargaba `js/version-check.js` sin `?v=` (mientras `index.html` sí lo llevaba), y el
+ * actualizador nunca lo tocó. Ahora, si `oldVer` es null, el hash se AÑADE.
  */
 function findAssets(html) {
-    const regex = /(?:href|src)="((?:css\/|js\/)[^"']+)\?v=([^"']+)"/g;
+    const regex = /(?:href|src)="((?:css\/|js\/)[^"'?]+)(?:\?v=([^"']+))?"/g;
     const assets = [];
     let match;
     while ((match = regex.exec(html)) !== null) {
         assets.push({
             fullMatch: match[0],
             filePath: match[1],
-            oldVer: match[2],
+            oldVer: match[2] || null,
         });
     }
     return assets;
@@ -153,12 +158,18 @@ function processFile(projectRoot, filePath, findFn, labelFn) {
     for (const asset of assets) {
         const assetPath = path.join(projectRoot, asset.filePath);
         if (!fs.existsSync(assetPath)) {
-            console.log(`⚠  ${asset.filePath} no existe en disco, se conserva ?v=${asset.oldVer}`);
+            console.log(`⚠  ${asset.filePath} no existe en disco, se deja ${asset.oldVer ? '?v=' + asset.oldVer : 'SIN ?v='}`);
             continue;
         }
 
         const newHash = hashFile(assetPath);
-        if (newHash !== asset.oldVer) {
+        if (asset.oldVer === null) {
+            // Referencia SIN hash (el hueco que dejaba el patrón viejo): se le AÑADE.
+            content = content.replace(asset.fullMatch, asset.fullMatch.replace(asset.filePath, `${asset.filePath}?v=${newHash}`));
+            console.log(`+ ${labelFn(asset.filePath)}: ${asset.filePath} SIN ?v= → ?v=${newHash}`);
+            modified = true;
+            anyChange = true;
+        } else if (newHash !== asset.oldVer) {
             content = content.replace(asset.fullMatch, asset.fullMatch.replace(`?v=${asset.oldVer}`, `?v=${newHash}`));
             console.log(`✓ ${labelFn(asset.filePath)}: ${asset.filePath} ?v=${asset.oldVer} → ?v=${newHash}`);
             modified = true;
