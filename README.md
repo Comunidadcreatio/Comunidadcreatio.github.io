@@ -1089,7 +1089,24 @@ salió de **medir contraste**.
 
 > La lección que cierra: **quitar colores a mano no basta**. Hacen falta los instrumentos al lado, y los
 > instrumentos hay que revisarlos también (esta campaña encontró un inspector que mentía, una foto
-> inestable, un verificador que fijaba literales y una vista que se medía a medio montar). El borde de los campos **válidos** en modo
+> inestable, un verificador que fijaba literales y una vista que se medía a medio montar).
+
+**Y la pasada final: el BARRIDO de contraste** (`verificar-contraste-superficies.mjs --barrido`). Los 25
+pares del verificador son una **lista curada**, y lo que no está en la lista no se mira — que es
+justamente como se coló el placeholder a 1,48:1. El barrido recorre **todos** los elementos con texto
+propio de cada vista y tema, calcula su contraste real (con el fondo efectivo, subiendo por los padres) y
+saca los que no llegan. **Es una auditoría: informa, no falla.** Y en su primera pasada encontró cuatro
+cosas que ningún verificador miraba:
+
+| Dónde | Texto | Contraste |
+|---|---|---|
+| `auth` (claro) | el pie de página (`© 2026 Creatio`, la ciudad) | **2,52:1** ✗ |
+| `auth` (oscuro) | el botón «← Volver» | **1,09:1** ✗✗ (texto claro sobre tarjeta blanca) |
+| `panel` (claro) | el número de cada tarjeta de Cavent (`#1`, `#2`) | **2,52:1** ✗ |
+| `chat` (claro) | la inicial del avatar de un usuario sin foto | **1,23:1** ✗✗ |
+
+*(Nota: el barrido puede marcar elementos deshabilitados, decorativos o sobre imagen como falsos
+positivos; estos cuatro no lo son — se pueden ver en pantalla y no se leen.)* El borde de los campos **válidos** en modo
 oscuro (`#22c55e`) es `--color-success` **exacto** en ese tema (la regla es solo de tema oscuro) →
 migración de **cambio cero**. Foto SIN DIFERENCIAS.
 

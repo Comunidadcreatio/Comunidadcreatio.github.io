@@ -148,6 +148,44 @@ const lum = ([r, g, b]) => {
 const aRgb = (t) => { const m = String(t).match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(',').map((x) => parseFloat(x)); return [p[0], p[1], p[2]]; };
 const contraste = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 
+// BARRIDO: lo mismo que MEDIR pero para TODOS los elementos con texto propio, para auditar lo que NO
+// esta en la lista curada. Devuelve (hasta 40) los que no llegan al minimo, del peor al menos malo.
+// OJO: aqui dentro no se pueden usar backticks (rompen la plantilla que se inyecta en la pagina).
+const BARRIDO = `(() => {
+    const aRgb = (t) => { const m = t.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(',').map((x) => parseFloat(x)); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+    const lum = (c) => { const f = (v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+    const contraste = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const out = [];
+    for (const el of document.querySelectorAll('body *')) {
+        const propio = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(' ').trim();
+        if (!propio) continue;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        const cs = getComputedStyle(el);
+        if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.1) continue;
+        const c = aRgb(cs.color); if (!c) continue;
+        let fondo = null, nodo = el, imagen = false;
+        while (nodo && nodo !== document.documentElement.parentNode) {
+            const csN = getComputedStyle(nodo);
+            const bg = aRgb(csN.backgroundColor);
+            if (bg && bg.a > 0.05) { fondo = bg; break; }
+            if (csN.backgroundImage && csN.backgroundImage !== 'none') imagen = true;
+            nodo = nodo.parentElement;
+        }
+        if (!fondo || imagen) continue;
+        const ratio = contraste([c.r, c.g, c.b], [fondo.r, fondo.g, fondo.b]);
+        const px = parseFloat(cs.fontSize), peso = parseInt(cs.fontWeight, 10) || 400;
+        const minimo = (px >= 24 || (peso >= 700 && px >= 18.66)) ? 3 : 4.5;
+        if (ratio >= minimo) continue;
+        const nombre = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '')
+            + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+        out.push({ sel: nombre, texto: propio.slice(0, 34), ratio: +ratio.toFixed(2), minimo, color: cs.color, fondo: 'rgb(' + fondo.r + ', ' + fondo.g + ', ' + fondo.b + ')', px, peso });
+    }
+    out.sort((a, b) => a.ratio - b.ratio);
+    return JSON.stringify(out.slice(0, 40));
+})()`;
+
+const barridos = [];
 let pruebas = 0, fallos = 0;
 const check = (nombre, ok, detalle) => {
     pruebas++;
@@ -324,6 +362,19 @@ for (const vista of VISTAS) {
             check(`${etiqueta} [${tema}]`, ratio >= minimo,
                 `${ratio.toFixed(2)}:1 (minimo ${minimo}, texto ${m.tamano}px/${m.peso}) ${m.color} sobre ${m.fondo}`);
         }
+        // BARRIDO (solo con --barrido): recorre TODOS los elementos con texto propio de la vista y saca
+        // los que NO llegan al minimo. Es una AUDITORIA, no una comprobacion: informa y no falla. Existe
+        // porque los pares de arriba son una lista curada, y lo que no esta en la lista no se mira — asi
+        // fue como aparecio el placeholder a 1.48:1, que ademas era un TOKEN (la caza de hexes no lo
+        // habria encontrado nunca).
+        if (args.includes('--barrido')) {
+            const lista = await evalJs(BARRIDO);
+            if (typeof lista === 'string' && lista[0] === '[') {
+                const fallos = JSON.parse(lista);
+                barridos.push(...fallos.map((f) => ({ ...f, vista: vista.nombre, tema })));
+                console.log(`   [barrido ${vista.nombre} · ${tema}] ${fallos.length} textos por debajo del minimo`);
+            }
+        }
     }
     // UNA VISTA QUE NO MIDE NADA ES UN FALLO, no un verde vacio. Si el estado no se alcanza (una clase
     // que no existe, un clic que no abre nada), antes esto pasaba desapercibido: la vista entera se
@@ -366,6 +417,16 @@ for (const vista of VISTAS) {
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 if (logs.length) fallos++;
+
+// RESUMEN DEL BARRIDO (auditoria, no comprobacion): lo peor de todas las vistas y temas.
+if (args.includes('--barrido')) {
+    console.log('\n=== BARRIDO DE CONTRASTE (auditoria: informa, NO falla) ===');
+    if (!barridos.length) console.log('   ningun texto por debajo del minimo');
+    for (const f of barridos.slice(0, 30)) {
+        console.log(`   ${String(f.ratio).padStart(5)}:1 (min ${f.minimo}) · ${f.vista}/${f.tema} · ${f.sel} · "${f.texto}" · ${f.color} sobre ${f.fondo} · ${f.px}px/${f.peso}`);
+    }
+    console.log(`   TOTAL: ${barridos.length} textos por debajo del minimo (revisar a mano: puede haber deshabilitados, decorativos o sobre imagen)`);
+}
 
 // EL CONTRATO DE LOS ROLES SÓLIDOS: son los que se usan para poner TEXTO BLANCO encima, así que su
 // contrato es que el blanco se lea. Esto no depende de ninguna vista (se lee el valor del rol del
