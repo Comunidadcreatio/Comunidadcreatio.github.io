@@ -410,7 +410,7 @@ select:valid,
 [data-theme="dark"] select:valid,
 [data-theme="dark"] #login-form input:valid,
 [data-theme="dark"] #forgot-section input:valid {
-    border: 1.5px solid #22c55e;
+    border: 1.5px solid var(--color-success);
     box-shadow: none;
     background-color: rgba(0, 0, 0, 0.15);
 }

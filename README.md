@@ -1067,9 +1067,26 @@ de presencia** del perfil: `#9ca3af` ×2 (apagado) → `--color-gray-400`, y `#2
 **mejora** el gráfico de 2,28:1 a 3,30:1, mientras que en oscuro es exacto. Foto con **4 diferencias,
 todas la buscada**; la variante «en línea» va verificada con números porque el fixture está desconectado.
 
-**Y el servidor local se cayó otra vez** (sexta vez en la campaña) justo al empezar la tanda: el
-**preflight abortó las dos fotos** y hubo que levantarlo y repetirlas. Es exactamente lo que debe pasar:
-mejor abortar que medir una página de error y creérsela.
+**Tanda 12: `auth.css` (1 declaración) y la hoja queda a CERO.** El borde de los campos **válidos** en modo
+oscuro (`#22c55e`) es `--color-success` **exacto** en ese tema (la regla es solo de tema oscuro) →
+migración de **cambio cero**. Foto SIN DIFERENCIAS.
+
+**Y aquí se ve el final de la campaña**: los **21 sueltos** que quedan ya **no son migraciones, son
+decisiones**. El desglose, con lo que recomiendo para cada uno:
+
+| Valor | Dónde | Qué es | Contraste medido | Recomendación |
+|---|---|---|---|---|
+| `#ff4d6a` | galería | el «me gusta» de comentarios | **3,22:1** ✗ en claro | **Arreglar**: darle un rol de tinta theme-aware (claro `--color-danger-dark` 6,47:1 · oscuro `#f87171` 5,96:1), que es justo el par que ya usan los comentarios |
+| `#c0392b` ×2 | problogs | rojo ladrillo (borrar) | 5,44:1 ✔ | Mapear a `--color-danger-dark` (6,47:1): es su rol |
+| `#e67e22` ×2 | problogs | naranja del estado «borrador» | 5,79:1 ✔ | Mapear a `--color-warning`: es su rol |
+| `#f87171` ×2 · `#4ade80` ×2 | problogs | el rojo y el verde **claros** del modo oscuro | 5,96:1 y 9,46:1 ✔ | **Dejar y marcar deliberado**: son las versiones **legibles** en oscuro; los tokens `danger`/`success` de la paleta son más oscuros y **fallarían** ahí |
+| `#8a8a8a` ×2 | problogs · chat | gris medio (controles, botón cerrado) | — | Dejar (el paso más próximo se mueve 23-27) o aceptar el desplazamiento |
+| `#ffd166` | style | anillo de **foco** en oscuro | — | Dejar: es una decisión de diseño (o un futuro rol `--color-focus`) |
+| `#3a3a3a` · `#444` ×3 · `#333` ×2 · `#888` · `#64748b` · `#7ef0c8` | style · formularios · notificaciones · header · chat | divisores y bordes oscuros, el gris pizarra de un botón, el visto verde menta | — | Dejar y marcar `color-a-mano: deliberado`: son tonos neutros o de estado cuyo paso más próximo se mueve ≥ 20 |
+
+Dicho de otro modo: **quedan 3 arreglos** (el «me gusta» y los dos semánticos de problogs) y el resto es
+dejarlo **escrito como deliberado** en el propio CSS, que es lo que hace que el contador deje de contarlo
+como deuda.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
