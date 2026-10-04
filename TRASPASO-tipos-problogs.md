@@ -532,6 +532,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    medidas**, y **tres corridas seguidas 700 = 700 = 700 con SIN DIFERENCIAS en las tres comparaciones**.
    El guardián de `exigidos` se estrenó cazando el problema del perfil (abortó la foto en vez de
    escribirla corta).
+   **TANDA 6 (2026-10-04, Fase A) — `problogs.css` (5 declaraciones).** Se migraron al token exacto o al
+   más próximo (≤17): el `border: 3px solid #ffffff` (que en oscuro debe ser el color del fondo) a
+   `--color-bg`, y dos parejas de rojo/verde a `--color-danger-dark` (`#b3261e` → `#b91c1c`, delta 12) y
+   `--color-success-dark` (`#15803d`, **exacto**). **Foto SIN DIFERENCIAS** (700 = 700). La hoja baja de
+   14 a **9 sueltos**.
+   **Y aquí aparece la LISTA CORTA de la Fase A**: los 9 que quedan en `problogs.css` **no son fallos**
+   (todos pasan contraste en su tema, medido) sino **variantes de tono que la paleta no tiene**:
+   `#c0392b` ×2 (ladrillo suave: 5.44:1 sobre blanco), `#e67e22` ×2 (naranja del estado «borrador»:
+   5.79:1 sobre oscuro), `#f87171` ×2 y `#4ade80` ×2 (el rojo y el verde **claros** del modo oscuro:
+   5.96:1 y 9.46:1 sobre tarjeta oscura) y `#8a8a8a` (el color de los controles de comentarios). La
+   decisión de la Fase A es si se mapean a los roles de la paleta (`--color-danger`, `--color-warning`,
+   `--color-success`, grises) —con un cambio de tono visible pero medido— o se quedan como están.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

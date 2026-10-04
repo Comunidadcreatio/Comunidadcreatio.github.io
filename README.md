@@ -991,12 +991,29 @@ sueltos.
 `header.css` 6, `panel-artista.css` 3, `galeria-publica.css` 2, `notificaciones.css` 2, `modales.css` 1,
 `search-results.css` 1.
 
-**Y lo que queda en `formularios.css` es una DECISIÓN, no una migración**: sus 15 sueltos son casi todos
-**grises intermedios que la escala no tiene** (`#444` ×3, `#333` ×3, `#666`, `#555`, `#999`, `#aaa`, `#222`,
-`#262626`), más el blanco/negro deliberado del botón de ratio (blanco con texto negro **en los dos
-temas**, y así está medido). La escala de la paleta **no está invertida sino re-basada por rol** (en los
-dos temas 50 es la superficie y 800 la tinta), así que añadir estos intermedios pide decidir **cuántos
-pasos** quiere tener la escala; o se quedan como están.
+**Tanda 6: `problogs.css` (5 declaraciones).** Al token exacto o al más próximo (≤ 17): el
+`border: 3px solid #ffffff` a `--color-bg` (en oscuro debe ser el color del fondo), y dos parejas de
+rojo/verde a `--color-danger-dark` (`#b3261e` → `#b91c1c`, delta 12) y `--color-success-dark`
+(`#15803d`, **exacto**). **Foto SIN DIFERENCIAS** (700 = 700). La hoja baja de 14 a **9 sueltos**.
+
+**Y aquí aparece la LISTA CORTA de la Fase A.** Los 9 que quedan en `problogs.css` **no son fallos**
+(todos pasan contraste en su tema, medido) sino **variantes de tono que la paleta no tiene**:
+
+| Valor | Dónde | Contraste medido |
+|---|---|---|
+| `#c0392b` ×2 | rojo ladrillo (icono de borrar) | 5,44:1 sobre blanco |
+| `#e67e22` ×2 | naranja del estado «borrador» | 5,79:1 sobre oscuro |
+| `#f87171` ×2 | rojo **claro** del modo oscuro | 5,96:1 sobre tarjeta oscura |
+| `#4ade80` ×2 | verde **claro** del modo oscuro | 9,46:1 sobre tarjeta oscura |
+| `#8a8a8a` ×1 | color de los controles de comentarios | (borde) |
+
+La decisión de cierre de la Fase A es si se **mapean a los roles de la paleta** (`--color-danger`,
+`--color-warning`, `--color-success`, grises) —con un cambio de tono visible pero medido— o se quedan.
+
+**Y un aviso que salió de esta tanda**: `verificar-contraste-comentarios.mjs` **fijaba los literales**
+(`--comentario-rojo: #b3261e`) en vez de medir el color resuelto, así que la migración a un token lo puso
+en rojo aunque el contraste fuera el mismo (6,54 → 6,47:1). Se actualizó el contrato para que compruebe
+**el token** y quede claro que esos dos colores ya salen de la paleta.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla

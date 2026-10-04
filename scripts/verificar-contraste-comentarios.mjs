@@ -127,10 +127,14 @@ const PARES = {
 
 // --- Que los colores del tema sigan siendo los que dice el CSS ---
 // Evita el falso aprobado si alguien cambia el CSS y no este script.
+// OJO: desde el 2026-10-04 los colores CLAROS de los comentarios NO son literales: salen de la paleta
+// (`--color-danger-dark` y `--color-success-dark`), y su contraste sigue medido arriba (6.47:1 y
+// 6.99:1). Aqui se comprueba el TOKEN: si alguien lo cambia, esto salta y hay que decidirlo a
+// conciencia. Los OSCUROS siguen siendo literales, porque son variantes claras propias del modo oscuro.
 const ESPERADOS_EN_CSS = [
-  ['--comentario-rojo: #b3261e', 'valor claro del rojo'],
+  ['--comentario-rojo: var(--color-danger-dark)', 'valor claro del rojo (token de la paleta)'],
   ['--comentario-rojo: #f87171', 'valor oscuro del rojo'],
-  ['--comentario-verde: #15803d', 'valor claro del verde'],
+  ['--comentario-verde: var(--color-success-dark)', 'valor claro del verde (token de la paleta)'],
   ['--comentario-verde: #4ade80', 'valor oscuro del verde'],
   ['--comentario-control: #8a8a8a', 'borde de control en claro'],
   ['--comentario-control: rgba(255, 255, 255, 0.36)', 'borde de control en oscuro'],

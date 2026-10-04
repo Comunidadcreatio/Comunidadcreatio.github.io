@@ -171,7 +171,7 @@
 /* La elegida se marca con el borde blanco más grueso (los demás, 1px gris). La
    imagen ocupa el cuadro entero, sin etiquetas encima. */
 #crear-problogs-contenido .problog-portada-cuadro.elegida {
-    border: 3px solid #ffffff;
+    border: 3px solid var(--color-bg);
 }
 
 #crear-problogs-contenido .problog-portada-cuadro.vacio {
@@ -710,14 +710,14 @@
 #perfil-tab-content .problog-social-btn.liked {
     /* Rojo oscurecido: el #c0392b de antes daba 5.44:1 en claro pero solo
        3.64:1 sobre el fondo oscuro. */
-    color: #b3261e;
+    color: var(--color-danger-dark);
 }
 
 /* Reblogueado: se enciende en verde (el like lo hace en rojo). El verde de
    antes (#16a34a) se quedaba en 3.3:1 sobre blanco. */
 #problogs .problog-social-btn.reblogueado,
 #perfil-tab-content .problog-social-btn.reblogueado {
-    color: #15803d;
+    color: var(--color-success-dark);
 }
 
 /* En oscuro los dos se aclaran para despegar del fondo #0a0a0a. */
@@ -762,8 +762,8 @@
 .problog-comentarios {
     /* Los dos colores que dependen del tema viven aquí: así se cambian en un
        solo sitio y valen para el bloque entero. */
-    --comentario-rojo: #b3261e;
-    --comentario-verde: #15803d;
+    --comentario-rojo: var(--color-danger-dark);
+    --comentario-verde: var(--color-success-dark);
     /* DOS tipos de borde, cada uno con su mínimo:
        · control: delimita algo con lo que se interactúa (la caja de escribir,
          los botones). Tiene que llegar a 3:1 para distinguirse del fondo, así
