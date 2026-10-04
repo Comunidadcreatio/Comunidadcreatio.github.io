@@ -829,7 +829,7 @@ body.teclado-abierto .chat-enviar-btn {
 /* Salas con candado (Jurado 1 / Jurado 2): cerradas por ahora */
 .chat-sala-fab.cerrada {
     background: var(--color-gray-300, #cbd5e1);
-    color: #64748b;
+    color: #64748b; /* color-a-mano: deliberado (gris pizarra del boton de sala cerrada: tono propio) */
     cursor: not-allowed;
     opacity: 0.9;
 }
@@ -838,7 +838,7 @@ body.teclado-abierto .chat-enviar-btn {
 }
 [data-theme="dark"] .chat-sala-fab.cerrada {
     background: var(--color-gray-200);
-    color: #8a8a8a;
+    color: #8a8a8a; /* color-a-mano: deliberado (gris medio del boton cerrado: el paso mas proximo se mueve 27) */
 }
 [data-theme="dark"] .chat-cluster {
     /* Degradado vertical negro marcado: nace en el nav y se pierde muy por
@@ -1081,7 +1081,7 @@ body.teclado-abierto .chat-enviar-btn {
     opacity: 0.85;
 }
 .chat-msg-leido.visto {
-    color: #7ef0c8;
+    color: #7ef0c8; /* color-a-mano: deliberado (visto de leido: color de estado propio (menta)) */
 }
 .chat-msg-imagen + .chat-msg-pie { margin-left: 0; }
 

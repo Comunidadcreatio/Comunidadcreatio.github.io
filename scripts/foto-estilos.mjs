@@ -520,11 +520,26 @@ const PAGINAS = [
         ruta: '',
         esperar: `!!document.getElementById('toggle-panel')`,
         fixture: false,
+        // El EDITOR se pillaba a medio montar: en una corrida el contenedor salia con `opacity: 0` y
+        // ancho 0 (la animacion de entrada a medias) y la comparacion daba 96 diferencias de maquetacion
+        // que no eran del CSS. Con esto, o esta montado del todo, o la foto aborta.
+        exigidos: ['#crear-problogs-contenido', '#problog-nav-bar', '.problog-anadir-btn'],
         abrir: async (ev, dormir) => {
             await ev(`document.getElementById('btn-crear-cavent')?.click()`);
             await dormir(1600);
             await ev(`document.getElementById('tab-problogs')?.click()`);
-            await dormir(1600);
+            // Se espera a que el editor este VISIBLE DE VERDAD (opacidad 1 y con caja), no a un tiempo fijo.
+            for (let i = 0; i < 25; i++) {
+                const listo = await ev(`(() => {
+                    const el = document.getElementById('crear-problogs-contenido');
+                    if (!el) return false;
+                    const r = el.getBoundingClientRect();
+                    return parseFloat(getComputedStyle(el).opacity) > 0.99 && r.width > 0 && r.height > 0;
+                })()`);
+                if (listo === true) break;
+                await dormir(300);
+            }
+            await dormir(600);
             // Se anade un parrafo para que aparezcan los botones de accion del bloque.
             const centro = await ev(`(() => {
                 const b = document.querySelector('#crear-problogs-contenido .problog-anadir-btn')

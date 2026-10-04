@@ -37,7 +37,7 @@
 [data-theme="dark"] .notification {
     background: var(--color-gray-800);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    border: 1px solid #333;
+    border: 1px solid #333; /* color-a-mano: deliberado (borde oscuro: el paso mas proximo se mueve 23) */
 }
 
 @keyframes slideIn {

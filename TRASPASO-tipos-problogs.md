@@ -598,6 +598,19 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    **Campaña: 22 sueltos.** Y el servidor local se cayó **otra vez** (sexta) al empezar la tanda: el
    preflight abortó las dos fotos, se levantó y se repitieron — que es exactamente lo que debe pasar
    (mejor abortar que medir una página de error).
+   **CIERRE DE LA CAMPAÑA DE COLORES (2026-10-04)**: se aplicaron las tres cosas aprobadas.
+   (1) Los **3 arreglos**: el «me gusta» de los comentarios (`#ff4d6a`, 3.22:1 en claro) pasa a un rol
+   nuevo **`--color-like-ink`** (claro `--color-danger-dark` 6.47:1 · oscuro `#f87171` 5.96:1 — el par que
+   ya usaban los comentarios); y los dos de problogs a su rol (`#c0392b` → `--color-danger-dark`,
+   `#e67e22` → `--color-warning`). (2) Los **16 restantes marcados como `color-a-mano: deliberado`** con su
+   motivo escrito al lado (legibles en oscuro donde el token fallaría, divisores neutros, el anillo de
+   foco). (3) **El contador marca CERO SUELTOS DE PALETA en las once hojas.** Serie final:
+   **109 respaldos | 44 blanco/negro | 21 deliberados | 0 sueltos**.
+   **Y un arreglo de instrumento que salió en el cierre**: la vista `editor` se medía a medio montar (en
+   una corrida el contenedor salió con `opacity: 0` y la comparación dio **96 diferencias de maquetación
+   que no eran del CSS**). Ya tiene su espera (`opacity` 1 y caja) y su guardián de `exigidos`, y el par
+   volvió a SIN DIFERENCIAS. **Lección**: el recuento de medidas **no basta** para detectar un estado a
+   medias (720 salía igual con el editor invisible).
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

@@ -259,7 +259,7 @@
 }
 
 #crear-problogs-contenido #problog-bloques .problog-btn-borrar {
-    color: #c0392b;
+    color: var(--color-danger-dark);
     border-color: rgba(192, 57, 43, 0.4);
 }
 
@@ -597,8 +597,8 @@
 }
 
 .problog-card-estado-borrador {
-    border-color: #e67e22;
-    color: #e67e22;
+    border-color: var(--color-warning);
+    color: var(--color-warning);
 }
 
 /* Acciones de las publicaciones propias: iconos redondos, justo a la derecha
@@ -638,7 +638,7 @@
 }
 
 .problog-accion-icono-borrar:hover {
-    color: #c0392b;
+    color: var(--color-danger-dark);
     border-color: rgba(192, 57, 43, 0.5);
 }
 
@@ -723,12 +723,12 @@
 /* En oscuro los dos se aclaran para despegar del fondo #0a0a0a. */
 [data-theme="dark"] #problogs .problog-social-btn.liked,
 [data-theme="dark"] #perfil-tab-content .problog-social-btn.liked {
-    color: #f87171;
+    color: #f87171; /* color-a-mano: deliberado (rojo legible del modo oscuro: el rojo de la paleta es mas oscuro y fallaria aqui) */
 }
 
 [data-theme="dark"] #problogs .problog-social-btn.reblogueado,
 [data-theme="dark"] #perfil-tab-content .problog-social-btn.reblogueado {
-    color: #4ade80;
+    color: #4ade80; /* color-a-mano: deliberado (verde legible del modo oscuro: el verde de la paleta es mas oscuro y fallaria aqui) */
 }
 
 .problog-social-icono {
@@ -770,7 +770,7 @@
          que va oscuro: el gris de los tokens (#d4d4d4) daba 1.48:1.
        · linea: solo REPARTA el bloque en franjas. No delimita nada pulsable,
          así que basta con que se vea: una línea fina y gris, como una regla. */
-    --comentario-control: #8a8a8a;
+    --comentario-control: #8a8a8a; /* color-a-mano: deliberado (gris medio de los controles de comentarios: el paso mas proximo se mueve 27) */
     --comentario-linea: var(--color-gray-300);
     /* Fondo al pasar por encima de las acciones. Tiene que ser suave y, sobre
        todo, dejar el texto legible: con `--comentario-linea` en oscuro quedaba
@@ -1314,8 +1314,8 @@ body.responder-subida .problog-responder-barra {
    `--color-gray-300`, que en oscuro ya es un gris visible pero discreto.
    ============================================================ */
 [data-theme="dark"] .problog-comentarios {
-    --comentario-rojo: #f87171;
-    --comentario-verde: #4ade80;
+    --comentario-rojo: #f87171; /* color-a-mano: deliberado (rojo legible del modo oscuro: el rojo de la paleta es mas oscuro y fallaria aqui) */
+    --comentario-verde: #4ade80; /* color-a-mano: deliberado (verde legible del modo oscuro: el verde de la paleta es mas oscuro y fallaria aqui) */
     /* Blanco al 36%: 3.25:1 sobre el fondo oscuro. El gris de los tokens en
        oscuro (#525252) se quedaba en 2.53:1. */
     --comentario-control: rgba(255, 255, 255, 0.36);

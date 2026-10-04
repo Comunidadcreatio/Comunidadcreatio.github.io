@@ -1024,7 +1024,7 @@ form,
 }
 
 [data-theme="dark"] .carrusel-dot {
-    background: #444;
+    background: #444; /* color-a-mano: deliberado (divisor oscuro: el paso mas proximo se mueve 24) */
 }
 
 [data-theme="dark"] .carrusel-count {
@@ -1265,7 +1265,7 @@ form,
 [data-theme="dark"] #obra-form .form-group select,
 [data-theme="dark"] #obra-form .form-group textarea {
     color: var(--color-ink);
-    border-bottom-color: #444;
+    border-bottom-color: #444; /* color-a-mano: deliberado (divisor oscuro: el paso mas proximo se mueve 24) */
     background: transparent;
     background-color: transparent;
 }
@@ -1416,7 +1416,7 @@ form,
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 6px solid #888;
+    border-top: 6px solid #888; /* color-a-mano: deliberado (borde superior del desplegable: el paso mas proximo se mueve 36) */
     pointer-events: none;
 }
 
@@ -1471,7 +1471,7 @@ form,
 
 [data-theme="dark"] #obra-form .custom-select-trigger {
     color: var(--color-ink);
-    border-bottom-color: #444;
+    border-bottom-color: #444; /* color-a-mano: deliberado (divisor oscuro: el paso mas proximo se mueve 24) */
 }
 
 [data-theme="dark"] #obra-form .custom-select-trigger:focus {

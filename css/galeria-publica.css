@@ -1468,7 +1468,7 @@ body.cajon-teclado .comentarios-drawer {
     color: var(--color-ink);
 }
 .comentario-btn-like.liked {
-    color: #ff4d6a;
+    color: var(--color-like-ink);
 }
 .comentario-replies {
     margin-top: 8px;

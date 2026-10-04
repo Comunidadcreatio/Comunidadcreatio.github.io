@@ -409,7 +409,7 @@ picture {
 .search-result-item:hover .search-result-avatar-placeholder {
     transform: scale(1.05);
     border-color: var(--color-ink);
-    background: linear-gradient(135deg, var(--color-ink) 0%, #333 100%);
+    background: linear-gradient(135deg, var(--color-ink) 0%, #333 100%); /* color-a-mano: deliberado (extremo claro del degradado de un hover: el paso mas proximo se mueve 23) */
     color: white;
 }
 

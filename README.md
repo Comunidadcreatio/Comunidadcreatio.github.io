@@ -1067,7 +1067,29 @@ de presencia** del perfil: `#9ca3af` ×2 (apagado) → `--color-gray-400`, y `#2
 **mejora** el gráfico de 2,28:1 a 3,30:1, mientras que en oscuro es exacto. Foto con **4 diferencias,
 todas la buscada**; la variante «en línea» va verificada con números porque el fixture está desconectado.
 
-**Tanda 12: `auth.css` (1 declaración) y la hoja queda a CERO.** El borde de los campos **válidos** en modo
+## La campaña de los colores a mano — CERRADA
+
+**Serie final: 109 respaldos · 44 blanco/negro literales · 21 deliberados · 0 sueltos de paleta.** Las
+once hojas a cero. Lo que queda tiene nombre y motivo:
+
+- **109 respaldos** (`var(--color-x, #hex)`): red de seguridad deliberada, no deuda.
+- **44 blanco/negro literales**: no son deuda, porque los tokens de superficie **se invierten** en oscuro
+  (`--color-white` vale `#0a0a0a` ahí) y cambiar el `#fff` de un texto pondría el texto **negro sobre un
+  fondo sólido**.
+- **21 deliberados**, cada uno **marcado en el propio CSS** con `color-a-mano: deliberado (motivo)`: son
+  las versiones **legibles en oscuro** (donde el token de la paleta fallaría), divisores neutros cuyo paso
+  más próximo se mueve ≥ 20, y el color del anillo de foco (una decisión de diseño).
+
+**Lo que encontró la campaña** (y que no era cosmético): el **placeholder** de los formularios a
+**1,48:1** en claro y 2,23:1 en oscuro; las **insignias rojas** del chat con texto blanco a **4,23:1**;
+el morado del modo oscuro a **2,45:1**; el **borde blanco brillante** del formulario en tema oscuro; los
+puntos de presencia por debajo del mínimo de un gráfico; el «me gusta» a 3,22:1. Y el caso más instructivo:
+el placeholder era un **token**, no un hex, así que **la caza de hexes no lo habría encontrado nunca** —
+salió de **medir contraste**.
+
+> La lección que cierra: **quitar colores a mano no basta**. Hacen falta los instrumentos al lado, y los
+> instrumentos hay que revisarlos también (esta campaña encontró un inspector que mentía, una foto
+> inestable, un verificador que fijaba literales y una vista que se medía a medio montar). El borde de los campos **válidos** en modo
 oscuro (`#22c55e`) es `--color-success` **exacto** en ese tema (la regla es solo de tema oscuro) →
 migración de **cambio cero**. Foto SIN DIFERENCIAS.
 

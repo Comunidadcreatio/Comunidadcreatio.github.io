@@ -22,13 +22,13 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=fe9702b189');
+@import url('header.css?v=2bb92c0c31');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=76968ffaa8');
+@import url('galeria-publica.css?v=7311900c41');
 
 /* Chat global + privado */
-@import url('chat.css?v=1be89115e6');
+@import url('chat.css?v=3dc8fd40b8');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -38,7 +38,7 @@
 @import url('modales.css?v=7c0627d4e2');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=13e0a4905e');
+@import url('formularios.css?v=e8ebeb4683');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -79,7 +79,7 @@
     }
     /* En modo oscuro se intercambian: el interior claro y el exterior oscuro. */
     [data-theme="dark"] :focus-visible {
-        outline-color: #ffd166 !important;
+        outline-color: #ffd166 !important; /* color-a-mano: deliberado (color del anillo de foco: decision de diseno) */
         box-shadow: 0 0 0 6px #1a1a1a !important;
     }
 
@@ -463,6 +463,12 @@
     --color-artist-ink: #8e44ad;
     --color-artist-solid: #8e44ad;
 
+    /* El color del «me gusta» de los comentarios. Necesita tinta propia porque el rojo de la paleta no
+       sirve para texto en oscuro: en claro vale `--color-danger-dark` (#b91c1c, 6.47:1) y en oscuro hay
+       que subir a un rojo claro (#f87171, 5.96:1), que es justo el par que ya usaban los comentarios.
+       Antes esto era un rosa a mano que daba 3.22:1 en claro: no llegaba. */
+    --color-like-ink: var(--color-danger-dark);
+
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
     --color-primary-dark: var(--color-ink-light);
@@ -535,6 +541,9 @@
     /* El morado era el peor de todos en oscuro: #8e44ad como texto sobre la tarjeta oscura daba 2.45:1.
        Se sube a su versión clara de la misma familia. */
     --color-artist-ink: #bb8fce;
+    /* Y la tinta del «me gusta» en oscuro: un rojo CLARO, porque el rojo de la paleta en este tema
+       (#ef4444) se queda en 3.76:1 sobre la tarjeta oscura y no llega para texto. */
+    --color-like-ink: #f87171;
     /* Y los grises de papel, en su versión oscura: el borde suave es el que ya usaban las reglas
        oscuras del chat (#2a2a2a = la escala gray-200 en oscuro). El realce y el fondo profundo valen lo
        mismo en los dos temas: son superficies deliberadamente oscuras. */
@@ -1766,7 +1775,7 @@
     border-radius: 0;
 }
 [data-theme="dark"] .carrusel-viewport {
-    border-bottom-color: #3a3a3a;
+    border-bottom-color: #3a3a3a; /* color-a-mano: deliberado (divisor del carrusel en oscuro: el paso mas proximo se mueve 28) */
 }
 
 /* Barra inferior (flechas <> / limpiar / crear-duplicar-actualizar): sin relleno */
