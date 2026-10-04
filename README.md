@@ -1450,18 +1450,22 @@ resultado.
 
 ## Scripts
 
-> **Limpieza de 2026-10-04.** `scripts/` tenía **128** ficheros `.mjs` y **17.542** líneas: **más código de
-> herramientas que de aplicación** (11.853 de CSS + 12.861 de JS). Se borraron **82 ficheros** (unos 8.700
-> líneas) que cumplían dos condiciones: **no los llama nadie** (comprobado con un buscador de citas en
-> todo el repositorio) y **su trabajo ya está hecho** (arreglos de una sola vez, diagnósticos de bugs
-> cerrados, y los `test-*`/`verify-*` viejos que la suite de `verificar-*.mjs` ya sustituye).
+> **Limpieza de 2026-10-04.** `scripts/` tenía **128** ficheros `.mjs` y **17.542** líneas, más **23 capturas
+> PNG (18,1 MB)** de los `shot-*`: **más código de herramientas que de aplicación** (11.853 de CSS + 12.861
+> de JS). Quedó en **51 ficheros y 9.422 líneas**: se borraron **77 ficheros de código (8.120 líneas)** y las
+> 23 capturas. El criterio fueron dos condiciones: **no los llama nadie** (comprobado con un buscador de
+> citas en todo el repositorio) y **su trabajo ya está hecho** (arreglos de una sola vez, diagnósticos de
+> bugs cerrados, y los `test-*`/`verify-*` viejos que la suite de `verificar-*.mjs` ya sustituye). Esa
+> comprobación previa evitó dos errores: `png-pixeles.mjs` y `serve-local.mjs` parecían de campaña pero los
+> **llama un verificador vivo**.
 >
-> **Lo que se queda, y por qué**: los 23 verificadores de la suite, la **metodología documentada**
+> **Lo que se queda, y por qué**: los **23 verificadores** (6.110 líneas), la **metodología documentada**
 > (`contar-color-a-mano`, `auditar-important`, `analizar-color`, `migrar-color`, `acercar-grises`,
 > `medir-color`, `auditar-css-muerto`, `borrar-css-muerto`, `auditar-capas`, `importantes-lote`,
 > `quitar-important`, `adoptar-modulo`, `limpiar-bloques-vacios`, `dbg-selectores-existen`,
 > `dbg-cascada-real`), las que **llama un verificador vivo** (`png-pixeles`, `serve-local`) y las de
-> **reparación de fallos recurrentes** (`arreglar-codificacion`, `dbg-codificacion`).
+> **reparación de fallos recurrentes** (`arreglar-codificacion`, `dbg-codificacion`) — 28 ficheros, 3.312
+> líneas.
 >
 > Todo lo borrado sigue en el historial de git: recuperar cualquiera es un `git show`. **Después de
 > borrar: suite 22/22, tipos sin errores y las herramientas que quedan funcionando.**
