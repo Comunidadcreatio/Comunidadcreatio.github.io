@@ -629,6 +629,22 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    el verificador de contraste porque su vista del panel **no monta el estado completo** que sí monta la
    foto (que **sí** los mide: son 720 medidas y las dos vistas se solapan a medias). Y faltan las vistas
    de **galería** y **perfil** en ese verificador. Las dos cosas son trabajo de estado, no parches.
+   **FASE B, SEGUNDA PARTE (2026-10-04): las dos piezas se PROBARON y se DESCARTARON con motivo.**
+   - **La vista de perfil se montó de verdad** (con la receta de la foto: `abrirObraDesdePerfil(55001)`,
+     clic en el avatar, espera a las secciones). **Se monta bien** —los elementos tienen caja— pero
+     **todos** salen como «no hay fondo pintado detrás»: el perfil **flota sobre el slideshow**, así que
+     el contraste **no es medible por este método**. Es la misma razón por la que el verificador cubre
+     `auth`, `panel` y `chat` (las tres con superficie sólida). Se quitó (y saltó, con razón, la regla de
+     «una vista que no mide nada es un fallo») y quedó escrito en el propio código para que nadie lo
+     reintente.
+   - **Los campos del formulario de obra están PLEGADOS** en esa vista (`div.form-group` con caja 0x0):
+     montarlos pide replicar la navegación completa de la foto. Los mide la foto.
+   - **Y el diagnóstico de «oculto» ahora dice QUÉ ANCESTRO lo esconde** (nombre, display y caja), que es
+     lo que permitió ver las dos cosas de un vistazo.
+   - **La conclusión no es «faltan cosas»: los instrumentos son COMPLEMENTARIOS POR CONSTRUCCIÓN.** La
+     **foto** mide estilos calculados en cualquier sitio (incluidas las vistas que flotan); el
+     **verificador de contraste** mide contraste donde la superficie es sólida, con el **barrido** para lo
+     que no está en la lista curada. Duplicar el uno en el otro sería trabajo sin medida nueva.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se
@@ -655,3 +671,50 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
   apunta en el README **con el número exacto** y se sigue. Nunca dejar el chequeo en rojo.
 - **Contar la verdad**: si algo no se terminó o salió mal, decirlo en el resumen, con el
   número.
+
+---
+
+## 10. Estado final (2026-10-04)
+
+**La auditoría de cierre**, con el número de cada cosa:
+
+| Qué | Resultado |
+|---|---|
+| Colores a mano (`contar-color-a-mano.mjs`) | **0 sueltos de paleta** · 109 respaldos · 43 blanco/negro · 21 deliberados |
+| `!important` (`auditar-important.mjs --resumen`) | **43** (eran 168): 37 en `components`, 6 en `base` (accesibilidad y autofill) |
+| Chequeo de tipos (`verificar-tipos.mjs`) | **0 errores** en los **27** ficheros vigilados |
+| Suite (`verificar-todo.mjs`) | **22/22**, y **dos pasadas seguidas idénticas** |
+| Foto (`foto-estilos.mjs`) | **720 = 720**, SIN DIFERENCIAS |
+| Barrido de contraste (`--barrido`) | **0 textos** por debajo del mínimo en las seis combinaciones |
+
+**No queda nada pendiente de las tres fases**: la campaña de colores está cerrada (A), los instrumentos
+están a punto (B) y esta es la auditoría final (C).
+
+**Lo que se deja A PROPÓSITO** (y por qué):
+
+- **109 respaldos** `var(--color-x, #hex)`: red de seguridad deliberada, no deuda.
+- **43 blanco/negro literales**: no son deuda, porque los tokens de superficie **se invierten** en modo
+  oscuro (`--color-white` vale `#0a0a0a` ahí) y cambiar un `#fff` de texto pondría el texto **negro sobre
+  un fondo sólido**.
+- **21 deliberados**, cada uno **marcado en el propio CSS** con `color-a-mano: deliberado (motivo)`: las
+  versiones **legibles en oscuro** (donde el token de la paleta fallaría), divisores neutros cuyo paso más
+  próximo se mueve ≥ 20, y el color del anillo de foco.
+- **43 `!important`**: los 6 de la capa `base` son accesibilidad (foco y autofill); el resto está medido.
+- **Los huecos de cobertura que no se pueden cerrar por diseño** (el perfil flota sobre el slideshow, los
+  campos del panel están plegados): cubiertos por la **foto** o por el **barrido**.
+
+**Las trampas que han mordido** (para no repetirlas):
+
+1. **Backticks dentro de una plantilla que se inyecta en la página**: rompen el script entero. Pasó
+   **cuatro veces** en esta campaña.
+2. **Medir un estado a medio montar**: da números plausibles y falsos. La cura: `exigidos` por vista y
+   esperas deterministas (29 pueblos con caja, opacidad 1, geometría asentada).
+3. **`sleep` en vez de esperar una condición**: es la causa raíz de casi toda la inestabilidad.
+4. **Ignorar el alfa de un fondo translúcido**: da falsos positivos de contraste (el botón «Volver»).
+5. **Fijar literales en un verificador** en vez de medir el color resuelto: se pone en rojo al migrar.
+6. **La escala de grises es por ROL, no invertida**: en oscuro `gray-300` es un borde, no texto. Un token
+   mal elegido **no lo encuentra ninguna caza de hexes**: solo medir contraste (así apareció el
+   placeholder a 1,48:1).
+7. **El servidor local se cae** (siete veces en la campaña): los scripts llevan **preflight** y abortan en
+   vez de medir una página de error.
+8. **Un `stash` dejado a medias**: comprobar `git stash list` antes de dar por bueno un cambio de sitio.
