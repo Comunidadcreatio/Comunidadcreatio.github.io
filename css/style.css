@@ -28,17 +28,17 @@
 @import url('galeria-publica.css?v=ce67e604c4');
 
 /* Chat global + privado */
-@import url('chat.css?v=f1f72bf7bb');
+@import url('chat.css?v=73ceb848bf');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 @import url('panel-artista.css?v=a14a0bdae4');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
-@import url('modales.css?v=cda8f6e1f8');
+@import url('modales.css?v=4ae16d0b63');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=cc598a1a66');
+@import url('formularios.css?v=b523c50f61');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
@@ -449,6 +449,17 @@
        turquesa, 4.83:1 el oro y 5.61:1 el morado. */
     --color-info-ink: #1565c0;
     --color-teal-ink: #0f766e;
+
+    /* GRISES QUE LA APP USABA A MANO, cada uno con su papel. (Los demás grises ya son la escala
+       `--color-gray-N`, que NO está invertida sino RE-BASADA por rol: en los dos temas 50 es la
+       superficie y 800 la tinta.)
+       OJO con `#888`: NO se convierte en token. Medido da 3.54:1 sobre blanco (y 3.25:1 sobre tarjeta
+       clara), o sea que **no llega** al 4.5 que pide un texto; los sitios que lo usaban pasan a
+       `--color-text-muted` (#737373 en claro = 4.74:1 sobre blanco). Un fallo de contraste no se
+       convierte en token: se corrige. */
+    --color-border-soft: #e5e5e5;      /* borde claro (chat, formularios) */
+    --color-surface-deep: #121212;     /* fondo más profundo que la escala (carrusel, en oscuro) */
+    --color-surface-raised: #242424;   /* realce/hover sobre superficie oscura (filas del chat) */
     --color-artist-ink: #8e44ad;
     --color-artist-solid: #8e44ad;
 
@@ -524,6 +535,12 @@
     /* El morado era el peor de todos en oscuro: #8e44ad como texto sobre la tarjeta oscura daba 2.45:1.
        Se sube a su versión clara de la misma familia. */
     --color-artist-ink: #bb8fce;
+    /* Y los grises de papel, en su versión oscura: el borde suave es el que ya usaban las reglas
+       oscuras del chat (#2a2a2a = la escala gray-200 en oscuro). El realce y el fondo profundo valen lo
+       mismo en los dos temas: son superficies deliberadamente oscuras. */
+    --color-border-soft: #2a2a2a;
+    --color-surface-deep: #121212;
+    --color-surface-raised: #242424;
 
     /* Aliases de compatibilidad */
     --color-primary: var(--color-ink);
@@ -1789,11 +1806,11 @@
     background: var(--color-gray-50);
 }
 [data-theme="dark"] .cavent-item {
-    background: #1a1a1a;
+    background: var(--color-gray-50);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 [data-theme="dark"] .cavent-item:hover {
-    background: #242424;
+    background: var(--color-surface-raised);
 }
 
 /* Mis Cavents: despliegue fluido (max-height animado) */

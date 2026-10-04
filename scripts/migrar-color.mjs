@@ -11,7 +11,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const hoja = process.argv[2];
-const MAPA = JSON.parse(readFileSync(process.argv[3], 'utf8'));
+// OJO: el `Set-Content -Encoding UTF8` de PowerShell escribe BOM, y `JSON.parse` revienta con el. Se
+// quita, porque el mapa puede venir escrito a mano o generado por una herramienta de Windows.
+const MAPA = JSON.parse(readFileSync(process.argv[3], 'utf8').replace(/^\uFEFF/, ''));
 
 const lineas = readFileSync(hoja, 'utf8').split('\n');
 let cambios = 0, saltadas = [];

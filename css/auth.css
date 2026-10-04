@@ -1530,7 +1530,7 @@ button[type="submit"]:not(.nav-btn):active,
 
 [data-theme="dark"] .password-strength .strength-bar {
     background-color: #262626;
-    border-color: #e5e5e5;
+    border-color: var(--color-border-soft);
 }
 
 [data-theme="dark"] .strength-label {

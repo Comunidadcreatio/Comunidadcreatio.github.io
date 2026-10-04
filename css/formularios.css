@@ -916,7 +916,7 @@ form,
    ============================================== */
 [data-theme="dark"] #formulario-obra {
     background-color: #0a0a0a;
-    border-color: #e5e5e5;
+    border-color: var(--color-border-soft);
 }
 
 [data-theme="dark"] #panel-artista #formulario-obra {
@@ -1016,11 +1016,11 @@ form,
 }
 
 [data-theme="dark"] .carrusel-viewport {
-    background: #121212;
+    background: var(--color-surface-deep);
 }
 
 [data-theme="dark"] .carrusel-slide {
-    background: #121212;
+    background: var(--color-surface-deep);
 }
 
 [data-theme="dark"] .carrusel-dot {

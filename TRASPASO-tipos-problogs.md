@@ -494,6 +494,18 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    (692 medidas). Lo que queda ahí son **grises que la paleta no tiene** (`#444`, `#333`, `#121212`,
    `#666`, `#555`, `#999`, `#aaa`, `#222`, `#262626`) y el blanco/negro deliberado del botón de ratio:
    **decisión de diseño** (ampliar la escala de grises o dejarlo), no migración.
+   **TANDA 3 (2026-10-04): la escala de grises, ampliada** (el usuario dio luz verde). Se añadieron tres
+   roles **con los valores que ya se veían** (cero cambio por construcción): `--color-border-soft`
+   (`#e5e5e5` claro / `#2a2a2a` oscuro), `--color-surface-deep` (`#121212`) y `--color-surface-raised`
+   (`#242424`). 9 declaraciones migradas en 5 hojas. **Y destapó un fallo real**: los cuatro bordes
+   `#e5e5e5` estaban en reglas **claras**, así que en modo oscuro quedaban **blancos brillantes**; la foto
+   lo midió (el borde del formulario de obra pasa de `rgb(229,229,229)` a `rgb(42,42,42)`: **6
+   diferencias, todas esa**). **Corrección de lo que yo mismo conté**: los «13 usos de `#888`» de
+   `chat.css` **no eran deuda** — ya eran `var(--color-text-muted, #888)`, el token con el gris viejo de
+   respaldo, y manda el token (4,74:1 sobre blanco). **La escala de la paleta NO está invertida sino
+   re-basada por rol** (en los dos temas 50 = superficie, 800 = tinta). Estado: 109 respaldos + 49
+   blanco/negro literales + **76 sueltos de paleta** (eran 85). Lo que queda en `formularios.css` (15) y
+   `chat.css` (15) son **grises intermedios** que piden decidir **cuántos pasos** tiene la escala.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

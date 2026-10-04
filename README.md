@@ -967,13 +967,36 @@ DIFERENCIAS en los dos temas** en las dos mitades de la tanda.
 exacto (`--color-bg`, `--color-gray-600` y `--color-neutral-soft` / `--color-neutral-on-soft`, que es
 justo el rol «texto sobre fondo suave neutro» que hacía falta). **Foto SIN DIFERENCIAS** (692 medidas).
 
-**Y lo que queda en `formularios.css` es una DECISIÓN, no una migración**: sus 18 sueltos son casi todos
-**grises que la paleta no tiene** (`#444` ×3, `#333` ×3, `#121212` ×2, `#666`, `#555`, `#999`, `#aaa`,
-`#222`, `#262626`), más el blanco/negro deliberado del botón de ratio (que es blanco con texto negro **en
-los dos temas**, y así está medido). O se amplía la escala de grises de la paleta, o esos valores se
-quedan: es una decisión de diseño, y por eso no se toca a ciegas. **Lo mismo en `chat.css`**: 13 de sus
-17 son `#888`, un gris apagado que la paleta **no tiene** (`--color-text-muted` vale `#737373` en claro y
-`#a3a3a3` en oscuro).
+**Tanda 3: la escala de grises, ampliada (9 declaraciones).** Aquí hacía falta **añadir a la paleta**,
+no solo mover valores, y se hizo **con los valores que ya se veían** (cero cambio por construcción):
+
+| Rol nuevo | Claro | Oscuro | Para qué |
+|---|---|---|---|
+| `--color-border-soft` | `#e5e5e5` | `#2a2a2a` | El borde claro del chat, el formulario, auth y modales |
+| `--color-surface-deep` | `#121212` | `#121212` | El fondo del carrusel, más profundo que la escala |
+| `--color-surface-raised` | `#242424` | `#242424` | Realce/hover sobre superficie oscura (filas del chat, tarjeta de Cavent) |
+
+**Y destapó un fallo real**: los cuatro bordes `#e5e5e5` estaban en reglas **claras**, así que en modo
+oscuro se quedaban **blancos brillantes**. La foto lo midió: el borde del formulario de obra pasa de
+`rgb(229,229,229)` a `rgb(42,42,42)` — **6 diferencias, todas esa**, en los dos anchos.
+
+**Una corrección importante de lo que yo mismo había contado**: dije que en `chat.css` había «13 usos de
+`#888`, un gris que la paleta no tiene». **Era falso.** Esos sitios ya eran `var(--color-text-muted,
+#888)`, o sea **el token con el gris viejo de respaldo**, y el token es el que manda (4,74:1 sobre
+blanco, pasa). Eran **respaldos, no deuda** — y el analizador nuevo lo confirma: no los lista entre los
+sueltos.
+
+**Estado de la campaña**: **109 respaldos** + **49 blanco/negro literales** + **76 sueltos de paleta**
+(eran 85): `chat.css` 15, `formularios.css` 15, `problogs.css` 13, `style.css` 12, `auth.css` 6,
+`header.css` 6, `panel-artista.css` 3, `galeria-publica.css` 2, `notificaciones.css` 2, `modales.css` 1,
+`search-results.css` 1.
+
+**Y lo que queda en `formularios.css` es una DECISIÓN, no una migración**: sus 15 sueltos son casi todos
+**grises intermedios que la escala no tiene** (`#444` ×3, `#333` ×3, `#666`, `#555`, `#999`, `#aaa`, `#222`,
+`#262626`), más el blanco/negro deliberado del botón de ratio (blanco con texto negro **en los dos
+temas**, y así está medido). La escala de la paleta **no está invertida sino re-basada por rol** (en los
+dos temas 50 es la superficie y 800 la tinta), así que añadir estos intermedios pide decidir **cuántos
+pasos** quiere tener la escala; o se quedan como están.
 
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 

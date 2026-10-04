@@ -217,7 +217,7 @@ body.teclado-abierto .chat-enviar-btn {
     border-top: 1px solid var(--color-gray-100, #eee);
 }
 [data-theme="dark"] .chat-pueblo-header:hover {
-    background: #242424;
+    background: var(--color-surface-raised);
 }
 [data-theme="dark"] .chat-pueblo-count {
     background: var(--color-gray-200);
@@ -581,7 +581,7 @@ body.teclado-abierto .chat-enviar-btn {
     color: var(--color-ink);
 }
 [data-theme="dark"] .chat-user-row:hover {
-    background: #242424;
+    background: var(--color-surface-raised);
 }
 [data-theme="dark"] .chat-pueblo-info-contador {
     background: var(--color-gray-200);
