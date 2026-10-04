@@ -106,10 +106,12 @@ const MOCK = `(() => {
 })();`;
 
 // La medida se hace EN LA PAGINA: el navegador es el unico que sabe el fondo efectivo.
-const MEDIR = (sel) => `(() => {
+const MEDIR = (sel, pseudo) => `(() => {
     const el = document.querySelector(${JSON.stringify(sel)});
     if (!el) return null;
-    const cs = getComputedStyle(el);
+    // El pseudo es opcional: sirve para medir el PLACEHOLDER de un campo (::placeholder), que es texto
+    // y tiene que leerse igual que el resto. Sin esto, ese color no lo miraba nadie.
+    const cs = getComputedStyle(el${pseudo ? `, ${JSON.stringify(pseudo)}` : ''});
     const aRgb = (t) => {
         const m = t.match(/rgba?\\(([^)]+)\\)/);
         if (!m) return null;
@@ -195,10 +197,33 @@ const VISTAS = [
             })()`);
             await ev(`document.getElementById('cavents-trigger')?.click()`);
             await esperar(`(() => { const it = document.querySelector('.cavent-item'); return !!it && it.getBoundingClientRect().height > 0; })()`);
+            // Se montan los ESTADOS de los campos que la vista de la foto ya monta: valores puestos y el
+            // campo de artista en solo-lectura. Hace falta porque el color del texto de un campo
+            // `:read-only` en modo oscuro estaba en 2.87:1 y aqui no se medía (no habia campo en ese
+            // estado). El de la foto es el mismo camino.
+            await ev(`(() => {
+                const poner = (sel, valor) => {
+                    const el = document.querySelector(sel);
+                    if (!el) return null;
+                    const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype
+                        : (el.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype);
+                    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, valor);
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    return true;
+                };
+                poner('#input-titulo', 'Obra de prueba');
+                poner('#input-precio', '100');
+                const artista = document.querySelector('#input-artista');
+                if (artista) artista.readOnly = true;
+            })()`);
+            await sleep(400);
         },
         pares: [
             ['.form-block .form-group label', 'etiqueta de campo (panel)'],
             ['#input-titulo', 'texto de un campo del panel'],
+            // El campo en SOLO-LECTURA y su PLACEHOLDER: los dos son texto y los dos estaban sin medir.
+            ['#input-artista', 'texto de un campo de solo lectura'],
+            ['#input-titulo', 'placeholder de un campo', '::placeholder'],
             ['.cavent-item-titulo', 'titulo de la tarjeta de Cavent'],
             ['.cavent-item-meta span', 'meta de la tarjeta (precio)'],
             ['.status-badge.status-activo', 'pildora de estado activo'],
@@ -268,8 +293,8 @@ for (const vista of VISTAS) {
         await evalJs(`(() => { try { localStorage.setItem('theme', '${tema}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${tema}'); })()`);
         await sleep(400);
         console.log(`\n--- ${vista.nombre} · tema ${tema}`);
-        for (const [sel, etiqueta] of vista.pares) {
-            const crudo = await evalJs(MEDIR(sel));
+        for (const [sel, etiqueta, pseudo] of vista.pares) {
+            const crudo = await evalJs(MEDIR(sel, pseudo));
             if (!crudo || typeof crudo !== 'string' || crudo[0] !== '{') { console.log(`  --    ${etiqueta}: no esta en esta vista`); continue; }
             const m = JSON.parse(crudo);
             // Un elemento con tamaño CERO no se pinta: su "fondo efectivo" seria el de un padre que

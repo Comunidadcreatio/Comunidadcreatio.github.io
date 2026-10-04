@@ -22,7 +22,10 @@ for (const [numStr, { valor, token }] of Object.entries(MAPA)) {
     const l = lineas[i];
     if (l === undefined) { saltadas.push(`${numStr}: la linea no existe`); continue; }
     if (!l.toLowerCase().includes(valor.toLowerCase())) { saltadas.push(`${numStr}: no contiene ${valor} -> ${l.trim().slice(0, 60)}`); continue; }
-    if (l.includes('var(--')) { saltadas.push(`${numStr}: ya tenia un token`); continue; }
+    // El guardian de "ya tenia un token" evita dobles migraciones... pero NO aplica cuando lo que se
+    // cambia es un token MAL ELEGIDO por otro (el 2026-10-04 aparecio uno: `--color-gray-300` como color
+    // de texto en una regla oscura, donde ese token es un gris OSCURO y el texto quedaba en 2.11:1).
+    if (l.includes('var(--') && !valor.toLowerCase().startsWith('var(')) { saltadas.push(`${numStr}: ya tenia un token`); continue; }
     // Solo se sustituye el valor por el token; el resto de la declaracion (y el `;`) no se toca.
     lineas[i] = l.replace(new RegExp(valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), `var(${token})`);
     cambios++;

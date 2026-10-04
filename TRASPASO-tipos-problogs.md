@@ -574,6 +574,21 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    mejora—; el umbral de ≤17 es para los **grises neutros**, donde un cambio visible no tiene ninguna
    justificación semántica. `style.css` baja de 6 a 2 sueltos (la amarilla del foco `#ffd166` y el divisor
    oscuro `#3a3a3a`: lista corta).
+   **TANDA 10 (2026-10-04) — `formularios.css`, y aquí estaba el fallo más gordo de toda la campaña.**
+   Dos colores de **texto** en el formulario de la obra:
+   - El **placeholder**: `var(--color-gray-300)` → `--color-text-muted`. Estaba **casi invisible en los
+     DOS temas**: en claro 1.48:1 (`#d4d4d4` sobre blanco) y en oscuro 2.23:1 (`#525252` sobre `#1a1a1a`).
+     Ahora 4.74:1 y 6.90:1.
+   - El texto del campo de **solo lectura** en oscuro: `#666` → `--color-text-muted` (2.87:1 → 5.27:1).
+   **La lección**: con la escala **re-basada por rol**, `gray-300` en oscuro es un gris de **borde**, no de
+   texto. Y como era un **token** (no un hex a mano), la caza de hexes **no lo habría encontrado nunca**:
+   salió de **medir contraste**. La foto midió el arreglo (16 diferencias, todas la buscada: el campo de
+   solo lectura en los dos anchos, con los bordes que siguen a `currentColor`). `formularios.css` baja de
+   5 a 4 sueltos (los `#444` ×3 y el `#888`: lista corta). `migrar-color.mjs` ahora también permite
+   **corregir un token mal elegido**, no solo migrar hexes.
+   **Y queda un cabo de instrumento**: la vista `auth` del foto **también** es inestable (2 valores de
+   `#main-content` inestables en esta medición), así que necesita la misma espera de geometría que se le
+   puso a `panel`.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

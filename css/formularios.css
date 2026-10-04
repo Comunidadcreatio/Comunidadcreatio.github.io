@@ -1278,11 +1278,11 @@ form,
 
 [data-theme="dark"] #obra-form .form-group input::placeholder,
 [data-theme="dark"] #obra-form .form-group textarea::placeholder {
-    color: var(--color-gray-300);
+    color: var(--color-text-muted);
 }
 
 [data-theme="dark"] #obra-form .form-group input:read-only {
-    color: #666;
+    color: var(--color-text-muted);
 }
 
 [data-theme="dark"] #obra-form .form-group select {

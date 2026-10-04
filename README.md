@@ -1038,12 +1038,28 @@ Queda **1 suelto**: `#333`, el extremo claro de un degradado en un hover (se mue
 oscura). Y el **corazón del like** (`fill`/`stroke: #ef4444`) pasa a `--color-danger`: en claro sube de
 3,76:1 a **4,83:1** (es un gráfico: mínimo 3) y en oscuro es **exacto**. **SIN DIFERENCIAS** (720 = 720).
 
-**Y queda afinada la regla de decisión de toda la campaña**, que es lo más reutilizable de esta tanda:
+**Tanda 10: `formularios.css`, y aquí estaba el fallo más gordo de toda la campaña.** Dos colores de
+**texto** del formulario de la obra:
 
-- Para los colores **semánticos** (`danger`, `success`, `warning`) la migración al rol es correcta
-  **aunque el salto de tono sea grande**: la paleta es la fuente de verdad y el contraste suele mejorar.
-- El umbral de **≤ 17** aplica a los **grises neutros**, donde un cambio visible no tiene ninguna
-  justificación semántica.
+| Qué | Antes | Contraste | Ahora | Contraste |
+|---|---|---|---|---|
+| **placeholder** (en claro) | `var(--color-gray-300)` = `#d4d4d4` | **1,48:1** ✗✗ | `--color-text-muted` | **4,74:1** ✔ |
+| **placeholder** (en oscuro) | `var(--color-gray-300)` = `#525252` | **2,23:1** ✗ | `--color-text-muted` | **6,90:1** ✔ |
+| texto del campo de **solo lectura** (en oscuro) | `#666` | **2,87:1** ✗ | `--color-text-muted` | **5,27:1** ✔ |
+
+El placeholder estaba **casi invisible en los dos temas**, y llevaba ahí sin que nadie lo mirara.
+
+**Y la lección es la más importante de la campaña**: con la escala **re-basada por rol**, `gray-300` en
+modo oscuro es un gris de **borde o superficie**, no de texto. Y como era un **token** —no un hex a
+mano—, **la caza de hexes no lo habría encontrado nunca**: salió de **medir contraste**. Una campaña de
+«quitar colores a mano» no basta; hace falta la medición al lado.
+
+La foto midió el arreglo (16 diferencias, todas la buscada) y `migrar-color.mjs` aprendió a **corregir un
+token mal elegido**, no solo a migrar hexes. `formularios.css` baja de 5 a 4 sueltos.
+
+**Queda un cabo de instrumento**: la vista `auth` del foto **también** es inestable (2 valores de
+`#main-content` salieron inestables en esa medición). Necesita la misma espera de geometría que se le puso
+a `panel`.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
