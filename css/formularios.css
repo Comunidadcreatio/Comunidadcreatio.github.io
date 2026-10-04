@@ -920,7 +920,7 @@ form,
 }
 
 [data-theme="dark"] #panel-artista #formulario-obra {
-    background-color: #0a0a0a;
+    background-color: var(--color-bg);
 }
 
 [data-theme="dark"] #formulario-obra h2 {
@@ -979,7 +979,7 @@ form,
 }
 
 [data-theme="dark"] #obra-progress-bar {
-    background: #0a0a0a;
+    background: var(--color-bg);
 }
 
 [data-theme="dark"] #obra-progress-bar .form-progress-row #form-progress-percentage {
@@ -1032,7 +1032,7 @@ form,
 }
 
 [data-theme="dark"] .form-section {
-    border-color: #e5e5e5;
+    border-color: var(--color-gray-600);
 }
 
 [data-theme="dark"] .form-section h3 {
@@ -1246,7 +1246,7 @@ form,
 }
 
 [data-theme="dark"] #obra-form .form-group select option {
-    background: #1a1a1a;
+    background: var(--color-neutral-soft);
     color: var(--color-ink);
 }
 
@@ -1758,7 +1758,7 @@ body.creando-problogs #crear-problogs-contenido {
 
 /* Dark mode */
 [data-theme="dark"] .cavents-trigger {
-    background: #0a0a0a;
+    background: var(--color-bg);
     border-color: #333;
     color: var(--color-ink);
 }
@@ -1773,15 +1773,15 @@ body.creando-problogs #crear-problogs-contenido {
 }
 
 [data-theme="dark"] .cavent-item:hover {
-    background: #1a1a1a;
+    background: var(--color-neutral-soft);
 }
 
 [data-theme="dark"] .cavent-item-meta {
-    color: #888;
+    color: var(--color-neutral-on-soft);
 }
 
 [data-theme="dark"] .cavent-item-actions button {
-    background: #1a1a1a;
+    background: var(--color-neutral-soft);
     border-color: #333;
     color: #aaa;
 }

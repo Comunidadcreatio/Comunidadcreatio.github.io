@@ -936,37 +936,44 @@ una medida del navegador**, y se dice: las otras cuatro secciones sí miden en e
 resultados de búsqueda), así que la provocación vino sola: **falló con ellos y ahora pasa** (15/15).
 Hay **15 imágenes de Cloudinary en plantillas** y todas llevan `srcset`.
 
-## La campaña de los colores a mano (tanda 1: `chat.css`)
+## La campaña de los colores a mano (tandas 1 y 2)
 
-**Cuánto queda de verdad**: al contar los hex «a mano» hay que separar dos cosas, y la primera versión de
-este número las mezclaba:
+**Cuánto queda de verdad**: al contar los hex «a mano» hay que separar **tres** cosas, y las dos primeras
+versiones de este número las mezclaban:
 
-- **109 son RESPALDO** dentro de `var(--color-x, #hex)`. Eso **no es deuda**: es una red de seguridad
-  deliberada. (En `chat.css` había 74, y por eso la primera cuenta daba un tamaño falso.)
-- **142 son valores SUELTOS** (lo que la campaña va a por ellos): `formularios.css` 36, `chat.css` 30,
-  `style.css` 24, `problogs.css` 14, `galeria-publica.css` 10, `header.css` 10, `auth.css` 8,
-  `panel-artista.css` 5, `notificaciones.css` 2, `modales.css` 2, `search-results.css` 1.
+| | cuántos | qué es |
+|---|---|---|
+| **Respaldos** `var(--color-x, #hex)` | **109** | Red de seguridad deliberada. **No es deuda.** (En `chat.css` había 74, y por eso el primer número daba un tamaño falso.) |
+| **Blanco y negro literales** | **49** | **Tampoco es deuda**, y esto es importante: `--color-white` y `--color-black` son tokens de **superficie** y **se invierten** en modo oscuro (`--color-white` vale `#0a0a0a` ahí). Cambiar el `#fff` de un texto por el token pondría el texto **negro sobre un fondo sólido**. |
+| **Sueltos de paleta** | **85** | **Estos** son la campaña: `formularios.css` 18, `chat.css` 17, `style.css` 14, `problogs.css` 13, `auth.css` 7, `header.css` 6, `panel-artista.css` 3, `galeria-publica.css` 2, `modales.css` 2, `notificaciones.css` 2, `search-results.css` 1. |
 
-**Dos herramientas nuevas** (el método, con la lección del incidente de `importantes-lote.mjs --linea`
-incorporada):
+**Tres herramientas** (el método, con la lección del incidente de `importantes-lote.mjs --linea` dentro):
 
-- **`contar-color-a-mano.mjs`**: cuenta respaldos y sueltos por hoja (sin argumento, todas), y con hoja
-  dice además el detalle por valor.
+- **`analizar-color.mjs`**: para cada hex suelto de una hoja dice su **línea**, su **propiedad**, si está
+  en una regla **clara u oscura** y si el valor **coincide exactamente** con algún token de la paleta. Es
+  el primer paso de cada tanda: lo que coincide exacto se migra sin cambio; lo que no, necesita medición.
+- **`contar-color-a-mano.mjs`**: cuenta respaldos, blanco/negro y sueltos de paleta por hoja (sin
+  argumento, todas).
 - **`migrar-color.mjs`**: migra **una** tanda, **por línea** y con el token escrito a mano en un mapa
   JSON. **No adivina**: si la línea no tiene el valor esperado —o ya lleva un token— **aborta sin
   escribir nada**. Después, siempre: foto antes/después (**debe dar SIN DIFERENCIAS**) y la suite.
 
-**Tanda 1, hecha: `chat.css` (28 declaraciones).** Primero las **reglas de modo oscuro** (25 valores) a
-sus tokens **oscuros exactos** — cambio cero **por construcción**, porque el token vale en oscuro justo
-lo que valía el hex. Después las claras que tenían token exacto en claro (3). **La foto dio SIN
-DIFERENCIAS en los dos temas** en las dos mitades de la tanda, que es la prueba de que sobraban los
-hex (las reglas oscuras ya cubrían esos elementos, así que hacerlas sensibles al tema no movió nada).
+**Tanda 1: `chat.css` (28 declaraciones).** Primero las **reglas de modo oscuro** (25 valores) a sus
+tokens **oscuros exactos** — cambio cero **por construcción**, porque el token vale en oscuro justo lo
+que valía el hex. Después las claras que tenían token exacto en claro (3). **La foto dio SIN
+DIFERENCIAS en los dos temas** en las dos mitades de la tanda.
 
-**Lo que queda en `chat.css`** son 30 sueltos, y son **decisiones, no migraciones**: 13 son `#fff`
-(texto blanco sobre colores sólidos, o sea territorio de los roles `solid`), 13 son `#888` (un gris
-apagado que **la paleta no tiene**: `--color-text-muted` vale `#737373` en claro y `#a3a3a3` en oscuro,
-no `#888`), y el resto sueltos (`#e5e5e5` de bordes, `#e53935`, `#242424`…). Eso va en la tanda
-siguiente, con la medición de contraste delante.
+**Tanda 2: `formularios.css` (8 declaraciones).** El mismo patrón: las reglas oscuras con token oscuro
+exacto (`--color-bg`, `--color-gray-600` y `--color-neutral-soft` / `--color-neutral-on-soft`, que es
+justo el rol «texto sobre fondo suave neutro» que hacía falta). **Foto SIN DIFERENCIAS** (692 medidas).
+
+**Y lo que queda en `formularios.css` es una DECISIÓN, no una migración**: sus 18 sueltos son casi todos
+**grises que la paleta no tiene** (`#444` ×3, `#333` ×3, `#121212` ×2, `#666`, `#555`, `#999`, `#aaa`,
+`#222`, `#262626`), más el blanco/negro deliberado del botón de ratio (que es blanco con texto negro **en
+los dos temas**, y así está medido). O se amplía la escala de grises de la paleta, o esos valores se
+quedan: es una decisión de diseño, y por eso no se toca a ciegas. **Lo mismo en `chat.css`**: 13 de sus
+17 son `#888`, un gris apagado que la paleta **no tiene** (`--color-text-muted` vale `#737373` en claro y
+`#a3a3a3` en oscuro).
 
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
@@ -1196,7 +1203,8 @@ resultado.
 | scripts/quitar-important.mjs | Quita el `!important` de las reglas que casen con un `--selector`, sin reestructurar nada (solo cambia el cuerpo de esas reglas). Aborta si cambiarían las llaves |
 | scripts/auditar-capas.mjs | Lista las reglas SIN capa que pueden ganarle a las capadas (etiquetas solas y familias). Detecta selectores repartidos en varias líneas |
 | scripts/migrar-color.mjs | **Migra UNA tanda de color a tokens, por línea y con el token escrito a mano** (mapa JSON). Aborta sin escribir nada si la línea no tiene el valor esperado |
-| scripts/contar-color-a-mano.mjs | Cuántos colores a mano quedan, **separando los respaldos** (`var(--color-x, #hex)`, que no son deuda) de los **sueltos** (que son la campaña). Sin argumento recorre todas las hojas |
+| scripts/analizar-color.mjs | Para cada color a mano de una hoja: línea, propiedad, si la regla es clara u oscura, y si el valor **coincide exactamente** con un token (primer paso de cada tanda) |
+| scripts/contar-color-a-mano.mjs | Cuántos colores a mano quedan, separando **respaldos** (`var(--color-x, #hex)`), **blanco/negro literales** y **sueltos de paleta** (que son la campaña). Sin argumento recorre todas las hojas |
 | scripts/verificar-todo.mjs | **Corre TODOS los verificadores** (los que empiecen por `verificar-`, menos él mismo) y saca el resumen. Es el comando que hay que usar antes de publicar: ver abajo |
 | scripts/verificar-*.mjs | Verificadores de comportamiento y contraste (Chrome headless vía CDP) |
 | scripts/verificar-estados-inputs-auth.mjs | Los estados de los campos de auth (`:invalid`, `:valid`, `.input-error`) en los dos temas: lo que la foto de estilos **no** puede ver (solo mide los campos vacíos) |

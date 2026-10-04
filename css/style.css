@@ -38,7 +38,7 @@
 @import url('modales.css?v=cda8f6e1f8');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=6a4fb8920a');
+@import url('formularios.css?v=cc598a1a66');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)

@@ -483,6 +483,17 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    `formularios.css` 36, `chat.css` 30, `style.css` 24, `problogs.css` 14, `galeria-publica.css` 10,
    `header.css` 10, `auth.css` 8, `panel-artista.css` 5, `notificaciones.css` 2, `modales.css` 2,
    `search-results.css` 1.
+   **CORREGIDO Y AMPLIADO (2026-10-03, tanda 2)**: el número bueno separa **tres** cosas: **109
+   respaldos** (`var(--color-x, #hex)`, no son deuda), **49 blanco/negro literales** (**tampoco**:
+   `--color-white`/`--color-black` son tokens de **superficie** y **se invierten** en oscuro, así que
+   cambiar un `#fff` de texto por el token pondría el texto negro sobre un fondo sólido) y **85 sueltos
+   de paleta**, que son la campaña de verdad. Herramienta nueva: `analizar-color.mjs` (línea, propiedad,
+   contexto claro/oscuro y si el valor coincide exacto con un token). **Tanda 2 hecha**:
+   `formularios.css`, 8 declaraciones (reglas oscuras con token oscuro exacto: `--color-bg`,
+   `--color-gray-600`, `--color-neutral-soft` y `--color-neutral-on-soft`) → **foto SIN DIFERENCIAS**
+   (692 medidas). Lo que queda ahí son **grises que la paleta no tiene** (`#444`, `#333`, `#121212`,
+   `#666`, `#555`, `#999`, `#aaa`, `#222`, `#262626`) y el blanco/negro deliberado del botón de ratio:
+   **decisión de diseño** (ampliar la escala de grises o dejarlo), no migración.
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se
