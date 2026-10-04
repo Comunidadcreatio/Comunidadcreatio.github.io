@@ -563,6 +563,17 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    que son deuda. Queda **1 suelto** (`#333`, el extremo claro de un degradado en un hover: se mueve 23, o
    sea a la lista corta). **Serie completa: 109 respaldos | 44 blanco/negro | 5 deliberados | 30 SUELTOS
    DE PALETA.** Foto SIN DIFERENCIAS (720 = 720, el cambio era un comentario).
+   **TANDA 9 (2026-10-04) — `style.css` (4 declaraciones).** Los dos `#1a1a1a` (el anillo de foco y el
+   texto del botón «Comprar» en hover) son `--color-ink` **exacto** en claro → migración de **cambio
+   cero** (en oscuro los pisa una regla oscura, así que tampoco se mueve nada). Y el **corazón del like**
+   (`fill`/`stroke: #ef4444`) pasa a `--color-danger`: en claro sube de 3.76:1 a **4.83:1** (es un
+   gráfico: mínimo 3) y en oscuro es **exacto**. **Foto SIN DIFERENCIAS** (720 = 720; el corazón no se
+   pinta en el estado medido porque el mock va con `liked: false`, así que ese va verificado con números).
+   **Y queda afinada la regla de decisión**: para los roles **semánticos** (danger/success/warning) la
+   migración es correcta **aunque el salto sea grande** —la paleta es la fuente de verdad y el contraste
+   mejora—; el umbral de ≤17 es para los **grises neutros**, donde un cambio visible no tiene ninguna
+   justificación semántica. `style.css` baja de 6 a 2 sueltos (la amarilla del foco `#ffd166` y el divisor
+   oscuro `#3a3a3a`: lista corta).
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se

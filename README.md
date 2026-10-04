@@ -1033,9 +1033,17 @@ arcoíris:
 
 Queda **1 suelto**: `#333`, el extremo claro de un degradado en un hover (se mueve 23 → lista corta).
 
-**Y el contador tiene ya cuatro categorías honestas**: respaldos (109), blanco/negro literales (44, que
-no son deuda porque los tokens de superficie **se invierten** en oscuro), **deliberados** (5) y **sueltos
-de paleta (30)**, que es lo que la campaña persigue.
+**Tanda 9: `style.css` (4 declaraciones).** Los dos `#1a1a1a` (el anillo de foco y el texto del botón
+«Comprar» en hover) son `--color-ink` **exacto** en claro → **cambio cero** (en oscuro los pisa una regla
+oscura). Y el **corazón del like** (`fill`/`stroke: #ef4444`) pasa a `--color-danger`: en claro sube de
+3,76:1 a **4,83:1** (es un gráfico: mínimo 3) y en oscuro es **exacto**. **SIN DIFERENCIAS** (720 = 720).
+
+**Y queda afinada la regla de decisión de toda la campaña**, que es lo más reutilizable de esta tanda:
+
+- Para los colores **semánticos** (`danger`, `success`, `warning`) la migración al rol es correcta
+  **aunque el salto de tono sea grande**: la paleta es la fuente de verdad y el contraste suele mejorar.
+- El umbral de **≤ 17** aplica a los **grises neutros**, donde un cambio visible no tiene ninguna
+  justificación semántica.
 
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla

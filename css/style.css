@@ -73,7 +73,7 @@
            contraste 1 (invisible) y un anillo amarillo sobre un enlace amarillo, 1,3. Con
            dos colores opuestos, sobre cualquier elemento y cualquier fondo hay uno de los
            dos que se ve. */
-        outline: 3px solid #1a1a1a !important;   /* anillo interior (oscuro) */
+        outline: 3px solid var(--color-ink) !important;   /* anillo interior (oscuro) */
         outline-offset: 0 !important;
         box-shadow: 0 0 0 6px #ffd166 !important; /* anillo exterior (claro) */
     }
@@ -1154,7 +1154,7 @@
 }
 .btn-accion-comprar:hover {
     background: var(--color-gold-fill);
-    color: #1a1a1a;
+    color: var(--color-ink);
     box-shadow: 0 4px 14px rgba(245, 197, 66, 0.4);
 }
 .btn-accion-notificar {
@@ -1213,8 +1213,8 @@
 [data-theme="dark"] .btn-accion-artista:hover { background: var(--color-artist-solid); color: #fff; }
 /* Like animado */
 .metrica-like.liked svg {
-    fill: #ef4444;
-    stroke: #ef4444;
+    fill: var(--color-danger);
+    stroke: var(--color-danger);
     animation: like-pop 0.35s ease;
 }
 @keyframes like-pop {
