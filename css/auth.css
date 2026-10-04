@@ -268,7 +268,7 @@ legend {
     display: flex;
     align-items: center;
     margin: 16px 0;
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
     font-size: 13px;
     font-weight: 600;
 }
@@ -461,7 +461,7 @@ select.input-error,
 .reg-step-label {
     font-size: 11px;
     font-weight: 600;
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 4px;
@@ -595,7 +595,7 @@ select.input-error,
     padding: 8px 12px 4px;
     font-size: 11px;
     font-weight: 700;
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
@@ -654,7 +654,7 @@ select.input-error,
 }
 
 [data-theme="dark"] .custom-select-group {
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
 }
 
 /* ==============================================
@@ -889,7 +889,7 @@ button[type="submit"]:not(.nav-btn):active,
     content: '○';
     position: absolute;
     left: 0;
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
     font-size: 12px;
     transition: color 0.3s ease, content 0.3s ease;
 }
@@ -1110,13 +1110,13 @@ button[type="submit"]:not(.nav-btn):active,
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    color: var(--color-gray-500);
+    color: var(--color-gray-600);
     flex-wrap: wrap;
     margin-bottom: 8px;
 }
 
 .auth-footer-links a {
-    color: var(--color-gray-500);
+    color: var(--color-gray-600);
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -1128,7 +1128,7 @@ button[type="submit"]:not(.nav-btn):active,
 .auth-footer-bottom {
     text-align: center;
     font-size: 11px;
-    color: var(--color-gray-400);
+    color: var(--color-gray-600);
     display: flex;
     justify-content: center;
     gap: 6px;
@@ -1442,7 +1442,7 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 [data-theme="dark"] .auth-footer-links a {
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
 }
 
 [data-theme="dark"] .auth-section h1 {
@@ -1472,7 +1472,7 @@ button[type="submit"]:not(.nav-btn):active,
 }
 
 [data-theme="dark"] .form-group input::placeholder {
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
 }
 
 /* OJO con el segundo selector: `.nav-btn` a secas tambien pilla al boton de VOLVER

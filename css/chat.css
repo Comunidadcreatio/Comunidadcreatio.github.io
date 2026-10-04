@@ -309,7 +309,11 @@ body.teclado-abierto .chat-enviar-btn {
     border-radius: 50%;
     object-fit: cover;
     background: var(--color-gray-200, #e0e0e0);
-    color: #fff;
+    /* La INICIAL de un usuario sin foto iba en BLANCO sobre este gris claro: 1.23:1, invisible en tema
+       claro. Con el rol `--color-gray-600` se lee en los dos temas (claro #525252 sobre #e8e8e8 = 5.9:1
+       y oscuro #e5e5e5 sobre #2a2a2a = 10.4:1): la escala haciendo su trabajo. Lo encontró el BARRIDO de
+       contraste, no un verificador: nadie lo estaba mirando. */
+    color: var(--color-gray-600);
     display: flex;
     align-items: center;
     justify-content: center;

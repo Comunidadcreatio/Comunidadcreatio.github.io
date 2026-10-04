@@ -28,7 +28,7 @@
 @import url('galeria-publica.css?v=7311900c41');
 
 /* Chat global + privado */
-@import url('chat.css?v=3dc8fd40b8');
+@import url('chat.css?v=4f9d97eb73');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -38,7 +38,7 @@
 @import url('modales.css?v=7c0627d4e2');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=e8ebeb4683');
+@import url('formularios.css?v=35790a52ac');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)

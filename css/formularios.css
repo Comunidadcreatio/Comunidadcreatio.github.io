@@ -1709,7 +1709,7 @@ body.creando-problogs #crear-problogs-contenido {
 .cavent-item-num {
     font-size: 10px;
     font-weight: 700;
-    color: var(--color-gray-400);
+    color: var(--color-text-muted);
     min-width: 22px;
     text-align: left;
     flex-shrink: 0;

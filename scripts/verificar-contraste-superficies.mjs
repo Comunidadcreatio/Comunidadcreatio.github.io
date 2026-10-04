@@ -118,15 +118,34 @@ const MEDIR = (sel, pseudo) => `(() => {
         const p = m[1].split(',').map((x) => parseFloat(x));
         return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
     };
-    let fondo = null, nodo = el, imagen = false;
+    // Se sube por los ancestros APILANDO las capas de fondo y se COMPONEN (alfa sobre alfa) hasta la
+    // primera opaca. Antes se tomaba la primera con alfa > 0.05 y se ignoraba su alfa: un fondo
+    // rgba(255, 255, 255, 0.06) se leia como BLANCO PURO y salia un "blanco sobre blanco" que no
+    // existe (falso positivo cazado el 2026-10-04 con el boton de volver a la landing).
+    const capas = [];
+    let nodo = el, imagen = false;
     while (nodo && nodo !== document.documentElement.parentNode) {
         const csNodo = getComputedStyle(nodo);
         const c = aRgb(csNodo.backgroundColor);
-        if (c && c.a > 0.05) { fondo = c; break; }
+        if (c && c.a > 0) { capas.push(c); if (c.a >= 0.999) break; }
         if (csNodo.backgroundImage && csNodo.backgroundImage !== 'none') imagen = true;
         nodo = nodo.parentElement;
     }
-    // SI NO HAY FONDO PINTADO, NO SE INVENTA UNO. Esta app no pinta un color de fondo: detras hay un
+    let fondo = null;
+    const base = capas[capas.length - 1];
+    if (base && base.a >= 0.999) {
+        let comp = { r: base.r, g: base.g, b: base.b };
+        for (let i = capas.length - 2; i >= 0; i--) {
+            const t = capas[i];
+            comp = {
+                r: t.r * t.a + comp.r * (1 - t.a),
+                g: t.g * t.a + comp.g * (1 - t.a),
+                b: t.b * t.a + comp.b * (1 - t.a)
+            };
+        }
+        fondo = { r: Math.round(comp.r), g: Math.round(comp.g), b: Math.round(comp.b), a: 1 };
+    }
+    // SI NO HAY FONDO OPACO, NO SE INVENTA UNO. Esta app no pinta un color de fondo: detras hay un
     // SLIDESHOW de imagenes (body transparente a proposito). Suponer blanco daba un "blanco sobre
     // blanco" que no existe (paso el 2026-10-02 con el chat en modo oscuro). Si hay imagen, el
     // contraste NO es medible por este metodo y se dice.
@@ -165,12 +184,36 @@ const BARRIDO = `(() => {
         if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.1) continue;
         const c = aRgb(cs.color); if (!c) continue;
         let fondo = null, nodo = el, imagen = false;
+        // Se recorre la cadena de ancestros apilando las capas y se COMPONEN (alfa sobre alfa) hasta la
+        // primera opaca, igual que en MEDIR: sin componer, un fondo translucido se lee como si fuera
+        // solido y salen falsos positivos. La lista de capas es ademas el diagnostico de quien pinta.
+        const cadena = [];
+        const capas = [];
         while (nodo && nodo !== document.documentElement.parentNode) {
             const csN = getComputedStyle(nodo);
             const bg = aRgb(csN.backgroundColor);
-            if (bg && bg.a > 0.05) { fondo = bg; break; }
+            if (bg && bg.a > 0) {
+                capas.push(bg);
+                const nom = nodo.tagName.toLowerCase() + (nodo.id ? '#' + nodo.id : '')
+                    + (typeof nodo.className === 'string' && nodo.className.trim() ? '.' + nodo.className.trim().split(/\\s+/)[0] : '');
+                cadena.push(nom + ' = ' + csN.backgroundColor);
+                if (bg.a >= 0.999) break;
+            }
             if (csN.backgroundImage && csN.backgroundImage !== 'none') imagen = true;
             nodo = nodo.parentElement;
+        }
+        const base = capas[capas.length - 1];
+        if (base && base.a >= 0.999) {
+            let comp = { r: base.r, g: base.g, b: base.b };
+            for (let i = capas.length - 2; i >= 0; i--) {
+                const t = capas[i];
+                comp = {
+                    r: t.r * t.a + comp.r * (1 - t.a),
+                    g: t.g * t.a + comp.g * (1 - t.a),
+                    b: t.b * t.a + comp.b * (1 - t.a)
+                };
+            }
+            fondo = { r: Math.round(comp.r), g: Math.round(comp.g), b: Math.round(comp.b) };
         }
         if (!fondo || imagen) continue;
         const ratio = contraste([c.r, c.g, c.b], [fondo.r, fondo.g, fondo.b]);
@@ -179,7 +222,7 @@ const BARRIDO = `(() => {
         if (ratio >= minimo) continue;
         const nombre = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '')
             + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
-        out.push({ sel: nombre, texto: propio.slice(0, 34), ratio: +ratio.toFixed(2), minimo, color: cs.color, fondo: 'rgb(' + fondo.r + ', ' + fondo.g + ', ' + fondo.b + ')', px, peso });
+        out.push({ sel: nombre, texto: propio.slice(0, 34), ratio: +ratio.toFixed(2), minimo, color: cs.color, fondo: 'rgb(' + fondo.r + ', ' + fondo.g + ', ' + fondo.b + ')', px, peso, cadena });
     }
     out.sort((a, b) => a.ratio - b.ratio);
     return JSON.stringify(out.slice(0, 40));
@@ -312,14 +355,14 @@ for (const vista of VISTAS) {
     for (let i = 0; i < 60; i++) {
         const ruta = String(await evalJs(`location.pathname`));
         if (ruta.endsWith(esperada) || ruta.endsWith('/')) break;
-        await sleep(300);
+        await sleep(800);
     }
-    for (let i = 0; i < 60; i++) { if (await evalJs(vista.esperar) === true) break; await sleep(300); }
+    for (let i = 0; i < 60; i++) { if (await evalJs(vista.esperar) === true) break; await sleep(800); }
     await sleep(1500);
     // Ayudantes: `ev` evalua, `esperar` insiste hasta que la condicion se cumple (o se agota).
     const prepararConEspera = async () => {
         const esperar = async (expr, intentos = 25) => {
-            for (let i = 0; i < intentos; i++) { if (await evalJs(expr) === true) return true; await sleep(300); }
+            for (let i = 0; i < intentos; i++) { if (await evalJs(expr) === true) return true; await sleep(800); }
             return false;
         };
         await vista.preparar(evalJs, esperar);
@@ -424,6 +467,8 @@ if (args.includes('--barrido')) {
     if (!barridos.length) console.log('   ningun texto por debajo del minimo');
     for (const f of barridos.slice(0, 30)) {
         console.log(`   ${String(f.ratio).padStart(5)}:1 (min ${f.minimo}) · ${f.vista}/${f.tema} · ${f.sel} · "${f.texto}" · ${f.color} sobre ${f.fondo} · ${f.px}px/${f.peso}`);
+        // La CADENA de ancestros que pintan fondo: es el diagnostico de "quien pinta esto".
+        if (f.cadena?.length) console.log(`          pinta: ${f.cadena.slice(0, 4).join('  <-  ')}`);
     }
     console.log(`   TOTAL: ${barridos.length} textos por debajo del minimo (revisar a mano: puede haber deshabilitados, decorativos o sobre imagen)`);
 }
@@ -436,7 +481,7 @@ console.log('\n--- contrato de los roles solidos (blanco encima >= 4.5:1)');
 const ROLES_SOLIDOS = ['--color-success-solid', '--color-danger-solid', '--color-info-solid', '--color-teal-solid'];
 for (const tema of ['light', 'dark']) {
     await evalJs(`(() => { try { localStorage.setItem('theme', '${tema}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${tema}'); })()`);
-    await sleep(300);
+    await sleep(800);
     for (const rol of ROLES_SOLIDOS) {
         const valor = await evalJs(`(() => {
             const sonda = document.createElement('span');
@@ -467,7 +512,7 @@ const leerRol = async (rol) => evalJs(`(() => {
 })()`);
 for (const tema of ['light', 'dark']) {
     await evalJs(`(() => { try { localStorage.setItem('theme', '${tema}'); } catch (_) {} document.documentElement.setAttribute('data-theme', '${tema}'); })()`);
-    await sleep(300);
+    await sleep(800);
     const fondo = await leerRol('--color-gray-100');
     for (const rol of ROLES_TINTE) {
         const valor = await leerRol(rol);

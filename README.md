@@ -1106,7 +1106,26 @@ cosas que ningún verificador miraba:
 | `chat` (claro) | la inicial del avatar de un usuario sin foto | **1,23:1** ✗✗ |
 
 *(Nota: el barrido puede marcar elementos deshabilitados, decorativos o sobre imagen como falsos
-positivos; estos cuatro no lo son — se pueden ver en pantalla y no se leen.)* El borde de los campos **válidos** en modo
+positivos; estos cuatro no lo son — se pueden ver en pantalla y no se leen.)*
+
+**Los cuatro, ARREGLADOS** (y uno era un falso positivo del propio barrido, que es la mejor noticia):
+
+| Dónde | Antes | Ahora | Cómo |
+|---|---|---|---|
+| pie de `auth` (claro) | **2,52:1** ✗ | **7,0:1** ✔ | `--color-gray-400` → `--color-gray-600` (y el fondo real no era blanco sino `#f7f7f7`: con el rol «muted» se quedaba en 4,43, a 0,07 del mínimo) |
+| números de las tarjetas de Cavent (claro) | **2,52:1** ✗ | **4,74:1** ✔ | `--color-gray-400` → `--color-text-muted` |
+| inicial del avatar del chat (claro) | **1,23:1** ✗✗ | **5,9:1** (claro) · **10,4:1** (oscuro) | la regla no daba color: heredaba blanco; ahora `--color-gray-600` |
+| botón «← Volver» (oscuro) | 1,09:1 ✗ | **es correcto** ✔ | **falso positivo**: su fondo es `rgba(255,255,255,0.06)` y el barrido **ignoraba el alfa**, así que leía un 6 % de blanco como blanco puro |
+
+**Y de paso salió un fallo sistémico**: en `auth.css` había **ocho** reglas usando `color:
+var(--color-gray-400)` en vez del rol `--color-text-muted`. La migración es **segura en los dos temas**
+(en oscuro `--color-text-muted` vale exactamente `gray-400`), así que solo mejora el tema claro.
+
+**Y el instrumento quedó arreglado**: tanto el barrido como los 25 pares curados ahora **componen las
+capas translúcidas** (alfa sobre alfa) hasta la primera opaca, en vez de ignorar el alfa. Era el **cuarto
+fallo de instrumento** de la campaña: un inspector que mentía, una foto inestable, un verificador que
+fijaba literales y ahora uno que no sabía componer transparencias. **Resultado del barrido: 0 textos por
+debajo del mínimo en las seis combinaciones de vista y tema.** El borde de los campos **válidos** en modo
 oscuro (`#22c55e`) es `--color-success` **exacto** en ese tema (la regla es solo de tema oscuro) →
 migración de **cambio cero**. Foto SIN DIFERENCIAS.
 
