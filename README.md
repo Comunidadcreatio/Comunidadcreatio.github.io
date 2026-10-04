@@ -1061,6 +1061,16 @@ token mal elegido**, no solo a migrar hexes. `formularios.css` baja de 5 a 4 sue
 `#main-content` salieron inestables en esa medición). Necesita la misma espera de geometría que se le puso
 a `panel`.
 
+**Tanda 11: `panel-artista.css` (3 declaraciones), y la hoja queda a CERO.** Su deuda era el **indicador
+de presencia** del perfil: `#9ca3af` ×2 (apagado) → `--color-gray-400`, y `#22c55e` (en línea) →
+`--color-success` — el mismo caso que los puntos del chat, donde en claro el token vale `#16a34a` y eso
+**mejora** el gráfico de 2,28:1 a 3,30:1, mientras que en oscuro es exacto. Foto con **4 diferencias,
+todas la buscada**; la variante «en línea» va verificada con números porque el fixture está desconectado.
+
+**Y el servidor local se cayó otra vez** (sexta vez en la campaña) justo al empezar la tanda: el
+**preflight abortó las dos fotos** y hubo que levantarlo y repetirlas. Es exactamente lo que debe pasar:
+mejor abortar que medir una página de error y creérsela.
+
 **Tanda 4: la escala se queda en 9 pasos y los intermedios se ACERCAN (30 declaraciones).** En vez de
 añadir escalones, cada gris intermedio va al **paso más próximo** de su tema. Se hizo con una tabla
 previa que dice, por línea, **a qué paso va y cuánto se mueve** (`acercar-grises.mjs`), y se aplicó solo

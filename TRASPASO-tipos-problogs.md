@@ -589,6 +589,15 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    **Y queda un cabo de instrumento**: la vista `auth` del foto **también** es inestable (2 valores de
    `#main-content` inestables en esta medición), así que necesita la misma espera de geometría que se le
    puso a `panel`.
+   **TANDA 11 (2026-10-04) — `panel-artista.css` (3 declaraciones).** Su deuda era el **indicador de
+   presencia** del perfil: `#9ca3af` ×2 (apagado) → `--color-gray-400`, y `#22c55e` (en línea) →
+   `--color-success` (el mismo caso que los puntos del chat: en claro el token vale `#16a34a`, que
+   **mejora** el gráfico de 2.28:1 a 3.30:1, y en oscuro es exacto). **La hoja queda a CERO sueltos.**
+   Foto con **4 diferencias, todas la buscada** (el gris del indicador, dos temas y dos anchos); la
+   variante «en línea» va verificada con números porque el fixture del perfil está desconectado.
+   **Campaña: 22 sueltos.** Y el servidor local se cayó **otra vez** (sexta) al empezar la tanda: el
+   preflight abortó las dos fotos, se levantó y se repitieron — que es exactamente lo que debe pasar
+   (mejor abortar que medir una página de error).
 4. **`srcset`/`sizes` (front C)**: HECHO (2026-10-03). Casi todo estaba ya en pie (`utils.js` tiene
    `cloudinaryUrl` y `srcsetCloudinary`, y los usan galería, chat, comentarios, búsqueda y perfil, con
    14 comprobaciones que lo vigilaban): **la nota de aquí estaba vieja**. Los huecos que sí había, y se
