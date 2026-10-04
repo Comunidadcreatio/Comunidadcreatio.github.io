@@ -1507,6 +1507,22 @@ vista de comentarios está pendiente de añadir ahí.
 **El cronómetro está puesto**: la suite imprime el tiempo de cada verificador, el total y los 5 más lentos,
 para que la próxima vez no haya que suponerlo.
 
+**Y ya se ha cobrado la primera pieza: `verificar-comentarios-problog.mjs`, de 43,2 s a 8,9 s** (el que más
+esperaba de toda la suite: 25 `sleep()` que sumaban 33,2 s). Sus esperas se convirtieron en **condiciones
+reales** (la tarjeta del feed con su botón, el comentario publicado en la lista, la barra de responder
+asentada, la respuesta anidada, el «me gusta» marcado…), y quedan **1,8 s** de reloj en 6 esperas. Tres
+corridas seguidas: **92/92, cero avisos**.
+
+Dos cosas que aprendí convirtiéndolo, y que valen para los demás:
+
+1. **Para el layout, no basta esperar un elemento: hay que esperar a que su caja se asiente** (dos lecturas
+   seguidas iguales). Es lo que hacen `esperarCaja()` y la propia foto del panel.
+2. **Y hay clics que se pierden**: la app arranca por módulos, así que un botón puede existir con su caja
+   **antes** de tener su `listener`. Al convertir la espera del perfil, la espera pasiva no bastaba (el
+   clic se perdía) mientras que los 3,5 s de reloj de antes lo tapaban. La solución no es dormir más: es
+   **pulsar y comprobar el efecto, repitiendo el clic** (`pulsarHasta()`). Un fallo que la espera destapó y
+   que el `sleep` escondía.
+
 ### Los recursos que se sirven en cada página, vigilados
 
 `verificar-recursos-servidos.mjs` (dentro de la suite) descubre **todas** las páginas HTML de la raíz —no

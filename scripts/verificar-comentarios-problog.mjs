@@ -112,13 +112,54 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
 });
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
-await sleep(1500);
+await esperar(`(() => { const b = document.getElementById('btn-problogs-nav'); return !!b && b.getBoundingClientRect().height > 0; })()`, 'el boton de Problogs del menu');
 
 let fallos = 0; let pruebas = 0;
 function check(nombre, condicion, detalle) {
   pruebas++;
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
+}
+
+// ESPERA POR CONDICIÓN, no por reloj. Este verificador tenía 25 `sleep()` que sumaban 33 s (el 77% de su
+// tiempo) y casi todos esperaban un efecto COMPROBABLE (una vista que se abre, un comentario que aparece).
+// Se sustituyen por esperas que miran la condición real: son más rápidas cuando la app va bien y, si algo
+// no llega, lo DICEN con su nombre en vez de seguir midiendo a ciegas.
+async function esperar(expr, que, intentos = 40) {
+    for (let i = 0; i < intentos; i++) {
+        if (await evalJs(expr) === true) return true;
+        await sleep(100);
+    }
+    console.log(`  AVISO no llegó: ${que}`);
+    return false;
+}
+// Para las esperas de LAYOUT (un scroll, un resize): se lee la caja hasta que dos lecturas seguidas
+// coinciden. Es la misma idea que usa la foto del panel.
+async function esperarCaja(expr, que, intentos = 30) {
+    let anterior = '';
+    for (let i = 0; i < intentos; i++) {
+        const caja = await evalJs(expr);
+        if (typeof caja === 'string' && caja && caja === anterior) return true;
+        anterior = typeof caja === 'string' ? caja : '';
+        await sleep(100);
+    }
+    console.log(`  AVISO no se asentó: ${que}`);
+    return false;
+}
+// PULSAR Y COMPROBAR. Hay clics que se PIERDEN si el manejador aún no está enganchado: la app arranca por
+// módulos, así que el botón puede existir con su caja ANTES de tener listener. Pasó al convertir la espera
+// del perfil: los 4 s de reloj tapaban esa carrera y una espera pasiva no. Aquí se pulsa y se comprueba el
+// efecto, repitiendo el clic si hace falta: es una condición real, no un tiempo.
+async function pulsarHasta(sel, expr, que, intentos = 8) {
+    for (let i = 0; i < intentos; i++) {
+        await evalJs(`document.querySelector(${JSON.stringify(sel)})?.click()`);
+        for (let j = 0; j < 5; j++) {
+            if (await evalJs(expr) === true) return true;
+            await sleep(100);
+        }
+    }
+    console.log(`  AVISO no llegó: ${que}`);
+    return false;
 }
 const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__enviados)`));
 
@@ -127,9 +168,9 @@ const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__en
 // ============================================================
 console.log('=== Desde la tarjeta del feed ===');
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-await sleep(2500);
+await esperar(`(() => { const c = document.querySelector('.problog-card [data-problog-comentar]'); return !!c && c.getBoundingClientRect().height > 0; })()`, 'la tarjeta del feed con su boton de comentarios');
 await evalJs(`document.querySelector('.problog-card [data-problog-comentar]')?.click()`);
-await sleep(2500);
+await esperar(`(() => { const d = document.getElementById('problogs-detalle'); return !!d && !d.classList.contains('hidden') && !!document.querySelector('[data-problog-comentarios]'); })()`, 'la publicacion abierta con sus comentarios');
 const trasTarjeta = JSON.parse(await evalJs(`JSON.stringify({
     lectura: !document.getElementById('problogs-detalle').classList.contains('hidden'),
     comentarios: !!document.querySelector('[data-problog-comentarios]'),
@@ -143,7 +184,7 @@ check('NO se abre el cajón de comentarios de Cavents', trasTarjeta.cajon === fa
 // Orden: cuerpo -> marcadores -> comentarios
 // ============================================================
 console.log('\n=== Orden dentro de la publicación ===');
-await sleep(600);
+await esperar(`(() => { const c = document.querySelector('.problogs-detalle'); return !!c && !!c.querySelector('.problog-lectura-cuerpo') && !!c.querySelector('.problog-social') && !!c.querySelector('[data-problog-comentarios]'); })()`, 'las tres partes de la publicacion');
 const orden = JSON.parse(await evalJs(`(() => {
     const caja = document.querySelector('.problogs-detalle');
     const cuerpo = caja.querySelector('.problog-lectura-cuerpo');
@@ -190,7 +231,7 @@ await evalJs(`(() => {
     caja.querySelector('[data-comentario-texto]').value = 'Comentario de prueba';
     caja.querySelector('[data-problog-comentario-form]').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 })()`);
-await sleep(2200);
+await esperar(`(() => { const s = document.querySelector('[data-problog-comentarios]'); return !!s && s.querySelectorAll('.problog-comentario-texto').length >= 3; })()`, 'el comentario publicado en la lista');
 let todos = await enviados();
 const publicado = todos.filter((e) => e.tipo === 'comentario').pop();
 const trasPublicar = JSON.parse(await evalJs(`(() => {
@@ -214,7 +255,7 @@ console.log('\n=== Responder ===');
 // El botón «Responder» ya NO rellena un chip en el cajón de abajo: abre la barra
 // temporal de arriba, justo debajo del menú principal, con su propio input.
 await evalJs(`document.querySelector('[data-comentario-responder="1"]')?.click()`);
-await sleep(500);
+await esperar(`(() => { const b = document.getElementById('problog-responder-barra'); return !!b && b.getBoundingClientRect().height > 0; })()`, 'la barra de responder');
 const barra = JSON.parse(await evalJs(`(() => {
     const b = document.getElementById('problog-responder-barra');
     if (!b) return JSON.stringify({ falta: true });
@@ -299,7 +340,7 @@ const CASOS_TECLADO = [
 for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) {
   if (bajarAlFinal) {
     await evalJs(`window.scrollTo(0, document.documentElement.scrollHeight)`);
-    await sleep(500);
+    await esperar(`Math.abs(window.scrollY + window.innerHeight - document.documentElement.scrollHeight) < 4`, 'el scroll al final');
   }
   await evalJs(`(() => {
       // El modulo lee window.__vvPrueba antes que el real: asi la prueba es
@@ -309,7 +350,7 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
       window.dispatchEvent(new Event('resize'));
       window.scrollBy(0, 1); window.scrollBy(0, -1);
   })()`);
-  await sleep(700);
+  await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra tras el teclado');
   const conTeclado = JSON.parse((await evalJs(`(() => {
       const b = document.getElementById('problog-responder-barra').getBoundingClientRect();
       const vv = window.__vvPrueba || window.visualViewport;
@@ -390,7 +431,7 @@ for (const [nombre, altoVisual, desplazamiento, bajarAlFinal] of CASOS_TECLADO) 
 }
 // Se quita el viewport falso para no dejar la página tocada.
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
-await sleep(500);
+await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
 
 // 3) EL CIERRE DEL TECLADO SIN AVISO. Se comprobó que hay casos en los que el
 //    teclado se cierra y el navegador no dispara NINGÚN evento: la barra se quedaba
@@ -409,13 +450,13 @@ for (const [nombre, avisa] of CIERRES) {
           addEventListener: () => {}, removeEventListener: () => {} };
       window.dispatchEvent(new Event('resize'));
   })()`);
-  await sleep(800);
+  await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
   // Y se cierra: si `avisa`, se lanza el evento; si no, solo cambia la medida.
   await evalJs(`(() => {
       delete window.__vvPrueba;
       ${avisa ? "window.dispatchEvent(new Event('resize'));" : '/* sin avisar */'}
   })()`);
-  await sleep(1400);
+  await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
   const cerrado = JSON.parse((await evalJs(`(() => {
       const b = document.getElementById('problog-responder-barra');
       const r = b.getBoundingClientRect();
@@ -452,7 +493,7 @@ for (const [nombre, avisa] of CIERRES) {
 console.log('\n=== La ventana encogida sin teclado ===');
 for (const [nombre, altoVentana] of [['ventana 752px', 752], ['ventana 700px', 700]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: 393, height: altoVentana, deviceScaleFactor: 1, mobile: true });
-  await sleep(900);
+  await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
   const encogido = JSON.parse((await evalJs(`(() => {
       const b = document.getElementById('problog-responder-barra');
       const r = b.getBoundingClientRect();
@@ -495,13 +536,13 @@ for (const [nombre, altoVentana] of [['ventana 752px', 752], ['ventana 700px', 7
 }
 // Se devuelve la ventana a su tamaño para el resto de comprobaciones.
 await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
-await sleep(700);
+await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
 await evalJs(`(() => {
     const input = document.getElementById('problog-responder-texto');
     input.value = 'Respuesta de prueba';
     document.getElementById('problog-responder-barra').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 })()`);
-await sleep(2400);
+await esperar(`document.querySelectorAll('.problog-comentario-respuestas .problog-comentario').length === 2`, 'la respuesta anidada');
 todos = await enviados();
 const respuesta = todos.filter((e) => e.tipo === 'comentario').pop();
 check('la respuesta se envía con comentario_padre_id = 1', respuesta && respuesta.padre === 1, JSON.stringify(respuesta));
@@ -516,7 +557,7 @@ check('la barra se cierra tras enviar la respuesta', barraTras === true);
 console.log('\n=== Me gusta en un comentario ===');
 const antesLike = await evalJs(`document.querySelector('[data-comentario-like="1"] [data-comentario-likes]').textContent`);
 await evalJs(`document.querySelector('[data-comentario-like="1"]')?.click()`);
-await sleep(1500);
+await esperar(`(() => { const b = document.querySelector('[data-comentario-like="1"]'); return !!b && b.classList.contains('liked'); })()`, 'el me gusta marcado');
 const trasLike = JSON.parse(await evalJs(`(() => {
     const b = document.querySelector('[data-comentario-like="1"]');
     return JSON.stringify({ num: b.querySelector('[data-comentario-likes]').textContent, liked: b.classList.contains('liked'), pressed: b.getAttribute('aria-pressed') });
@@ -531,7 +572,9 @@ check('el número sube y el botón queda marcado', Number(trasLike.num) === Numb
 // ============================================================
 console.log('\n=== Botón de comentarios de la fila social ===');
 await evalJs(`document.querySelector('.problog-social [data-problog-comentar]')?.click()`);
-await sleep(1500);
+// Comprobacion NEGATIVA (el cajon NO debe abrirse): no hay condicion que esperar, solo dar margen a que
+// la app procese el clic. Antes eran 1,5 s por si acaso.
+await sleep(400);
 const trasBoton = JSON.parse(await evalJs(`JSON.stringify({
     cajon: document.getElementById('comentarios-drawer')?.classList.contains('visible') || false,
     seccion: !!document.querySelector('[data-problog-comentarios]')
@@ -544,13 +587,15 @@ check('y la publicación sigue con sus comentarios a la vista', trasBoton.seccio
 // ============================================================
 console.log('\n=== Comentarios desde el perfil ===');
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1500);
+await esperar(`(() => { const b = document.getElementById('btn-perfil-sidebar'); return !!b && b.getBoundingClientRect().height > 0; })()`, 'el boton del perfil en la barra');
 await evalJs(`document.getElementById('btn-perfil-sidebar')?.click()`);
-await sleep(2000);
+// Aquí hubo que ir MÁS ALLÁ de esperar: el clic se perdía si el manejador no estaba enganchado todavía
+// (los 2 s de reloj de antes tapaban la carrera). Se pulsa y se comprueba el efecto, repitiendo si hace falta.
+await pulsarHasta('#btn-perfil-sidebar', `(() => { const p = document.getElementById('perfil-usuario'); return !!p && !p.classList.contains('hidden'); })()`, 'el perfil abierto');
 const perfil = JSON.parse(await evalJs(`JSON.stringify({ visible: !document.getElementById('perfil-usuario').classList.contains('hidden') })`));
 check('el perfil propio está abierto', perfil.visible === true, JSON.stringify(perfil));
 await evalJs(`document.querySelector('.perfil-tab-btn[data-tab="problogs"]')?.click()`);
-await sleep(2500);
+await esperar(`(() => { const c = document.getElementById('perfil-tab-content'); return !!c && c.querySelectorAll('.problog-card [data-problog-comentar]').length > 0; })()`, 'las publicaciones del perfil');
 const diagPerfil = JSON.parse(await evalJs(`(() => {
     const c = document.getElementById('perfil-tab-content');
     return JSON.stringify({
@@ -563,7 +608,7 @@ console.log('   perfil: ' + JSON.stringify(diagPerfil));
 const hayTarjeta = await evalJs(`!!document.querySelector('#perfil-tab-content .problog-card [data-problog-comentar]')`);
 check('el perfil lista publicaciones con su botón de comentarios', hayTarjeta === true, JSON.stringify(diagPerfil));
 await evalJs(`document.querySelector('#perfil-tab-content .problog-card [data-problog-comentar]')?.click()`);
-await sleep(3500);
+await esperar(`(() => { const d = document.getElementById('problogs-detalle'); return !!document.getElementById('problogs') && !document.getElementById('problogs').classList.contains('hidden') && !!d && !d.classList.contains('hidden') && document.querySelectorAll('.problog-comentario-texto').length >= 2; })()`, 'la publicacion del perfil abierta con sus comentarios');
 const trasPerfil = JSON.parse(await evalJs(`JSON.stringify({
     enProblogs: !document.getElementById('problogs').classList.contains('hidden'),
     lectura: !document.getElementById('problogs-detalle').classList.contains('hidden'),
@@ -589,9 +634,9 @@ await evalJs(`(() => {
         addEventListener: () => {}, removeEventListener: () => {} };
     window.dispatchEvent(new Event('resize'));
 })()`);
-await sleep(600);
+await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra de responder');
 await evalJs(`document.querySelector('#problogs-detalle [data-comentario-responder]')?.click()`);
-await sleep(1200);
+await esperarCaja(`(() => { const b = document.getElementById('problog-responder-barra'); if (!b) return ''; const r = b.getBoundingClientRect(); return Math.round(r.top) + 'x' + Math.round(r.bottom); })()`, 'la barra con el teclado ya abierto');
 const yaAbierto = JSON.parse((await evalJs(`(() => {
     const b = document.getElementById('problog-responder-barra');
     const r = b.getBoundingClientRect();
