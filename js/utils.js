@@ -245,8 +245,13 @@ export function conTransicion(cambio) {
     const doc = /** @type {any} */ (document);
     if (!hayViewTransitions()) { cambio(); return Promise.resolve(); }
     const t = doc.startViewTransition(cambio);
-    // Si la transición se salta (otra en curso, pestaña oculta...), la promesa se
-    // rechaza: hay que recogerla o salta un "unhandled rejection" en consola.
+    // Si la transición se salta (otra en curso, pestaña oculta...), las promesas se rechazan: hay que
+    // recogerlas TODAS o salta un "unhandled rejection" en consola.
+    // Faltaba `ready`: la spec rechaza ESA (con `AbortError: Transition was skipped. New ViewTransition
+    // started`) cuando se lanza una transición mientras otra está en curso, así que el error salía en
+    // consola al navegar rápido. Lo destapó un verificador al que se le quitaron los `sleep()`: al pulsar
+    // más rápido, las transiciones se solapaban. Un usuario rápido hacía lo mismo.
+    if (t && t.ready && typeof t.ready.catch === 'function') t.ready.catch(() => {});
     if (t && t.finished && typeof t.finished.catch === 'function') t.finished.catch(() => {});
     if (t && t.updateCallbackDone && typeof t.updateCallbackDone.catch === 'function') {
         return t.updateCallbackDone.catch(() => {});

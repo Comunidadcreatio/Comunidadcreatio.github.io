@@ -109,9 +109,40 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
       };
   })();`
 });
+
+// ESPERA POR CONDICIÓN, no por reloj. Este verificador tenía 26 `sleep()` que sumaban 27 s (más de la
+// mitad de su tiempo) y casi todos esperaban un efecto COMPROBABLE (un desplegable que se abre, un
+// re-recorte que llega, una imagen que se suma). Si algo no llega, se DICE con su nombre y se sigue: el
+// verificador informa en vez de medir a ciegas.
+// Van AQUÍ ARRIBA, antes del arranque, porque el propio arranque ya usa `CAJA` (y `const` no se puede usar
+// antes de su línea: fue un ReferenceError de manual al convertir esto).
+async function esperar(expr, que, intentos = 40) {
+    for (let i = 0; i < intentos; i++) {
+        if (await evalJs(expr) === true) return true;
+        await sleep(100);
+    }
+    console.log(`  AVISO no llegó: ${que}`);
+    return false;
+}
+// PULSAR Y COMPROBAR: hay clics que se pierden si el manejador aún no está enganchado (la app arranca por
+// módulos y el botón existe con su caja antes de tener listener). Es la carrera que apareció al convertir
+// el verificador de comentarios; aquí se pulsa y se comprueba el efecto, repitiendo si hace falta.
+async function pulsarHasta(sel, expr, que, intentos = 8) {
+    for (let i = 0; i < intentos; i++) {
+        await evalJs(`document.querySelector(${JSON.stringify(sel)})?.click()`);
+        for (let j = 0; j < 5; j++) {
+            if (await evalJs(expr) === true) return true;
+            await sleep(100);
+        }
+    }
+    console.log(`  AVISO no llegó: ${que}`);
+    return false;
+}
+const CAJA = (sel) => `(() => { const e = document.querySelector(${JSON.stringify(sel)}); return !!e && e.getBoundingClientRect().height > 0; })()`;
+
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
-await sleep(1500);
+await esperar(CAJA('#btn-cavents-hub'), 'el boton de Cavents del menu');
 
 let fallos = 0; let pruebas = 0;
 function check(nombre, condicion, detalle) {
@@ -124,12 +155,9 @@ function check(nombre, condicion, detalle) {
 // XSS en el desplegable "Mis Cavents"
 // ============================================================
 console.log('=== XSS: título con HTML en la lista de Mis Cavents ===');
-await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1200);
-await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1600);
-await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1400);
+await pulsarHasta('#btn-cavents-hub', CAJA('#btn-crear-cavent'), 'el boton de crear Cavent');
+await pulsarHasta('#btn-crear-cavent', CAJA('#cavents-trigger'), 'el desplegable de Mis Cavents');
+await pulsarHasta('#cavents-trigger', CAJA('.cavent-item-titulo'), 'la lista de Mis Cavents abierta');
 const lista = JSON.parse(await evalJs(`(() => {
     const t = document.querySelector('.cavent-item-titulo');
     return JSON.stringify({
@@ -162,10 +190,10 @@ await evalJs(`(async () => {
 for (let i = 0; i < 25; i++) { await sleep(300); if (await evalJs(`document.querySelectorAll('#carrusel-track .carrusel-slide').length > 1`)) break; }
 const src45 = await evalJs(`document.querySelector('#carrusel-track img')?.src || ''`);
 await evalJs(`document.querySelector('.ratio-btn[data-ratio="1/1"]')?.click()`);
-await sleep(1500);
+await esperar(`document.querySelector('#carrusel-track img')?.src !== ${JSON.stringify(src45)}`, 'el re-recorte a 1:1');
 const src11 = await evalJs(`document.querySelector('#carrusel-track img')?.src || ''`);
 await evalJs(`document.querySelector('.ratio-btn[data-ratio="4/5"]')?.click()`);
-await sleep(1500);
+await esperar(`document.querySelector('#carrusel-track img')?.src === ${JSON.stringify(src45)}`, 'la vuelta a 4:5');
 const srcVuelta = await evalJs(`document.querySelector('#carrusel-track img')?.src || ''`);
 check('el cambio a 1:1 sí re-recorta', src11 !== src45 && src11.length > 100);
 check('volver a 4:5 da EXACTAMENTE la imagen original (no recorta la recortada)',
@@ -223,7 +251,8 @@ const larga = await evalJs(`(() => {
     document.getElementById('problog-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     return document.body.innerText.includes('demasiado larga');
 })()`);
-await sleep(800);
+// Comprobación NEGATIVA (la publicación NO debe enviarse): no hay condición que esperar.
+await sleep(300);
 const postsTrasLarga = await evalJs(`window.__posts.length`);
 check('una publicación de más de 20.000 caracteres se bloquea', larga === true, String(larga));
 check('y no se envió al servidor', postsTrasLarga === 0, `posts=${postsTrasLarga}`);
@@ -245,14 +274,14 @@ for (let i = 1; i < 5; i++) {
         inp.files = dt.files;
         inp.dispatchEvent(new Event('change', { bubbles: true }));
     })()`);
-    await sleep(900);
+    await esperar(`document.querySelectorAll('#carrusel-track .carrusel-slide').length === ${i + 1}`, 'la imagen ' + (i + 1) + ' en la pista');
 }
 const totalSlides = await evalJs(`document.querySelectorAll('#carrusel-track .carrusel-slide').length`);
 check('se pudieron poner 5 imágenes', totalSlides === 5, `slides=${totalSlides}`);
 // Se busca el texto exacto del aviso (otros avisos anteriores siguen en pantalla).
 const avisosAntes = await evalJs(`document.body.innerText.split('Ya hay 5 imágenes').length - 1`);
 await evalJs(`document.getElementById('btn-agregar-imagen')?.click()`);
-await sleep(700);
+await esperar(`document.body.innerText.split('Ya hay 5 imágenes').length - 1 > ${avisosAntes}`, 'el aviso de que ya no cabe ninguna mas');
 const avisosDespues = await evalJs(`document.body.innerText.split('Ya hay 5 imágenes').length - 1`);
 check('el "+" avisa cuando ya no cabe ninguna más', avisosDespues > avisosAntes, `antes=${avisosAntes} despues=${avisosDespues}`);
 
@@ -327,7 +356,9 @@ check('al mostrar el editor el hueco se calcula al momento (no espera 350ms)',
 console.log('\n=== Feed: error de carga y textos con acentos ===');
 await evalJs(`window.__feedModo = 'vacio'`);
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-await sleep(2500);
+// OJO con la condición: "que tenga texto" NO vale, porque mientras carga pone "Cargando publicaciones…" y
+// la espera se cumpliría a mitad. Hay que esperar a que TERMINE (que ya no esté cargando).
+await esperar(`(() => { const t = document.getElementById('problogs-feed').innerText.trim(); return t.length > 0 && !t.includes('Cargando'); })()`, 'el feed terminado de cargar');
 const feedVacio = await evalJs(`document.getElementById('problogs-feed').innerText.trim()`);
 check('el feed vacío se anuncia en buen español', feedVacio.includes('Todavía no hay publicaciones'), JSON.stringify(feedVacio.slice(0, 60)));
 check('no queda mojibake en los textos', !/Ã|Â/.test(feedVacio), JSON.stringify(feedVacio.slice(0, 60)));
@@ -336,9 +367,9 @@ check('no queda mojibake en los textos', !/Ã|Â/.test(feedVacio), JSON.stringif
 await evalJs(`localStorage.setItem('test_feed_modo', 'error')`);
 await send('Page.reload', { ignoreCache: false });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
-await sleep(1500);
+await esperar(CAJA('#btn-problogs-nav'), 'el menu tras la recarga');
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-await sleep(2500);
+await esperar(`(() => { const t = document.getElementById('problogs-feed').innerText.trim(); return t.length > 0 && !t.includes('Cargando'); })()`, 'el feed terminado de cargar tras la recarga');
 const feedError = await evalJs(`document.getElementById('problogs-feed').innerText.trim()`);
 check('si la carga falla se dice que falló (no "no hay publicaciones")',
   feedError.includes('No se pudieron cargar'), JSON.stringify(feedError.slice(0, 60)));

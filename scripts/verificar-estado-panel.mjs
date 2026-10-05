@@ -93,9 +93,38 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
       };
   })();`
 });
+// ESPERA POR CONDICIÓN, no por reloj. Este verificador tenía 21 `sleep()` que sumaban 26 s (casi todo su
+// tiempo) y casi todos esperaban un efecto COMPROBABLE (el panel que se abre, la pestaña que cambia, el
+// aviso de "cambios sin guardar"…). Si algo no llega, se DICE con su nombre y se sigue.
+async function esperar(expr, que, intentos = 40, silencioso = false) {
+    for (let i = 0; i < intentos; i++) {
+        if (await evalJs(expr) === true) return true;
+        await sleep(100);
+    }
+    if (!silencioso) console.log(`  AVISO no llegó: ${que}`);
+    return false;
+}
+// PULSAR Y COMPROBAR: hay clics que se pierden si el manejador aún no está enganchado (la app arranca por
+// módulos). Es la carrera que apareció al convertir el verificador de comentarios; aquí se pulsa y se
+// comprueba el efecto, repitiendo si hace falta.
+async function pulsarHasta(sel, expr, que, intentos = 8) {
+    for (let i = 0; i < intentos; i++) {
+        await evalJs(`document.querySelector(${JSON.stringify(sel)})?.click()`);
+        for (let j = 0; j < 5; j++) {
+            if (await evalJs(expr) === true) return true;
+            await sleep(100);
+        }
+    }
+    console.log(`  AVISO no llegó: ${que}`);
+    return false;
+}
+const CAJA = (sel) => `(() => { const e = document.querySelector(${JSON.stringify(sel)}); return !!e && e.getBoundingClientRect().height > 0; })()`;
+const PANEL_OCULTO = `document.getElementById('panel-artista').classList.contains('hidden')`;
+const PANEL_VISIBLE = `!document.getElementById('panel-artista').classList.contains('hidden')`;
+
 await send('Page.navigate', { url: URL_BASE });
 for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
-await sleep(1500);
+await esperar(CAJA('#btn-cavents-hub'), 'el boton de Cavents del menu');
 
 let fallos = 0; let pruebas = 0;
 function check(nombre, condicion, detalle) {
@@ -107,17 +136,16 @@ const panelVisible = () => evalJs(`!document.getElementById('panel-artista').cla
 const tabActiva = () => evalJs(`(document.querySelector('#crear-tabs .crear-tab.activa') || {}).id || ''`);
 
 // Clic en "+" resolviendo el aviso de "cambios sin guardar" si aparece.
-async function clickPlus() {
+async function clickPlus(silencioso = false) {
   await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-  await sleep(500);
-  const hayAviso = await evalJs(`!!document.querySelector('.confirm-overlay .confirm-btn-ok')`);
+  // Se espera la RESPUESTA al clic: o sale el aviso de "cambios sin guardar", o el panel se abre.
+  await esperar(`!!document.querySelector('.confirm-overlay .confirm-btn-ok') || ` + PANEL_VISIBLE, 'la respuesta al boton +', 40, silencioso);
   let aviso = false;
-  if (hayAviso) {
+  if (await evalJs(`!!document.querySelector('.confirm-overlay .confirm-btn-ok')`)) {
     aviso = true;
     await evalJs(`document.querySelector('.confirm-overlay .confirm-btn-ok')?.click()`);
-    await sleep(400);
   }
-  await sleep(1200);
+  await esperar(PANEL_VISIBLE, 'el panel de creacion abierto', 40, silencioso);
   return aviso;
 }
 
@@ -125,15 +153,22 @@ async function clickPlus() {
 // CAV-5 + INT-6
 // ============================================================
 console.log('=== CAV-5: el "+" no debe conservar la obra que se estaba editando ===');
-await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1200);
-await clickPlus();
+// El clic del hub y el del "+" van JUNTOS y se reintentan. El del hub puede perderse si la app todavía no
+// ha enganchado su manejador (la misma carrera que en el perfil), y el efecto que se espera —el panel
+// abierto— lo produce el "+" con el hub ya abierto. Los reintentos van EN SILENCIO: un aviso debe
+// significar "no llegó", no "llegó a la segunda". Si de verdad no llega, el `esperar` final avisa.
+for (let i = 0; i < 6; i++) {
+    await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
+    await clickPlus(true);
+    if (await panelVisible() === true) break;
+    await sleep(200);
+}
+await esperar(PANEL_VISIBLE, 'el panel de creacion abierto');
 check('el panel de creación está abierto', (await panelVisible()) === true);
 // Editar la obra desde "Mis Cavents"
-await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1200);
+await pulsarHasta('#cavents-trigger', CAJA('.cavent-item .btn-edit'), 'la lista de Mis Cavents');
 await evalJs(`document.querySelector('.cavent-item .btn-edit')?.click()`);
-await sleep(1500);
+await esperar(`document.getElementById('input-id-edicion').value === '1'`, 'la obra 1 en modo edicion');
 const enEdicion = JSON.parse(await evalJs(`JSON.stringify({
     id: document.getElementById('input-id-edicion').value,
     titulo: document.getElementById('input-titulo').value,
@@ -143,7 +178,7 @@ console.log('   ' + JSON.stringify(enEdicion));
 check('queda en modo edición de la obra 1', enEdicion.id === '1' && enEdicion.boton === 'Actualizar Cavent', JSON.stringify(enEdicion));
 // Volver con la flecha y entrar otra vez con "+"
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1500);
+await esperar(PANEL_OCULTO, 'el panel cerrado con la flecha');
 check('la flecha cierra el panel', (await panelVisible()) === false);
 await clickPlus();
 const trasPlus = JSON.parse(await evalJs(`JSON.stringify({
@@ -159,17 +194,17 @@ check('el botón vuelve a decir "Crear Cavent"', trasPlus.boton === 'Crear Caven
 console.log('\n=== INT-6: el "+" abre la pestaña del contexto ===');
 // Se deja Problogs como última pestaña usada y se vuelve a pulsar "+" desde la galería
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
-await sleep(500);
+await esperar(`(document.querySelector('#crear-tabs .crear-tab.activa') || {}).id === 'tab-problogs'`, 'la pestaña de Problogs activa');
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);   // flecha
-await sleep(1500);
+await esperar(PANEL_OCULTO, 'el panel cerrado');
 await clickPlus();
 const tabTrasPlus = await tabActiva();
 check('desde la galería abre Cavents (no Problogs)', tabTrasPlus === 'tab-cavents', tabTrasPlus);
 // Y desde la sección Problogs debe abrir el editor de Problogs
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1500);
+await esperar(PANEL_OCULTO, 'el panel cerrado');
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-await sleep(1800);
+await esperar(`!document.getElementById('problogs').classList.contains('hidden')`, 'la seccion de Problogs');
 await clickPlus();
 const tabDesdeProblogs = await tabActiva();
 check('desde la sección Problogs abre Problogs', tabDesdeProblogs === 'tab-problogs', tabDesdeProblogs);
@@ -181,11 +216,11 @@ console.log('\n=== INT-5: la clase creando-problogs se retira al salir ===');
 // Se abre el editor de Problogs explícitamente para que la comprobación no
 // dependa de en qué pestaña la dejó la fase anterior.
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
-await sleep(700);
+await esperar(`document.body.classList.contains('creando-problogs')`, 'la clase de edicion de problogs');
 const claseDentro = await evalJs(`document.body.classList.contains('creando-problogs')`);
 check('mientras se edita un problog la clase está puesta', claseDentro === true);
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1800);
+await esperar(`!document.body.classList.contains('creando-problogs')`, 'la clase de edicion retirada al salir');
 const trasSalir = JSON.parse(await evalJs(`JSON.stringify({
     clase: document.body.classList.contains('creando-problogs'),
     paddingBody: getComputedStyle(document.body).paddingBottom
@@ -201,7 +236,8 @@ console.log('\n=== INT-7: los contadores no se borran con una llamada sin datos 
 await evalJs(`document.getElementById('stats-problogs').textContent = '5'`);
 await evalJs(`document.getElementById('stats-comcons').textContent = '7'`);
 await evalJs(`window.actualizarEstadisticas()`);
-await sleep(1500);
+// Comprobacion NEGATIVA (los contadores NO deben borrarse): no hay condicion que esperar.
+await sleep(300);
 const sinDatos = JSON.parse(await evalJs(`JSON.stringify({
     problogs: document.getElementById('stats-problogs').textContent,
     comcons: document.getElementById('stats-comcons').textContent
@@ -209,7 +245,7 @@ const sinDatos = JSON.parse(await evalJs(`JSON.stringify({
 check('el contador de Problogs se mantiene (no se pone a 0)', sinDatos.problogs === '5', JSON.stringify(sinDatos));
 check('el contador de Comcons se mantiene', sinDatos.comcons === '7', JSON.stringify(sinDatos));
 await evalJs(`window.actualizarEstadisticas(null, { problogs: 3, comcons: 2 })`);
-await sleep(1500);
+await esperar(`document.getElementById('stats-problogs').textContent === '3' && document.getElementById('stats-comcons').textContent === '2'`, 'los contadores pintados con datos');
 const conDatos = JSON.parse(await evalJs(`JSON.stringify({
     problogs: document.getElementById('stats-problogs').textContent,
     comcons: document.getElementById('stats-comcons').textContent
@@ -220,18 +256,17 @@ check('cuando sí hay datos se pintan', conDatos.problogs === '3' && conDatos.co
 // INT-9 — volver a la subpestaña del perfil
 // ============================================================
 console.log('\n=== INT-9: volver del editor a la subpestaña del perfil ===');
-await evalJs(`document.getElementById('btn-perfil-sidebar')?.click()`);
-await sleep(2000);
+await pulsarHasta('#btn-perfil-sidebar', `!document.getElementById('perfil-usuario').classList.contains('hidden')`, 'el perfil abierto');
 const perfilVisible = await evalJs(`!document.getElementById('perfil-usuario').classList.contains('hidden')`);
 check('el perfil propio está abierto', perfilVisible === true);
 await evalJs(`document.querySelector('.perfil-tab-btn[data-tab="problogs"]')?.click()`);
-await sleep(1500);
+await esperar(`((document.querySelector('.perfil-tab-btn.active') || {}).dataset || {}).tab === 'problogs'`, 'la subpestaña de Problogs del perfil');
 const tabAntes = await evalJs(`(document.querySelector('.perfil-tab-btn.active') || {}).dataset?.tab || ''`);
 check('la subpestaña Problogs está activa', tabAntes === 'problogs', tabAntes);
 // Abrir el editor con "+" (el icono está oculto en el perfil: se pulsa por JS) y volver
 await clickPlus();
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(2500);
+await esperar(`!document.getElementById('perfil-usuario').classList.contains('hidden') && ((document.querySelector('.perfil-tab-btn.active') || {}).dataset || {}).tab === 'problogs'`, 'la vuelta al perfil con su subpestaña');
 const tabDespues = JSON.parse(await evalJs(`JSON.stringify({
     tab: (document.querySelector('.perfil-tab-btn.active') || {}).dataset?.tab || '',
     perfilVisible: !document.getElementById('perfil-usuario').classList.contains('hidden')
@@ -241,7 +276,11 @@ check('se vuelve al perfil', tabDespues.perfilVisible === true);
 check('y a la subpestaña Problogs (no a "Mis cavents")', tabDespues.tab === 'problogs', tabDespues.tab);
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
-console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
+// OJO CON EL ORDEN: antes esto se sumaba DESPUÉS de imprimir el RESULTADO, así que una corrida con una
+// excepción en la página decía "18/18 comprobaciones OK — sin fallos" y a la vez terminaba en error. La
+// suite lo marcaba como FALLA y el mensaje parecía contradecirla. Ahora el fallo se cuenta ANTES de
+// imprimir, y el resumen lo dice.
 if (logs.length) fallos++;
+console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)${logs.length ? ' (por excepciones en la pagina)' : ''}` : ' — sin fallos'}`);
 process.exitCode = fallos ? 1 : 0;
 ws.close(); chrome.kill(); try { rmSync(profileDir, { recursive: true, force: true }); } catch {}
