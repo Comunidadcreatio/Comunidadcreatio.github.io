@@ -231,6 +231,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Este `z-index` ya estaba aquí (99999) y es el que hace que el preloader TAPE de verdad: por eso un
+       toque durante el arranque no se pierde nunca. Lo certifica `verificar-arranque-bloqueado.mjs` con
+       toques reales y `elementFromPoint`: mientras el preloader está puesto, el punto que ocupa un botón lo
+       ocupa el preloader. Si alguien lo quitara, ese verificador se pone en rojo. */
     z-index: 99999;
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
@@ -326,14 +330,22 @@
 .app-container,
 .auth-container {
     opacity: 0;
+    /* Una capa INVISIBLE no debe aceptar pulsaciones: `opacity: 0` NO desactiva el hit-testing (a
+       diferencia de `visibility: hidden` o `pointer-events: none`). Es un PRINCIPIO, no el arreglo de un
+       fallo medido: hoy el preloader tapa la pantalla y un toque durante el arranque lo absorbe él
+       (certificado por `verificar-arranque-bloqueado.mjs`). Esto solo garantiza que, si algún día el
+       preloader no estuviera, el contenedor invisible tampoco se comería un toque. */
+    pointer-events: none;
 }
 .app-container {
     position: relative;
     z-index: 1; /* encima del slideshow de fondo */
     transition: opacity 0.8s ease 0.3s;
 }
-.app-container.visible {
+.app-container.visible,
+.auth-container.visible {
     opacity: 1;
+    pointer-events: auto;
 }
 
 /* Auth usa animation en vez de transition para mayor control */

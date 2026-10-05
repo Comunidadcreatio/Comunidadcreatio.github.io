@@ -1523,6 +1523,33 @@ Dos cosas que aprendí convirtiéndolo, y que valen para los demás:
    **pulsar y comprobar el efecto, repitiendo el clic** (`pulsarHasta()`). Un fallo que la espera destapó y
    que el `sleep` escondía.
 
+### El contrato de arranque, certificado con toques reales
+
+`verificar-arranque-bloqueado.mjs` (en la suite, 7 comprobaciones) mide lo que ve **un usuario**, no un
+script: usa **toques reales** (eventos de entrada por CDP, que pasan por el *hit-testing*) y
+`document.elementFromPoint` para saber qué hay de verdad en cada punto.
+
+Certifica que **mientras la app carga, un toque no se pierde**: el `#preloader` tapa la pantalla
+(`position: fixed` + `z-index: 99999`) y se lleva el toque; cuando se retira, el mismo punto ya pertenece
+al botón **y el toque responde**. Si alguien quitara ese `z-index`, el verificador se pone en rojo.
+
+**Nació de un error mío, tres veces repetido.** En dos verificadores aparecía un «clic perdido» al pulsar
+rápido y lo interpreté como un fallo de la app («pinta el botón antes de engancharle el listener»). Era
+**falso**, y cada intento de comprobarlo se equivocó por lo mismo —el instrumento medía otra cosa—:
+
+1. Los verificadores pulsan con `el.click()`, que es **programático** y **se salta el hit-testing**: un
+   usuario no puede pulsar ahí porque el preloader lo cubre.
+2. La primera versión de esta prueba midió a los 114 ms, **antes de que la hoja de estilos cargara**, y
+   «descubrió» que el preloader no tapaba (su `position` era `static`… porque no había CSS todavía).
+3. Y la detección del efecto del toque solo miraba qué **secciones** estaban visibles; la app respondía
+   con un cambio de clase. Con detección amplia se ve claro: `activos 5 → 6`.
+
+> **La conclusión es sobre los instrumentos, no sobre la app**: un verificador que pulsa por programa y
+> espera «a que un elemento tenga caja» está midiendo un estado que **no existe para un usuario**. Lo que
+> hay que esperar es a que **la app esté lista** (estilos aplicados, `#preloader.hidden`,
+> `.app-container.visible`, y asentada). Esa es la causa de familia de casi toda la inestabilidad de esta
+> suite, y es lo que queda por hacer en ella.
+
 ### Los recursos que se sirven en cada página, vigilados
 
 `verificar-recursos-servidos.mjs` (dentro de la suite) descubre **todas** las páginas HTML de la raíz —no
