@@ -141,7 +141,12 @@ async function pulsarHasta(sel, expr, que, intentos = 8) {
 const CAJA = (sel) => `(() => { const e = document.querySelector(${JSON.stringify(sel)}); return !!e && e.getBoundingClientRect().height > 0; })()`;
 
 await send('Page.navigate', { url: URL_BASE });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
+// ESPERA A QUE LA APP ESTE LISTA, no solo a que exista un elemento. La condicion vieja ("existe
+// #toggle-panel y no esta hidden") se cumple DETRAS del preloader: la app todavia no responde, y los clics
+// (que aqui son programaticos y se saltan el hit-testing) se colaban en ese hueco. Por eso habia despues un
+// `sleep` de asentamiento: tapaba esta carrera. Ahora se espera a lo que de verdad hace falta: panel
+// visible + preloader retirado + contenedor con .visible (la senal que pone la app al terminar de arrancar).
+for (let i = 0; i < 120; i++) { if (await evalJs(`(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`) === true) break; await sleep(150); }
 await esperar(CAJA('#btn-cavents-hub'), 'el boton de Cavents del menu');
 
 let fallos = 0; let pruebas = 0;
@@ -328,7 +333,6 @@ await evalJs(`(() => {
     c.value = 'vuelve la imagen\\n\\n<image>${imagenPuesta}</image>';
     c.dispatchEvent(new Event('input', { bubbles: true }));
 })()`);
-await sleep(900);
 const rehabilitada = await evalJs(`(() => {
     const cuadro = document.querySelector('.problog-portada-cuadro:not(.vacio) img');
     return JSON.stringify({ hay: !!cuadro, blob: !!cuadro && cuadro.src.startsWith('blob:'), cargada: !!cuadro && cuadro.naturalWidth > 0 });
@@ -366,7 +370,7 @@ check('no queda mojibake en los textos', !/Ã|Â/.test(feedVacio), JSON.stringif
 // cargado, así que se cambia el modo en localStorage y se recarga la página.
 await evalJs(`localStorage.setItem('test_feed_modo', 'error')`);
 await send('Page.reload', { ignoreCache: false });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
+for (let i = 0; i < 120; i++) { if (await evalJs(`(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`) === true) break; await sleep(150); }
 await esperar(CAJA('#btn-problogs-nav'), 'el menu tras la recarga');
 await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
 await esperar(`(() => { const t = document.getElementById('problogs-feed').innerText.trim(); return t.length > 0 && !t.includes('Cargando'); })()`, 'el feed terminado de cargar tras la recarga');

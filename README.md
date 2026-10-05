@@ -1539,6 +1539,31 @@ Dos cosas que aprendí convirtiéndolo, y que valen para los demás:
    **pulsar y comprobar el efecto, repitiendo el clic** (`pulsarHasta()`). Un fallo que la espera destapó y
    que el `sleep` escondía.
 
+### La espera de arranque, subida a «la app está lista» (y la foto, limpia del todo)
+
+La condición de arranque de los verificadores era **«existe `#toggle-panel` y no está `hidden`»**. Eso se
+cumple **detrás del preloader**: la app todavía no responde, y como los verificadores pulsan **por
+programa** (se saltan el hit-testing), los clics se colaban en ese hueco. Por eso casi todos llevaban
+detrás un `sleep` de asentamiento: **tapaba esa carrera**.
+
+Ahora la condición es la de verdad (**panel visible + preloader retirado + contenedor con `.visible`**, la
+señal que pone la app al terminar de arrancar) en los **12 bucles de arranque** de los verificadores y en
+las **8 vistas de la foto**, y **siete `sleep` de asentamiento se han quitado** porque ya no hacen falta.
+
+> Un verificador que pulsa por programa y espera «a que un elemento tenga caja» mide un estado **que no
+> existe para un usuario**. Esa era la **causa de familia** de casi toda la inestabilidad de esta suite.
+
+**Y la foto está limpia del todo**: las **8 vistas tienen guardián de estado** (`exigidos`, los elementos
+que tienen que estar o la foto aborta), y se le añadió a la vista `auth` la espera de **geometría
+asentada** (`#main-content` bailaba entre capturas: eran los «2 valores inestables» que quedaban). Ahora:
+
+| | |
+|---|---|
+| Medidas | **720 = 720** |
+| Comparación | **SIN DIFERENCIAS** |
+| Valores inestables | **ninguno** (antes 2) |
+| Código de salida | **0** (antes terminaba en error por los inestables) |
+
 ### El contrato de arranque, certificado con toques reales
 
 `verificar-arranque-bloqueado.mjs` (en la suite, 7 comprobaciones) mide lo que ve **un usuario**, no un

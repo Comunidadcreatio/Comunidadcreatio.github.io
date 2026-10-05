@@ -97,8 +97,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
   })();`
 });
 await send('Page.navigate', { url: URL_BASE });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
-await sleep(1500);
+// ESPERA A QUE LA APP ESTE LISTA, no solo a que exista un elemento. La condicion vieja ("existe
+// #toggle-panel y no esta hidden") se cumple DETRAS del preloader: la app todavia no responde, y los clics
+// (que aqui son programaticos y se saltan el hit-testing) se colaban en ese hueco. Por eso habia despues un
+// `sleep` de asentamiento: tapaba esta carrera. Ahora se espera a lo que de verdad hace falta: panel
+// visible + preloader retirado + contenedor con .visible (la senal que pone la app al terminar de arrancar).
+for (let i = 0; i < 120; i++) { if (await evalJs(`(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`) === true) break; await sleep(150); }
 
 let fallos = 0; let pruebas = 0;
 function check(nombre, condicion, detalle) {

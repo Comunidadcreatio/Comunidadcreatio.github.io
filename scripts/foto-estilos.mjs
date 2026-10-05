@@ -55,8 +55,11 @@ const PROPIEDADES = [
 const PAGINAS = [
     {
         nombre: 'index',
+    // Guardian de estado: la vista `index` es la del banco de pruebas (`#fx-*`), asi que estos dos
+    // existen si y solo si el banco se monto.
+    exigidos: ['#fx-input', '#fx-button'],
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         // Muestra de etiquetas SIN clases, fuera de pantalla pero renderizada: aisla las
         // reglas de BASE (las que dependen solo de la etiqueta) del resto de la app.
         fixture: true,
@@ -72,8 +75,10 @@ const PAGINAS = [
     },
     {
         nombre: 'auth',
+    // Guardian de estado: sin el formulario de acceso montado, esta vista se medía a medias.
+    exigidos: ['#login-form', '.auth-section'],
         ruta: 'auth.html',
-        esperar: `!!document.getElementById('login-form')`,
+        esperar: `(() => { const f = document.getElementById('login-form'); const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return !!f && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         abrir: async (ev, dormir) => {
             // Se montan los ESTADOS de los campos: sin esto la foto solo mide el REPOSO, y las reglas
@@ -119,7 +124,22 @@ const PAGINAS = [
                     foco: document.activeElement ? document.activeElement.id : null
                 });
             })()`);
-            await dormir(500);
+            // Y se espera a que la GEOMETRIA se ASIENTE (dos lecturas seguidas iguales). La altura de
+            // `#main-content` bailaba entre capturas y el comparador lo reportaba como "2 valores
+            // inestables": era lo último que quedaba de inestabilidad en la foto, y no lo arregla el
+            // guardián de estado (que comprueba que los elementos ESTÉN, no que la caja esté quieta).
+            let cajaAnterior = '';
+            for (let i = 0; i < 20; i++) {
+                const caja = await ev(`(() => {
+                    const m = document.getElementById('main-content');
+                    if (!m) return '';
+                    const r = m.getBoundingClientRect();
+                    return Math.round(r.width) + 'x' + Math.round(r.height);
+                })()`);
+                if (typeof caja === 'string' && caja && caja === cajaAnterior) break;
+                cajaAnterior = typeof caja === 'string' ? caja : '';
+                await dormir(150);
+            }
         },
         // El `:focus` de un campo obligatorio del registro, forzado por CDP.
         forzarPseudo: { '#reg-rol': ['focus'] },
@@ -146,7 +166,7 @@ const PAGINAS = [
         // pagina. Sin esto, cualquier cambio en problogs.css se quedaria sin cubrir.
         nombre: 'problogs',
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // Si falta alguno de estos, la vista no llego a su estado y la foto ABORTA (ver el comentario
         // del bloque `exigidos` en la captura). Esta vista era una de las tres inestables.
@@ -197,8 +217,10 @@ const PAGINAS = [
         // a ciegas. Se abre el panel y se deja la pestaña de Cavents activa (la de por
         // defecto), para medir los campos VISIBLES.
         nombre: 'panel',
+    // Guardian de estado: el formulario de obra y su primer campo tienen que estar pintados.
+    exigidos: ['#obra-form', '#input-titulo'],
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         abrir: async (ev, dormir) => {
             await ev(`document.getElementById('btn-crear-cavent')?.click()`);
@@ -330,7 +352,7 @@ const PAGINAS = [
         // fila de usuario tambien quede medida.
         nombre: 'chat',
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // Una de las tres vistas inestables: a veces medía el pueblo sin desplegar (50 elementos en vez
         // de 80). Con esto, o esta desplegado con su fila de usuario, o la foto no se escribe.
@@ -384,8 +406,10 @@ const PAGINAS = [
         // `#galeria-container.modo-grid .obra-card` (galeria-publica.css, cinco `!important`) solo
         // aplican con la clase `modo-grid` puesta, y esa clase la pone el boton de Explorar.
         nombre: 'grid',
+    // Guardian de estado: la rejilla de Explorar y una tarjeta dentro.
+    exigidos: ['#galeria-container.modo-grid', '.obra-card'],
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         abrir: async (ev, dormir) => {
             // La obra se carga por el camino real (el mismo que usa el perfil), y luego se entra en
@@ -420,7 +444,7 @@ const PAGINAS = [
         // perfil tiene su propia familia de reglas en galeria-publica.css / style.css.
         nombre: 'perfil',
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // Una de las tres vistas inestables: a veces medía el perfil sin sus secciones (58 elementos en
         // vez de 64). Si no estan, la foto no se escribe.
@@ -518,7 +542,7 @@ const PAGINAS = [
         // problogs.css: sin abrirlo, un cambio de capas ahí pasaria inadvertido.
         nombre: 'editor',
         ruta: '',
-        esperar: `!!document.getElementById('toggle-panel')`,
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // El EDITOR se pillaba a medio montar: en una corrida el contenedor salia con `opacity: 0` y
         // ancho 0 (la animacion de entrada a medias) y la comparacion daba 96 diferencias de maquetacion

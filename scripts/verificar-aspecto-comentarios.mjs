@@ -119,7 +119,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
 // porque cambiar el tamaño de la ventana en caliente deja medidas a medias.
 await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: true });
 await send('Page.navigate', { url: URL_BASE });
-for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
+// ESPERA A QUE LA APP ESTE LISTA, no solo a que exista un elemento. La condicion vieja ("existe
+// #toggle-panel y no esta hidden") se cumple DETRAS del preloader: la app todavia no responde, y los clics
+// (que aqui son programaticos y se saltan el hit-testing) se colaban en ese hueco. Por eso habia despues un
+// `sleep` de asentamiento: tapaba esta carrera. Ahora se espera a lo que de verdad hace falta: panel
+// visible + preloader retirado + contenedor con .visible (la senal que pone la app al terminar de arrancar).
+for (let i = 0; i < 120; i++) { if (await evalJs(`(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`) === true) break; await sleep(150); }
 await sleep(1200);
 // Se anota el ancho de ventana de estas comprobaciones: el barrido de anchos del
 // final lo cambia, así que no se puede dar por supuesto al comparar medidas.
@@ -890,7 +895,7 @@ const LINEAS = `(() => {
 for (const anchoVentana of [320, 360, 420, 768, 1280]) {
   await send('Emulation.setDeviceMetricsOverride', { width: anchoVentana, height: 900, deviceScaleFactor: 1, mobile: anchoVentana < 700 });
   await send('Page.navigate', { url: URL_BASE });
-  for (let i = 0; i < 60; i++) { if (await evalJs(`!!document.getElementById('toggle-panel') && !document.getElementById('toggle-panel').classList.contains('hidden')`)) break; await sleep(300); }
+  for (let i = 0; i < 120; i++) { if (await evalJs(`(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`) === true) break; await sleep(150); }
   await sleep(900);
   await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
   await sleep(1500);
