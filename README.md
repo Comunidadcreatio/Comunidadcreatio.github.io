@@ -1458,6 +1458,22 @@ resultado.
 
 ## Scripts
 
+> **El servidor local no se caía: dejaba de haber alguien escuchando.** En la campaña se dijo siete veces
+> «se ha caído el servidor» cuando el preflight no encontraba nada en `http://127.0.0.1:8099/`. Se
+> investigó y **no hay evidencia de crash**: el servidor que estuvo levantado durante media campaña
+> sobrevivió a unas 30 aperturas y cierres de headless Chrome sin un solo error en su salida, y
+> `probar-servidor.mjs` (el martillo: corta peticiones a lo bruto, manda cabeceras incompletas, basura,
+> `../` y 404s) lo deja claro — **200 cortes y sigue sirviendo**.
+>
+> Lo que sí se ha hecho, porque el hueco era real aunque la causa no fuera un crash:
+> - `servidor-local.mjs` **avisa claro si el puerto está ocupado** (`EADDRINUSE`) en vez de morir con una
+>   excepción sin contexto, y recoge los errores de petición y respuesta y los de cliente mal formado.
+> - **La suite comprueba el servidor antes de CADA verificador** y, si no está, se para en seco con el
+>   mensaje y el comando para levantarlo. Antes, un hueco a mitad de suite habría hecho fallar a los
+>   veinte siguientes midiendo **páginas de error**.
+> - **Los tres instrumentos que miden en navegador** (foto, suite, contraste y el del arranque) llevan
+>   **preflight**: abortan en vez de medir una página de error.
+
 > **Limpieza de 2026-10-04.** `scripts/` tenía **128** ficheros `.mjs` y **17.542** líneas, más **23 capturas
 > PNG (18,1 MB)** de los `shot-*`: **más código de herramientas que de aplicación** (11.853 de CSS + 12.861
 > de JS). Quedó en **51 ficheros y 9.422 líneas**: se borraron **77 ficheros de código (8.120 líneas)** y las

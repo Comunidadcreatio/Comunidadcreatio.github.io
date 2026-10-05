@@ -28,7 +28,13 @@ const TIPOS = {
     '.woff2': 'font/woff2'
 };
 
-createServer(async (req, res) => {
+const servidor = createServer(async (req, res) => {
+    // Los errores de la PETICIÓN y de la RESPUESTA se recogen aquí. Un headless Chrome que se cierra a
+    // mitad de carga corta la conexión, y escribir en un socket muerto emite un `error` en la respuesta:
+    // sin este oyente, un `error` sin manejar tumba el proceso. (Medido: con 150 cortes brutales el
+    // servidor aguanta —Node ya protege bastante—, pero esto quita la vía por la que SÍ podría morir.)
+    req.on('error', () => {});
+    res.on('error', () => {});
     let ruta = decodeURIComponent((req.url || '/').split('?')[0]);
     if (ruta === '/') ruta = '/index.html';
     // Sin salirse de la raiz.
@@ -42,7 +48,29 @@ createServer(async (req, res) => {
         });
         res.end(datos);
     } catch {
-        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-        res.end('404 ' + ruta);
+        try {
+            res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end('404 ' + ruta);
+        } catch { /* el cliente ya se fue: da igual */ }
     }
-}).listen(PUERTO, () => console.log(`servidor local en http://127.0.0.1:${PUERTO}/ (raiz: ${RAIZ})`));
+});
+
+// Una petición mal formada (el cliente corta a mitad de las cabeceras) NO debe tumbar el servidor.
+servidor.on('clientError', (err, socket) => {
+    try { socket.destroy(); } catch {}
+});
+
+servidor.on('error', (err) => {
+    // El caso que importa: el puerto ya está ocupado. Antes esto salía como una excepción sin contexto y
+    // el trabajo en segundo plano moría sin decir por qué.
+    if (err.code === 'EADDRINUSE') {
+        console.error(`EL PUERTO ${PUERTO} YA ESTA OCUPADO: parece que ya hay un servidor levantado.`);
+        console.error(`Comprueba con:  curl http://127.0.0.1:${PUERTO}/version.json`);
+        console.error(`(Si responde, NO hace falta levantar otro: usa ese.)`);
+    } else {
+        console.error('el servidor local fallo:', err.message);
+    }
+    process.exit(1);
+});
+
+servidor.listen(PUERTO, () => console.log(`servidor local en http://127.0.0.1:${PUERTO}/ (raiz: ${RAIZ})`));

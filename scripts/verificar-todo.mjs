@@ -79,7 +79,23 @@ const resultados = [];
 // arranques. Se guarda el tiempo de cada uno para poder decir cuáles son los caros (y si merece la pena
 // un subconjunto rápido para el día a día).
 const tiempos = [];
+// EL SERVIDOR SE COMPRUEBA ANTES DE CADA VERIFICADOR. Si se cae a mitad de la suite (pasó varias veces en
+// la campaña: no por un crash —con 150 cortes brutales aguanta— sino porque dejaba de haber alguien
+// escuchando), los siguientes veinte fallarían midiendo una PÁGINA DE ERROR y el diagnóstico sería un
+// galimatías. Con esto, se para en seco y se dice lo que pasa.
+const servidorVivo = async () => {
+    try {
+        const r = await fetch(URL, { signal: AbortSignal.timeout(3000) });
+        return r.ok;
+    } catch { return false; }
+};
 for (const s of orden) {
+    if (!(await servidorVivo())) {
+        console.error(`\nNO HAY SERVIDOR en ${URL}: se para la suite para no medir páginas de error.`);
+        console.error(`Levantalo en otro sitio y vuelve a lanzarla:  node scripts/servidor-local.mjs 8099`);
+        console.error(`(Si el puerto estuviera ocupado, el servidor lo dice ahora con un mensaje claro.)`);
+        process.exit(2);
+    }
     const t0 = Date.now();
     const r = await correr(s);
     const ms = Date.now() - t0;
