@@ -102,6 +102,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 const posts = async () => JSON.parse(await evalJs(`JSON.stringify(window.__posts)`));
 
 // Abrir el panel de creación y meter una imagen real en el slot 0
@@ -178,7 +203,7 @@ await evalJs(`(() => {
     };
 })()`);
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1200);
+await asentar();
 const hayLista = await evalJs(`!!document.querySelector('.cavent-item .btn-dup')`);
 check('la lista "Mis Cavents" tiene el botón Duplicar', hayLista === true);
 await evalJs(`document.querySelector('.cavent-item .btn-dup')?.click()`);

@@ -90,6 +90,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) { console.log(`  PASS  ${nombre}`); }
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 const fondoBloqueado = async () => JSON.parse(await evalJs(`JSON.stringify({
     html: document.documentElement.style.overflow || '',
     body: document.body.style.overflow || '',
@@ -101,7 +126,7 @@ const fondoBloqueado = async () => JSON.parse(await evalJs(`JSON.stringify({
 console.log('\n=== 1) Vista previa de Problogs + navegar con el nav (Cavents) ===');
 // Flujo real: "+" del header abre el panel de creación (switchSection).
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1600);
+await asentar();
 console.log('   ' + await evalJs(`(() => {
       document.getElementById('tab-problogs')?.click();
       const t = document.getElementById('problog-titulo'); if (t) t.value = 'Prueba';
@@ -113,7 +138,7 @@ await sleep(400);
 check('la vista previa queda abierta y el fondo bloqueado (estado de partida)',
   (await fondoBloqueado()).html === 'hidden' || (await evalJs(`!!document.getElementById('problog-vista-previa-capa')`)));
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1200);
+await asentar();
 let capa = await evalJs(`!!document.getElementById('problog-vista-previa-capa')`);
 let fondo = await fondoBloqueado();
 check('la capa de vista previa se retira al navegar', capa === false);
@@ -122,7 +147,7 @@ check('el fondo queda libre (html/body/#galeria-container)', fondo.html !== 'hid
 // --- 2) Vista previa + Chat (camino que NO pasa por switchSection) --------
 console.log('\n=== 2) Vista previa + abrir el Chat (abrirChat no pasa por switchSection) ===');
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1600);
+await asentar();
 await evalJs(`(() => {
       document.getElementById('tab-problogs')?.click();
       const c = document.getElementById('problog-contenido'); if (c) c.value = 'Texto de prueba 2';
@@ -130,20 +155,20 @@ await evalJs(`(() => {
   })()`);
 await sleep(400);
 await evalJs(`document.getElementById('btn-chat-global')?.click()`);
-await sleep(1400);
+await asentar();
 capa = await evalJs(`!!document.getElementById('problog-vista-previa-capa')`);
 fondo = await fondoBloqueado();
 check('la vista previa se cierra al abrir el Chat', capa === false);
 check('el fondo queda libre tras abrir el Chat', fondo.html !== 'hidden' && fondo.body !== 'hidden', JSON.stringify(fondo));
 await evalJs(`document.getElementById('chat-cerrar')?.click()`);
-await sleep(600);
+await asentar();
 
 // --- 3) Cajón de comentarios + navegación --------------------------------
 console.log('\n=== 3) Cajón de comentarios + navegar ===');
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(2000);
+await asentar();
 const abrioCajon = await evalJs(`(() => { const m = document.querySelector('.metrica-comentario'); if (!m) return false; m.click(); return true; })()`);
-await sleep(1200);
+await asentar();
 if (!abrioCajon) {
   check('el cajón de comentarios se pudo abrir (necesario para la prueba)', false, 'no hay tarjeta con métrica de comentario');
 } else {
@@ -153,7 +178,7 @@ if (!abrioCajon) {
   })`));
   check('el cajón está abierto y bloquea el fondo (estado de partida)', abierto.visible && abierto.html === 'hidden', JSON.stringify(abierto));
   await evalJs(`document.getElementById('btn-buscar')?.click()`);
-  await sleep(1300);
+  await asentar();
   const tras = JSON.parse(await evalJs(`JSON.stringify({
       visible: document.getElementById('comentarios-drawer')?.classList.contains('visible') || false,
       enPantalla: (() => { const d = document.getElementById('comentarios-drawer'); if (!d) return false; const r = d.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(d).display !== 'none'; })(),
@@ -167,9 +192,9 @@ if (!abrioCajon) {
 // --- 4) Modal de descripción (lupa) + botón "+" (crear) ------------------
 console.log('\n=== 4) Modal de descripción de un Cavent + pulsar "+" (crear) ===');
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(2000);
+await asentar();
 const abrioModal = await evalJs(`(() => { const b = document.querySelector('.btn-detalles-toggle'); if (!b) return false; b.click(); return true; })()`);
-await sleep(900);
+await asentar();
 if (!abrioModal) {
   check('el modal de descripción se pudo abrir (necesario para la prueba)', false, 'no hay tarjeta con botón de detalles');
 } else {
@@ -180,7 +205,7 @@ if (!abrioModal) {
   check('el modal está abierto y bloquea el fondo + el gesto (estado de partida)',
     antes.abierto && fondoAntes.html === 'hidden' && fondoAntes.touchmoveCancelado === true, JSON.stringify({ ...antes, ...fondoAntes }));
   await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-  await sleep(1300);
+  await asentar();
   const despues = JSON.parse(await evalJs(`JSON.stringify({
       modalOculto: document.getElementById('modal-detalles-cavent').classList.contains('hidden'),
       panelVisible: !document.getElementById('panel-artista').classList.contains('hidden')

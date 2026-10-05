@@ -155,6 +155,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 
 // ============================================================
 // XSS en el desplegable "Mis Cavents"
@@ -216,7 +241,7 @@ check('el progreso no es 0% teniendo ya una imagen', progreso !== '0%' && progre
 // ============================================================
 console.log('\n=== PRO-5: etiquetas repetidas y validación de archivos ===');
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
-await sleep(700);
+await asentar();
 const repetidas = await evalJs(`(() => {
     const c = document.getElementById('problog-contenido');
     c.value = Array.from({ length: 9 }, () => '<image>repetida.jpg</image>').join(' ');
@@ -295,7 +320,7 @@ check('el "+" avisa cuando ya no cabe ninguna más', avisosDespues > avisosAntes
 // ============================================================
 console.log('\n=== PRO-5b: liberación de vistas previas del editor ===');
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
-await sleep(700);
+await asentar();
 const imagenPuesta = await evalJs(`(async () => {
     window.__revocados = 0;
     const orig = URL.revokeObjectURL;
@@ -345,7 +370,7 @@ check('al recuperar la etiqueta la vista previa vuelve a verse', JSON.parse(reha
 // ============================================================
 console.log('\n=== INT-8: hueco inferior del editor ===');
 await evalJs(`document.getElementById('tab-cavents')?.click()`);
-await sleep(600);
+await asentar();
 const paddingOculto = await evalJs(`document.getElementById('crear-problogs-contenido').style.paddingBottom || ''`);
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
 await sleep(150);
@@ -388,9 +413,9 @@ await evalJs(`window.__logout = 0; sessionStorage.removeItem('test_logout'); ses
     document.addEventListener('userLogout', () => { window.__logout++; try { sessionStorage.setItem('test_logout', '1'); } catch (e) {} });`);
 await evalJs(`window.__post401 = true`);
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1200);
+await asentar();
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1500);
+await asentar();
 // Hace falta una imagen: el formulario no se puede guardar sin ella.
 await evalJs(`(async () => {
     const blob = await new Promise((res) => {

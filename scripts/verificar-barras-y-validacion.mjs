@@ -92,12 +92,37 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 
 // Abrir el panel de creación por el flujo real ("+")
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
 await sleep(1000);
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1600);
+await asentar();
 
 // ============================================================
 // INT-4 — barras y nav oculto (teclado)
@@ -155,7 +180,7 @@ await evalJs(`document.getElementById('chat-global').classList.add('hidden'); wi
 await sleep(300);
 // La barra del desplegable "Mis Cavents" usaba la misma fórmula
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(900);
+await asentar();
 const barraDesp = JSON.parse(await evalJs(`(() => {
     const b = document.getElementById('obra-cavents-bar');
     if (!b) return JSON.stringify({ existe: false });
@@ -227,7 +252,11 @@ const rellenado = await evalJs(`(() => {
 })()`);
 console.log('   selects sin opción: ' + rellenado);
 await evalJs(`document.getElementById('obra-form').requestSubmit()`);
-await sleep(3000);
+// AQUÍ estaba la carrera (y la sospecha de más abajo, resuelta): tras guardar, la app REPINTA el formulario
+// y ese repintado puede llegar DESPUÉS del relleno de la comprobación siguiente, pisándolo (el campo queda
+// vacío y la comprobación de "cancelar no borra" lee vacío). Mínimo largo, que es lo que hacía el `sleep`
+// de 3 s que había: esperar a que el guardado termine de verdad.
+await asentar(1800, 4000);
 const completo = JSON.parse(await evalJs(`JSON.stringify({ posts: window.__posts, aviso: document.body.innerText.includes('obligatorios') })`));
 console.log('   ' + JSON.stringify(completo));
 check('con todo relleno la obra SÍ se guarda (sin falsos positivos)', completo.posts.length === 1, JSON.stringify(completo.posts));
@@ -239,27 +268,27 @@ check('el título enviado es el correcto', completo.posts[0] && completo.posts[0
 console.log('\n=== CAV-7: "Limpiar campos" pide confirmación ===');
 await evalJs(`(() => { const t = document.getElementById('input-titulo'); t.value = 'No me borres'; t.dispatchEvent(new Event('input', { bubbles: true })); })()`);
 await evalJs(`document.getElementById('obra-step-limpiar')?.click()`);
-await sleep(500);
+await asentar();
 const hayDialogo = await evalJs(`!!document.querySelector('.confirm-overlay')`);
 check('al pulsar limpiar aparece la confirmación', hayDialogo === true);
 await evalJs(`document.querySelector('.confirm-overlay .confirm-btn-cancel')?.click()`);
-await sleep(600);
+await asentar();
 check('si se cancela, no se borra lo escrito', (await evalJs(`document.getElementById('input-titulo').value`)) === 'No me borres');
 await evalJs(`document.getElementById('obra-step-limpiar')?.click()`);
-await sleep(500);
+await asentar();
 await evalJs(`document.querySelector('.confirm-overlay .confirm-btn-ok')?.click()`);
-await sleep(700);
+await asentar();
 check('si se acepta, el formulario queda vacío', (await evalJs(`document.getElementById('input-titulo').value`)) === '');
 
 console.log('\n=== CAV-7b: lo mismo en el editor de Problogs ===');
 await evalJs(`document.getElementById('tab-problogs')?.click()`);
-await sleep(600);
+await asentar();
 await evalJs(`(() => { const t = document.getElementById('problog-titulo'); t.value = 'Titulo de problog'; t.dispatchEvent(new Event('input', { bubbles: true })); })()`);
 await evalJs(`document.getElementById('problog-nav-limpiar')?.click()`);
-await sleep(500);
+await asentar();
 check('el limpiar de Problogs también confirma', (await evalJs(`!!document.querySelector('.confirm-overlay')`)) === true);
 await evalJs(`document.querySelector('.confirm-overlay .confirm-btn-cancel')?.click()`);
-await sleep(600);
+await asentar();
 check('al cancelar se conserva el título del problog', (await evalJs(`document.getElementById('problog-titulo').value`)) === 'Titulo de problog');
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');

@@ -38,6 +38,31 @@ const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
     `--user-data-dir=${perfil}`, '--window-size=1280,900', 'about:blank'
 ], { stdio: 'ignore' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
 const getJson = async (u) => (await fetch(u)).json();
 let ws = null; const logs = [];
 const salir = (c) => { try { ws?.close(); } catch {} try { chrome.kill(); } catch {} try { rmSync(perfil, { recursive: true, force: true }); } catch {} process.exit(c); };
@@ -274,7 +299,7 @@ const VISTAS = [
         esperar: `!!document.getElementById('toggle-panel')`,
         preparar: async (ev, esperar) => {
             await ev(`document.getElementById('btn-crear-cavent')?.click()`);
-            await sleep(1600);
+            await asentar();
             // Se pulsa la PESTAÑA de Cavents, igual que la vista de la foto: sin este clic el estado no
             // es el mismo y los campos del formulario de la obra se quedaban con caja 0x0 (el par se
             // reportaba como "oculto" y ni el campo de solo lectura ni su placeholder se median nunca).

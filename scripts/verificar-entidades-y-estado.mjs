@@ -135,6 +135,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__enviados)`));
 
 // ============================================================
@@ -143,7 +168,7 @@ const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__en
 console.log('=== CAV-9: textos guardados con entidades ===');
 // 1) Tarjeta de la galería
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(2500);
+await asentar();
 const tarjeta = JSON.parse(await evalJs(`(() => {
     const t = document.querySelector('.obra-titulo-marquee .marquee-text') || document.querySelector('.obra-grid-titulo');
     const m = document.querySelector('.obra-meta-marcos');
@@ -168,17 +193,17 @@ if (abrioModal) {
 // 3) Editar: el campo Título debe venir decodificado (antes no) y al guardar debe
 //    enviarse el texto real, de modo que el backend lo re-escape UNA sola vez.
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1200);
+await asentar();
 const hayEdit = await evalJs(`!!document.querySelector('.cavent-item .btn-edit')`);
 check('la lista de Mis Cavents está disponible', hayEdit === true);
 await evalJs(`document.querySelector('.cavent-item .btn-edit')?.click()`);
-await sleep(1500);
+await asentar();
 const tituloCampo = await evalJs(`document.getElementById('input-titulo').value`);
 check('el campo Título se rellena con el texto real (sin entidades)', tituloCampo === TITULO_REAL, JSON.stringify(tituloCampo));
 const marcosCampo = await evalJs(`document.getElementById('input-marcos').value`);
 check('el campo Marcos también', marcosCampo === MARCOS_REAL, JSON.stringify(marcosCampo));
 await evalJs(`document.getElementById('obra-form').requestSubmit()`);
-await sleep(2500);
+await asentar();
 const guardadas = await enviados();
 const put = guardadas.filter(e => e.method === 'PUT').pop();
 check('se envió la actualización de la obra', !!put, JSON.stringify(guardadas));
@@ -194,9 +219,9 @@ check('los marcos enviados son el texto real', put && put.marcos === MARCOS_REAL
 console.log('\n=== PRO-3: estado al crear y al editar ===');
 // 3a) CREAR: sin selector de estado debe enviarse 'publicado'
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(800);
+await asentar();
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1600);
+await asentar();
 await evalJs(`(() => {
     document.getElementById('tab-problogs')?.click();
     document.getElementById('problog-titulo').value = 'Publicacion nueva';
@@ -204,7 +229,7 @@ await evalJs(`(() => {
 })()`);
 await sleep(400);
 await evalJs(`document.getElementById('problog-nav-publicar')?.click()`);
-await sleep(2000);
+await asentar();
 let todos = await enviados();
 let creado = todos.filter(e => e.method === 'POST' && e.url === '/problogs').pop();
 check('al crear se envía estado="publicado"', creado && creado.estado === 'publicado', JSON.stringify(creado && creado.estado));
@@ -226,7 +251,7 @@ const enEdicion = JSON.parse(await evalJs(`JSON.stringify({
 console.log('   ' + JSON.stringify(enEdicion));
 check('el borrador se abrió para editar', enEdicion.boton.includes('Guardar cambios'), JSON.stringify(enEdicion));
 await evalJs(`document.getElementById('problog-nav-publicar')?.click()`);
-await sleep(2500);
+await asentar();
 todos = await enviados();
 const editado = todos.filter(e => e.method === 'PUT' && e.url === '/problogs/30001').pop();
 check('se envió la actualización del borrador', !!editado, JSON.stringify(todos.map(t => t.method + ' ' + t.url)));

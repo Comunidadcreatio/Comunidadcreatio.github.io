@@ -144,7 +144,7 @@ const volverAlInicio = JSON.parse((await evalJs(`(() => {
                             ventana: document.documentElement.clientWidth });
 })()`)) || 'null');
 await evalJs(`document.querySelector('.problog-card')?.click()`);
-await sleep(2000);
+await asentar();
 
 // --- Utilidades de medición -------------------------------------------------
 
@@ -407,6 +407,31 @@ function check(nombre, ok, detalle) {
   if (ok) log(`  PASS  ${nombre}`);
   else { fallos++; log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 const transparente = (c) => {
   if (!c || c === 'transparent') return true;
   const t = String(c);
@@ -430,7 +455,7 @@ for (const tema of ['dark', 'light']) {
   // El sangrado de las líneas interiores lo mide el JS al abrir y al cambiar el
   // tamaño: hay que avisarle, como haría el navegador de verdad.
   await evalJs(`window.dispatchEvent(new Event('resize'))`);
-  await sleep(500);
+  await asentar();
   await apartarRaton();
 
   const d = JSON.parse((await evalJs(MEDIR(tema))) || 'null');
@@ -815,7 +840,7 @@ if (volverAlInicio && volverAlInicio.campanaDerecha !== null && trasAbrir && tra
     `${volverAlInicio.campanaDerecha} → ${trasAbrir.campanaDerecha}`);
 }
 await evalJs(`document.getElementById('btn-problog-volver')?.click()`);
-await sleep(1400);
+await asentar();
 const trasVolver = JSON.parse((await evalJs(`(() => {
     const btn = document.getElementById('btn-problog-volver');
     const campana = document.getElementById('btn-notificaciones');

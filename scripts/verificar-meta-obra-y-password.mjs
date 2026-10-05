@@ -110,6 +110,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__enviados)`));
 
 // ============================================================
@@ -117,18 +142,18 @@ const enviados = async () => JSON.parse(await evalJs(`JSON.stringify(window.__en
 // ============================================================
 console.log('=== BE-4: editar una obra con id personalizado, localización y peso ===');
 await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
-await sleep(1000);
+await asentar();
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);
-await sleep(1500);
+await asentar();
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1200);
+await asentar();
 const hayEdit = await evalJs(`!!document.querySelector('.cavent-item .btn-edit')`);
 check('la lista de Mis Cavents está disponible', hayEdit === true);
 await evalJs(`document.querySelector('.cavent-item .btn-edit')?.click()`);
-await sleep(1600);
+await asentar();
 check('la obra se cargó en modo edición', (await evalJs(`document.getElementById('input-id-edicion').value`)) === '1');
 await evalJs(`document.getElementById('obra-form').requestSubmit()`);
-await sleep(2500);
+await asentar();
 let todos = await enviados();
 let put = todos.filter(e => e.method === 'PUT').pop();
 console.log('   ' + JSON.stringify(put));
@@ -149,11 +174,11 @@ check('la conservación guardada (fuera de la lista) no se pierde',
 
 console.log('\n=== BE-4b: duplicar tampoco debe perder localización y peso ===');
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);   // flecha
-await sleep(1500);
+await asentar();
 await evalJs(`document.getElementById('btn-crear-cavent')?.click()`);   // "+" (limpia el formulario)
-await sleep(1500);
+await asentar();
 await evalJs(`document.getElementById('cavents-trigger')?.click()`);
-await sleep(1200);
+await asentar();
 await evalJs(`document.querySelector('.cavent-item .btn-dup')?.click()`);
 // Esperar a que termine la copia de la imagen (si no, el guardado se bloquea)
 for (let i = 0; i < 20; i++) { await sleep(400); if (await evalJs(`document.querySelectorAll('#carrusel-track .carrusel-slide').length > 1`)) break; }

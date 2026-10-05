@@ -125,6 +125,31 @@ function check(nombre, condicion, detalle) {
   if (condicion) console.log(`  PASS  ${nombre}`);
   else { fallos++; console.log(`  FALLO ${nombre}${detalle ? ' → ' + detalle : ''}`); }
 }
+// ESPERA A QUE LA APP SE ASIENTE. Sustituye a los `sleep` que iban despues de una accion (un clic, un
+// submit, un cambio de metricas): en vez de un tiempo a ojo, se espera a que el DOM deje de cambiar.
+//   - MINIMO 350 ms: una comprobacion NEGATIVA no cambia nada, asi que "estable" seria cierto al instante y
+//     se mediria antes de que la app hubiera podido reaccionar.
+//   - MAXIMO 2,5 s: si algo se queda cambiando (una animacion larga), no se espera para siempre.
+async function asentar(minimoMs = 350, maximoMs = 2500) {
+    const firma = () => evalJs(`(() => {
+        const clases = [];
+        for (const el of document.body.children) {
+            if (el.className && typeof el.className === 'string') clases.push(el.id + ':' + el.className);
+        }
+        return clases.join('|') + '#' + document.querySelectorAll('*').length + '#' + document.querySelectorAll('.hidden').length;
+    })()`);
+    const t0 = Date.now();
+    let anterior = '';
+    await sleep(minimoMs);
+    while (Date.now() - t0 < maximoMs) {
+        const ahora = await firma();
+        if (typeof ahora === 'string' && ahora && ahora === anterior) return true;
+        anterior = typeof ahora === 'string' ? ahora : '';
+        await sleep(120);
+    }
+    return false;
+}
+
 
 // ESPERA POR CONDICIÓN, no por reloj. Este verificador tenía 25 `sleep()` que sumaban 33 s (el 77% de su
 // tiempo) y casi todos esperaban un efecto COMPROBABLE (una vista que se abre, un comentario que aparece).
@@ -663,7 +688,7 @@ check('con el teclado ya abierto, la barra se coloca encima del teclado (sin hue
 check('con el teclado ya abierto, la barra sigue siendo fija',
   !!yaAbierto && yaAbierto.posicion === 'fixed', JSON.stringify(yaAbierto));
 await evalJs(`(() => { delete window.__vvPrueba; window.dispatchEvent(new Event('resize')); })()`);
-await sleep(600);
+await asentar();
 
 console.log('\nEXCEPCIONES:', logs.length ? logs : 'ninguna');
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
