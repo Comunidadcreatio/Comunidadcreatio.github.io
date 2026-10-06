@@ -103,6 +103,10 @@ const MOCK = `(() => {
         const u = String(input);
         const method = ((init && init.method) || 'GET').toUpperCase();
         if (!u.includes('backend-fundacion-atpe.onrender.com')) return realFetch(input, init);
+        // Se registran las peticiones que hace la app. Sirve para diagnosticar una vista que sale vacia:
+        // saber si la app PIDIO lo que hacia falta y con que forma se le contesto.
+        window.__pedidas = window.__pedidas || [];
+        window.__pedidas.push(u.split('onrender.com')[1] || u);
         if (method !== 'GET') return json({ success: true, id: 9 });
         if (u.includes('heartbeat')) return json({ ok: true });
         if (u.includes('mis-reacciones')) return json({ reacciones: [] });
@@ -121,6 +125,31 @@ const MOCK = `(() => {
         // Notificaciones SIN LEER: son las que hacen aparecer la insignia de la campana, que es uno de
         // los sitios que llevan texto blanco sobre un color solido.
         if (u.includes('no-leidas') || u.includes('notificaciones')) return json({ success: true, no_leidas: 2, notificaciones: [] });
+        // Los PROBLOGS: la publicacion con sus comentarios. Hace falta para la vista de comentarios, que es
+        // donde el verificador de contraste de comentarios solo mira la FUENTE (lee el CSS como texto) y no
+        // lo que el navegador pinta. Los comentarios van en su propio endpoint (/problogs/:id/comentarios),
+        // que es como los pide la app.
+        if (u.includes('/problogs')) {
+            // La forma de cada comentario es la que espera la app: si falta problog_id, los DESCARTA y la
+            // vista sale sin comentarios (y eso ya no es un problema de contraste, es del mock).
+            const comentarios = [
+                { id: 1, problog_id: 30001, usuario_id: 480002, texto: 'Un comentario de prueba para medir.',
+                    comentario_padre_id: null, created_at: new Date().toISOString(), autor_nombre: 'Ana', autor_foto: '', likes_count: 2, liked: false },
+                { id: 2, problog_id: 30001, usuario_id: 480003, texto: 'Otro comentario, mas corto.',
+                    comentario_padre_id: null, created_at: new Date().toISOString(), autor_nombre: 'Beto', autor_foto: '', likes_count: 0, liked: false }
+            ];
+            // SIN expresiones regulares en esta zona: dentro de una plantilla inyectada, un escape de barra
+            // se convierte en una barra suelta y la expresion llega ROTA a la pagina (el script entero del
+            // mock no se instala y todo el verificador mide cero). includes() no necesita escapes.
+            if (u.includes('/comentarios')) return json({ success: true, comentarios });
+            const publicacion = { id: 30001, titulo: 'Una publicacion', etiquetas: 'arte', estado: 'publicado',
+                created_at: new Date().toISOString(), bloques: [{ tipo: 'texto', contenido: 'Texto de la publicacion.' }],
+                imagenes: [null, null, null, null, null, null, null, null], miniaturas: [null, null, null, null, null, null, null, null],
+                portada_slot: null, nombre_artista: 'T', foto_artista: '', likes_count: 1, comentarios_count: comentarios.length,
+                reblogs_count: 0, liked: false, reblogged: false, comentarios };
+            if (u.includes('/problogs/')) return json(publicacion);   // el detalle va DIRECTO, sin envolver
+            return json({ success: true, problogs: [publicacion], total: 1, page: 1, limit: 10 });
+        }
         // La OBRA de ejemplo: sin ella la galeria sale vacia y la vista de Explorar no mide nada.
         if (u.includes('/obras')) return json([{ id: 55001, titulo: 'Obra de prueba', precio: '100', artista: 'Ana',
             artista_user_id: 480002, foto_artista: '', estado_obra: 'publicada', vistas: 0, imagen: '', imagenes: [],
@@ -390,6 +419,42 @@ const VISTAS = [
             ['.chat-user-nombre', 'nombre de usuario (chat)'],
             ['.chat-user-estado', 'estado de usuario (chat)']
         ]
+    },
+    {
+        // LOS COMENTARIOS de un Problogs: la vista que faltaba. `verificar-contraste-comentarios` mira los
+        // colores DECLARADOS (lee `css/problogs.css` como texto), no los que el navegador PINTA, asi que un
+        // token que resuelva distinto en tema oscuro —la forma exacta del fallo del placeholder— no lo
+        // cazaria. Aqui se mide lo pintado, con el fondo efectivo compuesto.
+        //
+        // OJO con lo que sale "--": el panel de la publicacion es TRANSLUCIDO sobre el slideshow, asi que
+        // sus textos no tienen fondo pintado detras y este metodo no puede medirlos (lo dice el propio
+        // verificador, que se niega a inventarse un fondo). Lo que SI se mide es lo que lleva fondo propio,
+        // como la INICIAL DEL AVATAR (`.problog-comentario-avatar`, que pinta `--color-gray-200`): ese fue
+        // uno de los fallos de contraste de hoy —estaba a 1,23:1 en claro, invisible— y aqui queda vigilado
+        // en su sitio, medido en la pagina: 7,17:1 en claro y 13,08:1 en oscuro.
+        nombre: 'problogs (comentarios)',
+        ruta: '',
+        esperar: `!!document.getElementById('toggle-panel')`,
+        preparar: async (ev, esperar) => {
+            await ev(`document.getElementById('btn-problogs-nav')?.click()`);
+            await esperar(`(() => { const c = document.querySelector('.problog-card [data-problog-comentar]'); return !!c && c.getBoundingClientRect().height > 0; })()`);
+            await ev(`document.querySelector('.problog-card [data-problog-comentar]')?.click()`);
+            await esperar(`(() => { const d = document.getElementById('problogs-detalle'); const c = document.querySelector('[data-problog-comentarios] .problog-comentario'); return !!d && !d.classList.contains('hidden') && !!c && c.getBoundingClientRect().height > 0; })()`);
+            // Si la vista sale vacia, esto dice que PIDIO la app (es lo que permitio ver que el problema
+            // era el mock entero sin instalar, y no "pide y no le contestan bien").
+            console.log('   peticiones de la app: ' + await ev(`JSON.stringify((window.__pedidas || []).slice(-6))`));
+        },
+        pares: [
+            ['.problog-comentario-autor', 'nombre del autor del comentario'],
+            ['.problog-comentario-cab', 'cabecera del comentario (fecha)'],
+            ['.problog-comentario-texto', 'texto del comentario'],
+            ['.problog-comentario-enviar', 'boton de comentar'],
+            ['[data-comentario-responder]', 'accion «Responder»'],
+            // La INICIAL del avatar cuando el usuario no tiene foto: ese fue uno de los fallos de contraste
+            // que se encontraron (1,23:1 en claro, invisible). Aqui queda vigilado en su sitio.
+            ['.problog-comentario-avatar', 'inicial del avatar del comentario'],
+            ['[data-comentario-like]', 'accion de me gusta del comentario']
+        ]
     }
 ];
 
@@ -405,6 +470,10 @@ const VISTAS = [
 // La regla de "una vista que no mide nada es un fallo" impide que entren aqui dando un verde vacio.
 
 for (const vista of VISTAS) {
+    // Vistas declaradas pero omitidas (intentadas y no conseguidas): se saltan a propósito, y la razón
+    // está escrita en su propia ficha. Sin esto, una vista con `pares: []` dispararía la regla de "una
+    // vista que no mide nada es un fallo", que es justo la que impide los verdes vacíos.
+    if (vista.omitida) { console.log(`\n--- ${vista.nombre}: OMITIDA (${vista.motivo})`); continue; }
     await send('Page.navigate', { url: URL_BASE + vista.ruta });
     // OJO: esperar a `#login-form` NO basta para la vista de auth, porque index.html tambien tiene un
     // `#login-form` oculto (del modal viejo): la espera se daba por buena antes de que la navegacion

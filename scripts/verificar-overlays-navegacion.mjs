@@ -178,7 +178,19 @@ if (!abrioCajon) {
   })`));
   check('el cajón está abierto y bloquea el fondo (estado de partida)', abierto.visible && abierto.html === 'hidden', JSON.stringify(abierto));
   await evalJs(`document.getElementById('btn-buscar')?.click()`);
-  await asentar();
+  // El cajón se cierra con una TRANSICIÓN y la app lo deja en `display: none` al terminar. El asentamiento
+  // genérico se queda corto: el DOM "se asienta" en cuanto desaparece la clase `visible`, pero el cajón
+  // sigue teniendo caja mientras se desliza (por eso esta comprobación fallaba de forma INTERMITENTE).
+  for (let i = 0; i < 30; i++) {
+      const fuera = await evalJs(`(() => {
+          const d = document.getElementById('comentarios-drawer');
+          if (!d) return true;
+          const r = d.getBoundingClientRect();
+          return getComputedStyle(d).display === 'none' || r.width === 0 || r.height === 0;
+      })()`);
+      if (fuera === true) break;
+      await sleep(100);
+  }
   const tras = JSON.parse(await evalJs(`JSON.stringify({
       visible: document.getElementById('comentarios-drawer')?.classList.contains('visible') || false,
       enPantalla: (() => { const d = document.getElementById('comentarios-drawer'); if (!d) return false; const r = d.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(d).display !== 'none'; })(),
