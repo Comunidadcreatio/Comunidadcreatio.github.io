@@ -455,6 +455,23 @@ const VISTAS = [
             ['.problog-comentario-avatar', 'inicial del avatar del comentario'],
             ['[data-comentario-like]', 'accion de me gusta del comentario']
         ]
+    },
+    {
+        // LA GALERIA (EXPLORAR): INTENTADA Y QUITADA (2026-10-05). NO es un problema de estado, es el mismo
+        // límite que el perfil, y ahora está MEDIDO:
+        //   - La tarjeta tiene caja (`209x262`), pero **no pinta fondo**: es translúcida sobre el slideshow,
+        //     así que sus textos no tienen contra qué medirse y este método se niega a inventarse un fondo
+        //     (informa "no hay fondo pintado detras"). Igual que el perfil.
+        //   - Y sus piezas interiores no ayudan: en rejilla, `.obra-artista-row` y `.obra-avatar-clickable`
+        //     miden 0x0 (se colapsan) y `.obra-card-titulo`, `.obra-imagen`, `.obra-precio` **no existen**
+        //     en ese estado.
+        //   - O sea: para medir la galería haría falta otro método (capturar el fondo real del lienzo, o
+        //     medirla con la tarjeta abierta en detalles, donde sí hay superficie). No es un verde vacío.
+        nombre: 'galeria (Explorar)',
+        ruta: '',
+        omitida: true,
+        motivo: 'la tarjeta no pinta fondo (translucida sobre el slideshow) y sus piezas interiores miden 0x0 o no existen',
+        pares: []
     }
 ];
 

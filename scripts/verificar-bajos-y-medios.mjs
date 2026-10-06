@@ -358,6 +358,17 @@ await evalJs(`(() => {
     c.value = 'vuelve la imagen\\n\\n<image>${imagenPuesta}</image>';
     c.dispatchEvent(new Event('input', { bubbles: true }));
 })()`);
+// La vista previa se rehace con el BLOB de la imagen: es una CARGA ASÍNCRONA, y el asentamiento genérico se
+// queda corto (el DOM se asienta en cuanto la etiqueta está puesta, pero la imagen todavía no ha cargado).
+// Se espera a que la imagen esté CARGADA de verdad, que es lo que comprueba la línea siguiente.
+for (let i = 0; i < 40; i++) {
+    const cargada = await evalJs(`(() => {
+        const cuadro = document.querySelector('.problog-portada-cuadro:not(.vacio) img');
+        return !!cuadro && cuadro.naturalWidth > 0;
+    })()`);
+    if (cargada === true) break;
+    await sleep(100);
+}
 const rehabilitada = await evalJs(`(() => {
     const cuadro = document.querySelector('.problog-portada-cuadro:not(.vacio) img');
     return JSON.stringify({ hay: !!cuadro, blob: !!cuadro && cuadro.src.startsWith('blob:'), cargada: !!cuadro && cuadro.naturalWidth > 0 });

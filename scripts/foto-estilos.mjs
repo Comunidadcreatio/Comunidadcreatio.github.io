@@ -959,6 +959,16 @@ for (const pag of PAGINAS) {
                 datos[clave] = filtrado;
             }
             console.log(`   ${pag.nombre} · ${tema} · ${ancho}px: ${Object.keys(uno).length} elementos, ${inestables} valores inestables`);
+            // QUÉ NO SE HA MEDIDO, dicho en voz alta. Hasta ahora, un selector de la lista que no existía (o
+            // que existía con caja 0x0) se saltaba EN SILENCIO: la vista parecía medida y ese trozo no lo
+            // estaba. Se descubrió porque la vista `grid` mide `.obra-card-titulo` desde siempre y ese
+            // elemento NO EXISTE en el estado de rejilla. No es un fallo (hay selectores que solo aplican en
+            // algunos estados), pero tiene que verse.
+            const noEstan = pag.selectores.filter((s) => !(s in uno));
+            const sinCaja = pag.selectores.filter((s) => uno[s] && (uno[s].__ancho === '0' && uno[s].__alto === '0'));
+            if (noEstan.length || sinCaja.length) {
+                console.log(`      sin medir: ${noEstan.length ? noEstan.length + ' no existen (' + noEstan.slice(0, 4).join(', ') + (noEstan.length > 4 ? ', …' : '') + ')' : ''}${noEstan.length && sinCaja.length ? ' · ' : ''}${sinCaja.length ? sinCaja.length + ' con caja 0x0 (' + sinCaja.slice(0, 4).join(', ') + (sinCaja.length > 4 ? ', …' : '') + ')' : ''}`);
+            }
         }
     }
 }
