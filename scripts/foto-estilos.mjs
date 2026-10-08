@@ -518,6 +518,10 @@ const PAGINAS = [
         // perfil tiene su propia familia de reglas en galeria-publica.css / style.css.
         nombre: 'perfil',
         ruta: '',
+        // El avatar del perfil y su capa: `.perfil-avatar-overlay` solo se ve al PASAR EL RATON por el
+        // avatar (por eso medía 0x0). Se fuerza el `:hover` del boton del avatar por CDP, con el mismo
+        // mecanismo que ya se usa para el `:focus` del registro.
+        forzarPseudo: { '#perfil-avatar-btn': ['hover'] },
         esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // Una de las tres vistas inestables: a veces medía el perfil sin sus secciones (58 elementos en
@@ -666,6 +670,58 @@ const PAGINAS = [
             // `.input-etiquetas-subtle`). Son del FORMULARIO DE OBRA, no del editor de Problogs, y ahi miden
             // 0x0: el cruce de las 32 lecturas lo dijo. La barra de pasos ya se pinta en la vista `panel` (y
             // se miden alli), asi que no se pierde nada; la de etiquetas sigue en la lista de `panel`.
+        ]
+    },
+    {
+        // El FEED de Problogs, SIN abrir ninguna publicacion. La vista `problogs` abre el detalle, y con el
+        // detalle abierto el feed queda oculto: por eso `.problogs-feed`, `.problog-card` y
+        // `.problog-social-btn` se median con caja 0x0. Esta vista se queda en el feed, que es donde viven.
+        nombre: 'problogs (feed)',
+        ruta: '',
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        // El feed pintado: una tarjeta con caja.
+        exigidos: ['#problogs', '#problogs .problog-card'],
+        abrir: async (ev, dormir) => {
+            // El clic se repite: la app arranca por modulos y el boton puede existir antes de tener su
+            // listener (es la carrera que ya aparecio varias veces).
+            for (let intento = 0; intento < 6; intento++) {
+                await ev(`document.getElementById('btn-problogs-nav')?.click()`);
+                await dormir(1200);
+                const listo = await ev(`(() => { const c = document.querySelector('#problogs .problog-card'); return !!c && c.getBoundingClientRect().height > 0; })()`);
+                if (listo === true) break;
+            }
+            await dormir(600);
+        },
+        selectores: [
+            '#problogs', '#problogs .problogs-feed', '#problogs .problog-card', '.problog-social-btn'
+        ]
+    },
+    {
+        // La GALERIA en CARRUSEL (su modo por defecto), sin entrar en Explorar: `modo-grid` lo pone el boton
+        // de Explorar. Hace falta porque el avatar del artista de la tarjeta (`.obra-avatar-clickable` y
+        // `.obra-avatar-placeholder`) se COLAPSA en rejilla (su fila se pliega) y en la vista `grid` mide
+        // 0x0. Aqui es donde se pinta.
+        nombre: 'galeria (carrusel)',
+        ruta: '',
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        // Solo se exige la tarjeta con caja (no la fila del artista: si esa no se pinta en carrusel, es un
+        // DATO, no un fallo, y la foto tiene que poder escribirlo).
+        exigidos: ['#galeria-container', '.obra-card'],
+        abrir: async (ev, dormir) => {
+            await ev(`window.abrirObraDesdePerfil ? window.abrirObraDesdePerfil(55001) : null`);
+            await dormir(2600);
+            for (let i = 0; i < 20; i++) {
+                const listo = await ev(`(() => { const c = document.querySelector('#galeria-container .obra-card'); return !!c && c.getBoundingClientRect().height > 0; })()`);
+                if (listo === true) break;
+                await dormir(300);
+            }
+            await dormir(600);
+        },
+        selectores: [
+            '#galeria-publica', '#galeria-container', '.obra-card', '.obra-artista-row',
+            '.obra-avatar-clickable', '.obra-avatar-placeholder'
         ]
     }
 ];

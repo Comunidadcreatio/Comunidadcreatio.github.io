@@ -48,3 +48,21 @@ for (const [nombre, lista] of Object.entries(grupos)) {
         console.log(`   ${c.vista.padEnd(16)} ${c.sel.padEnd(44)} de ${c.n} lecturas · medidas ${c.medidos} · no existe ${c.noExiste} · caja0 ${c.cero}`);
     }
 }
+
+// Y EL BALANCE POR SELECTOR, que es lo que de verdad importa: un elemento puede seguir contando como "sin
+// pintar" en la vista donde NO vive aunque ya este cubierto en su vista hermana (es lo que pasa con `auth` y
+// `auth (login)`, o con `grid` y `galeria (carrusel)`). Aqui se junta todo: en cuantas vistas se PINTA y en
+// cuantas no. Los que no se pintan en NINGUNA son los unicos que siguen sin cobertura visual.
+const porSelector = new Map();
+for (const c of mapa.values()) {
+    if (!porSelector.has(c.sel)) porSelector.set(c.sel, { sel: c.sel, vistas: 0, pintado: 0, sinPintar: 0 });
+    const g = porSelector.get(c.sel);
+    g.vistas++;
+    if (c.medidos > 0) g.pintado++; else g.sinPintar++;
+}
+const nuncaPintados = [...porSelector.values()].filter((g) => g.pintado === 0).sort((a, b) => a.sel.localeCompare(b.sel));
+const yaCubiertos = [...porSelector.values()].filter((g) => g.pintado > 0 && g.sinPintar > 0).length;
+console.log(`\n== BALANCE POR SELECTOR: ${porSelector.size} selectores distintos`);
+console.log(`   cubiertos en una vista y sin pintar en otra (contaban como SIN PINTAR): ${yaCubiertos}`);
+console.log(`   NUNCA pintados en ninguna vista: ${nuncaPintados.length}${nuncaPintados.length ? ' ->' : '  (cobertura visual completa)'}`);
+for (const g of nuncaPintados) console.log(`      ${g.sel.padEnd(46)} sin pintar en ${g.sinPintar} de ${g.vistas} vistas`);
