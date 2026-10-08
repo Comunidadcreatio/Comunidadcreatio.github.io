@@ -240,6 +240,58 @@ const PAGINAS = [
         ]
     },
     {
+        // AUTH (LANDING): el estado INICIAL de la pagina, sin pulsar nada. `#login-landing` es la pantalla
+        // con los dos botones (`.secondary-btn`: «Iniciar Sesion» y «Crear cuenta nueva»), y las vistas
+        // `auth` y `auth (login)` la dejan atras al abrir el formulario: por eso medía 0x0 y el balance la
+        // marcaba como sin cobertura visual. Aqui se vuelve a ella si la app la hubiera pasado.
+        nombre: 'auth (landing)',
+        exigidos: ['#login-landing', '.secondary-btn'],
+        ruta: 'auth.html',
+        esperar: `(() => { const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            for (let i = 0; i < 20; i++) {
+                const listo = await ev(`(() => { const l = document.getElementById('login-landing'); return !!l && l.getBoundingClientRect().height > 0; })()`);
+                if (listo === true) break;
+                // Si la app abrio el formulario, se vuelve con su propio boton.
+                await ev(`document.getElementById('btn-volver-landing')?.click()`);
+                await dormir(400);
+            }
+            await dormir(500);
+        },
+        selectores: [
+            'html', 'body', '#login-landing', '.secondary-btn', '#btn-mostrar-login', '#btn-ir-registro',
+            '#login-section', '.auth-container', '#auth-dark-mode-btn'
+        ]
+    },
+    {
+        // AUTH (RECUPERAR): la pantalla de «¿Olvidaste tu contrasena?», que se abre desde el enlace del
+        // formulario de login (`#btn-olvide-contrasena`). Sin esta vista, `#forgot-section`, `#forgot-email`
+        // y el boton de volver median 0x0 en todas las demas.
+        nombre: 'auth (recuperar)',
+        exigidos: ['#forgot-section', '#forgot-email'],
+        ruta: 'auth.html',
+        esperar: `(() => { const f = document.getElementById('login-form'); const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return !!f && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            // Primero el formulario (el enlace vive dentro) y luego el enlace, con reintento: la app arranca
+            // por modulos y el clic se puede perder si el listener todavia no esta.
+            for (let intento = 0; intento < 6; intento++) {
+                await ev(`document.getElementById('btn-mostrar-login')?.click()`);
+                await dormir(600);
+                await ev(`document.getElementById('btn-olvide-contrasena')?.click()`);
+                await dormir(600);
+                const listo = await ev(`(() => { const s = document.getElementById('forgot-section'); return !!s && s.getBoundingClientRect().height > 0; })()`);
+                if (listo === true) break;
+            }
+            await dormir(500);
+        },
+        selectores: [
+            'html', 'body', '#forgot-section', '#forgot-email', '.secondary-btn',
+            '#btn-volver-login-from-forgot', '#login-section', '.auth-container', '#auth-dark-mode-btn'
+        ]
+    },
+    {
         // pagina. Sin esto, cualquier cambio en problogs.css se quedaria sin cubrir.
         nombre: 'problogs',
         ruta: '',
