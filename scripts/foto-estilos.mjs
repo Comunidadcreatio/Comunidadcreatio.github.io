@@ -68,7 +68,7 @@ const PAGINAS = [
             '#fx-submit', '#fx-p', '#fx-h2', '#fx-label', '#fx-a', '#fx-span', '#fx-div',
             '#fx-main', '#fx-picture', '#fx-img', '#fx-form', '#fx-fieldset', '#fx-legend',
             '#fx-invalid', '#fx-invalid-select',
-            'html', 'body', '#main-header', '#toggle-panel', '#toggle-panel .nav-btn',
+            'html', 'body', '#main-header', '#toggle-panel',
             '#btn-notificaciones', '#desktop-logout-all', '#desktop-logout-single',
             '#mobile-logout-all', '#mobile-logout-single', '#problog-responder-barra'
         ]
@@ -159,8 +159,8 @@ const PAGINAS = [
             '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais',
             // Estados montados arriba y la familia de tema oscuro de auth.css (contenedor, seccion,
             // titulos, etiquetas), mas los botones secundarios y la navegacion por pasos.
-            '.input-error', '.input-available', '.auth-section', '.auth-section h1',
-            '.auth-section p', '.form-group label', '.secondary-btn', '.nav-btn',
+            '.input-error', '.input-available', '.auth-section',
+            '.auth-section p', '.secondary-btn', '.nav-btn',
             '.password-wrapper', '.password-wrapper input', '.step-navigation .nav-btn'
         ]
     },
@@ -204,11 +204,11 @@ const PAGINAS = [
         },
         selectores: [
             '#problogs', '#problogs .problogs-feed', '#problogs .problog-card',
-            '#problogs-detalle', '#problogs-detalle .problog-titulo',
-            '#problogs-detalle .problog-contenido', '[data-problog-comentarios]',
+            '#problogs-detalle',
+ '[data-problog-comentarios]',
             '.problog-comentario', '.problog-comentario-avatar', '.problog-comentario-texto',
             '.problog-comentario-input', '.problog-comentario-enviar',
-            '.problog-social-btn', '.problog-marcadores',
+            '.problog-social-btn',
             '#problog-responder-barra', '#problog-responder-texto', '.problog-responder-icono'
         ]
     },
@@ -335,12 +335,12 @@ const PAGINAS = [
             '.cavents-dropdown', '.cavents-dropdown.open', '.cavents-trigger',
             '#obra-step-bar .crear-btn', '#obra-step-bar .limpiar-btn',
             '#obra-etiquetas-bar .input-etiquetas-subtle',
-            '.form-block .form-group input', '.form-block .form-group select',
+            '.form-block .form-group input',
             // Lo que miden las reglas de formularios.css de la obra (estados montados arriba y la
             // maquetacion por filas): sin estos elementos, esos `!important` no tenian red.
             '#formulario-obra', '.form-block .form-group label', '.form-row-tight',
             '.form-block .form-row-3', '#input-descripcion-artistica', '#obra-progress-bar',
-            '.form-block .form-group textarea',
+
             // La familia del carrusel y el boton de ratio inactivo (los `!important` de style.css),
             // y las etiquetas del encabezado, que se pintan u ocultan con `display`.
             '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label',
@@ -400,10 +400,10 @@ const PAGINAS = [
             // grafico de estado) y hasta el 2026-10-04 no los medía nadie, asi que migrarlos a un token
             // era invisible para la foto (se comprobaba solo con numeros).
             '.chat-user-dot', '.chat-user-dot.online',
-            '.chat-nav-badge', '.chat-fab-badge', '.chat-conv-item-badge',
-            '.chat-conv-dot', '.chat-conv-dot.online', '.chat-sala-fab.cerrada',
-            '.chat-msg-leido.visto',
-            '#btn-chat-global-fab', '#chat-cerrar'
+            '.chat-nav-badge', '.chat-fab-badge',
+ '.chat-sala-fab.cerrada',
+
+            '#btn-chat-global-fab',
         ]
     },
     {
@@ -438,7 +438,7 @@ const PAGINAS = [
         },
         selectores: [
             '#galeria-container', '#galeria-container.modo-grid', '.obra-card',
-            '.obra-card-titulo', '.obra-avatar-clickable', '.obra-card .obra-imagen',
+ '.obra-avatar-clickable',
             '#galeria-publica'
         ]
     },
@@ -538,7 +538,7 @@ const PAGINAS = [
             '.perfil-tab-btn', '#perfil-estadisticas', '.perfil-seccion',
             '.perfil-seccion-layout', '.perfil-seccion-info',
             '#galeria-publica', '#galeria-container', '.obra-card',
-            '.obra-avatar-clickable', '.obra-avatar-placeholder', '.obra-card-titulo'
+            '.obra-avatar-clickable', '.obra-avatar-placeholder',
         ]
     },
     {
@@ -586,7 +586,7 @@ const PAGINAS = [
         },
         selectores: [
             '#crear-problogs-contenido', '#problog-form', '#problog-nav-bar',
-            '.problog-anadir-btn', '.problog-btn-icono', '.problog-bloque',
+            '.problog-anadir-btn',
             '#crear-problogs-contenido button', '.problog-anadir-btn:not(.hidden)',
             '#problog-nav-bar .nav-btn', '#problog-nav-bar .crear-btn',
             '#problog-nav-bar .limpiar-btn', '#obra-step-bar', '#obra-step-bar .crear-btn',
@@ -845,6 +845,10 @@ const FIXTURE = `(() => {
 })()`;
 
 const datos = {};
+// Lo que NO se ha medido, en crudo: { vista, tema, ancho, noEstan, sinCaja, medidos }. Se escribe junto a la
+// foto para poder CRUZARLO (`scripts/analizar-no-medido.mjs`): saber si un selector no mide en NINGUNA vista,
+// tema o ancho (entonces sobra) o solo en algunos estados (entonces se queda).
+const sinMedir = [];
 console.log(`Foto de estilos: ${BASE}`);
 
 for (const pag of PAGINAS) {
@@ -981,6 +985,10 @@ for (const pag of PAGINAS) {
             // algunos estados), pero tiene que verse.
             const noEstan = pag.selectores.filter((s) => !(s in uno));
             const sinCaja = pag.selectores.filter((s) => uno[s] && (uno[s].__ancho === '0' && uno[s].__alto === '0'));
+            // Y se GUARDA, en crudo y SIN truncar, para poder cruzarlo despues. La linea de consola solo
+            // enseña cuatro ejemplos; para decidir si un selector sobra hay que saber si mide en ALGUNA vista,
+            // tema o ancho, y eso pide la lista entera (lo lee `scripts/analizar-no-medido.mjs`).
+            sinMedir.push({ vista: pag.nombre, tema, ancho, noEstan, sinCaja, medidos: Object.keys(uno) });
             if (noEstan.length || sinCaja.length) {
                 console.log(`      sin medir: ${noEstan.length ? noEstan.length + ' no existen (' + noEstan.slice(0, 4).join(', ') + (noEstan.length > 4 ? ', …' : '') + ')' : ''}${noEstan.length && sinCaja.length ? ' · ' : ''}${sinCaja.length ? sinCaja.length + ' con caja 0x0 (' + sinCaja.slice(0, 4).join(', ') + (sinCaja.length > 4 ? ', …' : '') + ')' : ''}`);
             }
@@ -990,4 +998,7 @@ for (const pag of PAGINAS) {
 
 writeFileSync(rutaSalida, JSON.stringify({ cuando: new Date().toISOString(), url: BASE, medidas: Object.keys(datos).length, datos }, null, 1), 'utf8');
 console.log(`\nFoto guardada en ${rutaSalida}: ${Object.keys(datos).length} medidas`);
+// Y el registro de lo NO medido, junto a la foto (mismo nombre + `.sin-medir.json`).
+writeFileSync(rutaSalida.replace(/\.json$/, '') + '.sin-medir.json', JSON.stringify(sinMedir, null, 1), 'utf8');
+console.log(`Registro de lo no medido: ${rutaSalida.replace(/\.json$/, '')}.sin-medir.json (${sinMedir.length} lecturas)`);
 salir(0);
