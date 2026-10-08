@@ -387,6 +387,23 @@ const PAGINAS = [
                 cajaAnterior = caja;
                 await dormir(300);
             }
+            // Y SE AVANZA AL PASO QUE PIDA LA VISTA. El asistente pinta UN paso y oculta los demas
+            // (`showStep` de panel-ui.js alterna `.form-section` con `.hidden`): por eso los campos de los
+            // otros pasos median 0x0. El flujo pone PASO_PANEL (1 para la vista `panel`); aqui se pulsa
+            // «siguiente» las veces necesarias y se ESPERA a que el paso cambie de verdad.
+            for (let paso = 1; paso < PASO_PANEL; paso++) {
+                const antes = await ev(`(() => { const s = document.querySelector('#obra-form .form-section:not(.hidden)'); return s ? s.getAttribute('data-section') : ''; })()`);
+                await ev(`document.getElementById('obra-step-next')?.click()`);
+                for (let i = 0; i < 25; i++) {
+                    await dormir(200);
+                    const ahora = await ev(`(() => { const s = document.querySelector('#obra-form .form-section:not(.hidden)'); return s ? s.getAttribute('data-section') : ''; })()`);
+                    if (ahora && ahora !== antes) break;
+                }
+            }
+            if (PASO_PANEL > 1) {
+                const seccion = await ev(`(() => { const s = document.querySelector('#obra-form .form-section:not(.hidden)'); return s ? s.getAttribute('data-section') : 'NINGUNA'; })()`);
+                console.log(`   [panel] paso ${PASO_PANEL} -> seccion visible: ${seccion}`);
+            }
         },
         // El `:focus` de un campo obligatorio VACIO (:invalid + :focus), forzado por CDP.
         forzarPseudo: { '#input-ano': ['focus'] },
@@ -723,10 +740,56 @@ const PAGINAS = [
             '#galeria-publica', '#galeria-container', '.obra-card', '.obra-artista-row',
             '.obra-avatar-clickable', '.obra-avatar-placeholder'
         ]
-    }
+    },
+    // LOS PASOS DEL ASISTENTE DE OBRA. El asistente pinta UNO y oculta los demas (`showStep` alterna
+    // `.form-section` con `.hidden`), asi que los campos de los otros pasos median 0x0: el balance por
+    // selector lo dijo con nombre y apellido (19 de los 32 sin cobertura visual eran suyos). El `abrir` de
+    // la vista `panel` avanza hasta el paso que pida cada una.
+    //
+    // Las cuatro llevan LA MISMA LISTA a proposito: no se sabe de antemano que campo vive en que paso, y
+    // asi la foto responde ESO (cada paso enseña cuales de los campos pinta). El balance por selector junta
+    // despues las cuatro y dice si alguno se queda sin pintar en ninguna.
+    ...[
+        { paso: 2, seccion: 'basica' },
+        { paso: 3, seccion: 'visibilidad' },
+        { paso: 4, seccion: 'tecnicos' },
+        { paso: 5, seccion: 'proveniencia' }
+    ].map(({ paso, seccion }) => ({
+        nombre: `panel (paso ${paso})`,
+        paso,
+        // Guardian de estado: la seccion de ESE paso tiene que estar PINTADA. Si el avance no ocurre, la
+        // foto aborta en vez de escribir un paso 1 disfrazado de paso N.
+        exigidos: ['#obra-form', `[data-section="${seccion}"]`],
+        ruta: '',
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: ABRIR_PANEL,
+        // El `:focus` del campo del año (esta en el paso 2, «Informacion Basica») tambien aqui.
+        forzarPseudo: paso === 2 ? { '#input-ano': ['focus'] } : undefined,
+        selectores: [
+            '#input-titulo', '#input-artista', '#input-ano', '#input-ancho', '#input-alto', '#input-precio',
+            '#input-etiquetas', '#input-estado-obra', '#input-status',
+            '#input-descripcion-artistica', '#input-descripcion-tecnica',
+            '.form-block .form-group input', '.form-block .form-group label', '.form-row-tight',
+            '.form-block .form-row-3', '.toggle-label', '.custom-select', '.custom-select-trigger',
+            '#obra-form .form-group', '#obra-etiquetas-bar', '#obra-etiquetas-bar .input-etiquetas-subtle'
+        ]
+    }))
 ];
 
 const ANCHOS = [393, 1280];
+// En que PASO del asistente de obra tiene que quedar la vista `panel` (y sus hermanas `panel (paso N)`).
+// Lo pone el flujo antes de abrir. El asistente pinta UN paso y oculta los demas: por eso los campos de los
+// otros pasos median 0x0 (el balance por selector lo dejo claro: 19 de los 32 sin cobertura visual eran
+// SUYOS).
+let PASO_PANEL = 1;
+// Reutiliza el `abrir` de la vista `panel` para las vistas de los pasos. Es una DECLARACION DE FUNCION a
+// proposito (se hoistea, asi que puede usarse en la lista de arriba) y busca la vista `panel` en tiempo de
+// LLAMADA: mover las 60 lineas del `abrir` para compartirlas seria mucho mas arriesgado que esto.
+async function ABRIR_PANEL(ev, dormir) {
+    const panel = PAGINAS.find((v) => v.nombre === 'panel');
+    return panel.abrir(ev, dormir);
+}
 const TEMAS = ['light', 'dark'];
 
 const salir = (codigo) => { try { ws?.close(); } catch {} try { chrome?.kill(); } catch {} try { rmSync(perfil, { recursive: true, force: true }); } catch {} process.exit(codigo); };
@@ -1023,7 +1086,7 @@ for (const pag of PAGINAS) {
             if (ok !== 'ok') { console.error(`No se pudo montar la muestra en ${pag.nombre}:`, ok); salir(2); }
         }
         // Algunas vistas hay que ABRIRLAS (Problogs: feed + publicacion + barra).
-        if (pag.abrir) await pag.abrir(evalJs, sleep);
+        if (pag.abrir) { PASO_PANEL = pag.paso || 1; await pag.abrir(evalJs, sleep); }
         // Y si la vista declara selectores EXIGIDOS, se comprueba que el estado llego de verdad. Es la
         // otra mitad del arreglo de la inestabilidad: la lectura salta en silencio los selectores que no
         // encuentra, asi que una vista a medio montar producia una foto COJA que parecia buena (paso el
