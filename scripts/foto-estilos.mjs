@@ -655,9 +655,11 @@ const PAGINAS = [
             '.problog-anadir-btn',
             '#crear-problogs-contenido button', '.problog-anadir-btn:not(.hidden)',
             '#problog-nav-bar .nav-btn', '#problog-nav-bar .crear-btn',
-            '#problog-nav-bar .limpiar-btn', '#obra-step-bar', '#obra-step-bar .crear-btn',
-            '#obra-step-bar .limpiar-btn', '#obra-etiquetas-bar',
-            '#obra-etiquetas-bar .input-etiquetas-subtle'
+            '#problog-nav-bar .limpiar-btn'
+            // QUITADOS (2026-10-05): `#obra-step-bar`, sus dos botones y `#obra-etiquetas-bar` (con su
+            // `.input-etiquetas-subtle`). Son del FORMULARIO DE OBRA, no del editor de Problogs, y ahi miden
+            // 0x0: el cruce de las 32 lecturas lo dijo. La barra de pasos ya se pinta en la vista `panel` (y
+            // se miden alli), asi que no se pierde nada; la de etiquetas sigue en la lista de `panel`.
         ]
     }
 ];
@@ -852,7 +854,9 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             } });
             if (u.includes('/chat/conversaciones')) return json({ success: true, conversaciones: [] });
             if (u.includes('/chat/bloqueados')) return json({ success: true, bloqueados: [] });
-            if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 0 });
+            // NO LEIDOS de verdad (3): es lo que hace APARECER las insignias del chat (chat-nav-badge,
+            // chat-fab-badge), que hasta ahora se medían con caja 0x0 porque el mock decía 0.
+            if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 3 });
             if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/problogs/70001')) return json(pub);
             if (u.includes('/problogs')) return json({ success: true, problogs: [pub], total: 1 });
