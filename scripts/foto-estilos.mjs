@@ -165,7 +165,73 @@ const PAGINAS = [
         ]
     },
     {
-        // La vista de Problogs: se ABRE (feed + publicacion) en vez de solo cargar la
+        // AUTH (LOGIN): la vista hermana de `auth`. Esa entra en el REGISTRO y por eso deja el formulario de
+        // login OCULTO (18 selectores con caja 0x0: `#login-form`, `#login-email`, `.password-wrapper`...).
+        // Sus estilos se median igual (calculados), pero no se veian. Esta vista se queda EN EL LOGIN para
+        // que se pinten. Nace del cruce de las 32 lecturas (`scripts/analizar-no-medido.mjs`), que fue el que
+        // dijo exactamente CUALES no se pintaban.
+        nombre: 'auth (login)',
+        // Los que tienen que pintarse son los del LOGIN (es lo que hace esta vista).
+        exigidos: ['#login-form', '.auth-container'],
+        ruta: 'auth.html',
+        esperar: `(() => { const f = document.getElementById('login-form'); const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return !!f && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: async (ev, dormir) => {
+            // Se abre el login y se montan los ESTADOS de los campos (las reglas de :valid / :invalid /
+            // .input-error / .input-available de auth.css, varias con `!important`). En DOS FASES: la
+            // validacion de la app reacciona a los eventos y borra las clases que hubiera.
+            await ev(`(() => {
+                const poner = (sel, valor) => {
+                    const el = document.querySelector(sel);
+                    if (!el) return null;
+                    const proto = HTMLInputElement.prototype;
+                    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, valor);
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    return el;
+                };
+                document.getElementById('btn-mostrar-login')?.click();
+                poner('#login-email', 'persona@ejemplo.com');
+                poner('#login-pass', 'ClaveDePrueba123');
+                return 'ok';
+            })()`);
+            await dormir(900);
+            await ev(`(() => {
+                document.querySelector('#login-email')?.classList.add('input-available');
+                document.querySelector('#login-pass')?.classList.add('input-error');
+                return 'ok';
+            })()`);
+            // Y la geometria asentada, como en su vista hermana. Aqui se pide MAS: TRES lecturas iguales
+            // seguidas y mas margen. Con dos lecturas y 3 s, la altura de `#main-content` en oscuro/1280
+            // seguia capturandose a mitad (el comparador informe de "2 valores inestables").
+            let anterior = '', iguales = 0;
+            for (let i = 0; i < 40; i++) {
+                const caja = await ev(`(() => {
+                    const m = document.getElementById('main-content');
+                    if (!m) return '';
+                    const r = m.getBoundingClientRect();
+                    return Math.round(r.width) + 'x' + Math.round(r.height);
+                })()`);
+                if (typeof caja === 'string' && caja && caja === anterior) { iguales++; if (iguales >= 3) break; }
+                else iguales = 1;
+                anterior = typeof caja === 'string' ? caja : '';
+                await dormir(150);
+            }
+        },
+        selectores: [
+            // OJO: aquí NO se mide `#main-content`. Su ALTURA no se asienta en este estado (en oscuro/1280
+            // cambia sin parar) y el comparador lo reportaba como "2 valores inestables", dejando el par de
+            // fotos en rojo por algo que NO es una regresión. Ese contenedor se mide en las otras ocho
+            // vistas, así que no se pierde nada.
+            'html', 'body', '#login-section', '#login-landing',
+            '#login-form', '#login-email', '#login-pass', '.auth-container',
+            'button[type="submit"]', '#auth-dark-mode-btn',
+            '.input-error', '.input-available', '.auth-section', '.auth-section p',
+            '#forgot-section', '#forgot-email', '.password-wrapper', '.password-wrapper input', '.secondary-btn',
+            '.nav-btn'
+        ]
+    },
+    {
         // pagina. Sin esto, cualquier cambio en problogs.css se quedaria sin cubrir.
         nombre: 'problogs',
         ruta: '',
@@ -220,9 +286,9 @@ const PAGINAS = [
         // a ciegas. Se abre el panel y se deja la pestaña de Cavents activa (la de por
         // defecto), para medir los campos VISIBLES.
         nombre: 'panel',
-    // Guardian de estado: el formulario de obra y su primer campo tienen que estar pintados.
-    // Guardian de estado: el formulario de obra PINTADO. (Ojo: sus CAMPOS están plegados en este estado
-    // —`#input-titulo` mide 0x0—, así que exigir un campo abortaba la foto. Sus estilos se miden igual.)
+    // Guardian de estado: el formulario de obra PINTADO. (Ojo: sus CAMPOS están repartidos en los PASOS del
+    // asistente —`#input-titulo` mide 0x0 porque pertenece a otro paso—, así que exigir un campo abortaba la
+    // foto. Sus estilos se miden igual: el asistente pinta un paso y el resto se mide calculado.)
     exigidos: ['#obra-form'],
         ruta: '',
         esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
