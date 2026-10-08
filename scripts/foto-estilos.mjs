@@ -75,8 +75,11 @@ const PAGINAS = [
     },
     {
         nombre: 'auth',
-    // Guardian de estado: sin el formulario de acceso montado, esta vista se medía a medias.
-    exigidos: ['#login-form', '.auth-section'],
+    // Guardian de estado: los que TIENEN que pintarse son los del REGISTRO, porque esta vista entra en el
+    // registro (el `abrir` rellena el login y luego pulsa «ir al registro»). Los del formulario de login se
+    // miden igual (existen y tienen estilos calculados), pero están OCULTOS: exigirlos aquí abortaba la foto
+    // con razón, porque «existe» no es lo mismo que «se pinta».
+    exigidos: ['.auth-container', '#reg-nombres'],
         ruta: 'auth.html',
         esperar: `(() => { const f = document.getElementById('login-form'); const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return !!f && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
@@ -218,7 +221,9 @@ const PAGINAS = [
         // defecto), para medir los campos VISIBLES.
         nombre: 'panel',
     // Guardian de estado: el formulario de obra y su primer campo tienen que estar pintados.
-    exigidos: ['#obra-form', '#input-titulo'],
+    // Guardian de estado: el formulario de obra PINTADO. (Ojo: sus CAMPOS están plegados en este estado
+    // —`#input-titulo` mide 0x0—, así que exigir un campo abortaba la foto. Sus estilos se miden igual.)
+    exigidos: ['#obra-form'],
         ruta: '',
         esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
@@ -886,10 +891,20 @@ for (const pag of PAGINAS) {
             for (let intento = 0; intento < 3; intento++) {
                 faltan = [];
                 for (const sel of pag.exigidos) {
-                    if (await evalJs(`!!document.querySelector(${JSON.stringify(sel)})`) !== true) faltan.push(sel);
+                    // TIENE QUE ESTAR *Y PINTARSE* (caja > 0), no solo existir: comprobar solo que existe
+                    // dejaba pasar estados a medias (la vista `auth` tiene 18 selectores cuyo elemento mide
+                    // 0x0, los del formulario de login, que está oculto porque esa vista entra en el
+                    // REGISTRO). Los de `exigidos` son los que TIENEN que verse.
+                    const pintado = await evalJs(`(() => {
+                        const e = document.querySelector(${JSON.stringify(sel)});
+                        if (!e) return false;
+                        const r = e.getBoundingClientRect();
+                        return r.width > 0 && r.height > 0;
+                    })()`);
+                    if (pintado !== true) faltan.push(sel);
                 }
                 if (!faltan.length) break;
-                console.log(`   ${pag.nombre}: faltan ${faltan.join(', ')} — se reintenta la apertura (${intento + 1}/3)`);
+                console.log(`   ${pag.nombre}: faltan (o no se pintan) ${faltan.join(', ')} — se reintenta la apertura (${intento + 1}/3)`);
                 if (pag.abrir) await pag.abrir(evalJs, sleep);
             }
             if (faltan.length) {

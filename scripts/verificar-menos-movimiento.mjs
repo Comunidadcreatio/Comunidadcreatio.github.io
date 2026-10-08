@@ -155,16 +155,27 @@ await emular('reduce');
 await sleep(400);
 // La navegacion espera al evento `animationend`: con las animaciones a 0,01ms tiene que
 // llegar igual. Se comprueba que Problogs se abre y que su feed pinta publicaciones.
-await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+// El clic se REPITE hasta que la sección se abra: la app arranca por módulos y el botón puede existir con su
+// caja ANTES de tener su listener (la carrera que apareció en el perfil y en el hub de Cavents). Con un solo
+// clic, bajo la suite —con más carga— se perdía y esto fallaba de forma intermitente (pasó: 6/8 con la misma
+// máquina en la que solo, tres veces seguidas, da 8/8).
 let abierta = false;
-for (let i = 0; i < 12; i++) {
-    await sleep(400);
-    abierta = await evalJs(`(() => { const s = document.getElementById('problogs'); return !!s && !s.classList.contains('hidden'); })()`) === true;
-    if (abierta) break;
+for (let intento = 0; intento < 6 && !abierta; intento++) {
+    await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+    for (let i = 0; i < 10; i++) {
+        await sleep(200);
+        abierta = await evalJs(`(() => { const s = document.getElementById('problogs'); return !!s && !s.classList.contains('hidden'); })()`) === true;
+        if (abierta) break;
+    }
 }
 check('la seccion de Problogs se abre con menos movimiento', abierta === true, abierta);
-await sleep(1500);
-const tarjetas = await evalJs(`document.querySelectorAll('#problogs .problog-card').length`);
+// Y el feed se espera por su condición (que pinte tarjetas), no por un tiempo.
+let tarjetas = 0;
+for (let i = 0; i < 25; i++) {
+    tarjetas = Number(await evalJs(`document.querySelectorAll('#problogs .problog-card').length`));
+    if (tarjetas > 0) break;
+    await sleep(200);
+}
 check('y su feed pinta publicaciones', Number(tarjetas) > 0, tarjetas);
 const detalle = JSON.parse(await evalJs(`JSON.stringify({
     transicion: getComputedStyle(document.getElementById('problogs')).transitionDuration,
