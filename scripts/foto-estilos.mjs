@@ -70,7 +70,12 @@ const PAGINAS = [
             '#fx-invalid', '#fx-invalid-select',
             'html', 'body', '#main-header', '#toggle-panel',
             '#btn-notificaciones', '#desktop-logout-all', '#desktop-logout-single',
-            '#mobile-logout-all', '#mobile-logout-single'
+            '#mobile-logout-all', '#mobile-logout-single',
+            // Las ETIQUETAS DE LA BARRA DE NAVEGACION (Chat, cavents, Buscar, Problogs). Estaban en la lista
+            // de las vistas del panel, donde miden 0x0 porque el panel abierto oculta la barra: el balance
+            // por selector las marcaba como "nunca pintadas" y no son del asistente. Su sitio es este, el de
+            // la app con la barra a la vista.
+            '.toggle-label'
             // QUITADO (2026-10-05): `#problog-responder-barra` es la barra de respuesta de Problogs y se
             // PINTA en la vista `problogs`, que es donde tiene sentido (el cruce lo confirmo). Aqui medía
             // 0x0 y solo duplicaba.
@@ -411,7 +416,11 @@ const PAGINAS = [
             '#obra-form', '#obra-form .form-section', '#obra-form .form-group',
             '#input-titulo', '#input-artista', '#input-ano', '#input-precio',
             '#input-ancho', '#input-alto', '#input-etiquetas', '#obra-etiquetas-bar',
-            '#input-status', '#input-estado-obra', '#input-descripcion-tecnica',
+            // QUITADOS (2026-10-05): `#input-status`, `#input-estado-obra` y `#input-descripcion-tecnica` son
+            // `<select>` NATIVOS que la app OCULTA a proposito (`display: none`): los sustituye por su propio
+            // desplegable, `.custom-select` / `.custom-select-trigger`, que SI se miden aqui. No eran un hueco
+            // de cobertura, era el diseño. Lo demostro la cadena de ancestros: el select a `none` y su
+            // envoltorio `.custom-select` a 331x44.
             '.custom-select', '.custom-select-trigger', '#obra-step-bar',
             '#obra-form .form-section-content',
             // Los botones de ratio y el carrusel de imagenes del editor de la obra: tienen su
@@ -429,7 +438,7 @@ const PAGINAS = [
 
             // La familia del carrusel y el boton de ratio inactivo (los `!important` de style.css),
             // y las etiquetas del encabezado, que se pintan u ocultan con `display`.
-            '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)', '.toggle-label',
+            '.carrusel-slide', '.carrusel-slide-empty', '.ratio-btn:not(.active)',
             // Las tarjetas del desplegable de Mis Cavents (con los botones y la pildora de estado).
             '.cavent-item', '.cavent-item-titulo', '.cavent-item-actions .btn-del',
             '.cavent-item-actions .btn-dup', '.status-badge',
@@ -768,10 +777,15 @@ const PAGINAS = [
         forzarPseudo: paso === 2 ? { '#input-ano': ['focus'] } : undefined,
         selectores: [
             '#input-titulo', '#input-artista', '#input-ano', '#input-ancho', '#input-alto', '#input-precio',
-            '#input-etiquetas', '#input-estado-obra', '#input-status',
-            '#input-descripcion-artistica', '#input-descripcion-tecnica',
+            '#input-etiquetas',
+            '#input-descripcion-artistica',
+            // QUITADOS (2026-10-05): los tres `<select>` nativos (`#input-estado-obra`, `#input-status`,
+            // `#input-descripcion-tecnica`) los OCULTA la app a proposito (`display: none`): los sustituye
+            // por `.custom-select`, que si se mide. Y `.toggle-label` NO es del asistente: son las etiquetas
+            // de la barra de NAVEGACION (Chat, cavents, Buscar, Problogs), que con el panel abierto estan
+            // ocultas. Su sitio es la vista `index`, y alli se ha añadido.
             '.form-block .form-group input', '.form-block .form-group label', '.form-row-tight',
-            '.form-block .form-row-3', '.toggle-label', '.custom-select', '.custom-select-trigger',
+            '.form-block .form-row-3', '.custom-select', '.custom-select-trigger',
             '#obra-form .form-group', '#obra-etiquetas-bar', '#obra-etiquetas-bar .input-etiquetas-subtle'
         ]
     }))
@@ -1134,6 +1148,16 @@ for (const pag of PAGINAS) {
                 }
             }
             await sleep(400);
+        }
+        // DIAGNOSTICO de las vistas de paso: que seccion esta visible y que caja tienen los campos del
+        // asistente que se resisten. Se imprime AQUI, en el mismo punto en el que se va a capturar: si el
+        // estado se pierde entre la apertura y la captura, esto lo enseña.
+        if (PASO_PANEL > 1) {
+                  console.log('   [paso] ' + await evalJs(`(() => {
+                const s = document.querySelector('#obra-form .form-section:not(.hidden)');
+                const caja = (sel) => { const e = document.querySelector(sel); if (!e) return 'no-existe'; const r = e.getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); };
+                return 'seccion=' + (s ? s.getAttribute('data-section') : 'NINGUNA') + ' status=' + caja('#input-status') + ' estado=' + caja('#input-estado-obra') + ' tecnica=' + caja('#input-descripcion-tecnica') + ' toggle=' + caja('.toggle-label');
+            })()`));
         }
         for (const tema of TEMAS) {
             // El tema se fija Y SE COMPRUEBA (theme.js lo elige por la hora del dia).
