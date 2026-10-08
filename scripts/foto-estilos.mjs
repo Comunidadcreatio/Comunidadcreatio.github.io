@@ -70,7 +70,10 @@ const PAGINAS = [
             '#fx-invalid', '#fx-invalid-select',
             'html', 'body', '#main-header', '#toggle-panel',
             '#btn-notificaciones', '#desktop-logout-all', '#desktop-logout-single',
-            '#mobile-logout-all', '#mobile-logout-single', '#problog-responder-barra'
+            '#mobile-logout-all', '#mobile-logout-single'
+            // QUITADO (2026-10-05): `#problog-responder-barra` es la barra de respuesta de Problogs y se
+            // PINTA en la vista `problogs`, que es donde tiene sentido (el cruce lo confirmo). Aqui medía
+            // 0x0 y solo duplicaba.
         ]
     },
     {
@@ -603,8 +606,11 @@ const PAGINAS = [
             // encontraban nada nunca, asi que esas partes del perfil se median a ciegas.
             '.perfil-tab-btn', '#perfil-estadisticas', '.perfil-seccion',
             '.perfil-seccion-layout', '.perfil-seccion-info',
-            '#galeria-publica', '#galeria-container', '.obra-card',
-            '.obra-avatar-clickable', '.obra-avatar-placeholder',
+            // QUITADOS (2026-10-05): `#galeria-publica`, `#galeria-container`, `.obra-card`,
+            // `.obra-avatar-clickable` y `.obra-avatar-placeholder` son de la GALERIA, y aqui miden 0x0
+            // porque el perfil la oculta (el propio `abrir` de esta vista comprueba `galeriaOculta`). Se
+            // miden en la vista `grid`, que es donde vive la galeria: el cruce de las 32 lecturas confirmo
+            // que ahi estan (y ahi se pintan). Duplicarlas aqui solo daba 0x0.
         ]
     },
     {
@@ -911,6 +917,14 @@ const FIXTURE = `(() => {
         '</fieldset></form>'
     ].join('');
     document.body.appendChild(f);
+    // LOS BOTONES DE LOGOUT, PINTADOS. Viven en dos contenedores ocultos
+    // (#desktop-logout-options y #mobile-logout-options) que la app abre al pulsar su icono. Aqui se
+    // quita la clase hidden para que se PINTEN: hasta ahora se median con caja 0x0 (el cruce de las 32
+    // lecturas lo dijo), o sea que estaban en la foto pero no se veian. Se hace en el banco de pruebas
+    // porque este script corre en la pagina DESPUES de navegar, que es donde el estado tiene sentido.
+    for (const id of ['desktop-logout-options', 'mobile-logout-options']) {
+        document.getElementById(id)?.classList.remove('hidden');
+    }
     return 'ok';
 })()`;
 
