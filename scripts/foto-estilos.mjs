@@ -164,7 +164,11 @@ const PAGINAS = [
             '#forgot-section', '#forgot-email', '#reg-rol',
             // Campos del REGISTRO: el tema oscuro de los campos (auth.css) los pinta con
             // selectores con id, y sin medirlos un cambio de esa regla se hacia a ciegas.
-            '#reg-nombres', '#reg-email', '#reg-pass', '#reg-pais',
+            '#reg-nombres', '#reg-email', '#reg-pass',
+            // `#reg-pais` QUITADO (2026-10-05): es un `<select>` nativo que la app sustituye por su propio
+            // desplegable (`initCustomSelect` en auth-logic.js), asi que mide 0x0 en TODAS las vistas. Igual
+            // que los tres de la obra: no es cobertura que falte, es el diseño. El balance por selector lo
+            // dejo como el ultimo de los "nunca pintados", y era el mismo caso.
             // Estados montados arriba y la familia de tema oscuro de auth.css (contenedor, seccion,
             // titulos, etiquetas), mas los botones secundarios y la navegacion por pasos.
             '.input-error', '.input-available', '.auth-section',
@@ -446,9 +450,9 @@ const PAGINAS = [
             }
             // Y SE AVANZA AL PASO QUE PIDA LA VISTA. El asistente pinta UN paso y oculta los demas
             // (`showStep` de panel-ui.js alterna `.form-section` con `.hidden`): por eso los campos de los
-            // otros pasos median 0x0. El flujo pone PASO_PANEL (1 para la vista `panel`); aqui se pulsa
+            // otros pasos median 0x0. El flujo pone PASO (1 para la vista `panel`); aqui se pulsa
             // «siguiente» las veces necesarias y se ESPERA a que el paso cambie de verdad.
-            for (let paso = 1; paso < PASO_PANEL; paso++) {
+            for (let paso = 1; paso < PASO; paso++) {
                 const antes = await ev(`(() => { const s = document.querySelector('#obra-form .form-section:not(.hidden)'); return s ? s.getAttribute('data-section') : ''; })()`);
                 await ev(`document.getElementById('obra-step-next')?.click()`);
                 for (let i = 0; i < 25; i++) {
@@ -457,9 +461,9 @@ const PAGINAS = [
                     if (ahora && ahora !== antes) break;
                 }
             }
-            if (PASO_PANEL > 1) {
+            if (PASO > 1) {
                 const seccion = await ev(`(() => { const s = document.querySelector('#obra-form .form-section:not(.hidden)'); return s ? s.getAttribute('data-section') : 'NINGUNA'; })()`);
-                console.log(`   [panel] paso ${PASO_PANEL} -> seccion visible: ${seccion}`);
+                console.log(`   [panel] paso ${PASO} -> seccion visible: ${seccion}`);
             }
         },
         // El `:focus` de un campo obligatorio VACIO (:invalid + :focus), forzado por CDP.
@@ -810,6 +814,39 @@ const PAGINAS = [
     // Las cuatro llevan LA MISMA LISTA a proposito: no se sabe de antemano que campo vive en que paso, y
     // asi la foto responde ESO (cada paso enseña cuales de los campos pinta). El balance por selector junta
     // despues las cuatro y dice si alguno se queda sin pintar en ninguna.
+    // LOS PASOS DEL REGISTRO DE `auth`. Es otro asistente de cinco pasos, con los pasos en
+    // `<div class="step" data-step="N">` y los que no tocan en `display:none`. `#reg-pais` (paso 2),
+    // `#reg-email` (paso 4) y `#reg-pass` (paso 5) median 0x0 porque la vista `auth` se queda en el paso 1.
+    // El `abrir` compartido rellena cada paso y avanza.
+    ...[
+        { paso: 2 }, { paso: 3 }, { paso: 4 }, { paso: 5 }
+    ].map(({ paso }) => ({
+        nombre: `auth (registro ${paso})`,
+        paso,
+        // Guardian de estado: el paso tiene que estar PINTADO. Ojo: NO se puede exigir un campo concreto de
+        // otro paso (`#reg-nombres` esta oculto en el paso 2, porque la app esconde el paso entero): eso
+        // abortaba la foto. Lo que se exige es el paso, que es la garantia real de que el avance ocurrio.
+        exigidos: [`[data-step="${paso}"]`],
+        ruta: 'auth.html',
+        esperar: `(() => { const f = document.getElementById('login-form'); const p = document.getElementById('preloader'); const a = document.querySelector('.auth-container'); return !!f && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: ABRIR_REGISTRO,
+        selectores: [
+            '#reg-nombres', '#reg-rol', '#reg-email', '#reg-pass',
+            // `#reg-pais` QUITADO (2026-10-05): es otro `<select>` nativo que la app sustituye por su
+            // desplegable (`initCustomSelect` en auth-logic.js), asi que mide 0x0 EN TODOS los pasos. No es
+            // cobertura que falte: es el diseño. Lo que si se mide es el desplegable de verdad.
+            '.custom-select', '.custom-select-trigger',
+            // Y NO se pone `.step` / `.reg-step-label` / `.next-btn`: la foto mide el PRIMER match de cada
+            // selector, y el primero es el del PASO 1, que en estas vistas esta oculto. Aparecian como "nunca
+            // pintados" siendo un artefacto de eso, no un hueco.
+            '#btn-registrarse-final', '#btn-ir-registro'
+        ]
+    })),
+    // LOS PASOS DEL ASISTENTE DE OBRA. El asistente pinta UNO y oculta los demas (`showStep` alterna
+    // `.form-section` con `.hidden`), asi que los campos de los otros pasos median 0x0: el balance por
+    // selector lo dijo con nombre y apellido (19 de los 32 sin cobertura visual eran suyos). El `abrir` de
+    // la vista `panel` avanza hasta el paso que pida cada una.
     ...[
         { paso: 2, seccion: 'basica' },
         { paso: 3, seccion: 'visibilidad' },
@@ -844,17 +881,72 @@ const PAGINAS = [
 ];
 
 const ANCHOS = [393, 1280];
-// En que PASO del asistente de obra tiene que quedar la vista `panel` (y sus hermanas `panel (paso N)`).
-// Lo pone el flujo antes de abrir. El asistente pinta UN paso y oculta los demas: por eso los campos de los
-// otros pasos median 0x0 (el balance por selector lo dejo claro: 19 de los 32 sin cobertura visual eran
-// SUYOS).
-let PASO_PANEL = 1;
+// En que PASO tiene que quedar la vista: lo pone el flujo antes de abrir, y lo leen los dos asistentes de la
+// app (el formulario de OBRA, en `panel` y sus hermanas, y el REGISTRO de `auth`). Los dos pintan UN paso y
+// ocultan los demas: por eso los campos de los otros pasos median 0x0 (el balance por selector fue el que
+// puso nombre y apellido a los que faltaban).
+let PASO = 1;
 // Reutiliza el `abrir` de la vista `panel` para las vistas de los pasos. Es una DECLARACION DE FUNCION a
 // proposito (se hoistea, asi que puede usarse en la lista de arriba) y busca la vista `panel` en tiempo de
 // LLAMADA: mover las 60 lineas del `abrir` para compartirlas seria mucho mas arriesgado que esto.
 async function ABRIR_PANEL(ev, dormir) {
     const panel = PAGINAS.find((v) => v.nombre === 'panel');
     return panel.abrir(ev, dormir);
+}
+// Y el del REGISTRO de `auth`, que es otro asistente de cinco pasos (`<div class="step" data-step="N">`, con
+// los que no tocan en `display:none`). Cada paso esta VALIDADO (`validateStep`), asi que para avanzar hay que
+// rellenar lo que se ve: se hace GENERICO (todo input/select del paso visible, con un valor valido segun su
+// tipo) en vez de a mano campo por campo.
+async function ABRIR_REGISTRO(ev, dormir) {
+    // Al registro, con reintento: la app arranca por modulos y el clic se pierde si el listener no esta.
+    for (let intento = 0; intento < 6; intento++) {
+        await ev(`document.getElementById('btn-ir-registro')?.click()`);
+        await dormir(800);
+        const enPaso1 = await ev(`(() => { const v = Array.from(document.querySelectorAll('.step')).filter((s) => getComputedStyle(s).display !== 'none')[0]; return !!v; })()`);
+        if (enPaso1 === true) break;
+    }
+    const pasoVisible = () => ev(`(() => { const v = Array.from(document.querySelectorAll('.step')).filter((s) => getComputedStyle(s).display !== 'none')[0]; return v ? v.getAttribute('data-step') : 'NINGUNO'; })()`);
+    for (let paso = 1; paso < PASO; paso++) {
+        const antes = await pasoVisible();
+        // Rellenar lo que se ve, con un valor valido por tipo (es lo que exige la validacion del paso).
+        await ev(`(() => {
+            const v = Array.from(document.querySelectorAll('.step')).filter((s) => getComputedStyle(s).display !== 'none')[0];
+            if (!v) return 'sin paso';
+            v.querySelectorAll('input, select, textarea').forEach((el) => {
+                const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype : (el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype);
+                // El valor se elige por TIPO y por PISTA (id/placeholder): los pasos tienen validaciones
+                // propias, y con un texto generico el paso 4 no dejaba avanzar (el campo del telefono).
+                const pista = ((el.id || '') + ' ' + (el.placeholder || '') + ' ' + (el.name || '')).toLowerCase();
+                let valor = 'Prueba';
+                if (el.tagName === 'SELECT') {
+                    const op = Array.from(el.options).find((o) => o.value);
+                    if (!op) return;
+                    valor = op.value;
+                } else if (el.type === 'email') valor = 'persona@ejemplo.com';
+                else if (el.type === 'password') valor = 'ClaveDePrueba123';
+                else if (el.type === 'date') valor = '1990-01-01';
+                else if (el.type === 'number') valor = '40';
+                else if (el.type === 'tel' || pista.includes('telefono') || pista.includes('celular')) valor = '04121234567';
+                else if (pista.includes('fecha') || pista.includes('nacimiento')) valor = '1990-01-01';
+                else if (el.type === 'checkbox' || el.type === 'radio') return;
+                try { Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, valor); } catch (e) { return; }
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+            return 'ok';
+        })()`);
+        await dormir(500);
+        // Y «Siguiente» del paso visible.
+        await ev(`(() => { const v = Array.from(document.querySelectorAll('.step')).filter((s) => getComputedStyle(s).display !== 'none')[0]; v && v.querySelector('.next-btn') && v.querySelector('.next-btn').click(); return 'ok'; })()`);
+        // Se espera a que el paso visible CAMBIE (no a un tiempo): si la validacion lo bloquea, se ve.
+        for (let i = 0; i < 25; i++) {
+            await dormir(200);
+            const ahora = await pasoVisible();
+            if (ahora && ahora !== antes) break;
+        }
+    }
+    const donde = await pasoVisible();
+    console.log('   [registro] paso pedido ' + PASO + ' -> paso visible: ' + donde);
 }
 const TEMAS = ['light', 'dark'];
 
@@ -1047,6 +1139,14 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             if (u.includes('/chat/bloqueados')) return json({ success: true, bloqueados: [] });
             // NO LEIDOS de verdad (3): es lo que hace APARECER las insignias del chat (chat-nav-badge,
             // chat-fab-badge), que hasta ahora se medían con caja 0x0 porque el mock decía 0.
+            // DISPONIBILIDAD de correo y nombre de usuario: el paso 4 del REGISTRO no deja avanzar hasta que
+            // la app ha comprobado contra el backend que el correo esta libre (auth-logic.js exige
+            // disponibilidad.email === true). Sin esta respuesta, el asistente se queda clavado en el paso 4.
+            if (u.includes('verificar-email') || u.includes('verificar-nombre')) {
+                // OJO con el nombre del campo: la app lee data.available (no disponible). Con el nombre
+                // equivocado marca el correo como YA REGISTRADO y el asistente no pasa del paso 4.
+                return json({ success: true, available: true, disponible: true });
+            }
             if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 3 });
             if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/problogs/70001')) return json(pub);
@@ -1152,7 +1252,7 @@ for (const pag of PAGINAS) {
             if (ok !== 'ok') { console.error(`No se pudo montar la muestra en ${pag.nombre}:`, ok); salir(2); }
         }
         // Algunas vistas hay que ABRIRLAS (Problogs: feed + publicacion + barra).
-        if (pag.abrir) { PASO_PANEL = pag.paso || 1; await pag.abrir(evalJs, sleep); }
+        if (pag.abrir) { PASO = pag.paso || 1; await pag.abrir(evalJs, sleep); }
         // Y si la vista declara selectores EXIGIDOS, se comprueba que el estado llego de verdad. Es la
         // otra mitad del arreglo de la inestabilidad: la lectura salta en silencio los selectores que no
         // encuentra, asi que una vista a medio montar producia una foto COJA que parecia buena (paso el
@@ -1204,7 +1304,7 @@ for (const pag of PAGINAS) {
         // DIAGNOSTICO de las vistas de paso: que seccion esta visible y que caja tienen los campos del
         // asistente que se resisten. Se imprime AQUI, en el mismo punto en el que se va a capturar: si el
         // estado se pierde entre la apertura y la captura, esto lo enseña.
-        if (PASO_PANEL > 1) {
+        if (PASO > 1) {
                   console.log('   [paso] ' + await evalJs(`(() => {
                 const s = document.querySelector('#obra-form .form-section:not(.hidden)');
                 const caja = (sel) => { const e = document.querySelector(sel); if (!e) return 'no-existe'; const r = e.getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); };

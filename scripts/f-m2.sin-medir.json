@@ -1,0 +1,470 @@
+[
+ {
+  "vista": "auth (registro 2)",
+  "tema": "light",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 2)",
+  "tema": "dark",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 2)",
+  "tema": "light",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 2)",
+  "tema": "dark",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 3)",
+  "tema": "light",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 3)",
+  "tema": "dark",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 3)",
+  "tema": "light",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 3)",
+  "tema": "dark",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 4)",
+  "tema": "light",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 4)",
+  "tema": "dark",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 4)",
+  "tema": "light",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 4)",
+  "tema": "dark",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 5)",
+  "tema": "light",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 5)",
+  "tema": "dark",
+  "ancho": 393,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 5)",
+  "tema": "light",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ },
+ {
+  "vista": "auth (registro 5)",
+  "tema": "dark",
+  "ancho": 1280,
+  "noEstan": [],
+  "sinCaja": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-ir-registro"
+  ],
+  "medidos": [
+   "#reg-nombres",
+   "#reg-rol",
+   "#reg-pais",
+   "#reg-email",
+   "#reg-pass",
+   ".step",
+   ".reg-step-label",
+   ".next-btn",
+   "#btn-registrarse-final",
+   "#btn-ir-registro"
+  ]
+ }
+]
