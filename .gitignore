@@ -29,3 +29,7 @@ scripts/.tmp-*
 scripts/*.out.txt
 scripts/t[0-9].txt
 scripts/tmp-*.mjs
+
+# Salidas de la foto de estilos y su registro de lo no medido (se generan, no se versionan)
+scripts/f-*.json
+scripts/*.sin-medir.json
