@@ -877,7 +877,27 @@ const PAGINAS = [
             '.form-block .form-row-3', '.custom-select', '.custom-select-trigger',
             '#obra-form .form-group', '#obra-etiquetas-bar', '#obra-etiquetas-bar .input-etiquetas-subtle'
         ]
-    }))
+    })),
+    {
+        // CHAT (CONVERSACIONES): la lista de conversaciones privadas. `#chat-conversaciones` es un contenedor
+        // que nace con la clase `hidden` y solo se enseña al pulsar el icono del header
+        // (`#btn-conversaciones` -> `abrirConversaciones()` en chat.js): en la vista `chat` no se ve, y por
+        // eso medía 0x0 en todas. Aqui se abre con el boton de la app.
+        nombre: 'chat (conversaciones)',
+        exigidos: ['#chat-conversaciones'],
+        ruta: '',
+        esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
+        fixture: false,
+        abrir: ABRIR_CHAT,
+        selectores: [
+            '#chat-global', '#chat-conversaciones', '#chat-conversaciones-lista', '#btn-conversaciones',
+            '.chat-nav-badge', '.chat-fab-badge'
+            // NO se ponen `.chat-conv-item`, `.chat-conv-item-badge` ni `.chat-conv-dot`: la lista de
+            // conversaciones esta VACIA en el mock (no hay conversaciones privadas), asi que no existen. Para
+            // cubrir esas filas hace falta una conversacion de mentira con la forma que espera la app; queda
+            // apuntado como siguiente paso, no como verde.
+        ]
+    }
 ];
 
 const ANCHOS = [393, 1280];
@@ -897,8 +917,19 @@ async function ABRIR_PANEL(ev, dormir) {
 // los que no tocan en `display:none`). Cada paso esta VALIDADO (`validateStep`), asi que para avanzar hay que
 // rellenar lo que se ve: se hace GENERICO (todo input/select del paso visible, con un valor valido segun su
 // tipo) en vez de a mano campo por campo.
-async function ABRIR_REGISTRO(ev, dormir) {
-    // Al registro, con reintento: la app arranca por modulos y el clic se pierde si el listener no esta.
+async function ABRIR_CHAT(ev, dormir) {
+    // Primero al chat (reutilizando su vista) y luego a la lista de conversaciones con su boton.
+    const chat = PAGINAS.find((v) => v.nombre === 'chat');
+    await chat.abrir(ev, dormir);
+    for (let intento = 0; intento < 6; intento++) {
+        await ev(`document.getElementById('btn-conversaciones')?.click()`);
+        await dormir(800);
+        const listo = await ev(`(() => { const c = document.getElementById('chat-conversaciones'); return !!c && !c.classList.contains('hidden') && c.getBoundingClientRect().height > 0; })()`);
+        if (listo === true) break;
+    }
+    await dormir(500);
+}
+async function ABRIR_REGISTRO(ev, dormir) {    // Al registro, con reintento: la app arranca por modulos y el clic se pierde si el listener no esta.
     for (let intento = 0; intento < 6; intento++) {
         await ev(`document.getElementById('btn-ir-registro')?.click()`);
         await dormir(800);
@@ -1147,7 +1178,11 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
                 // equivocado marca el correo como YA REGISTRADO y el asistente no pasa del paso 4.
                 return json({ success: true, available: true, disponible: true });
             }
-            if (u.includes('/chat/no-leidos')) return json({ success: true, no_leidos: 3 });
+            // NO LEIDOS: la app espera canales (un array de {canal, n}) y lo recorre para montar su mapa
+            // (chat.js: data.canales.forEach...). Con CUALQUIER otra forma, el mapa queda vacio, el total es
+            // 0 y las insignias se quedan ocultas: es lo que pasaba devolviendo no_leidos: 3. La clave
+            // global es la de la sala global (el FAB).
+            if (u.includes('/chat/no-leidos')) return json({ success: true, canales: [{ canal: 'global', n: 3 }] });
             if (u.includes('mis-problogs') || u.includes('mis-reblogs')) return json({ success: true, problogs: [pub], total: 1 });
             if (u.includes('/problogs/70001')) return json(pub);
             if (u.includes('/problogs')) return json({ success: true, problogs: [pub], total: 1 });
