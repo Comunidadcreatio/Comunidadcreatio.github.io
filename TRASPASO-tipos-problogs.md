@@ -18,17 +18,28 @@ método que funciona, las trampas que ya nos han mordido y cómo se verifica.
 
 ```powershell
 # 1. Comprobar que el servidor local está vivo (si no, LEVANTARLO: es la causa nº1 de
-#    "fallos" que no lo son)
-node scripts/serve-local.mjs          # dejar en segundo plano (http://127.0.0.1:8099)
+#    "fallos" que no lo son). Los trabajos en segundo plano se RECICLAN con el tiempo, así que
+#    esto hay que hacerlo cada vez: los scripts lo comprueban solos (preflight) y abortan con
+#    el comando exacto si no está.
+node scripts/servidor-local.mjs 8099   # dejar en segundo plano (http://127.0.0.1:8099)
 Invoke-WebRequest 'http://127.0.0.1:8099/index.html' -UseBasicParsing | Select-Object StatusCode
 
 # 2. Estado del chequeo de tipos
 node scripts/verificar-tipos.mjs      # debe decir: SIN ERRORES (27 módulos vigilados)
 
-# 3. Todos los verificadores de la app, en serie (tarda ~10 min)
+# 3. Todos los verificadores de la app, en serie (tarda ~5,5 min; 25 verificadores)
 node scripts/verificar-todo.mjs http://127.0.0.1:8099/
 node scripts/verificar-todo.mjs --solo <texto>   # solo los que contengan ese texto
+
+# 4. La foto de estilos: dos corridas y comparar (debe dar SIN DIFERENCIAS)
+#    Y el balance de cobertura visual, que dice qué selectores NO se pintan en ninguna vista
+node scripts/foto-estilos.mjs http://127.0.0.1:8099/ --salida scripts/f-a.json
+node scripts/foto-estilos.mjs http://127.0.0.1:8099/ --salida scripts/f-b.json
+node scripts/foto-estilos.mjs --comparar scripts/f-a.json scripts/f-b.json
+node scripts/analizar-no-medido.mjs scripts/f-a.sin-medir.json
 ```
+
+**NUNCA en paralelo**: dos verificadores a la vez (o dos corridas de la foto) se contaminan entre ellos.
 
 ---
 
@@ -36,11 +47,11 @@ node scripts/verificar-todo.mjs --solo <texto>   # solo los que contengan ese te
 
 | | |
 |---|---|
-| Versión desplegada | **1.0.656** |
+| Versión desplegada | ver `version.json` (el último bump; solo cambia si se tocan ficheros servidos) |
 | Commit | ver el último commit de `main` |
 | Módulos con tipos | **27 de 27** — el chequeo está **VERDE** |
 | Sin adoptar | **ninguno** |
-| Verificadores | **17** de app en `scripts/` (más el de tipos): **18 de 18 en verde**; el de la foto cubre **7 vistas** (476 medidas) |
+| Verificadores | **25** en `scripts/` (24 de app + sintaxis), en verde; la foto cubre **22 vistas** (1268 medidas) y su **cobertura visual es completa** (0 selectores sin pintar, eran 32) |
 
 **Adoptados y limpios (27):** auth-logic, auth, biometric-login, bloqueo-fondo, busqueda,
 capacitor-native-biometric, chat, ciudades, comentarios, config, cuenta, etiquetas,
@@ -658,6 +669,44 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
    (el selector de portada y los resultados de búsqueda), o sea que la provocación vino sola: falló con
    ellos y ahora pasa (15/15). 15 imágenes de Cloudinary en plantillas, todas con `srcset`.
 
+5. **La cobertura visual de la foto (front F): HECHA (2026-10-05)**. 32 selectores que la foto medía pero
+   **nunca pintaba** → **0**. Herramientas nuevas:
+   - `foto-estilos.mjs` escribe, junto a cada foto, un registro de lo **no** medido
+     (`<salida>.sin-medir.json`): por vista, tema y ancho, qué selectores no existen y cuáles tienen caja
+     0x0. La línea de consola solo enseña cuatro ejemplos; para decidir hace falta la lista entera.
+   - `analizar-no-medido.mjs` lo **cruza** y da el **balance por selector**: cuántos se pintan en alguna
+     vista y cuántos en **ninguna** (esos son los únicos sin cobertura real). Sin ese balance, el filtro
+     por vista engaña: un elemento cubierto en su vista hermana sigue figurando como «sin pintar».
+
+   **Cómo se cerraron los 32**, porque el patrón se repite y sirve para lo que venga:
+   - **Los dos asistentes de la app** (el formulario de OBRA en `panel`, y el REGISTRO en `auth`): los dos
+     pintan UN paso y ocultan los demás. Se resolvió con **una vista por paso** y un `abrir` compartido que
+     rellena el paso visible y avanza **esperando a que la sección visible cambie** (no a un tiempo).
+     El del registro está **validado paso a paso** y su paso 4 **exige el backend**: la app no deja pasar
+     hasta que `/api/artistas/verificar-email/<correo>` contesta `{available: true}` (ojo: **available**, no
+     `disponible`: con el nombre equivocado da el correo por ya registrado y no pasa nunca).
+   - **Vistas hermanas** para cada estado que faltaba: `auth (login)`, `auth (landing)`, `auth (recuperar)`,
+     `problogs (feed)`, `galeria (carrusel)` y `chat (conversaciones)`.
+   - **Estados montados**: el banco de pruebas de `index` quita el `hidden` de los contenedores de logout
+     (sus botones se medían con caja 0x0).
+   - **Listas limpiadas** cuando el selector era de **otra** vista (los de obra que estaban en `editor`, la
+     galería duplicada en `perfil`, la barra de respuesta en `index`).
+   - **Y 5 que NO eran huecos**, demostrado con medición: los tres `<select>` nativos del formulario de obra
+     y `#reg-pais` (la app los **oculta** y usa su propio desplegable `.custom-select`, que sí se mide), y
+     `.toggle-label` (el CSS lo tiene oculto a propósito y **nada lo vuelve a mostrar**).
+   - **El instrumento se endureció por el camino**: `exigidos` ahora exige que el elemento **se pinte**
+     (caja > 0), no solo que exista. Al endurecerlo se destaparon dos guardianes mal puestos: `auth` exigía
+     el formulario de login, que esa vista **no** muestra, y `panel` exigía un campo, cuando los campos del
+     formulario de obra están repartidos en los pasos.
+
+   **Lo que queda ABIERTO de esta campaña** (dicho, no escondido):
+   - `.chat-conv-item`, `.chat-conv-item-badge` y `.chat-conv-dot`: la lista de conversaciones está **vacía**
+     en el mock, así que no existen. Cubrirlas pide una conversación de mentira con la forma que espera la app.
+   - `.perfil-avatar-overlay`: la app lo oculta en el perfil **ajeno** (`perfil.js` pone `display: none` y
+     desactiva el botón, porque la foto de otro no se cambia). Cubrirlo pide una vista del perfil **propio**.
+   - Y la **pregunta del backend del chat** (ver §10): la app exige `canales: [{canal, n}]` en
+     `/chat/no-leidos`; si el backend devolviera otra forma, las insignias **no se encenderían nunca**.
+
 ---
 
 ## 9. Reglas de la casa (no negociables)
@@ -674,7 +723,7 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 
 ---
 
-## 10. Estado final (2026-10-04)
+## 10. Estado final (2026-10-05)
 
 **La auditoría de cierre**, con el número de cada cosa:
 
@@ -683,12 +732,14 @@ node scripts/verificar-tipos.mjs 2>&1 | Select-String '<fichero>.js\(' | ForEach
 | Colores a mano (`contar-color-a-mano.mjs`) | **0 sueltos de paleta** · 109 respaldos · 43 blanco/negro · 21 deliberados |
 | `!important` (`auditar-important.mjs --resumen`) | **43** (eran 168): 37 en `components`, 6 en `base` (accesibilidad y autofill) |
 | Chequeo de tipos (`verificar-tipos.mjs`) | **0 errores** en los **27** ficheros vigilados |
-| Suite (`verificar-todo.mjs`) | **22/22**, y **dos pasadas seguidas idénticas** |
-| Foto (`foto-estilos.mjs`) | **720 = 720**, SIN DIFERENCIAS |
-| Barrido de contraste (`--barrido`) | **0 textos** por debajo del mínimo en las seis combinaciones |
+| Suite (`verificar-todo.mjs`) | **25/25** (eran 22), ~5,5 min, con **cronómetro por verificador** |
+| Foto (`foto-estilos.mjs`) | **1268 medidas**, **22 vistas** (eran 720 y 7), dos corridas SIN DIFERENCIAS |
+| Cobertura visual de la foto (`analizar-no-medido.mjs`) | **0 selectores sin pintar** (eran **32**) |
+| Barrido de contraste (`--barrido`) | **0 textos** por debajo del mínimo, **6 vistas** (se añadieron comentarios de Problogs y galería) |
+| Sintaxis de los scripts (`verificar-sintaxis-scripts.mjs`) | **160/160** (compila los 53 scripts y los 27 ficheros de `js/`, y que ninguno esté vacío) |
 
-**No queda nada pendiente de las tres fases**: la campaña de colores está cerrada (A), los instrumentos
-están a punto (B) y esta es la auditoría final (C).
+**No queda nada pendiente de las fases A, B y C**, ni de las tandas que vinieron después (arranque, esperas,
+servidor, cobertura): todas cerradas con medición.
 
 **Lo que se deja A PROPÓSITO** (y por qué):
 
@@ -696,25 +747,58 @@ están a punto (B) y esta es la auditoría final (C).
 - **43 blanco/negro literales**: no son deuda, porque los tokens de superficie **se invierten** en modo
   oscuro (`--color-white` vale `#0a0a0a` ahí) y cambiar un `#fff` de texto pondría el texto **negro sobre
   un fondo sólido**.
-- **21 deliberados**, cada uno **marcado en el propio CSS** con `color-a-mano: deliberado (motivo)`: las
-  versiones **legibles en oscuro** (donde el token de la paleta fallaría), divisores neutros cuyo paso más
-  próximo se mueve ≥ 20, y el color del anillo de foco.
+- **21 deliberados**, cada uno **marcado en el propio CSS** con `color-a-mano: deliberado (motivo)`.
 - **43 `!important`**: los 6 de la capa `base` son accesibilidad (foco y autofill); el resto está medido.
-- **Los huecos de cobertura que no se pueden cerrar por diseño** (el perfil flota sobre el slideshow, los
-  campos del panel están plegados): cubiertos por la **foto** o por el **barrido**.
+- **5 selectores que la foto NO pinta, y está demostrado que no es un hueco** (antes figuraban como los
+  últimos «sin cobertura visual»): los tres `<select>` nativos del formulario de obra
+  (`#input-status`, `#input-estado-obra`, `#input-descripcion-tecnica`) y `#reg-pais`, que la app
+  **sustituye por su propio desplegable** (`.custom-select`, que sí se mide), y `.toggle-label`, que el CSS
+  tiene **oculto a propósito** (el botón ya lleva el icono). Quedan escritos en el sitio donde se midieron.
+- **La galería y el perfil no son medibles por el barrido**: su superficie es **translúcida sobre el
+  slideshow**, así que no hay fondo pintado contra el que medir y la herramienta se niega a inventárselo.
+  Está medido y escrito (la tarjeta tiene caja 209×262 y **ningún** fondo pintado).
 
 **Las trampas que han mordido** (para no repetirlas):
 
-1. **Backticks dentro de una plantilla que se inyecta en la página**: rompen el script entero. Pasó
-   **cuatro veces** en esta campaña.
+1. **Backticks dentro de una plantilla que se inyecta en la página**: rompen el script entero (o, peor, lo
+   dejan sintácticamente válido y estallan **en ejecución**, como `ReferenceError: nav is not defined`).
+   Pasó **doce veces** en la campaña. La red que lo pilla es `node --check` (guardado en la suite) y, para
+   el caso de ejecución, que el instrumento **falle en voz alta**.
 2. **Medir un estado a medio montar**: da números plausibles y falsos. La cura: `exigidos` por vista y
-   esperas deterministas (29 pueblos con caja, opacidad 1, geometría asentada).
-3. **`sleep` en vez de esperar una condición**: es la causa raíz de casi toda la inestabilidad.
-4. **Ignorar el alfa de un fondo translúcido**: da falsos positivos de contraste (el botón «Volver»).
-5. **Fijar literales en un verificador** en vez de medir el color resuelto: se pone en rojo al migrar.
-6. **La escala de grises es por ROL, no invertida**: en oscuro `gray-300` es un borde, no texto. Un token
-   mal elegido **no lo encuentra ninguna caza de hexes**: solo medir contraste (así apareció el
-   placeholder a 1,48:1).
-7. **El servidor local se cae** (siete veces en la campaña): los scripts llevan **preflight** y abortan en
-   vez de medir una página de error.
-8. **Un `stash` dejado a medias**: comprobar `git stash list` antes de dar por bueno un cambio de sitio.
+   esperas deterministas. Y desde el 2026-10-05, `exigidos` exige que el elemento **se PINTE** (caja > 0),
+   no solo que exista: con lo de antes pasaban estados a medias.
+3. **`sleep` en vez de esperar una condición**: causa raíz de casi toda la inestabilidad. Cuando la
+   condición es un efecto asíncrono (una **imagen** cargando, una **transición** terminando), el
+   asentamiento genérico **no basta**: hay que esperar `naturalWidth > 0`, o `display: none` tras la
+   transición, o lo que de verdad termine.
+4. **Borrar un selector con UNA sola medición**: la lista de «sin medir» es **por vista, tema y ancho**.
+   Con una sola lectura se quitaron 14 selectores y la foto cayó de **720 a 636** medidas. Y una línea de
+   la lista puede llevar **varios selectores**: borrar la línea entera para quitar uno se llevó los otros
+   cuatro. Las dos veces se revirtió **con el número delante**.
+5. **La foto mide el PRIMER match** de cada selector: si el primero está oculto (el paso 1 de un asistente),
+   aparece como «nunca pintado» sin serlo.
+6. **El filtro por vista engaña**: un elemento cubierto en su vista hermana sigue figurando como «sin
+   pintar» en la otra. Hace falta el **balance por selector** (`analizar-no-medido.mjs`), que fue el que
+   dijo la verdad durante toda la campaña de cobertura.
+7. **La forma del mock es parte del contrato**: el chat exigía `canales: [{canal, n}]` y el mock devolvía
+   `{no_leidos: 3}`, así que las insignias **nunca** se encendían. Parecía un fallo de la app y era del
+   instrumento.
+8. **Fijar literales en un verificador** en vez de medir el color resuelto: se pone en rojo al migrar.
+9. **La escala de grises es por ROL, no invertida**: en oscuro `gray-300` es un borde, no texto. Un token
+   mal elegido **no lo encuentra ninguna caza de hexes**: solo medir contraste (así apareció el placeholder
+   a 1,48:1).
+10. **El servidor local se cae**: los scripts llevan **preflight** y abortan con el comando exacto en vez de
+    medir una página de error. Y está **diagnosticado**: los trabajos en segundo plano se **reciclan** con
+    el tiempo (no es un crash; se vio desaparecer el servidor entre dos comandos, sin interrupción).
+11. **Dos verificadores en paralelo**: se contaminan entre ellos (dos Chrome contra el mismo servidor). Pasó
+    el 2026-10-05 y hubo que matar el trabajo y **repetir limpio**.
+12. **Las salidas de la foto no se versionan**: `scripts/f-*.json` y `*.sin-medir.json` son artefactos y
+    están en el `.gitignore` (se colaron una vez, 14 000 líneas en un commit).
+13. **Un `stash` dejado a medias**: comprobar `git stash list` antes de dar por bueno un cambio de sitio.
+14. **Ignorar el alfa de un fondo translúcido**: da falsos positivos de contraste (el botón «Volver»). El
+    barrido de contraste compone el fondo efectivo por eso mismo.
+
+**Y una pregunta ABIERTA que no se puede cerrar desde aquí** (no hay acceso al backend): la app exige que
+`/chat/no-leidos` devuelva `canales: [{canal, n}]`. Si el backend devolviera otra forma, **las insignias del
+chat no se encenderían nunca**. Comprobarlo es un minuto en la pestaña de red en producción.
+

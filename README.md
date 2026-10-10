@@ -1242,6 +1242,50 @@ cruzadas**. El guardián de `exigidos` se estrenó cazando justo el problema del
 vez de escribirla corta): el instrumento comprobando sus propias condiciones, que es la lección que ya
 había salido tres veces en esta campaña.
 
+## La cobertura visual de la foto: de 32 selectores sin pintar a 0 (2026-10-05)
+
+La foto mide **estilos calculados**, así que durante mucho tiempo midió selectores que **nunca se pintaban**:
+existían en el DOM, tenían estilos, y pasaban por buenos. No es teórico: un elemento `display: none` con el
+color mal puesto no lo ve nadie, pero ahí estaba «cubierto». Se encontró porque la vista `grid` medía
+`.obra-card-titulo` desde siempre y ese elemento **no existe** en el estado de rejilla.
+
+**Las dos herramientas que lo hacen visible** (y que se quedan):
+
+- `foto-estilos.mjs` escribe, junto a cada foto, un registro de lo **no** medido
+  (`<salida>.sin-medir.json`): por vista, tema y ancho, qué selectores **no existen** y cuáles tienen
+  **caja 0×0**. La línea de consola solo enseña cuatro ejemplos; para decidir hace falta la lista entera.
+- `analizar-no-medido.mjs` lo cruza y da el **balance por selector**: cuántos se pintan en alguna vista y
+  cuántos en **ninguna**. Es el único número honesto, porque el filtro por vista engaña: un elemento
+  cubierto en su vista hermana sigue figurando como «sin pintar» en la otra.
+
+**Cómo se cerraron los 32** (el patrón se repite y sirve para lo que venga):
+
+- **Los dos asistentes de la app** — el formulario de OBRA (`panel`) y el REGISTRO (`auth`) — pintan **un
+  paso** y ocultan los demás: **una vista por paso**, con un `abrir` compartido que rellena el paso visible
+  y avanza **esperando a que la sección visible cambie** (no a un tiempo). El del registro está **validado
+  paso a paso** y su paso 4 **exige el backend**: no deja pasar hasta que
+  `/api/artistas/verificar-email/<correo>` contesta `{available: true}`. Ojo con el nombre del campo:
+  **`available`**, no `disponible` — con el equivocado da el correo por ya registrado y no pasa **nunca**.
+- **Vistas hermanas** para los estados que faltaban: `auth (login)`, `auth (landing)`, `auth (recuperar)`,
+  `problogs (feed)`, `galeria (carrusel)` y `chat (conversaciones)` (esta abre la lista con el botón de la
+  app, `#btn-conversaciones`).
+- **Estados montados**: el banco de pruebas de `index` quita el `hidden` de los contenedores de logout.
+- **Listas limpiadas** cuando el selector era de **otra** vista (los de obra que estaban en `editor`, la
+  galería duplicada en `perfil`, la barra de responder en `index`).
+- **Y 5 que NO eran huecos** (medido, no supuesto): los tres `<select>` nativos del formulario de obra y
+  `#reg-pais` los **oculta la app** porque usa su propio desplegable (`.custom-select`, que sí se mide), y
+  `.toggle-label` lo tiene el CSS oculto **a propósito** (`style.css`) y nada lo vuelve a mostrar.
+
+**El instrumento se endureció por el camino**: `exigidos` ahora exige que el elemento **se pinte** (caja > 0),
+no solo que exista. Al endurecerlo aparecieron **dos guardianes mal puestos**: la vista `auth` exigía el
+formulario de login (que esa vista **no** muestra: entra en el registro) y `panel` exigía un campo (los campos
+del formulario de obra están **repartidos en los pasos**).
+
+**Lo que queda abierto, dicho**: `.chat-conv-item*` y `.chat-conv-dot` no existen porque la lista de
+conversaciones está **vacía** en el mock; `.perfil-avatar-overlay` lo oculta la app en el perfil **ajeno**
+(`perfil.js` pone `display: none` y desactiva el botón). Y la **pregunta del backend del chat**: la app exige
+`canales: [{canal, n}]` en `/chat/no-leidos`; con otra forma, las insignias **no se encienden nunca**.
+
 ## Container queries: la pieza mira SU contenedor, no la pantalla
 
 La misma tarjeta de Problogs se usa en dos sitios de anchos muy distintos: el feed principal (ancho de
@@ -1473,6 +1517,21 @@ resultado.
 >   veinte siguientes midiendo **páginas de error**.
 > - **Los tres instrumentos que miden en navegador** (foto, suite, contraste y el del arranque) llevan
 >   **preflight**: abortan en vez de medir una página de error.
+>
+> **Y la causa está diagnosticada (2026-10-05)**: no es un crash, es que los **trabajos en segundo plano se
+> reciclan con el tiempo**. Se vio desaparecer el servidor **entre dos comandos, sin interrupción de por
+> medio**, y el preflight lo dijo claro en vez de dejar veinte verificadores midiendo páginas de error.
+
+> **`verificar-sintaxis-scripts.mjs` (2026-10-05)**: compila **todos** los scripts y los ficheros de `js/`
+> con `node --check`, y comprueba que ninguno esté **vacío**. Es el guardián de un error que se ha cometido
+> **doce veces** en estas campañas: meter un **backtick** dentro de una plantilla que se inyecta en la
+> página. Unas veces rompe el fichero (y `node --check` lo caza) y otras lo deja **sintácticamente válido**
+> y estalla en ejecución (`ReferenceError: nav is not defined`), que es cuando lo pilla el propio
+> instrumento al fallar en voz alta. Está en la suite: 160 comprobaciones.
+
+> **`analizar-no-medido.mjs` (2026-10-05)**: cruza el registro de lo no medido de la foto y da el **balance
+> por selector** (cuántos se pintan en alguna vista y cuántos en **ninguna**). Es la herramienta que cerró
+> la campaña de cobertura visual: ver la sección «La cobertura visual de la foto».
 
 > **Limpieza de 2026-10-04.** `scripts/` tenía **128** ficheros `.mjs` y **17.542** líneas, más **23 capturas
 > PNG (18,1 MB)** de los `shot-*`: **más código de herramientas que de aplicación** (11.853 de CSS + 12.861
@@ -1481,7 +1540,9 @@ resultado.
 > citas en todo el repositorio) y **su trabajo ya está hecho** (arreglos de una sola vez, diagnósticos de
 > bugs cerrados, y los `test-*`/`verify-*` viejos que la suite de `verificar-*.mjs` ya sustituye). Esa
 > comprobación previa evitó dos errores: `png-pixeles.mjs` y `serve-local.mjs` parecían de campaña pero los
-> **llama un verificador vivo**.
+> **llama un verificador vivo**. (Después se han añadido tres herramientas más —`probar-servidor.mjs`,
+> `verificar-sintaxis-scripts.mjs` y `analizar-no-medido.mjs`—, así que hoy son **53** ficheros en
+> `scripts/` y la suite son **25** verificadores, no 23.)
 >
 > **Lo que se queda, y por qué**: los **23 verificadores** (6.110 líneas), la **metodología documentada**
 > (`contar-color-a-mano`, `auditar-important`, `analizar-color`, `migrar-color`, `acercar-grises`,
