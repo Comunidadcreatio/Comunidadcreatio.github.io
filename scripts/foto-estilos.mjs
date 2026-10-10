@@ -70,12 +70,11 @@ const PAGINAS = [
             '#fx-invalid', '#fx-invalid-select',
             'html', 'body', '#main-header', '#toggle-panel',
             '#btn-notificaciones', '#desktop-logout-all', '#desktop-logout-single',
-            '#mobile-logout-all', '#mobile-logout-single',
-            // Las ETIQUETAS DE LA BARRA DE NAVEGACION (Chat, cavents, Buscar, Problogs). Estaban en la lista
-            // de las vistas del panel, donde miden 0x0 porque el panel abierto oculta la barra: el balance
-            // por selector las marcaba como "nunca pintadas" y no son del asistente. Su sitio es este, el de
-            // la app con la barra a la vista.
-            '.toggle-label'
+            '#mobile-logout-all', '#mobile-logout-single'
+            // `.toggle-label` QUITADO (2026-10-05) Y NO ES UN HUECO: son las etiquetas del encabezado
+            // («Chat», «cavents», «Buscar», «Problogs») y el CSS las tiene OCULTAS A PROPOSITO
+            // (style.css: .toggle-label { display: none; }, con el comentario que lo explica: el boton ya
+            // lleva el icono). Nada las vuelve a mostrar, asi que no pueden pintarse en ningun estado.
             // QUITADO (2026-10-05): `#problog-responder-barra` es la barra de respuesta de Problogs y se
             // PINTA en la vista `problogs`, que es donde tiene sentido (el cruce lo confirmo). Aqui medía
             // 0x0 y solo duplicaba.
@@ -600,10 +599,6 @@ const PAGINAS = [
         // perfil tiene su propia familia de reglas en galeria-publica.css / style.css.
         nombre: 'perfil',
         ruta: '',
-        // El avatar del perfil y su capa: `.perfil-avatar-overlay` solo se ve al PASAR EL RATON por el
-        // avatar (por eso medía 0x0). Se fuerza el `:hover` del boton del avatar por CDP, con el mismo
-        // mecanismo que ya se usa para el `:focus` del registro.
-        forzarPseudo: { '#perfil-avatar-btn': ['hover'] },
         esperar: `(() => { const t = document.getElementById('toggle-panel'); const p = document.getElementById('preloader'); const a = document.querySelector('.app-container'); return !!t && !t.classList.contains('hidden') && (!p || p.classList.contains('hidden')) && (!a || a.classList.contains('visible')); })()`,
         fixture: false,
         // Una de las tres vistas inestables: a veces medía el perfil sin sus secciones (58 elementos en
@@ -685,13 +680,20 @@ const PAGINAS = [
         selectores: [
             '#perfil-usuario', '#perfil-avatar-seccion', '.perfil-nombre-artista-seccion',
             '.perfil-nombre-real-seccion', '.perfil-ciudad', '#perfil-avatar-btn',
-            '#perfil-online-indicator', '.perfil-avatar-overlay',
+            '#perfil-online-indicator',
             // OJO: aqui habia tres selectores MUERTOS (`#perfil-usuario .perfil-tabs`,
             // `#perfil-usuario .perfil-tab` y `#perfil-usuario .perfil-stats`): las clases de verdad son
             // `.perfil-tab-btn` y `.perfil-estadisticas`, y las secciones van sin el prefijo. No
             // encontraban nada nunca, asi que esas partes del perfil se median a ciegas.
             '.perfil-tab-btn', '#perfil-estadisticas', '.perfil-seccion',
             '.perfil-seccion-layout', '.perfil-seccion-info',
+            // `.perfil-avatar-overlay` QUITADO (2026-10-05) Y NO ES UN HUECO: la app lo OCULTA a proposito
+            // cuando el perfil es de OTRO artista (`perfil.js`: display = 'none' y el boton del avatar con
+            // pointer-events: none, porque la foto de otro no se cambia). Esta vista entra por el avatar de
+            // una obra, o sea un perfil AJENO: oculto es lo correcto. Para cubrirlo haria falta una vista del
+            // perfil PROPIO, donde `galeria-ui.js` si lo pone en flex.
+            // (Y el `:hover` que se le puso antes SI se forzaba -- la foto lo midio con opacity 1 -- pero el
+            // display none del JS manda: por eso media 0x0 y parecia un disparador equivocado.)
             // QUITADOS (2026-10-05): `#galeria-publica`, `#galeria-container`, `.obra-card`,
             // `.obra-avatar-clickable` y `.obra-avatar-placeholder` son de la GALERIA, y aqui miden 0x0
             // porque el perfil la oculta (el propio `abrir` de esta vista comprueba `galeriaOculta`). Se
