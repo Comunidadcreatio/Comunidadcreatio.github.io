@@ -1550,6 +1550,20 @@ body.cajon-teclado .comentarios-drawer {
     cursor: pointer;
 }
 
+/* ── Comentario editado y comentario eliminado (el borrado es SUAVE: el hilo de respuestas se mantiene) ── */
+.comentario-editado {
+    font-size: 11px;
+    color: var(--color-gray-500);
+    font-style: italic;
+}
+.comentario-eliminado {
+    color: var(--color-gray-500);
+    font-style: italic;
+}
+.comentario-item.comentario-borrado .comentario-avatar {
+    opacity: 0.6;
+}
+
 /* ── Borrar: confirmacion EN LINEA, sin dialogos del sistema ─────────────────────────────────────── */
 .comentario-confirmar {
     display: flex;

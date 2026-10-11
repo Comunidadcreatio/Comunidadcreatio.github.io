@@ -423,11 +423,25 @@ function renderizarComentario(c, todosReplies) {
     const likes = c.likes_count || 0;
     const marcado = estaMarcado(c);
     const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (marcado ? 'currentColor' : 'none') + '"');
+    // Comentario BORRADO: el borrado es suave, asi que el comentario sigue en su sitio (vacio y marcado) y sus
+    // respuestas NO se van con el. Aqui se pinta como «Comentario eliminado» y, en ese estado, no se ofrece
+    // ni responder, ni dar «me gusta», ni editar ni borrar otra vez.
+    const borrado = !!c.eliminado;
     // Editar y borrar, SOLO en los comentarios propios (y solo si la API dice de quién es).
-    const acciones = esMio(c)
+    const acciones = (!borrado && esMio(c))
         ? '<button class="comentario-btn-editar" data-id="' + c.id + '">Editar</button>'
             + '<button class="comentario-btn-eliminar" data-id="' + c.id + '">Eliminar</button>'
         : '';
+    // El rotulo «editado» solo aparece si el servidor lo dice (se guarda al editar).
+    const rotuloEditado = c.editado ? '<span class="comentario-editado">editado</span>' : '';
+    const accionesFila = borrado
+        ? '<span class="comentario-fecha">' + fecha + '</span>'
+        : '<span class="comentario-fecha">' + fecha + '</span>' + rotuloEditado
+            + '<button class="comentario-btn-responder" data-id="' + c.id + '">Responder</button>'
+            + '<button class="comentario-btn-like' + (marcado ? ' liked' : '') + '" data-id="' + c.id + '" aria-pressed="' + (marcado ? 'true' : 'false') + '" title="Me gusta">'
+            + '<span class="comentario-corazon">' + corazon + '</span><span class="comentario-likes-count">' + likes + '</span>'
+            + '</button>'
+            + acciones;
 
     // Buscar replies de este comentario
     const hijos = todosReplies ? todosReplies.filter(r => r.comentario_padre_id === c.id) : [];
@@ -436,23 +450,20 @@ function renderizarComentario(c, todosReplies) {
         : '';
 
     return `
-        <div class="comentario-item" data-id="${c.id}">
+        <div class="comentario-item${borrado ? ' comentario-borrado' : ''}" data-id="${c.id}">
             ${avatarHTML}
             <div class="comentario-body">
                 <div class="comentario-autor">${renderText(c.autor_nombre) || 'Usuario'}</div>
-                <div class="comentario-texto">${renderText(c.texto || c.comentario)}</div>
+                ${borrado
+                    ? '<div class="comentario-texto comentario-eliminado">Comentario eliminado</div>'
+                    : `<div class="comentario-texto">${renderText(c.texto || c.comentario)}</div>`}
                 <div class="comentario-meta">
-                    <span class="comentario-fecha">${fecha}</span>
-                    <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
-                    <button class="comentario-btn-like${marcado ? ' liked' : ''}" data-id="${c.id}" aria-pressed="${marcado ? 'true' : 'false'}" title="Me gusta">
-                        <span class="comentario-corazon">${corazon}</span><span class="comentario-likes-count">${likes}</span>
-                    </button>
-                    ${acciones}
+                    ${accionesFila}
                 </div>
-                <div class="comentario-reply-input hidden" data-parent="${c.id}">
+                ${borrado ? '' : `<div class="comentario-reply-input hidden" data-parent="${c.id}">
                     <input type="text" class="comentario-reply-field" placeholder="Escribe una respuesta..." autocomplete="off">
                     <button class="comentario-reply-send">➤</button>
-                </div>
+                </div>`}
                 ${repliesHTML}
             </div>
         </div>`;

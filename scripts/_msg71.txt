@@ -1,0 +1,28 @@
+Frontend: rotulo «editado» y «Comentario eliminado» (borrado suave, sin cascada)
+
+Se completa la funcion de editar/borrar con los dos estados que faltaban, ahora que el backend ya los manda:
+
+- Un comentario editado lleva el rotulo **«editado»** al lado de la fecha (lo dice el servidor con `editado`).
+- Un comentario borrado se pinta como **«Comentario eliminado»** y, en ese estado, NO ofrece nada: ni
+  responder, ni dar «me gusta», ni editar, ni borrar otra vez. Pero **SUS RESPUESTAS SIGUEN VISIBLES**,
+  porque el borrado es SUAVE: el comentario se queda en su sitio (vacio y marcado) y el hilo no se rompe.
+  Eso es justo lo que se pidio: nada de cascada.
+
+VERIFICADOR AMPLIADO a 14 comprobaciones (`verificar-comentarios-acciones.mjs`). Las tres nuevas vigilan:
+  - que al borrar la fila NO se quite, sino que quede marcada (borrado suave),
+  - que en pantalla se lea «Comentario eliminado» y no ofrezca NINGUN boton,
+  - y que SUS RESPUESTAS SIGAN ahi (la prueba de que no hay cascada).
+
+DOS FALLOS QUE DESTAPO EL PROPIO VERIFICADOR, y que eran del INSTRUMENTO, no de la app:
+  1. El mock QUITABA la fila al borrar, mientras el backend real la MARCA. El mock estaba mintiendo sobre lo
+     que hace el servidor: ahora hace el borrado suave igual (y el PATCH marca `editado`, como el backend).
+  2. La comprobacion de «no ofrece botones» contaba tambien los de la RESPUESTA ANIDADA (que si tiene los
+     suyos). Habia que acotarla a la fila del propio comentario.
+  La app, mientras tanto, se portaba bien.
+
+Y una nota: el respaldo local de «me gusta» (`localStorage`) que se añadio cuando la API de obra no mandaba
+`liked` YA NO HACE FALTA, porque ahora lo manda. Se deja porque es inofensivo (el servidor tiene prioridad y
+nunca se consulta si el dato viene), pero se puede quitar cuando se quiera.
+
+Version 1.0.709. La sonda contra la API desplegada se queda como herramienta manual
+(`verificar-backend-desplegado.mjs`, NO entra en la suite porque llama a produccion).

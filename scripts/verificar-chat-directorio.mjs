@@ -172,7 +172,13 @@ await sleep(300);
 // parecen fallos de la app y son una carga lenta.
 check('el directorio llega a pintarse (29 pueblos con caja)', pueblosListos === true,
     pueblosListos ? '' : 'se agoto la espera de 30 s: la app no llego a pintar el directorio');
-const dir = await leer(`(() => {
+// La bandera es una IMAGEN y los contadores llegan con los datos del directorio: las dos cosas son
+// ASINCRONAS, asi que se espera a que esten de verdad antes de medir. Con una sola lectura, bajo la suite
+// (con mas carga) la imagen todavia no habia cargado y esto fallaba de forma intermitente: 18/18 aislado y
+// 15/18 dentro de la suite.
+let dir = null;
+for (let intento = 0; intento < 25; intento++) {
+    dir = await leer(`(() => {
     const acc = document.getElementById('chat-accordion');
     const items = acc ? [...acc.querySelectorAll('.chat-pueblo')] : [];
     const nombres = items.map((i) => (i.querySelector('.chat-pueblo-nombre') || {}).textContent || '');
@@ -197,6 +203,10 @@ const dir = await leer(`(() => {
         hayAvisoDeVacio: !!sinUsers
     });
 })()`);
+    // Se espera a que las dos cosas ASINCRONAS esten: la bandera cargada de verdad y los contadores pintados.
+    if (dir && dir.banderaCargada === true && /Artistas/.test(dir.countsDeConUsers)) break;
+    await new Promise((r) => setTimeout(r, 400));
+}
 console.log('   ' + JSON.stringify(dir));
 check('el chat abre en el directorio', dir.seccionVisible === true && dir.directorioVisible === true, JSON.stringify(dir));
 check('se pintan los 29 pueblos', dir.items === 29, dir.items);

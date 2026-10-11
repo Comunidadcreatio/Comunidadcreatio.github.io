@@ -63,8 +63,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         // La lista de comentarios CON MEMORIA: editar cambia el texto y borrar lo quita, para que al recargar
         // se vea el estado de verdad (si el mock devolviera siempre lo mismo, la prueba no probaria nada).
         let comentarios = [
-            { id: 900, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario mio de prueba', created_at: new Date().toISOString(), likes_count: 3, comentario_padre_id: null },
-            { id: 901, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Comentario ajeno', created_at: new Date().toISOString(), likes_count: 1, comentario_padre_id: null }
+            { id: 900, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario mio de prueba', created_at: new Date().toISOString(), likes_count: 3, editado: 1, eliminado: 0, comentario_padre_id: null },
+            { id: 901, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Comentario ajeno', created_at: new Date().toISOString(), likes_count: 1, editado: 0, eliminado: 0, comentario_padre_id: null },
+            // BORRADO SUAVE, con una RESPUESTA debajo: es el caso que hay que vigilar (que la respuesta no se
+            // vaya con el comentario borrado).
+            { id: 902, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: '', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 1, comentario_padre_id: null },
+            { id: 903, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Respuesta que sobrevive', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: 902 }
         ];
         // Interruptor para probar los DOS casos: con usuario_id (como Problogs) y sin el (como obras hoy).
         let mandarUsuarioId = true;
@@ -83,12 +87,14 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
                     if (metodo === 'PATCH') {
                         let texto = '';
                         try { texto = JSON.parse(init.body).texto; } catch (e) {}
-                        comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { texto: texto }) : c; });
+                        comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { texto: texto, editado: 1 }) : c; });
                         return json({ success: true });
                     }
                     if (metodo === 'DELETE') {
-                        comentarios = comentarios.filter(function (c) { return c.id !== id; });
-                        return json({ success: true });
+                        // BORRADO SUAVE, como el backend de verdad: la fila se queda, vacia y marcada (si no,
+                        // el mock estaria mintiendo sobre lo que hace el servidor).
+                        comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { eliminado: 1, texto: '' }) : c; });
+                        return json({ success: true, id: id });
                     }
                     const salida = comentarios.map(function (c) {
                         if (mandarUsuarioId) return c;
@@ -170,6 +176,10 @@ await evalJs(`document.querySelector('.comentario-item .comentario-btn-guardar')
 await sleep(1200);
 const trasGuardar = await evalJs(`window.__comentarios()`);
 check('al guardar, el cambio llega al servidor', Array.isArray(trasGuardar) && trasGuardar[0] === 'Texto editado de prueba', JSON.stringify(trasGuardar));
+// El rotulo «editado» se comprueba AQUI (recien editado): mas tarde la prueba borra ese comentario, y un
+// comentario borrado no lleva rotulo (a proposito).
+const rotulo = await evalJs(`(document.querySelector('.comentario-item .comentario-editado') || {}).textContent || ''`);
+check('un comentario editado lleva su rotulo al lado de la fecha', rotulo.trim() === 'editado', JSON.stringify(rotulo));
 
 // Cerrar y volver a abrir: el texto tiene que seguir cambiado.
 await evalJs(`document.getElementById('btn-buscar')?.click()`);
@@ -179,20 +189,45 @@ const trasReabrir = await evalJs(`(document.querySelector('.comentario-item .com
 check('el texto editado SIGUE al cerrar y reabrir el cajon', trasReabrir.trim() === 'Texto editado de prueba', JSON.stringify(trasReabrir.trim()));
 
 console.log('\n=== 3) Borrar ===');
+const antesDeBorrar = await evalJs(`window.__comentarios()`);
 await evalJs(`document.querySelector('.comentario-item .comentario-btn-eliminar')?.click()`);
 await sleep(500);
 const confirmar = await evalJs(`!!document.querySelector('.comentario-item .comentario-confirmar')`);
 check('al pulsar Eliminar se pide confirmacion (en linea)', confirmar === true);
 await evalJs(`document.querySelector('.comentario-item .comentario-btn-borrar-si')?.click()`);
-await sleep(1200);
+await sleep(1400);
 const trasBorrar = JSON.parse(await evalJs(`JSON.stringify({
     textos: window.__comentarios(),
     enPantalla: Array.from(document.querySelectorAll('.comentario-item .comentario-texto')).map(function (e) { return e.textContent.trim(); })
 })`) || '{}');
-check('al confirmar, el comentario desaparece', Array.isArray(trasBorrar.textos) && trasBorrar.textos.length === 1 && trasBorrar.textos[0] === 'Comentario ajeno', JSON.stringify(trasBorrar.textos));
-check('y desaparece de la pantalla', Array.isArray(trasBorrar.enPantalla) && trasBorrar.enPantalla.length === 1 && trasBorrar.enPantalla[0] === 'Comentario ajeno', JSON.stringify(trasBorrar.enPantalla));
+check('al confirmar, el comentario queda marcado como eliminado (borrado SUAVE, no se quita la fila)',
+    Array.isArray(trasBorrar.textos) && trasBorrar.textos.length === antesDeBorrar.length && trasBorrar.textos.indexOf('Texto editado de prueba') === -1,
+    JSON.stringify(trasBorrar.textos));
+check('y en pantalla se lee «Comentario eliminado»',
+    Array.isArray(trasBorrar.enPantalla) && trasBorrar.enPantalla.indexOf('Comentario eliminado') > -1,
+    JSON.stringify(trasBorrar.enPantalla));
 
-console.log('\n=== 4) Sin usuario_id (como los comentarios de OBRA hoy) ===');
+console.log('\n=== 4) Un comentario borrado NO se lleva sus respuestas, y no ofrece nada ===');
+const borradoUI = JSON.parse(await evalJs(`(() => {
+    // El comentario borrado CON respuesta es el 902: hay que pedirlo por id, porque la prueba tambien borra
+    // otro (el 900) y ese no tiene respuestas.
+    const item = document.querySelector('.comentario-item[data-id="902"]');
+    if (!item) return JSON.stringify({ hay: false });
+    // OJO: hay que mirar SOLO la fila de ESE comentario. El item contiene tambien sus RESPUESTAS anidadas,
+    // y una respuesta SI tiene sus botones (like y responder): contarlos seria un falso fallo.
+    const meta = item.querySelector('.comentario-body') ? item.querySelector('.comentario-body').querySelector('.comentario-meta') : null;
+    return JSON.stringify({
+        hay: true,
+        texto: (item.querySelector('.comentario-texto') || {}).textContent || '',
+        botones: meta ? meta.querySelectorAll('button').length : -1,
+        respuestas: Array.from(item.querySelectorAll('.comentario-replies .comentario-texto')).map(function (e) { return e.textContent.trim(); })
+    });
+})()`) || '{}');
+check('el comentario borrado se pinta como tal', borradoUI.hay === true && borradoUI.texto.trim() === 'Comentario eliminado', JSON.stringify(borradoUI.texto));
+check('y no ofrece ni editar, ni borrar, ni like, ni responder', borradoUI.botones === 0, 'botones=' + borradoUI.botones);
+check('SUS RESPUESTAS SIGUEN (el borrado no va en cascada)', Array.isArray(borradoUI.respuestas) && borradoUI.respuestas.indexOf('Respuesta que sobrevive') > -1, JSON.stringify(borradoUI.respuestas));
+
+console.log('\n=== 5) Sin usuario_id (como los comentarios de OBRA hasta hoy) ===');
 await evalJs(`window.__mandarUsuarioId(false)`);
 await evalJs(`document.getElementById('btn-buscar')?.click()`);
 await sleep(900);
