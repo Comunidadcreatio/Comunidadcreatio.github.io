@@ -1510,15 +1510,28 @@ body.cajon-teclado .comentarios-drawer {
 }
 .comentario-editor-campo {
     width: 100%;
+    /* EL AIRE DE LOS LADOS: con `width: 100%` y relleno, la caja se salia por la derecha (el relleno se
+       sumaba al ancho: medido, 426px dentro de un cuerpo de 400px). Con border-box, el relleno va POR DENTRO. */
+    box-sizing: border-box;
     min-height: 62px;
     resize: vertical;
     font: inherit;
     font-size: 14px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     border: 1px solid var(--color-gray-300);
     border-radius: 8px;
-    background: var(--color-white);
+    /* Sin fondo, como se pidio: solo el borde. */
+    background: transparent;
     color: var(--color-ink);
+}
+
+/* El anillo de foco de estos campos se quita en `css/style.css` (capa `base`), porque desde aqui no se le
+   puede ganar: con `!important` el orden de capas se invierte y `base` manda. Aqui solo se deja la senal de
+   foco que SI se ve: el borde se oscurece. */
+.comentarios-input:focus,
+.comentario-reply-field:focus,
+.comentario-editor-campo:focus {
+    border-color: var(--color-ink);
 }
 .comentario-editor-botones {
     display: flex;

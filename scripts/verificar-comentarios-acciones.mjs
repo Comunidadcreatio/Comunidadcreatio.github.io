@@ -65,10 +65,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         let comentarios = [
             { id: 900, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario mio de prueba', created_at: new Date().toISOString(), likes_count: 3, editado: 1, eliminado: 0, comentario_padre_id: null },
             { id: 901, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Comentario ajeno', created_at: new Date().toISOString(), likes_count: 1, editado: 0, eliminado: 0, comentario_padre_id: null },
-            // BORRADO SUAVE, con una RESPUESTA debajo: es el caso que hay que vigilar (que la respuesta no se
-            // vaya con el comentario borrado).
-            { id: 902, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: '', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 1, comentario_padre_id: null },
-            { id: 903, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Respuesta que sobrevive', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: 902 }
+            // MIO y CON UNA RESPUESTA: es el que se borra para comprobar que el borrado se lleva el hilo
+            // entero (y que no queda ninguna respuesta huerfana).
+            { id: 902, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario con respuesta', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: null },
+            { id: 903, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Respuesta que se va con el', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: 902 },
+            // MIO y sin respuestas: se queda hasta el final, para poder abrir el editor y mirar su aspecto.
+            { id: 904, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario para mirar el aspecto', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: null }
         ];
         // Interruptor para probar los DOS casos: con usuario_id (como Problogs) y sin el (como obras hoy).
         let mandarUsuarioId = true;
@@ -91,10 +93,10 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
                         return json({ success: true });
                     }
                     if (metodo === 'DELETE') {
-                        // BORRADO SUAVE, como el backend de verdad: la fila se queda, vacia y marcada (si no,
-                        // el mock estaria mintiendo sobre lo que hace el servidor).
-                        comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { eliminado: 1, texto: '' }) : c; });
-                        return json({ success: true, id: id });
+                        // BORRADO REAL, como el backend ahora: se van el comentario Y SUS RESPUESTAS (si se
+                        // quedaran sin padre, serian invisibles para todo el mundo).
+                        comentarios = comentarios.filter(function (c) { return c.id !== id && c.comentario_padre_id !== id; });
+                        return json({ success: true, id: id, borrados: 2 });
                     }
                     const salida = comentarios.map(function (c) {
                         if (mandarUsuarioId) return c;
@@ -188,44 +190,80 @@ await abrirCajon();
 const trasReabrir = await evalJs(`(document.querySelector('.comentario-item .comentario-texto') || {}).textContent || ''`);
 check('el texto editado SIGUE al cerrar y reabrir el cajon', trasReabrir.trim() === 'Texto editado de prueba', JSON.stringify(trasReabrir.trim()));
 
-console.log('\n=== 3) Borrar ===');
+console.log('\n=== 3) Borrar el comentario QUE TIENE UNA RESPUESTA ===');
 const antesDeBorrar = await evalJs(`window.__comentarios()`);
-await evalJs(`document.querySelector('.comentario-item .comentario-btn-eliminar')?.click()`);
+await evalJs(`document.querySelector('.comentario-item[data-id="902"] .comentario-btn-eliminar')?.click()`);
 await sleep(500);
-const confirmar = await evalJs(`!!document.querySelector('.comentario-item .comentario-confirmar')`);
+const confirmar = await evalJs(`!!document.querySelector('.comentario-item[data-id="902"] .comentario-confirmar')`);
 check('al pulsar Eliminar se pide confirmacion (en linea)', confirmar === true);
-await evalJs(`document.querySelector('.comentario-item .comentario-btn-borrar-si')?.click()`);
+await evalJs(`document.querySelector('.comentario-item[data-id="902"] .comentario-btn-borrar-si')?.click()`);
 await sleep(1400);
 const trasBorrar = JSON.parse(await evalJs(`JSON.stringify({
     textos: window.__comentarios(),
-    enPantalla: Array.from(document.querySelectorAll('.comentario-item .comentario-texto')).map(function (e) { return e.textContent.trim(); })
+    idsEnPantalla: Array.from(document.querySelectorAll('.comentario-item')).map(function (e) { return e.getAttribute('data-id'); }),
+    respuestasEnPantalla: document.querySelectorAll('.comentario-replies .comentario-item').length
 })`) || '{}');
-check('al confirmar, el comentario queda marcado como eliminado (borrado SUAVE, no se quita la fila)',
-    Array.isArray(trasBorrar.textos) && trasBorrar.textos.length === antesDeBorrar.length && trasBorrar.textos.indexOf('Texto editado de prueba') === -1,
+check('al confirmar, el comentario DESAPARECE de verdad (borrado real)',
+    Array.isArray(trasBorrar.textos) && trasBorrar.textos.indexOf('Comentario con respuesta') === -1 && trasBorrar.textos.length === antesDeBorrar.length - 2,
     JSON.stringify(trasBorrar.textos));
-check('y en pantalla se lee «Comentario eliminado»',
-    Array.isArray(trasBorrar.enPantalla) && trasBorrar.enPantalla.indexOf('Comentario eliminado') > -1,
-    JSON.stringify(trasBorrar.enPantalla));
+check('y se lleva su RESPUESTA (nada de huerfanas invisibles)',
+    Array.isArray(trasBorrar.idsEnPantalla) && trasBorrar.idsEnPantalla.indexOf('902') === -1 && trasBorrar.idsEnPantalla.indexOf('903') === -1,
+    JSON.stringify(trasBorrar.idsEnPantalla));
+check('y no queda ninguna respuesta colgando sin su comentario', trasBorrar.respuestasEnPantalla === 0, 'respuestas=' + trasBorrar.respuestasEnPantalla);
 
-console.log('\n=== 4) Un comentario borrado NO se lleva sus respuestas, y no ofrece nada ===');
-const borradoUI = JSON.parse(await evalJs(`(() => {
-    // El comentario borrado CON respuesta es el 902: hay que pedirlo por id, porque la prueba tambien borra
-    // otro (el 900) y ese no tiene respuestas.
-    const item = document.querySelector('.comentario-item[data-id="902"]');
-    if (!item) return JSON.stringify({ hay: false });
-    // OJO: hay que mirar SOLO la fila de ESE comentario. El item contiene tambien sus RESPUESTAS anidadas,
-    // y una respuesta SI tiene sus botones (like y responder): contarlos seria un falso fallo.
-    const meta = item.querySelector('.comentario-body') ? item.querySelector('.comentario-body').querySelector('.comentario-meta') : null;
+console.log('\n=== 4) El campo de editar: sin fondo, con su aire y sin el anillo ambar ===');
+await evalJs(`document.querySelector('.comentario-item[data-id="904"] .comentario-btn-editar')?.click()`);
+await sleep(500);
+// El foco se pone con un CLIC DE VERDAD (eventos por CDP), no con `campo.focus()`: un foco puesto por script
+// NO dispara `:focus-visible`, asi que el anillo del navegador no se dibujaria y la comprobacion de abajo
+// pasaria sin comprobar nada (paso: la provoque y seguia en verde).
+const centroCampo = await evalJs(`(() => {
+    const c = document.querySelector('.comentario-editor-campo');
+    if (!c) return '';
+    const r = c.getBoundingClientRect();
+    return Math.round(r.left + r.width / 2) + ',' + Math.round(r.top + r.height / 2);
+})()`);
+if (typeof centroCampo === 'string' && centroCampo.indexOf(',') > 0) {
+    const [cx, cy] = centroCampo.split(',').map(Number);
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: cx, y: cy, button: 'left', clickCount: 1 });
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: cx, y: cy, button: 'left', clickCount: 1 });
+}
+await sleep(300);
+const campo = JSON.parse(await evalJs(`(() => {
+    const c = document.querySelector('.comentario-editor-campo');
+    if (!c) return JSON.stringify({ hay: false });
+    const cs = getComputedStyle(c);
+    const r = c.getBoundingClientRect();
+    const cuerpo = c.closest('.comentario-body');
+    const rb = cuerpo ? cuerpo.getBoundingClientRect() : null;
     return JSON.stringify({
         hay: true,
-        texto: (item.querySelector('.comentario-texto') || {}).textContent || '',
-        botones: meta ? meta.querySelectorAll('button').length : -1,
-        respuestas: Array.from(item.querySelectorAll('.comentario-replies .comentario-texto')).map(function (e) { return e.textContent.trim(); })
+        fondo: cs.backgroundColor,
+        borde: cs.borderTopColor,
+        anillo: cs.outlineStyle,
+        anilloAncho: cs.outlineWidth,
+        // El ambar del tema CLARO no es el outline: es un box-shadow exterior. Hay que mirar los dos.
+        sombra: cs.boxShadow,
+        // Quien tiene el foco de verdad, y si el campo coincide con :focus-visible (que es cuando el
+        // navegador dibuja su anillo).
+        activo: document.activeElement ? (document.activeElement.className || document.activeElement.tagName) : 'ninguno',
+        focusVisible: c.matches(':focus-visible'),
+        // El aire de los lados: la caja NO puede salirse del cuerpo del comentario.
+        derechaCampo: Math.round(r.right),
+        derechaCuerpo: rb ? Math.round(rb.right) : null,
+        rellenoDerecha: cs.paddingRight
     });
 })()`) || '{}');
-check('el comentario borrado se pinta como tal', borradoUI.hay === true && borradoUI.texto.trim() === 'Comentario eliminado', JSON.stringify(borradoUI.texto));
-check('y no ofrece ni editar, ni borrar, ni like, ni responder', borradoUI.botones === 0, 'botones=' + borradoUI.botones);
-check('SUS RESPUESTAS SIGUEN (el borrado no va en cascada)', Array.isArray(borradoUI.respuestas) && borradoUI.respuestas.indexOf('Respuesta que sobrevive') > -1, JSON.stringify(borradoUI.respuestas));
+check('el campo de editar existe (si no, lo de abajo no valdria nada)', campo.hay === true);
+check('el campo de editar no tiene fondo (transparente)', campo.hay === true && (campo.fondo === 'rgba(0, 0, 0, 0)' || campo.fondo === 'transparent'), String(campo.fondo));
+check('el campo respeta el aire de la derecha (no se pega ni se sale)', campo.hay === true && campo.derechaCuerpo !== null && campo.derechaCampo <= campo.derechaCuerpo, 'campo=' + campo.derechaCampo + ' cuerpo=' + campo.derechaCuerpo + ' relleno=' + campo.rellenoDerecha);
+check('el campo se queda con el foco tras el clic (si no, lo del anillo no se puede juzgar)', campo.hay === true && String(campo.activo).indexOf('comentario-editor-campo') > -1, 'activo=' + campo.activo + ' focus-visible=' + campo.focusVisible);
+check('al enfocar NO sale ningun anillo VISIBLE del navegador (el ambar en oscuro)',
+    campo.hay === true && (campo.anillo === 'none' || campo.anilloAncho === '0px'),
+    'outline-style=' + campo.anillo + ' grosor=' + campo.anilloAncho + ' focus-visible=' + campo.focusVisible);
+check('ni el halo ambar del tema claro (que es un box-shadow, no el outline)',
+    campo.hay === true && (campo.sombra === 'none' || campo.sombra === '' || campo.sombra === undefined),
+    'box-shadow=' + campo.sombra);
 
 console.log('\n=== 5) Sin usuario_id (como los comentarios de OBRA hasta hoy) ===');
 await evalJs(`window.__mandarUsuarioId(false)`);

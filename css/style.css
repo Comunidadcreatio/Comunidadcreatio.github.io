@@ -25,7 +25,7 @@
 @import url('header.css?v=2bb92c0c31');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=9d7e53cf27');
+@import url('galeria-publica.css?v=ba319203b9');
 
 /* Chat global + privado */
 @import url('chat.css?v=4f9d97eb73');
@@ -81,6 +81,21 @@
     [data-theme="dark"] :focus-visible {
         outline-color: #ffd166 !important; /* color-a-mano: deliberado (color del anillo de foco: decision de diseno) */
         box-shadow: 0 0 0 6px #1a1a1a !important;
+    }
+
+    /* EXCEPCION (2026-10-11): los CAMPOS DE TEXTO del cajon de comentarios, sin anillo.
+       Motivo: en un campo de texto `:focus-visible` coincide SIEMPRE que esta enfocado (no solo con
+       teclado), asi que el anillo salia en CADA clic al escribir, y se pidio quitarlo.
+       Va AQUI, en `base`, y no en components, por lo que dice el comentario de arriba: con `!important` el
+       orden de capas se INVIERTE, asi que solo desde `base` se le puede ganar al anillo. Se quitan las dos
+       partes (outline y box-shadow), porque el ambar sale del box-shadow en tema claro y del outline en
+       oscuro.
+       OJO: en botones y enlaces el anillo SIGUE puesto, que es donde de verdad hace falta. */
+    .comentarios-input:focus-visible,
+    .comentario-reply-field:focus-visible,
+    .comentario-editor-campo:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     /* Flecha personalizada para selects (modo claro - negra) */
