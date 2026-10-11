@@ -62,7 +62,11 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
               const json = async (data) => ({ ok: true, status: 200, json: async () => data });
               if (u.includes('/api/artistas/heartbeat')) return json({ ok: true });
               if (u.includes('mis-reacciones')) return json({ reacciones: [] });
-              if (u.includes('/comentarios')) return json({ comentarios: [] });
+              // UN comentario de verdad, no la lista vacia: con una lista vacia el cajon se abre sin nada, no hay
+        // boton de «me gusta» que mirar y por eso nadie habia visto que pintaba simbolos raros en vez del
+        // corazon (js/comentarios.js tenia el caracter corrupto: una "a" con tilde, un simbolo de marca y un
+        // yen, en vez de un corazon).
+        if (u.includes('/comentarios')) return json({ comentarios: [{ id: 900, autor_nombre: 'Ana', autor_foto: '', texto: 'Un comentario de prueba', created_at: new Date().toISOString(), likes_count: 3, comentario_padre_id: null }] });
               if (u.includes('/problogs')) return json({ success: true, publicaciones: [], total: 0 });
               if (u.includes('/obras')) return json(obrasMock);
               if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
@@ -177,6 +181,18 @@ if (!abrioCajon) {
       html: document.documentElement.style.overflow || ''
   })`));
   check('el cajón está abierto y bloquea el fondo (estado de partida)', abierto.visible && abierto.html === 'hidden', JSON.stringify(abierto));
+  // Y LO QUE VE EL USUARIO EN EL CAJÓN: el botón de «me gusta» tiene que pintar un CORAZÓN, no símbolos.
+  // Nació de un aviso real («aparecen símbolos extraños en vez del corazón»): el fichero tenía el carácter
+  // corrupto por un UTF-8 releído como Windows-1252, y el HTML era válido, así que ninguna prueba de
+  // comportamiento lo veía. Esto lo mira PINTADO, que es donde se nota.
+  const glifos = JSON.parse(await evalJs(`JSON.stringify({
+      like: (document.querySelector('.comentario-btn-like') || {}).textContent || '',
+      enviar: (document.querySelector('.comentario-reply-send') || {}).textContent || '',
+      hayLike: !!document.querySelector('.comentario-btn-like')
+  })`));
+  check('el cajón pinta un comentario con su botón de me gusta', glifos.hayLike === true, glifos.like.trim());
+  check('el botón de me gusta pinta un CORAZÓN y no símbolos', glifos.like.includes('♥') && !glifos.like.includes('â'), JSON.stringify(glifos.like.trim()));
+  check('el botón de enviar de una respuesta pinta su flecha y no símbolos', glifos.enviar.includes('➤') && !glifos.enviar.includes('â'), JSON.stringify(glifos.enviar.trim()));
   await evalJs(`document.getElementById('btn-buscar')?.click()`);
   // El cajón se cierra con una TRANSICIÓN y la app lo deja en `display: none` al terminar. El asentamiento
   // genérico se queda corto: el DOM "se asienta" en cuanto desaparece la clase `visible`, pero el cajón

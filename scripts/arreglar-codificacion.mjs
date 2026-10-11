@@ -8,6 +8,13 @@
 // Uso:
 //   node scripts/arreglar-codificacion.mjs js/etiquetas.js js/comentarios.js
 //   node scripts/arreglar-codificacion.mjs --comprobar
+// AVISO (2026-10-05): la tabla de abajo y su `MARCAS` buscan secuencias CONCRETAS, y por eso se les escapan
+// familias enteras. Paso de verdad: `js/comentarios.js` tenia "â™¥" (que era un corazon) y "âž¤" (que era una
+// flecha) y ni la tabla ni `MARCAS` los veian -- el usuario los veia como simbolos raros.
+// Para COMPROBAR, usa `scripts/verificar-codificacion.mjs`: reconstruye los bytes de cada secuencia y
+// comprueba si son UTF-8 valido (que es la definicion del asunto), y ademas te dice cual era el caracter
+// original. Esta en la suite, asi que ya no hace falta acordarse. Este script se queda para REPARAR en bloque
+// los casos de la tabla.
 import { readFileSync, writeFileSync, copyFileSync, readdirSync } from 'node:fs';
 
 const args = process.argv.slice(2);

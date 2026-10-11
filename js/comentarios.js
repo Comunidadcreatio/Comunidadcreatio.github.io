@@ -373,12 +373,12 @@ function renderizarComentario(c, todosReplies) {
                     <span class="comentario-fecha">${fecha}</span>
                     <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
                     <button class="comentario-btn-like" data-id="${c.id}">
-                        â™¥ <span class="comentario-likes-count">${likes}</span>
+                        ♥ <span class="comentario-likes-count">${likes}</span>
                     </button>
                 </div>
                 <div class="comentario-reply-input hidden" data-parent="${c.id}">
                     <input type="text" class="comentario-reply-field" placeholder="Escribe una respuesta..." autocomplete="off">
-                    <button class="comentario-reply-send">âž¤</button>
+                    <button class="comentario-reply-send">➤</button>
                 </div>
                 ${repliesHTML}
             </div>
