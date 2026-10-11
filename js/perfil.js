@@ -9,7 +9,7 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary } from './utils.js?v=b9fc40d1cb';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=a13785fb7c';
+import { setupViewTracking } from './galeria.js?v=a3ab2a05c3';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';

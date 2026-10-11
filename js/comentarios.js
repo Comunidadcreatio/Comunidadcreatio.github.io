@@ -346,6 +346,12 @@ async function cargarComentarios(obraId) {
     }
 }
 
+// El corazon del boton de «me gusta». Es un SVG y no un caracter de texto: el glifo de la fuente cambia de
+// forma segun el dispositivo (y en algunos se sustituye por un emoji en color), asi que no se puede controlar.
+// Se rellena con `currentColor` cuando el comentario esta marcado, igual que en el cajon de Problogs.
+// (La forma -- contorno redondeado -- se eligio viendo opciones renderizadas en este mismo cajon.)
+const ICONO_CORAZON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 20.4 4.7 13.6A5.2 5.2 0 0 1 12 6.1a5.2 5.2 0 0 1 7.3 7.5L12 20.4z"/></svg>';
+
 function renderizarComentario(c, todosReplies) {
     const inicial = (c.autor_nombre || '?')[0].toUpperCase();
     const avatarHTML = c.autor_foto
@@ -356,6 +362,7 @@ function renderizarComentario(c, todosReplies) {
 
     const fecha = timeAgoShort(c.created_at || c.fecha);
     const likes = c.likes_count || 0;
+    const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (c.liked ? 'currentColor' : 'none') + '"');
 
     // Buscar replies de este comentario
     const hijos = todosReplies ? todosReplies.filter(r => r.comentario_padre_id === c.id) : [];
@@ -372,8 +379,8 @@ function renderizarComentario(c, todosReplies) {
                 <div class="comentario-meta">
                     <span class="comentario-fecha">${fecha}</span>
                     <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
-                    <button class="comentario-btn-like" data-id="${c.id}">
-                        ♥ <span class="comentario-likes-count">${likes}</span>
+                    <button class="comentario-btn-like${c.liked ? ' liked' : ''}" data-id="${c.id}" aria-pressed="${c.liked ? 'true' : 'false'}" title="Me gusta">
+                        <span class="comentario-corazon">${corazon}</span><span class="comentario-likes-count">${likes}</span>
                     </button>
                 </div>
                 <div class="comentario-reply-input hidden" data-parent="${c.id}">

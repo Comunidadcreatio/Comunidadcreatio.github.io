@@ -1463,12 +1463,34 @@ body.cajon-teclado .comentarios-drawer {
     font-family: inherit;
     transition: color 0.15s;
 }
+.comentario-btn-like {
+    /* El corazon es un SVG, no un caracter de la fuente: el glifo cambiaba de forma segun el dispositivo (y
+       en algunos se sustituia por un emoji en color). Se alinea con flexbox para que no baile con la linea
+       base del numero. */
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.comentario-corazon {
+    display: inline-flex;
+    align-items: center;
+}
+.comentario-corazon svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+}
 .comentario-btn-responder:hover,
 .comentario-btn-like:hover {
     color: var(--color-ink);
 }
 .comentario-btn-like.liked {
     color: var(--color-like-ink);
+}
+/* El relleno al marcar tiene que venir de AQUI: al pulsar solo se AÑADE la clase `liked` (no se vuelve a
+   pintar el HTML), asi que el atributo `fill` del SVG se queda en `none` y el corazon no se rellenaria. */
+.comentario-btn-like.liked .comentario-corazon svg {
+    fill: currentColor;
 }
 .comentario-replies {
     margin-top: 8px;

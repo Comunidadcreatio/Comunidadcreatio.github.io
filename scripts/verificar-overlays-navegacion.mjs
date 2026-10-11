@@ -188,10 +188,13 @@ if (!abrioCajon) {
   const glifos = JSON.parse(await evalJs(`JSON.stringify({
       like: (document.querySelector('.comentario-btn-like') || {}).textContent || '',
       enviar: (document.querySelector('.comentario-reply-send') || {}).textContent || '',
-      hayLike: !!document.querySelector('.comentario-btn-like')
+      hayLike: !!document.querySelector('.comentario-btn-like'),
+      haySvg: !!document.querySelector('.comentario-btn-like .comentario-corazon svg')
   })`));
   check('el cajón pinta un comentario con su botón de me gusta', glifos.hayLike === true, glifos.like.trim());
-  check('el botón de me gusta pinta un CORAZÓN y no símbolos', glifos.like.includes('♥') && !glifos.like.includes('â'), JSON.stringify(glifos.like.trim()));
+  // El corazón es un SVG (no un carácter de la fuente: el glifo cambiaba de forma según el dispositivo). Y
+  // sigue sin poder aparecer mojibake, que es el aviso que originó todo esto.
+  check('el botón de me gusta pinta su CORAZÓN como icono (SVG) y sin símbolos', glifos.haySvg === true && !glifos.like.includes('â') && !glifos.enviar.includes('â'), `svg=${glifos.haySvg} texto=${JSON.stringify(glifos.like.trim())}`);
   check('el botón de enviar de una respuesta pinta su flecha y no símbolos', glifos.enviar.includes('➤') && !glifos.enviar.includes('â'), JSON.stringify(glifos.enviar.trim()));
   await evalJs(`document.getElementById('btn-buscar')?.click()`);
   // El cajón se cierra con una TRANSICIÓN y la app lo deja en `display: none` al terminar. El asentamiento
