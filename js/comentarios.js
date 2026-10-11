@@ -528,7 +528,10 @@ async function guardarEdicion(item, commentId) {
     const btn = /** @type {HTMLButtonElement | null} */ (item.querySelector('.comentario-btn-guardar'));
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
     try {
-        await apiRequest(baseComentarios() + '/' + commentId, { method: 'PATCH', body: JSON.stringify({ texto }) });
+        // PUT, no PATCH: es lo que define el backend (`router.put('/:id/comentarios/:commentId')`). Con PATCH
+        // la peticion no casaba con ninguna ruta y el cambio NO se guardaba (404 silencioso): se veia el
+        // campo, se pulsaba Guardar y el texto volvia al de antes.
+        await apiRequest(baseComentarios() + '/' + commentId, { method: 'PUT', body: JSON.stringify({ texto }) });
         await cargarComentarios(obraIdActual);
     } catch (err) {
         if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }

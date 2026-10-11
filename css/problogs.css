@@ -1973,3 +1973,47 @@ body.creando-problogs #problog-nav-bar {
 
 }
 
+
+/* ── Editar y borrar MI comentario (mismo criterio que el cajon de comentarios de Cavents) ───────────── */
+.problog-comentario-accion.peligro:hover {
+    color: var(--color-danger);
+}
+.problog-comentario-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 4px 0;
+}
+/* Mismo aspecto que se pidio en Cavents: sin fondo, solo el borde, y con aire a los lados. */
+.problog-comentario-editor .problog-comentario-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    padding: 8px 12px;
+    margin: 0;
+}
+.problog-comentario-editor-botones {
+    display: flex;
+    gap: 8px;
+}
+.problog-comentario-accion.guardar {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 4px 12px;
+}
+.problog-comentario-accion.guardar:disabled {
+    opacity: 0.6;
+}
+.problog-comentario-confirmar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(220, 38, 38, 0.08);
+    font-size: 12px;
+    color: var(--color-ink);
+}

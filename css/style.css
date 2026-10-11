@@ -83,9 +83,9 @@
         box-shadow: 0 0 0 6px #1a1a1a !important;
     }
 
-    /* EXCEPCION (2026-10-11): los CAMPOS DE TEXTO del cajon de comentarios, sin anillo.
+    /* EXCEPCION (2026-10-11): los CAMPOS DE TEXTO de los comentarios (Cavents y Problogs), sin anillo.
        Motivo: en un campo de texto `:focus-visible` coincide SIEMPRE que esta enfocado (no solo con
-       teclado), asi que el anillo salia en CADA clic al escribir, y se pidio quitarlo.
+       teclado), asi que el anillo salia en CADA clic al escribir, y se pidio quitarlo en los dos sitios.
        Va AQUI, en `base`, y no en components, por lo que dice el comentario de arriba: con `!important` el
        orden de capas se INVIERTE, asi que solo desde `base` se le puede ganar al anillo. Se quitan las dos
        partes (outline y box-shadow), porque el ambar sale del box-shadow en tema claro y del outline en
@@ -93,7 +93,11 @@
        OJO: en botones y enlaces el anillo SIGUE puesto, que es donde de verdad hace falta. */
     .comentarios-input:focus-visible,
     .comentario-reply-field:focus-visible,
-    .comentario-editor-campo:focus-visible {
+    .comentario-editor-campo:focus-visible,
+    .problog-comentario-input:focus-visible,
+    [data-comentario-texto]:focus-visible,
+    .problog-responder-barra input:focus-visible,
+    .problog-responder-barra textarea:focus-visible {
         outline: none !important;
         box-shadow: none !important;
     }

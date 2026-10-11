@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9b8cce7eac';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=b9fc40d1cb';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=7b1b9650a8';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=3e191577f6';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -1289,6 +1289,15 @@ function comentarioHTML(c, respuestas) {
     // Mismo corazón que el like de la publicación (y misma regla: relleno si ya
     // lo he pulsado), pero el CSS lo pinta más pequeño aquí.
     const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (liked ? 'currentColor' : 'none') + '"');
+    // Editar y borrar MI comentario. Aquí los comentarios los pinta este módulo (no el cajón de
+    // comentarios.js, que es el de Cavents), así que los botones van aquí. `usuario_id` lo manda la API de
+    // Problogs; si no viniera, no se ofrece nada (mejor no ofrecer que ofrecer y que el servidor lo rechace).
+    const esMio = c.usuario_id !== null && c.usuario_id !== undefined
+        && artistaActual && String(c.usuario_id) === String(artistaActual.id);
+    const accionesPropias = esMio
+        ? '<button type="button" class="problog-comentario-accion" data-comentario-editar="' + c.id + '">Editar</button>'
+            + '<button type="button" class="problog-comentario-accion peligro" data-comentario-eliminar="' + c.id + '">Eliminar</button>'
+        : '';
     const hijos = (respuestas && respuestas.length)
         ? `<div class="problog-comentario-respuestas">${respuestas.map((r) => comentarioHTML(r, [])).join('')}</div>`
         : '';
@@ -1308,6 +1317,7 @@ function comentarioHTML(c, respuestas) {
                     </button>
                     <button type="button" class="problog-comentario-accion" data-comentario-responder="${c.id}"
                         data-comentario-autor="${escapeHtml(autor)}">Responder</button>
+                    ${accionesPropias}
                 </div>
                 ${hijos}
             </div>
@@ -1317,6 +1327,129 @@ function comentarioHTML(c, respuestas) {
 function seccionComentarios(id) {
     return document.querySelector('[data-problog-comentarios="' + id + '"]');
 }
+
+// ============================================================
+// EDITAR Y BORRAR MI COMENTARIO (en la publicacion)
+// ------------------------------------------------------------
+// Mismo criterio que el cajon de Cavents (js/comentarios.js) y el mismo metodo que define el backend:
+// PUT para editar (NO PATCH: con PATCH la peticion no casa con ninguna ruta y el cambio no se guarda, que es
+// justo lo que se estaba viendo) y DELETE para borrar. Al terminar se RECARGA la lista desde el servidor, en
+// vez de dejar en el navegador un estado propio que luego no coincide con lo guardado.
+// ============================================================
+
+function problogDeLaSeccion(el) {
+    const seccion = el.closest('[data-problog-comentarios]');
+    return seccion ? seccion.getAttribute('data-problog-comentarios') : null;
+}
+
+function empezarEdicionComentario(comentarioEl) {
+    const texto = comentarioEl.querySelector('.problog-comentario-texto');
+    if (!texto || comentarioEl.querySelector('.problog-comentario-editor')) return;
+    const editor = document.createElement('div');
+    editor.className = 'problog-comentario-editor';
+    const campo = document.createElement('textarea');
+    campo.className = 'problog-comentario-input';
+    campo.rows = 2;
+    campo.maxLength = 1000;
+    campo.value = (texto.textContent || '').trim();
+    const botones = document.createElement('div');
+    botones.className = 'problog-comentario-editor-botones';
+    botones.innerHTML = '<button type="button" class="problog-comentario-accion guardar" data-comentario-guardar-edicion>Guardar</button>'
+        + '<button type="button" class="problog-comentario-accion" data-comentario-cancelar-edicion>Cancelar</button>';
+    editor.appendChild(campo);
+    editor.appendChild(botones);
+    texto.replaceWith(editor);
+    campo.focus();
+}
+
+async function guardarEdicionComentario(comentarioEl, comentarioId) {
+    const campo = comentarioEl.querySelector('.problog-comentario-editor .problog-comentario-input');
+    const texto = (campo ? campo.value : '').trim();
+    if (!texto) { alert('El comentario no puede quedar vacío'); return; }
+    const problogId = problogDeLaSeccion(comentarioEl);
+    if (!problogId) return;
+    const boton = comentarioEl.querySelector('[data-comentario-guardar-edicion]');
+    if (boton) { boton.disabled = true; boton.textContent = 'Guardando…'; }
+    try {
+        await apiRequest('/problogs/' + problogId + '/comentarios/' + comentarioId, {
+            method: 'PUT',
+            body: JSON.stringify({ texto })
+        });
+        await cargarComentariosDeLaPublicacion(problogId);
+    } catch (err) {
+        debugLog.error('Error guardando el comentario:', err);
+        if (boton) { boton.disabled = false; boton.textContent = 'Guardar'; }
+        alert('No se pudo guardar el cambio');
+    }
+}
+
+function pedirConfirmacionBorradoComentario(comentarioEl) {
+    if (comentarioEl.querySelector('.problog-comentario-confirmar')) return;
+    const cuerpo = comentarioEl.querySelector('.problog-comentario-cuerpo');
+    if (!cuerpo) return;
+    const caja = document.createElement('div');
+    caja.className = 'problog-comentario-confirmar';
+    caja.innerHTML = '<span>¿Eliminar este comentario?</span>'
+        + '<button type="button" class="problog-comentario-accion peligro" data-comentario-borrar-si>Si, eliminar</button>'
+        + '<button type="button" class="problog-comentario-accion" data-comentario-borrar-no>Cancelar</button>';
+    cuerpo.appendChild(caja);
+}
+
+async function borrarComentarioDeLaPublicacion(comentarioEl, comentarioId) {
+    const problogId = problogDeLaSeccion(comentarioEl);
+    if (!problogId) return;
+    const boton = comentarioEl.querySelector('[data-comentario-borrar-si]');
+    if (boton) { boton.disabled = true; boton.textContent = 'Eliminando…'; }
+    try {
+        await apiRequest('/problogs/' + problogId + '/comentarios/' + comentarioId, { method: 'DELETE' });
+        await cargarComentariosDeLaPublicacion(problogId);
+    } catch (err) {
+        debugLog.error('Error borrando el comentario:', err);
+        if (boton) { boton.disabled = false; boton.textContent = 'Si, eliminar'; }
+        alert('No se pudo eliminar el comentario');
+    }
+}
+
+// Un solo enganche para los cuatro botones nuevos, con delegacion (los comentarios se repintan a cada rato,
+// asi que enganchar boton a boton no serviria).
+document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) return;
+    const editar = e.target.closest('[data-comentario-editar]');
+    if (editar) {
+        const comentarioEl = editar.closest('.problog-comentario');
+        if (comentarioEl) empezarEdicionComentario(comentarioEl);
+        return;
+    }
+    const guardar = e.target.closest('[data-comentario-guardar-edicion]');
+    if (guardar) {
+        const comentarioEl = guardar.closest('.problog-comentario');
+        if (comentarioEl) guardarEdicionComentario(comentarioEl, comentarioEl.getAttribute('data-comentario-id'));
+        return;
+    }
+    const cancelarEdicion = e.target.closest('[data-comentario-cancelar-edicion]');
+    if (cancelarEdicion) {
+        const problogId = problogDeLaSeccion(cancelarEdicion);
+        if (problogId) cargarComentariosDeLaPublicacion(problogId);   // recargar: vuelve el texto de verdad
+        return;
+    }
+    const eliminar = e.target.closest('[data-comentario-eliminar]');
+    if (eliminar) {
+        const comentarioEl = eliminar.closest('.problog-comentario');
+        if (comentarioEl) pedirConfirmacionBorradoComentario(comentarioEl);
+        return;
+    }
+    const borrarSi = e.target.closest('[data-comentario-borrar-si]');
+    if (borrarSi) {
+        const comentarioEl = borrarSi.closest('.problog-comentario');
+        if (comentarioEl) borrarComentarioDeLaPublicacion(comentarioEl, comentarioEl.getAttribute('data-comentario-id'));
+        return;
+    }
+    const borrarNo = e.target.closest('[data-comentario-borrar-no]');
+    if (borrarNo) {
+        const caja = borrarNo.closest('.problog-comentario-confirmar');
+        if (caja) caja.remove();
+    }
+});
 
 // ============================================================
 // RESPONDER A UN COMENTARIO (barra de arriba)

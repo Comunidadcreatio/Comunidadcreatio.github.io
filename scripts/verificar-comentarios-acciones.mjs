@@ -72,6 +72,12 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
             // MIO y sin respuestas: se queda hasta el final, para poder abrir el editor y mirar su aspecto.
             { id: 904, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario para mirar el aspecto', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: null }
         ];
+        // Los comentarios de PROBLOGS: otra lista, porque son otro recurso (y los pinta otro modulo).
+        let comentariosProblog = [
+            { id: 700, problog_id: 60001, usuario_id: 1, autor_nombre: 'T', autor_foto: '', texto: 'Comentario mio en el problog', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: null },
+            { id: 701, problog_id: 60001, usuario_id: 42, autor_nombre: 'Otra persona', autor_foto: '', texto: 'Comentario ajeno en el problog', created_at: new Date().toISOString(), likes_count: 0, editado: 0, eliminado: 0, comentario_padre_id: null }
+        ];
+        const pubMock = { id: 60001, titulo: 'Una publicacion', etiquetas: 'arte', estado: 'publicado', created_at: new Date().toISOString(), bloques: [{ tipo: 'texto', contenido: 'Texto de la publicacion.' }], imagenes: [null,null,null,null,null,null,null,null], miniaturas: [null,null,null,null,null,null,null,null], portada_slot: null, nombre_artista: 'T', foto_artista: '', likes_count: 1, comentarios_count: 2, reblogs_count: 0, liked: false, reblogged: false };
         // Interruptor para probar los DOS casos: con usuario_id (como Problogs) y sin el (como obras hoy).
         let mandarUsuarioId = true;
         window.__mandarUsuarioId = function (v) { mandarUsuarioId = v; };
@@ -86,25 +92,37 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
                 if (u.includes('mis-reacciones')) return json({ reacciones: [] });
                 if (u.includes('/comentarios')) {
                     const id = Number(u.split('/').pop());
-                    if (metodo === 'PATCH') {
+                    // Los comentarios de PROBLOGS son otra lista (y otro recurso): se distinguen por la URL.
+                    const esProblog = u.indexOf('/problogs/') > -1;
+                    // OJO CON EL METODO: el backend define PUT para editar. Si el frontend mandara PATCH, la
+                    // peticion no casaria con ninguna ruta y el cambio no se guardaria (paso en produccion).
+                    // Aqui se responde 404 igual que el backend de verdad, para que ese fallo NO pueda pasar
+                    // desapercibido otra vez.
+                    if (metodo === 'PATCH') return { ok: false, status: 404, json: async () => ({ success: false, error: 'Cannot PATCH' }) };
+                    if (metodo === 'PUT') {
                         let texto = '';
                         try { texto = JSON.parse(init.body).texto; } catch (e) {}
-                        comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { texto: texto, editado: 1 }) : c; });
-                        return json({ success: true });
+                        if (esProblog) comentariosProblog = comentariosProblog.map(function (c) { return c.id === id ? Object.assign({}, c, { texto: texto, editado: 1 }) : c; });
+                        else comentarios = comentarios.map(function (c) { return c.id === id ? Object.assign({}, c, { texto: texto, editado: 1 }) : c; });
+                        return json({ success: true, comentario: { id: id, texto: texto, editado: 1 } });
                     }
                     if (metodo === 'DELETE') {
-                        // BORRADO REAL, como el backend ahora: se van el comentario Y SUS RESPUESTAS (si se
-                        // quedaran sin padre, serian invisibles para todo el mundo).
-                        comentarios = comentarios.filter(function (c) { return c.id !== id && c.comentario_padre_id !== id; });
-                        return json({ success: true, id: id, borrados: 2 });
+                        if (esProblog) comentariosProblog = comentariosProblog.filter(function (c) { return c.id !== id && c.comentario_padre_id !== id; });
+                        else comentarios = comentarios.filter(function (c) { return c.id !== id && c.comentario_padre_id !== id; });
+                        return json({ success: true, id: id });
                     }
-                    const salida = comentarios.map(function (c) {
+                    const fuente = esProblog ? comentariosProblog : comentarios;
+                    const salida = fuente.map(function (c) {
                         if (mandarUsuarioId) return c;
                         const copia = Object.assign({}, c); delete copia.usuario_id; return copia;
                     });
                     return json({ comentarios: salida });
                 }
-                if (u.includes('/problogs')) return json({ success: true, publicaciones: [], total: 0 });
+                if (u.includes('/problogs/') && !u.includes('/comentarios')) {
+                    // El detalle de la publicacion (los comentarios ya se han servido arriba).
+                    return json(pubMock);
+                }
+                if (u.includes('/problogs')) return json({ success: true, problogs: [pubMock], publicaciones: [pubMock], total: 1 });
                 if (u.includes('/obras')) return json(obrasMock);
                 if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
                 return json({ success: true });
@@ -275,6 +293,85 @@ const sinId = JSON.parse(await evalJs(`(() => {
     return JSON.stringify({ total: items.length, botones: Array.from(document.querySelectorAll('.comentario-btn-editar, .comentario-btn-eliminar')).length });
 })()`) || '{}');
 check('sin usuario_id NO se ofrecen los botones (es a proposito: mejor no ofrecer que ofrecer y fallar)', sinId.total > 0 && sinId.botones === 0, JSON.stringify(sinId));
+
+console.log('\n=== 6) Los mismos botones en los comentarios de PROBLOGS ===');
+// OJO: hay que DEVOLVER el interruptor a true. En el punto anterior se apago para probar el caso sin
+// `usuario_id`, y si se queda apagado los comentarios de Problogs llegan sin el y no salen los botones.
+await evalJs(`window.__mandarUsuarioId(true)`);
+// Problogs pinta sus comentarios con OTRO modulo (problogs.js) y no con el cajon, asi que hay que probarlo
+// aparte: era justo el sitio donde el guardado no funcionaba.
+for (let intento = 0; intento < 8; intento++) {
+    await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+    await sleep(900);
+    const hayTarjeta = await evalJs(`(() => { const c = document.querySelector('#problogs .problog-card'); return !!c && c.getBoundingClientRect().height > 0; })()`);
+    if (hayTarjeta === true) break;
+}
+for (let intento = 0; intento < 8; intento++) {
+    await evalJs(`document.querySelector('#problogs .problog-card')?.click()`);
+    await sleep(900);
+    const abierto = await evalJs(`(() => { const d = document.getElementById('problogs-detalle'); return !!d && !d.classList.contains('hidden') && document.querySelectorAll('.problog-comentario').length >= 2; })()`);
+    if (abierto === true) break;
+}
+const problogUI = JSON.parse(await evalJs(`(() => {
+    const items = Array.from(document.querySelectorAll('.problog-comentario'));
+    const botonesDe = (el) => el ? Array.from(el.querySelectorAll('[data-comentario-editar], [data-comentario-eliminar]')).map(function (b) { return b.textContent.trim(); }) : [];
+    return JSON.stringify({ total: items.length, mio: botonesDe(items[0]), ajeno: botonesDe(items[1]) });
+})()`) || '{}');
+check('en Problogs el comentario propio tambien ofrece Editar y Eliminar', problogUI.mio.join(',') === 'Editar,Eliminar', JSON.stringify(problogUI));
+check('y el ajeno tampoco ofrece nada en Problogs', problogUI.ajeno.length === 0, JSON.stringify(problogUI.ajeno));
+
+// EDITAR: aqui estaba el fallo (se mandaba PATCH y el backend define PUT).
+await evalJs(`document.querySelector('.problog-comentario [data-comentario-editar]')?.click()`);
+await sleep(500);
+const editorProblog = JSON.parse(await evalJs(`(() => {
+    const campo = document.querySelector('.problog-comentario-editor .problog-comentario-input');
+    return JSON.stringify({ hay: !!campo, texto: campo ? campo.value : '' });
+})()`) || '{}');
+check('en Problogs, Editar abre el campo con el texto actual', editorProblog.hay === true && editorProblog.texto === 'Comentario mio en el problog', JSON.stringify(editorProblog));
+await evalJs(`(() => { const c = document.querySelector('.problog-comentario-editor .problog-comentario-input'); if (c) c.value = 'Texto editado en el problog'; })()`);
+await evalJs(`document.querySelector('[data-comentario-guardar-edicion]')?.click()`);
+await sleep(1500);
+const trasEditarProblog = await evalJs(`(document.querySelector('.problog-comentario .problog-comentario-texto') || {}).textContent || ''`);
+check('en Problogs EL CAMBIO SE APLICA Y SE VE (con PUT, que es lo que define el backend)', trasEditarProblog.trim() === 'Texto editado en el problog', JSON.stringify(trasEditarProblog.trim()));
+
+// El anillo ambar en los campos de Problogs.
+await evalJs(`document.querySelector('.problog-comentario [data-comentario-editar]')?.click()`);
+await sleep(500);
+const centroProblog = await evalJs(`(() => {
+    const c = document.querySelector('.problog-comentario-editor .problog-comentario-input');
+    if (!c) return '';
+    const r = c.getBoundingClientRect();
+    return Math.round(r.left + r.width / 2) + ',' + Math.round(r.top + r.height / 2);
+})()`);
+if (typeof centroProblog === 'string' && centroProblog.indexOf(',') > 0) {
+    const [px, py] = centroProblog.split(',').map(Number);
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: px, y: py, button: 'left', clickCount: 1 });
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: px, y: py, button: 'left', clickCount: 1 });
+    await sleep(300);
+}
+const campoProblog = JSON.parse(await evalJs(`(() => {
+    const c = document.querySelector('.problog-comentario-editor .problog-comentario-input');
+    if (!c) return JSON.stringify({ hay: false });
+    const cs = getComputedStyle(c);
+    return JSON.stringify({ hay: true, anillo: cs.outlineStyle, anilloAncho: cs.outlineWidth, sombra: cs.boxShadow, fondo: cs.backgroundColor, activo: document.activeElement === c });
+})()`) || '{}');
+check('en Problogs el campo de escribir tampoco lleva el anillo ambar', campoProblog.hay === true && campoProblog.activo === true && (campoProblog.anillo === 'none' || campoProblog.anilloAncho === '0px') && (campoProblog.sombra === 'none' || !campoProblog.sombra), 'outline=' + campoProblog.anillo + ' sombra=' + campoProblog.sombra + ' activo=' + campoProblog.activo);
+
+// BORRAR en Problogs.
+await evalJs(`document.querySelector('[data-comentario-cancelar-edicion]')?.click()`);
+await sleep(900);
+await evalJs(`document.querySelector('.problog-comentario [data-comentario-eliminar]')?.click()`);
+await sleep(500);
+const confirmaProblog = await evalJs(`!!document.querySelector('.problog-comentario-confirmar')`);
+check('en Problogs, al pulsar Eliminar se pide confirmacion', confirmaProblog === true);
+await evalJs(`document.querySelector('[data-comentario-borrar-si]')?.click()`);
+await sleep(1500);
+const trasBorrarProblog = JSON.parse(await evalJs(`(() => {
+    const textos = Array.from(document.querySelectorAll('.problog-comentario .problog-comentario-texto')).map(function (e) { return e.textContent.trim(); });
+    return JSON.stringify({ textos: textos, quedan: document.querySelectorAll('.problog-comentario').length });
+})()`) || '{}');
+check('en Problogs el comentario borrado desaparece', Array.isArray(trasBorrarProblog.textos) && trasBorrarProblog.textos.indexOf('Texto editado en el problog') === -1, JSON.stringify(trasBorrarProblog.textos));
+check('y el ajeno sigue en su sitio', Array.isArray(trasBorrarProblog.textos) && trasBorrarProblog.textos.indexOf('Comentario ajeno en el problog') > -1, JSON.stringify(trasBorrarProblog.textos));
 
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 try { chrome.kill(); } catch {}

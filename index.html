@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.710';
+        var currentVer = '1.0.711';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,10 +78,10 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=cc2b91c1a9">
+    <link rel="stylesheet" href="css/style.css?v=894a621b7f">
     <link rel="stylesheet" href="css/notificaciones.css?v=8a04c0024f">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
-    <link rel="stylesheet" href="css/problogs.css?v=b5f7652353">
+    <link rel="stylesheet" href="css/problogs.css?v=1521e7ec1a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -1137,7 +1137,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=616cddd5ab" type="module"></script>
+    <script src="js/main.js?v=1d4624dc25" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
