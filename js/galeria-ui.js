@@ -3,10 +3,10 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=3683948701';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=a1eee1237f';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=c3731c11c5';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=4d708a0268';
 import { artistaActual, token, esArtista } from './auth.js?v=d03e50cca9';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=c82ca9febd';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=f5ff9b56be';
 import { confirmarDescartarCambios } from './panel-ui.js?v=d46c3a5950';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=b9fc40d1cb';

@@ -36,3 +36,6 @@ scripts/*.sin-medir.json
 
 # Capturas de la herramienta de diseño de iconos (se generan, no se versionan)
 scripts/_corazon-*.png
+
+# Capturas de las herramientas de diseno (se generan, no se versionan)
+scripts/_accion-*.png

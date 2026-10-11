@@ -1,7 +1,7 @@
 // @ts-check
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest } from './config.js?v=9b8cce7eac';
+import { apiRequest, ARTISTA_KEY } from './config.js?v=9b8cce7eac';
 import { renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=b9fc40d1cb';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
@@ -52,6 +52,28 @@ function estaMarcado(c) {
     if (c.liked === true) return true;            // el servidor lo dice: manda él
     if (c.liked === false) return false;          // el servidor dice que no
     return likesLocales.has(tipoRecurso + ':' + c.id);   // no dice nada (obras): se usa lo apuntado
+}
+
+// ── ¿Este comentario es MÍO? ─────────────────────────────────────────────────────────────────────────
+// Editar y borrar solo se ofrecen en los comentarios propios, y para saberlo hace falta que la API diga de
+// quién es cada comentario (`usuario_id`). Los de PROBLOGS lo traen; los de OBRA todavía no: mientras no lo
+// traigan, en Cavents NO se ofrecen los botones. Es a propósito: es mejor no ofrecer que ofrecer y que el
+// servidor lo rechace.
+//
+// OJO: esto es solo la parte visible. Quien de verdad impide tocar un comentario ajeno es el SERVIDOR, que
+// tiene que comprobar el dueño en cada PATCH y cada DELETE (el botón se puede quitar desde la consola).
+function miUsuarioId() {
+    try {
+        const guardado = JSON.parse(localStorage.getItem(ARTISTA_KEY) || 'null');
+        return guardado && guardado.id != null ? String(guardado.id) : null;
+    } catch (e) { return null; }
+}
+
+/** @param {{id:number|string, usuario_id?:number|string|null}} c */
+function esMio(c) {
+    const mio = miUsuarioId();
+    if (mio === null || c.usuario_id === null || c.usuario_id === undefined) return false;
+    return String(c.usuario_id) === mio;
 }
 
 function init() {
@@ -401,6 +423,11 @@ function renderizarComentario(c, todosReplies) {
     const likes = c.likes_count || 0;
     const marcado = estaMarcado(c);
     const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (marcado ? 'currentColor' : 'none') + '"');
+    // Editar y borrar, SOLO en los comentarios propios (y solo si la API dice de quién es).
+    const acciones = esMio(c)
+        ? '<button class="comentario-btn-editar" data-id="' + c.id + '">Editar</button>'
+            + '<button class="comentario-btn-eliminar" data-id="' + c.id + '">Eliminar</button>'
+        : '';
 
     // Buscar replies de este comentario
     const hijos = todosReplies ? todosReplies.filter(r => r.comentario_padre_id === c.id) : [];
@@ -420,6 +447,7 @@ function renderizarComentario(c, todosReplies) {
                     <button class="comentario-btn-like${marcado ? ' liked' : ''}" data-id="${c.id}" aria-pressed="${marcado ? 'true' : 'false'}" title="Me gusta">
                         <span class="comentario-corazon">${corazon}</span><span class="comentario-likes-count">${likes}</span>
                     </button>
+                    ${acciones}
                 </div>
                 <div class="comentario-reply-input hidden" data-parent="${c.id}">
                     <input type="text" class="comentario-reply-field" placeholder="Escribe una respuesta..." autocomplete="off">
@@ -457,8 +485,75 @@ async function enviarComentario(parentId = null) {
     }
 }
 
-async function likeComentario(commentId) {
+// ── Editar y borrar el comentario propio ─────────────────────────────────────────────────────────────
+// Las dos recargan la lista al terminar. Es lo simple y lo que NO miente: el texto, los contadores y los
+// «me gusta» vienen otra vez del servidor, en vez de dejar en el navegador un estado inventado que luego no
+// coincide con lo guardado.
+
+/** @param {HTMLElement} item */
+function empezarEdicion(item) {
+    const texto = item.querySelector('.comentario-texto');
+    if (!texto || item.querySelector('.comentario-editor')) return;
+    const editor = document.createElement('div');
+    editor.className = 'comentario-editor';
+    const campo = document.createElement('textarea');
+    campo.className = 'comentario-editor-campo';
+    campo.maxLength = 1000;
+    campo.value = (texto.textContent || '').trim();
+    const botones = document.createElement('div');
+    botones.className = 'comentario-editor-botones';
+    botones.innerHTML = '<button class="comentario-btn-guardar">Guardar</button><button class="comentario-btn-cancelar">Cancelar</button>';
+    editor.appendChild(campo);
+    editor.appendChild(botones);
+    texto.replaceWith(editor);
+    campo.focus();
+}
+
+/** @param {HTMLElement} item @param {number} commentId */
+async function guardarEdicion(item, commentId) {
+    const campo = /** @type {HTMLTextAreaElement | null} */ (item.querySelector('.comentario-editor-campo'));
+    const texto = (campo?.value || '').trim();
+    if (!texto) { alert('El comentario no puede quedar vacío'); return; }
+    const btn = /** @type {HTMLButtonElement | null} */ (item.querySelector('.comentario-btn-guardar'));
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
     try {
+        await apiRequest(baseComentarios() + '/' + commentId, { method: 'PATCH', body: JSON.stringify({ texto }) });
+        await cargarComentarios(obraIdActual);
+    } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
+        alert('No se pudo guardar el cambio');
+    }
+}
+
+/** @param {HTMLElement} item */
+function pedirConfirmacionBorrado(item) {
+    if (item.querySelector('.comentario-confirmar')) return;
+    const cuerpo = item.querySelector('.comentario-body');
+    if (!cuerpo) return;
+    const caja = document.createElement('div');
+    caja.className = 'comentario-confirmar';
+    caja.innerHTML = '<span>¿Eliminar este comentario?</span>'
+        + '<button class="comentario-btn-borrar-si">Sí, eliminar</button>'
+        + '<button class="comentario-btn-borrar-no">Cancelar</button>';
+    cuerpo.appendChild(caja);
+}
+
+/** @param {HTMLElement} item @param {number} commentId */
+async function borrarComentario(item, commentId) {
+    const btn = /** @type {HTMLButtonElement | null} */ (item.querySelector('.comentario-btn-borrar-si'));
+    if (btn) { btn.disabled = true; btn.textContent = 'Eliminando…'; }
+    try {
+        await apiRequest(baseComentarios() + '/' + commentId, { method: 'DELETE' });
+        // El contador de la tarjeta solo existe en las de obra, igual que al comentar.
+        if (tipoRecurso === 'obras') actualizarContador(cardActual, -1);
+        await cargarComentarios(obraIdActual);
+    } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Sí, eliminar'; }
+        alert('No se pudo eliminar el comentario');
+    }
+}
+
+async function likeComentario(commentId) {    try {
         const res = await apiRequest(baseComentarios() + '/' + commentId + '/like', { method: 'POST' });
         const btn = document.querySelector(`.comentario-btn-like[data-id="${commentId}"]`);
         const span = btn?.querySelector('.comentario-likes-count');
@@ -655,6 +750,44 @@ lista?.addEventListener('click', (e) => {
     const btnLike = e.target.closest('.comentario-btn-like');
     if (btnLike) {
         likeComentario(parseInt(btnLike.dataset.id));
+        return;
+    }
+    // Editar mi comentario: el texto se convierte en campo, en su sitio.
+    const btnEditar = e.target.closest('.comentario-btn-editar');
+    if (btnEditar) {
+        const item = btnEditar.closest('.comentario-item');
+        if (item) empezarEdicion(/** @type {HTMLElement} */ (item));
+        return;
+    }
+    // Guardar el cambio (y recargar la lista desde el servidor).
+    const btnGuardar = e.target.closest('.comentario-btn-guardar');
+    if (btnGuardar) {
+        const item = btnGuardar.closest('.comentario-item');
+        if (item) guardarEdicion(/** @type {HTMLElement} */ (item), parseInt(/** @type {HTMLElement} */ (item).dataset.id || '0'));
+        return;
+    }
+    // Cancelar la edición: se recarga la lista y vuelve el texto de verdad.
+    const btnCancelar = e.target.closest('.comentario-btn-cancelar');
+    if (btnCancelar) {
+        cargarComentarios(obraIdActual);
+        return;
+    }
+    // Eliminar: primero se pide confirmación EN LÍNEA (sin diálogos del sistema).
+    const btnEliminar = e.target.closest('.comentario-btn-eliminar');
+    if (btnEliminar) {
+        const item = btnEliminar.closest('.comentario-item');
+        if (item) pedirConfirmacionBorrado(/** @type {HTMLElement} */ (item));
+        return;
+    }
+    const btnBorrarSi = e.target.closest('.comentario-btn-borrar-si');
+    if (btnBorrarSi) {
+        const item = btnBorrarSi.closest('.comentario-item');
+        if (item) borrarComentario(/** @type {HTMLElement} */ (item), parseInt(/** @type {HTMLElement} */ (item).dataset.id || '0'));
+        return;
+    }
+    const btnBorrarNo = e.target.closest('.comentario-btn-borrar-no');
+    if (btnBorrarNo) {
+        btnBorrarNo.closest('.comentario-confirmar')?.remove();
         return;
     }
 });

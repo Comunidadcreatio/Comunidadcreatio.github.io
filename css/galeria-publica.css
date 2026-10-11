@@ -1453,7 +1453,9 @@ body.cajon-teclado .comentarios-drawer {
     margin-top: 4px;
 }
 .comentario-btn-responder,
-.comentario-btn-like {
+.comentario-btn-like,
+.comentario-btn-editar,
+.comentario-btn-eliminar {
     background: none;
     border: none;
     color: var(--color-gray-500);
@@ -1481,8 +1483,14 @@ body.cajon-teclado .comentarios-drawer {
     display: block;
 }
 .comentario-btn-responder:hover,
-.comentario-btn-like:hover {
+.comentario-btn-like:hover,
+.comentario-btn-editar:hover,
+.comentario-btn-eliminar:hover {
     color: var(--color-ink);
+}
+/* «Eliminar» avisa de lo que hace: se pone en el rojo de peligro al pasar por encima. */
+.comentario-btn-eliminar:hover {
+    color: var(--color-danger);
 }
 .comentario-btn-like.liked {
     color: var(--color-like-ink);
@@ -1491,6 +1499,83 @@ body.cajon-teclado .comentarios-drawer {
    pintar el HTML), asi que el atributo `fill` del SVG se queda en `none` y el corazon no se rellenaria. */
 .comentario-btn-like.liked .comentario-corazon svg {
     fill: currentColor;
+}
+
+/* ── Editar mi comentario: el texto se convierte en campo, EN SU SITIO (sin modal) ──────────────── */
+.comentario-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 2px;
+}
+.comentario-editor-campo {
+    width: 100%;
+    min-height: 62px;
+    resize: vertical;
+    font: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-ink);
+}
+.comentario-editor-botones {
+    display: flex;
+    gap: 8px;
+}
+.comentario-btn-guardar {
+    background: var(--color-ink);
+    color: var(--color-white);
+    border: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+.comentario-btn-guardar:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+.comentario-btn-cancelar,
+.comentario-btn-borrar-no {
+    background: none;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-gray-600);
+    cursor: pointer;
+}
+
+/* ── Borrar: confirmacion EN LINEA, sin dialogos del sistema ─────────────────────────────────────── */
+.comentario-confirmar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--color-danger-soft, rgba(220, 38, 38, 0.08));
+    font-size: 12px;
+    color: var(--color-ink);
+}
+.comentario-btn-borrar-si {
+    background: var(--color-danger);
+    color: var(--color-white);
+    border: none;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+.comentario-btn-borrar-si:disabled {
+    opacity: 0.6;
+    cursor: default;
 }
 .comentario-replies {
     margin-top: 8px;
