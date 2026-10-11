@@ -17,6 +17,43 @@ let tipoRecurso = 'obras';
 let cardActual = null;
 let drawer, lista, input, btnEnviar, nav, bloqueoEl;
 
+// ── «Me gusta» que el servidor NO recuerda ────────────────────────────────────────────────────────────
+// La API de los comentarios de OBRA devuelve `id, texto, created_at, likes_count, autor_*` y **no** manda
+// `liked` (comprobado contra el backend real: la de Problogs sí lo manda). Como la app lee `liked` en los dos
+// sitios, en Cavents el corazón se quedaba sin rellenar al reabrir el cajón, aunque el «me gusta» SÍ se
+// hubiera guardado (el contador viene del servidor y persiste).
+//
+// Mientras el backend no añada ese campo, aquí se APUNTA lo que el usuario ha marcado. Con dos reglas:
+//   1) el SERVIDOR manda: si algún día manda `liked`, esto no se usa para ese comentario;
+//   2) solo se apunta si la respuesta del «me gusta» fue buena, para no pintar un estado que no se guardó.
+const CLAVE_LIKES = 'creatio_likes_comentarios';
+const MAX_LIKES = 300;
+/** @type {Set<string>} */
+let likesLocales = new Set();
+try {
+    const guardado = JSON.parse(localStorage.getItem(CLAVE_LIKES) || '[]');
+    if (Array.isArray(guardado)) likesLocales = new Set(guardado.map(String));
+} catch (e) { /* si el almacén está corrupto, se empieza de cero */ }
+
+function recordarLike(id, marcado) {
+    // La clave lleva el RECURSO: los ids de comentario de una obra y de un Problogs son de tablas distintas
+    // y pueden coincidir, así que sin esto un «me gusta» en una obra podría marcar un comentario de Problogs.
+    const clave = tipoRecurso + ':' + id;
+    if (marcado) likesLocales.add(clave);
+    else likesLocales.delete(clave);
+    // Se guardan los últimos: el almacén no puede crecer sin freno.
+    const lista = Array.from(likesLocales).slice(-MAX_LIKES);
+    likesLocales = new Set(lista);
+    try { localStorage.setItem(CLAVE_LIKES, JSON.stringify(lista)); } catch (e) { /* modo privado, etc. */ }
+}
+
+/** @param {{id:number|string, liked?:boolean}} c */
+function estaMarcado(c) {
+    if (c.liked === true) return true;            // el servidor lo dice: manda él
+    if (c.liked === false) return false;          // el servidor dice que no
+    return likesLocales.has(tipoRecurso + ':' + c.id);   // no dice nada (obras): se usa lo apuntado
+}
+
 function init() {
     if (drawer) return;
     drawer    = document.getElementById('comentarios-drawer');
@@ -362,7 +399,8 @@ function renderizarComentario(c, todosReplies) {
 
     const fecha = timeAgoShort(c.created_at || c.fecha);
     const likes = c.likes_count || 0;
-    const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (c.liked ? 'currentColor' : 'none') + '"');
+    const marcado = estaMarcado(c);
+    const corazon = ICONO_CORAZON.replace('fill="none"', 'fill="' + (marcado ? 'currentColor' : 'none') + '"');
 
     // Buscar replies de este comentario
     const hijos = todosReplies ? todosReplies.filter(r => r.comentario_padre_id === c.id) : [];
@@ -379,7 +417,7 @@ function renderizarComentario(c, todosReplies) {
                 <div class="comentario-meta">
                     <span class="comentario-fecha">${fecha}</span>
                     <button class="comentario-btn-responder" data-id="${c.id}">Responder</button>
-                    <button class="comentario-btn-like${c.liked ? ' liked' : ''}" data-id="${c.id}" aria-pressed="${c.liked ? 'true' : 'false'}" title="Me gusta">
+                    <button class="comentario-btn-like${marcado ? ' liked' : ''}" data-id="${c.id}" aria-pressed="${marcado ? 'true' : 'false'}" title="Me gusta">
                         <span class="comentario-corazon">${corazon}</span><span class="comentario-likes-count">${likes}</span>
                     </button>
                 </div>
@@ -427,6 +465,9 @@ async function likeComentario(commentId) {
         if (btn) {
             if (res.liked) btn.classList.add('liked');
             else btn.classList.remove('liked');
+            // Y se apunta, para que al cerrar y reabrir el cajón el corazón siga marcado (el servidor de
+            // obras no manda `liked`, así que sin esto se perdía el rojo aunque el like SÍ estuviera hecho).
+            recordarLike(commentId, res.liked === true);
         }
         if (span) span.textContent = res.likes_count;
     } catch (err) {

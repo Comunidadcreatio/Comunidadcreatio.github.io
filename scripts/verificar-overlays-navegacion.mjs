@@ -56,8 +56,14 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
       const img45 = mkImg(800,1000,'#cc3344');
       const obrasMock = [{ id: 1, titulo: 'Retrato', artista: 'T', artista_user_id: 1, imagen_url: img45, etiquetas: 'Oleo', ano: 2024, ancho: 80, alto: 100, descripcion_tecnica: 'Oleo', soporte: 'Lienzo', marcos: 'No', estado_obra: 'Disponible (en venta)', descripcion_artistica: 'Desc', procedencia: '-', certificado: '-', firma: '-', conservacion: 'Buena', likes_count: 2, views_count: 5, comments_count: 1, precio: '100', foto_artista: '' }];
       const realFetch = window.fetch.bind(window);
+      // FUERA del wrapper, no dentro: si se declara dentro del bloque, se reinicia en CADA peticion y el
+      // contador nunca sube (paso, y la comprobacion del numero lo destapo).
+      let likes900 = 3;
+      // Y las peticiones que hace la app, para poder diagnosticar desde la comprobacion.
+      window.__pedidas = [];
       window.fetch = async (input, init) => {
           const u = String(input);
+          window.__pedidas.push(u.split('onrender.com')[1] || u);
           if (u.includes('backend-fundacion-atpe.onrender.com')) {
               const json = async (data) => ({ ok: true, status: 200, json: async () => data });
               if (u.includes('/api/artistas/heartbeat')) return json({ ok: true });
@@ -66,7 +72,10 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
         // boton de «me gusta» que mirar y por eso nadie habia visto que pintaba simbolos raros en vez del
         // corazon (js/comentarios.js tenia el caracter corrupto: una "a" con tilde, un simbolo de marca y un
         // yen, en vez de un corazon).
-        if (u.includes('/comentarios')) return json({ comentarios: [{ id: 900, autor_nombre: 'Ana', autor_foto: '', texto: 'Un comentario de prueba', created_at: new Date().toISOString(), likes_count: 3, comentario_padre_id: null }] });
+        // El «me gusta» de un comentario: la app lee los campos liked y likes_count de la respuesta. Va
+        // ANTES de la rama de /comentarios, porque su URL tambien contiene /comentarios.
+        if (u.includes('/like')) { likes900 = likes900 + 1; return json({ success: true, liked: true, likes_count: likes900 }); }
+        if (u.includes('/comentarios')) return json({ comentarios: [{ id: 900, autor_nombre: 'Ana', autor_foto: '', texto: 'Un comentario de prueba', created_at: new Date().toISOString(), likes_count: likes900, comentario_padre_id: null }] });
               if (u.includes('/problogs')) return json({ success: true, publicaciones: [], total: 0 });
               if (u.includes('/obras')) return json(obrasMock);
               if (u.includes('usuarios') || u.includes('artistas/buscar')) return json({ usuarios: [] });
@@ -196,6 +205,16 @@ if (!abrioCajon) {
   // sigue sin poder aparecer mojibake, que es el aviso que originó todo esto.
   check('el botón de me gusta pinta su CORAZÓN como icono (SVG) y sin símbolos', glifos.haySvg === true && !glifos.like.includes('â') && !glifos.enviar.includes('â'), `svg=${glifos.haySvg} texto=${JSON.stringify(glifos.like.trim())}`);
   check('el botón de enviar de una respuesta pinta su flecha y no símbolos', glifos.enviar.includes('➤') && !glifos.enviar.includes('â'), JSON.stringify(glifos.enviar.trim()));
+  // Y EL FALLO QUE REPORTÓ EL USUARIO: el «me gusta» se veía rojo, pero al cerrar el cajón y volver a
+  // abrirlo el rojo se perdía. La causa medida: la API de los comentarios de OBRA no devuelve `liked` (la de
+  // Problogs sí), así que al repintar no había forma de saber que YA estaba marcado.
+  await evalJs(`document.querySelector('.comentario-btn-like')?.click()`);
+  await sleep(1000);
+  const trasLike = JSON.parse(await evalJs(`JSON.stringify({
+      liked: !!document.querySelector('.comentario-btn-like.liked'),
+      cuenta: (document.querySelector('.comentario-likes-count') || {}).textContent || ''
+  })`));
+  check('al pulsar «me gusta» el corazón se marca y sube el contador', trasLike.liked === true && trasLike.cuenta === '4', JSON.stringify(trasLike));
   await evalJs(`document.getElementById('btn-buscar')?.click()`);
   // El cajón se cierra con una TRANSICIÓN y la app lo deja en `display: none` al terminar. El asentamiento
   // genérico se queda corto: el DOM "se asienta" en cuanto desaparece la clase `visible`, pero el cajón
@@ -218,6 +237,22 @@ if (!abrioCajon) {
   })`));
   check('el cajón se cierra al navegar', !tras.visible && !tras.enPantalla, JSON.stringify(tras));
   check('el fondo queda libre tras cerrar el cajón', tras.html !== 'hidden' && tras.body !== 'hidden', JSON.stringify(tras));
+
+  // Y AL VOLVER A ABRIRLO, el corazón tiene que seguir marcado: es exactamente lo que fallaba.
+  for (let intento = 0; intento < 8; intento++) {
+      await evalJs(`document.getElementById('btn-cavents-hub')?.click()`);
+      await sleep(900);
+      await evalJs(`document.querySelector('.metrica-comentario')?.click()`);
+      await sleep(900);
+      if (await evalJs(`!!document.querySelector('.comentario-btn-like')`) === true) break;
+  }
+  const trasReabrir = JSON.parse(await evalJs(`JSON.stringify({
+      liked: !!document.querySelector('.comentario-btn-like.liked'),
+      relleno: (() => { const s = document.querySelector('.comentario-btn-like .comentario-corazon svg'); return s ? s.getAttribute('fill') : null; })(),
+      cuenta: (document.querySelector('.comentario-likes-count') || {}).textContent || ''
+  })`));
+  check('al CERRAR y REABRIR el cajón, el corazón sigue marcado (y el contador sigue subido)', trasReabrir.liked === true && trasReabrir.cuenta === '4', JSON.stringify(trasReabrir));
+  check('y el corazón sigue relleno al reabrir (no solo la clase)', trasReabrir.relleno !== 'none' && trasReabrir.relleno !== null, `fill=${trasReabrir.relleno}`);
 }
 
 // --- 4) Modal de descripción (lupa) + botón "+" (crear) ------------------
