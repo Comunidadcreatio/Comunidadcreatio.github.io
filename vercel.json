@@ -7,7 +7,7 @@
   ],
   "headers": [
     {
-      "source": "/(index\\.html)?",
+      "source": "/",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
         { "key": "Pragma", "value": "no-cache" },
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "source": "/(auth|reset-password)\\.html",
+      "source": "/(.*)\\.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
         { "key": "Pragma", "value": "no-cache" },
