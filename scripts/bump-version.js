@@ -84,7 +84,17 @@ function findCssImports(cssContent) {
 function updateAllModuleImports(projectRoot, setAnyChange) {
     const jsDir = path.join(projectRoot, 'js');
     const files = fs.readdirSync(jsDir).filter(f => f.endsWith('.js') && !f.includes('.min.') && !f.includes('.check.'));
-    for (let pass = 0; pass < 6; pass++) {
+    // TOPE DE PASADAS. La propagación es en CASCADA (reescribir un import cambia el hash
+    // del importador), y el orden de `readdirSync` NO está garantizado (NTFS lo da
+    // alfabético, ext4 —el del runner de CI— por orden de hash). Se midió con el tope
+    // subido a 40 y 12 órdenes de recorrido: el máximo real fue 5 pasadas, y la
+    // profundidad del grafo de imports es 8 saltos. Con el tope viejo de 6 quedaba UNA
+    // sola pasada de margen: una arista más en la cadena crítica lo agotaba y dejaba un
+    // `?v=` desfasado EN SILENCIO (nada en el repo comprueba los hashes entre módulos).
+    // Ahora hay margen de sobra y, sobre todo, si NO converge se dice y el comando falla.
+    const MAX_PASADAS = 12;
+    let convergio = false;
+    for (let pass = 0; pass < MAX_PASADAS; pass++) {
         let passChanged = false;
         for (const importer of files) {
             const filePath = path.join(jsDir, importer);
@@ -122,6 +132,29 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
                 }
                 return newMatch;
             });
+            // Imports de EFECTO SECUNDARIO: import './mod.js?v=...'  (sin `from`).
+            // No los veían ninguno de los dos regex de arriba: exigían `from` o `import(`.
+            // Caso real: `biometric-login.js` hacía `import './capacitor-native-biometric.js?v=1'`,
+            // ese `?v=1` quedaba CONGELADO para siempre y, con el cache-first del service
+            // worker, un arreglo en ese módulo (es el que registra el plugin nativo de
+            // biometría en el APK) no llegaba NUNCA a quien ya tuviera el SW instalado.
+            // ANCLADA AL PRINCIPIO DE LÍNEA Y CON LA COMILLA DE APERTURA CAPTURADA, a propósito:
+            //  - `^[ \t]*import` (con flag m) evita que case dentro de otra palabra (`reimport`) o en
+            //    medio de un comentario (`// OJO: import './x.js?v=1'`), que no son imports de verdad.
+            //  - se reescribe con LA MISMA comilla que traía. Sin eso, una cadena que contuviera el
+            //    texto de un import entre comillas dobles acababa con comillas desbalanceadas
+            //    (`const s = 'import "./config.js"';` → `SyntaxError`).
+            content = content.replace(/^([ \t]*)import\s+(['"])\.\/([A-Za-z0-9_-]+\.js)(\?v=[^'"]*)?\2/gm, (match, sangria, comilla, modFile) => {
+                const modPath = path.join(jsDir, modFile);
+                if (!fs.existsSync(modPath)) return match;
+                const h = hashFile(modPath);
+                const newMatch = `${sangria}import ${comilla}./${modFile}?v=${h}${comilla}`;
+                if (newMatch !== match) {
+                    changed = true;
+                    console.log(`✓ ${importer} import de efecto: ./${modFile} ?v=${h}`);
+                }
+                return newMatch;
+            });
             if (changed) {
                 // Salvaguarda dura: jamás escribir un archivo vacío (p.ej. si la
                 // lectura devolvió '' por un bloqueo transitorio del filesystem).
@@ -135,7 +168,47 @@ function updateAllModuleImports(projectRoot, setAnyChange) {
                 if (setAnyChange) setAnyChange();
             }
         }
-        if (!passChanged) break;
+        if (!passChanged) { convergio = true; break; }
+    }
+    if (!convergio) {
+        console.error(`\n❌ NO CONVERGE: los imports seguían cambiando tras ${MAX_PASADAS} pasadas.`);
+        console.error('   Queda algún `?v=` desfasado y la app puede romper con "export no provisto".');
+        console.error('   Revisa el grafo de imports (¿algún ciclo real entre módulos?) antes de commitear.');
+        process.exitCode = 1;
+    }
+}
+
+/**
+ * Rota el nombre de la caché del service worker.
+ *
+ * POR QUÉ HACE FALTA: `sw.js` guarda los assets versionados con la clave del `?v=`, y
+ * hacía cache-first. Con `CACHE_NAME` FIJO ('creatio-cache-v1'), cada despliegue añadía
+ * entradas nuevas y NUNCA se evacuaban las viejas: la caché del dispositivo crecía sin
+ * límite. Ahora el número de la última línea sube en cada release, `activate` borra las
+ * cachés con otro nombre y el almacenamiento vuelve a empezar limpio.
+ */
+function bumpServiceWorkerCache(projectRoot) {
+    const swPath = path.join(projectRoot, 'sw.js');
+    if (!fs.existsSync(swPath)) return;
+    const sw = fs.readFileSync(swPath, 'utf-8');
+    // El patrón admite comillas simples o dobles: lo que NO puede pasar es que no case y esto se
+    // quede callado. Si alguien pone `const`, dobles comillas o un espacio de más, la rotación se
+    // detendría EN SILENCIO y volvería el crecimiento sin límite de la caché del dispositivo —el
+    // fallo que este código existe para evitar—. Por eso, si no casa, se avisa y el comando falla.
+    const PATRON = /((?:var|const|let)\s+CACHE_NAME\s*=\s*)(['"])creatio-cache-v(\d+)\2/;
+    if (!PATRON.test(sw)) {
+        console.error('\n❌ sw.js existe pero NO se reconoce su línea de CACHE_NAME.');
+        console.error('   Se esperaba algo como:  var CACHE_NAME = \'creatio-cache-v2\';');
+        console.error('   Sin rotación, la caché del service worker crece sin límite en cada release.');
+        console.error('   Arregla la línea (o el patrón de bumpServiceWorkerCache) antes de commitear.');
+        process.exitCode = 1;
+        return;
+    }
+    const nueva = sw.replace(PATRON, (m, pre, comilla, num) => pre + comilla + 'creatio-cache-v' + (parseInt(num, 10) + 1) + comilla);
+    if (nueva !== sw) {
+        fs.writeFileSync(swPath, nueva, 'utf-8');
+        const m = nueva.match(PATRON);
+        console.log(`✎ sw.js → creatio-cache-v${m ? m[3] : '?'}`);
     }
 }
 
@@ -242,7 +315,12 @@ function main() {
             fs.writeFileSync(versionPath, JSON.stringify(versionData, null, 2) + '\n', 'utf-8');
             console.log(`✎ ${VERSION_FILE} → versión ${versionData.version} (${versionData.date})`);
 
-            // 4b. Actualizar currentVer en el script auto-recarga de index.html
+            // 4b. Rotar la caché del service worker (si no, crece sin límite: ver
+            // bumpServiceWorkerCache). Va ANTES de copiar a www/: así las tres copias
+            // salen ya con el nombre nuevo y la verificación de sync pasa.
+            bumpServiceWorkerCache(projectRoot);
+
+            // 4c. Actualizar currentVer en el script auto-recarga de index.html
             const indexPath = path.join(projectRoot, 'index.html');
             if (fs.existsSync(indexPath)) {
                 let html = fs.readFileSync(indexPath, 'utf-8');
@@ -307,7 +385,6 @@ function main() {
         'sw.js', 'manifest.webmanifest'
     ];
     const dirsToCopy = ['css', 'js', 'iconos'];
-
     for (const { src: srcDir, dest: destDir } of dirs) {
         if (!fs.existsSync(path.join(projectRoot, destDir))) {
             fs.mkdirSync(path.join(projectRoot, destDir), { recursive: true });

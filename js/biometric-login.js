@@ -24,7 +24,7 @@ const OLVIDO_EXPLICITO_KEY = 'creatio_olvido_explicito'; // '1' si el usuario ce
 
 import { login } from './auth.js?v=d03e50cca9';
 // Registra el plugin nativo de biometría en el runtime de Capacitor (APK)
-import './capacitor-native-biometric.js?v=1';
+import './capacitor-native-biometric.js?v=b42d5999aa';
 
 // ---------- Utilidades base64 ----------
 function b64url(bytes) {

@@ -4,7 +4,7 @@
 // y modo grid de la galería.
 
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=b7e2ef50b5';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=f4a3751744';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=339d56df96';
 import { artistaActual, token, esArtista } from './auth.js?v=d03e50cca9';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=1e38fa8dc3';
 import { confirmarDescartarCambios } from './panel-ui.js?v=d46c3a5950';

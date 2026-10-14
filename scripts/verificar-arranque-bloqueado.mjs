@@ -95,6 +95,15 @@ await send('Page.addScriptToEvaluateOnNewDocument', {
           if (u.includes('/problogs')) return json({ success: true, problogs: [], total: 0, page: 1, limit: 10 });
           return json({ success: true, no_leidas: 0, count: 0, usuario: { id: 480001, nombre_artista: 'T', rol: 'artista' } });
       };
+
+      // NOTA (2026-10-14): aquí vivía un muestreo del arranque que intentaba medir "justo en el
+      // instante en que la app retira el preloader" (deshaciendo la clase hidden desde un
+      // MutationObserver). Se quitó CON EVIDENCIA, no por comodidad: el observador se enganchaba
+      // (se comprobó), pero su callback no llegaba a tiempo —al consultar, la clase ya era la final
+      // y el valor seguía a null—, así que la medición dependía de la carga de la máquina y salía
+      // nula dentro de la suite completa aunque en solitario pasara siempre.
+      // La comprobación determinista que lo sustituye mide una PROPIEDAD del hit-testing, no un
+      // instante: "mientras el preloader está puesto, ese punto no pertenece al botón". Ver más abajo.
   })();`
 });
 
@@ -137,30 +146,48 @@ console.log(`=== El botón del hub ya existe a los ${msHastaBoton} ms`);
 check('el botón del hub llega a existir con caja', !!cajaHub, 'no apareció en 5 s');
 
 if (cajaHub) {
-    const enEsePunto = await evalJs(`(() => {
-        const el = document.elementFromPoint(${cajaHub.x}, ${cajaHub.y});
-        if (!el) return JSON.stringify({ que: 'nada', cadena: '' });
-        const pre = document.getElementById('preloader');
-        const dentroDelPreloader = !!(pre && (el === pre || pre.contains(el)));
-        // La CADENA de ancestros del que ocupa el punto: sin esto solo se sabe que es un "span" y no de
-        // quién es. (Es el mismo diagnóstico que se le puso a la foto y al verificador de contraste.)
-        const cadena = [];
-        let n = el, saltos = 0;
-        while (n && saltos < 6) {
-            const cls = typeof n.className === 'string' && n.className.trim() ? '.' + n.className.trim().split(/\\s+/).slice(0, 2).join('.') : '';
-            cadena.push((n.id ? '#' + n.id : n.tagName.toLowerCase()) + cls);
-            n = n.parentElement; saltos++;
-        }
-        return JSON.stringify({
-            que: (el.id || el.tagName.toLowerCase()),
-            dentroDelPreloader,
-            preloaderPuesto: !!(pre && !pre.classList.contains('hidden')),
-            cadena: cadena.join(' < ')
-        });
-    })()`);
-    const punto = typeof enEsePunto === 'string' ? JSON.parse(enEsePunto) : null;
+    // LA COMPROBACIÓN DE "MIENTRAS CARGA", hecha de forma que NO dependa de cuándo llegue el bucle.
+    //
+    // Historia, para que nadie la repita: la versión original medía UNA vez, tras un sleep fijo, y
+    // fallaba 2 de cada 3 corridas sin que hubiera nada roto (medido en un worktree del commit
+    // original). Se intentó después medir "en el instante exacto de la retirada" con un
+    // MutationObserver, y se descartó con evidencia: el observador se enganchaba pero su callback no
+    // llegaba a tiempo. Y una tercera versión (una sola lectura tras el bucle del botón) seguía
+    // parpadeando, porque el bucle puede tardar más que el propio preloader.
+    //
+    // Lo que se hace ahora no depende de relojes: se LEE EN BUCLE hasta que el preloader aparece en
+    // ese punto o hasta que consta que ya se retiró. Así se observa la ventana real (que existe:
+    // ~500 ms con el punto ocupado por el preloader) sin apostar por un instante concreto.
+    let medida = null;
+    for (let i = 0; i < 60; i++) {
+        const crudo = await evalJs(`(() => {
+            const el = document.elementFromPoint(${cajaHub.x}, ${cajaHub.y});
+            const pre = document.getElementById('preloader');
+            if (!pre) return JSON.stringify({ sinPreloader: true });
+            const cadena = [];
+            let n = el, saltos = 0;
+            while (n && saltos < 6) {
+                const cls = typeof n.className === 'string' && n.className.trim() ? '.' + n.className.trim().split(/\\s+/).slice(0, 2).join('.') : '';
+                cadena.push((n.id ? '#' + n.id : n.tagName.toLowerCase()) + cls);
+                n = n.parentElement; saltos++;
+            }
+            return JSON.stringify({
+                que: el ? (el.id || el.tagName.toLowerCase()) : 'nada',
+                dentroDelPreloader: !!(el && (el === pre || pre.contains(el))),
+                perteneceAlBoton: !!(el && el.closest && el.closest('#btn-cavents-hub')),
+                preloaderPuesto: !pre.classList.contains('hidden'),
+                cadena: cadena.join(' < ')
+            });
+        })()`);
+        const m = typeof crudo === 'string' ? JSON.parse(crudo) : null;
+        if (!m || m.sinPreloader) break;
+        if (m.dentroDelPreloader) { medida = m; break; }        // encontrado: el preloader ocupa el punto
+        if (!m.preloaderPuesto) { medida = m; break; }          // ya se retiró: se informa de lo que hay
+        await sleep(25);
+    }
+    const punto = medida;
     console.log('   en ese punto hay: ' + JSON.stringify(punto));
-    // Y los `z-index` CALCULADOS, que es lo que decide quién está encima: si el preloader no gana aquí,
+    // Los `z-index` CALCULADOS, que es lo que decide quién está encima: si el preloader no gana aquí,
     // el problema no es el CSS que se escribió, es que no se está aplicando (o hay otra capa por medio).
     console.log('   ' + await evalJs(`(() => {
         const pre = document.getElementById('preloader');
@@ -171,8 +198,13 @@ if (cajaHub) {
         while (n && saltos < 5) { cadena.push((n.id ? '#' + n.id : n.tagName.toLowerCase()) + ' z=' + z(n)); n = n.parentElement; saltos++; }
         return 'preloader: z=' + z(pre) + ' opacity=' + getComputedStyle(pre).opacity + ' | punto: ' + cadena.join(' < ');
     })()`));
-    check('mientras la app carga, ese punto lo ocupa el preloader (el toque no se pierde: lo absorbe él)',
-        !!punto && punto.dentroDelPreloader === true, JSON.stringify(punto));
+
+    check('mientras el preloader está puesto, el punto del botón lo ocupa el preloader (el toque lo absorbe él)',
+        !!punto && punto.dentroDelPreloader === true,
+        `dentroDelPreloader=${punto && punto.dentroDelPreloader}, preloaderPuesto=${punto && punto.preloaderPuesto}, en el punto: ${punto && punto.que}`);
+    check('y por eso el punto NO pertenece al botón durante el arranque (un toque no puede abrirlo)',
+        !!punto && punto.perteneceAlBoton === false,
+        `perteneceAlBoton=${punto && punto.perteneceAlBoton}`);
 
     // 2) Toque real: no debe cambiar de sección.
     const antes = await evalJs(`JSON.stringify({ panel: !document.getElementById('panel-artista').classList.contains('hidden') })`);

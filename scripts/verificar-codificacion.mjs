@@ -14,6 +14,9 @@
 // Uso: node scripts/verificar-codificacion.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+// El detector de la SEGUNDA generacion de mojibake (la familia "í³", que este fichero
+// no veia: ver el comentario largo mas abajo y la cabecera de arreglar-mojibake-2g.mjs).
+import { buscarMojibake2G } from './arreglar-mojibake-2g.mjs';
 
 // --- detector ---------------------------------------------------------------------------------------
 // cp1252: los unicos bytes que NO coinciden con Latin-1 son 0x80-0x9F (el byte 0x99 es "™", no un control).
@@ -81,9 +84,20 @@ console.log('=== Codificacion de los ficheros servidos ===');
 const ficheros = ficherosServidos();
 let total = 0;
 const porFichero = [];
+// SEGUNDA FAMILIA, la que este detector NO veia (y por la que daba un falso verde).
+// Aqui el 'Ã' de la primera generacion se corrompio OTRA VEZ a 'í', asi que los bytes
+// reconstruidos (ED B3) no son UTF-8 valido y el bucle de arriba los descarta sin
+// mirar. Caso real: `js/etiquetas.js` pintaba 'í—' donde debia pintar '×'.
+// El detector de esa familia vive en `arreglar-mojibake-2g.mjs`, que ademas trae el
+// mapa exacto para repararla: aqui solo se USA, para que un hallazgo suyo encole.
+let total2g = 0;
+const porFichero2g = [];
 for (const f of ficheros) {
-    const hallazgos = buscarMojibake(readFileSync(f, 'utf8'));
+    const texto = readFileSync(f, 'utf8');
+    const hallazgos = buscarMojibake(texto);
     if (hallazgos.length) { porFichero.push([f, hallazgos]); total += hallazgos.length; }
+    const hallazgos2g = buscarMojibake2G(texto);
+    if (hallazgos2g.length) { porFichero2g.push([f, hallazgos2g]); total2g += hallazgos2g.length; }
 }
 
 check(`ninguno de los ${ficheros.length} ficheros servidos tiene mojibake`, total === 0,
@@ -95,10 +109,28 @@ for (const [f, hallazgos] of porFichero) {
     }
 }
 
-// Y una comprobacion de que el detector DETECTA (si no, un verde no valdria nada): se le da una secuencia
-// conocida y tiene que encontrarla.
+// La comprobacion de la segunda familia. Va aparte para que el mensaje diga QUE
+// herramienta repara cada una: con este hallazgo, el arreglo es `arreglar-mojibake-2g.mjs`.
+check(`ninguno de los ${ficheros.length} ficheros servidos tiene mojibake de 2a generacion`, total2g === 0,
+    total2g === 0 ? `${ficheros.length} ficheros limpios` : `${total2g} tramo(s) en ${porFichero2g.length} fichero(s) — repara con: node scripts/arreglar-mojibake-2g.mjs`);
+
+for (const [f, hallazgos] of porFichero2g) {
+    for (const h of hallazgos) {
+        console.log(`      ${f}:${h.linea}  "${h.antes}" deberia ser "${h.despues}"   | ${h.contexto}`);
+    }
+}
+
+// Y una comprobacion de que cada detector DETECTA (si no, un verde no valdria nada). Se le dan
+// secuencias conocidas de las DOS familias y tienen que encontrarlas. La de la segunda familia
+// es literalmente la que se escapo: 'Seleccií³n' (que era "Selección").
 check('el detector reconoce una secuencia de mojibake conocida', buscarMojibake('x \u00e2\u2122\u00a5 y').length === 1);
 check('el detector NO marca texto correcto', buscarMojibake('Corazon \u2665 y acentos: \u00f1 \u00e9 \u00e1').length === 0);
+check('el detector de 2a generacion reconoce "Selecci\u00ed\u00b3n" (Seleccion)',
+    buscarMojibake2G('x Selecci\u00ed\u00b3n M\u00ed\u0161LTIPLE y').length === 2);
+check('el detector de 2a generacion reconoce el glifo perdido "\u00ed\u2014" (x)',
+    buscarMojibake2G('<span>x\u00ed\u2014</span>').length === 1);
+check('el detector de 2a generacion NO marca espanol correcto',
+    buscarMojibake2G('s\u00ed, d\u00eda, pa\u00eds, m\u00eda, todav\u00eda, romp\u00eda, Selecci\u00f3n M\u00daLTIPLE').length === 0);
 
 console.log(`\nRESULTADO: ${pruebas - fallos}/${pruebas} comprobaciones OK${fallos ? ` — ${fallos} FALLO(S)` : ' — sin fallos'}`);
 process.exit(fallos ? 1 : 0);
