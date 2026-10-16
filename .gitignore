@@ -39,3 +39,8 @@ scripts/_corazon-*.png
 
 # Capturas de las herramientas de diseno (se generan, no se versionan)
 scripts/_accion-*.png
+
+# Vista de prueba del preloader: herramienta local de diseno, no parte de la app. Vive en
+# scripts/ a proposito: verificar-recursos-servidos.mjs descubre TODAS las paginas .html de la
+# RAIZ (readdirSync), asi que un HTML nuevo en la raiz romperia la suite.
+scripts/preview-preloader.html
