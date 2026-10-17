@@ -970,7 +970,12 @@ button[type="submit"]:not(.nav-btn):active,
 
 .nav-btn.next-btn {
     background: rgba(0, 0, 0, 0.85);
-    color: var(--color-white);
+    /* `#ffffff` LITERAL, no `var(--color-white)` (2026-10-16). `--color-white` es un token de
+       SUPERFICIE y se INVIERTE en modo oscuro (alli vale #0a0a0a), asi que el boton salia con el
+       fondo casi negro y el texto casi negro: la palabra «Siguiente» no se leia. Aqui el fondo es
+       siempre oscuro, asi que el texto tiene que ser siempre blanco, y eso no lo puede dar un
+       token que cambia de signo. */
+    color: #ffffff;
     order: 1;
 }
 

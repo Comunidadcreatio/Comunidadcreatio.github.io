@@ -126,8 +126,12 @@ const PAGINAS = [
             await ev(`(() => {
                 document.querySelector('#login-email')?.classList.add('input-available');
                 document.querySelector('#login-pass')?.classList.add('input-error');
-                const rol = document.getElementById('reg-rol');
-                if (rol) { rol.focus(); }
+                // El campo enfocado es reg-nombres y NO reg-rol: desde 2026-10-16 el rol es un
+                // desplegable propio (.custom-select, con el select en display:none), asi que
+                // enfocarlo no monta ningun estado visible. reg-nombres si es un campo real del paso 1.
+                // OJO: NADA de backticks dentro de esta plantilla (rompe el fichero; trampa conocida).
+                const nombre = document.getElementById('reg-nombres');
+                if (nombre) { nombre.focus(); }
                 return JSON.stringify({
                     error: !!document.querySelector('.input-error'),
                     disponible: !!document.querySelector('.input-available'),
@@ -151,8 +155,9 @@ const PAGINAS = [
                 await dormir(150);
             }
         },
-        // El `:focus` de un campo obligatorio del registro, forzado por CDP.
-        forzarPseudo: { '#reg-rol': ['focus'] },
+        // El `:focus` de un campo obligatorio del registro, forzado por CDP. Apunta a `#reg-nombres`
+        // porque `#reg-rol` paso a ser un `.custom-select` con el `<select>` oculto (2026-10-16).
+        forzarPseudo: { '#reg-nombres': ['focus'] },
         selectores: [
             'html', 'body', '#main-content', '#login-section', '#login-landing',
             '#login-form', '#login-email', '#login-pass', '.auth-container',
@@ -160,7 +165,10 @@ const PAGINAS = [
             // Los estados de estos campos los gobiernan las reglas de :invalid / :valid de
             // auth.css, y su competidora es el estilo base de los campos (formularios.css).
             // Sin ellos en la lista, ese trozo de cascada se quedaba sin red.
-            '#forgot-section', '#forgot-email', '#reg-rol',
+            '#forgot-section', '#forgot-email',
+            // `#reg-rol` QUITADO (2026-10-16): es un `<select>` nativo que la app sustituye por su
+            // desplegable (`initCustomSelect` en auth-logic.js), igual que `#reg-pais`. Mide 0x0 por
+            // diseño; lo que se mide de verdad es `.custom-select` / `.custom-select-trigger`.
             // Campos del REGISTRO: el tema oscuro de los campos (auth.css) los pinta con
             // selectores con id, y sin medirlos un cambio de esa regla se hacia a ciegas.
             '#reg-nombres', '#reg-email', '#reg-pass',
@@ -834,7 +842,9 @@ const PAGINAS = [
         fixture: false,
         abrir: ABRIR_REGISTRO,
         selectores: [
-            '#reg-nombres', '#reg-rol', '#reg-email', '#reg-pass',
+            '#reg-nombres', '#reg-email', '#reg-pass',
+            // `#reg-rol` QUITADO (2026-10-16): igual que `#reg-pais`, es un `<select>` que la app
+            // oculta al sustituirlo por `.custom-select`. No es cobertura que falte: es el diseño.
             // `#reg-pais` QUITADO (2026-10-05): es otro `<select>` nativo que la app sustituye por su
             // desplegable (`initCustomSelect` en auth-logic.js), asi que mide 0x0 EN TODOS los pasos. No es
             // cobertura que falte: es el diseño. Lo que si se mide es el desplegable de verdad.

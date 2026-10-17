@@ -154,6 +154,10 @@ function initCustomSelect(selectEl, placeholder) {
 }
 
 function setupAllCustomSelects() {
+    // Rol (paso 1). FALTABA en esta lista: `#reg-rol` se quedaba como `<select>` nativo y por eso
+    // su desplegable se abria con el estilo del sistema, distinto del resto. Es el mismo caso que
+    // `#reg-pais`, que ya estaba convertido. (2026-10-16)
+    initCustomSelect(document.getElementById('reg-rol'), '¿Cómo participarás?');
     // País
     initCustomSelect(document.getElementById('reg-pais'), 'Selecciona tu país');
     // Fecha

@@ -83,13 +83,18 @@
         box-shadow: 0 0 0 6px #1a1a1a !important;
     }
 
-    /* EXCEPCION (2026-10-11): los CAMPOS DE TEXTO de los comentarios (Cavents y Problogs), sin anillo.
-       Motivo: en un campo de texto `:focus-visible` coincide SIEMPRE que esta enfocado (no solo con
-       teclado), asi que el anillo salia en CADA clic al escribir, y se pidio quitarlo en los dos sitios.
+    /* EXCEPCION (2026-10-11, AMPLIADA 2026-10-16): sin anillo los CAMPOS DE TEXTO de los
+       comentarios (Cavents y Problogs) y los de los formularios de ACCESO (login, registro y
+       recuperar).
+       Motivo: en un campo de texto o en un `<select>`, `:focus-visible` coincide SIEMPRE que esta
+       enfocado (no solo con teclado), asi que el anillo salia en CADA clic al escribir o al abrir
+       un desplegable, y se pidio quitarlo.
        Va AQUI, en `base`, y no en components, por lo que dice el comentario de arriba: con `!important` el
        orden de capas se INVIERTE, asi que solo desde `base` se le puede ganar al anillo. Se quitan las dos
        partes (outline y box-shadow), porque el ambar sale del box-shadow en tema claro y del outline en
        oscuro.
+       En los campos de acceso la senal de foco NO se pierde: el borde cambia a `--color-ink` en
+       `:focus` (ver `auth.css`, `.form-group input:focus`).
        OJO: en botones y enlaces el anillo SIGUE puesto, que es donde de verdad hace falta. */
     .comentarios-input:focus-visible,
     .comentario-reply-field:focus-visible,
@@ -97,7 +102,13 @@
     .problog-comentario-input:focus-visible,
     [data-comentario-texto]:focus-visible,
     .problog-responder-barra input:focus-visible,
-    .problog-responder-barra textarea:focus-visible {
+    .problog-responder-barra textarea:focus-visible,
+    #login-form input:focus-visible,
+    #login-form select:focus-visible,
+    #registro-form input:focus-visible,
+    #registro-form select:focus-visible,
+    #forgot-section input:focus-visible,
+    #forgot-section select:focus-visible {
         outline: none !important;
         box-shadow: none !important;
     }
