@@ -35,7 +35,12 @@
 /* En modo oscuro, las notificaciones necesitan un fondo más claro
    que el fondo general para destacar visualmente */
 [data-theme="dark"] .notification {
-    background: var(--color-gray-800);
+    /* OJO (2026-10-16): la escala de grises esta RE-BASADA por rol y se INVIERTE en oscuro, asi
+       que `--color-gray-800` alli vale #fafafa (casi BLANCO). Se usaba como fondo y el texto
+       (`--color-text` = #f5f5f5) quedaba BLANCO SOBRE BLANCO: el aviso de "Completa todos los
+       campos requeridos" no se leia en modo oscuro. Aqui hace falta una superficie oscura un poco
+       mas CLARA que el fondo de la pagina (#0a0a0a): en oscuro `gray-200` es #2a2a2a. */
+    background: var(--color-gray-200);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     border: 1px solid #333; /* color-a-mano: deliberado (borde oscuro: el paso mas proximo se mueve 23) */
 }
