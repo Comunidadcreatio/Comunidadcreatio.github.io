@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.732';
+        var currentVer = '1.0.733';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=67f7fcd002">
+    <link rel="stylesheet" href="css/style.css?v=7107d5fed9">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -197,6 +197,24 @@
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <span class="toggle-label">Buscar</span>
+            </button>
+            <!-- Comcons: sección de concursos (medalla). Se reparte con `space-evenly`, igual
+                 que los tres iconos de la izquierda. (2026-10-18) -->
+            <button id="btn-comcons-nav" class="toggle-nav-btn" aria-label="Comcons">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="6"></circle>
+                    <polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"></polyline>
+                </svg>
+                <span class="toggle-label">Comcons</span>
+            </button>
+            <!-- Web: información sobre Creatio (globo). -->
+            <button id="btn-web-nav" class="toggle-nav-btn" aria-label="Sobre Creatio">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span class="toggle-label">Web</span>
             </button>
         </div>
     </div>
@@ -349,6 +367,30 @@
                 <div id="resultados-busqueda-lista" class="resultados-lista">
                     <!-- Los resultados se cargarán aquí -->
                 </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: COMCONS (concursos). De momento el aviso de «próximamente»: aquí irán las
+             bases, la participación y los resultados. (2026-10-18) -->
+        <section id="comcons" class="hidden" aria-labelledby="comcons-title" role="region">
+            <div class="seccion-info">
+                <h2 id="comcons-title" class="seccion-info-titulo">Comcons</h2>
+                <p class="seccion-info-texto">Los concursos de Creatio llegarán pronto. Aquí verás las bases de cada uno, podrás participar y seguir los resultados.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: SOBRE CREATIO (icono «Web»). Información de la app y de la comunidad. -->
+        <section id="sobre-creatio" class="hidden" aria-labelledby="sobre-creatio-title" role="region">
+            <div class="seccion-info">
+                <h2 id="sobre-creatio-title" class="seccion-info-titulo">Sobre Creatio</h2>
+                <p class="seccion-info-texto">Creatio es una galería y comunidad de arte del estado Táchira, Venezuela: conecta con el arte de tu tierra y descubre a los artistas locales y sus obras.</p>
+                <ul class="seccion-info-lista">
+                    <li><strong>Cavents</strong>: la galería, con las obras de los artistas.</li>
+                    <li><strong>Problogs</strong>: publicaciones con texto e imágenes.</li>
+                    <li><strong>Comcons</strong>: los concursos de la comunidad.</li>
+                    <li><strong>Chat</strong>: el directorio de artistas y las salas de la comunidad.</li>
+                </ul>
+                <p class="seccion-info-pie">© 2026 Creatio · Táchira, Venezuela</p>
             </div>
         </section>
 
@@ -1122,7 +1164,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=7aa02fdc1c" type="module"></script>
+    <script src="js/main.js?v=16527aaba4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

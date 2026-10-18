@@ -32,7 +32,7 @@ function obtenerGaleriaContainer() {
 // SISTEMA DE TRANSICIONES ENTRE SECCIONES
 // ============================================
 let isTransitioning = false;
-const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca', 'chat-global', 'problogs'];
+const SECCIONES = ['galeria-publica', 'panel-artista', 'mi-cuenta', 'perfil-usuario', 'resultados-busqueda', 'pagina-blanca', 'chat-global', 'problogs', 'comcons', 'sobre-creatio'];
 
 export function encontrarSeccionActual() {
     for (const id of SECCIONES) {
@@ -334,6 +334,18 @@ export function actualizarEstadoNavButtons() {
     // La barrita del botón de Problogs sigue a su sección.
     if (btnProblogsNav) {
         btnProblogsNav.classList.toggle('nav-btn-active', enProblogs);
+    }
+
+    // Comcons y Web (iconos nuevos a la derecha): su barrita sigue a su sección.
+    const btnComconsNav = /** @type {HTMLButtonElement} */ (document.getElementById('btn-comcons-nav'));
+    const btnWebNav = /** @type {HTMLButtonElement} */ (document.getElementById('btn-web-nav'));
+    const comcons = /** @type {HTMLElement} */ (document.getElementById('comcons'));
+    const sobreCreatio = /** @type {HTMLElement} */ (document.getElementById('sobre-creatio'));
+    if (btnComconsNav && comcons) {
+        btnComconsNav.classList.toggle('nav-btn-active', !comcons.classList.contains('hidden'));
+    }
+    if (btnWebNav && sobreCreatio) {
+        btnWebNav.classList.toggle('nav-btn-active', !sobreCreatio.classList.contains('hidden'));
     }
 }
 

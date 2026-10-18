@@ -34,8 +34,8 @@ import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView, toggleProblogs,
-    abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono
-} from './galeria-ui.js?v=15108bd8e2';
+    abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono, cambiarSeccion
+} from './galeria-ui.js?v=9dec6c57a4';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
@@ -43,8 +43,8 @@ import {
     limpiarFormularioConConfirmacion
 } from './panel-ui.js?v=8222b22c85';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=f39ad9003b';
-import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=f9e3ae8326';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=664b6b2cbc';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=b90461fdcf';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=2626cab299';
 import { setupPush } from './push.js?v=04e165955d';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -181,7 +181,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     /** @type {HTMLElement} */ (document.getElementById('notif-dropdown')).classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js?v=15108bd8e2');
+                    const galeriaUI = await import('./galeria-ui.js?v=9dec6c57a4');
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -320,7 +320,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js?v=7741c181a9').then(m => {
+    import('./busqueda.js?v=0c953f7e98').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -395,6 +395,18 @@ function setupEvents() {
         });
     }
 
+    // ----- Botones Comcons y Web del nav (iconos nuevos, a la derecha) -----
+    // Comcons: sección de concursos (de momento, «próximamente»).
+    // Web: sección «Sobre Creatio» con la información de la app.
+    const btnComconsNav = document.getElementById('btn-comcons-nav');
+    if (btnComconsNav) {
+        btnComconsNav.addEventListener('click', () => { cambiarSeccion('comcons'); });
+    }
+    const btnWebNav = document.getElementById('btn-web-nav');
+    if (btnWebNav) {
+        btnWebNav.addEventListener('click', () => { cambiarSeccion('sobre-creatio'); });
+    }
+
     // ----- Icono de volver (header): cierra la lectura de un problog -----
     // Vive junto a la campana y solo se ve mientras hay una publicación abierta
     // (lo muestra/oculta problogs.js al abrir y cerrar la lectura).
@@ -435,7 +447,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js?v=15108bd8e2').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./galeria-ui.js?v=9dec6c57a4').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -625,7 +637,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js?v=15108bd8e2');
+            const galeriaUI = await import('./galeria-ui.js?v=9dec6c57a4');
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {
