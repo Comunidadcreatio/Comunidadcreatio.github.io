@@ -808,17 +808,23 @@
     box-sizing: border-box;
 }
 
-/* Columna izquierda: cavents al final, justo antes del centro */
+/* Columna izquierda: los TRES iconos de sección (Chat | cavents | Problogs), repartidos a la
+   misma distancia entre ellos. Antes eran dos y se pegaban al centro (`flex-end` + margen);
+   al entrar Problogs en esta columna se reparten con `space-evenly`, que deja huecos iguales
+   (incluidos los de los extremos). El perfil sigue perfectamente centrado porque las dos
+   columnas laterales siguen siendo `flex: 1`. */
 .bottom-bar-left {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-evenly;
     min-width: 0;
 }
 
+/* Sin margen por botón: el hueco lo pone `space-evenly` y, si se sumara un margen, los tres
+   quedarían a distinta distancia. */
 .bottom-bar-left .toggle-nav-btn {
-    margin-right: 16px;
+    margin-right: 0;
 }
 
 /* Columna central: el perfil perfectamente centrado entre columnas flex:1
