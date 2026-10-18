@@ -414,9 +414,14 @@ export async function toggleGaleria(galeriaContainer) {
     if (galeria.classList.contains('hidden')) {
         // Mostrar galería en modo normal (carousel)
         galeriaModo = 1;
+        // Si las tarjetas YA están pintadas de la vez anterior, no se vacía ni se vuelve a
+        // pedir nada: se quita el modo grid y se enseña lo que hay AL INSTANTE. Antes se hacía
+        // `innerHTML = ''` y `cargarGaleria()` siempre, y eso era la espera al volver de
+        // Problogs o de Mi perfil (la galería aparecía vacía y se llenaba después).
+        const yaPintada = !!(galeriaContainerLocal && galeriaContainerLocal.querySelector('.obra-card'));
         if (galeriaContainerLocal) {
             galeriaContainerLocal.classList.remove('modo-grid');
-            galeriaContainerLocal.innerHTML = '';
+            if (!yaPintada) galeriaContainerLocal.innerHTML = '';
             setupPullToRefresh(galeriaContainerLocal);
         }
         ptrReparent(galeriaContainerLocal); // a carrusel: indicador en el contenedor
@@ -424,6 +429,12 @@ export async function toggleGaleria(galeriaContainer) {
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'false');
 
         switchSection(encontrarSeccionActual(), galeria, () => {
+            if (yaPintada) {
+                // Ya está en el DOM: solo se refresca el estado del nav. Para refrescar los
+                // datos sigue estando pull-to-refresh y volver a pulsar Cavents.
+                actualizarEstadoNavButtons();
+                return;
+            }
             cargarGaleria(galeriaContainer).then(obras => {
                 mostrarGaleria(obras, galeriaContainer, (id) => {
                     seleccionarObraDesdeGrid(id);
@@ -465,9 +476,12 @@ async function activarExplorar() {
         // Mostrar galería directamente en modo grid
         galeriaModo = 2;
         document.body.classList.add('search-abierto'); // Explorar: etiquetas + grid (sin buscador)
-        gridEntering = true;
+        // Igual que en Cavents: si ya hay tarjetas pintadas, se enseña al instante en vez de
+        // vaciar y volver a pedir (esa era la espera al venir de Problogs o de Mi perfil).
+        const yaPintada = !!(galeriaContainerLocal && galeriaContainerLocal.querySelector('.obra-card'));
+        gridEntering = !yaPintada;
         if (galeriaContainerLocal) {
-            galeriaContainerLocal.innerHTML = '';
+            if (!yaPintada) galeriaContainerLocal.innerHTML = '';
             galeriaContainerLocal.classList.add('modo-grid');
             setupPullToRefresh(galeriaContainerLocal);
         }
@@ -479,6 +493,14 @@ async function activarExplorar() {
         // para que el buscador y el grid aparezcan sincronizados.
         return new Promise((resolve) => {
             switchSection(encontrarSeccionActual(), galeria, () => {
+                if (yaPintada) {
+                    actualizarEstadoNavButtons();
+                    ensurePTRInContainer(galeriaContainerLocal);
+                    gridEntering = false;
+                    renderEtiquetasCarrusel();
+                    resolve(true);
+                    return;
+                }
                 cargarGaleria(galeriaContainerLocal).then(obras => {
                     mostrarGaleria(obras, galeriaContainerLocal, (id) => {
                         seleccionarObraDesdeGrid(id);
