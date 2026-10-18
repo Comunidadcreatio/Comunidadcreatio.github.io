@@ -1,6 +1,6 @@
 // @ts-check
 // js/auth.js
-import { ARTISTA_KEY, AUTH_TOKEN_KEY, AUTH_TOKEN_PERSIST_KEY, apiRequest } from './config.js?v=9b8cce7eac';
+import { ARTISTA_KEY, AUTH_TOKEN_KEY, AUTH_TOKEN_PERSIST_KEY, apiRequest } from './config.js?v=1078af3437';
 import { debugLog } from './utils.js?v=b9fc40d1cb';
 
 // Timestamp de última actividad del usuario (compartido con main.js y perfil.js)

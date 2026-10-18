@@ -1,7 +1,7 @@
 // @ts-check
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9b8cce7eac';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=1078af3437';
 import { debugLog } from './utils.js?v=b9fc40d1cb';
 
 // Las escrituras van con fetch crudo porque llevan FormData (apiRequest fija
@@ -17,8 +17,14 @@ function sesionExpirada(res) {
 export async function cargarMisObras(page = 1, limit = 10, search = '', sortBy = 'id', order = 'DESC') {
     // URLSearchParams quiere texto: se convierten los números (antes los convertía él solo).
     const params = new URLSearchParams({ page: String(page), limit: String(limit), search, sortBy, order });
-    const data = await apiRequest(`/api/artistas/mis-obras?${params}`);
-    return data;
+    // `apiRequest` LANZA si no hay respuesta (2026-10-18). Aqui se conserva el contrato de siempre
+    // (devolver un objeto) para no cambiarle la vida a quien llama: solo se envuelve.
+    try {
+        return await apiRequest(`/api/artistas/mis-obras?${params}`);
+    } catch (e) {
+        debugLog.error('Error al cargar mis obras:', e);
+        return { success: false, error: e instanceof Error ? e.message : 'Error de conexión' };
+    }
 }
 
 

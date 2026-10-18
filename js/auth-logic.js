@@ -1,8 +1,8 @@
 // @ts-check
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=d03e50cca9';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=9b8cce7eac';
+import { login, register } from './auth.js?v=c6db1f1f3c';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=1078af3437';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading, showConfirmChoice } from './notificaciones.js?v=a2dfb905a6';
 import { mostrarErrores, debounce, debugLog } from './utils.js?v=b9fc40d1cb';
 import { setupDarkModeToggle } from './theme.js?v=f024ca3802'; // v67
@@ -10,7 +10,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=e87c9d3245';
+} from './biometric-login.js?v=446ba56b52';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -254,8 +254,15 @@ async function verificarDisponibilidad(tipo, valor, inputElement) {
             disponibilidad[clave] = false;
         }
     } catch (error) {
+        // Fallo de RED (apiRequest ahora LANZA cuando no hay respuesta). NO se puede afirmar que el
+        // correo este ocupado: antes esto caia en la rama de `data.available === undefined`, pintaba
+        // «ya esta registrado» y bloqueaba el registro con un mensaje falso. Se deja el campo neutro
+        // y se limpia el aviso; el paso pedira «espera mientras verificamos». (2026-10-18)
         debugLog.error('Error al verificar disponibilidad:', error);
         disponibilidad[clave] = null;
+        inputElement.classList.remove('input-available', 'input-unavailable');
+        const aviso = inputElement.parentElement.querySelector('.validation-message');
+        if (aviso) aviso.style.display = 'none';
     }
 }
 
@@ -381,15 +388,19 @@ function evaluarRequisitosPassword(password) {
 
 // Calcula el nivel de fortaleza (0 a 4) y su etiqueta
 function calcularFortalezaPassword(password) {
-    if (!password) {
+    // El backend SANA con `.trim()` ANTES de medir (`body('password').trim()` en authRoutes), asi
+    // que aqui se mide LO MISMO. Con el valor crudo, un espacio al final contaba como «simbolo»:
+    // el medidor decia «Buena» y el servidor respondia 400 «contraseña muy debil». (2026-10-18)
+    const valor = String(password || '').trim();
+    if (!valor) {
         return { nivel: 0, etiqueta: '', requisitos: evaluarRequisitosPassword('') };
     }
 
-    const req = evaluarRequisitosPassword(password);
+    const req = evaluarRequisitosPassword(valor);
     let puntos = Object.values(req).filter(Boolean).length;
 
     // Bonus por longitud generosa
-    if (password.length >= 12) puntos++;
+    if (valor.length >= 12) puntos++;
 
     let nivel;
     if (puntos <= 2) nivel = 1;       // Débil

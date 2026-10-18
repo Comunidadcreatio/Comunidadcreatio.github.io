@@ -32,10 +32,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9b8cce7eac';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=1078af3437';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=b9fc40d1cb';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=93551c628e';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=81587d6574';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -43,7 +43,7 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=d03e50cca9';
+import { artistaActual } from './auth.js?v=c6db1f1f3c';
 
 // Anchos que se ofrecen en el `srcset` de las imagenes de Problogs. El navegador elige uno segun el
 // hueco (`sizes`) y la densidad de pantalla, asi que en un movil normal NO se baja el grande:
@@ -2245,6 +2245,11 @@ function manejarAcciones(e, desdePerfil) {
             apiRequest('/problogs/' + id).then((data) => {
                 if (data && data.id) cargarParaEditar(data);
                 else showError('No se pudo abrir la publicación para editarla.');
+            }).catch((err) => {
+                // `apiRequest` LANZA si no hay respuesta (2026-10-18): sin este catch, editar una
+                // publicacion con la red caida no hacia nada y dejaba un unhandled rejection.
+                debugLog.error('Error al abrir la publicación para editar:', err);
+                showError('No se pudo abrir la publicación para editarla.');
             });
         }
         return;

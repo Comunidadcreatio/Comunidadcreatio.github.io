@@ -45,10 +45,32 @@ export function cerrarSesionLocal() {
     document.dispatchEvent(new Event('userLogout'));
 }
 
+/**
+ * Error de TRANSPORTE: no hubo respuesta del servidor, la respuesta no era JSON, o la sesion
+ * caduco. Se LANZA a proposito para que quien llama pueda distinguirlo de un «no» del servidor.
+ *
+ * Por que: antes `apiRequest` se tragaba todos los fallos y devolvia `{ success: false }`, igual
+ * que un 400 legitimo. Eso hacia imposible distinguirlos, y el codigo de alrededor estaba escrito
+ * como si lanzara: los `try/catch` no se ejecutaban nunca, los `.catch()` que revierten un like
+ * optimista eran codigo muerto, y un fallo de red se trataba como exito (se vaciaba el input de un
+ * comentario, se sumaba +1 al contador, se pintaba "undefined"...). (2026-10-18)
+ */
+export class ApiError extends Error {
+    /** @param {string} mensaje @param {{ status?: number, esSesion?: boolean }} [opciones] */
+    constructor(mensaje, opciones = {}) {
+        super(mensaje);
+        this.name = 'ApiError';
+        this.esApiError = true;
+        this.status = opciones.status || 0;
+        this.esSesion = !!opciones.esSesion;
+    }
+}
+
 export async function apiRequest(endpoint, options = {}) {
+    let res;
     try {
         const authToken = getAuthToken();
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+        res = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
             credentials: 'include', // Envía la cookie HttpOnly automáticamente (APK)
             headers: {
@@ -57,25 +79,36 @@ export async function apiRequest(endpoint, options = {}) {
                 ...options.headers
             }
         });
-
-        // NOTA: un 401 en el LOGIN significa credenciales INCORRECTAS (el
-        // backend responde con su propio mensaje), no una sesión expirada:
-        // ese caso se deja pasar para que se muestre el error real.
-        if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta') && !endpoint.endsWith('/api/artistas/login')) {
-            cerrarSesionLocal();
-            return { success: false, error: "Sesión expirada. Por favor inicia sesión nuevamente." };
-        }
-
-        let data;
-        try {
-            data = await res.json();
-        } catch (e) {
-            debugLog.error("Error parsing JSON response:", e);
-            return { success: false, error: "Respuesta inválida del servidor." };
-        }
-        return data;
     } catch (error) {
-        debugLog.error("Error en apiRequest:", error);
-        return { success: false, error: "Error de conexión. Intenta más tarde." };
+        debugLog.error('Error en apiRequest (red):', error);
+        throw new ApiError('Error de conexión. Intenta más tarde.');
+    }
+
+    // NOTA: un 401 en el LOGIN significa credenciales INCORRECTAS (el backend responde con su
+    // propio mensaje), no una sesión expirada: ese caso se deja pasar para que se muestre el
+    // error real. Igual en eliminar-cuenta, donde el 401 es «contraseña incorrecta».
+    if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta') && !endpoint.endsWith('/api/artistas/login')) {
+        cerrarSesionLocal();
+        throw new ApiError('Sesión expirada. Por favor inicia sesión nuevamente.', { status: 401, esSesion: true });
+    }
+
+    try {
+        return await res.json();
+    } catch (e) {
+        debugLog.error('Error parsing JSON response:', e);
+        throw new ApiError('Respuesta inválida del servidor.', { status: res.status });
     }
 }
+
+// RED DE SEGURIDAD: si algun dia una llamada deja escapar un ApiError sin `catch`, que se vea en
+// consola con contexto en vez de quedar como una promesa rechazada muda. No muestra nada al
+// usuario: avisar es responsabilidad de quien llama (que es quien sabe que texto tiene sentido).
+if (typeof window !== 'undefined') {
+    window.addEventListener('unhandledrejection', (ev) => {
+        const motivo = /** @type {any} */ (ev.reason);
+        if (motivo && motivo.esApiError) {
+            debugLog.error('apiRequest rechazo sin manejar (' + (motivo.status || 'red') + '):', motivo.message);
+        }
+    });
+}
+

@@ -1,7 +1,7 @@
 // @ts-check
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest, ARTISTA_KEY } from './config.js?v=9b8cce7eac';
+import { apiRequest, ARTISTA_KEY } from './config.js?v=1078af3437';
 import { renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=b9fc40d1cb';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.
@@ -488,10 +488,17 @@ async function enviarComentario(parentId = null) {
     try {
         const body = { texto };
         if (parentId) body.comentario_padre_id = parentId;
-        await apiRequest(baseComentarios(), {
+        const res = await apiRequest(baseComentarios(), {
             method: 'POST',
             body: JSON.stringify(body)
         });
+        // El servidor puede decir que NO sin que sea un fallo de red (400/500 con JSON): eso ya no
+        // lanza, asi que hay que mirarlo. Antes se vaciaba el input y se sumaba +1 igualmente, y el
+        // comentario se perdia sin avisar. (2026-10-18)
+        if (res && res.success === false) {
+            alert(res.error || 'No se pudo enviar el comentario');
+            return;
+        }
         if (!isReply) input.value = '';
         await cargarComentarios(obraIdActual);
         // El contador de la tarjeta solo existe en las de obra.
@@ -539,7 +546,12 @@ async function guardarEdicion(item, commentId) {
         // PUT, no PATCH: es lo que define el backend (`router.put('/:id/comentarios/:commentId')`). Con PATCH
         // la peticion no casaba con ninguna ruta y el cambio NO se guardaba (404 silencioso): se veia el
         // campo, se pulsaba Guardar y el texto volvia al de antes.
-        await apiRequest(baseComentarios() + '/' + commentId, { method: 'PUT', body: JSON.stringify({ texto }) });
+        const res = await apiRequest(baseComentarios() + '/' + commentId, { method: 'PUT', body: JSON.stringify({ texto }) });
+        if (res && res.success === false) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
+            alert(res.error || 'No se pudo guardar el cambio');
+            return;
+        }
         await cargarComentarios(obraIdActual);
     } catch (err) {
         if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
@@ -583,6 +595,9 @@ async function borrarComentario(item, commentId) {
 
 async function likeComentario(commentId) {    try {
         const res = await apiRequest(baseComentarios() + '/' + commentId + '/like', { method: 'POST' });
+        // Un «no» del servidor ya no lanza, pero tampoco es un exito: sin esta guarda el contador
+        // del corazon se pintaba como «undefined» y el estado quedaba inventado. (2026-10-18)
+        if (!res || res.success === false) return;
         const btn = document.querySelector(`.comentario-btn-like[data-id="${commentId}"]`);
         const span = btn?.querySelector('.comentario-likes-count');
         if (btn) {

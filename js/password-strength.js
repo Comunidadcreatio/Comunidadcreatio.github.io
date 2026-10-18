@@ -32,13 +32,18 @@ const ETIQUETAS = { 1: 'Débil', 2: 'Media', 3: 'Buena', 4: 'Fuerte' };
 
 // Devuelve { nivel, etiqueta, requisitos }: nivel 0..4 (0 = vacía).
 export function calcularFortalezaPassword(password) {
-    if (!password) {
+    // El backend SANA con `.trim()` ANTES de medir la fortaleza (`body('password').trim()` en
+    // authRoutes), asi que aqui hay que medir LO MISMO. Medir el valor crudo hacia que un espacio
+    // al final contara como «simbolo»: el medidor decia «Buena» y el servidor respondia 400
+    // «contraseña muy debil». (2026-10-18)
+    const valor = String(password || '').trim();
+    if (!valor) {
         return { nivel: 0, etiqueta: '', requisitos: evaluarRequisitosPassword('') };
     }
 
-    const req = evaluarRequisitosPassword(password);
+    const req = evaluarRequisitosPassword(valor);
     let puntos = Object.values(req).filter(Boolean).length;
-    if (password.length >= 12) puntos++;      // bonus por longitud generosa
+    if (valor.length >= 12) puntos++;      // bonus por longitud generosa
 
     let nivel;
     if (puntos <= 2) nivel = 1;
