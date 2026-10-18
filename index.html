@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.733';
+        var currentVer = '1.0.734';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=7107d5fed9">
+    <link rel="stylesheet" href="css/style.css?v=352b63a6e0">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -190,7 +190,7 @@
                     <path d="M12 12.5v8.5M8.5 12.5L5 21M15.5 12.5L19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                     <path d="M5.5 17.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                 </svg>
-                <span class="toggle-label">cavents</span>
+                <span class="toggle-label">Cavents</span>
             </button>
             <!-- Problogs: sección propia. Va a la IZQUIERDA, detrás de Cavents, para que los tres
                  iconos de sección (Chat | cavents | Problogs) queden juntos y ordenados. El perfil
@@ -213,6 +213,9 @@
             <button id="btn-perfil-sidebar" class="btn-perfil-circular" aria-label="Perfil de usuario" aria-expanded="false">
                 <img id="perfil-avatar-mini" class="perfil-avatar-img" src="iconos/avatar-default.svg" alt="Foto de perfil">
             </button>
+            <!-- Etiqueta bajo el avatar, como el resto de iconos del nav. aria-hidden porque el
+                 botón ya tiene su aria-label («Perfil de usuario»). -->
+            <span class="toggle-label" aria-hidden="true">Mi Perfil</span>
         </div>
         <div class="bottom-bar-right">
             <button id="btn-buscar" class="toggle-nav-btn" aria-label="Buscar artista">
@@ -221,7 +224,7 @@
                     <path fill-rule="evenodd" d="M10.8 3.4a7.3 7.3 0 1 1 0 14.6 7.3 7.3 0 0 1 0-14.6zm0 2.6a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4z" fill="currentColor"></path>
                     <path d="M15.3 13.4l1.9-1.9 4.7 4.7-1.9 1.9z" fill="currentColor"></path>
                 </svg>
-                <span class="toggle-label">Buscar</span>
+                <span class="toggle-label">Explorar</span>
             </button>
             <!-- Comcons: sección de concursos (medalla). Se reparte con `space-evenly`, igual
                  que los tres iconos de la izquierda. (2026-10-18) -->
@@ -252,7 +255,7 @@
                     </defs>
                     <circle cx="12" cy="12" r="9" fill="currentColor" mask="url(#nav-mask-web)"></circle>
                 </svg>
-                <span class="toggle-label">Web</span>
+                <span class="toggle-label">FAQ</span>
             </button>
         </div>
     </div>

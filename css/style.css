@@ -796,7 +796,7 @@
     left: 0;
     z-index: 998;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
     height: calc(60px + env(safe-area-inset-bottom, 0px));
     padding: 0 16px;
@@ -816,7 +816,7 @@
 .bottom-bar-left {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-evenly;
     min-width: 0;
 }
@@ -835,6 +835,9 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    /* En columna para que la etiqueta «Mi Perfil» quede debajo del avatar, como los demás. */
+    flex-direction: column;
+    gap: 2px;
 }
 
 /* Columna derecha: los TRES iconos de acción (Buscar | Comcons | Web), repartidos igual que los
@@ -844,7 +847,7 @@
     flex: 1;
     min-width: 0;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-evenly;
 }
 .bottom-bar-right .toggle-nav-btn {
@@ -933,7 +936,19 @@
 /* Las etiquetas del encabezado ("Chat", "cavents", "Buscar") van ocultas: el boton ya lleva el
    icono. (Antes era `display: none !important`; se quito el `!important` el 2026-10-01 y la foto
    lo dio por bueno: nada las vuelve a mostrar.) */
-.toggle-label { display: none; }
+/* Etiquetas de los iconos del nav: pequeñas y debajo de cada icono (petición 2026-10-18).
+   Antes estaban ocultas (`display: none`). */
+.toggle-label {
+    display: block;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: inherit;
+    opacity: 0.72;
+    white-space: nowrap;
+    text-align: center;
+    pointer-events: none;
+}
 
 /* ===== Botón de perfil circular — DENTRO de la barra, centrado ===== */
 .btn-perfil-circular {
@@ -951,8 +966,8 @@
     flex-shrink: 0;
     z-index: 2;
     position: relative;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     transition: transform 0.2s ease;
 }
 .btn-perfil-circular:hover {
@@ -960,12 +975,24 @@
 }
 .btn-perfil-circular .perfil-avatar-img {
     display: block;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     object-fit: cover;
     background-color: var(--color-gray-200);
     pointer-events: none;
+}
+
+/* Alineación de las etiquetas del nav (2026-10-18): las columnas se estiran al alto de la barra
+   y cada celda coloca su contenido ABAJO, así las etiquetas quedan en la MISMA línea aunque el
+   avatar del perfil (40 px) sea más alto que los iconos (26 px). Antes se intentó con
+   `height: 100%` en el botón, pero no surtía efecto: el padre no tenía altura definida y el
+   porcentaje se resolvía como `auto`. */
+.toggle-nav-btn,
+.bottom-bar-center {
+    justify-content: flex-end;
+    padding-bottom: 5px;
+    box-sizing: border-box;
 }
 
 /* ==============================================
