@@ -268,6 +268,28 @@ export function conTransicion(cambio, alTerminar = null) {
     return Promise.resolve();
 }
 
+/**
+ * Ejecuta `fn` cuando el navegador está libre, para no competir con lo que se está pintando
+ * en ese momento (la galería, al arrancar). Sirve para PRECARGAR datos de una sección que el
+ * usuario todavía no ha abierto, y así que al pulsar el icono ya estén.
+ *
+ * Lleva un tope de tiempo: si el navegador nunca se queda libre (móvil lento, animaciones),
+ * se ejecuta igual al llegar a `esperaMax`, porque lo peor sería no precargar nunca.
+ *
+ * @param {() => void} fn
+ * @param {number} [esperaMax]  ms de tope (por defecto 2500).
+ */
+export function cuandoLibre(fn, esperaMax = 2500) {
+    const w = /** @type {any} */ (window);
+    if (typeof w.requestIdleCallback === 'function') {
+        w.requestIdleCallback(() => { try { fn(); } catch (e) { /* que no rompa el arranque */ } }, { timeout: esperaMax });
+        return;
+    }
+    // Respaldo sin `requestIdleCallback` (Safari antiguo): un margen fijo, corto pero suficiente
+    // para que el primer pintado y las primeras peticiones de la galería ya estén en marcha.
+    setTimeout(() => { try { fn(); } catch (e) { /* igual */ } }, Math.min(esperaMax, 1800));
+}
+
 // ============================================
 // URL DE CLOUDINARY CON TRANSFORMACIONES (1080p, WebP, calidad optimizada)
 // ============================================

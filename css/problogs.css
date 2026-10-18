@@ -463,6 +463,29 @@
     color: var(--color-gray-500);
 }
 
+/* Esqueleto del feed: la forma de las tarjetas que van a llegar, en gris y con un brillo que
+   las recorre. Sustituye al texto «Cargando publicaciones…». El brillo se apaga con «menos
+   movimiento». (2026-10-18) */
+.problogs-esqueleto {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px 16px;
+}
+.problogs-esqueleto-tarjeta {
+    height: 190px;
+    border-radius: 12px;
+    background: linear-gradient(90deg,
+        var(--color-gray-200) 25%,
+        var(--color-gray-300) 37%,
+        var(--color-gray-200) 63%);
+    background-size: 400% 100%;
+    animation: esqueletoBrillo 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .problogs-esqueleto-tarjeta { animation: none; }
+}
+
 /* Tarjeta sin caja: ni borde, ni esquinas redondeadas, ni relleno de fondo. */
 .problog-card {
     border: none;

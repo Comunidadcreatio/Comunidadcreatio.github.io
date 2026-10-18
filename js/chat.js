@@ -4,10 +4,10 @@
 // Economía: sin websockets. El cliente hace polling condicional — solo
 // mientras el chat está abierto y la pestaña visible — pidiendo
 // GET /chat/mensajes?canal=...&afterId=último (respuestas de pocos KB).
-import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=755422aff2';
-import { artistaActual } from './auth.js?v=08fb1f14f1';
-import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=adc837ce30';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=97e5de37c4';
+import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=7da631dcf6';
+import { artistaActual } from './auth.js?v=8dbd042376';
+import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl, cuandoLibre } from './utils.js?v=7e1398d254';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=39c12ef09b';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -713,6 +713,12 @@ export function setupChat() {
         // Explorar: nunca oculta la sección al re-presionar el icono.
         abrirChat();
     });
+
+    // PRECARGA DEL DIRECTORIO. Se pide en cuanto el navegador está libre (no compite con la
+    // galería al arrancar), para que al pulsar el icono los pueblos YA estén: sin esto, la
+    // primera apertura enseñaba el esqueleto sí o sí porque la petición empezaba al abrir.
+    // Solo si hay sesión y si el usuario no ha abierto el chat todavía.
+    if (artistaActual) cuandoLibre(() => { if (!chatAbierto) cargarDirectorio(); });
     // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
     const fab = /** @type {HTMLButtonElement} */ (document.getElementById('btn-chat-global-fab'));
     if (fab) fab.addEventListener('click', abrirChatGlobal);
@@ -990,9 +996,22 @@ window.refrescarChatNoLeidos = refrescarChatNoLeidos;
 // ============================================
 // DIRECTORIO: sala global + acordeón de pueblos
 // ============================================
+// Esqueleto del directorio: la FORMA de lo que va a llegar, en vez de un texto «Cargando
+// usuarios…» que aparece y desaparece. Se ve solo la primera vez (la precarga de
+// `setupChat` lo evita casi siempre) y dura lo que la petición. (2026-10-18)
+function esqueletoDirectorio() {
+    return '<div class="chat-esqueleto" role="status">' +
+        '<span class="visually-hidden">Cargando usuarios…</span>' +
+        '<div class="chat-esqueleto-fila"></div>'.repeat(6) +
+        '</div>';
+}
+
 async function cargarDirectorio() {
     const cont = /** @type {HTMLElement} */ (document.getElementById('chat-accordion'));
-    cont.innerHTML = '<div class="chat-cargando">Cargando usuarios…</div>';
+    // Solo se enseña el esqueleto si NO hay pueblos ya pintados: si los hay, se refresca por
+    // debajo sin borrarlos. Antes se vaciaba siempre, y por eso la lista parpadeaba cada vez
+    // que se abría el chat aunque los datos ya estuvieran cargados.
+    if (!cont.querySelector('.chat-pueblo')) cont.innerHTML = esqueletoDirectorio();
     try {
         const [dirRes, convRes] = await Promise.all([
             apiRequest('/chat/directorio'),

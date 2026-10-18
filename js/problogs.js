@@ -32,10 +32,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=755422aff2';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=adc837ce30';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=7da631dcf6';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=97e5de37c4';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=39c12ef09b';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -43,7 +43,7 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=08fb1f14f1';
+import { artistaActual } from './auth.js?v=8dbd042376';
 
 // Anchos que se ofrecen en el `srcset` de las imagenes de Problogs. El navegador elige uno segun el
 // hueco (`sizes`) y la densidad de pantalla, asi que en un movil normal NO se baja el grande:
@@ -976,9 +976,22 @@ async function cargarPagina(pagina, reemplazar) {
     }
 }
 
+// Esqueleto del feed: la FORMA de las tarjetas, en vez de un texto «Cargando publicaciones…»
+// que aparece y desaparece. Suena solo la primera vez (la precarga del observador lo evita
+// casi siempre) y dura lo que la petición. (2026-10-18)
+function esqueletoFeed() {
+    return '<div class="problogs-esqueleto" role="status">' +
+        '<span class="visually-hidden">Cargando publicaciones…</span>' +
+        '<div class="problogs-esqueleto-tarjeta"></div>'.repeat(3) +
+        '</div>';
+}
+
 function cargarFeed() {
     if (!feedEl) return;
-    feedEl.innerHTML = '<p class="problogs-cargando">Cargando publicaciones…</p>';
+    // Solo se enseña el esqueleto si NO hay tarjetas ya pintadas: si las hay, se refresca por
+    // debajo sin borrarlas. Antes se vaciaba siempre, y el feed parpadeaba cada vez que se
+    // volvía a abrir la sección aunque las publicaciones ya estuvieran cargadas.
+    if (!feedEl.querySelector('.problog-card')) feedEl.innerHTML = esqueletoFeed();
     actualizarBotonMas();
     return cargarPagina(1, true);
 }
@@ -2397,6 +2410,9 @@ export function setupProblogs() {
         };
         new MutationObserver(aplicar).observe(seccionEl, { attributes: true, attributeFilter: ['class'] });
         aplicar();
+        // PRECARGA: el feed se pide en cuanto el navegador está libre, no al abrir la sección.
+        // Así, cuando el usuario pulsa Problogs, las publicaciones ya están y no hay esqueleto.
+        cuandoLibre(() => { if (!feedCargado) cargarFeed(); });
     }
 
     feedEl?.addEventListener('click', (e) => manejarAcciones(e, false));

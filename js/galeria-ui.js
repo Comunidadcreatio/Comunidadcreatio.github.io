@@ -3,13 +3,13 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=c210de9ea2';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=6298c96fe9';
-import { artistaActual, token, esArtista } from './auth.js?v=08fb1f14f1';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=b02863f238';
-import { confirmarDescartarCambios } from './panel-ui.js?v=d61ea7227e';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=f39ad9003b';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=1795fb6da8';
+import { artistaActual, token, esArtista } from './auth.js?v=8dbd042376';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=0f6eecdc9a';
+import { confirmarDescartarCambios } from './panel-ui.js?v=8222b22c85';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
-import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=adc837ce30';
+import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=7e1398d254';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;

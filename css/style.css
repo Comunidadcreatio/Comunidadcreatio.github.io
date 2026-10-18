@@ -28,7 +28,7 @@
 @import url('galeria-publica.css?v=ba319203b9');
 
 /* Chat global + privado */
-@import url('chat.css?v=474324b544');
+@import url('chat.css?v=0c2464ac16');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -1920,4 +1920,11 @@
         line-height: 1.35;
         color: var(--color-text-muted);
     }
+}
+
+/* Brillo que recorre los esqueletos de carga (chat y problogs). Vive aquí porque lo usan las
+   dos hojas; cada sección define su forma en la suya. (2026-10-18) */
+@keyframes esqueletoBrillo {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
 }
