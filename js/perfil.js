@@ -6,7 +6,7 @@
 import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=7da631dcf6';
 import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=8dbd042376';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
-import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary } from './utils.js?v=7e1398d254';
+import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary, cuandoLibre } from './utils.js?v=7e1398d254';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
 import { setupViewTracking } from './galeria.js?v=f39ad9003b';
@@ -484,6 +484,10 @@ export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn
     const btn = document.getElementById('btn-perfil-sidebar');
     if (!btn) return;
 
+    // El grid de «Mi Cuenta» se pide ya, en cuanto el navegador está libre: así al abrir el
+    // perfil aparece de golpe en vez del «Cargando obras…». (2026-10-18)
+    precargarObrasPropias();
+
     const abrirPerfil = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -574,6 +578,36 @@ export function activarTabCavents() {
     cargarContenidoTab('cavents');
 }
 
+/** @type {any[] | null} */
+let cacheObrasPropias = null;
+let cacheObrasMomento = 0;
+
+// Se piden las obras propias en cuanto el navegador está libre, para que al abrir «Mi Cuenta»
+// el grid aparezca YA (y no el «Cargando obras…»). Mismo patrón que el chat y Problogs.
+// (2026-10-18)
+export function precargarObrasPropias() {
+    if (!artistaActual) return;
+    cuandoLibre(() => {
+        apiRequest('/api/artistas/mis-obras?limit=50')
+            .then((res) => {
+                if (res && res.success && Array.isArray(res.obras)) {
+                    cacheObrasPropias = res.obras;
+                    cacheObrasMomento = Date.now();
+                }
+            })
+            .catch(() => { /* silencioso: es una precarga */ });
+    });
+}
+
+// Esqueleto del grid: la forma de las tarjetas que van a llegar, en vez del texto
+// «Cargando obras...». (2026-10-18)
+function esqueletoGridPerfil() {
+    return '<div class="perfil-esqueleto" role="status">' +
+        '<span class="visually-hidden">Cargando obras…</span>' +
+        '<div class="perfil-esqueleto-celda"></div>'.repeat(6) +
+        '</div>';
+}
+
 async function cargarContenidoTab(tab) {
     const content = document.getElementById('perfil-tab-content');
     if (!content) return;
@@ -581,9 +615,9 @@ async function cargarContenidoTab(tab) {
     const viendoExterno = !!perfilExternoId;
 
     if (tab === 'cavents') {
-        content.innerHTML = '<div class="perfil-grid-loading">Cargando obras...</div>';
-        try {
-            if (viendoExterno) {
+        if (viendoExterno) {
+            content.innerHTML = esqueletoGridPerfil();
+            try {
                 const res = await apiRequest('/obras?limit=100');
                 if (res && Array.isArray(res)) {
                     const obrasUsuario = res.filter(obra => String(obra.artista_user_id) === String(perfilExternoId));
@@ -591,14 +625,43 @@ async function cargarContenidoTab(tab) {
                 } else {
                     content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
                 }
+            } catch (e) {
+                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
+            }
+            return;
+        }
+
+        // Se copia a una constante para que TypeScript sepa que NO es null dentro del if (y
+        // dentro del `then`, que es un closure).
+        const cacheadas = cacheObrasPropias;
+        if (cacheadas && Date.now() - cacheObrasMomento < 60000) {
+            // Con caché: se pinta AL INSTANTE y se refresca por debajo (sin volver a enseñar
+            // esqueleto ni borrar lo que ya se ve).
+            renderizarGridObras(cacheadas.filter(obra => obra.status !== 'Inactivo (Oculto)'), content);
+            apiRequest('/api/artistas/mis-obras?limit=50')
+                .then((res) => {
+                    if (!res || !res.success || !Array.isArray(res.obras)) return;
+                    cacheObrasPropias = res.obras;
+                    cacheObrasMomento = Date.now();
+                    // Solo se repinta si el usuario sigue en esta pestaña.
+                    if (perfilTabActual === 'cavents' && content.isConnected) {
+                        renderizarGridObras(res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)'), content);
+                    }
+                })
+                .catch(() => { /* se queda lo que ya se ve */ });
+            return;
+        }
+
+        content.innerHTML = esqueletoGridPerfil();
+        try {
+            const res = await apiRequest('/api/artistas/mis-obras?limit=50');
+            if (res && res.success && res.obras) {
+                cacheObrasPropias = res.obras;
+                cacheObrasMomento = Date.now();
+                const obrasActivas = res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)');
+                renderizarGridObras(obrasActivas, content);
             } else {
-                const res = await apiRequest('/api/artistas/mis-obras?limit=50');
-                if (res && res.success && res.obras) {
-                    const obrasActivas = res.obras.filter(obra => obra.status !== 'Inactivo (Oculto)');
-                    renderizarGridObras(obrasActivas, content);
-                } else {
-                    content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
-                }
+                content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">No se pudieron cargar las obras.</p>';
             }
         } catch (e) {
             content.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:20px;">Error al cargar las obras.</p>';
@@ -607,7 +670,7 @@ async function cargarContenidoTab(tab) {
         // El pintado real vive en problogs.js (dueño del marcado y estilos del feed).
         // Se avisa por evento en vez de importar, para no crear un ciclo de módulos
         // (perfil.js -> problogs.js -> galeria-ui.js -> perfil.js).
-        content.innerHTML = '<div class="problogs-cargando">Cargando publicaciones...</div>';
+        content.innerHTML = '<div class="problogs-esqueleto" role="status"><span class="visually-hidden">Cargando publicaciones…</span><div class="problogs-esqueleto-tarjeta"></div></div>';
         document.dispatchEvent(new CustomEvent('perfil:problogs', {
             detail: { contenedor: content, autorId: perfilExternoId || null }
         }));

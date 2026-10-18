@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=f9c0b87af2');
+@import url('panel-artista.css?v=49175c534d');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
@@ -1405,6 +1405,15 @@
             animation: 190ms ease-in both seccionVtSalir;
         }
         ::view-transition-new(seccion-activa) {
+            animation: 250ms cubic-bezier(0.22, 1, 0.36, 1) both seccionVtEntrar;
+        }
+        /* El cluster de salas del chat (Global / Jurado) es `position: fixed` y NO está dentro
+           de la sección: se le da su propio nombre en galeria-ui.js para que no aparezca de
+           golpe, y aquí se le pone el mismo fundido que a la sección. */
+        ::view-transition-old(chat-cluster) {
+            animation: 190ms ease-in both seccionVtSalir;
+        }
+        ::view-transition-new(chat-cluster) {
             animation: 250ms cubic-bezier(0.22, 1, 0.36, 1) both seccionVtEntrar;
         }
     }

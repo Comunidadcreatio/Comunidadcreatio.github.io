@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=7da631dcf6';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=39c12ef09b';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=00481c9240';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -910,7 +910,7 @@ function tarjetaProblog(p, conAcciones) {
             </div>
             ${portada ? `<div class="problog-card-portada"><img src="${safeImgUrl(cloudinaryUrl(portada, 600))}"
                 srcset="${srcsetCloudinary(portada, ANCHOS_PORTADA)}"
-                sizes="(max-width: 600px) 100vw, 520px" alt="" loading="lazy" decoding="async"></div>` : ''}
+                sizes="(max-width: 600px) 100vw, 520px" alt="" loading="eager" decoding="async"></div>` : ''}
             <div class="problog-card-cuerpo">
                 <div class="problog-card-cabecera">
                     <h3 class="problog-card-titulo">${renderText(p.titulo)}</h3>

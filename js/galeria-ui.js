@@ -6,7 +6,7 @@
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=f39ad9003b';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=1795fb6da8';
 import { artistaActual, token, esArtista } from './auth.js?v=8dbd042376';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=0f6eecdc9a';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=667eafb2c6';
 import { confirmarDescartarCambios } from './panel-ui.js?v=8222b22c85';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=7e1398d254';
@@ -126,9 +126,16 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
         const saliente = sectionSaliente;
         if (saliente) saliente.style.viewTransitionName = 'seccion-saliente';
         sectionEntrante.style.viewTransitionName = 'seccion-activa';
+        // El CLUSTER DE SALAS del chat (Global / Jurado) es `position: fixed` y vive FUERA de
+        // la sección: sin nombre propio se queda fuera de las dos imágenes y aparece de golpe,
+        // sin fundido, como si no fuera con el cambio. Con nombre viaja en la misma transición.
+        const cluster = document.getElementById('chat-cluster');
+        const tocaChat = (saliente && saliente.id === 'chat-global') || sectionEntrante.id === 'chat-global';
+        if (cluster && tocaChat) cluster.style.viewTransitionName = 'chat-cluster';
         const limpiarNombres = () => {
             if (saliente) saliente.style.viewTransitionName = '';
             sectionEntrante.style.viewTransitionName = '';
+            if (cluster) cluster.style.viewTransitionName = '';
         };
         conTransicion(() => {
             for (const id of SECCIONES) {
