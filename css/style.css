@@ -22,10 +22,10 @@
 @layer reset, base, components, utilities;
 
 /* 1. Estilos globales, reset y tipografía */
-@import url('header.css?v=2bb92c0c31');
+@import url('header.css?v=499c47a950');
 
 /* 2. Galería pública (tarjetas de obras) */
-@import url('galeria-publica.css?v=ba319203b9');
+@import url('galeria-publica.css?v=0d75f713d3');
 
 /* Chat global + privado */
 @import url('chat.css?v=0c2464ac16');
@@ -884,7 +884,7 @@
     height: 3px;
     border-radius: 3px;
     background: var(--color-ink);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.25s ease-out;
 }
 
 /* Estado activo: SOLO la barrita indicadora (color neutro ink, sin azul).

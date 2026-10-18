@@ -714,18 +714,6 @@
    MODO GRID — misma proporción que vista normal, 3 columnas
    ============================================== */
 
-/* Animación de entrada para las tarjetas al activar modo grid */
-@keyframes gridCardEnter {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 @keyframes gridCardExit {
     from {
         opacity: 1;
@@ -747,12 +735,6 @@
     padding: 6px 0 12px;
     overflow-y: auto;
     scroll-snap-type: none;
-    animation: gridContainerEnter 0.4s ease-out;
-}
-
-@keyframes gridContainerEnter {
-    from { opacity: 0.6; }
-    to   { opacity: 1; }
 }
 
 /* Las tarjetas se animan al entrar en modo grid */
@@ -774,17 +756,7 @@
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
     margin-bottom: 6px;
-    animation: gridCardEnter 0.35s ease-out both;
 }
-
-/* Stagger: cada tarjeta se anima con un ligero retraso al entrar */
-#galeria-container.modo-grid .obra-card:nth-child(1) { animation-delay: 0.05s; }
-#galeria-container.modo-grid .obra-card:nth-child(2) { animation-delay: 0.10s; }
-#galeria-container.modo-grid .obra-card:nth-child(3) { animation-delay: 0.15s; }
-#galeria-container.modo-grid .obra-card:nth-child(4) { animation-delay: 0.20s; }
-#galeria-container.modo-grid .obra-card:nth-child(5) { animation-delay: 0.25s; }
-#galeria-container.modo-grid .obra-card:nth-child(6) { animation-delay: 0.30s; }
-#galeria-container.modo-grid .obra-card:nth-child(n+7) { animation-delay: 0.35s; }
 
 /* Animación de salida al quitar modo grid.
    Dos cosas aprendidas midiendo (lo prueba `verificar-animaciones-tarjetas.mjs`):
@@ -806,21 +778,6 @@
 #galeria-container .obra-card.modo-grid-exit:nth-child(2)  { animation-delay: 0.04s; }
 #galeria-container .obra-card.modo-grid-exit:nth-child(3)  { animation-delay: 0.08s; }
 #galeria-container .obra-card.modo-grid-exit:nth-child(n+4) { animation-delay: 0.12s; }
-
-/* Animación de entrada para el modo normal (flex) */
-@keyframes flexCardEnter {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.obra-card.modo-flex-enter {
-    animation: flexCardEnter 0.4s ease-out both;
-}
-
-.obra-card.modo-flex-enter:nth-child(1)  { animation-delay: 0.05s; }
-.obra-card.modo-flex-enter:nth-child(2)  { animation-delay: 0.10s; }
-.obra-card.modo-flex-enter:nth-child(3)  { animation-delay: 0.15s; }
-.obra-card.modo-flex-enter:nth-child(n+4) { animation-delay: 0.20s; }
 
 #galeria-container.modo-grid .obra-card-inner {
     padding: 0;

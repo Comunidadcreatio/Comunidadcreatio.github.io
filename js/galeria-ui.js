@@ -403,9 +403,8 @@ export function seleccionarObraDesdeGrid(obraId) {
             if (targetCard) {
                 galeriaContainerLocal.scrollTop = /** @type {HTMLElement} */ (targetCard).offsetTop;
             }
-
-            const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-            cards.forEach(c => c.classList.add('modo-flex-enter'));
+            // Las tarjetas ya NO llevan animación de entrada (`.modo-flex-enter`): se quitó a
+            // petición, porque al abrir Cavents se veía el retardo y la subida de 20px.
         });
     });
 }
@@ -450,11 +449,7 @@ export async function toggleGaleria(galeriaContainer) {
                     verPerfilArtistaDesdeGaleria(artistaId);
                 });
                 ensurePTRInContainer(galeriaContainer);
-                if (galeriaContainerLocal) {
-                    galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c) => {
-                        c.classList.add('modo-flex-enter');
-                    });
-                }
+                // Sin animación de entrada en las tarjetas (se quitó a petición).
             });
         });
     } else if (galeriaModo === 2) {
@@ -462,11 +457,6 @@ export async function toggleGaleria(galeriaContainer) {
         galeriaModo = 1;
         actualizarVisibilidadIconosHeader(encontrarSeccionActual()); // vuelve el "+"
         salirDeModoGrid(() => {
-            if (galeriaContainerLocal) {
-                galeriaContainerLocal.querySelectorAll('.obra-card').forEach((c) => {
-                    c.classList.add('modo-flex-enter');
-                });
-            }
             actualizarEstadoNavButtons();
         });
     } else {

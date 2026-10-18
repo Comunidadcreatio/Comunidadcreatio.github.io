@@ -140,7 +140,7 @@ picture {
    (en vez de saltar por el reflow del flex).
    ============================================== */
 #btn-configuracion:not(.hidden) {
-    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: hamburguesaAparece 0.32s ease-out;
 }
 @keyframes hamburguesaAparece {
     from {
@@ -156,7 +156,7 @@ picture {
    de los iconos condicionales (hamburguesa, "+", conversaciones, lupa).
    La distancia la calcula JS (--iconos-derecha = iconos visibles × ancho+gap). */
 #main-header:has(#btn-configuracion:not(.hidden), #btn-crear-cavent:not(.hidden), #btn-conversaciones:not(.hidden), #btn-lupa-explorar:not(.hidden)) #btn-notificaciones {
-    animation: campanaDesliza 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: campanaDesliza 0.32s ease-out;
 }
 @keyframes campanaDesliza {
     from { transform: translateX(var(--iconos-derecha, 0px)); }
@@ -199,7 +199,7 @@ picture {
    con el mismo desvanecido.
    ============================================== */
 #btn-crear-cavent:not(.hidden) {
-    animation: crearAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: crearAparece 0.32s ease-out;
 }
 @keyframes crearAparece {
     from {
@@ -239,7 +239,7 @@ picture {
    iconos condicionales del header.
    ============================================== */
 #btn-conversaciones:not(.hidden) {
-    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: hamburguesaAparece 0.32s ease-out;
 }
 #btn-conversaciones.ocultando {
     animation: hamburguesaOculta 0.26s ease-in forwards;
@@ -257,7 +257,7 @@ picture {
     margin-left: auto;
 }
 #btn-lupa-explorar:not(.hidden) {
-    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: hamburguesaAparece 0.32s ease-out;
 }
 #btn-lupa-explorar.ocultando {
     animation: hamburguesaOculta 0.26s ease-in forwards;
@@ -288,7 +288,7 @@ picture {
 #btn-crear-cavent.modo-flecha .icono-flecha,
 #btn-configuracion.modo-flecha .icono-flecha,
 #btn-conversaciones.modo-flecha .icono-flecha {
-    animation: flechaAparece 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: flechaAparece 0.25s ease-out;
 }
 @keyframes flechaAparece {
     from { opacity: 0; transform: translateX(8px) scale(0.7); }
@@ -301,7 +301,7 @@ picture {
    aparece mientras se lee una publicación.
    ============================================== */
 #btn-problog-volver:not(.hidden) {
-    animation: hamburguesaAparece 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: hamburguesaAparece 0.32s ease-out;
 }
 #btn-problog-volver.ocultando {
     animation: hamburguesaOculta 0.26s ease-in forwards;
