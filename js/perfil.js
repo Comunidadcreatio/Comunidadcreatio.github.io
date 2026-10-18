@@ -3,13 +3,13 @@
 // Gestión del perfil de usuario, estadísticas, foto de perfil,
 // visualización de perfiles externos y resultados de búsqueda.
 
-import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=1078af3437';
-import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=c6db1f1f3c';
+import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=755422aff2';
+import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=08fb1f14f1';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
-import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary } from './utils.js?v=b9fc40d1cb';
+import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary } from './utils.js?v=adc837ce30';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=66bc7cbb82';
+import { setupViewTracking } from './galeria.js?v=c210de9ea2';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';

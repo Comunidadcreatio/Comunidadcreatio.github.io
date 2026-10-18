@@ -1956,10 +1956,14 @@ body.creando-problogs #problog-nav-bar {
             animation: none;
         }
 
-        ::view-transition-old(root) {
+        /* SOLO cuando el cambio lo pide Problogs: la clase `vt-problogs` la pone problogs.js
+           mientras dura el paso feed <-> lectura. Antes estas reglas eran generales y el
+           cambio de SECCIÓN heredaba este barrido lateral, que se escribió para abrir una
+           publicación, no para navegar entre secciones. (2026-10-18) */
+        html.vt-problogs::view-transition-old(root) {
             animation: 170ms ease-in both problogVtSalir;
         }
-        ::view-transition-new(root) {
+        html.vt-problogs::view-transition-new(root) {
             animation: 260ms cubic-bezier(0.22, 1, 0.36, 1) both problogVtEntrar;
         }
     }

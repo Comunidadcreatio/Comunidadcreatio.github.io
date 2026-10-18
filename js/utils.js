@@ -236,12 +236,16 @@ export function hayViewTransitions() {
  * sin librerías.
  *
  * @param {() => void} cambio  Lo que cambia el DOM (tiene que ser SÍNCRONO).
+ * @param {(() => void) | null} [alTerminar]  Se llama cuando la ANIMACIÓN ha acabado (o se ha
+ *   saltado). Opcional: lo usa el cambio de sección para quitar los `view-transition-name` que
+ *   pone solo durante el cambio. No se puede usar el `then` de la vuelta para eso: ese se
+ *   resuelve al aplicarse el DOM, con la animación todavía en marcha.
  * @returns {Promise<void>}  Se resuelve cuando el cambio YA está aplicado en el DOM.
  *   Hay que esperarlo si después se va a escribir DENTRO de lo que se acaba de pintar:
  *   el navegador llama al cambio de forma ASÍNCRONA, así que sin esperar se puede
  *   escribir primero y que el cambio lo borre después (carrera).
  */
-export function conTransicion(cambio) {
+export function conTransicion(cambio, alTerminar = null) {
     const doc = /** @type {any} */ (document);
     if (!hayViewTransitions()) { cambio(); return Promise.resolve(); }
     const t = doc.startViewTransition(cambio);
@@ -252,7 +256,12 @@ export function conTransicion(cambio) {
     // consola al navegar rápido. Lo destapó un verificador al que se le quitaron los `sleep()`: al pulsar
     // más rápido, las transiciones se solapaban. Un usuario rápido hacía lo mismo.
     if (t && t.ready && typeof t.ready.catch === 'function') t.ready.catch(() => {});
-    if (t && t.finished && typeof t.finished.catch === 'function') t.finished.catch(() => {});
+    // `alTerminar` (opcional) se llama cuando la ANIMACIÓN ha acabado (o se ha saltado). Lo necesita el
+    // cambio de sección para quitar los `view-transition-name` que pone solo durante el cambio: si se
+    // quitaran al terminar el cambio de DOM (updateCallbackDone), se haría con la animación en marcha.
+    if (t && t.finished && typeof t.finished.catch === 'function') {
+        t.finished.catch(() => {}).then(() => { if (typeof alTerminar === 'function') alTerminar(); });
+    }
     if (t && t.updateCallbackDone && typeof t.updateCallbackDone.catch === 'function') {
         return t.updateCallbackDone.catch(() => {});
     }

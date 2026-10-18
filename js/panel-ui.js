@@ -3,11 +3,11 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=1078af3437';
-import { token, artistaActual } from './auth.js?v=c6db1f1f3c';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=8aad3de2aa';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=755422aff2';
+import { token, artistaActual } from './auth.js?v=08fb1f14f1';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=c72ea84dab';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
-import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=b9fc40d1cb';
+import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=adc837ce30';
 
 /**
  * Un campo del formulario que tiene `.value`: los `[data-required="true"]` del editor son

@@ -3,13 +3,13 @@
 // Navegación entre secciones, transiciones, toggle de galería/panel/perfil/cuenta,
 // y modo grid de la galería.
 
-import { cargarGaleria, mostrarGaleria } from './galeria.js?v=66bc7cbb82';
-import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=23ca203c61';
-import { artistaActual, token, esArtista } from './auth.js?v=c6db1f1f3c';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=90c0128988';
-import { confirmarDescartarCambios } from './panel-ui.js?v=fa10bcb512';
+import { cargarGaleria, mostrarGaleria } from './galeria.js?v=c210de9ea2';
+import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=6298c96fe9';
+import { artistaActual, token, esArtista } from './auth.js?v=08fb1f14f1';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=b02863f238';
+import { confirmarDescartarCambios } from './panel-ui.js?v=d61ea7227e';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
-import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=b9fc40d1cb';
+import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=adc837ce30';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -104,6 +104,17 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
     // menú) se queda quieto porque tiene su propio `view-transition-name` en el CSS.
     // Si el navegador no las trae, se sigue por el camino de siempre (más abajo).
     if (hayViewTransitions()) {
+        // Las dos secciones llevan su PROPIO nombre solo mientras dura el cambio: así la
+        // transición anima únicamente ellas (fundido con desenfoque, en style.css) y el fondo
+        // con la foto se queda quieto. Sin esto, el `root` lo arrastraba todo y el cambio
+        // parecía un temblor de la pantalla entera. Se quitan al ACABAR la animación.
+        const saliente = sectionSaliente;
+        if (saliente) saliente.style.viewTransitionName = 'seccion-saliente';
+        sectionEntrante.style.viewTransitionName = 'seccion-activa';
+        const limpiarNombres = () => {
+            if (saliente) saliente.style.viewTransitionName = '';
+            sectionEntrante.style.viewTransitionName = '';
+        };
         conTransicion(() => {
             for (const id of SECCIONES) {
                 const el = document.getElementById(id);
@@ -112,7 +123,7 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
             sectionEntrante.classList.remove('hidden', 'section-exiting');
             actualizarVisibilidadIconosHeader(sectionEntrante);
             actualizarEstadoNavButtons();
-        }).then(() => {
+        }, limpiarNombres).then(() => {
             isTransitioning = false;
             if (callback) callback();
         });

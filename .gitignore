@@ -44,3 +44,4 @@ scripts/_accion-*.png
 # scripts/ a proposito: verificar-recursos-servidos.mjs descubre TODAS las paginas .html de la
 # RAIZ (readdirSync), asi que un HTML nuevo en la raiz romperia la suite.
 scripts/preview-preloader.html
+scripts/preview-transiciones.html

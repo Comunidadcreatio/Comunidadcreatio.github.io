@@ -1341,28 +1341,34 @@
 /* ==============================================
    TRANSICIONES SUAVES ENTRE SECCIONES
    ============================================== */
-/* Animación de entrada: fade-in + slide-up suave */
+/* ============================================================
+   CAMBIO DE SECCIÓN: FUNDIDO CON DESENFOQUE
+   ============================================================
+   Dos caminos, y los dos tienen que dar la MISMA sensación:
+
+   1. Navegadores sin View Transitions: las clases .section-entering /
+      .section-exiting (las pone galeria-ui.js). Antes eran DOS pasos con
+      desplazamiento vertical —salía subiendo 12px y entraba desde 16px
+      más abajo—: ~600ms y un hueco en medio en el que la pantalla se
+      quedaba medio vacía. Ahora solo se desenfoca y se enfoca.
+
+   2. Chrome y el WebView del APK: View Transitions. Ahí las secciones
+      llevan su PROPIO `view-transition-name` mientras dura el cambio (lo
+      pone galeria-ui.js), para que SOLO se muevan ellas: el fondo y el
+      marco se quedan quietos. Sin eso, el `root` arrastraba la foto de
+      fondo y el cambio parecía un temblor de toda la pantalla.
+   ============================================================ */
+
+/* Entrada: llega desenfocada y se enfoca. */
 @keyframes sectionEnter {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; filter: blur(8px); }
+    to   { opacity: 1; filter: blur(0); }
 }
 
-/* Animación de salida: fade-out + slide-down suave */
+/* Salida: se desenfoca y se disuelve. */
 @keyframes sectionExit {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-12px);
-    }
+    from { opacity: 1; filter: blur(0); }
+    to   { opacity: 0.15; filter: blur(8px); }
 }
 
 /* Las secciones obtienen animación solo cuando JS lo activa */
@@ -1373,7 +1379,7 @@
 #resultados-busqueda.section-entering,
 #pagina-blanca.section-entering,
 #problogs.section-entering {
-    animation: sectionEnter 0.35s ease-out forwards;
+    animation: sectionEnter 0.33s ease-out forwards;
 }
 
 #galeria-publica.section-exiting,
@@ -1384,7 +1390,33 @@
 #pagina-blanca.section-exiting,
 #problogs.section-exiting,
 #chat-global.section-exiting {
-    animation: sectionExit 0.25s ease-in forwards;
+    animation: sectionExit 0.26s ease-in forwards;
+}
+
+/* El MISMO movimiento en el camino de View Transitions.
+   Las secciones llevan su propio `view-transition-name` mientras dura el cambio (lo pone
+   galeria-ui.js), así que la transición las anima a ellas y NO al `root`. El barrido del
+   `root` que hay en problogs.css está ahora acotado a `html.vt-problogs`, así que aquí no
+   compite: el fondo con la foto se queda quieto. */
+@media (prefers-reduced-motion: no-preference) {
+    @layer utilities {
+        ::view-transition-old(seccion-saliente) {
+            animation: 260ms ease-in both seccionVtSalir;
+        }
+        ::view-transition-new(seccion-activa) {
+            animation: 330ms cubic-bezier(0.22, 1, 0.36, 1) both seccionVtEntrar;
+        }
+    }
+}
+
+@keyframes seccionVtSalir {
+    from { opacity: 1; filter: blur(0); }
+    to   { opacity: 0.15; filter: blur(8px); }
+}
+
+@keyframes seccionVtEntrar {
+    from { opacity: 0; filter: blur(8px); }
+    to   { opacity: 1; filter: blur(0); }
 }
 
 /* Página en blanco: se mantiene en el DOM (la navegación la usa como estado

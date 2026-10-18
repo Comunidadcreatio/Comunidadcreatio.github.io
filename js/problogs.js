@@ -32,10 +32,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=1078af3437';
-import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=b9fc40d1cb';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=755422aff2';
+import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=adc837ce30';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=81587d6574';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=dfda9c5a65';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -43,7 +43,7 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=c6db1f1f3c';
+import { artistaActual } from './auth.js?v=08fb1f14f1';
 
 // Anchos que se ofrecen en el `srcset` de las imagenes de Problogs. El navegador elige uno segun el
 // hueco (`sizes`) y la densidad de pantalla, asi que en un movil normal NO se baja el grande:
@@ -1963,7 +1963,11 @@ async function abrirLectura(id) {
         publicacionAbierta = data;
         // PASO 2, con transición: ENTRA la publicación. Se ESPERA a que el cambio esté
         // aplicado antes de pintar los comentarios, o el propio cambio los borraría.
-        await conTransicion(() => { detalle.innerHTML = pintarLectura(data); });
+        // `vt-problogs` es la clase que hace que el barrido lateral del `root` sea SOLO de este
+        // paso: sin ella, el cambio de sección heredaba esa animación (va en problogs.css).
+        document.documentElement.classList.add('vt-problogs');
+        await conTransicion(() => { detalle.innerHTML = pintarLectura(data); },
+            () => document.documentElement.classList.remove('vt-problogs'));
         // Los comentarios de la publicación se cargan al abrirla.
         cargarComentariosDeLaPublicacion(data.id);
         // Y se miden las cajas con línea (el cajón de escribir) al ancho real.
@@ -1999,6 +2003,7 @@ function cerrarLectura() {
     if (!detalleEl || !feedEl) return;
     const detalle = detalleEl, feed = feedEl;
     // La vuelta al feed también va con la transición (mismo efecto, al revés).
+    document.documentElement.classList.add('vt-problogs');
     conTransicion(() => {
         detalle.classList.add('hidden');
         detalle.innerHTML = '';
@@ -2006,7 +2011,7 @@ function cerrarLectura() {
         // Si se estaba respondiendo a un comentario, la barra se va con la vista.
         dejarDeResponder();
         mostrarIconoVolver(false);
-    });
+    }, () => document.documentElement.classList.remove('vt-problogs'));
     publicacionAbierta = null;
 }
 
