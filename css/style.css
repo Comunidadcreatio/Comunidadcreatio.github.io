@@ -28,7 +28,7 @@
 @import url('galeria-publica.css?v=ba319203b9');
 
 /* Chat global + privado */
-@import url('chat.css?v=5b33b062e2');
+@import url('chat.css?v=e7a99bafea');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -775,69 +775,6 @@
     background-color: var(--color-gray-200);
 }
 
-/* ==============================================
-   CERRAR SESIÓN EN MODO OSCURO
-   ==============================================
-   Antes esto eran 6 reglas con `!important` y con ids escalados a mano
-   (`[data-theme="dark"] #mobile-logout-all.logout-option.disabled`...) para poder
-   ganarle a reglas de la parte clara que llevaban id, como
-   `#mobile-main-menu .logout-option { color: white }` (especificidad 1,1,0, que gana
-   a cualquier regla de clase por muchas clases que se le añadan).
-
-   Eso ya no hace falta: las reglas de la parte clara que llevaban id ahora usan
-   `:where()`, que vale 0 de especificidad (ver más abajo). Así que basta con las
-   reglas de clase, en su orden natural, y SIN `!important`. */
-[data-theme="dark"] .logout-option {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .logout-option.disabled {
-    color: var(--color-gray-400);
-}
-
-[data-theme="dark"] .logout-option.enabled {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] #desktop-logout-single.logout-option,
-[data-theme="dark"] #mobile-logout-single.logout-option {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .logout-option:hover {
-    color: var(--color-ink);
-    background-color: var(--color-gray-200);
-}
-
-/* Modo oscuro para bocadillos de escritorio y móvil */
-[data-theme="dark"] .desktop-logout-panel.speech-bubble {
-    background-color: var(--color-gray-100);
-    border: 1px solid var(--color-border);
-}
-
-[data-theme="dark"] .desktop-logout-panel.speech-bubble::after {
-    border-top-color: var(--color-gray-100);
-}
-
-[data-theme="dark"] .mobile-logout-panel.speech-bubble {
-    background-color: var(--color-gray-100);
-    border: 1px solid var(--color-border);
-}
-
-[data-theme="dark"] .mobile-logout-panel.speech-bubble::after {
-    border-top-color: var(--color-gray-100);
-}
-
-[data-theme="dark"] .desktop-logout-panel .logout-option.enabled,
-[data-theme="dark"] .mobile-logout-panel .logout-option.enabled {
-    color: var(--color-ink);
-}
-
-[data-theme="dark"] .desktop-logout-panel .logout-option.disabled,
-[data-theme="dark"] .mobile-logout-panel .logout-option.disabled {
-    color: var(--color-gray-400);
-}
-
 #btn-guardar {
     font-family: 'Nunito', sans-serif;
 }
@@ -1028,42 +965,6 @@
     object-fit: cover;
     background-color: var(--color-gray-200);
     pointer-events: none;
-}
-
-.desktop-logout-modal {
-    position: fixed;
-    z-index: 9999;
-    display: none;
-}
-.desktop-logout-modal:not(.hidden) {
-    display: block;
-}
-
-.desktop-logout-panel.speech-bubble {
-    position: absolute;
-    background: var(--color-black);
-    width: 180px;
-    max-width: 80vw;
-    border-radius: 14px;
-    padding: 6px 0;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    text-align: center;
-    z-index: 9999;
-}
-
-/* Cola para los bocadillos de escritorio (misma que móvil) */
-.desktop-logout-panel.speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: var(--tail-x, 50%);
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid var(--color-black);
-    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
 }
 
 /* ==============================================
@@ -1431,43 +1332,6 @@
     flex-shrink: 0;
 }
 
-/* Opciones de menú */
-.logout-option {
-    color: var(--color-white);
-    display: block;
-    width: 100%;
-    padding: 12px 20px;
-    background: transparent;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-.logout-option:hover {
-    background: rgba(255,255,255,0.1);
-}
-.logout-option.disabled {
-    color: var(--color-gray-400);
-    pointer-events: none;
-    opacity: 0.6;
-}
-.logout-option.enabled {
-    color: var(--color-white);
-    pointer-events: auto;
-}
-
-/* `:where()` vale CERO de especificidad: así estas dos reglas son equivalentes a
-   `.logout-option` (0,1,0) y las de modo oscuro pueden ganarles por clase, sin
-   `!important` y sin repetir el id a mano. El resultado visual es el mismo (van
-   después en el archivo, así que siguen ganando por orden a `.logout-option`). */
-:where(#desktop-logout-single, #mobile-logout-single).logout-option {
-    color: var(--color-white);
-    font-weight: 600;
-}
-
 .divider {
     height: 1px;
     background-color: var(--color-gray-dark);
@@ -1561,15 +1425,6 @@
     }
 
     /* OJO: aqui estaba tambien `#mobile-main-menu`, que ya no existe (se quito el 2026-10-01);
-       este selector SI se queda: `#mobile-logout-options` lleva la clase `mobile-logout-modal`. */
-    .mobile-logout-modal {
-        display: none;
-    }
-
-    
-    .desktop-logout-panel {
-        pointer-events: auto;
-    }
 }@media (max-width: 768px){
 
     /* Explorar (móvil): grid justo bajo el header (sin buscador), con el aire
@@ -1592,61 +1447,6 @@
     #btn-logout-sidebar { 
         margin-left: 0;
         display: none;
-    }
-
-    .desktop-logout-modal {
-        display: none;
-    }
-
-    .mobile-logout-modal {
-        position: fixed;
-        z-index: 9999;
-        pointer-events: none;
-        width: 0;
-        height: 0;
-        overflow: visible;
-    }
-    .mobile-logout-modal.hidden { display: none; }
-    .mobile-logout-modal:not(.hidden) { pointer-events: none; }
-
-    .mobile-logout-panel.speech-bubble {
-        position: fixed;
-        background: var(--color-black);
-        width: 140px;
-        max-width: 60vw;
-        margin: 0;
-        border-radius: 14px;
-        padding: 6px 0;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        text-align: center;
-        z-index: 2001;
-        pointer-events: auto;
-    }
-
-    .mobile-logout-panel.speech-bubble::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: var(--tail-x, 50%);
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-top: 8px solid var(--color-black);
-        filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
-    }
-
-    
-    
-
-    
-    
-
-    .mobile-logout-panel .logout-option,
-    .logout-option {
-        font-size: 13px;
-        padding: 8px 14px;
     }
 }
 

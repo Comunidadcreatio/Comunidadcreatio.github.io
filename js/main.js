@@ -44,7 +44,7 @@ import {
 } from './panel-ui.js?v=fa10bcb512';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=66bc7cbb82';
 import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=cadd1f6eaa';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=1c329138a2';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=f24f9fa58a';
 import { setupPush } from './push.js?v=b507fdcf52';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -56,18 +56,6 @@ export function getGaleriaContainer() {
     return document.getElementById('galeria-container');
 }
 const tablaBody = document.getElementById('tabla-obras-body');
-
-// Variables para paneles flotantes
-/** @type {HTMLElement | null} */
-let desktopLogoutModal = null;
-/** @type {HTMLButtonElement | null} */
-let desktopLogoutAllBtn = null;
-/** @type {HTMLButtonElement | null} */
-let desktopLogoutSingleBtn = null;
-/** @type {((event: MouseEvent) => void) | null} */
-let clickOutsideHandlerLogout = null;
-/** @type {((event: MouseEvent) => void) | null} */
-let mobileClickOutsideHandler = null;
 
 // Conteo de sesiones activas
 let activeSessionsCount = 0;
@@ -249,10 +237,9 @@ async function fetchActiveSessionsCount() {
 function updateCerrarTodasSesionesButtonState() {
     const isEnabled = activeSessionsCount >= 2;
 
-    // Actualizar todos los botones de "cerrar demás sesiones"
+    // Solo queda un boton: el de "Mi Cuenta". Los de los paneles flotantes del sidebar
+    // desaparecieron con el boton que los abria. (2026-10-18)
     const allButtons = [
-        document.getElementById('mobile-logout-all'),
-        document.getElementById('desktop-logout-all'),
         document.getElementById('btn-cerrar-todas-sesiones')
     ];
 
@@ -298,96 +285,8 @@ async function closeAllSessions() {
 window.closeAllSessions = closeAllSessions;
 
 // ============================================
-// LOGOUT Y PANELES FLOTANTES
+// SESIONES (cerrar sesion y cerrar demas sesiones)
 // ============================================
-async function ejecutarLogout() {
-    try {
-        const res = await apiRequest('/api/artistas/logout', { method: 'POST' });
-        if (res && !res.success) debugLog.warn(res.error);
-    } catch (error) {
-        debugLog.error("Error en logout backend:", error);
-    } finally {
-        logout();
-        window.location.href = 'auth.html';
-    }
-}
-
-function cerrarMobileLogoutModal() {
-    const modal = document.getElementById('mobile-logout-options');
-    if (modal) modal.classList.add('hidden');
-    if (mobileClickOutsideHandler) {
-        document.removeEventListener('click', mobileClickOutsideHandler);
-        mobileClickOutsideHandler = null;
-    }
-}
-
-function cerrarDesktopLogoutModal() {
-    if (desktopLogoutModal) desktopLogoutModal.classList.add('hidden');
-    if (clickOutsideHandlerLogout) {
-        document.removeEventListener('click', clickOutsideHandlerLogout);
-        clickOutsideHandlerLogout = null;
-    }
-}
-
-function cerrarTodosLosPaneles() {
-    if (desktopLogoutModal && !desktopLogoutModal.classList.contains('hidden')) {
-        cerrarDesktopLogoutModal();
-    }
-    const mobileLogoutModal = document.getElementById('mobile-logout-options');
-    if (mobileLogoutModal && !mobileLogoutModal.classList.contains('hidden')) {
-        cerrarMobileLogoutModal();
-    }
-}
-
-function positionDesktopPanel(triggerElement, panelElement) {
-    if (!panelElement || !triggerElement) return;
-    const rect = triggerElement.getBoundingClientRect();
-    const panelDiv = panelElement.querySelector('.desktop-logout-panel');
-    if (!panelDiv) return;
-
-    const panelRect = panelDiv.getBoundingClientRect();
-    const margin = 16;
-    const iconCenterX = rect.left + rect.width / 2;
-    let top = rect.top - panelRect.height - 12;
-    if (top < margin) top = margin;
-
-    let left = iconCenterX - panelRect.width / 2;
-    const maxLeft = window.innerWidth - panelRect.width - margin;
-    if (left > maxLeft) left = maxLeft;
-    if (left < margin) left = margin;
-
-    panelElement.style.top = `${top}px`;
-    panelElement.style.left = `${left}px`;
-
-    const tailX = iconCenterX - left;
-    panelDiv.style.setProperty('--tail-x', `${tailX}px`);
-}
-
-function positionMobilePanel(triggerElement, panelElement) {
-    if (!panelElement || !triggerElement) return;
-    const panelDiv = panelElement.querySelector('.mobile-logout-panel');
-    if (!panelDiv) return;
-
-    const iconRect = triggerElement.getBoundingClientRect();
-    const panelRect = panelDiv.getBoundingClientRect();
-    const iconCenterX = iconRect.left + iconRect.width / 2;
-    const margin = 8;
-
-    let top = iconRect.top - panelRect.height - 12;
-    if (top < margin) top = margin;
-
-    let left = iconCenterX - panelRect.width / 2;
-    const maxLeft = window.innerWidth - panelRect.width - margin;
-    if (left > maxLeft) left = maxLeft;
-    if (left < margin) left = margin;
-
-    panelDiv.style.top = `${top}px`;
-    panelDiv.style.left = `${left}px`;
-
-    const tailX = iconCenterX - left;
-    panelDiv.style.setProperty('--tail-x', `${tailX}px`);
-}
-
 // ============================================
 // VERIFICAR SESIÓN EN BACKEND
 // ============================================
@@ -477,76 +376,6 @@ function setupEvents() {
         }
     }
 
-    // ----- Panel de logout (escritorio y móvil) -----
-    const logoutIcon = document.getElementById('btn-logout-sidebar');
-    if (logoutIcon) {
-        logoutIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                const mobileModal = document.getElementById('mobile-logout-options');
-                if (mobileModal) {
-                    if (mobileModal.classList.contains('hidden')) {
-                        cerrarTodosLosPaneles();
-                        mobileModal.classList.remove('hidden');
-                        positionMobilePanel(logoutIcon, mobileModal);
-                        setTimeout(() => {
-                            mobileClickOutsideHandler = function(e) {
-                                const objetivo = e.target instanceof Element ? e.target : null;
-                                const isNavButton = objetivo?.closest('#btn-galeria-sidebar') ||
-                                    objetivo?.closest('#btn-registro-sidebar') ||
-                                    objetivo?.closest('#btn-perfil-sidebar');
-                                if (e.target instanceof Node && !mobileModal.contains(e.target) && e.target !== logoutIcon && !isNavButton) {
-                                    cerrarMobileLogoutModal();
-                                }
-                            };
-                            document.addEventListener('click', mobileClickOutsideHandler);
-                        }, 0);
-                    } else {
-                        mobileModal.classList.add('hidden');
-                    }
-                }
-            } else {
-                if (!desktopLogoutModal) {
-                    desktopLogoutModal = document.getElementById('desktop-logout-options');
-                    desktopLogoutAllBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('desktop-logout-all'));
-                    desktopLogoutSingleBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('desktop-logout-single'));
-                    if (desktopLogoutAllBtn) {
-                        desktopLogoutAllBtn.addEventListener('click', () => {
-                            closeAllSessions();
-                            cerrarDesktopLogoutModal();
-                        });
-                    }
-                    if (desktopLogoutSingleBtn) {
-                        desktopLogoutSingleBtn.addEventListener('click', async () => {
-                            cerrarDesktopLogoutModal();
-                            await ejecutarLogout();
-                        });
-                    }
-                }
-                if (desktopLogoutModal?.classList.contains('hidden')) {
-                    cerrarTodosLosPaneles();
-                    updateCerrarTodasSesionesButtonState();
-                    desktopLogoutModal?.classList.remove('hidden');
-                    positionDesktopPanel(logoutIcon, desktopLogoutModal);
-                    if (clickOutsideHandlerLogout) {
-                        document.removeEventListener('click', clickOutsideHandlerLogout);
-                    }
-                    clickOutsideHandlerLogout = function(event) {
-                        if (event.target instanceof Node && desktopLogoutModal && !desktopLogoutModal.contains(event.target) && event.target !== logoutIcon) {
-                            cerrarDesktopLogoutModal();
-                        }
-                    };
-                    setTimeout(() => {
-                        if (clickOutsideHandlerLogout) document.addEventListener('click', clickOutsideHandlerLogout);
-                    }, 0);
-                } else {
-                    cerrarDesktopLogoutModal();
-                }
-            }
-        });
-    }
-
     // ----- Botones de navegación de la barra inferior -----
     // Cavents abre directamente la galería (Global Cavents); ya no hay popover.
     const btnCaventsHub = document.getElementById('btn-cavents-hub');
@@ -595,32 +424,6 @@ function setupEvents() {
         });
     }
 
-    // ----- Botones del panel móvil de logout -----
-    const mobileSingle = document.getElementById('mobile-logout-single');
-    if (mobileSingle) {
-        mobileSingle.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            await ejecutarLogout();
-        });
-    }
-    const mobileAll = document.getElementById('mobile-logout-all');
-    if (mobileAll) {
-        mobileAll.addEventListener('click', async () => {
-            cerrarMobileLogoutModal();
-            if (activeSessionsCount >= 2) {
-                await closeAllSessions();
-            } else {
-                showInfo("No hay otras sesiones activas. Solo tienes la sesión actual.");
-            }
-        });
-    }
-    const mobileModalLogout = document.getElementById('mobile-logout-options');
-    if (mobileModalLogout) {
-        mobileModalLogout.addEventListener('click', (e) => {
-            if (e.target === mobileModalLogout) cerrarMobileLogoutModal();
-        });
-    }
-
     // ----- Abrir obra desde perfil (global) -----
     window.abrirObraDesdePerfil = (obraId) => {
         const galeria = document.getElementById('galeria-publica');
@@ -661,7 +464,7 @@ function setupEvents() {
     };
 
     // ----- Sección de perfil -----
-    setupPerfilInteracciones(togglePerfil, cerrarTodosLosPaneles);
+    setupPerfilInteracciones(togglePerfil);
     setupChat();
     setupPush();
 
@@ -729,7 +532,6 @@ function setupEvents() {
             document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
                 modal.classList.add('hidden');
             });
-            cerrarTodosLosPaneles();
             const searchDropdown = document.getElementById('search-results-dropdown');
             if (searchDropdown) searchDropdown.classList.add('hidden');
         }

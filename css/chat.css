@@ -223,58 +223,6 @@ body.teclado-abierto .chat-enviar-btn {
     background: var(--color-gray-200);
     color: var(--color-gray-500);
 }
-
-/* Barra de información superior: nombre y contadores centrados */
-.chat-pueblo-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* todo centrado */
-    gap: 6px;
-    padding: 10px 8px 8px;
-}
-.chat-pueblo-info-titulo {
-    max-width: 100%;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--color-text, #1a1a1a);
-    text-align: center; /* centrado */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.chat-pueblo-info-municipio {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text-muted, #888);
-}
-.chat-pueblo-info-contadores {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* centrado */
-    gap: 8px;
-}
-.chat-pueblo-info-contador {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    background: var(--color-gray-100, #f0f0f0);
-    padding: 3px 11px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-    color: var(--color-text, #1a1a1a);
-}
-.chat-pueblo-info-contador em {
-    font-style: normal;
-    font-weight: 500;
-    font-size: 10.5px;
-    color: var(--color-text-muted, #888);
-}
-.chat-pueblo-usuarios {
-    display: flex;
-    flex-direction: column;
-}
 .chat-pueblo-vacio {
     padding: 12px 16px;
     font-size: 13px;
@@ -363,18 +311,6 @@ body.teclado-abierto .chat-enviar-btn {
 .chat-user-flecha {
     color: var(--color-text-muted, #aaa);
     font-size: 13px;
-}
-
-/* Las conversaciones ahora se muestran como círculos en el cluster (ver .chat-conv-circle) */
-
-/* ==============================================
-   VISTA SALA (mensajes)
-   ============================================== */
-#chat-sala {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
 }
 #chat-sala.hidden {
     display: none;
@@ -587,14 +523,6 @@ body.teclado-abierto .chat-enviar-btn {
 [data-theme="dark"] .chat-user-row:hover {
     background: var(--color-surface-raised);
 }
-[data-theme="dark"] .chat-pueblo-info-contador {
-    background: var(--color-gray-200);
-}
-
-/* Panel de la lista de usuarios del municipio seleccionado */
-.chat-pueblo-panel {
-    padding: 6px 4px 0;
-}
 [data-theme="dark"] .chat-input {
     background: var(--color-gray-100);
     color: var(--color-ink-light);
@@ -703,35 +631,6 @@ body.teclado-abierto .chat-enviar-btn {
 .chat-cluster-convs::-webkit-scrollbar {
     display: none;
 }
-.chat-conv-circle {
-    position: relative;
-    width: 56px;
-    height: 56px;
-    box-sizing: border-box; /* el borde entra en los 56px (igual que el FAB) */
-    border-radius: 50%;
-    border: 2px solid var(--color-bg, #fff);
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-    background: var(--color-gray-200, #e0e0e0);
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* Sin overflow hidden: el badge numérico debe poder sobresalir del borde */
-    overflow: visible;
-    font-family: inherit;
-    transition: transform 0.15s;
-}
-.chat-conv-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    display: block;
-}
 /* Punto de presencia en los círculos de conversación (verde activo / gris offline) */
 .chat-conv-dot {
     position: absolute;
@@ -750,9 +649,6 @@ body.teclado-abierto .chat-enviar-btn {
 }
 [data-theme="dark"] .chat-conv-dot {
     border-color: var(--color-bg);
-}
-.chat-conv-circle:hover {
-    transform: scale(1.06);
 }
 
 /* ==============================================
@@ -853,9 +749,6 @@ body.teclado-abierto .chat-enviar-btn {
         rgba(0, 0, 0, 0.55) 60%,
         rgba(0, 0, 0, 0) 85%);
 }
-[data-theme="dark"] .chat-conv-circle {
-    border-color: var(--color-bg);
-}
 [data-theme="dark"] .chat-fab {
     background: var(--color-gray-700);
     color: var(--color-bg);
@@ -864,91 +757,6 @@ body.teclado-abierto .chat-enviar-btn {
     .chat-cluster {
         bottom: 24px; /* el degradado mantiene el ancho completo */
     }
-}
-
-/* ==============================================
-   PAPELERA PARA ELIMINAR CONVERSACIONES
-   (mantener pulsado un círculo y arrastrarlo hasta aquí)
-   ============================================== */
-/* Velo degradado de pantalla completa, detrás de la papelera */
-.chat-trash-veil {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1001;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-    /* Degradado que tapa ligeramente las opciones de abajo (blanco en claro) */
-    background: linear-gradient(to bottom,
-        rgba(255, 255, 255, 0.55) 0%,
-        rgba(255, 255, 255, 0.18) 35%,
-        rgba(255, 255, 255, 0) 70%);
-}
-.chat-trash-veil.activo {
-    opacity: 1;
-}
-[data-theme="dark"] .chat-trash-veil {
-    background: linear-gradient(to bottom,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.2) 35%,
-        rgba(0, 0, 0, 0) 70%);
-}
-
-.chat-trash {
-    position: fixed;
-    /* Después del header (50px + status bar + margen) */
-    top: calc(68px + var(--status-bar-height, 24px));
-    left: 50%;
-    transform: translateX(-50%) translateY(-12px);
-    z-index: 1002; /* delante del velo */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--color-gray-800);
-    color: var(--color-gray-100);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s, background 0.2s;
-}
-.chat-trash.activo {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-.chat-trash.hover {
-    background: var(--color-danger); /* rojo al pasar el círculo encima */
-    transform: translateX(-50%) translateY(0) scale(1.1);
-}
-.chat-trash svg {
-    width: 26px;
-    height: 26px;
-    flex-shrink: 0;
-}
-.chat-trash span {
-    display: none; /* solo el icono */
-}
-[data-theme="dark"] .chat-trash {
-    background: var(--color-gray-700);
-    color: var(--color-bg);
-}
-[data-theme="dark"] .chat-trash.hover {
-    background: var(--color-danger);
-    color: #fff;
-}
-
-/* Círculo en modo arrastre (sigue al dedo, fuera del contenedor que recorta) */
-.chat-conv-circle.dragging {
-    z-index: 1003;
-    pointer-events: none;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
-    transform: scale(1.08);
-    transition: none;
 }
 
 /* ==============================================

@@ -716,10 +716,7 @@ export function setupChat() {
     // FAB: acceso directo a la sala "Chat Global" (abre el panel si está cerrado)
     const fab = /** @type {HTMLButtonElement} */ (document.getElementById('btn-chat-global-fab'));
     if (fab) fab.addEventListener('click', abrirChatGlobal);
-    const cerrarBtn = /** @type {HTMLButtonElement} */ (document.getElementById('chat-cerrar'));
-    if (cerrarBtn) cerrarBtn.addEventListener('click', cerrarChat);
     /** @type {HTMLFormElement} */ (document.getElementById('chat-form')).addEventListener('submit', enviarMensaje);
-    setupDragEliminar();
     setupImagenBtn();
     setupTypingInput();
     setupSalaMenu();
@@ -813,19 +810,6 @@ function abrirChatGlobal() {
     const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     if (seccion.classList.contains('hidden')) abrirChat();
     abrirSala('global', 'Chat Global');
-}
-
-function cerrarChat() {
-    const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
-    if (seccion) seccion.classList.add('hidden');
-    actualizarVisibilidadIconosHeader(null); // sin sección visible → iconos ocultos
-    chatAbierto = false;
-    detenerPoll();
-    canalActivo = null;
-    window._canalChatActivo = null;
-    actualizarFlechaConversaciones(false);
-    setFabVisible(false);
-    actualizarEstadoNavButtons();
 }
 
 function volverDirectorio() {
@@ -1083,45 +1067,6 @@ function municipioDe(ciudad) {
 }
 
 // Lista de usuarios del municipio seleccionado en el carrusel
-function renderUsuariosPueblo(ciudad) {
-    const panel = /** @type {HTMLElement} */ (document.getElementById('chat-pueblo-panel'));
-    const info = /** @type {HTMLElement} */ (document.getElementById('chat-pueblo-info'));
-    const users = ultimosPueblos[ciudad] || [];
-    const activos = users.filter(esOnline).length;
-    // Barra superior: nombre a la izquierda, contadores a la derecha
-    if (info) {
-        const municipio = municipioDe(ciudad);
-        // El municipio se muestra siempre, justo después del pueblo
-        const titulo = municipio
-            ? `${escapeHtml(ciudad)} <span class="chat-pueblo-info-municipio">· ${escapeHtml(municipio)}</span>`
-            : escapeHtml(ciudad);
-        info.innerHTML =
-            `<span class="chat-pueblo-info-titulo">${titulo}</span>` +
-            `<span class="chat-pueblo-info-contadores">` +
-            `<span class="chat-pueblo-info-contador on">${activos} <em>En línea</em></span>` +
-            `<span class="chat-pueblo-info-contador tot">${users.length} <em>Artistas</em></span>` +
-            `</span>`;
-    }
-    if (!panel) return;
-    panel.innerHTML = '';
-    const lista = document.createElement('div');
-    lista.className = 'chat-pueblo-usuarios';
-    if (users.length) {
-        users.forEach(u => {
-            const row = document.createElement('button');
-            row.type = 'button';
-            row.className = 'chat-user-row';
-            row.innerHTML = estadoUsuarioHTML(u);
-            row.addEventListener('click', () => abrirPrivado(u));
-            setupUsuarioRowMenu(row, u);
-            lista.appendChild(row);
-        });
-    } else {
-        lista.innerHTML = '<div class="chat-pueblo-vacio">Sin usuarios registrados aún</div>';
-    }
-    panel.appendChild(lista);
-}
-
 // Las conversaciones ya NO se muestran como círculos en el cluster: se listan
 // en la vista "Conversaciones" (se abre desde el icono del header, visible solo
 // en la sección Chat). La más reciente queda arriba.
@@ -1427,162 +1372,4 @@ async function enviarMensaje(e) {
 // ELIMINAR CONVERSACIÓN: mantener pulsado un círculo
 // y arrastrarlo hacia arriba hasta la papelera
 // ============================================
-function setupDragEliminar() {
-    const trash = /** @type {HTMLElement} */ (document.getElementById('chat-trash'));
-    const veil = /** @type {HTMLElement} */ (document.getElementById('chat-trash-veil'));
-    const cont = /** @type {HTMLElement} */ (document.getElementById('chat-cluster-convs'));
-    if (!trash || !veil || !cont) return;
-
-    const UMBRAL = 450;   // ms de pulsación para activar el arrastre
-    const MOVER_ANTES = 10; // px de movimiento que cancela la pulsación (es scroll)
-
-    const cluster = /** @type {HTMLElement | null} */ (cont.closest('.chat-cluster'));
-
-    /** @type {number | null | undefined} */
-let timer;
-    /** @type {HTMLElement | null} */
-let circle = null;     // círculo en modo arrastre
-    let activo = false;    // arrastre en curso
-    let startX = 0, startY = 0;
-
-    function ocultarTrash() {
-        trash.classList.remove('activo', 'hover');
-        veil.classList.remove('activo');
-    }
-
-    // Termina el arrastre y restaura el círculo a su lugar
-    function finArrastre() {
-        cont.style.overflow = ''; // restaurar recorte del contenedor
-        if (cluster) cluster.style.zIndex = ''; // restaurar nivel de apilado
-        if (circle) {
-            circle.classList.remove('dragging');
-            circle.style.transform = '';
-        }
-        activo = false;
-        circle = null;
-        ocultarTrash();
-    }
-
-    function cancelar() {
-        if (timer) { clearTimeout(timer); timer = null; }
-        if (activo) finArrastre();
-    }
-
-    function iniciarArrastre(el, x, y) {
-        timer = null;
-        activo = true;
-        circle = el;
-        startX = x;
-        startY = y;
-        el.classList.add('dragging');
-        // El círculo NO sale del contenedor (si no, los touchmove dejan de
-        // burbujear hasta aquí y el arrastre se congela). En su lugar se
-        // habilita el overflow visible para que suba sin recortarse, y se eleva
-        // el cluster para que el círculo quede por encima del velo y la papelera.
-        cont.style.overflow = 'visible';
-        if (cluster) cluster.style.zIndex = '1004';
-        trash.classList.add('activo');
-        veil.classList.add('activo');
-    }
-
-    function mover(x, y) {
-        if (!activo || !circle) return;
-        circle.style.transform = `translate(${x - startX}px, ${y - startY}px)`;
-        const r = trash.getBoundingClientRect();
-        const cr = circle.getBoundingClientRect();
-        const cx = cr.left + cr.width / 2;
-        const cy = cr.top + cr.height / 2;
-        trash.classList.toggle('hover',
-            cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom);
-    }
-
-    function soltar() {
-        if (!activo || !circle) { cancelar(); return; }
-        const hover = trash.classList.contains('hover');
-        const canal = circle.dataset.canal;
-        const el = circle;
-        suprimirProximoClick(); // evita que el click posterior abra la sala
-        if (hover && canal) {
-            el.remove(); // se eliminó la conversación
-            finArrastre();
-            eliminarConversacion(canal);
-        } else {
-            finArrastre(); // vuelve a su lugar
-        }
-    }
-
-    // --- Touch (móvil) ---
-    cont.addEventListener('touchstart', (e) => {
-        const t = e.touches[0];
-        const el = e.target instanceof Element ? e.target.closest('.chat-conv-circle') : null;
-        if (!el) return;
-        startX = t.clientX;
-        startY = t.clientY;
-        timer = setTimeout(() => iniciarArrastre(el, startX, startY), UMBRAL);
-    }, { passive: true });
-
-    cont.addEventListener('touchmove', (e) => {
-        const t = e.touches[0];
-        if (activo) {
-            e.preventDefault();
-            mover(t.clientX, t.clientY);
-        } else if (timer &&
-            (Math.abs(t.clientX - startX) > MOVER_ANTES || Math.abs(t.clientY - startY) > MOVER_ANTES)) {
-            clearTimeout(timer);
-            timer = null; // es deslizamiento/scroll, no pulsación
-        }
-    }, { passive: false });
-
-    cont.addEventListener('touchend', () => {
-        if (activo) soltar();
-        else if (timer) { clearTimeout(timer); timer = null; }
-    }, { passive: true });
-    cont.addEventListener('touchcancel', cancelar, { passive: true });
-
-    // --- Mouse (escritorio) ---
-    cont.addEventListener('mousedown', (e) => {
-        const el = e.target instanceof Element ? e.target.closest('.chat-conv-circle') : null;
-        if (!el) return;
-        startX = e.clientX;
-        startY = e.clientY;
-        timer = setTimeout(() => iniciarArrastre(el, startX, startY), UMBRAL);
-    });
-    document.addEventListener('mousemove', (e) => {
-        if (activo) mover(e.clientX, e.clientY);
-        else if (timer &&
-            (Math.abs(e.clientX - startX) > MOVER_ANTES || Math.abs(e.clientY - startY) > MOVER_ANTES)) {
-            clearTimeout(timer);
-            timer = null;
-        }
-    });
-    document.addEventListener('mouseup', () => {
-        if (activo) soltar();
-        else if (timer) { clearTimeout(timer); timer = null; }
-    });
-}
-
 // Evita el click que se dispara justo después de un arrastre con soltado
-function suprimirProximoClick() {
-    const cap = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        document.removeEventListener('click', cap, true);
-    };
-    document.addEventListener('click', cap, true);
-}
-
-async function eliminarConversacion(canal) {
-    try {
-        const data = await apiRequest('/chat/conversaciones', {
-            method: 'DELETE',
-            body: JSON.stringify({ canal })
-        });
-        if (data && data.success) {
-            cargarDirectorio(); // refresca los círculos de conversaciones
-        } else {
-            debugLog.error('eliminar conversación:', data && data.error);
-        }
-    } catch (e) {
-        debugLog.error('eliminar conversación:', e);
-    }
-}

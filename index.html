@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.721';
+        var currentVer = '1.0.722';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=7322939e0a">
+    <link rel="stylesheet" href="css/style.css?v=4341f40644">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=8e488d6f94">
@@ -204,23 +204,6 @@
     <!-- Popover del menú cavents: eliminado — cavents abre la galería directo -->
 
     <input type="file" id="input-foto-perfil" accept="image/*" hidden>
-
-    <!-- Paneles flotantes (fuera de app-container para correcto posicionamiento fixed) -->
-    <div id="desktop-logout-options" class="desktop-logout-modal hidden">
-        <div class="desktop-logout-panel speech-bubble">
-            <button id="desktop-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
-            <div class="divider"></div>
-            <button id="desktop-logout-single" class="logout-option">Cerrar Sesión</button>
-        </div>
-    </div>
-
-    <div id="mobile-logout-options" class="mobile-logout-modal hidden">
-        <div class="mobile-logout-panel speech-bubble">
-            <button id="mobile-logout-all" class="logout-option disabled">Cerrar demás sesiones</button>
-            <div class="divider"></div>
-            <button id="mobile-logout-single" class="logout-option">Cerrar Sesión</button>
-        </div>
-    </div>
 
     <div class="app-container">
 
@@ -1107,19 +1090,6 @@
         </div>
     </div>
 
-    <!-- Velo degradado de fondo al arrastrar un círculo hacia la papelera -->
-    <div id="chat-trash-veil" class="chat-trash-veil"></div>
-
-    <!-- Papelera para eliminar conversaciones (mantener pulsado un círculo y arrastrar hasta aquí) -->
-    <div id="chat-trash" class="chat-trash" aria-label="Eliminar conversación">
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            <line x1="10" y1="11" x2="10" y2="17"></line>
-            <line x1="14" y1="11" x2="14" y2="17"></line>
-        </svg>
-        <span>Soltar para eliminar</span>
-    </div>
  </div>
 
 
@@ -1152,7 +1122,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=ca93059f02" type="module"></script>
+    <script src="js/main.js?v=ddae2777c3" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
