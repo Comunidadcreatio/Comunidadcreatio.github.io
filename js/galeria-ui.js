@@ -343,34 +343,16 @@ function salirDeModoGrid(onComplete) {
     const galeriaContainerLocal = obtenerGaleriaContainer();
     gridExiting = true;
 
-    if (!galeriaContainerLocal) {
-        gridExiting = false;
-        if (onComplete) onComplete();
-        return;
-    }
-
-    const cards = galeriaContainerLocal.querySelectorAll('.obra-card');
-    cards.forEach(c => c.classList.add('modo-grid-exit'));
-
-    let animEndHandled = false;
-    const lastCard = cards[cards.length - 1];
-    const onAnimEnd = () => {
-        if (animEndHandled) return;
-        animEndHandled = true;
-        gridExiting = false;
+    // SIN ANIMACIÓN (petición): antes cada tarjeta se desvanecía escalonada (0.3s + retardos de
+    // 0 / 0.04 / 0.08 / 0.12s) y el cambio ESPERABA al `animationend` de la última, con 600ms de
+    // red de seguridad. Eso era la espera al pasar de Explorar a Cavents. Ahora se quita el modo
+    // grid de golpe y el callback se llama en el acto.
+    if (galeriaContainerLocal) {
         galeriaContainerLocal.classList.remove('modo-grid');
-        cards.forEach(c => c.classList.remove('modo-grid-exit'));
         ptrReparent(galeriaContainerLocal); // a carrusel: el indicador vuelve al contenedor
-        if (onComplete) onComplete();
-    };
-
-    if (lastCard) {
-        lastCard.addEventListener('animationend', onAnimEnd, { once: true });
-        setTimeout(onAnimEnd, 600);
-    } else {
-        gridExiting = false;
-        onAnimEnd();
     }
+    gridExiting = false;
+    if (onComplete) onComplete();
 }
 
 export function verPerfilArtistaDesdeGaleria(artistaId) {

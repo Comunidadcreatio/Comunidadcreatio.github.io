@@ -714,16 +714,6 @@
    MODO GRID — misma proporción que vista normal, 3 columnas
    ============================================== */
 
-@keyframes gridCardExit {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-}
 
 /* MODO GRID — masonry tipo Pinterest: columnas con altura real de cada tarjeta
    (4:5 o 1:1 según la subió el autor), en lugar de una cuadrícula rígida de
@@ -757,27 +747,6 @@
     -webkit-column-break-inside: avoid;
     margin-bottom: 6px;
 }
-
-/* Animación de salida al quitar modo grid.
-   Dos cosas aprendidas midiendo (lo prueba `verificar-animaciones-tarjetas.mjs`):
-   1. Se declaran los LONGHANDS en vez del atajo: un `animation` con `!important` marca importantes
-      TODOS sus longhands (incluido `animation-delay: 0`), y por eso los cuatro retardos de abajo
-      necesitaban `!important` para ganarle. Sin el atajo, el delay no se resetea.
-   2. El selector lleva el mismo `#galeria-container` que la animación de ENTRADA
-      (`#galeria-container.modo-grid .obra-card`, que con el id le ganaba a `.obra-card.modo-grid-exit`
-      por especificidad). Con el id, las dos son (1,2,0) y gana esta por ORDEN, que va más abajo.
-      Quitando el id, el verificador se pone en 0/5: la salida pasa a ser la de entrada. */
-#galeria-container .obra-card.modo-grid-exit {
-    animation-name: gridCardExit;
-    animation-duration: 0.3s;
-    animation-timing-function: ease-in;
-    animation-fill-mode: forwards;
-}
-
-#galeria-container .obra-card.modo-grid-exit:nth-child(1)  { animation-delay: 0s; }
-#galeria-container .obra-card.modo-grid-exit:nth-child(2)  { animation-delay: 0.04s; }
-#galeria-container .obra-card.modo-grid-exit:nth-child(3)  { animation-delay: 0.08s; }
-#galeria-container .obra-card.modo-grid-exit:nth-child(n+4) { animation-delay: 0.12s; }
 
 #galeria-container.modo-grid .obra-card-inner {
     padding: 0;

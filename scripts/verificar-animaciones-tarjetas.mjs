@@ -125,35 +125,28 @@ await evalJs(`(() => {
 })()`);
 await sleep(400);
 
-const entrada = await evalJs(`(() => {
+// Las tarjetas ya NO se animan ni al ENTRAR ni al SALIR del modo grid: se quitó a petición
+// (2026-10-18), junto con la espera al `animationend` de la última tarjeta. Este bloque lo
+// comprueba al revés que antes: que NO haya animación.
+const entrada = JSON.parse(await evalJs(`(() => {
     const c = document.querySelector('#galeria-container.modo-grid .obra-card');
     const cs = getComputedStyle(c);
-    return JSON.stringify({ nombre: cs.animationName, duracion: cs.animationDuration, relleno: cs.animationFillMode });
-})()`);
-console.log('   animacion de ENTRADA (sin la clase de salida): ' + entrada);
+    return JSON.stringify({ nombre: cs.animationName, duracion: cs.animationDuration });
+})()`));
+console.log('   animacion de ENTRADA en el grid: ' + JSON.stringify(entrada));
+check('al entrar en el grid las tarjetas NO se animan', entrada.nombre === 'none', entrada.nombre);
 
-// Y ahora la clase de salida, que es lo que pone la app al dejar el grid.
 const salida = JSON.parse(await evalJs(`(() => {
     const tarjetas = [...document.querySelectorAll('#galeria-container.modo-grid .obra-card')].slice(0, 5);
     tarjetas.forEach((c) => c.classList.add('modo-grid-exit'));
-    const lee = (c) => {
-        const cs = getComputedStyle(c);
-        return { nombre: cs.animationName, duracion: cs.animationDuration, retardo: cs.animationDelay, relleno: cs.animationFillMode, curva: cs.animationTimingFunction };
-    };
-    return JSON.stringify({ primera: lee(tarjetas[0]), retardos: tarjetas.map((c) => getComputedStyle(c).animationDelay) });
+    const lee = (c) => { const cs = getComputedStyle(c); return { nombre: cs.animationName, retardo: cs.animationDelay }; };
+    const datos = { primera: lee(tarjetas[0]), retardos: tarjetas.map((c) => getComputedStyle(c).animationDelay) };
+    tarjetas.forEach((c) => c.classList.remove('modo-grid-exit'));
+    return JSON.stringify(datos);
 })()`));
-console.log('   animacion de SALIDA: ' + JSON.stringify(salida.primera));
-console.log('   retardos por tarjeta: ' + JSON.stringify(salida.retardos));
-
-check('la salida es la animacion de salida (gridCardExit), NO la de entrada',
-    salida.primera.nombre === 'gridCardExit', `nombre = ${salida.primera.nombre}`);
-check('dura 0.3s', salida.primera.duracion === '0.3s', salida.primera.duracion);
-check('se queda en el ultimo fotograma (forwards)', salida.primera.relleno === 'forwards', salida.primera.relleno);
-check('la curva es ease-in', salida.primera.curva === 'ease-in', salida.primera.curva);
-const ESPERADOS = ['0s', '0.04s', '0.08s', '0.12s', '0.12s'];
-const retardosOk = ESPERADOS.every((v, i) => salida.retardos[i] === v);
-check('cada tarjeta tiene su retardo (0 / 0.04 / 0.08 / 0.12 / 0.12)',
-    retardosOk && salida.retardos.length === 5, JSON.stringify(salida.retardos));
+console.log('   animacion de SALIDA en el grid: ' + JSON.stringify(salida.primera));
+check('al salir del grid las tarjetas NO se animan', salida.primera.nombre === 'none', salida.primera.nombre);
+check('ninguna tarjeta lleva retardo de animacion', salida.retardos.every((r) => r === '0s'), JSON.stringify(salida.retardos));
 
 // ---------- 2. El cursor del typewriter (auth) ----------
 // AQUI HAY ALGO SIN RESOLVER, y se deja escrito en vez de disimulado: en la pantalla de auth, la regla
