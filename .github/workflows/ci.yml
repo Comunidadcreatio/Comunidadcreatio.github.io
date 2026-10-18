@@ -18,13 +18,12 @@ jobs:
           node-version: 20
 
       - name: Sintaxis JS (ES modules + scripts)
-        run: |
-          set -e
-          for f in js/*.js; do
-            node --input-type=module --check < "$f"
-          done
-          node --check scripts/bump-version.js
-          node --check scripts/minify.js
+        # Un solo instrumento para local y CI: cubre js/*.js (28 modulos) y scripts/ (59 .mjs,
+        # 2 .js y 1 .cjs). Antes el CI compilaba a mano solo js/*.js y DOS scripts, asi que los 59
+        # verificadores .mjs no se comprobaban en ninguna parte — y la trampa del backtick dentro
+        # de un evalJs() vive justo ahi. El script trae canarios: si dejara de detectar un error
+        # conocido, falla en vez de dar un PASS vacio.
+        run: node scripts/verificar-sintaxis-scripts.mjs
 
       - name: JSON valido (configs y manifest)
         run: |
