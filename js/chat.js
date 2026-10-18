@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=9b8cce7eac';
 import { artistaActual } from './auth.js?v=d03e50cca9';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=b9fc40d1cb';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=d2130e8d0e';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=93551c628e';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -1230,6 +1230,10 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     cont.innerHTML = '<div class="chat-cargando">Cargando mensajes…</div>';
     try {
         const data = await apiRequest(`/chat/mensajes?canal=${encodeURIComponent(canal)}`);
+        // GUARDA (2026-10-18): si mientras llegaba la respuesta se abrio OTRA sala, esta ya no
+        // pinta nada. Sin ella, la respuesta lenta de A BORRA la lista de B (y marca A como
+        // leida sin que se haya visto). Con Render despertando en frio pasa siempre.
+        if (canal !== canalActivo) return;
         cont.innerHTML = '';
         if (data && data.success && data.mensajes && data.mensajes.length) {
             data.mensajes.forEach(m => appendMensaje(m, m.autor_id === miId()));

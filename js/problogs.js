@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9b8cce7eac';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA } from './utils.js?v=b9fc40d1cb';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=d2130e8d0e';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=93551c628e';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -1298,6 +1298,9 @@ function comentarioHTML(c, respuestas) {
         ? '<button type="button" class="problog-comentario-accion" data-comentario-editar="' + c.id + '">Editar</button>'
             + '<button type="button" class="problog-comentario-accion peligro" data-comentario-eliminar="' + c.id + '">Eliminar</button>'
         : '';
+    // Rotulo «editado»: el backend ya lo guarda y lo devuelve (`editado`, problogController), pero
+    // aqui no se pintaba y en el cajon de Cavents si. Misma clase, asi se ve igual en los dos. (2026-10-18)
+    const rotuloEditado = c.editado ? '<span class="comentario-editado">editado</span>' : '';
     const hijos = (respuestas && respuestas.length)
         ? `<div class="problog-comentario-respuestas">${respuestas.map((r) => comentarioHTML(r, [])).join('')}</div>`
         : '';
@@ -1308,6 +1311,7 @@ function comentarioHTML(c, respuestas) {
                 <div class="problog-comentario-cab">
                     <span class="problog-comentario-autor">${renderText(autor)}</span>
                     <span class="problog-comentario-fecha">${escapeHtml(tiempoTranscurrido(c.created_at))}</span>
+                    ${rotuloEditado}
                 </div>
                 <p class="problog-comentario-texto">${renderText(c.texto || c.comentario)}</p>
                 <div class="problog-comentario-fila">

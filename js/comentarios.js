@@ -16,6 +16,10 @@ let tipoRecurso = 'obras';
 /** @type {HTMLElement | null} */
 let cardActual = null;
 let drawer, lista, input, btnEnviar, nav, bloqueoEl;
+// Envio en vuelo. El handler de Enter NO pasa por el boton, asi que `btnEnviar.disabled` no
+// frena un segundo Enter: sin esta bandera, dos Enter seguidos creaban DOS comentarios
+// identicos (el backend no deduplica). (2026-10-18)
+let enviandoComentario = false;
 
 // ── «Me gusta» que el servidor NO recuerda ────────────────────────────────────────────────────────────
 // La API de los comentarios de OBRA devuelve `id, texto, created_at, likes_count, autor_*` y **no** manda
@@ -471,11 +475,14 @@ function renderizarComentario(c, todosReplies) {
 
 /** @param {number|string|null} [parentId] */
 async function enviarComentario(parentId = null) {
+    // Guarda de reentrada: dos Enter seguidos (o Enter + clic) no deben crear dos comentarios.
+    if (enviandoComentario) return;
     const isReply = parentId !== null;
     const texto = isReply
         ? /** @type {HTMLInputElement | null} */ (document.querySelector(`.comentario-reply-input[data-parent="${parentId}"] .comentario-reply-field`))?.value.trim()
         : input.value.trim();
     if (!texto || !obraIdActual) return;
+    enviandoComentario = true;
     btnEnviar.disabled = true;
 
     try {
@@ -492,6 +499,7 @@ async function enviarComentario(parentId = null) {
     } catch (err) {
         alert('No se pudo enviar el comentario');
     } finally {
+        enviandoComentario = false;
         btnEnviar.disabled = false;
     }
 }
@@ -557,9 +565,15 @@ async function borrarComentario(item, commentId) {
     const btn = /** @type {HTMLButtonElement | null} */ (item.querySelector('.comentario-btn-borrar-si'));
     if (btn) { btn.disabled = true; btn.textContent = 'Eliminando…'; }
     try {
-        await apiRequest(baseComentarios() + '/' + commentId, { method: 'DELETE' });
-        // El contador de la tarjeta solo existe en las de obra, igual que al comentar.
-        if (tipoRecurso === 'obras') actualizarContador(cardActual, -1);
+        const res = await apiRequest(baseComentarios() + '/' + commentId, { method: 'DELETE' });
+        // El backend borra el HILO COMPLETO (padre + respuestas + nietos) y devuelve cuantas filas
+        // cayeron en `borrados`. Restar 1 dejaba la tarjeta por encima de la cuenta real: el contador
+        // de la obra es una SUBCUENTA COUNT(*), asi que el servidor ya lo tiene bien y aqui hay que
+        // restar lo mismo. Si la peticion fallo, NO se toca el contador. (2026-10-18)
+        if (!(res && res.success === false) && tipoRecurso === 'obras') {
+            const borrados = Number(res && res.borrados);
+            actualizarContador(cardActual, -(Number.isFinite(borrados) && borrados > 0 ? borrados : 1));
+        }
         await cargarComentarios(obraIdActual);
     } catch (err) {
         if (btn) { btn.disabled = false; btn.textContent = 'Sí, eliminar'; }

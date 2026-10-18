@@ -1315,6 +1315,13 @@ body.teclado-abierto .chat-enviar-btn {
     font-size: 18px;
     font-weight: 700;
 }
+/* En oscuro `--color-primary` se INVIERTE (vale #f5f5f5), asi que el `#fff` del texto dejaba la
+   inicial BLANCO SOBRE BLANCO: medido 1.09:1, invisible. Se pinta como sus hermanos
+   (`.chat-msg.own`, `.chat-enviar-btn`): gris medio + tinta clara, ~6:1. (2026-10-18) */
+[data-theme="dark"] .chat-conv-item-inicial {
+    background: var(--color-gray-300);
+    color: var(--color-ink);
+}
 .chat-conv-item-info {
     flex: 1;
     min-width: 0;
