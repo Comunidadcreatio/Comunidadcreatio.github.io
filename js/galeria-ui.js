@@ -9,6 +9,7 @@ import { artistaActual, token, esArtista } from './auth.js?v=8dbd042376';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=667eafb2c6';
 import { confirmarDescartarCambios } from './panel-ui.js?v=8222b22c85';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
+import { debugLog } from './utils.js?v=7e1398d254';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -570,6 +571,19 @@ export async function toggleExplorar() {
 // Al presionar el icono se abre Problogs (contenido por
 // implementar); al presionarlo de nuevo se vuelve a Cavents.
 // ============================================
+// Problogs registra aquí cómo recargarse: así galeria-ui no tiene que importarlo (habría ciclo:
+// perfil.js -> problogs.js -> galeria-ui.js -> perfil.js).
+/** @type {null | (() => Promise<any> | void)} */
+let refrescarProblogsFn = null;
+
+/**
+ * Lo llama problogs.js al arrancar: le dice a galeria-ui cómo recargar su feed.
+ * @param {() => Promise<any> | void} fn
+ */
+export function registrarRefrescoProblogs(fn) {
+    refrescarProblogsFn = fn;
+}
+
 export function toggleProblogs() {
     if (isTransitioning || gridEntering || gridExiting) return;
 
@@ -578,10 +592,11 @@ export function toggleProblogs() {
 
     if (problogs.classList.contains('hidden')) {
         switchSection(encontrarSeccionActual(), problogs);
-    } else {
-        // Volver a Cavents (galería en carrusel)
-        toggleGaleria(obtenerGaleriaContainer());
+        return;
     }
+    // Ya estamos en Problogs: se REFRESCA, igual que hace Cavents al volver a pulsar su icono.
+    // Antes esto volvía a Cavents, que es lo que no se esperaba al pulsar dos veces.
+    if (refrescarProblogsFn) refrescarConCirculo(problogs, refrescarProblogsFn);
 }
 
 // ============================================================
@@ -811,6 +826,39 @@ export async function triggerRefreshGrid() {
     container.style.paddingTop = '';
     container.style.scrollSnapType = 'none';
     await ejecutarRefreshGrid(container); // bloquea scroll durante la carga y lo restaura
+}
+
+/**
+ * Muestra EL MISMO círculo de refresco que Cavents, pero dentro de otra sección, mientras corre
+ * `tarea`. Lo usa el icono de Problogs al pulsarlo estando ya dentro (antes volvía a Cavents).
+ *
+ * Se reutiliza el elemento del PTR (`.pull-refresh-indicator`) para que sea exactamente el mismo
+ * dibujo y las mismas animaciones; al terminar se devuelve a la galería, que es su sitio.
+ *
+ * @param {HTMLElement} seccion  Dónde se quiere ver el círculo (p. ej. `#problogs`).
+ * @param {() => Promise<any> | void} tarea  La recarga que se hace detrás del círculo.
+ */
+export async function refrescarConCirculo(seccion, tarea) {
+    if (!seccion || ptrRefreshing) return;
+    const cont = obtenerGaleriaContainer();
+    if (!ptrIndicator) createPTRIndicator(cont || seccion);
+    if (!ptrIndicator) return;
+    ptrRefreshing = true;
+    seccion.insertBefore(ptrIndicator, seccion.firstChild);
+    setPtrState('visible', 'loading');
+    setPtrProgress(0.75); // arco de 270° girando, igual que durante la carga de Cavents
+    try {
+        await tarea();
+    } catch (e) {
+        debugLog.error('refresco con círculo:', e);
+    } finally {
+        setPtrProgress(1);
+        setPtrState('visible', 'done');
+        await new Promise((r) => setTimeout(r, 420)); // el pop de confirmación
+        setPtrState();
+        ptrRefreshing = false;
+        if (cont) ptrReparent(cont); // el círculo vuelve a la galería
+    }
 }
 
 // El indicador vive donde corresponde según el modo:

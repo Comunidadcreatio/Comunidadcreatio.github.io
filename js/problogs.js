@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=7da631dcf6';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs } from './galeria-ui.js?v=af9b1f5a9f';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=15108bd8e2';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -2302,6 +2302,14 @@ export function volverDesdeLectura() {
 
 export function setupProblogs() {
     form = document.getElementById('problog-form');
+
+    // El icono de Problogs del nav, pulsado OTRA VEZ estando ya dentro, refresca el feed con el
+    // MISMO círculo que Cavents (antes volvía a Cavents). galeria-ui no puede importarnos (sería
+    // un ciclo), así que le dejamos aquí cómo recargar.
+    registrarRefrescoProblogs(() => {
+        feedCargado = false;
+        return cargarFeed();
+    });
 
     // La pestaña Problogs del perfil avisa por evento: perfil.js no puede
     // importarnos sin crear un ciclo de módulos. Se registra ANTES del corte de
