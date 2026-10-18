@@ -42,6 +42,21 @@ export function encontrarSeccionActual() {
     return document.getElementById('pagina-blanca');
 }
 
+/**
+ * Cambia a la sección `id` con la transición normal (fundido con desenfoque).
+ * Lo usa el chat: antes enseñaba su sección a mano y por eso tenía una animación propia
+ * (`chatSlideUp`) distinta a la del resto. Ahora entra igual que cualquier otra sección.
+ * @param {string} id
+ * @param {() => void} [callback]
+ * @returns {boolean}  false si esa sección no existe en la página.
+ */
+export function cambiarSeccion(id, callback) {
+    const destino = document.getElementById(id);
+    if (!destino) return false;
+    switchSection(encontrarSeccionActual(), destino, callback);
+    return true;
+}
+
 function switchSection(sectionSaliente, sectionEntrante, callback) {
     // Cualquier navegación empieza cerrando las capas flotantes (vista previa
     // de Problogs, cajón de comentarios, modal de descripción). Antes quedaban
@@ -158,9 +173,11 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
         sectionSaliente.classList.remove('section-entering');
         sectionSaliente.classList.add('section-exiting');
         sectionSaliente.addEventListener('animationend', function onExit(e) {
-            // Solo la animación de salida (sectionExit) debe disparar el cambio:
-            // un animationend de OTRA animación (p.ej. chatSlideUp al reabrir el
-            // chat) no debe ocultar la sección entrante.
+            // Solo la animación de salida (sectionExit) debe disparar el cambio: un
+            // `animationend` de OTRA animación que tenga la sección por cualquier motivo no
+            // debe ocultar la entrante. Ya no hay ninguna sección con animación propia (el
+            // chat perdió la suya, `chatSlideUp`, al entrar por este mismo camino), pero el
+            // filtro se queda: es barato y evita que vuelva a pasar.
             if (e && e.animationName && e.animationName !== 'sectionExit') return;
             sectionSaliente.removeEventListener('animationend', onExit);
             sectionSaliente.classList.remove('section-exiting');

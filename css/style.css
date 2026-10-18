@@ -28,7 +28,7 @@
 @import url('galeria-publica.css?v=ba319203b9');
 
 /* Chat global + privado */
-@import url('chat.css?v=e7a99bafea');
+@import url('chat.css?v=474324b544');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
@@ -1378,8 +1378,9 @@
 #perfil-usuario.section-entering,
 #resultados-busqueda.section-entering,
 #pagina-blanca.section-entering,
+#chat-global.section-entering,
 #problogs.section-entering {
-    animation: sectionEnter 0.33s ease-out forwards;
+    animation: sectionEnter 0.25s ease-out forwards;
 }
 
 #galeria-publica.section-exiting,
@@ -1390,7 +1391,7 @@
 #pagina-blanca.section-exiting,
 #problogs.section-exiting,
 #chat-global.section-exiting {
-    animation: sectionExit 0.26s ease-in forwards;
+    animation: sectionExit 0.19s ease-in forwards;
 }
 
 /* El MISMO movimiento en el camino de View Transitions.
@@ -1401,10 +1402,10 @@
 @media (prefers-reduced-motion: no-preference) {
     @layer utilities {
         ::view-transition-old(seccion-saliente) {
-            animation: 260ms ease-in both seccionVtSalir;
+            animation: 190ms ease-in both seccionVtSalir;
         }
         ::view-transition-new(seccion-activa) {
-            animation: 330ms cubic-bezier(0.22, 1, 0.36, 1) both seccionVtEntrar;
+            animation: 250ms cubic-bezier(0.22, 1, 0.36, 1) both seccionVtEntrar;
         }
     }
 }

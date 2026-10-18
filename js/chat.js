@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=755422aff2';
 import { artistaActual } from './auth.js?v=08fb1f14f1';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=adc837ce30';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha } from './galeria-ui.js?v=dfda9c5a65';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=97e5de37c4';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -783,22 +783,38 @@ function abrirChat() {
     }
     const seccion = /** @type {HTMLElement} */ (document.getElementById('chat-global'));
     const actual = encontrarSeccionActual();
-    // El chat no pasa por switchSection: sin esto, una vista previa o el cajón
-    // de comentarios abiertos seguirían por encima del chat con el fondo fijo.
+
+    // Lo interno del chat se prepara YA, no en el callback de la transición: así el directorio
+    // va cargando MIENTRAS dura el fundido, en vez de aparecer vacío y llenarse después.
+    // Siempre arranca en el directorio (sala y conversaciones cerradas).
+    const preparar = () => {
+        /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
+        /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
+        /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.remove('hidden');
+        actualizarFlechaConversaciones(false); // en el directorio el icono es el original
+        chatAbierto = true;
+        cargarDirectorio();
+        refrescarChatNoLeidos(); // badges al abrir el chat
+        setFabVisible(true); // en el directorio, el FAB de la sala global sí se muestra
+        actualizarEstadoNavButtons();
+    };
+
+    // Con otra transición en marcha (o si ya estamos en el chat) se enseña de inmediato: si se
+    // llamara a `cambiarSeccion` estando ocupada, `switchSection` sale sin hacer nada y el toque
+    // se perdería sin abrir el chat.
+    if (actual && actual !== seccion && !isTransitioningNow()) {
+        preparar();
+        cambiarSeccion('chat-global'); // el MISMO fundido con desenfoque que el resto
+        return;
+    }
+
+    // Camino inmediato. Cierra antes las capas flotantes: si no, una vista previa o el cajón
+    // de comentarios se quedarían por encima del chat con el fondo congelado.
     cerrarOverlaysFlotantes();
     if (actual && actual !== seccion) actual.classList.add('hidden');
     seccion.classList.remove('hidden');
-    actualizarVisibilidadIconosHeader(seccion); // el chat no pasa por mostrarSeccion
-    // Siempre arranca en el directorio (sala y conversaciones cerradas)
-    /** @type {HTMLElement} */ (document.getElementById('chat-sala')).classList.add('hidden');
-    /** @type {HTMLElement} */ (document.getElementById('chat-conversaciones')).classList.add('hidden');
-    /** @type {HTMLElement} */ (document.getElementById('chat-directorio')).classList.remove('hidden');
-    actualizarFlechaConversaciones(false); // en el directorio el icono es el original
-    chatAbierto = true;
-    cargarDirectorio();
-    refrescarChatNoLeidos(); // badges al abrir el chat
-    setFabVisible(true); // en el directorio, el FAB de la sala global sí se muestra
-    actualizarEstadoNavButtons();
+    actualizarVisibilidadIconosHeader(seccion);
+    preparar();
 }
 
 // Acceso directo a la sala global desde el botón flotante (FAB)
