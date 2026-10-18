@@ -9,7 +9,6 @@ import { artistaActual, token, esArtista } from './auth.js?v=8dbd042376';
 import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=667eafb2c6';
 import { confirmarDescartarCambios } from './panel-ui.js?v=8222b22c85';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
-import { conTransicion, hayViewTransitions, menosMovimiento } from './utils.js?v=7e1398d254';
 
 // Variable de control para el modo de galería: 0=oculta, 1=vista normal, 2=vista grid
 export let galeriaModo = 0;
@@ -43,7 +42,7 @@ export function encontrarSeccionActual() {
 }
 
 /**
- * Cambia a la sección `id` con la transición normal (fundido con desenfoque).
+ * Cambia a la sección `id` de forma INSTANTÁNEA (sin animación, por petición expresa).
  * Lo usa el chat: antes enseñaba su sección a mano y por eso tenía una animación propia
  * (`chatSlideUp`) distinta a la del resto. Ahora entra igual que cualquier otra sección.
  * @param {string} id
@@ -78,7 +77,7 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
 
     // Al salir de Explorar (grid + etiquetas) hacia OTRA sección, ocultar las
     // etiquetas INMEDIATAMENTE, igual que el grid: quitar search-abierto al
-    // iniciar la transición. Antes se quitaba al terminar (en mostrarSeccion)
+    // iniciar el cambio. Antes se quitaba al terminar la transición
     // y las etiquetas (fixed bajo el header) quedaban visibles unos segundos,
     // bajándose y cortadas sobre la sección nueva.
     if (document.body.classList.contains('search-abierto') &&
@@ -93,109 +92,20 @@ function switchSection(sectionSaliente, sectionEntrante, callback) {
 
     isTransitioning = true;
 
-    // CON MENOS MOVIMIENTO: el cambio se hace DIRECTAMENTE, sin animaciones ni esperas.
-    // Hace falta este camino propio porque el de siempre espera al evento `animationend`,
-    // y con las animaciones a 0,01ms (que es lo que pide el bloque de style.css) ese evento
-    // PUEDE NO LLEGAR: la animación termina antes del primer fotograma y el navegador no lo
-    // dispara. El resultado era que la sección no se abría nunca y quien tiene activado
-    // "reducir movimiento" en su sistema se quedaba con la pantalla vacía. Lo encontró el
-    // verificador de menos movimiento (scripts/verificar-menos-movimiento.mjs).
-    if (menosMovimiento()) {
-        for (const id of SECCIONES) {
-            const el = document.getElementById(id);
-            if (el && el !== sectionEntrante) el.classList.add('hidden');
-        }
-        sectionEntrante.classList.remove('hidden', 'section-exiting', 'section-entering');
-        actualizarVisibilidadIconosHeader(sectionEntrante);
-        actualizarEstadoNavButtons();
-        isTransitioning = false;
-        if (callback) callback();
-        return;
+    // SIN ANIMACIÓN (petición expresa): el cambio entre secciones es INSTANTÁNEO, en los dos
+    // caminos (con y sin View Transitions). Antes había un fundido con desenfoque; se quitó
+    // entero, junto con las clases .section-entering / .section-exiting y sus keyframes.
+    // Se conserva el candado `isTransitioning` para que un doble toque no encadene cambios.
+    for (const id of SECCIONES) {
+        const el = document.getElementById(id);
+        if (!el || el === sectionEntrante) continue;
+        el.classList.add('hidden');
     }
-
-    // CON VIEW TRANSITIONS (si el navegador las trae): un solo paso. Se oculta la
-    // sección que sale y se enseña la que entra DENTRO de la transición, sin las
-    // animaciones por clase ni las esperas de `animationend`. El marco (cabecera y
-    // menú) se queda quieto porque tiene su propio `view-transition-name` en el CSS.
-    // Si el navegador no las trae, se sigue por el camino de siempre (más abajo).
-    if (hayViewTransitions()) {
-        // Las dos secciones llevan su PROPIO nombre solo mientras dura el cambio: así la
-        // transición anima únicamente ellas (fundido con desenfoque, en style.css) y el fondo
-        // con la foto se queda quieto. Sin esto, el `root` lo arrastraba todo y el cambio
-        // parecía un temblor de la pantalla entera. Se quitan al ACABAR la animación.
-        const saliente = sectionSaliente;
-        if (saliente) saliente.style.viewTransitionName = 'seccion-saliente';
-        sectionEntrante.style.viewTransitionName = 'seccion-activa';
-        // El CLUSTER DE SALAS del chat (Global / Jurado) es `position: fixed` y vive FUERA de
-        // la sección: sin nombre propio se queda fuera de las dos imágenes y aparece de golpe,
-        // sin fundido, como si no fuera con el cambio. Con nombre viaja en la misma transición.
-        const cluster = document.getElementById('chat-cluster');
-        const tocaChat = (saliente && saliente.id === 'chat-global') || sectionEntrante.id === 'chat-global';
-        if (cluster && tocaChat) cluster.style.viewTransitionName = 'chat-cluster';
-        const limpiarNombres = () => {
-            if (saliente) saliente.style.viewTransitionName = '';
-            sectionEntrante.style.viewTransitionName = '';
-            if (cluster) cluster.style.viewTransitionName = '';
-        };
-        conTransicion(() => {
-            for (const id of SECCIONES) {
-                const el = document.getElementById(id);
-                if (el && el !== sectionEntrante) el.classList.add('hidden');
-            }
-            sectionEntrante.classList.remove('hidden', 'section-exiting');
-            actualizarVisibilidadIconosHeader(sectionEntrante);
-            actualizarEstadoNavButtons();
-        }, limpiarNombres).then(() => {
-            isTransitioning = false;
-            if (callback) callback();
-        });
-        return;
-    }
-
-    let safetyFired = false;
-    const safetyTimeout = setTimeout(() => {
-        safetyFired = true;
-        isTransitioning = false;
-        for (const id of SECCIONES) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.remove('section-entering', 'section-exiting');
-                el.classList.add('hidden');
-            }
-        }
-        if (sectionEntrante && document.getElementById(sectionEntrante.id)) {
-            sectionEntrante.classList.remove('hidden');
-            actualizarVisibilidadIconosHeader(sectionEntrante);
-            if (callback) callback();
-        }
-    }, 800);
-
-    function finish() {
-        if (safetyFired) return;
-        clearTimeout(safetyTimeout);
-        // isTransitioning se libera al terminar la animación de ENTRADA (en mostrarSeccion)
-    }
-
-    if (sectionSaliente) {
-        sectionSaliente.classList.remove('section-entering');
-        sectionSaliente.classList.add('section-exiting');
-        sectionSaliente.addEventListener('animationend', function onExit(e) {
-            // Solo la animación de salida (sectionExit) debe disparar el cambio: un
-            // `animationend` de OTRA animación que tenga la sección por cualquier motivo no
-            // debe ocultar la entrante. Ya no hay ninguna sección con animación propia (el
-            // chat perdió la suya, `chatSlideUp`, al entrar por este mismo camino), pero el
-            // filtro se queda: es barato y evita que vuelva a pasar.
-            if (e && e.animationName && e.animationName !== 'sectionExit') return;
-            sectionSaliente.removeEventListener('animationend', onExit);
-            sectionSaliente.classList.remove('section-exiting');
-            sectionSaliente.classList.add('hidden');
-            finish();
-            mostrarSeccion(sectionEntrante, callback);
-        }, { once: true });
-    } else {
-        finish();
-        mostrarSeccion(sectionEntrante, callback);
-    }
+    sectionEntrante.classList.remove('hidden');
+    actualizarVisibilidadIconosHeader(sectionEntrante);
+    actualizarEstadoNavButtons();
+    isTransitioning = false;
+    if (callback) callback();
 }
 
 // Iconos del header condicionales (mismo patrón):
@@ -305,7 +215,7 @@ function actualizarVisibilidadIconosHeader(section) {
     if (!esExplorar) visibilidadIconoHeader(notif, true);
     sincronizarIconosDerecha();
 }
-// Exportado para chat.js (abre/cierra su sección sin pasar por mostrarSeccion)
+// Exportado para chat.js (abre/cierra su sección por su cuenta)
 export { actualizarVisibilidadIconosHeader, actualizarModoFlecha };
 
 // ============================================
@@ -368,23 +278,6 @@ export function volverDesdeIcono() {
     }
 }
 
-function mostrarSeccion(section, callback) {
-    if (!section) return;
-    section.classList.remove('hidden', 'section-exiting');
-    actualizarVisibilidadIconosHeader(section);
-    actualizarEstadoNavButtons();
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            section.classList.add('section-entering');
-            section.addEventListener('animationend', function onEnter() {
-                section.removeEventListener('animationend', onEnter);
-                section.classList.remove('section-entering');
-                isTransitioning = false;
-                if (callback) callback();
-            }, { once: true });
-        });
-    });
-}
 
 export function ocultarTodasLasSecciones() {
     // Cerrar sesión / ir a la página en blanco también debe retirar las capas
@@ -395,7 +288,6 @@ export function ocultarTodasLasSecciones() {
     SECCIONES.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            el.classList.remove('section-entering', 'section-exiting');
             el.classList.add('hidden');
         }
     });

@@ -694,19 +694,25 @@ else {
   check('el botón de Problogs existe en el nav principal', nav.existe && nav.enElNav);
   check('el icono Problogs del header ya no está', nav.iconoEnHeader === false);
 }
-await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
-// La sección entra con una transición (~0.8s): se espera a que termine de
-// verdad en vez de mirar a los 1.5s y dar por hecho que ya está.
+// El cambio de sección es INSTANTÁNEO desde 2026-10-18: ya no hay `.section-entering` que
+// esperar. Antes este bucle esperaba a que esa clase desapareciera, así que ahora habría
+// comprobado en el mismo instante del clic y a veces pillaba la sección aún sin abrir (el
+// botón ignora el toque si otra transición del grid está en curso). Se espera a la CONDICIÓN
+// que de verdad importa —sección abierta y botón marcado— y se reintenta el clic si el
+// primero se ignoró, sin volver a pulsar cuando ya está abierta (el botón es un toggle).
 let abierto = null;
-for (let i = 0; i < 20; i++) {
-  abierto = JSON.parse((await evalJs(`(() => {
-      const sec = document.getElementById('problogs');
-      const btn = document.getElementById('btn-problogs-nav');
-      const entrada = sec ? sec.classList.contains('section-entering') : false;
-      return JSON.stringify({ abierta: !!sec && !sec.classList.contains('hidden'), activo: !!btn && btn.classList.contains('nav-btn-active'), entrada });
-  })()`)) || 'null');
-  if (abierto && abierto.abierta && !abierto.entrada) break;
-  await sleep(300);
+for (let intento = 0; intento < 4; intento++) {
+  await evalJs(`document.getElementById('btn-problogs-nav')?.click()`);
+  for (let i = 0; i < 10; i++) {
+    await sleep(200);
+    abierto = JSON.parse((await evalJs(`(() => {
+        const sec = document.getElementById('problogs');
+        const btn = document.getElementById('btn-problogs-nav');
+        return JSON.stringify({ abierta: !!sec && !sec.classList.contains('hidden'), activo: !!btn && btn.classList.contains('nav-btn-active') });
+    })()`)) || 'null');
+    if (abierto && abierto.abierta) break;
+  }
+  if (abierto && abierto.abierta) break;
 }
 if (!abierto) { check('el botón abre Problogs', false); }
 else {
