@@ -871,8 +871,8 @@
     transition: color 0.3s ease, transform 0.15s ease;
 }
 .toggle-nav-btn svg {
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
     display: block;
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
@@ -966,8 +966,8 @@
     flex-shrink: 0;
     z-index: 2;
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     transition: transform 0.2s ease;
 }
 .btn-perfil-circular:hover {
@@ -975,8 +975,8 @@
 }
 .btn-perfil-circular .perfil-avatar-img {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
     background-color: var(--color-gray-200);
@@ -1433,8 +1433,8 @@
     
 
     .toggle-nav-btn svg {
-        width: 20px;
-        height: 20px;
+        width: 30px;
+        height: 30px;
     }
 
     #btn-logout-sidebar { 
@@ -1932,4 +1932,29 @@
     margin: 8px 0 0;
     font-size: 13px;
     color: var(--color-gray-400);
+}
+
+
+/* Móviles MUY estrechos (≤ 340 px): los siete botones con iconos de 34 px y el avatar de 48 px
+   sumaban 324 px y desbordaban los 288 disponibles (320 − 32 de padding). Aquí bajan un poco.
+   Medido a 320 / 360 / 420 px. (2026-10-18) */
+@media (max-width: 340px) {
+    .toggle-nav-btn {
+        padding: 2px 4px;
+    }
+    .toggle-nav-btn svg {
+        width: 28px;
+        height: 28px;
+    }
+    .btn-perfil-circular {
+        width: 42px;
+        height: 42px;
+    }
+    .btn-perfil-circular .perfil-avatar-img {
+        width: 36px;
+        height: 36px;
+    }
+    .toggle-label {
+        font-size: 7px;
+    }
 }

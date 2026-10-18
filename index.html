@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.734';
+        var currentVer = '1.0.735';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=352b63a6e0">
+    <link rel="stylesheet" href="css/style.css?v=c9378841b6">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -213,9 +213,6 @@
             <button id="btn-perfil-sidebar" class="btn-perfil-circular" aria-label="Perfil de usuario" aria-expanded="false">
                 <img id="perfil-avatar-mini" class="perfil-avatar-img" src="iconos/avatar-default.svg" alt="Foto de perfil">
             </button>
-            <!-- Etiqueta bajo el avatar, como el resto de iconos del nav. aria-hidden porque el
-                 botón ya tiene su aria-label («Perfil de usuario»). -->
-            <span class="toggle-label" aria-hidden="true">Mi Perfil</span>
         </div>
         <div class="bottom-bar-right">
             <button id="btn-buscar" class="toggle-nav-btn" aria-label="Buscar artista">
