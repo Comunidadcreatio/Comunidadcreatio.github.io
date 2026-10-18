@@ -156,13 +156,20 @@
             <button id="btn-chat-global" class="toggle-nav-btn" aria-label="Chat">
                 <span class="chat-nav-icon-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <!-- Iconos del nav en ESTILO SÓLIDO (elegido 2026-10-18): silueta rellena y
-                             los detalles en negativo, con el color del fondo del nav
-                             (var(--color-white) vale para claro y oscuro: #fff / #0a0a0a). -->
-                        <path d="M4 5.2A1.7 1.7 0 0 1 5.7 3.5h12.6A1.7 1.7 0 0 1 20 5.2v8.4a1.7 1.7 0 0 1-1.7 1.7H9.4L4 20.4V5.2z" fill="currentColor"></path>
-                        <circle cx="8.5" cy="9.4" r="1.15" fill="var(--color-white)"></circle>
-                        <circle cx="12" cy="9.4" r="1.15" fill="var(--color-white)"></circle>
-                        <circle cx="15.5" cy="9.4" r="1.15" fill="var(--color-white)"></circle>
+                        <!-- Iconos del nav en ESTILO SÓLIDO. Los detalles NO se pintan de un color:
+                             se RECORTAN con una máscara, así que quedan TRANSPARENTES y dejan ver el
+                             fondo del nav (que en oscuro es semitransparente). Antes se pintaban con
+                             var(--color-white), que en oscuro es un #0a0a0a OPACO: por eso los
+                             huecos se veían negros en vez de fundirse con la barra. (2026-10-18) -->
+                        <defs>
+                            <mask id="nav-mask-chat">
+                                <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                                <circle cx="8.5" cy="9.4" r="1.15" fill="#000"></circle>
+                                <circle cx="12" cy="9.4" r="1.15" fill="#000"></circle>
+                                <circle cx="15.5" cy="9.4" r="1.15" fill="#000"></circle>
+                            </mask>
+                        </defs>
+                        <path d="M4 5.2A1.7 1.7 0 0 1 5.7 3.5h12.6A1.7 1.7 0 0 1 20 5.2v8.4a1.7 1.7 0 0 1-1.7 1.7H9.4L4 20.4V5.2z" fill="currentColor" mask="url(#nav-mask-chat)"></path>
                     </svg>
                     <span id="chat-nav-badge" class="chat-nav-badge hidden"></span>
                 </span>
@@ -170,11 +177,16 @@
             </button>
             <button id="btn-cavents-hub" class="toggle-nav-btn" aria-label="Cavents">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Caballete (sólido): marco relleno con el LIENZO EN NEGATIVO (hueco) +
+                    <!-- Caballete (sólido): marco relleno con el LIENZO RECORTADO (transparente) +
                          patas y repisa en trazo. Con el lienzo relleno se leía como una silla;
-                         hueco se lee «cuadro sobre caballete». (2026-10-18) -->
-                    <rect x="6.5" y="2" width="11" height="10.5" rx="1" fill="currentColor"></rect>
-                    <rect x="7.9" y="3.4" width="8.2" height="7.7" rx="0.4" fill="var(--color-white)"></rect>
+                         recortado se lee «cuadro sobre caballete». -->
+                    <defs>
+                        <mask id="nav-mask-cavents">
+                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                            <rect x="7.9" y="3.4" width="8.2" height="7.7" rx="0.4" fill="#000"></rect>
+                        </mask>
+                    </defs>
+                    <rect x="6.5" y="2" width="11" height="10.5" rx="1" fill="currentColor" mask="url(#nav-mask-cavents)"></rect>
                     <path d="M12 12.5v8.5M8.5 12.5L5 21M15.5 12.5L19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                     <path d="M5.5 17.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                 </svg>
@@ -185,9 +197,14 @@
                  sigue en el CENTRO del nav y "Buscar" a la derecha. (2026-10-18) -->
             <button id="btn-problogs-nav" class="toggle-nav-btn" aria-label="Problogs">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Pluma (sólida): silueta rellena y el cañón en negativo. -->
-                    <path d="M4 20c4.6 0 8.7-2.6 11.2-7.2C16.9 10 18.3 7.8 20.5 6.8c-.7 4.6-2.7 8.3-6.2 10.9C11.5 19.6 7.9 20 4 20z" fill="currentColor"></path>
-                    <path d="M6 18l8.2-8.2" fill="none" stroke="var(--color-white)" stroke-width="1.5" stroke-linecap="round"></path>
+                    <!-- Pluma (sólida): silueta rellena y el cañón RECORTADO (transparente). -->
+                    <defs>
+                        <mask id="nav-mask-problogs">
+                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                            <path d="M6 18l8.2-8.2" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
+                        </mask>
+                    </defs>
+                    <path d="M4 20c4.6 0 8.7-2.6 11.2-7.2C16.9 10 18.3 7.8 20.5 6.8c-.7 4.6-2.7 8.3-6.2 10.9C11.5 19.6 7.9 20 4 20z" fill="currentColor" mask="url(#nav-mask-problogs)"></path>
                 </svg>
                 <span class="toggle-label">Problogs</span>
             </button>
@@ -210,20 +227,30 @@
                  que los tres iconos de la izquierda. (2026-10-18) -->
             <button id="btn-comcons-nav" class="toggle-nav-btn" aria-label="Comcons">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Medalla (sólida): cinta, disco relleno y el aro interior en negativo. -->
+                    <!-- Medalla (sólida): cinta, disco relleno y el aro interior RECORTADO. -->
+                    <defs>
+                        <mask id="nav-mask-comcons">
+                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                            <circle cx="12" cy="8" r="2.7" fill="#000"></circle>
+                        </mask>
+                    </defs>
                     <path d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11z" fill="currentColor"></path>
-                    <circle cx="12" cy="8" r="6" fill="currentColor"></circle>
-                    <circle cx="12" cy="8" r="2.7" fill="var(--color-white)"></circle>
+                    <circle cx="12" cy="8" r="6" fill="currentColor" mask="url(#nav-mask-comcons)"></circle>
                 </svg>
                 <span class="toggle-label">Comcons</span>
             </button>
             <!-- Web: información sobre Creatio (globo). -->
             <button id="btn-web-nav" class="toggle-nav-btn" aria-label="Sobre Creatio">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Globo (sólido): disco relleno y meridianos en negativo. -->
-                    <circle cx="12" cy="12" r="9" fill="currentColor"></circle>
-                    <path d="M3 12h18" fill="none" stroke="var(--color-white)" stroke-width="1.5" stroke-linecap="round"></path>
-                    <path d="M12 3c3 3.4 3 14.6 0 18M12 3c-3 3.4-3 14.6 0 18" fill="none" stroke="var(--color-white)" stroke-width="1.5" stroke-linecap="round"></path>
+                    <!-- Globo (sólido): disco relleno con los meridianos RECORTADOS (transparentes). -->
+                    <defs>
+                        <mask id="nav-mask-web">
+                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                            <path d="M3 12h18" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
+                            <path d="M12 3c3 3.4 3 14.6 0 18M12 3c-3 3.4-3 14.6 0 18" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
+                        </mask>
+                    </defs>
+                    <circle cx="12" cy="12" r="9" fill="currentColor" mask="url(#nav-mask-web)"></circle>
                 </svg>
                 <span class="toggle-label">Web</span>
             </button>
