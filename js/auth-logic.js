@@ -11,6 +11,7 @@ import {
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
 } from './biometric-login.js?v=446ba56b52';
+import { initCustomSelect } from './custom-select.js?v=6f849e0816';
 
 // ============================================
 // VARIABLES GLOBALES
@@ -62,6 +63,7 @@ function poblarCiudades(paisSeleccionado) {
                     // Disparar evento change para validación
                     hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
                     dropdown.classList.remove('open');
+                    trigger.setAttribute('aria-expanded', 'false');
                 });
                 dropdown.appendChild(item);
             });
@@ -76,96 +78,33 @@ function paisChangeHandler() {
     }
 }
 
-// Convierte un <select> en dropdown custom (transparente, fixed, blur)
-function initCustomSelect(selectEl, placeholder) {
-    if (!selectEl || selectEl.dataset.customReady === '1') return;
-    selectEl.dataset.customReady = '1';
-    selectEl.style.display = 'none';
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'custom-select';
-    selectEl.parentNode.insertBefore(wrapper, selectEl);
-    wrapper.appendChild(selectEl);
-
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'custom-select-trigger';
-    trigger.textContent = placeholder || 'Seleccionar';
-    wrapper.appendChild(trigger);
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'custom-select-dropdown';
-    wrapper.appendChild(dropdown);
-
-    function buildOptions() {
-        dropdown.innerHTML = '';
-        Array.from(selectEl.querySelectorAll('option')).forEach(opt => {
-            if (opt.disabled && !opt.value) return; // skip placeholder
-            const item = document.createElement('div');
-            item.className = 'custom-select-option';
-            item.textContent = opt.textContent;
-            item.dataset.value = opt.value;
-            item.addEventListener('click', () => {
-                selectEl.value = opt.value;
-                trigger.textContent = opt.textContent;
-                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-                dropdown.classList.remove('open');
-            });
-            dropdown.appendChild(item);
-        });
-    }
-
-    function positionDropdown() {
-        const rect = trigger.getBoundingClientRect();
-        dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = Math.max(0, Math.min(rect.left, window.innerWidth - rect.width - 24)) + 'px';
-        dropdown.style.width = rect.width + 'px';
-    }
-
-    trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const isOpen = dropdown.classList.contains('open');
-        if (!isOpen) {
-            buildOptions();
-            positionDropdown();
-        }
-        dropdown.classList.toggle('open');
-    });
-
-    window.addEventListener('scroll', () => {
-        if (dropdown.classList.contains('open')) positionDropdown();
-    }, { passive: true });
-    window.addEventListener('resize', () => {
-        if (dropdown.classList.contains('open')) positionDropdown();
-    }, { passive: true });
-
-    document.addEventListener('click', (e) => {
-        if (!(e.target instanceof Element) || !e.target.closest('.custom-select')) {
-            dropdown.classList.remove('open');
-        }
-    });
-
-    // Sync trigger text if select changes programmatically
-    selectEl.addEventListener('change', () => {
-        const selected = selectEl.selectedOptions[0];
-        if (selected) trigger.textContent = selected.textContent;
-    });
+// El conversor de <select> a desplegable propio vive en `custom-select.js`: el panel ya tenia
+// la version ACCESIBLE (role=combobox, aria-expanded/controls/activedescendant y teclado) y el
+// registro se habia quedado con una copia vieja que solo funcionaba con raton. Una sola
+// implementacion para los dos. (2026-10-18)
+/**
+ * `getElementById` devuelve `HTMLElement | null`, pero estos son `<select>`: se anota para que el
+ * tipo cuadre con el de `initCustomSelect` (que necesita `.options` y `.selectedOptions`).
+ * @param {string} id
+ * @returns {HTMLSelectElement | null}
+ */
+function selectPorId(id) {
+    return /** @type {HTMLSelectElement | null} */ (document.getElementById(id));
 }
 
 function setupAllCustomSelects() {
     // Rol (paso 1). FALTABA en esta lista: `#reg-rol` se quedaba como `<select>` nativo y por eso
     // su desplegable se abria con el estilo del sistema, distinto del resto. Es el mismo caso que
     // `#reg-pais`, que ya estaba convertido. (2026-10-16)
-    initCustomSelect(document.getElementById('reg-rol'), '¿Cómo participarás?');
+    initCustomSelect(selectPorId('reg-rol'), '¿Cómo participarás?');
     // País
-    initCustomSelect(document.getElementById('reg-pais'), 'Selecciona tu país');
+    initCustomSelect(selectPorId('reg-pais'), 'Selecciona tu país');
     // Fecha
-    initCustomSelect(document.getElementById('reg-dia'), 'Día');
-    initCustomSelect(document.getElementById('reg-mes'), 'Mes');
-    initCustomSelect(document.getElementById('reg-ano'), 'Año');
+    initCustomSelect(selectPorId('reg-dia'), 'Día');
+    initCustomSelect(selectPorId('reg-mes'), 'Mes');
+    initCustomSelect(selectPorId('reg-ano'), 'Año');
     // Género
-    initCustomSelect(document.getElementById('reg-genero'), 'Selecciona Género');
+    initCustomSelect(selectPorId('reg-genero'), 'Selecciona Género');
 }
 
 // Ejecutar al cargar
@@ -194,6 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isOpen = dropdown.classList.contains('open');
         if (!isOpen) positionDropdown();
         dropdown.classList.toggle('open');
+        // El estado tiene que ANUNCIARSE: sin esto un lector de pantalla dice siempre «contraido».
+        trigger.setAttribute('aria-expanded', String(!isOpen));
     });
 
     window.addEventListener('scroll', () => {
@@ -207,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         if (!(e.target instanceof Element) || !e.target.closest('.custom-select')) {
             dropdown.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
         }
     });
 });

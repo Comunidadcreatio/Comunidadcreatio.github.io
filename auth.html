@@ -175,6 +175,7 @@
             <p class="reg-step-subtitle">Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña. Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.</p>
             <form id="solicitar-restablecimiento-form" novalidate>
                 <div class="form-group">
+                    <label for="forgot-email" class="visually-hidden">Correo electrónico</label>
                     <input type="email" id="forgot-email" placeholder="Correo electrónico" autocomplete="email" required data-required="true">
                 </div>
                 <button type="submit" id="btn-enviar-reset" style="margin-bottom:6px;">Enviar enlace</button>
@@ -193,6 +194,7 @@
                     <p class="reg-step-subtitle">Cuéntanos tu rol en la comunidad. Todos pueden explorar; solo los artistas publican Cavents.</p>
                     <!-- Rol del usuario: artista, coleccionista, comprador, curador o galería -->
                     <div class="form-group" style="margin-bottom:12px;">
+                        <label for="reg-rol" class="visually-hidden">Rol en la comunidad</label>
                         <select id="reg-rol" required data-required="true">
                             <option value="" disabled selected>¿Cómo participarás?</option>
                             <option value="artista">Soy artista</option>
@@ -204,9 +206,11 @@
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group">
+                            <label for="reg-nombres" class="visually-hidden">Nombres</label>
                             <input type="text" id="reg-nombres" placeholder="Nombres" autocomplete="given-name" required data-required="true">
                         </div>
                         <div class="form-group">
+                            <label for="reg-apellidos" class="visually-hidden">Apellidos</label>
                             <input type="text" id="reg-apellidos" placeholder="Apellidos" autocomplete="family-name" required data-required="true">
                         </div>
                     </div>
@@ -221,6 +225,7 @@
                     <h2 class="reg-step-title">¿Dónde te encuentras?</h2>
                     <p class="reg-step-subtitle">Selecciona tu país y ciudad para conectar con artistas cercanos.</p>
                     <div class="form-group">
+                        <label for="reg-pais" class="visually-hidden">País</label>
                         <select id="reg-pais" required data-required="true" autocomplete="off">
                             <option value="" disabled selected>Selecciona tu país</option>
                             <option value="Venezuela">Venezuela</option>
@@ -229,7 +234,10 @@
                     <div class="form-group">
                         <input type="hidden" id="reg-ciudad" value="">
                         <div class="custom-select" id="custom-ciudad">
-                            <button type="button" class="custom-select-trigger" id="ciudad-trigger">
+                            <label for="reg-ciudad" class="visually-hidden">Ciudad</label>
+                            <button type="button" class="custom-select-trigger" id="ciudad-trigger"
+                                    role="combobox" aria-haspopup="listbox" aria-expanded="false"
+                                    aria-controls="ciudad-dropdown" aria-label="Ciudad">
                                 Selecciona tu ciudad
                             </button>
                             <div class="custom-select-dropdown" id="ciudad-dropdown"></div>
@@ -246,9 +254,11 @@
                     <h2 class="reg-step-title">Datos de contacto</h2>
                     <p class="reg-step-subtitle">Te enviaremos novedades sobre concursos y novedades de la comunidad.</p>
                     <div class="form-group">
+                        <label for="reg-email" class="visually-hidden">Correo electrónico</label>
                         <input type="email" id="reg-email" placeholder="Correo Electrónico" required data-required="true">
                     </div>
                     <div class="form-group">
+                        <label for="reg-telefono" class="visually-hidden">Número de celular</label>
                         <input type="text" id="reg-telefono" placeholder="Número de celular" required data-required="true">
                     </div>
                     <div class="step-navigation">
@@ -262,17 +272,21 @@
                     <h2 class="reg-step-title">Información personal</h2>
                     <p class="reg-step-subtitle">Esta información ayuda a adaptar tu experiencia y verificar tu cuenta.</p>
                     <div class="date-group" style="margin-bottom:6px; gap:6px;">
+                        <label for="reg-dia" class="visually-hidden">Día</label>
                         <select name="dia" id="reg-dia" required data-required="true">
                             <option value="" disabled selected>Día</option>
                         </select>
+                        <label for="reg-mes" class="visually-hidden">Mes</label>
                         <select name="mes" id="reg-mes" required data-required="true">
                             <option value="" disabled selected>Mes</option>
                         </select>
+                        <label for="reg-ano" class="visually-hidden">Año</label>
                         <select name="ano" id="reg-ano" required data-required="true">
                             <option value="" disabled selected>Año</option>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="reg-genero" class="visually-hidden">Género</label>
                         <select id="reg-genero" required data-required="true">
                             <option value="" disabled selected>Selecciona Género</option>
                             <option value="masculino">Masculino</option>
@@ -291,10 +305,12 @@
                     <h2 class="reg-step-title">Protege tu cuenta</h2>
                     <p class="reg-step-subtitle">Elige un nombre de usuario único y una contraseña segura.</p>
                     <div class="form-group">
+                        <label for="reg-nombre-artista" class="visually-hidden">Nombre de usuario</label>
                         <input type="text" id="reg-nombre-artista" placeholder="Nombre de Usuario" required data-required="true">
                     </div>
                     <div class="form-group">
                         <div class="password-wrapper">
+                            <label for="reg-pass" class="visually-hidden">Contraseña</label>
                             <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required data-required="true">
                             <button type="button" class="toggle-password" data-target="reg-pass" aria-label="Mostrar contraseña"></button>
                         </div>
@@ -350,7 +366,7 @@
     <!-- Ciudades y banderas compartidas (registro + chat) -->
     <script src="js/ciudades.js?v=12207a1728"></script>
     <!-- auth-logic.js importa notificaciones.js como módulo -->
-    <script type="module" src="js/auth-logic.js?v=85d49e1395"></script>
+    <script type="module" src="js/auth-logic.js?v=586ef52683"></script>
 
     <!-- Preloader: se oculta tras un breve timeout para dar tiempo al módulo auth-logic.js a verificar sesión -->
     <script>
