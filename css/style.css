@@ -2075,3 +2075,16 @@
     }
 
 }
+
+/* Nota al pie de un campo de contraseña. Va en `style.css` (y en la capa `components`) porque la
+   necesitan las TRES páginas: el registro (`auth.html`), el reset y «Mi Cuenta» (`index.html`).
+   El backend RECORTA la contraseña antes de medirla, así que los espacios de los extremos no
+   cuentan: decirlo evita que alguien vea «Media» y no entienda por qué. (2026-10-18) */
+@layer components {
+    .password-note {
+        margin: 6px 0 0;
+        font-size: 11.5px;
+        line-height: 1.35;
+        color: var(--color-text-muted);
+    }
+}

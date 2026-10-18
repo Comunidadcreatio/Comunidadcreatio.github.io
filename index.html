@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.719';
+        var currentVer = '1.0.720';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=4f01569aee">
+    <link rel="stylesheet" href="css/style.css?v=7322939e0a">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=8e488d6f94">
@@ -891,6 +891,7 @@
                         <div class="form-group">
                             <label for="pass-nueva">Nueva contraseña</label>
                             <input type="password" id="pass-nueva" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+                            <p class="password-note">Los espacios al principio y al final se ignoran.</p>
                             <div class="password-strength" id="cuenta-password-strength" aria-live="polite">
                                 <div class="strength-bar"><span class="strength-bar-fill"></span></div>
                                 <span class="strength-text"></span>
@@ -1151,7 +1152,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=dfb94e6fb2" type="module"></script>
+    <script src="js/main.js?v=ca93059f02" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

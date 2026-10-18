@@ -397,19 +397,14 @@ function calcularFortalezaPassword(password) {
     }
 
     const req = evaluarRequisitosPassword(valor);
-    let puntos = Object.values(req).filter(Boolean).length;
 
-    // Bonus por longitud generosa
-    if (valor.length >= 12) puntos++;
-
+    // Los CINCO requisitos son obligatorios para aprobar (minimo nivel 3): asi la lista que ve el
+    // usuario es EXACTAMENTE lo que se exige. Faltando uno, el nivel se queda en «Media», que el
+    // backend rechaza. «Fuerte» = los cinco con 12+ caracteres. (2026-10-18)
     let nivel;
-    if (puntos <= 2) nivel = 1;       // Débil
-    else if (puntos === 3) nivel = 2; // Media
-    else if (puntos === 4) nivel = 3; // Buena
-    else nivel = 4;                   // Fuerte
-
-    // Sin la longitud mínima nunca pasa de débil
-    if (!req.length) nivel = 1;
+    if (!req.length) nivel = 1;                                                 // Débil
+    else if (!(req.lower && req.upper && req.number && req.special)) nivel = 2;  // Media
+    else nivel = valor.length >= 12 ? 4 : 3;                                    // Buena / Fuerte
 
     const etiquetas = { 1: 'Débil', 2: 'Media', 3: 'Buena', 4: 'Fuerte' };
     return { nivel, etiqueta: etiquetas[nivel], requisitos: req };

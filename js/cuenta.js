@@ -7,7 +7,7 @@ import { ARTISTA_KEY, apiRequest } from './config.js?v=1078af3437';
 import { token, artistaActual, logout } from './auth.js?v=c6db1f1f3c';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
 import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=b9fc40d1cb';
-import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=75b682dee5';
+import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=c634a73551';
 
 /**
  * Muestra errores del backend en un elemento de error inline del formulario.
