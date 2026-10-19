@@ -515,13 +515,17 @@
     margin: 0 auto;
 }
 
+/* Mi perfil: el avatar es un RECTANGULO pegado a la izquierda que ocupa todo el alto hasta la
+   fila de iconos (Cavents / Problogs / Comcons). El alto lo fija `min-height`: el bloque de
+   texto es mas bajo, asi el rectangulo llega justo hasta donde empiezan los iconos. (2026-10-18) */
 .perfil-seccion-layout {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;   /* ← CAMBIO: de center a flex-start para subir los nombres */
-    justify-content: center;
-    gap: 1.25rem;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 1rem;
     width: 100%;
+    min-height: 210px;
 }
 
 /* Botón avatar (sin cambios) */
@@ -539,28 +543,7 @@
     transition: transform 0.2s ease;
 }
 
-.perfil-avatar-btn::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border-radius: 50%;
-    background-image: conic-gradient(from 0deg,
-        #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd, #ff6b6b);
-    z-index: 0;
-    animation: rotateGradient 3s linear infinite;
-}
 
-@keyframes rotateGradient {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
 
 .perfil-avatar-btn:hover {
     transform: scale(1.05);
@@ -1127,4 +1110,60 @@
         width: 100%;
     }
 }
+}
+
+/* ==============================================
+   MI PERFIL — AVATAR RECTANGULAR
+   Va AL FINAL a proposito: hay reglas (la base y las de movil, ~linea 836 y ~927) que fijan
+   align-items: flex-start, el avatar a 64x64 y la foto a 64x64. Como todas tienen la misma
+   especificidad, solo ganan las ultimas. (2026-10-18)
+   ============================================== */
+/* Full-bleed a la IZQUIERDA: el layout se sale 48 px (los 24 de #perfil-usuario + los 24 de
+   .cuenta-seccion) para que el avatar toque el borde de la pantalla. La columna de texto sigue a
+   su sitio. */
+.perfil-seccion-layout {
+    margin-left: -48px;
+    width: calc(100% + 48px);
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* Sin margen superior: asi el avatar termina EXACTAMENTE donde empiezan los iconos de
+   Cavents / Problogs / Comcons. */
+.perfil-iconos-stats {
+    margin-top: 0;
+}
+
+.perfil-avatar-btn {
+    flex: 0 0 44%;
+    width: 44%;
+    height: auto;
+    align-self: stretch;
+    border-radius: 0;
+}
+
+.perfil-avatar-btn:hover {
+    transform: none;
+}
+
+.perfil-avatar-img-seccion {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+.perfil-avatar-overlay {
+    border-radius: 0;
+}
+
+/* La columna de texto ocupa el alto del bloque y centra su contenido. */
+.perfil-seccion-info {
+    align-self: stretch;
+    justify-content: center;
+    margin-top: 0;
+}
+
+/* El avatar arranca pegado al header: sin el padding superior de la seccion. */
+#perfil-usuario .perfil-seccion {
+    padding-top: 0;
 }
