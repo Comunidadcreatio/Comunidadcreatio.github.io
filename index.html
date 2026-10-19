@@ -466,24 +466,42 @@
 
                 <div class="perfil-iconos-stats">
                     <button class="perfil-tab-btn active" data-tab="cavents" aria-label="Mis cavents">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
+                        <!-- Mismos iconos que el nav (estilo solido). Los huecos van con MASCARA para
+                             que sean transparentes: aqui el fondo no es --color-white (el perfil va
+                             sobre la imagen de la app), asi que pintarlos de blanco se veria mal. -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <defs>
+                                <mask id="perfil-mask-cavents">
+                                    <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                                    <rect x="7.9" y="3.4" width="8.2" height="7.7" rx="0.4" fill="#000"></rect>
+                                </mask>
+                            </defs>
+                            <rect x="6.5" y="2" width="11" height="10.5" rx="1" fill="currentColor" mask="url(#perfil-mask-cavents)"></rect>
+                            <path d="M12 12.5v8.5M8.5 12.5L5 21M15.5 12.5L19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                            <path d="M5.5 17.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                         </svg>
                     </button>
                     <button class="perfil-tab-btn" data-tab="problogs" aria-label="Mis problogs">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <defs>
+                                <mask id="perfil-mask-problogs">
+                                    <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                                    <path d="M6 18l8.2-8.2" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
+                                </mask>
+                            </defs>
+                            <path d="M4 20c4.6 0 8.7-2.6 11.2-7.2C16.9 10 18.3 7.8 20.5 6.8c-.7 4.6-2.7 8.3-6.2 10.9C11.5 19.6 7.9 20 4 20z" fill="currentColor" mask="url(#perfil-mask-problogs)"></path>
                         </svg>
                     </button>
                     <button class="perfil-tab-btn" data-tab="comcons" aria-label="Mis comcons">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <defs>
+                                <mask id="perfil-mask-comcons">
+                                    <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
+                                    <circle cx="12" cy="8" r="2.7" fill="#000"></circle>
+                                </mask>
+                            </defs>
+                            <path d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11z" fill="currentColor"></path>
+                            <circle cx="12" cy="8" r="6" fill="currentColor" mask="url(#perfil-mask-comcons)"></circle>
                         </svg>
                     </button>
                 </div>
