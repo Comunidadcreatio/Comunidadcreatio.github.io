@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.743';
+        var currentVer = '1.0.744';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=0c1299cc32">
+    <link rel="stylesheet" href="css/style.css?v=7c436ad366">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -442,18 +442,24 @@
                         <span class="perfil-online-indicator offline" id="perfil-online-indicator" aria-label="Estado: en línea" style="display: none;"></span>
                     </button>
                     <div class="perfil-seccion-info">
-                        <p class="perfil-nombre-real perfil-nombre-real-seccion"></p>
                         <div class="perfil-nombre-artista-wrapper">
                             <span class="perfil-nombre-artista perfil-nombre-artista-seccion"></span>
                             <span class="perfil-ciudad"></span>
                         </div>
 
                         <div class="perfil-estadisticas" id="perfil-estadisticas">
-                            <span class="stat-value" id="stats-cavents">0</span> Cavents
-                            <span class="separator">|</span>
-                            <span class="stat-value" id="stats-problogs">0</span> Problogs
-                            <span class="separator">|</span>
-                            <span class="stat-value" id="stats-comcons">0</span> Comcons
+                            <div class="stat">
+                                <span class="stat-value" id="stats-cavents">0</span>
+                                <span class="stat-label">Cavents</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="stats-problogs">0</span>
+                                <span class="stat-label">Problogs</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="stats-comcons">0</span>
+                                <span class="stat-label">Comcons</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -878,6 +884,73 @@
         <section id="mi-cuenta" class="hidden" aria-label="Mi cuenta" role="region">
 
             <div class="cuenta-seccion">
+                <!-- MI PERFIL (2026-10-18): datos que el artista edita de su propio perfil. Va el
+                     primero porque es lo que mas se toca. -->
+                <button class="accordion-header" id="accordion-perfil" aria-expanded="false" aria-controls="perfil-content">
+                    <span class="accordion-header-left">
+                        <svg class="accordion-header-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path>
+                        </svg>
+                        <h3>Mi perfil</h3>
+                    </span>
+                    <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-content" id="perfil-content" hidden>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-header">
+                            <div class="cuenta-item-info">
+                                <h4>Foto de perfil</h4>
+                                <p class="cuenta-item-desc">Se recorta en cuadrado en tu perfil.</p>
+                            </div>
+                            <div class="cuenta-item-actions">
+                                <button type="button" id="btn-cambiar-avatar-perfil" class="btn-cuenta-secundario">Cambiar foto</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-info">
+                            <h4>Ciudad de origen</h4>
+                            <p class="cuenta-item-desc">Aparece junto a tu nombre de artista.</p>
+                            <input type="text" id="perfil-ciudad-input" class="cuenta-item-valor" maxlength="120" placeholder="Ej. San Cristóbal, Táchira" aria-label="Ciudad de origen">
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-info">
+                            <h4>Redes y canales de contacto</h4>
+                            <p class="cuenta-item-desc">Opcional. Se muestran en tu perfil para que te contacten.</p>
+                            <div class="perfil-campos">
+                                <label class="perfil-campo"><span>Instagram</span><input type="text" id="perfil-red-instagram" placeholder="@usuario" maxlength="300"></label>
+                                <label class="perfil-campo"><span>X (Twitter)</span><input type="text" id="perfil-red-x" placeholder="@usuario" maxlength="300"></label>
+                                <label class="perfil-campo"><span>WhatsApp</span><input type="text" id="perfil-red-whatsapp" placeholder="+58 412 000 0000" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Correo público</span><input type="email" id="perfil-red-correo" placeholder="hola@correo.com" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Sitio web</span><input type="url" id="perfil-red-web" placeholder="https://" maxlength="300"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-info">
+                            <h4>Opciones para cobrar</h4>
+                            <p class="cuenta-item-desc">Cómo prefieres recibir el pago de tus obras.</p>
+                            <div class="perfil-campos">
+                                <label class="perfil-campo"><span>Pago Móvil</span><input type="text" id="perfil-cobro-pago-movil" placeholder="Banco · teléfono · cédula" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Zelle</span><input type="text" id="perfil-cobro-zelle" placeholder="correo o teléfono" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Binance / USDT</span><input type="text" id="perfil-cobro-binance" placeholder="correo o wallet" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Otro</span><input type="text" id="perfil-cobro-otro" placeholder="Cuéntalo aquí" maxlength="300"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-form-acciones">
+                        <button type="button" id="btn-guardar-perfil" class="btn-cuenta-primario">Guardar cambios</button>
+                        <span class="cuenta-error" id="perfil-estado" role="status"></span>
+                    </div>
+                </div>
+
                 <button class="accordion-header" id="accordion-seguridad" aria-expanded="false" aria-controls="seguridad-content">
                     <span class="accordion-header-left">
                         <svg class="accordion-header-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1202,7 +1275,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=5621b3f438" type="module"></script>
+    <script src="js/main.js?v=fd32f2a5d6" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

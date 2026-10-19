@@ -1188,3 +1188,106 @@
 #perfil-usuario .perfil-seccion {
     padding-top: 0;
 }
+
+
+/* ==============================================
+   MI PERFIL — BLOQUE DE DATOS (2026-10-18)
+   - Fuera el nombre completo (solo usuario y ciudad).
+   - Usuario y ciudad mas grandes y en negrita.
+   - Contadores con el NUMERO arriba y la ETIQUETA debajo.
+   Va al final para ganar a las reglas de arriba, que tienen la misma especificidad.
+   ============================================== */
+.perfil-nombre-artista-seccion {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-text);
+}
+
+.perfil-nombre-artista-wrapper {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+    gap: 4px;
+}
+
+.perfil-ciudad {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.perfil-ciudad::before {
+    font-weight: 700;
+}
+
+.perfil-estadisticas {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 22px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.perfil-estadisticas .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+}
+
+.perfil-estadisticas .stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.perfil-estadisticas .stat-label {
+    margin-top: 2px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #666);
+}
+
+/* ==============================================
+   MI PERFIL — CAMPOS EDITABLES (redes y cobro)
+   Rejilla de dos columnas que se apila sola en pantallas estrechas. (2026-10-18)
+   ============================================== */
+.perfil-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.perfil-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.perfil-campo > span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-campo > input {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--color-border, #d9d9d9);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.perfil-campo > input:focus {
+    outline: none;
+    border-color: var(--color-text);
+}

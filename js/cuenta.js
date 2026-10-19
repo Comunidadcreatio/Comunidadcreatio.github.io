@@ -73,6 +73,124 @@ export function setupMiCuenta() {
     // ============================================
     // ACCORDION DE SESIÓN (cerrar sesión, cerrar todas)
     // ============================================
+    // ============================================
+    // ACCORDION DE MI PERFIL (ciudad, redes y cobro)
+    // ============================================
+    // Los datos se piden al abrir por primera vez: la seccion se abre desde la hamburguesa y
+    // no conviene pedirlos si el usuario no entra.
+    const accordionPerfil = document.getElementById('accordion-perfil');
+    const perfilContent = document.getElementById('perfil-content');
+    let perfilCargado = false;
+
+    /** Lee un input por id y devuelve su texto limpio. */
+    const valorDe = (id) => {
+        const el = /** @type {HTMLInputElement | null} */ (document.getElementById(id));
+        return el ? el.value.trim() : '';
+    };
+    /** Escribe un input por id. */
+    const poner = (id, v) => {
+        const el = /** @type {HTMLInputElement | null} */ (document.getElementById(id));
+        if (el) el.value = v == null ? '' : String(v);
+    };
+    /** El backend guarda redes y cobro como JSON en TEXT. */
+    const parsear = (txt) => {
+        try { return txt ? JSON.parse(txt) : {}; } catch (e) { return {}; }
+    };
+
+    const cargarPerfil = async () => {
+        if (perfilCargado) return;
+        perfilCargado = true;
+        try {
+            const res = await apiRequest('/api/artistas/perfil');
+            const u = (res && res.artista) || {};
+            poner('perfil-ciudad-input', u.ciudad);
+            const redes = parsear(u.redes);
+            poner('perfil-red-instagram', redes.instagram);
+            poner('perfil-red-x', redes.x);
+            poner('perfil-red-whatsapp', redes.whatsapp);
+            poner('perfil-red-correo', redes.correo);
+            poner('perfil-red-web', redes.web);
+            const cobro = parsear(u.cobro);
+            poner('perfil-cobro-pago-movil', cobro['pago-movil']);
+            poner('perfil-cobro-zelle', cobro.zelle);
+            poner('perfil-cobro-binance', cobro.binance);
+            poner('perfil-cobro-otro', cobro.otro);
+        } catch (e) {
+            debugLog.warn('No se pudieron cargar los datos del perfil:', e);
+        }
+    };
+
+    if (accordionPerfil && perfilContent) {
+        accordionPerfil.addEventListener('click', () => {
+            const isExpanded = accordionPerfil.getAttribute('aria-expanded') === 'true';
+            accordionPerfil.setAttribute('aria-expanded', String(!isExpanded));
+            if (isExpanded) {
+                perfilContent.hidden = true;
+                perfilContent.style.maxHeight = '0';
+                perfilContent.style.padding = '0 0';
+            } else {
+                perfilContent.hidden = false;
+                setTimeout(() => {
+                    perfilContent.style.maxHeight = '3000px';
+                    perfilContent.style.padding = '20px 0';
+                }, 10);
+                cargarPerfil();
+            }
+        });
+    }
+
+    const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
+    if (btnGuardarPerfil) {
+        btnGuardarPerfil.addEventListener('click', async () => {
+            const estado = document.getElementById('perfil-estado');
+            const ciudad = valorDe('perfil-ciudad-input');
+            const redes = {
+                instagram: valorDe('perfil-red-instagram'),
+                x: valorDe('perfil-red-x'),
+                whatsapp: valorDe('perfil-red-whatsapp'),
+                correo: valorDe('perfil-red-correo'),
+                web: valorDe('perfil-red-web')
+            };
+            const cobro = {
+                'pago-movil': valorDe('perfil-cobro-pago-movil'),
+                zelle: valorDe('perfil-cobro-zelle'),
+                binance: valorDe('perfil-cobro-binance'),
+                otro: valorDe('perfil-cobro-otro')
+            };
+            if (estado) estado.textContent = '';
+            const textoOriginal = btnGuardarPerfil.textContent;
+            btnGuardarPerfil.disabled = true;
+            btnGuardarPerfil.textContent = 'Guardando...';
+            try {
+                const res = await apiRequest('/api/artistas/perfil-datos', {
+                    method: 'PUT',
+                    body: JSON.stringify({ ciudad, redes, cobro })
+                });
+                if (res && res.success) {
+                    if (artistaActual) artistaActual.ciudad = ciudad;
+                    document.querySelectorAll('.perfil-ciudad').forEach((el) => { el.textContent = ciudad; });
+                    if (estado) estado.textContent = '✅ Guardado.';
+                    showSuccess('Perfil actualizado');
+                } else {
+                    if (estado) estado.textContent = '❌ ' + ((res && res.error) || 'No se pudo guardar.');
+                }
+            } catch (e) {
+                if (estado) estado.textContent = '❌ Error de conexión. Intenta más tarde.';
+            } finally {
+                btnGuardarPerfil.disabled = false;
+                btnGuardarPerfil.textContent = textoOriginal;
+            }
+        });
+    }
+
+    const btnAvatarPerfil = document.getElementById('btn-cambiar-avatar-perfil');
+    if (btnAvatarPerfil) {
+        btnAvatarPerfil.addEventListener('click', () => {
+            const input = /** @type {HTMLInputElement | null} */ (document.getElementById('input-foto-perfil'));
+            if (input) input.click();
+        });
+    }
+
     const accordionSesion = document.getElementById('accordion-sesion');
     const sesionContent = document.getElementById('sesion-content');
     if (accordionSesion && sesionContent) {
