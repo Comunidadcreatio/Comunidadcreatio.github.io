@@ -1398,3 +1398,25 @@
     margin-right: -24px;
     width: calc(100% + 48px);
 }
+
+/* ==============================================
+   PESTAÑAS SIN ICONO (2026-10-19)
+   Se quitaron los iconos de Cavents / Problogs / Comcons: ahora cada pestaña es el marcador
+   arriba y el nombre debajo, centrados. La fila sigue repartiendo los tres grupos con
+   space-between y el aire simétrico de 24 px por lado.
+   ============================================== */
+.perfil-tab-btn {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1px;
+}
+
+.perfil-tab-btn .tab-label {
+    margin-left: 0;
+    text-align: center;
+}
+
+.perfil-tab-btn .tab-num {
+    text-align: center;
+}
