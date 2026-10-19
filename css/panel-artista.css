@@ -1128,11 +1128,11 @@
     justify-content: flex-start;
 }
 
-/* Mismo aire ARRIBA de los iconos que el que tienen por abajo (20 px medidos hasta el texto
-   siguiente: 4 de padding de la fila + 16 del parrafo). Antes el cuadrado del avatar los
-   tocaba. */
+/* Mismo aire ARRIBA de los iconos que por abajo. Medido: por debajo del glifo quedan 9 px
+   (5 del boton + 4 de padding de la fila) hasta la linea donde empieza el contenido, asi que
+   arriba van los mismos 9. Antes habia 20 arriba y 9 abajo: se veia descompensado. (2026-10-18) */
 .perfil-iconos-stats {
-    margin-top: 20px;
+    margin-top: 9px;
 }
 
 .perfil-avatar-btn {
@@ -1156,12 +1156,15 @@
     border: none;   /* fuera el borde de 2 px que tenia la foto */
 }
 
-/* Punto de estado: CUADRADO en la esquina inferior derecha del cuadrado del avatar, sin pulso. */
-.perfil-online-indicator {
+/* Punto de estado: CUADRADO, pegado al vertice inferior derecho del cuadrado del avatar
+   (sin aire a la derecha ni abajo), sin borde y sin pulso. (2026-10-18) */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
     border-radius: 0;
-}
-
-.perfil-online-indicator.online {
+    border: none;
+    right: 0;
+    bottom: 0;
     animation: none;
 }
 
