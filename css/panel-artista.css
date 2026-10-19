@@ -525,7 +525,7 @@
     justify-content: flex-start;
     gap: 1rem;
     width: 100%;
-    min-height: 210px;
+    min-height: 0;   /* el alto lo marca el cuadrado del avatar */
 }
 
 /* Botón avatar (sin cambios) */
@@ -1135,10 +1135,10 @@
 }
 
 .perfil-avatar-btn {
-    flex: 0 0 44%;
-    width: 44%;
-    height: auto;
-    align-self: stretch;
+    flex: 0 0 104px;
+    width: 104px;
+    height: 104px;
+    align-self: stretch;   /* sin aire arriba ni abajo: el alto del bloque es su alto */
     border-radius: 0;
 }
 
@@ -1150,6 +1150,8 @@
     width: 100%;
     height: 100%;
     border-radius: 0;
+    object-fit: cover;
+    object-position: center;
 }
 
 .perfil-avatar-overlay {
@@ -1163,7 +1165,12 @@
     margin-top: 0;
 }
 
-/* El avatar arranca pegado al header: sin el padding superior de la seccion. */
+/* El avatar arranca pegado al header: sin padding superior de la seccion y sin el margen de
+   20 px que traia #perfil-usuario (era el aire que quedaba por arriba). (2026-10-18) */
+#perfil-usuario {
+    margin-top: 0;
+}
+
 #perfil-usuario .perfil-seccion {
     padding-top: 0;
 }
