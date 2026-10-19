@@ -1389,9 +1389,12 @@
     gap: 0;
 }
 
-/* Un poco más de aire entre los tres grupos: la fila se ensancha 24 px hacia la izquierda
-   (hasta el padding de #perfil-usuario) y space-between reparte el sobrante. */
+/* Más aire entre los tres grupos, pero SIMÉTRICO: la fila se sale 24 px por CADA lado (hasta
+   el padding de #perfil-usuario), así queda 24 px de aire a la izquierda y 24 a la derecha y
+   los grupos se reparten en el medio. Antes solo se salía por la izquierda y por eso había más
+   aire a la derecha (48 px) que a la izquierda (24 px). (2026-10-19) */
 #perfil-usuario .perfil-iconos-stats {
     margin-left: -24px;
-    width: calc(100% + 24px);
+    margin-right: -24px;
+    width: calc(100% + 48px);
 }
