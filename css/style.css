@@ -871,8 +871,8 @@
     transition: color 0.3s ease, transform 0.15s ease;
 }
 .toggle-nav-btn svg {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     display: block;
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
@@ -940,8 +940,8 @@
    Antes estaban ocultas (`display: none`). */
 .toggle-label {
     display: block;
-    font-size: 7.5px;
-    line-height: 1;
+    font-size: 9px;
+    line-height: 1.1;
     letter-spacing: 0;
     color: inherit;
     opacity: 0.72;
@@ -1943,8 +1943,8 @@
         padding: 2px 4px;
     }
     .toggle-nav-btn svg {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
     }
     .btn-perfil-circular {
         width: 42px;
@@ -1955,6 +1955,6 @@
         height: 36px;
     }
     .toggle-label {
-        font-size: 7px;
+        font-size: 8px;
     }
 }
