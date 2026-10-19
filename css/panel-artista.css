@@ -1420,3 +1420,33 @@
 .perfil-tab-btn .tab-num {
     text-align: center;
 }
+
+/* ==============================================
+   GRUPOS MÁS GRANDES Y MENOS SEPARADOS (2026-10-19)
+   Con los iconos fuera los grupos quedaban pequeños y con 67 px entre ellos. Ahora:
+   - el marcador sube a 1,35rem y el nombre a 0,72rem;
+   - la fila vuelve al ancho del contenido (sin los -24 px de los lados) y se reparte en TRES
+     TERCIOS iguales, en vez de empujar el primero y el último a los bordes.
+   Así el hueco entre grupos baja de 67 a ~48 px y cada grupo pesa más.
+   ============================================== */
+#perfil-usuario .perfil-iconos-stats {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    gap: 0;
+}
+
+.perfil-tab-btn {
+    flex: 1 1 0;
+    gap: 2px;
+}
+
+.perfil-tab-btn .tab-num {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.perfil-tab-btn .tab-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+}
