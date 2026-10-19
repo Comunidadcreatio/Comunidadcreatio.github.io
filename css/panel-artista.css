@@ -1336,3 +1336,62 @@
 .perfil-tab-btn.active .tab-label {
     color: var(--color-text);
 }
+
+/* ==============================================
+   MI PERFIL — NOMBRE Y «ROL DE CIUDAD» (2026-10-19)
+   Dos líneas: el nombre arriba y debajo «Artista de Táriba». El rol sale de lo que el usuario
+   eligió al registrarse (artista / comprador / coleccionista / curador / galería) o del que
+   devuelve el backend.
+   ============================================== */
+.perfil-nombre-artista-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.perfil-nombre-artista-seccion {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text);
+}
+
+.perfil-rol-linea {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-rol-linea .perfil-ciudad {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #666);
+}
+
+/* Aire entre el rol y el «de»: dentro de un flex los espacios del ::before se comen. */
+.perfil-rol-linea .perfil-rol {
+    margin-right: 0.35em;
+}
+
+.perfil-rol-linea .perfil-ciudad::before {
+    content: "de ";
+}
+
+/* Sin ciudad no debe quedar el « de » suelto del ::before. */
+.perfil-ciudad:empty {
+    display: none;
+}
+
+/* El número, pegado al icono. */
+.perfil-tab-btn {
+    gap: 0;
+}
+
+/* Un poco más de aire entre los tres grupos: la fila se ensancha 24 px hacia la izquierda
+   (hasta el padding de #perfil-usuario) y space-between reparte el sobrante. */
+#perfil-usuario .perfil-iconos-stats {
+    margin-left: -24px;
+    width: calc(100% + 24px);
+}

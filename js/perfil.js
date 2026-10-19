@@ -4,7 +4,7 @@
 // visualización de perfiles externos y resultados de búsqueda.
 
 import { ARTISTA_KEY, API_BASE_URL, apiRequest, getAuthToken } from './config.js?v=7da631dcf6';
-import { token, artistaActual, lastActivityTime, fusionarArtistaActual } from './auth.js?v=8dbd042376';
+import { token, artistaActual, lastActivityTime, fusionarArtistaActual, obtenerRolUsuario } from './auth.js?v=8dbd042376';
 import { showError, showSuccess, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary, cuandoLibre } from './utils.js?v=7e1398d254';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
@@ -13,6 +13,24 @@ import { setupViewTracking } from './galeria.js?v=f39ad9003b';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
+
+// Etiqueta visible del rol. Se muestra como «Artista de Tariba» debajo del nombre.
+const NOMBRES_ROL = {
+    artista: 'Artista',
+    comprador: 'Comprador',
+    coleccionista: 'Coleccionista',
+    curador: 'Curador',
+    galeria: 'Galería'
+};
+
+/**
+ * @param {string | null | undefined} rol
+ * @returns {string}
+ */
+function etiquetaRol(rol) {
+    const clave = String(rol || 'artista').toLowerCase();
+    return NOMBRES_ROL[clave] || 'Artista';
+}
 
 // Referencia a funciones del módulo de navegación (se inyecta para evitar dependencia circular)
 let _navegacion = null;
@@ -127,6 +145,9 @@ let datos = null;
         .forEach((img) => { const el = /** @type {HTMLImageElement} */ (img); el.src = src; el.sizes = '104px'; el.srcset = srcsetCloudinary(src, [104, 208, 312]); });
     document.querySelectorAll('.perfil-nombre-artista-seccion')
         .forEach((el) => { el.textContent = datos.nombre_artista || 'Artista'; });
+    // «Artista / Comprador / Coleccionista / Curador / Galería» debajo del nombre.
+    document.querySelectorAll('.perfil-rol')
+        .forEach((el) => { el.textContent = etiquetaRol(datos.rol || obtenerRolUsuario()); });
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
             .forEach((el) => { el.textContent = datos.nombre_real || ''; });
@@ -164,6 +185,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
 
         document.querySelectorAll('.perfil-nombre-real').forEach(el => { el.textContent = nombreReal; });
         document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
+        document.querySelectorAll('.perfil-rol').forEach(el => { el.textContent = etiquetaRol(obtenerRolUsuario()); });
         document.querySelectorAll('.perfil-ciudad').forEach(el => {
             el.textContent = ciudad ? escapeHtml(ciudad) : '';
         });

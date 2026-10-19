@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=7da631dcf6';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=170a95e9fe';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=e4fd76efb6';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';

@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.746';
+        var currentVer = '1.0.747';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=50ddffc719">
+    <link rel="stylesheet" href="css/style.css?v=e59b682288">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -443,11 +443,13 @@
                     </button>
                     <div class="perfil-seccion-info">
                         <div class="perfil-nombre-artista-wrapper">
+                            <!-- Dos lineas: el nombre arriba y «Rol de Ciudad» debajo (2026-10-19).
+                                 El rol sale de lo que el usuario eligio al registrarse. -->
                             <span class="perfil-nombre-artista perfil-nombre-artista-seccion"></span>
-                            <span class="perfil-ciudad"></span>
+                            <span class="perfil-rol-linea">
+                                <span class="perfil-rol"></span><span class="perfil-ciudad"></span>
+                            </span>
                         </div>
-
-                        
                     </div>
                 </div>
 
@@ -1286,7 +1288,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=fd32f2a5d6" type="module"></script>
+    <script src="js/main.js?v=e49f021fb7" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
