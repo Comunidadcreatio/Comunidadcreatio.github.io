@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.750';
+        var currentVer = '1.0.751';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=c36d20df6e">
+    <link rel="stylesheet" href="css/style.css?v=771bccfeba">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -155,57 +155,20 @@
         <div class="bottom-bar-left">
             <button id="btn-chat-global" class="toggle-nav-btn" aria-label="Chat">
                 <span class="chat-nav-icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <!-- Iconos del nav en ESTILO SÓLIDO. Los detalles NO se pintan de un color:
-                             se RECORTAN con una máscara, así que quedan TRANSPARENTES y dejan ver el
-                             fondo del nav (que en oscuro es semitransparente). Antes se pintaban con
-                             var(--color-white), que en oscuro es un #0a0a0a OPACO: por eso los
-                             huecos se veían negros en vez de fundirse con la barra. (2026-10-18) -->
-                        <defs>
-                            <mask id="nav-mask-chat">
-                                <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
-                                <circle cx="8.5" cy="9.4" r="1.15" fill="#000"></circle>
-                                <circle cx="12" cy="9.4" r="1.15" fill="#000"></circle>
-                                <circle cx="15.5" cy="9.4" r="1.15" fill="#000"></circle>
-                            </mask>
-                        </defs>
-                        <path d="M4 5.2A1.7 1.7 0 0 1 5.7 3.5h12.6A1.7 1.7 0 0 1 20 5.2v8.4a1.7 1.7 0 0 1-1.7 1.7H9.4L4 20.4V5.2z" fill="currentColor" mask="url(#nav-mask-chat)"></path>
-                    </svg>
+                    <img class="nav-icono" src="iconos/Chat.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                     <span id="chat-nav-badge" class="chat-nav-badge hidden"></span>
                 </span>
                 <span class="toggle-label">Chat</span>
             </button>
             <button id="btn-cavents-hub" class="toggle-nav-btn" aria-label="Cavents">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Caballete (sólido): marco relleno con el LIENZO RECORTADO (transparente) +
-                         patas y repisa en trazo. Con el lienzo relleno se leía como una silla;
-                         recortado se lee «cuadro sobre caballete». -->
-                    <defs>
-                        <mask id="nav-mask-cavents">
-                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
-                            <rect x="7.9" y="3.4" width="8.2" height="7.7" rx="0.4" fill="#000"></rect>
-                        </mask>
-                    </defs>
-                    <rect x="6.5" y="2" width="11" height="10.5" rx="1" fill="currentColor" mask="url(#nav-mask-cavents)"></rect>
-                    <path d="M12 12.5v8.5M8.5 12.5L5 21M15.5 12.5L19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                    <path d="M5.5 17.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                </svg>
+                <img class="nav-icono" src="iconos/Cavents.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                 <span class="toggle-label">Cavents</span>
             </button>
             <!-- Problogs: sección propia. Va a la IZQUIERDA, detrás de Cavents, para que los tres
                  iconos de sección (Chat | cavents | Problogs) queden juntos y ordenados. El perfil
                  sigue en el CENTRO del nav y "Buscar" a la derecha. (2026-10-18) -->
             <button id="btn-problogs-nav" class="toggle-nav-btn" aria-label="Problogs">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Pluma (sólida): silueta rellena y el cañón RECORTADO (transparente). -->
-                    <defs>
-                        <mask id="nav-mask-problogs">
-                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
-                            <path d="M6 18l8.2-8.2" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
-                        </mask>
-                    </defs>
-                    <path d="M4 20c4.6 0 8.7-2.6 11.2-7.2C16.9 10 18.3 7.8 20.5 6.8c-.7 4.6-2.7 8.3-6.2 10.9C11.5 19.6 7.9 20 4 20z" fill="currentColor" mask="url(#nav-mask-problogs)"></path>
-                </svg>
+                <img class="nav-icono" src="iconos/Problogs.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                 <span class="toggle-label">Problogs</span>
             </button>
         </div>
@@ -216,42 +179,18 @@
         </div>
         <div class="bottom-bar-right">
             <button id="btn-buscar" class="toggle-nav-btn" aria-label="Buscar artista">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Lupa (sólida): aro relleno (el hueco por evenodd) y mango. -->
-                    <path fill-rule="evenodd" d="M10.8 3.4a7.3 7.3 0 1 1 0 14.6 7.3 7.3 0 0 1 0-14.6zm0 2.6a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4z" fill="currentColor"></path>
-                    <path d="M15.3 13.4l1.9-1.9 4.7 4.7-1.9 1.9z" fill="currentColor"></path>
-                </svg>
+                <img class="nav-icono" src="iconos/Explorar.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                 <span class="toggle-label">Explorar</span>
             </button>
             <!-- Comcons: sección de concursos (medalla). Se reparte con `space-evenly`, igual
                  que los tres iconos de la izquierda. (2026-10-18) -->
             <button id="btn-comcons-nav" class="toggle-nav-btn" aria-label="Comcons">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Medalla (sólida): cinta, disco relleno y el aro interior RECORTADO. -->
-                    <defs>
-                        <mask id="nav-mask-comcons">
-                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
-                            <circle cx="12" cy="8" r="2.7" fill="#000"></circle>
-                        </mask>
-                    </defs>
-                    <path d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11z" fill="currentColor"></path>
-                    <circle cx="12" cy="8" r="6" fill="currentColor" mask="url(#nav-mask-comcons)"></circle>
-                </svg>
+                <img class="nav-icono" src="iconos/Comcons.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                 <span class="toggle-label">Comcons</span>
             </button>
             <!-- Web: información sobre Creatio (globo). -->
             <button id="btn-web-nav" class="toggle-nav-btn" aria-label="Sobre Creatio">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <!-- Globo (sólido): disco relleno con los meridianos RECORTADOS (transparentes). -->
-                    <defs>
-                        <mask id="nav-mask-web">
-                            <rect x="0" y="0" width="24" height="24" fill="#fff"></rect>
-                            <path d="M3 12h18" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
-                            <path d="M12 3c3 3.4 3 14.6 0 18M12 3c-3 3.4-3 14.6 0 18" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"></path>
-                        </mask>
-                    </defs>
-                    <circle cx="12" cy="12" r="9" fill="currentColor" mask="url(#nav-mask-web)"></circle>
-                </svg>
+                <img class="nav-icono" src="iconos/FAQ.svg" alt="" width="26" height="26" aria-hidden="true" focusable="false">
                 <span class="toggle-label">FAQ</span>
             </button>
         </div>

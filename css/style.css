@@ -1958,3 +1958,29 @@
         font-size: 8px;
     }
 }
+
+/* ==============================================
+   ICONOS DEL NAV EN <img> (2026-10-19)
+   Los seis iconos nuevos son SVG de Illustrator con relleno/trazo NEGRO fijo, asi que con <img>
+   no heredan currentColor. En oscuro se invierten (negro sobre transparente -> blanco); el
+   tamaño replica el que tenian los SVG inline.
+   ============================================== */
+.toggle-nav-btn img.nav-icono,
+.chat-nav-icon-wrap img.nav-icono {
+    width: 26px;
+    height: 26px;
+    display: block;
+    object-fit: contain;
+}
+
+[data-theme="dark"] .nav-icono {
+    filter: invert(1);
+}
+
+@media (max-width: 340px) {
+    .toggle-nav-btn img.nav-icono,
+    .chat-nav-icon-wrap img.nav-icono {
+        width: 24px;
+        height: 24px;
+    }
+}
