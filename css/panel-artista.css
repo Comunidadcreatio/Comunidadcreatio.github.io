@@ -1299,14 +1299,14 @@
    ============================================== */
 .perfil-iconos-stats {
     justify-content: space-between;
-    gap: 8px;
+    gap: 16px;   /* aire lateral entre los tres grupos */
 }
 
 .perfil-tab-btn {
-    flex: 1 1 0;
+    flex: 0 1 auto;   /* ancho del contenido: asi el aire sobrante va ENTRE grupos */
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 2px;         /* número pegado al icono */
     min-width: 0;
 }
 
@@ -1315,12 +1315,14 @@
     font-weight: 700;
     line-height: 1;
     color: var(--color-text);
-    min-width: 1.1em;
+    /* Sin ancho mínimo: reservaba 1,1em y dejaba un hueco visible antes del icono. Con cifras
+       tabulares los números siguen midiendo lo mismo entre si. */
+    font-variant-numeric: tabular-nums;
     text-align: left;
 }
 
 .perfil-tab-btn .tab-label {
-    margin-left: auto;
+    margin-left: 3px;
     /* 0,56rem y poco espaciado: en un tercio de 103 px, con el número y el icono, «PROBLOGS»
        y «COMCONS» se cortaban con puntos suspensivos. */
     font-size: 0.56rem;
