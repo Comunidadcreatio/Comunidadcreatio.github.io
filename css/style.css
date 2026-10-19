@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=881cc1b744');
+@import url('panel-artista.css?v=68a1f1597f');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
@@ -1983,4 +1983,19 @@
         width: 24px;
         height: 24px;
     }
+}
+
+/* ==============================================
+   NAV MÁS JUNTO Y NOMBRES MÁS PEQUEÑOS (2026-10-19)
+   Los dos grupos de tres se acercan: en vez de repartirse por toda su mitad (space-around), se
+   centran en ella con un hueco pequeño entre iconos.
+   ============================================== */
+.bottom-bar-left,
+.bottom-bar-right {
+    justify-content: center;
+    gap: 6px;
+}
+
+.toggle-label {
+    font-size: 8px;
 }

@@ -1450,3 +1450,60 @@
     font-size: 0.72rem;
     letter-spacing: 0.04em;
 }
+
+/* ==============================================
+   MI PERFIL — AVATAR CIRCULAR CENTRADO (2026-10-19)
+   Vuelve a ser un círculo, centrado, y debajo van el nombre y «Rol de Ciudad». Como el conjunto
+   pasa a ocupar más alto, las pestañas (contadores) y el contenido bajan solos.
+   ============================================== */
+.perfil-seccion-layout {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    min-height: 0;
+}
+
+.perfil-avatar-btn {
+    flex: 0 0 104px;
+    width: 104px;
+    height: 104px;
+    align-self: center;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+
+.perfil-avatar-img-seccion {
+    border-radius: 50%;
+}
+
+.perfil-avatar-overlay {
+    border-radius: 50%;
+}
+
+/* El punto de estado se apoya en el borde del círculo, no en la esquina del cuadrado. */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: 8px;
+    bottom: 8px;
+}
+
+.perfil-seccion-info {
+    align-items: center;
+    text-align: center;
+    align-self: center;
+}
+
+.perfil-nombre-artista-wrapper {
+    align-items: center;
+    text-align: center;
+}
+
+/* Un poco de aire arriba: el círculo ya no va pegado al header. */
+#perfil-usuario .perfil-seccion {
+    padding-top: 18px;
+}
