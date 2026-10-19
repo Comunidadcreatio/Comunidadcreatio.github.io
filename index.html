@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.744';
+        var currentVer = '1.0.745';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=7c436ad366">
+    <link rel="stylesheet" href="css/style.css?v=5c3458dc55">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -447,25 +447,13 @@
                             <span class="perfil-ciudad"></span>
                         </div>
 
-                        <div class="perfil-estadisticas" id="perfil-estadisticas">
-                            <div class="stat">
-                                <span class="stat-value" id="stats-cavents">0</span>
-                                <span class="stat-label">Cavents</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value" id="stats-problogs">0</span>
-                                <span class="stat-label">Problogs</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value" id="stats-comcons">0</span>
-                                <span class="stat-label">Comcons</span>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 
                 <div class="perfil-iconos-stats">
                     <button class="perfil-tab-btn active" data-tab="cavents" aria-label="Mis cavents">
+                        <span class="tab-num" id="stats-cavents">0</span>
                         <!-- Mismos iconos que el nav (estilo solido). Los huecos van con MASCARA para
                              que sean transparentes: aqui el fondo no es --color-white (el perfil va
                              sobre la imagen de la app), asi que pintarlos de blanco se veria mal. -->
@@ -480,8 +468,10 @@
                             <path d="M12 12.5v8.5M8.5 12.5L5 21M15.5 12.5L19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                             <path d="M5.5 17.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                         </svg>
+                        <span class="tab-label">Cavents</span>
                     </button>
                     <button class="perfil-tab-btn" data-tab="problogs" aria-label="Mis problogs">
+                        <span class="tab-num" id="stats-problogs">0</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <defs>
                                 <mask id="perfil-mask-problogs">
@@ -491,8 +481,10 @@
                             </defs>
                             <path d="M4 20c4.6 0 8.7-2.6 11.2-7.2C16.9 10 18.3 7.8 20.5 6.8c-.7 4.6-2.7 8.3-6.2 10.9C11.5 19.6 7.9 20 4 20z" fill="currentColor" mask="url(#perfil-mask-problogs)"></path>
                         </svg>
+                        <span class="tab-label">Problogs</span>
                     </button>
                     <button class="perfil-tab-btn" data-tab="comcons" aria-label="Mis comcons">
+                        <span class="tab-num" id="stats-comcons">0</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <defs>
                                 <mask id="perfil-mask-comcons">
@@ -503,6 +495,7 @@
                             <path d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11z" fill="currentColor"></path>
                             <circle cx="12" cy="8" r="6" fill="currentColor" mask="url(#perfil-mask-comcons)"></circle>
                         </svg>
+                        <span class="tab-label">Comcons</span>
                     </button>
                 </div>
 

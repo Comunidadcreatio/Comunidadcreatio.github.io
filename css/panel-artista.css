@@ -1291,3 +1291,46 @@
     outline: none;
     border-color: var(--color-text);
 }
+
+/* ==============================================
+   CONTADORES DENTRO DE LAS PESTAÑAS (2026-10-18)
+   Cada pestaña es [número] [icono] .... [nombre], con el nombre justificado a la derecha. Se
+   elimina la fila de contadores que había encima, así que se gana ese alto.
+   ============================================== */
+.perfil-iconos-stats {
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.perfil-tab-btn {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.perfil-tab-btn .tab-num {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-text);
+    min-width: 1.1em;
+    text-align: left;
+}
+
+.perfil-tab-btn .tab-label {
+    margin-left: auto;
+    /* 0,56rem y poco espaciado: en un tercio de 103 px, con el número y el icono, «PROBLOGS»
+       y «COMCONS» se cortaban con puntos suspensivos. */
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #666);
+    white-space: nowrap;
+}
+
+.perfil-tab-btn.active .tab-label {
+    color: var(--color-text);
+}
