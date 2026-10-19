@@ -799,7 +799,7 @@
     align-items: stretch;
     width: 100%;
     height: calc(60px + env(safe-area-inset-bottom, 0px));
-    padding: 0 16px;
+    padding: 0 12px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background-color: var(--color-white);
     border: none;
@@ -863,7 +863,7 @@
     align-items: center;
     justify-content: center;
     gap: 1px;
-    padding: 2px 6px;
+    padding: 2px 4px;
     color: var(--color-black);
     cursor: pointer;
     z-index: 10;
@@ -871,8 +871,8 @@
     transition: color 0.3s ease, transform 0.15s ease;
 }
 .toggle-nav-btn svg {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     display: block;
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
@@ -940,9 +940,9 @@
    Antes estaban ocultas (`display: none`). */
 .toggle-label {
     display: block;
-    font-size: 8px;
+    font-size: 7.5px;
     line-height: 1;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
     color: inherit;
     opacity: 0.72;
     white-space: nowrap;
@@ -1943,8 +1943,8 @@
         padding: 2px 4px;
     }
     .toggle-nav-btn svg {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
     }
     .btn-perfil-circular {
         width: 42px;
