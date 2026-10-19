@@ -37,7 +37,9 @@ export function getFotoPerfil() {
 
 export function guardarFotoPerfil(dataUrl) {
     // Crear thumbnail para no exceder la cuota de localStorage (~5-10 MB)
-    const MAX_THUMB_W = 200;
+    const MAX_THUMB_W = 400;   // 400 y no 200: el avatar del perfil mide 104 px CSS (208-312 reales)
+                              // y con 200 px se veia pixelado cuando la foto viene del cache local.
+                              // A 400 px un JPEG 0.7 ocupa ~30 KB, muy por debajo de la cuota.
     try {
         const img = new Image();
         img.onload = () => {
@@ -112,12 +114,17 @@ let datos = null;
     fusionarArtistaActual(datos);
 
     const src = datos.foto_perfil || AVATAR_DEFAULT;
-    ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach((elId) => {
-        const img = /** @type {HTMLImageElement | null} */ (document.getElementById(elId));
-        if (img) { img.src = src; img.sizes = '48px'; img.srcset = srcsetCloudinary(src, [48, 96, 144]); }
-    });
-    document.querySelectorAll('.perfil-avatar-img, .perfil-avatar-img-seccion')
+    // El avatar del nav (mini) y el grande del perfil NO se piden igual: el grande mide 104 px
+    // CSS, asi que con `sizes="48px"` el navegador elegia la imagen de 96 px y la estiraba a
+    // 208-312 px reales -> se veia pixelado. Cada uno con su `sizes` y sus anchos. (2026-10-18)
+    const mini = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-mini'));
+    if (mini) { mini.src = src; mini.sizes = '48px'; mini.srcset = srcsetCloudinary(src, [48, 96, 144]); }
+    const grande = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
+    if (grande) { grande.src = src; grande.sizes = '104px'; grande.srcset = srcsetCloudinary(src, [104, 208, 312]); }
+    document.querySelectorAll('.perfil-avatar-img')
         .forEach((img) => { const el = /** @type {HTMLImageElement} */ (img); el.src = src; el.sizes = '48px'; el.srcset = srcsetCloudinary(src, [48, 96, 144]); });
+    document.querySelectorAll('.perfil-avatar-img-seccion')
+        .forEach((img) => { const el = /** @type {HTMLImageElement} */ (img); el.src = src; el.sizes = '104px'; el.srcset = srcsetCloudinary(src, [104, 208, 312]); });
     document.querySelectorAll('.perfil-nombre-artista-seccion')
         .forEach((el) => { el.textContent = datos.nombre_artista || 'Artista'; });
     if (datos.nombre_real) {
@@ -146,10 +153,11 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
     // Si estamos viendo un perfil externo, no sobrescribir sus datos con los del usuario logueado
     if (!viendoPerfilExterno) {
         const src = getFotoPerfil() || AVATAR_DEFAULT;
-        ['perfil-avatar-mini', 'perfil-avatar-seccion'].forEach(id => {
-            const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
-            if (img) { img.src = src; img.sizes = '48px'; img.srcset = srcsetCloudinary(src, [48, 96, 144]); }
-        });
+        // Mismo reparto que arriba: el mini a 48 y el grande (104 px CSS) con anchos mayores.
+        const mini = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-mini'));
+        if (mini) { mini.src = src; mini.sizes = '48px'; mini.srcset = srcsetCloudinary(src, [48, 96, 144]); }
+        const grande = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
+        if (grande) { grande.src = src; grande.sizes = '104px'; grande.srcset = srcsetCloudinary(src, [104, 208, 312]); }
         const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
         const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
         const ciudad = (artistaActual && artistaActual.ciudad) || '';

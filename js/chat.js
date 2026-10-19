@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=7da631dcf6';
 import { artistaActual } from './auth.js?v=8dbd042376';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl, cuandoLibre } from './utils.js?v=7e1398d254';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=9dec6c57a4';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=170a95e9fe';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls

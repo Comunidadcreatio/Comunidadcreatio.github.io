@@ -591,8 +591,8 @@
     position: absolute;
     right: 3px;
     bottom: 3px;
-    width: 14px;
-    height: 14px;
+    width: 11px;
+    height: 11px;
     background-color: var(--color-gray-400);
     border: 2px solid var(--color-black);
     border-radius: 50%;
