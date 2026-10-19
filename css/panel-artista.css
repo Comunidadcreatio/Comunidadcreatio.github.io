@@ -1507,3 +1507,82 @@
 #perfil-usuario .perfil-seccion {
     padding-top: 18px;
 }
+
+/* ==============================================
+   CABECERA DEL PERFIL MÁS GRANDE (2026-10-19)
+   Avatar circular más grande, nombre de usuario más grande, el nombre real debajo en fino y, en
+   la línea del rol, el pin de ubicación y la bandera del municipio en un círculo pequeño. Todo el
+   texto de esa línea con el mismo grosor fino.
+   ============================================== */
+.perfil-avatar-btn {
+    flex: 0 0 132px;
+    width: 132px;
+    height: 132px;
+}
+
+.perfil-nombre-artista-seccion {
+    font-size: 1.5rem;
+    line-height: 1.2;
+}
+
+/* Nombre y apellidos: más pequeño y con la fuente más delgada. */
+.perfil-nombre-real-seccion {
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-nombre-real:empty {
+    display: none;
+}
+
+/* Línea «pin + Rol de Ciudad + bandera»: todo con el mismo grosor fino. */
+.perfil-rol-linea {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-rol-linea .perfil-rol,
+.perfil-rol-linea .perfil-ciudad,
+.perfil-rol-linea .perfil-ciudad::before {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--color-text-muted, #666);
+}
+
+.perfil-pin {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    stroke-width: 2;
+    opacity: 0.85;
+}
+
+.perfil-bandera {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gray-300, #d6d6d6);
+    background: var(--color-white);
+}
+
+.perfil-bandera[hidden] {
+    display: none;
+}
+
+.perfil-bandera img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

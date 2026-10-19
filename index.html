@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.752';
+        var currentVer = '1.0.753';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e176f05af3">
+    <link rel="stylesheet" href="css/style.css?v=64df2feab7">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -382,11 +382,17 @@
                     </button>
                     <div class="perfil-seccion-info">
                         <div class="perfil-nombre-artista-wrapper">
-                            <!-- Dos lineas: el nombre arriba y «Rol de Ciudad» debajo (2026-10-19).
-                                 El rol sale de lo que el usuario eligio al registrarse. -->
+                            <!-- Nombre de usuario, nombre real y «Rol de Ciudad» con pin y bandera
+                                 del municipio. (2026-10-19) -->
                             <span class="perfil-nombre-artista perfil-nombre-artista-seccion"></span>
+                            <span class="perfil-nombre-real perfil-nombre-real-seccion"></span>
                             <span class="perfil-rol-linea">
+                                <svg class="perfil-pin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
                                 <span class="perfil-rol"></span><span class="perfil-ciudad"></span>
+                                <span class="perfil-bandera" hidden><img id="perfil-bandera-img" alt="" src=""></span>
                             </span>
                         </div>
                     </div>
@@ -1197,7 +1203,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=e49f021fb7" type="module"></script>
+    <script src="js/main.js?v=3caf9c97d4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

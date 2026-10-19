@@ -31,6 +31,28 @@ function etiquetaRol(rol) {
     const clave = String(rol || 'artista').toLowerCase();
     return NOMBRES_ROL[clave] || 'Artista';
 }
+/**
+ * Pinta la bandera del municipio en la cabecera del perfil (o la oculta si no hay).
+ * El mapa municipio -> fichero lo pone ciudades.js en window.BANDERA_POR_CIUDAD, el mismo
+ * que usan el registro y el directorio del chat.
+ * @param {string | null | undefined} ciudad
+ */
+function pintarBanderaPerfil(ciudad) {
+    const img = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-bandera-img'));
+    const caja = img ? img.parentElement : null;
+    if (!img || !caja) return;
+    const mapa = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).BANDERA_POR_CIUDAD);
+    const archivo = (mapa && ciudad) ? mapa[ciudad] : '';
+    if (archivo) {
+        img.src = 'iconos/banderas/' + archivo;
+        img.alt = '';
+        caja.hidden = false;
+    } else {
+        img.removeAttribute('src');
+        img.alt = '';
+        caja.hidden = true;
+    }
+}
 
 // Referencia a funciones del módulo de navegación (se inyecta para evitar dependencia circular)
 let _navegacion = null;
@@ -148,6 +170,7 @@ let datos = null;
     // «Artista / Comprador / Coleccionista / Curador / Galería» debajo del nombre.
     document.querySelectorAll('.perfil-rol')
         .forEach((el) => { el.textContent = etiquetaRol(datos.rol || obtenerRolUsuario()); });
+    pintarBanderaPerfil(datos.ciudad || '');
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
             .forEach((el) => { el.textContent = datos.nombre_real || ''; });
@@ -189,6 +212,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         document.querySelectorAll('.perfil-ciudad').forEach(el => {
             el.textContent = ciudad ? escapeHtml(ciudad) : '';
         });
+        pintarBanderaPerfil(ciudad);
 
         // Y se piden los datos buenos al servidor (nombre, foto y contadores).
         refrescarDatosPropios();
