@@ -97,20 +97,20 @@ export function setupMiCuenta() {
         try { return txt ? JSON.parse(txt) : {}; } catch (e) { return {}; }
     };
 
-    /** Máximo de palabras de la biografía. */
-    const MAX_PALABRAS_BIO = 200;
+    /** Máximo de CARACTERES de la biografía. */
+    const MAX_CARACTERES_BIO = 200;
 
-    /** Cuenta palabras de verdad: separa por espacios y descarta vacíos. */
-    const contarPalabras = (texto) => String(texto || '').trim().split(/\s+/).filter(Boolean).length;
+    /** Cuenta caracteres (todo lo escrito, incluidos espacios). */
+    const contarCaracteres = (texto) => String(texto || '').length;
 
-    /** Pinta «N / 200 palabras» y marca en rojo si se pasa. */
+    /** Pinta «N / 200 caracteres» y marca en rojo si se pasa. */
     const actualizarContadorBio = () => {
         const contador = document.getElementById('perfil-bio-contador');
         const campo = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('perfil-bio-input'));
         if (!contador || !campo) return;
-        const n = contarPalabras(campo.value);
-        contador.textContent = n + ' / ' + MAX_PALABRAS_BIO + ' palabras';
-        contador.classList.toggle('perfil-bio-contador-pasado', n > MAX_PALABRAS_BIO);
+        const n = contarCaracteres(campo.value);
+        contador.textContent = n + ' / ' + MAX_CARACTERES_BIO + ' caracteres';
+        contador.classList.toggle('perfil-bio-contador-pasado', n > MAX_CARACTERES_BIO);
     };
 
     const cargarPerfil = async () => {
@@ -184,10 +184,10 @@ export function setupMiCuenta() {
                 otro: valorDe('perfil-cobro-otro')
             };
             if (estado) estado.textContent = '';
-            // Tope de 200 palabras: si se pasa, no se guarda y se avisa.
-            if (contarPalabras(bio) > MAX_PALABRAS_BIO) {
-                if (estado) estado.textContent = '❌ La biografía pasa de ' + MAX_PALABRAS_BIO + ' palabras.';
-                showWarning('La biografía no puede pasar de ' + MAX_PALABRAS_BIO + ' palabras.');
+            // Tope de 200 CARACTERES: si se pasa, no se guarda y se avisa.
+            if (contarCaracteres(bio) > MAX_CARACTERES_BIO) {
+                if (estado) estado.textContent = '❌ La biografía pasa de ' + MAX_CARACTERES_BIO + ' caracteres.';
+                showWarning('La biografía no puede pasar de ' + MAX_CARACTERES_BIO + ' caracteres.');
                 return;
             }
             const textoOriginal = btnGuardarPerfil.textContent;
@@ -205,6 +205,11 @@ export function setupMiCuenta() {
                     const municipio = (mapaMuni && ciudad) ? (mapaMuni[ciudad] || ciudad) : ciudad;
                     document.querySelectorAll('.perfil-ciudad').forEach((el) => { el.textContent = municipio; });
                     document.querySelectorAll('.perfil-bio').forEach((el) => { el.textContent = bio; });
+                    // Iconos de redes: se repintan con lo que se acaba de guardar (perfil.js escucha).
+                    document.dispatchEvent(new CustomEvent('perfil:redes', {
+                        detail: { instagram: redes.instagram, x: redes.x, whatsapp: redes.whatsapp, correo: redes.correo, web: redes.web }
+                    }));
+                    if (artistaActual) artistaActual.redes = JSON.stringify(redes);
                     if (artistaActual) artistaActual.bio = bio;
                     if (estado) estado.textContent = '✅ Guardado.';
                     showSuccess('Perfil actualizado');

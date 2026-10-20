@@ -1713,3 +1713,56 @@
 .perfil-bio:empty {
     display: none;
 }
+
+/* ==============================================
+   PUNTO VERDE CIRCULAR Y REDES SOCIALES (2026-10-19)
+   - El indicador de "activo" vuelve a ser círculo y algo más grande.
+   - Los iconos de redes van debajo de la biografía, en fila y centrados.
+   ============================================== */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    right: 6px;
+    bottom: 6px;
+}
+
+.perfil-redes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.perfil-redes:empty {
+    display: none;
+}
+
+.perfil-red {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: var(--color-text-muted, #666);
+    background: rgba(0, 0, 0, 0.04);
+    transition: color 0.15s ease, background 0.15s ease;
+    text-decoration: none;
+}
+
+.perfil-red:hover,
+.perfil-red:focus-visible {
+    color: var(--color-text, #1a1a1a);
+    background: rgba(0, 0, 0, 0.09);
+}
+
+.perfil-red svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}

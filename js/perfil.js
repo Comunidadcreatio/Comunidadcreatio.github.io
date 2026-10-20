@@ -51,6 +51,77 @@ function municipioDe(ciudad) {
  * Pinta la biografía en la cabecera del perfil (o la oculta si está vacía).
  * @param {string | null | undefined} bio
  */
+/** Iconos (trazo, heredan el color) de cada red. */
+const ICONOS_RED = {
+    instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 21l2.2-5.3A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.6 9.4c0 3.1 2.4 5.6 5.5 5.6"/></svg>',
+    correo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>',
+    web: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"/></svg>'
+};
+
+/** Nombre accesible de cada red. */
+const ETIQUETAS_RED = {
+    instagram: 'Instagram',
+    x: 'X (Twitter)',
+    whatsapp: 'WhatsApp',
+    correo: 'Correo',
+    web: 'Sitio web'
+};
+
+/**
+ * Convierte lo que escribió el usuario en un enlace seguro. Devuelve '' si no vale.
+ * @param {string} clave
+ * @param {any} valor
+ * @returns {string}
+ */
+function enlaceDeRed(clave, valor) {
+    const v = String(valor == null ? '' : valor).trim();
+    if (!v) return '';
+    if (clave === 'instagram') return 'https://instagram.com/' + encodeURIComponent(v.replace(/^@+/, ''));
+    if (clave === 'x') return 'https://x.com/' + encodeURIComponent(v.replace(/^@+/, ''));
+    if (clave === 'whatsapp') {
+        const soloDigitos = v.replace(/[^0-9]/g, '');
+        return soloDigitos ? 'https://wa.me/' + soloDigitos : '';
+    }
+    if (clave === 'correo') return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? 'mailto:' + v : '';
+    if (clave === 'web') return /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    return '';
+}
+
+/**
+ * Pinta los iconos de las redes que el usuario haya rellenado, debajo de la biografía.
+ * @param {any} redes  objeto o texto JSON con {instagram, x, whatsapp, correo, web}
+ */
+function pintarRedesPerfil(redes) {
+    const caja = /** @type {HTMLElement | null} */ (document.getElementById('perfil-redes'));
+    if (!caja) return;
+    let datos = redes;
+    if (typeof datos === 'string') {
+        try { datos = JSON.parse(datos); } catch (e) { datos = {}; }
+    }
+    if (!datos || typeof datos !== 'object') datos = {};
+    caja.textContent = '';
+    for (const clave of Object.keys(ETIQUETAS_RED)) {
+        const url = enlaceDeRed(clave, datos[clave]);
+        if (!url) continue;
+        const a = document.createElement('a');
+        a.className = 'perfil-red';
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.setAttribute('aria-label', ETIQUETAS_RED[clave]);
+        a.title = ETIQUETAS_RED[clave];
+        a.innerHTML = ICONOS_RED[clave] || '';
+        caja.appendChild(a);
+    }
+}
+
+// cuenta.js avisa cuando se guardan las redes desde Mi perfil, para repintar los iconos.
+document.addEventListener('perfil:redes', (ev) => {
+    pintarRedesPerfil(/** @type {CustomEvent} */ (ev).detail);
+});
+
 function pintarBioPerfil(bio) {
     const el = /** @type {HTMLElement | null} */ (document.getElementById('perfil-bio'));
     if (!el) return;
@@ -191,6 +262,7 @@ let datos = null;
         .forEach((el) => { el.textContent = etiquetaRol(datos.rol || obtenerRolUsuario()); });
     pintarBanderaPerfil(datos.ciudad || '');
     pintarBioPerfil(datos.bio);
+    pintarRedesPerfil(datos.redes);
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
             .forEach((el) => { el.textContent = datos.nombre_real || ''; });
@@ -234,6 +306,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         });
         pintarBanderaPerfil(ciudad);
         pintarBioPerfil(artistaActual && artistaActual.bio);
+        pintarRedesPerfil(artistaActual && artistaActual.redes);
 
         // Y se piden los datos buenos al servidor (nombre, foto y contadores).
         refrescarDatosPropios();
