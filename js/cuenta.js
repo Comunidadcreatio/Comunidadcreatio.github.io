@@ -217,7 +217,6 @@ const ICONOS_RED_PANEL = {
     ];
     const listaRedes = document.getElementById('perfil-redes-lista');
     const menuRedes = document.getElementById('perfil-red-menu');
-    const btnAgregarRed = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-agregar-red'));
 
     /** Añade una fila para esa red (si no estaba ya). */
     const agregarRed = (clave, valor) => {
@@ -273,11 +272,6 @@ const ICONOS_RED_PANEL = {
         return salida;
     };
 
-    const cerrarMenuRedes = () => {
-        if (menuRedes) menuRedes.hidden = true;
-        if (btnAgregarRed) btnAgregarRed.setAttribute('aria-expanded', 'false');
-    };
-
     /** Menú con las redes que aún no se han añadido. */
     const pintarMenuRedes = () => {
         if (!menuRedes) return;
@@ -301,14 +295,8 @@ const ICONOS_RED_PANEL = {
         });
     };
 
-    if (btnAgregarRed && menuRedes) {
-        btnAgregarRed.addEventListener('click', () => {
-            const abrir = menuRedes.hidden;
-            pintarMenuRedes();
-            menuRedes.hidden = !abrir;
-            btnAgregarRed.setAttribute('aria-expanded', abrir ? 'true' : 'false');
-        });
-    }
+    // Los iconos van siempre visibles junto al título: no hay botón + ni que abrir nada.
+    pintarMenuRedes();
 
     const cargarPerfil = async () => {
         if (perfilCargado) return;
