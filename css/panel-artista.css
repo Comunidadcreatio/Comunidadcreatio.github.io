@@ -1370,9 +1370,9 @@
     color: var(--color-text-muted, #666);
 }
 
-/* Aire entre el rol y el «de»: dentro de un flex los espacios del ::before se comen. */
+/* Sin margen: el hueco entre «Artista» y «de» lo pone el gap del flex (un solo espacio). */
 .perfil-rol-linea .perfil-rol {
-    margin-right: 0.35em;
+    margin-right: 0;
 }
 
 .perfil-rol-linea .perfil-ciudad::before {
@@ -1541,7 +1541,9 @@
 .perfil-rol-linea {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    /* 3 px = un espacio real a 0,82rem. Antes eran 6 px de gap MAS 0,35em de margen en el rol, y
+       por eso «Artista» quedaba demasiado lejos de «de». */
+    gap: 3px;
     font-size: 0.82rem;
     font-weight: 300;
     color: var(--color-text-muted, #666);
