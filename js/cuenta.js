@@ -216,14 +216,14 @@ const ICONOS_RED_PANEL = {
         { clave: 'web', etiqueta: 'Sitio web', placeholder: 'https://' }
     ];
     const listaRedes = document.getElementById('perfil-redes-lista');
-    const menuRedes = document.getElementById('perfil-red-menu');
+    const redesSelectTrigger = /** @type {HTMLButtonElement | null} */ (document.getElementById('redes-select-trigger'));
+    const redesSelectDropdown = /** @type {HTMLElement | null} */ (document.getElementById('redes-select-dropdown'));
 
-    /** Añade una fila para esa red (si no estaba ya). */
+    /** Añade una fila para esa red (se permiten varias de la misma). */
     const agregarRed = (clave, valor) => {
         if (!listaRedes) return;
         const def = REDES_DISPONIBLES.find((r) => r.clave === clave);
         if (!def) return;
-        // Se permiten varias cuentas de la misma red.
         const fila = document.createElement('div');
         fila.className = 'perfil-campo-red';
         fila.dataset.red = clave;
@@ -239,7 +239,6 @@ const ICONOS_RED_PANEL = {
         listaRedes.appendChild(fila);
     };
 
-    /** Pinta las que ya tenía guardadas. */
     /** Cuentas de una red: acepta texto suelto (datos viejos) o lista. */
     const cuentasDe = (v) => {
         if (Array.isArray(v)) return v.filter((x) => typeof x === 'string' && x.trim());
@@ -247,6 +246,7 @@ const ICONOS_RED_PANEL = {
         return [];
     };
 
+    /** Pinta las que ya tenía guardadas. */
     const pintarRedesGuardadas = (redes) => {
         if (!listaRedes) return;
         listaRedes.textContent = '';
@@ -257,7 +257,6 @@ const ICONOS_RED_PANEL = {
 
     /** Lo que hay escrito ahora mismo. */
     const leerRedes = () => {
-        /** @type {Record<string, string>} */
         /** @type {Record<string, string[]>} */
         const salida = {};
         if (!listaRedes) return salida;
@@ -272,31 +271,49 @@ const ICONOS_RED_PANEL = {
         return salida;
     };
 
-    /** Menú con las redes que aún no se han añadido. */
-    const pintarMenuRedes = () => {
-        if (!menuRedes) return;
-        menuRedes.textContent = '';
-        // Salen todas siempre: se pueden añadir varias cuentas de la misma red.
+    /** Cierra el desplegable de redes. */
+    const cerrarSelectRedes = () => {
+        if (redesSelectDropdown) redesSelectDropdown.classList.remove('open');
+        if (redesSelectTrigger) redesSelectTrigger.setAttribute('aria-expanded', 'false');
+    };
+
+    /** Llena el desplegable con todas las redes (icono + nombre). */
+    const pintarSelectRedes = () => {
+        if (!redesSelectDropdown) return;
+        redesSelectDropdown.textContent = '';
         REDES_DISPONIBLES.forEach(({ clave, etiqueta }) => {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'perfil-red-opcion';
-            b.setAttribute('aria-label', 'Añadir ' + etiqueta);
-            b.title = etiqueta;
-            b.innerHTML = ICONOS_RED_PANEL[clave] || etiqueta;
+            b.className = 'custom-select-option';
+            b.setAttribute('role', 'option');
+            const icono = document.createElement('span');
+            icono.className = 'opcion-icono-red';
+            icono.innerHTML = ICONOS_RED_PANEL[clave] || '';
+            const nombre = document.createElement('span');
+            nombre.className = 'opcion-nombre';
+            nombre.textContent = etiqueta;
+            b.appendChild(icono);
+            b.appendChild(nombre);
             b.addEventListener('click', () => {
                 agregarRed(clave, '');
-                // Se queda abierto para poder añadir varias seguidas.
-                pintarMenuRedes();
+                cerrarSelectRedes();
                 const ultimo = listaRedes ? listaRedes.querySelector('.perfil-campo-red:last-child input') : null;
                 if (ultimo) /** @type {HTMLInputElement} */ (ultimo).focus();
             });
-            menuRedes.appendChild(b);
+            redesSelectDropdown.appendChild(b);
         });
     };
 
-    // Los iconos van siempre visibles junto al título: no hay botón + ni que abrir nada.
-    pintarMenuRedes();
+    if (redesSelectTrigger && redesSelectDropdown) {
+        redesSelectTrigger.addEventListener('click', () => {
+            const abierto = redesSelectDropdown.classList.toggle('open');
+            redesSelectTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+        document.addEventListener('click', (ev) => {
+            const objetivo = /** @type {Node} */ (ev.target);
+            if (!redesSelectTrigger.contains(objetivo) && !redesSelectDropdown.contains(objetivo)) cerrarSelectRedes();
+        });
+    }
 
     // ============================================
     // MÉTODOS DE PAGO (Monetización)
@@ -358,7 +375,8 @@ const ICONOS_RED_PANEL = {
 
     /** @type {any[]} */
     let metodosPago = [];
-    const pagoBadges = document.getElementById('pago-badges');
+    const pagoSelectTrigger = /** @type {HTMLButtonElement | null} */ (document.getElementById('pago-select-trigger'));
+    const pagoSelectDropdown = /** @type {HTMLElement | null} */ (document.getElementById('pago-select-dropdown'));
     const pagoPanel = document.getElementById('pago-panel');
     const pagoLista = document.getElementById('pago-lista');
 
@@ -516,25 +534,49 @@ const ICONOS_RED_PANEL = {
         if (cancelar) cancelar.addEventListener('click', cerrarPanelPago);
     };
 
-    /** Pinta los círculos de todos los métodos. */
-    const pintarBadgesPago = () => {
-        if (!pagoBadges) return;
-        pagoBadges.textContent = '';
+    /** Cierra el desplegable de pagos. */
+    const cerrarSelectPago = () => {
+        if (pagoSelectDropdown) pagoSelectDropdown.classList.remove('open');
+        if (pagoSelectTrigger) pagoSelectTrigger.setAttribute('aria-expanded', 'false');
+    };
+
+    /** Llena el desplegable con todos los métodos (icono + nombre). */
+    const pintarSelectPago = () => {
+        if (!pagoSelectDropdown) return;
+        pagoSelectDropdown.textContent = '';
         metodosTodos().forEach((m) => {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'pago-badge';
-            b.style.setProperty('--pago-color', m.color);
-            pintarLogoPago(b, m);
-            b.title = m.nombre;
-            b.setAttribute('aria-label', 'Añadir ' + m.nombre);
+            b.className = 'custom-select-option';
+            b.setAttribute('role', 'option');
+            const icono = document.createElement('span');
+            icono.className = 'pago-badge opcion-badge';
+            icono.style.setProperty('--pago-color', m.color);
+            pintarLogoPago(icono, m);
+            const nombre = document.createElement('span');
+            nombre.className = 'opcion-nombre';
+            nombre.textContent = m.nombre;
+            b.appendChild(icono);
+            b.appendChild(nombre);
             b.addEventListener('click', () => {
+                cerrarSelectPago();
                 if (m.familia === 'banco') preguntarTipoBanco(m);
                 else abrirFormularioPago(m.id, '');
             });
-            pagoBadges.appendChild(b);
+            pagoSelectDropdown.appendChild(b);
         });
     };
+
+    if (pagoSelectTrigger && pagoSelectDropdown) {
+        pagoSelectTrigger.addEventListener('click', () => {
+            const abierto = pagoSelectDropdown.classList.toggle('open');
+            pagoSelectTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+        document.addEventListener('click', (ev) => {
+            const objetivo = /** @type {Node} */ (ev.target);
+            if (!pagoSelectTrigger.contains(objetivo) && !pagoSelectDropdown.contains(objetivo)) cerrarSelectPago();
+        });
+    }
 
     /** Carga lo guardado. */
     const cargarMetodosPago = (cobro) => {
@@ -653,7 +695,9 @@ const ICONOS_RED_PANEL = {
         });
     }
 
-    pintarBadgesPago();
+    // Los dos desplegables se llenan al arrancar.
+    pintarSelectPago();
+    pintarSelectRedes();
 
     const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {

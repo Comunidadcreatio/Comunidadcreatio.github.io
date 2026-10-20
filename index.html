@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.769';
+        var currentVer = '1.0.770';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=007991c4c7">
+    <link rel="stylesheet" href="css/style.css?v=b44ffac2eb">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -857,7 +857,11 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Redes y canales de contacto<div class="perfil-red-menu" id="perfil-red-menu"></div></h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Redes y canales de contacto</h4>
+                            <div class="custom-select select-panel" id="redes-select">
+                                <button type="button" class="custom-select-trigger" id="redes-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="redes-select-dropdown">Añadir red o canal</button>
+                                <div class="custom-select-dropdown" id="redes-select-dropdown" role="listbox" aria-label="Añadir red o canal"></div>
+                            </div>
                             
                             <div class="perfil-redes-lista" id="perfil-redes-lista"></div>
                             
@@ -885,7 +889,10 @@
 <div class="cuenta-item">
                         <div class="cuenta-item-info">
                             <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Opciones para cobrar</h4>
-                            <div class="pago-badges" id="pago-badges"></div>
+                            <div class="custom-select select-panel" id="pago-select">
+                                <button type="button" class="custom-select-trigger" id="pago-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="pago-select-dropdown">Elegir método de cobro</button>
+                                <div class="custom-select-dropdown" id="pago-select-dropdown" role="listbox" aria-label="Método de cobro"></div>
+                            </div>
                             <div class="pago-panel" id="pago-panel" hidden></div>
                             <div class="pago-lista" id="pago-lista"></div>
                         </div>
@@ -1221,7 +1228,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=69ab695460" type="module"></script>
+    <script src="js/main.js?v=a6d1512fed" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

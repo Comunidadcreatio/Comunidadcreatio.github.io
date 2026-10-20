@@ -2440,3 +2440,109 @@
     width: 34px;
     height: 34px;
 }
+
+/* ==============================================
+   SELECTS CON ICONO DEL PANEL (2026-10-20)
+   Mismo aspecto que el del municipio: desplegable con icono + nombre.
+   ============================================== */
+.select-panel {
+    position: relative;
+    max-width: 360px;
+    margin-top: 12px;
+}
+
+.select-panel .custom-select-trigger {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.select-panel .custom-select-trigger::after {
+    content: '▾';
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.select-panel .custom-select-dropdown {
+    display: none;
+    position: absolute;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    margin-top: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 6px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
+    background: var(--color-gray-50, #fafafa);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+
+.select-panel .custom-select-dropdown.open {
+    display: block;
+}
+
+.select-panel .custom-select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.select-panel .custom-select-option:hover {
+    background: rgba(128, 128, 128, 0.14);
+}
+
+.select-panel .opcion-nombre {
+    flex: 1;
+    min-width: 0;
+}
+
+.select-panel .opcion-badge {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    font-size: 0.5rem;
+    pointer-events: none;
+}
+
+.select-panel .opcion-icono-red {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted, #666);
+}
+
+.select-panel .opcion-icono-red svg {
+    width: 18px;
+    height: 18px;
+}
+
+[data-theme="dark"] .select-panel .opcion-icono-red svg {
+    filter: invert(1);
+}
