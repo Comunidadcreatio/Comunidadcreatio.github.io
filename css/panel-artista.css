@@ -1588,3 +1588,58 @@
     object-fit: cover;
     display: block;
 }
+
+/* ==============================================
+   BANDERA COMO LA DEL CHAT (2026-10-19)
+   En el chat es un rectángulo redondeado de 34x22 (radio 3, borde fino). Aquí, igual pero un
+   poco más pequeña: 24x16.
+   ============================================== */
+.perfil-bandera {
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.perfil-bandera img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==============================================
+   CONTADORES CON ICONO Y MÁS SEPARADOS (2026-10-19)
+   Cada grupo es [marcador][icono] arriba y el nombre debajo. Los tres siguen centrados como
+   conjunto, pero se separan más entre sí (space-between con grupos del ancho de su contenido).
+   ============================================== */
+.perfil-iconos-stats {
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.perfil-tab-btn {
+    flex: 0 1 auto;
+}
+
+.perfil-tab-btn .tab-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.perfil-tab-btn .tab-icono {
+    width: 18px;
+    height: 18px;
+    display: block;
+    object-fit: contain;
+}
+
+[data-theme="dark"] .perfil-tab-btn .tab-icono {
+    filter: invert(1);
+}

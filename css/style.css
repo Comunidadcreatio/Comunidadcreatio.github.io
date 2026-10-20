@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=0f8a972e50');
+@import url('panel-artista.css?v=eda4028c5a');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
@@ -1993,7 +1993,8 @@
 .bottom-bar-left,
 .bottom-bar-right {
     justify-content: center;
-    gap: 6px;
+    /* Sin nombres debajo, los iconos se separan un poco más entre sí. */
+    gap: 14px;
 }
 
 .toggle-label {
