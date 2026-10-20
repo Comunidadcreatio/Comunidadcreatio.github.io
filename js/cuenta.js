@@ -184,7 +184,11 @@ export function setupMiCuenta() {
             item.addEventListener('click', () => {
                 if (bloqueado) return;
                 muniHidden.value = capital;
-                if (muniTrigger) muniTrigger.textContent = municipio;
+                if (muniTrigger) {
+                    const banderaNueva = banderas[capital] || '';
+                    muniTrigger.innerHTML = (banderaNueva ? '<img class="custom-select-flag" src="iconos/banderas/' + banderaNueva + '" alt="">' : '') +
+                        '<span>' + municipio + '</span>';
+                }
                 cerrarMunicipios();
             });
             muniDropdown.appendChild(item);
@@ -192,7 +196,11 @@ export function setupMiCuenta() {
 
         if (capitalActual) {
             muniHidden.value = capitalActual;
-            if (muniTrigger) muniTrigger.textContent = municipioDeCapital(capitalActual);
+            if (muniTrigger) {
+                const banderaActual = banderas[capitalActual] || '';
+                muniTrigger.innerHTML = (banderaActual ? '<img class="custom-select-flag" src="iconos/banderas/' + banderaActual + '" alt="">' : '') +
+                    '<span>' + municipioDeCapital(capitalActual) + '</span>';
+            }
             muniDropdown.querySelectorAll('.custom-select-option').forEach((el) => {
                 el.classList.toggle('selected', /** @type {HTMLElement} */ (el).dataset.capital === capitalActual);
             });
@@ -210,6 +218,53 @@ export function setupMiCuenta() {
             if (!muniTrigger.contains(objetivo) && !muniDropdown.contains(objetivo)) cerrarMunicipios();
         });
     }
+
+    // ============================================
+    // VISIBILIDAD: qué bloques se enseñan en el perfil
+    // ============================================
+    const VISIBILIDAD_DEFECTO = { foto: true, municipio: true, bio: true, redes: true };
+    /** @type {Record<string, boolean>} */
+    let visibilidad = Object.assign({}, VISIBILIDAD_DEFECTO);
+    const switchesVisibilidad = [...document.querySelectorAll('.perfil-switch')];
+
+    /** Acepta el JSON guardado ("1"/"0") o un objeto; lo que falte queda visible. */
+    const normalizarVisibilidad = (valor) => {
+        let datos = valor;
+        if (typeof datos === 'string') { try { datos = JSON.parse(datos); } catch (e) { datos = null; } }
+        const salida = Object.assign({}, VISIBILIDAD_DEFECTO);
+        if (datos && typeof datos === 'object') {
+            Object.keys(salida).forEach((clave) => {
+                if (datos[clave] !== undefined) salida[clave] = String(datos[clave]) !== '0';
+            });
+        }
+        return salida;
+    };
+
+    const pintarSwitches = () => {
+        switchesVisibilidad.forEach((el) => {
+            const clave = /** @type {HTMLElement} */ (el).dataset.visibilidad || '';
+            el.setAttribute('aria-checked', visibilidad[clave] ? 'true' : 'false');
+        });
+    };
+
+    /** Enseña u oculta cada bloque en la cabecera del perfil. */
+    const aplicarVisibilidad = () => {
+        const avatar = document.getElementById('perfil-avatar-btn');
+        if (avatar) avatar.hidden = !visibilidad.foto;
+        document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.municipio; });
+        document.querySelectorAll('.perfil-bio').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.bio; });
+        document.querySelectorAll('.perfil-redes').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.redes; });
+    };
+
+    switchesVisibilidad.forEach((el) => {
+        el.addEventListener('click', () => {
+            const clave = /** @type {HTMLElement} */ (el).dataset.visibilidad || '';
+            visibilidad[clave] = !visibilidad[clave];
+            pintarSwitches();
+            aplicarVisibilidad();
+            if (artistaActual) artistaActual.visibilidad = JSON.stringify(visibilidad);
+        });
+    });
 
     // ============================================
     // REDES: se añaden de una en una con el botón +
@@ -638,6 +693,12 @@ const ICONOS_RED_PANEL = {
             }
             poner('perfil-bio-input', u.bio);
             actualizarContadorBio();
+            poner('perfil-username-input', u.nombre_artista);
+            const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
+            if (rolSelect) rolSelect.value = u.rol || 'artista';
+            visibilidad = normalizarVisibilidad(u.visibilidad);
+            pintarSwitches();
+            aplicarVisibilidad();
             const redes = parsear(u.redes);
             pintarRedesGuardadas(redes);
             cargarMetodosPago(u.cobro);
@@ -747,7 +808,7 @@ const ICONOS_RED_PANEL = {
             try {
                 const res = await apiRequest('/api/artistas/perfil-datos', {
                     method: 'PUT',
-                    body: JSON.stringify({ ciudad, redes, cobro, bio, foto_perfil: quitarFoto ? '' : undefined })
+                    body: JSON.stringify({ ciudad, redes, cobro, bio, visibilidad, foto_perfil: quitarFoto ? '' : undefined })
                 });
                 if (res && res.success) {
                     if (artistaActual) artistaActual.ciudad = ciudad;

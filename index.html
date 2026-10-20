@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.772';
+        var currentVer = '1.0.773';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=25d021ec41">
+    <link rel="stylesheet" href="css/style.css?v=9a85b3ce26">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -823,10 +823,30 @@
                                 <div class="accordion-content" id="perfil-content" hidden>
 
                     <div class="cuenta-item">
+                        <div class="cuenta-item-info">
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Nombre de usuario</h4>
+                            <input type="text" id="perfil-username-input" class="cuenta-item-valor" readonly aria-label="Nombre de usuario (no editable)">
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-info">
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h4M15 12h4M7 16h10"/></svg>Rol</h4>
+                            <select id="perfil-rol-select" class="cuenta-item-valor" disabled aria-label="Rol (no editable)">
+                                <option value="artista">Artista</option>
+                                <option value="comprador">Comprador</option>
+                                <option value="coleccionista">Coleccionista</option>
+                                <option value="curador">Curador</option>
+                                <option value="galeria">Galería</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
                         <div class="cuenta-avatar-fila">
                             <img id="perfil-avatar-preview" class="cuenta-avatar-preview" src="iconos/avatar-default.svg" alt="Foto de perfil actual">
                             <div class="cuenta-avatar-datos">
-                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto de perfil</h4>
+                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto de perfil<button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="foto" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button></h4>
                                 <div class="cuenta-item-actions">
                                     <button type="button" id="btn-cambiar-avatar-perfil" class="btn-cuenta-secundario">Cambiar foto</button>
                                     <button type="button" id="btn-quitar-avatar-perfil" class="btn-cuenta-secundario">Quitar foto</button>
@@ -837,7 +857,7 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Municipio de origen</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Municipio de origen<button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="municipio" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button></h4>
                             <input type="hidden" id="perfil-ciudad-input" value="">
                             <div class="custom-select perfil-muni-select" id="perfil-ciudad-select">
                                 <button type="button" class="custom-select-trigger" id="perfil-ciudad-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="perfil-ciudad-dropdown">Selecciona tu municipio</button>
@@ -849,7 +869,7 @@
 
 <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Biografía</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Biografía<button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="bio" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button></h4>
                             <textarea id="perfil-bio-input" class="cuenta-item-valor perfil-bio-texto" rows="4" maxlength="200" placeholder="Cuéntanos sobre ti, tu obra o tu trabajo…" aria-label="Biografía"></textarea>
                             <span class="perfil-bio-contador" id="perfil-bio-contador">0 / 200 caracteres</span>
                         </div>
@@ -857,7 +877,7 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Redes y canales de contacto</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Redes y canales de contacto<button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="redes" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button></h4>
                             <div class="custom-select select-panel" id="redes-select">
                                 <button type="button" class="custom-select-trigger" id="redes-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="redes-select-dropdown">Añadir red o canal</button>
                                 <div class="custom-select-dropdown" id="redes-select-dropdown" role="listbox" aria-label="Añadir red o canal"></div>
@@ -1228,7 +1248,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=c11cf0ac46" type="module"></script>
+    <script src="js/main.js?v=1a2f6e87b6" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

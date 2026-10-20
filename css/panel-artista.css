@@ -2546,3 +2546,60 @@
 [data-theme="dark"] .select-panel .opcion-icono-red svg {
     filter: invert(1);
 }
+
+/* ==============================================
+   SWITCH DE VISIBILIDAD (2026-10-20)
+   Junto a cada título de Mi perfil: decide si ese bloque se enseña en el perfil.
+   ============================================== */
+.perfil-switch {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.perfil-switch-bola {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-gray-400, #bdbdbd);
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.perfil-switch[aria-checked="true"] {
+    border-color: var(--color-ink);
+    background: rgba(128, 128, 128, 0.14);
+}
+
+.perfil-switch[aria-checked="true"] .perfil-switch-bola {
+    transform: translateX(18px);
+    background: var(--color-ink);
+}
+
+/* En el perfil, un bloque oculto no se ve aunque su clase tenga display propio. */
+#perfil-avatar-btn[hidden],
+.perfil-rol-linea[hidden],
+.perfil-bio[hidden],
+.perfil-redes[hidden] {
+    display: none !important;
+}
+
+/* El select de rol, apagado y con el mismo aire que los campos. */
+select.cuenta-item-valor {
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+input.cuenta-item-valor[readonly] {
+    cursor: default;
+}

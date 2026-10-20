@@ -137,6 +137,20 @@ document.addEventListener('perfil:redes', (ev) => {
     pintarRedesPerfil(/** @type {CustomEvent} */ (ev).detail);
 });
 
+/**
+ * Enseña u oculta los bloques del perfil según lo que el usuario haya decidido.
+ * @param {any} valor  JSON {"foto":"1",...} o el objeto ya parseado
+ */
+function aplicarVisibilidadHeader(valor) {
+    let datos = valor;
+    if (typeof datos === 'string') { try { datos = JSON.parse(datos); } catch (e) { datos = null; } }
+    const ver = (clave) => !datos || datos[clave] === undefined || String(datos[clave]) !== '0';
+    const avatar = document.getElementById('perfil-avatar-btn');
+    if (avatar) avatar.hidden = !ver('foto');
+    document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('municipio'); });
+    document.querySelectorAll('.perfil-bio').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('bio'); });
+    document.querySelectorAll('.perfil-redes').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('redes'); });
+}
 function pintarBioPerfil(bio) {
     const el = /** @type {HTMLElement | null} */ (document.getElementById('perfil-bio'));
     if (!el) return;
@@ -278,6 +292,7 @@ let datos = null;
     pintarBanderaPerfil(datos.ciudad || '');
     pintarBioPerfil(datos.bio);
     pintarRedesPerfil(datos.redes);
+    aplicarVisibilidadHeader(datos.visibilidad);
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
             .forEach((el) => { el.textContent = datos.nombre_real || ''; });
@@ -324,6 +339,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         pintarBanderaPerfil(ciudad);
         pintarBioPerfil(artistaActual && artistaActual.bio);
         pintarRedesPerfil(artistaActual && artistaActual.redes);
+        aplicarVisibilidadHeader(artistaActual && artistaActual.visibilidad);
 
         // Y se piden los datos buenos al servidor (nombre, foto y contadores).
         refrescarDatosPropios();
