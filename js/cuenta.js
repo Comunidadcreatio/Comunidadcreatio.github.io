@@ -166,10 +166,48 @@ export function setupMiCuenta() {
         actualizarContadorBio();
     }
 
+    // ============================================
+    // ACCORDION DE MONETIZACIÓN (opciones para cobrar)
+    // ============================================
+    const accordionMone = document.getElementById('accordion-monetizacion');
+    const moneContent = document.getElementById('monetizacion-content');
+    if (accordionMone && moneContent) {
+        accordionMone.addEventListener('click', () => {
+            const isExpanded = accordionMone.getAttribute('aria-expanded') === 'true';
+            accordionMone.setAttribute('aria-expanded', String(!isExpanded));
+            if (isExpanded) {
+                moneContent.hidden = true;
+                moneContent.style.maxHeight = '0';
+                moneContent.style.padding = '0 0';
+            } else {
+                moneContent.hidden = false;
+                setTimeout(() => {
+                    moneContent.style.maxHeight = '3000px';
+                    moneContent.style.padding = '20px 0';
+                }, 10);
+                // Los datos del perfil (incluido el cobro) se piden al abrir por primera vez.
+                cargarPerfil();
+            }
+        });
+    }
+
+    // El botón de Monetización guarda lo mismo que el de Mi perfil.
+    const btnGuardarMone = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-monetizacion'));
+    if (btnGuardarMone) {
+        btnGuardarMone.addEventListener('click', () => {
+            const principal = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
+            if (principal) principal.click();
+        });
+    }
+
     const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {
         btnGuardarPerfil.addEventListener('click', async () => {
-            const estado = document.getElementById('perfil-estado');
+            // El aviso se pinta en Mi perfil y en Monetización (se guardan juntos).
+            const estados = ['perfil-estado', 'monetizacion-estado']
+                .map((id) => document.getElementById(id))
+                .filter((el) => !!el);
+            const decir = (texto) => { estados.forEach((el) => { el.textContent = texto; }); };
             const ciudad = valorDe('perfil-ciudad-input');
             const bio = valorDe('perfil-bio-input');
             const redes = {
@@ -187,10 +225,10 @@ export function setupMiCuenta() {
                 binance: valorDe('perfil-cobro-binance'),
                 otro: valorDe('perfil-cobro-otro')
             };
-            if (estado) estado.textContent = '';
+            decir('');
             // Tope de 200 CARACTERES: si se pasa, no se guarda y se avisa.
             if (contarCaracteres(bio) > MAX_CARACTERES_BIO) {
-                if (estado) estado.textContent = '❌ La biografía pasa de ' + MAX_CARACTERES_BIO + ' caracteres.';
+                decir('❌ La biografía pasa de ' + MAX_CARACTERES_BIO + ' caracteres.');
                 showWarning('La biografía no puede pasar de ' + MAX_CARACTERES_BIO + ' caracteres.');
                 return;
             }
@@ -215,13 +253,13 @@ export function setupMiCuenta() {
                     }));
                     if (artistaActual) artistaActual.redes = JSON.stringify(redes);
                     if (artistaActual) artistaActual.bio = bio;
-                    if (estado) estado.textContent = '✅ Guardado.';
+                    decir('✅ Guardado.');
                     showSuccess('Perfil actualizado');
                 } else {
-                    if (estado) estado.textContent = '❌ ' + ((res && res.error) || 'No se pudo guardar.');
+                    decir('❌ ' + ((res && res.error) || 'No se pudo guardar.'));
                 }
             } catch (e) {
-                if (estado) estado.textContent = '❌ Error de conexión. Intenta más tarde.';
+                decir('❌ Error de conexión. Intenta más tarde.');
             } finally {
                 btnGuardarPerfil.disabled = false;
                 btnGuardarPerfil.textContent = textoOriginal;

@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.761';
+        var currentVer = '1.0.762';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=4574d8dc1d">
+    <link rel="stylesheet" href="css/style.css?v=cb92a92cc5">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -867,7 +867,25 @@
                         </div>
                     </div>
 
-                    <div class="cuenta-item">
+                    <div class="cuenta-form-acciones">
+                        <button type="button" id="btn-guardar-perfil" class="btn-cuenta-primario">Guardar cambios</button>
+                        <span class="cuenta-error" id="perfil-estado" role="status"></span>
+                    </div>
+                </div>
+
+                                <button class="accordion-header" id="accordion-monetizacion" aria-expanded="false" aria-controls="monetizacion-content">
+                    <span class="accordion-header-left">
+                        <svg class="accordion-header-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                            <line x1="2" y1="10" x2="22" y2="10"></line>
+                        </svg>
+                        <h3>Monetización</h3>
+                    </span>
+                    <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-content" id="monetizacion-content" hidden>
+
+<div class="cuenta-item">
                         <div class="cuenta-item-info">
                             <h4>Opciones para cobrar</h4>
                             <p class="cuenta-item-desc">Cómo prefieres recibir el pago de tus obras.</p>
@@ -881,12 +899,12 @@
                     </div>
 
                     <div class="cuenta-form-acciones">
-                        <button type="button" id="btn-guardar-perfil" class="btn-cuenta-primario">Guardar cambios</button>
-                        <span class="cuenta-error" id="perfil-estado" role="status"></span>
+                        <button type="button" id="btn-guardar-monetizacion" class="btn-cuenta-primario">Guardar</button>
+                        <span class="cuenta-error" id="monetizacion-estado" role="status"></span>
                     </div>
                 </div>
 
-                <button class="accordion-header" id="accordion-seguridad" aria-expanded="false" aria-controls="seguridad-content">
+<button class="accordion-header" id="accordion-seguridad" aria-expanded="false" aria-controls="seguridad-content">
                     <span class="accordion-header-left">
                         <svg class="accordion-header-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -1210,7 +1228,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=ba32a64083" type="module"></script>
+    <script src="js/main.js?v=b89313896e" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

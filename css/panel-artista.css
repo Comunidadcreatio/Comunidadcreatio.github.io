@@ -1822,3 +1822,16 @@
     transform: none;
     box-shadow: none;
 }
+
+/* ==============================================
+   CAMPOS DE REDES SIN RELLENO (2026-10-20)
+   Los inputs de «Redes y canales de contacto» llevaban background var(--color-white), que en
+   oscuro se ve como un relleno. Transparentes en los dos temas, como el resto de campos.
+   ============================================== */
+.perfil-campo > input {
+    background: transparent;
+}
+
+.perfil-campo > input:focus {
+    background: transparent;
+}
