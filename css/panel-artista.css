@@ -1671,3 +1671,45 @@
     align-items: center;
     text-align: center;
 }
+
+/* ==============================================
+   BIOGRAFÍA DEL PERFIL (2026-10-19)
+   Textarea en Mi perfil (máx. 200 palabras) y el texto debajo de rol + municipio en la cabecera.
+   ============================================== */
+.perfil-bio-texto {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    font: inherit;
+    line-height: 1.45;
+}
+
+.perfil-bio-contador {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #666);
+    text-align: right;
+}
+
+.perfil-bio-contador-pasado {
+    color: #c0392b;
+    font-weight: 700;
+}
+
+.perfil-bio {
+    max-width: 320px;
+    margin: 6px auto 0;
+    font-size: 0.8rem;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--color-text-muted, #666);
+    text-align: center;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.perfil-bio:empty {
+    display: none;
+}

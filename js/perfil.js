@@ -37,6 +37,25 @@ function etiquetaRol(rol) {
  * que usan el registro y el directorio del chat.
  * @param {string | null | undefined} ciudad
  */
+/**
+ * Nombre del municipio a partir de la capital (el usuario elige la capital al registrarse).
+ * El mapa lo pone ciudades.js en window.MUNICIPIO_POR_PUEBLO.
+ * @param {string | null | undefined} ciudad
+ * @returns {string}
+ */
+function municipioDe(ciudad) {
+    const mapa = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).MUNICIPIO_POR_PUEBLO);
+    return (mapa && ciudad && mapa[ciudad]) || ciudad || '';
+}
+/**
+ * Pinta la biografía en la cabecera del perfil (o la oculta si está vacía).
+ * @param {string | null | undefined} bio
+ */
+function pintarBioPerfil(bio) {
+    const el = /** @type {HTMLElement | null} */ (document.getElementById('perfil-bio'));
+    if (!el) return;
+    el.textContent = String(bio || '').trim();
+}
 function pintarBanderaPerfil(ciudad) {
     const img = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-bandera-img'));
     const caja = img ? img.parentElement : null;
@@ -171,13 +190,14 @@ let datos = null;
     document.querySelectorAll('.perfil-rol')
         .forEach((el) => { el.textContent = etiquetaRol(datos.rol || obtenerRolUsuario()); });
     pintarBanderaPerfil(datos.ciudad || '');
+    pintarBioPerfil(datos.bio);
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
             .forEach((el) => { el.textContent = datos.nombre_real || ''; });
     }
     if (datos.ciudad) {
         document.querySelectorAll('.perfil-ciudad')
-            .forEach((el) => { el.textContent = datos.ciudad || ''; });
+            .forEach((el) => { el.textContent = municipioDe(datos.ciudad); });
     }
     const ponerCuenta = (elId, valor) => {
         const el = document.getElementById(elId);
@@ -210,9 +230,10 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         document.querySelectorAll('.perfil-nombre-artista-seccion').forEach(el => { el.textContent = nombreArtista; });
         document.querySelectorAll('.perfil-rol').forEach(el => { el.textContent = etiquetaRol(obtenerRolUsuario()); });
         document.querySelectorAll('.perfil-ciudad').forEach(el => {
-            el.textContent = ciudad ? escapeHtml(ciudad) : '';
+            el.textContent = ciudad ? escapeHtml(municipioDe(ciudad)) : '';
         });
         pintarBanderaPerfil(ciudad);
+        pintarBioPerfil(artistaActual && artistaActual.bio);
 
         // Y se piden los datos buenos al servidor (nombre, foto y contadores).
         refrescarDatosPropios();

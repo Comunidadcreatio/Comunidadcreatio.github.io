@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.757';
+        var currentVer = '1.0.758';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=e3c6c3d32e">
+    <link rel="stylesheet" href="css/style.css?v=9c9bcc34ec">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -388,6 +388,7 @@
                                 <span class="perfil-rol"></span><span class="perfil-ciudad"></span>
                                 <span class="perfil-bandera" hidden><img id="perfil-bandera-img" alt="" src=""></span>
                             </span>
+                            <p class="perfil-bio" id="perfil-bio"></p>
                         </div>
                     </div>
                 </div>
@@ -842,6 +843,15 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
+                            <h4>Biografía</h4>
+                            <p class="cuenta-item-desc">Se muestra en tu perfil. Máximo 200 palabras.</p>
+                            <textarea id="perfil-bio-input" class="cuenta-item-valor perfil-bio-texto" rows="4" maxlength="1400" placeholder="Cuéntanos sobre ti, tu obra o tu trabajo…" aria-label="Biografía"></textarea>
+                            <span class="perfil-bio-contador" id="perfil-bio-contador">0 / 200 palabras</span>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-item">
+                        <div class="cuenta-item-info">
                             <h4>Redes y canales de contacto</h4>
                             <p class="cuenta-item-desc">Opcional. Se muestran en tu perfil para que te contacten.</p>
                             <div class="perfil-campos">
@@ -1196,8 +1206,8 @@
     </div>
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
-    <script src="js/ciudades.js?v=12207a1728"></script>
-    <script src="js/main.js?v=3caf9c97d4" type="module"></script>
+    <script src="js/ciudades.js?v=1ea2f83166"></script>
+    <script src="js/main.js?v=23023ffcd4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

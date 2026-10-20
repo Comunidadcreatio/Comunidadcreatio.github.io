@@ -13,7 +13,8 @@
         }
     };
 
-    window.BANDERA_POR_CIUDAD = {
+    
+window.BANDERA_POR_CIUDAD = {
         'San Cristóbal': 'san-cristobal.webp',
         'San Antonio del Táchira': 'bolivar.webp',
         'San Juan de Colón': 'ayacucho.webp',

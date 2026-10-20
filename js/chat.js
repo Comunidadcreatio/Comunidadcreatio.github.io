@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=7da631dcf6';
 import { artistaActual } from './auth.js?v=8dbd042376';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl, cuandoLibre } from './utils.js?v=7e1398d254';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=b6d9145480';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=9114d8eee7';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -1048,12 +1048,24 @@ function renderAcordeon(pueblos) {
             ? `<img class="chat-pueblo-bandera" src="iconos/banderas/${bandera}" alt="">`
             : '<span class="chat-pueblo-bandera"></span>';
 
-        const header = document.createElement('button');
+        // Municipio en negrita y capital debajo en fino. Si la ciudad no esta en el mapa
+    // (no es un municipio del Tachira) se muestra solo el nombre, como antes.
+    const nombrePuebloHTML = (ciudad) => {
+        const mapa = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).MUNICIPIO_POR_PUEBLO);
+        const municipio = (mapa && ciudad) ? mapa[ciudad] : '';
+        // Si el municipio se llama igual que la capital, una sola linea (no repetir).
+        if (!municipio || municipio === ciudad) return `<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span>`;
+        return `<span class="chat-pueblo-nombre">` +
+            `<span class="chat-pueblo-municipio">${escapeHtml(municipio)}</span>` +
+            `<span class="chat-pueblo-capital">${escapeHtml(ciudad)}</span>` +
+            `</span>`;
+    };
+    const header = document.createElement('button');
         header.type = 'button';
         header.className = 'chat-pueblo-header';
         header.setAttribute('aria-expanded', 'false');
         const activos = users.filter(esOnline).length;
-        header.innerHTML = `${banderaHTML}<span class="chat-pueblo-nombre">${escapeHtml(ciudad)}</span>` +
+        header.innerHTML = `${banderaHTML}${nombrePuebloHTML(ciudad)}` +
             `<span class="chat-pueblo-counts">` +
             `<span class="chat-pueblo-count act${activos >= 1 ? ' ok' : ''}">${activos} Activos</span>` +
             `<span class="chat-pueblo-count tot${users.length >= 1 ? ' ok' : ''}">${users.length} Artistas</span>` +

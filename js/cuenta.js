@@ -97,6 +97,22 @@ export function setupMiCuenta() {
         try { return txt ? JSON.parse(txt) : {}; } catch (e) { return {}; }
     };
 
+    /** Máximo de palabras de la biografía. */
+    const MAX_PALABRAS_BIO = 200;
+
+    /** Cuenta palabras de verdad: separa por espacios y descarta vacíos. */
+    const contarPalabras = (texto) => String(texto || '').trim().split(/\s+/).filter(Boolean).length;
+
+    /** Pinta «N / 200 palabras» y marca en rojo si se pasa. */
+    const actualizarContadorBio = () => {
+        const contador = document.getElementById('perfil-bio-contador');
+        const campo = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('perfil-bio-input'));
+        if (!contador || !campo) return;
+        const n = contarPalabras(campo.value);
+        contador.textContent = n + ' / ' + MAX_PALABRAS_BIO + ' palabras';
+        contador.classList.toggle('perfil-bio-contador-pasado', n > MAX_PALABRAS_BIO);
+    };
+
     const cargarPerfil = async () => {
         if (perfilCargado) return;
         perfilCargado = true;
@@ -104,6 +120,8 @@ export function setupMiCuenta() {
             const res = await apiRequest('/api/artistas/perfil');
             const u = (res && res.artista) || {};
             poner('perfil-ciudad-input', u.ciudad);
+            poner('perfil-bio-input', u.bio);
+            actualizarContadorBio();
             const redes = parsear(u.redes);
             poner('perfil-red-instagram', redes.instagram);
             poner('perfil-red-x', redes.x);
@@ -139,11 +157,19 @@ export function setupMiCuenta() {
         });
     }
 
+    // Contador de palabras de la biografía en vivo.
+    const campoBio = /** @type {HTMLTextAreaElement | null} */ (document.getElementById('perfil-bio-input'));
+    if (campoBio) {
+        campoBio.addEventListener('input', actualizarContadorBio);
+        actualizarContadorBio();
+    }
+
     const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {
         btnGuardarPerfil.addEventListener('click', async () => {
             const estado = document.getElementById('perfil-estado');
             const ciudad = valorDe('perfil-ciudad-input');
+            const bio = valorDe('perfil-bio-input');
             const redes = {
                 instagram: valorDe('perfil-red-instagram'),
                 x: valorDe('perfil-red-x'),
@@ -158,17 +184,28 @@ export function setupMiCuenta() {
                 otro: valorDe('perfil-cobro-otro')
             };
             if (estado) estado.textContent = '';
+            // Tope de 200 palabras: si se pasa, no se guarda y se avisa.
+            if (contarPalabras(bio) > MAX_PALABRAS_BIO) {
+                if (estado) estado.textContent = '❌ La biografía pasa de ' + MAX_PALABRAS_BIO + ' palabras.';
+                showWarning('La biografía no puede pasar de ' + MAX_PALABRAS_BIO + ' palabras.');
+                return;
+            }
             const textoOriginal = btnGuardarPerfil.textContent;
             btnGuardarPerfil.disabled = true;
             btnGuardarPerfil.textContent = 'Guardando...';
             try {
                 const res = await apiRequest('/api/artistas/perfil-datos', {
                     method: 'PUT',
-                    body: JSON.stringify({ ciudad, redes, cobro })
+                    body: JSON.stringify({ ciudad, redes, cobro, bio })
                 });
                 if (res && res.success) {
                     if (artistaActual) artistaActual.ciudad = ciudad;
-                    document.querySelectorAll('.perfil-ciudad').forEach((el) => { el.textContent = ciudad; });
+                    // La cabecera muestra el MUNICIPIO, no la capital.
+                    const mapaMuni = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).MUNICIPIO_POR_PUEBLO);
+                    const municipio = (mapaMuni && ciudad) ? (mapaMuni[ciudad] || ciudad) : ciudad;
+                    document.querySelectorAll('.perfil-ciudad').forEach((el) => { el.textContent = municipio; });
+                    document.querySelectorAll('.perfil-bio').forEach((el) => { el.textContent = bio; });
+                    if (artistaActual) artistaActual.bio = bio;
                     if (estado) estado.textContent = '✅ Guardado.';
                     showSuccess('Perfil actualizado');
                 } else {

@@ -28,11 +28,11 @@
 @import url('galeria-publica.css?v=66b3889adf');
 
 /* Chat global + privado */
-@import url('chat.css?v=0c2464ac16');
+@import url('chat.css?v=d474e5103a');
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=c88628f6e8');
+@import url('panel-artista.css?v=ac54accb42');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
