@@ -1767,3 +1767,58 @@
     height: 16px;
     display: block;
 }
+
+/* ==============================================
+   MI CUENTA: ACORDEONES MÁS ANCHOS, INPUTS SIN RELLENO Y BOTÓN COMÚN (2026-10-20)
+   - Los acordeones ocupaban 340 px de 420 por el padding de 24 px de .cuenta-seccion más el de
+     #mi-cuenta. Se reduce el lateral para que lleguen casi al borde.
+   - Los campos llevaban background gris (--color-gray-100), que en oscuro se veía como un relleno
+     negro: ahora son transparentes en los dos temas.
+   - .btn-cuenta-primario no existía en el CSS, así que «Guardar cambios» salía con el estilo por
+     defecto. Se le da el mismo aspecto que .btn-cuenta-secundario, que es el de los demás
+     acordeones.
+   ============================================== */
+#mi-cuenta {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.cuenta-seccion {
+    padding: 20px 0;
+}
+
+.cuenta-item-valor {
+    background: transparent;
+}
+
+.btn-cuenta-primario {
+    padding: 12px 20px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-cuenta-primario:hover {
+    background: transparent;
+    color: var(--color-text-muted);
+    border-color: var(--color-gray-400);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cuenta-primario:active {
+    transform: translateY(0);
+}
+
+.btn-cuenta-primario:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
