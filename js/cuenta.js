@@ -298,6 +298,219 @@ const ICONOS_RED_PANEL = {
     // Los iconos van siempre visibles junto al título: no hay botón + ni que abrir nada.
     pintarMenuRedes();
 
+    // ============================================
+    // MÉTODOS DE PAGO (Monetización)
+    // ============================================
+    /** Bancos venezolanos: código, nombre, siglas y color de marca. */
+    const BANCOS_VE = [
+        { id: '0102', nombre: 'Banco de Venezuela', corto: 'BDV', color: '#cf142b' },
+        { id: '0134', nombre: 'Banesco', corto: 'BAN', color: '#004a99' },
+        { id: '0105', nombre: 'Mercantil', corto: 'MER', color: '#002d62' },
+        { id: '0108', nombre: 'BBVA Provincial', corto: 'PRO', color: '#004481' },
+        { id: '0191', nombre: 'Banco Nacional de Crédito', corto: 'BNC', color: '#00a651' },
+        { id: '0175', nombre: 'Banco Bicentenario', corto: 'BIC', color: '#f58220' },
+        { id: '0172', nombre: 'Bancamiga', corto: 'AMI', color: '#e4002b' },
+        { id: '0174', nombre: 'Banplus', corto: 'PLU', color: '#0033a0' },
+        { id: '0163', nombre: 'Banco del Tesoro', corto: 'TES', color: '#c99700' },
+        { id: '0137', nombre: 'Sofitasa', corto: 'SOF', color: '#0057a8' },
+        { id: '0151', nombre: 'BFC Banco Fondo Común', corto: 'BFC', color: '#e30613' },
+        { id: '0115', nombre: 'Banco Exterior', corto: 'EXT', color: '#00457c' },
+        { id: '0114', nombre: 'Bancaribe', corto: 'CRI', color: '#d71920' },
+        { id: '0171', nombre: 'Banco Activo', corto: 'ACT', color: '#00693e' },
+        { id: '0169', nombre: 'Mi Banco', corto: 'MIB', color: '#005baa' }
+    ];
+
+    /** Métodos que no son bancos. */
+    const PAGOS_SIMPLES = [
+        { id: 'binance', nombre: 'Binance', corto: 'BNB', color: '#b58c00' },
+        { id: 'zelle', nombre: 'Zelle', corto: 'ZEL', color: '#6d1ed4' },
+        { id: 'zinli', nombre: 'Zinli', corto: 'ZIN', color: '#7b2ff7' },
+        { id: 'paypal', nombre: 'PayPal', corto: 'PP', color: '#003087' },
+        { id: 'usdt', nombre: 'USDT', corto: 'USDT', color: '#26a17b' },
+        { id: 'efectivo', nombre: 'Efectivo', corto: 'EFE', color: '#2e7d32' }
+    ];
+
+    /** Campos de cada formulario. */
+    const CAMPOS_PAGO = {
+        'pago-movil': [
+            { clave: 'telefono', etiqueta: 'Teléfono', placeholder: '0412 123 4567' },
+            { clave: 'cedula', etiqueta: 'Cédula', placeholder: 'V-12345678' },
+            { clave: 'titular', etiqueta: 'Titular (opcional)', placeholder: 'Nombre y apellido' }
+        ],
+        'transferencia': [
+            { clave: 'cuenta', etiqueta: 'Número de cuenta', placeholder: '0102 0000 0000 0000 0000' },
+            { clave: 'titular', etiqueta: 'Titular', placeholder: 'Nombre y apellido' },
+            { clave: 'cedula', etiqueta: 'Cédula (opcional)', placeholder: 'V-12345678' }
+        ],
+        binance: [{ clave: 'correo', etiqueta: 'Correo o ID', placeholder: 'correo@ejemplo.com' }],
+        zelle: [
+            { clave: 'correo', etiqueta: 'Correo o teléfono', placeholder: 'correo@ejemplo.com' },
+            { clave: 'titular', etiqueta: 'Titular', placeholder: 'Nombre y apellido' }
+        ],
+        zinli: [{ clave: 'correo', etiqueta: 'Correo o teléfono', placeholder: 'correo@ejemplo.com' }],
+        paypal: [{ clave: 'correo', etiqueta: 'Correo', placeholder: 'correo@ejemplo.com' }],
+        usdt: [
+            { clave: 'red', etiqueta: 'Red', placeholder: 'TRC20 / BEP20' },
+            { clave: 'wallet', etiqueta: 'Wallet', placeholder: 'Dirección' }
+        ],
+        efectivo: [{ clave: 'nota', etiqueta: 'Nota', placeholder: 'Ciudad y forma de entrega' }]
+    };
+
+    /** @type {any[]} */
+    let metodosPago = [];
+    const pagoBadges = document.getElementById('pago-badges');
+    const pagoPanel = document.getElementById('pago-panel');
+    const pagoLista = document.getElementById('pago-lista');
+
+    const tipoDe = (m) => (m && m.familia === 'banco' ? 'banco' : 'simple');
+    const metodosTodos = () => [
+        ...BANCOS_VE.map((b) => ({ ...b, familia: 'banco' })),
+        ...PAGOS_SIMPLES.map((p) => ({ ...p, familia: 'simple' }))
+    ];
+    const buscarMetodo = (id) => metodosTodos().find((m) => m.id === id);
+
+    /** Normaliza lo guardado: lista nueva u objeto viejo. */
+    const normalizarCobro = (cobro) => {
+        let datos = cobro;
+        if (typeof datos === 'string') { try { datos = JSON.parse(datos); } catch (e) { datos = []; } }
+        if (Array.isArray(datos)) return datos.filter((m) => m && typeof m === 'object');
+        if (datos && typeof datos === 'object') {
+            return Object.entries(datos)
+                .filter(([, v]) => typeof v === 'string' && v.trim())
+                .map(([k, v]) => ({ metodo: k, valor: String(v) }));
+        }
+        return [];
+    };
+
+    /** Texto corto con lo que se haya rellenado. */
+    // Solo los datos: el banco y el tipo ya van en el título de la fila.
+    const resumenMetodo = (m) => {
+        const partes = [];
+        if (m.valor) partes.push(m.valor);
+        for (const clave of ['telefono', 'cuenta', 'correo', 'wallet', 'red', 'cedula', 'titular', 'nota']) {
+            if (m[clave]) partes.push(String(m[clave]));
+        }
+        return partes.join(' · ');
+    };
+
+    const tituloMetodo = (m) => {
+        if (m.banco) {
+            const b = buscarMetodo(m.banco);
+            const banco = b ? b.nombre : m.banco;
+            if (m.tipo === 'pago-movil') return banco + ' · Pago Móvil';
+            if (m.tipo === 'transferencia') return banco + ' · Transferencia';
+            return banco;
+        }
+        const p = buscarMetodo(m.metodo);
+        return p ? p.nombre : (m.metodo || 'Método');
+    };
+
+    /** Repinta la lista de métodos añadidos. */
+    const pintarListaPagos = () => {
+        if (!pagoLista) return;
+        pagoLista.textContent = '';
+        metodosPago.forEach((m, indice) => {
+            const def = buscarMetodo(m.banco || m.metodo);
+            const item = document.createElement('div');
+            item.className = 'pago-item';
+            item.innerHTML = '<span class="pago-badge" style="--pago-color:' + ((def && def.color) || '#777') + '">' + ((def && def.corto) || '?') + '</span>' +
+                '<div class="pago-item-datos"><strong>' + tituloMetodo(m) + '</strong><span>' + resumenMetodo(m) + '</span></div>' +
+                '<button type="button" class="pago-quitar" aria-label="Quitar método">×</button>';
+            const quitar = item.querySelector('.pago-quitar');
+            if (quitar) quitar.addEventListener('click', () => { metodosPago.splice(indice, 1); pintarListaPagos(); });
+            pagoLista.appendChild(item);
+        });
+    };
+
+    /** Cierra el panel de formulario. */
+    const cerrarPanelPago = () => {
+        if (!pagoPanel) return;
+        pagoPanel.hidden = true;
+        pagoPanel.textContent = '';
+    };
+
+    /** Pinta el formulario de un método. */
+    const abrirFormularioPago = (metodo, tipo) => {
+        if (!pagoPanel) return;
+        const def = buscarMetodo(metodo);
+        const nombre = def ? def.nombre : metodo;
+        const titulo = tipo === 'pago-movil' ? nombre + ' · Pago Móvil'
+            : tipo === 'transferencia' ? nombre + ' · Transferencia bancaria'
+            : nombre;
+        const campos = CAMPOS_PAGO[tipo || metodo] || [];
+
+        pagoPanel.hidden = false;
+        pagoPanel.innerHTML = '<p class="pago-pregunta">' + titulo + '</p>' +
+            '<form class="pago-formulario">' +
+            campos.map((c) => '<label>' + c.etiqueta + '<input type="text" data-campo="' + c.clave + '" placeholder="' + c.placeholder + '" maxlength="300"></label>').join('') +
+            '</form>' +
+            '<div class="pago-acciones"><button type="button" class="pago-add">Añadir</button><button type="button" class="pago-cancelar">Cancelar</button></div>';
+
+        const cancelar = pagoPanel.querySelector('.pago-cancelar');
+        if (cancelar) cancelar.addEventListener('click', cerrarPanelPago);
+        const agregar = pagoPanel.querySelector('.pago-add');
+        if (agregar) {
+            agregar.addEventListener('click', () => {
+                /** @type {Record<string, string>} */
+                const datos = {};
+                pagoPanel.querySelectorAll('input[data-campo]').forEach((el) => {
+                    const input = /** @type {HTMLInputElement} */ (el);
+                    const valor = input.value.trim();
+                    if (valor) datos[input.dataset.campo || ''] = valor;
+                });
+                const entrada = Object.assign({ metodo: tipo ? metodo : metodo }, datos);
+                if (def && def.familia === 'banco') { entrada.banco = metodo; entrada.metodo = 'banco'; }
+                if (tipo) entrada.tipo = tipo;
+                metodosPago.push(entrada);
+                pintarListaPagos();
+                cerrarPanelPago();
+            });
+        }
+    };
+
+    /** Pregunta Pago Móvil o Transferencia cuando se elige un banco. */
+    const preguntarTipoBanco = (banco) => {
+        if (!pagoPanel) return;
+        pagoPanel.hidden = false;
+        pagoPanel.innerHTML = '<p class="pago-pregunta">¿Cómo quieres cobrar por <strong>' + banco.nombre + '</strong>?</p>' +
+            '<div class="pago-opciones">' +
+            '<button type="button" class="pago-opcion" data-tipo="pago-movil">Pago Móvil</button>' +
+            '<button type="button" class="pago-opcion" data-tipo="transferencia">Transferencia bancaria</button>' +
+            '<button type="button" class="pago-cancelar">Cancelar</button>' +
+            '</div>';
+        pagoPanel.querySelectorAll('.pago-opcion').forEach((b) => {
+            b.addEventListener('click', () => abrirFormularioPago(banco.id, /** @type {HTMLElement} */ (b).dataset.tipo || ''));
+        });
+        const cancelar = pagoPanel.querySelector('.pago-cancelar');
+        if (cancelar) cancelar.addEventListener('click', cerrarPanelPago);
+    };
+
+    /** Pinta los círculos de todos los métodos. */
+    const pintarBadgesPago = () => {
+        if (!pagoBadges) return;
+        pagoBadges.textContent = '';
+        metodosTodos().forEach((m) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'pago-badge';
+            b.style.setProperty('--pago-color', m.color);
+            b.textContent = m.corto;
+            b.title = m.nombre;
+            b.setAttribute('aria-label', 'Añadir ' + m.nombre);
+            b.addEventListener('click', () => {
+                if (m.familia === 'banco') preguntarTipoBanco(m);
+                else abrirFormularioPago(m.id, '');
+            });
+            pagoBadges.appendChild(b);
+        });
+    };
+
+    /** Carga lo guardado. */
+    const cargarMetodosPago = (cobro) => {
+        metodosPago = normalizarCobro(cobro);
+        pintarListaPagos();
+    };
+
     const cargarPerfil = async () => {
         if (perfilCargado) return;
         perfilCargado = true;
@@ -332,11 +545,7 @@ const ICONOS_RED_PANEL = {
             actualizarContadorBio();
             const redes = parsear(u.redes);
             pintarRedesGuardadas(redes);
-            const cobro = parsear(u.cobro);
-            poner('perfil-cobro-pago-movil', cobro['pago-movil']);
-            poner('perfil-cobro-zelle', cobro.zelle);
-            poner('perfil-cobro-binance', cobro.binance);
-            poner('perfil-cobro-otro', cobro.otro);
+            cargarMetodosPago(u.cobro);
         } catch (e) {
             debugLog.warn('No se pudieron cargar los datos del perfil:', e);
         }
@@ -413,6 +622,8 @@ const ICONOS_RED_PANEL = {
         });
     }
 
+    pintarBadgesPago();
+
     const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {
         btnGuardarPerfil.addEventListener('click', async () => {
@@ -425,12 +636,7 @@ const ICONOS_RED_PANEL = {
             const bio = valorDe('perfil-bio-input');
             // Las redes salen de las filas que haya añadidas.
             const redes = leerRedes();
-            const cobro = {
-                'pago-movil': valorDe('perfil-cobro-pago-movil'),
-                zelle: valorDe('perfil-cobro-zelle'),
-                binance: valorDe('perfil-cobro-binance'),
-                otro: valorDe('perfil-cobro-otro')
-            };
+            const cobro = metodosPago;
             decir('');
             // Tope de 200 CARACTERES: si se pasa, no se guarda y se avisa.
             if (contarCaracteres(bio) > MAX_CARACTERES_BIO) {

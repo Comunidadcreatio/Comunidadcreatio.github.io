@@ -2216,3 +2216,177 @@
     width: 14px;
     height: 14px;
 }
+
+/* ==============================================
+   MÉTODOS DE PAGO EN CÍRCULOS (2026-10-20)
+   Un círculo por banco (con su color de marca y siglas) y por método no bancario. Al pulsar un
+   banco se pregunta Pago Móvil o Transferencia y se muestra el formulario que toca.
+   ============================================== */
+.pago-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pago-badge {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--pago-color, #999);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--pago-color, #444);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.pago-badge:hover,
+.pago-badge:focus-visible {
+    background: var(--pago-color, #444);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.pago-panel {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
+}
+
+.pago-pregunta {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+}
+
+.pago-opciones,
+.pago-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pago-opcion {
+    padding: 9px 14px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pago-opcion:hover {
+    background: rgba(128, 128, 128, 0.12);
+}
+
+.pago-cancelar {
+    padding: 9px 14px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-text-muted, #666);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pago-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.pago-formulario label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #666);
+}
+
+.pago-formulario input {
+    padding: 9px 11px;
+    border: 1px solid var(--color-border, #d9d9d9);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.pago-add {
+    padding: 9px 16px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pago-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.pago-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 10px;
+}
+
+.pago-item .pago-badge {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    font-size: 0.55rem;
+    pointer-events: none;
+}
+
+.pago-item-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pago-item-datos strong {
+    font-size: 0.85rem;
+}
+
+.pago-item-datos span {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #666);
+    overflow-wrap: anywhere;
+}
+
+.pago-quitar {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border, #d9d9d9);
+    background: transparent;
+    color: var(--color-text-muted, #666);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
