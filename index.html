@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.763';
+        var currentVer = '1.0.764';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=3b3363846e">
+    <link rel="stylesheet" href="css/style.css?v=8ec93bc83d">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -826,7 +826,7 @@
                         <div class="cuenta-avatar-fila">
                             <img id="perfil-avatar-preview" class="cuenta-avatar-preview" src="iconos/avatar-default.svg" alt="Foto de perfil actual">
                             <div class="cuenta-avatar-datos">
-                                <h4>Foto de perfil</h4>
+                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto de perfil</h4>
                                 <p class="cuenta-item-desc">Es la que se ve en tu perfil. Puedes cambiarla o quitarla.</p>
                                 <div class="cuenta-item-actions">
                                     <button type="button" id="btn-cambiar-avatar-perfil" class="btn-cuenta-secundario">Cambiar foto</button>
@@ -838,7 +838,7 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Municipio de origen</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Municipio de origen</h4>
                             <p class="cuenta-item-desc">Aparece junto a tu nombre. Solo puedes cambiarlo una vez cada 30 días.</p>
                             <input type="hidden" id="perfil-ciudad-input" value="">
                             <div class="custom-select perfil-muni-select" id="perfil-ciudad-select">
@@ -851,7 +851,7 @@
 
 <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Biografía</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Biografía</h4>
                             <p class="cuenta-item-desc">Se muestra en tu perfil. Máximo 200 caracteres.</p>
                             <textarea id="perfil-bio-input" class="cuenta-item-valor perfil-bio-texto" rows="4" maxlength="200" placeholder="Cuéntanos sobre ti, tu obra o tu trabajo…" aria-label="Biografía"></textarea>
                             <span class="perfil-bio-contador" id="perfil-bio-contador">0 / 200 caracteres</span>
@@ -860,7 +860,7 @@
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Redes y canales de contacto</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Redes y canales de contacto</h4>
                             <p class="cuenta-item-desc">Opcional. Añade solo las que quieras: se muestran en tu perfil como iconos.</p>
                             <div class="perfil-redes-lista" id="perfil-redes-lista"></div>
                             <div class="perfil-redes-agregar">
@@ -890,7 +890,7 @@
 
 <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Opciones para cobrar</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Opciones para cobrar</h4>
                             <p class="cuenta-item-desc">Cómo prefieres recibir el pago de tus obras.</p>
                             <div class="perfil-campos">
                                 <label class="perfil-campo"><span>Pago Móvil</span><input type="text" id="perfil-cobro-pago-movil" placeholder="Banco · teléfono · cédula" maxlength="300"></label>
@@ -923,7 +923,7 @@
                 <div class="cuenta-item">
                     <div class="cuenta-item-header">
                         <div class="cuenta-item-info">
-                            <h4>Correo electrónico</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>Correo electrónico</h4>
                             <p class="cuenta-item-desc">Esta es la dirección de correo asociada a tu cuenta.</p>
                             <input type="email" id="cuenta-email-actual" class="cuenta-item-valor" readonly aria-label="Correo electrónico actual">
                         </div>
@@ -966,7 +966,7 @@
                 <div class="cuenta-item">
                     <div class="cuenta-item-header">
                         <div class="cuenta-item-info">
-                            <h4>Contraseña</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Contraseña</h4>
                             <p class="cuenta-item-desc">Cambia tu contraseña periódicamente para mantener tu cuenta segura.</p>
                         </div>
                         <div class="cuenta-item-actions">
@@ -1005,7 +1005,7 @@
                 <div class="cuenta-item">
                     <div class="cuenta-item-header">
                         <div class="cuenta-item-info">
-                            <h4>Eliminar cuenta</h4>
+                            <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar cuenta</h4>
                             <p class="cuenta-item-desc">Esta acción eliminará permanentemente tu cuenta y todas tus obras. No se puede deshacer.</p>
                         </div>
                         <div class="cuenta-item-actions">
@@ -1043,7 +1043,7 @@
                     <div class="cuenta-item">
                         <div class="cuenta-item-header">
                             <div class="cuenta-item-info">
-                                <h4>Apariencia</h4>
+                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Apariencia</h4>
                                 <p class="cuenta-item-desc">Cambia entre el tema oscuro y claro de la aplicación.</p>
                             </div>
                             <div class="cuenta-item-actions">
@@ -1069,7 +1069,7 @@
                     <div class="cuenta-item">
                         <div class="cuenta-item-header">
                             <div class="cuenta-item-info">
-                                <h4>Cerrar demás sesiones</h4>
+                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cerrar demás sesiones</h4>
                                 <p class="cuenta-item-desc">Cierra todas las sesiones activas excepto esta. Útil si olvidaste cerrar sesión en otro dispositivo.</p>
                             </div>
                             <div class="cuenta-item-actions">
@@ -1081,7 +1081,7 @@
                     <div class="cuenta-item">
                         <div class="cuenta-item-header">
                             <div class="cuenta-item-info">
-                                <h4>Cerrar sesión</h4>
+                                <h4><svg class="cuenta-titulo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión</h4>
                                 <p class="cuenta-item-desc">Cierra tu sesión actual. Podrás volver a iniciar sesión cuando quieras.</p>
                             </div>
                             <div class="cuenta-item-actions">
@@ -1231,7 +1231,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=81c7d5d565" type="module"></script>
+    <script src="js/main.js?v=a536a2c9e4" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

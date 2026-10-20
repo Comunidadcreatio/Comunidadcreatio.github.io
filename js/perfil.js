@@ -108,8 +108,16 @@ function pintarRedesPerfil(redes) {
     }
     if (!datos || typeof datos !== 'object') datos = {};
     caja.textContent = '';
+    // Cada red puede tener varias cuentas: se acepta texto suelto (datos viejos) o lista.
+    const normalizarCuentas = (v) => {
+        if (Array.isArray(v)) return v.filter((x) => typeof x === 'string' && x.trim());
+        if (typeof v === 'string' && v.trim()) return [v];
+        return [];
+    };
     for (const clave of Object.keys(ETIQUETAS_RED)) {
-        const url = enlaceDeRed(clave, datos[clave]);
+        const cuentas = normalizarCuentas(datos[clave]);
+        for (const valor of cuentas) {
+        const url = enlaceDeRed(clave, valor);
         if (!url) continue;
         const a = document.createElement('a');
         a.className = 'perfil-red';
@@ -120,6 +128,7 @@ function pintarRedesPerfil(redes) {
         a.title = ETIQUETAS_RED[clave];
         a.innerHTML = ICONOS_RED[clave] || '';
         caja.appendChild(a);
+        }
     }
 }
 
@@ -300,6 +309,8 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         if (mini) { mini.src = src; mini.sizes = '48px'; mini.srcset = srcsetCloudinary(src, [48, 96, 144]); }
         const grande = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
         if (grande) { grande.src = src; grande.sizes = '104px'; grande.srcset = srcsetCloudinary(src, [104, 208, 312]); }
+        const preview = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-preview'));
+        if (preview) preview.src = src;
         const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
         const nombreReal = (artistaActual && artistaActual.nombre_real) || '';
         const ciudad = (artistaActual && artistaActual.ciudad) || '';
