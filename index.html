@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.759';
+        var currentVer = '1.0.760';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=6437c8df6e">
+    <link rel="stylesheet" href="css/style.css?v=ed6bf4170a">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -859,6 +859,8 @@
                                 <label class="perfil-campo"><span>Instagram</span><input type="text" id="perfil-red-instagram" placeholder="@usuario" maxlength="300"></label>
                                 <label class="perfil-campo"><span>X (Twitter)</span><input type="text" id="perfil-red-x" placeholder="@usuario" maxlength="300"></label>
                                 <label class="perfil-campo"><span>WhatsApp</span><input type="text" id="perfil-red-whatsapp" placeholder="+58 412 000 0000" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Facebook</span><input type="text" id="perfil-red-facebook" placeholder="usuario o enlace" maxlength="300"></label>
+                                <label class="perfil-campo"><span>Telegram</span><input type="text" id="perfil-red-telegram" placeholder="@usuario" maxlength="300"></label>
                                 <label class="perfil-campo"><span>Correo público</span><input type="email" id="perfil-red-correo" placeholder="hola@correo.com" maxlength="300"></label>
                                 <label class="perfil-campo"><span>Sitio web</span><input type="url" id="perfil-red-web" placeholder="https://" maxlength="300"></label>
                             </div>
@@ -1208,7 +1210,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=6456e306e4" type="module"></script>
+    <script src="js/main.js?v=ba32a64083" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

@@ -124,8 +124,10 @@ export function setupMiCuenta() {
             actualizarContadorBio();
             const redes = parsear(u.redes);
             poner('perfil-red-instagram', redes.instagram);
+            poner('perfil-red-facebook', redes.facebook);
             poner('perfil-red-x', redes.x);
             poner('perfil-red-whatsapp', redes.whatsapp);
+            poner('perfil-red-telegram', redes.telegram);
             poner('perfil-red-correo', redes.correo);
             poner('perfil-red-web', redes.web);
             const cobro = parsear(u.cobro);
@@ -172,8 +174,10 @@ export function setupMiCuenta() {
             const bio = valorDe('perfil-bio-input');
             const redes = {
                 instagram: valorDe('perfil-red-instagram'),
+                facebook: valorDe('perfil-red-facebook'),
                 x: valorDe('perfil-red-x'),
                 whatsapp: valorDe('perfil-red-whatsapp'),
+                telegram: valorDe('perfil-red-telegram'),
                 correo: valorDe('perfil-red-correo'),
                 web: valorDe('perfil-red-web')
             };
@@ -207,7 +211,7 @@ export function setupMiCuenta() {
                     document.querySelectorAll('.perfil-bio').forEach((el) => { el.textContent = bio; });
                     // Iconos de redes: se repintan con lo que se acaba de guardar (perfil.js escucha).
                     document.dispatchEvent(new CustomEvent('perfil:redes', {
-                        detail: { instagram: redes.instagram, x: redes.x, whatsapp: redes.whatsapp, correo: redes.correo, web: redes.web }
+                        detail: { instagram: redes.instagram, facebook: redes.facebook, x: redes.x, telegram: redes.telegram, whatsapp: redes.whatsapp, correo: redes.correo, web: redes.web }
                     }));
                     if (artistaActual) artistaActual.redes = JSON.stringify(redes);
                     if (artistaActual) artistaActual.bio = bio;

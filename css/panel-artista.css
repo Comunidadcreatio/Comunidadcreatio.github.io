@@ -1734,7 +1734,8 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    /* Iconos más juntos: 5 px en vez de 10. */
+    gap: 5px;
     margin-top: 8px;
 }
 
@@ -1746,8 +1747,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     color: var(--color-text-muted, #666);
     background: rgba(0, 0, 0, 0.04);
