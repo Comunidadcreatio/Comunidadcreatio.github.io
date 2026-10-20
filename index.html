@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.762';
+        var currentVer = '1.0.763';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=cb92a92cc5">
+    <link rel="stylesheet" href="css/style.css?v=3b3363846e">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -820,29 +820,36 @@
                     </span>
                     <span class="accordion-icon">▼</span>
                 </button>
-                <div class="accordion-content" id="perfil-content" hidden>
+                                <div class="accordion-content" id="perfil-content" hidden>
 
                     <div class="cuenta-item">
-                        <div class="cuenta-item-header">
-                            <div class="cuenta-item-info">
+                        <div class="cuenta-avatar-fila">
+                            <img id="perfil-avatar-preview" class="cuenta-avatar-preview" src="iconos/avatar-default.svg" alt="Foto de perfil actual">
+                            <div class="cuenta-avatar-datos">
                                 <h4>Foto de perfil</h4>
-                                <p class="cuenta-item-desc">Se recorta en cuadrado en tu perfil.</p>
-                            </div>
-                            <div class="cuenta-item-actions">
-                                <button type="button" id="btn-cambiar-avatar-perfil" class="btn-cuenta-secundario">Cambiar foto</button>
+                                <p class="cuenta-item-desc">Es la que se ve en tu perfil. Puedes cambiarla o quitarla.</p>
+                                <div class="cuenta-item-actions">
+                                    <button type="button" id="btn-cambiar-avatar-perfil" class="btn-cuenta-secundario">Cambiar foto</button>
+                                    <button type="button" id="btn-quitar-avatar-perfil" class="btn-cuenta-secundario">Quitar foto</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Ciudad de origen</h4>
-                            <p class="cuenta-item-desc">Aparece junto a tu nombre de artista.</p>
-                            <input type="text" id="perfil-ciudad-input" class="cuenta-item-valor" maxlength="120" placeholder="Ej. San Cristóbal, Táchira" aria-label="Ciudad de origen">
+                            <h4>Municipio de origen</h4>
+                            <p class="cuenta-item-desc">Aparece junto a tu nombre. Solo puedes cambiarlo una vez cada 30 días.</p>
+                            <input type="hidden" id="perfil-ciudad-input" value="">
+                            <div class="custom-select perfil-muni-select" id="perfil-ciudad-select">
+                                <button type="button" class="custom-select-trigger" id="perfil-ciudad-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="perfil-ciudad-dropdown">Selecciona tu municipio</button>
+                                <div class="custom-select-dropdown" id="perfil-ciudad-dropdown" role="listbox" aria-label="Municipio de origen"></div>
+                            </div>
+                            <p class="cuenta-item-nota" id="perfil-ciudad-nota"></p>
                         </div>
                     </div>
 
-                    <div class="cuenta-item">
+<div class="cuenta-item">
                         <div class="cuenta-item-info">
                             <h4>Biografía</h4>
                             <p class="cuenta-item-desc">Se muestra en tu perfil. Máximo 200 caracteres.</p>
@@ -854,20 +861,16 @@
                     <div class="cuenta-item">
                         <div class="cuenta-item-info">
                             <h4>Redes y canales de contacto</h4>
-                            <p class="cuenta-item-desc">Opcional. Se muestran en tu perfil para que te contacten.</p>
-                            <div class="perfil-campos">
-                                <label class="perfil-campo"><span>Instagram</span><input type="text" id="perfil-red-instagram" placeholder="@usuario" maxlength="300"></label>
-                                <label class="perfil-campo"><span>X (Twitter)</span><input type="text" id="perfil-red-x" placeholder="@usuario" maxlength="300"></label>
-                                <label class="perfil-campo"><span>WhatsApp</span><input type="text" id="perfil-red-whatsapp" placeholder="+58 412 000 0000" maxlength="300"></label>
-                                <label class="perfil-campo"><span>Facebook</span><input type="text" id="perfil-red-facebook" placeholder="usuario o enlace" maxlength="300"></label>
-                                <label class="perfil-campo"><span>Telegram</span><input type="text" id="perfil-red-telegram" placeholder="@usuario" maxlength="300"></label>
-                                <label class="perfil-campo"><span>Correo público</span><input type="email" id="perfil-red-correo" placeholder="hola@correo.com" maxlength="300"></label>
-                                <label class="perfil-campo"><span>Sitio web</span><input type="url" id="perfil-red-web" placeholder="https://" maxlength="300"></label>
+                            <p class="cuenta-item-desc">Opcional. Añade solo las que quieras: se muestran en tu perfil como iconos.</p>
+                            <div class="perfil-redes-lista" id="perfil-redes-lista"></div>
+                            <div class="perfil-redes-agregar">
+                                <button type="button" id="btn-agregar-red" class="perfil-red-add" aria-label="Añadir red social" aria-expanded="false">+</button>
+                                <div class="perfil-red-menu" id="perfil-red-menu" hidden></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="cuenta-form-acciones">
+<div class="cuenta-form-acciones">
                         <button type="button" id="btn-guardar-perfil" class="btn-cuenta-primario">Guardar cambios</button>
                         <span class="cuenta-error" id="perfil-estado" role="status"></span>
                     </div>
@@ -1228,7 +1231,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=b89313896e" type="module"></script>
+    <script src="js/main.js?v=81c7d5d565" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

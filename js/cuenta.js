@@ -113,23 +113,216 @@ export function setupMiCuenta() {
         contador.classList.toggle('perfil-bio-contador-pasado', n > MAX_CARACTERES_BIO);
     };
 
+    // ============================================
+    // FOTO DE PERFIL (vista previa y quitarla)
+    // ============================================
+    const AVATAR_DEFECTO = 'iconos/avatar-default.svg';
+    const previewAvatar = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-preview'));
+    // Se pone a true al pulsar «Quitar foto» y se manda foto_perfil: '' al guardar.
+    let quitarFoto = false;
+
+    // ============================================
+    // MUNICIPIO DE ORIGEN (select con banderas)
+    // ============================================
+    const muniTrigger = /** @type {HTMLButtonElement | null} */ (document.getElementById('perfil-ciudad-trigger'));
+    const muniDropdown = /** @type {HTMLElement | null} */ (document.getElementById('perfil-ciudad-dropdown'));
+    const muniHidden = /** @type {HTMLInputElement | null} */ (document.getElementById('perfil-ciudad-input'));
+    const muniNota = document.getElementById('perfil-ciudad-nota');
+
+    /** Capital (lo que se guarda) -> municipio (lo que se muestra). */
+    const municipioDeCapital = (capital) => {
+        const mapa = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).MUNICIPIO_POR_PUEBLO);
+        return (mapa && capital && mapa[capital]) || capital || '';
+    };
+
+    const cerrarMunicipios = () => {
+        if (muniDropdown) muniDropdown.classList.remove('open');
+        if (muniTrigger) muniTrigger.setAttribute('aria-expanded', 'false');
+    };
+
+    /**
+     * Llena el desplegable con los 29 municipios y sus banderas y marca el actual.
+     * @param {string} capitalActual
+     * @param {boolean} bloqueado
+     */
+    const pintarMunicipios = (capitalActual, bloqueado) => {
+        if (!muniDropdown || !muniHidden) return;
+        const banderas = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).BANDERA_POR_CIUDAD) || {};
+        const paises = /** @type {any} */ (window).CIUDADES_POR_PAIS || {};
+        const lista = (paises.Venezuela && paises.Venezuela['Táchira']) || [];
+
+        const opciones = lista
+            .map((capital) => ({ capital, municipio: municipioDeCapital(capital) }))
+            .sort((a, b) => a.municipio.localeCompare(b.municipio, 'es'));
+
+        muniDropdown.textContent = '';
+        opciones.forEach(({ capital, municipio }) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'custom-select-option';
+            item.setAttribute('role', 'option');
+            item.dataset.capital = capital;
+            const bandera = banderas[capital] || '';
+            item.innerHTML = (bandera ? '<img class="custom-select-flag" src="iconos/banderas/' + bandera + '" alt="">' : '') + '<span>' + municipio + '</span>';
+            item.addEventListener('click', () => {
+                if (bloqueado) return;
+                muniHidden.value = capital;
+                if (muniTrigger) muniTrigger.textContent = municipio;
+                cerrarMunicipios();
+            });
+            muniDropdown.appendChild(item);
+        });
+
+        if (capitalActual) {
+            muniHidden.value = capitalActual;
+            if (muniTrigger) muniTrigger.textContent = municipioDeCapital(capitalActual);
+            muniDropdown.querySelectorAll('.custom-select-option').forEach((el) => {
+                el.classList.toggle('selected', /** @type {HTMLElement} */ (el).dataset.capital === capitalActual);
+            });
+        }
+    };
+
+    if (muniTrigger && muniDropdown) {
+        muniTrigger.addEventListener('click', () => {
+            const abierto = muniDropdown.classList.toggle('open');
+            muniTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+        document.addEventListener('click', (ev) => {
+            const objetivo = /** @type {Node} */ (ev.target);
+            if (!muniTrigger.contains(objetivo) && !muniDropdown.contains(objetivo)) cerrarMunicipios();
+        });
+    }
+
+    // ============================================
+    // REDES: se añaden de una en una con el botón +
+    // ============================================
+    const REDES_DISPONIBLES = [
+        { clave: 'instagram', etiqueta: 'Instagram', placeholder: '@usuario' },
+        { clave: 'facebook', etiqueta: 'Facebook', placeholder: 'usuario o enlace' },
+        { clave: 'x', etiqueta: 'X (Twitter)', placeholder: '@usuario' },
+        { clave: 'whatsapp', etiqueta: 'WhatsApp', placeholder: '+58 412 000 0000' },
+        { clave: 'telegram', etiqueta: 'Telegram', placeholder: '@usuario' },
+        { clave: 'correo', etiqueta: 'Correo', placeholder: 'hola@correo.com' },
+        { clave: 'web', etiqueta: 'Sitio web', placeholder: 'https://' }
+    ];
+    const listaRedes = document.getElementById('perfil-redes-lista');
+    const menuRedes = document.getElementById('perfil-red-menu');
+    const btnAgregarRed = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-agregar-red'));
+
+    /** Añade una fila para esa red (si no estaba ya). */
+    const agregarRed = (clave, valor) => {
+        if (!listaRedes) return;
+        const def = REDES_DISPONIBLES.find((r) => r.clave === clave);
+        if (!def) return;
+        if (listaRedes.querySelector('[data-red="' + clave + '"]')) return;
+        const fila = document.createElement('div');
+        fila.className = 'perfil-campo-red';
+        fila.dataset.red = clave;
+        fila.innerHTML = '<span>' + def.etiqueta + '</span>' +
+            '<div class="perfil-campo-red-fila">' +
+            '<input type="text" maxlength="300" placeholder="' + def.placeholder + '" aria-label="' + def.etiqueta + '">' +
+            '<button type="button" class="perfil-red-quitar" aria-label="Quitar ' + def.etiqueta + '">×</button>' +
+            '</div>';
+        const input = fila.querySelector('input');
+        if (input) input.value = valor == null ? '' : String(valor);
+        const quitar = fila.querySelector('.perfil-red-quitar');
+        if (quitar) quitar.addEventListener('click', () => fila.remove());
+        listaRedes.appendChild(fila);
+    };
+
+    /** Pinta las que ya tenía guardadas. */
+    const pintarRedesGuardadas = (redes) => {
+        if (!listaRedes) return;
+        listaRedes.textContent = '';
+        REDES_DISPONIBLES.forEach(({ clave }) => {
+            if (redes && redes[clave]) agregarRed(clave, redes[clave]);
+        });
+    };
+
+    /** Lo que hay escrito ahora mismo. */
+    const leerRedes = () => {
+        /** @type {Record<string, string>} */
+        const salida = {};
+        if (!listaRedes) return salida;
+        REDES_DISPONIBLES.forEach(({ clave }) => {
+            const input = /** @type {HTMLInputElement | null} */ (listaRedes.querySelector('[data-red="' + clave + '"] input'));
+            if (input && input.value.trim()) salida[clave] = input.value.trim();
+        });
+        return salida;
+    };
+
+    const cerrarMenuRedes = () => {
+        if (menuRedes) menuRedes.hidden = true;
+        if (btnAgregarRed) btnAgregarRed.setAttribute('aria-expanded', 'false');
+    };
+
+    /** Menú con las redes que aún no se han añadido. */
+    const pintarMenuRedes = () => {
+        if (!menuRedes || !listaRedes) return;
+        menuRedes.textContent = '';
+        REDES_DISPONIBLES.forEach(({ clave, etiqueta }) => {
+            if (listaRedes.querySelector('[data-red="' + clave + '"]')) return;
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'perfil-red-opcion';
+            b.textContent = etiqueta;
+            b.addEventListener('click', () => {
+                agregarRed(clave, '');
+                cerrarMenuRedes();
+            });
+            menuRedes.appendChild(b);
+        });
+        if (!menuRedes.childElementCount) {
+            const p = document.createElement('span');
+            p.className = 'cuenta-item-nota';
+            p.textContent = 'Ya has añadido todas.';
+            menuRedes.appendChild(p);
+        }
+    };
+
+    if (btnAgregarRed && menuRedes) {
+        btnAgregarRed.addEventListener('click', () => {
+            const abrir = menuRedes.hidden;
+            pintarMenuRedes();
+            menuRedes.hidden = !abrir;
+            btnAgregarRed.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+        });
+    }
+
     const cargarPerfil = async () => {
         if (perfilCargado) return;
         perfilCargado = true;
         try {
             const res = await apiRequest('/api/artistas/perfil');
             const u = (res && res.artista) || {};
-            poner('perfil-ciudad-input', u.ciudad);
+            // Foto actual en la vista previa.
+            if (previewAvatar) {
+                previewAvatar.src = u.foto_perfil || AVATAR_DEFECTO;
+                quitarFoto = false;
+            }
+            // Municipio: se bloquea si lo cambió hace menos de 30 días.
+            const cambióMs = u.ciudad_actualizada_en ? new Date(u.ciudad_actualizada_en).getTime() : 0;
+            const faltaMs = cambióMs ? (cambióMs + 30 * 86400000) - Date.now() : 0;
+            const bloqueado = faltaMs > 0;
+            pintarMunicipios(u.ciudad || '', bloqueado);
+            if (muniTrigger) {
+                muniTrigger.disabled = bloqueado;
+                muniTrigger.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+            }
+            if (muniNota) {
+                if (bloqueado) {
+                    const dias = Math.ceil(faltaMs / 86400000);
+                    muniNota.textContent = 'Podrás cambiarlo en ' + dias + (dias === 1 ? ' día.' : ' días.');
+                    muniNota.classList.add('bloqueado');
+                } else {
+                    muniNota.textContent = 'Puedes cambiarlo una vez cada 30 días.';
+                    muniNota.classList.remove('bloqueado');
+                }
+            }
             poner('perfil-bio-input', u.bio);
             actualizarContadorBio();
             const redes = parsear(u.redes);
-            poner('perfil-red-instagram', redes.instagram);
-            poner('perfil-red-facebook', redes.facebook);
-            poner('perfil-red-x', redes.x);
-            poner('perfil-red-whatsapp', redes.whatsapp);
-            poner('perfil-red-telegram', redes.telegram);
-            poner('perfil-red-correo', redes.correo);
-            poner('perfil-red-web', redes.web);
+            pintarRedesGuardadas(redes);
             const cobro = parsear(u.cobro);
             poner('perfil-cobro-pago-movil', cobro['pago-movil']);
             poner('perfil-cobro-zelle', cobro.zelle);
@@ -200,6 +393,17 @@ export function setupMiCuenta() {
         });
     }
 
+    // «Quitar foto»: se deja sin foto y se guarda al momento (foto_perfil: '').
+    const btnQuitarFoto = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-quitar-avatar-perfil'));
+    if (btnQuitarFoto) {
+        btnQuitarFoto.addEventListener('click', () => {
+            quitarFoto = true;
+            if (previewAvatar) previewAvatar.src = AVATAR_DEFECTO;
+            const principal = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
+            if (principal) principal.click();
+        });
+    }
+
     const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {
         btnGuardarPerfil.addEventListener('click', async () => {
@@ -210,15 +414,8 @@ export function setupMiCuenta() {
             const decir = (texto) => { estados.forEach((el) => { el.textContent = texto; }); };
             const ciudad = valorDe('perfil-ciudad-input');
             const bio = valorDe('perfil-bio-input');
-            const redes = {
-                instagram: valorDe('perfil-red-instagram'),
-                facebook: valorDe('perfil-red-facebook'),
-                x: valorDe('perfil-red-x'),
-                whatsapp: valorDe('perfil-red-whatsapp'),
-                telegram: valorDe('perfil-red-telegram'),
-                correo: valorDe('perfil-red-correo'),
-                web: valorDe('perfil-red-web')
-            };
+            // Las redes salen de las filas que haya añadidas.
+            const redes = leerRedes();
             const cobro = {
                 'pago-movil': valorDe('perfil-cobro-pago-movil'),
                 zelle: valorDe('perfil-cobro-zelle'),
@@ -238,7 +435,7 @@ export function setupMiCuenta() {
             try {
                 const res = await apiRequest('/api/artistas/perfil-datos', {
                     method: 'PUT',
-                    body: JSON.stringify({ ciudad, redes, cobro, bio })
+                    body: JSON.stringify({ ciudad, redes, cobro, bio, foto_perfil: quitarFoto ? '' : undefined })
                 });
                 if (res && res.success) {
                     if (artistaActual) artistaActual.ciudad = ciudad;
@@ -253,6 +450,14 @@ export function setupMiCuenta() {
                     }));
                     if (artistaActual) artistaActual.redes = JSON.stringify(redes);
                     if (artistaActual) artistaActual.bio = bio;
+                    // Si se quitó la foto, se cambia también el avatar grande y el del nav.
+                    if (quitarFoto) {
+                        if (artistaActual) artistaActual.foto_perfil = '';
+                        document.querySelectorAll('.perfil-avatar-img-seccion').forEach((el) => { /** @type {HTMLImageElement} */ (el).src = AVATAR_DEFECTO; });
+                        const avatarNav = document.querySelector('#btn-perfil-sidebar img');
+                        if (avatarNav) /** @type {HTMLImageElement} */ (avatarNav).src = AVATAR_DEFECTO;
+                        quitarFoto = false;
+                    }
                     decir('✅ Guardado.');
                     showSuccess('Perfil actualizado');
                 } else {
