@@ -918,6 +918,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const nombres = /** @type {HTMLInputElement} */ (document.getElementById('reg-nombres')).value;
             const apellidos = /** @type {HTMLInputElement} */ (document.getElementById('reg-apellidos')).value;
             const nombre_real = `${nombres} ${apellidos}`.trim();
+            // El nombre y los apellidos reales son OBLIGATORIOS (se muestran en el perfil).
+            // `required` en el HTML no basta: con solo espacios el campo pasa y quedaria vacio.
+            if (!nombres.trim() || !apellidos.trim()) {
+                showWarning('Los nombres y apellidos reales son obligatorios.');
+                currentStep = 1;
+                mostrarPasoActual();
+                const vacio = /** @type {HTMLInputElement | null} */ (document.getElementById(!nombres.trim() ? 'reg-nombres' : 'reg-apellidos'));
+                if (vacio) vacio.focus();
+                return;
+            }
             const email = /** @type {HTMLInputElement} */ (document.getElementById('reg-email')).value;
             const password = /** @type {HTMLInputElement} */ (document.getElementById('reg-pass')).value;
             const telefono = /** @type {HTMLInputElement} */ (document.getElementById('reg-telefono')).value;
