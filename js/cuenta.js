@@ -411,14 +411,22 @@ const ICONOS_RED_PANEL = {
      */
     const pintarLogoPago = (caja, m) => {
         caja.textContent = m.corto;
-        const img = document.createElement('img');
-        img.className = 'pago-logo';
-        img.alt = '';
-        img.addEventListener('load', () => {
-            caja.textContent = '';
-            caja.appendChild(img);
-        });
-        img.src = 'iconos/pagos/' + m.id + '.svg';
+        const intentar = (ext) => {
+            const img = document.createElement('img');
+            img.className = 'pago-logo';
+            img.alt = '';
+            img.addEventListener('load', () => {
+                caja.textContent = '';
+                caja.appendChild(img);
+            });
+            img.addEventListener('error', () => {
+                // Si no hay SVG, se prueba PNG; si tampoco, quedan las siglas.
+                if (ext === 'svg') intentar('png');
+                else caja.textContent = m.corto;
+            });
+            img.src = 'iconos/pagos/' + m.id + '.' + ext;
+        };
+        intentar('svg');
     };
 
     /** Repinta la lista de métodos añadidos. */
