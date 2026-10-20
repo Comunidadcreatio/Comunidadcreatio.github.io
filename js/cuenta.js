@@ -405,6 +405,22 @@ const ICONOS_RED_PANEL = {
         return p ? p.nombre : (m.metodo || 'Método');
     };
 
+    /**
+     * Pinta en la caja el logo de iconos/pagos/<id>.svg; si no existe, deja las siglas.
+     * Así, cuando se añada el logo de un banco con ese nombre, aparece solo.
+     */
+    const pintarLogoPago = (caja, m) => {
+        caja.textContent = m.corto;
+        const img = document.createElement('img');
+        img.className = 'pago-logo';
+        img.alt = '';
+        img.addEventListener('load', () => {
+            caja.textContent = '';
+            caja.appendChild(img);
+        });
+        img.src = 'iconos/pagos/' + m.id + '.svg';
+    };
+
     /** Repinta la lista de métodos añadidos. */
     const pintarListaPagos = () => {
         if (!pagoLista) return;
@@ -413,9 +429,11 @@ const ICONOS_RED_PANEL = {
             const def = buscarMetodo(m.banco || m.metodo);
             const item = document.createElement('div');
             item.className = 'pago-item';
-            item.innerHTML = '<span class="pago-badge" style="--pago-color:' + ((def && def.color) || '#777') + '">' + ((def && def.corto) || '?') + '</span>' +
+            item.innerHTML = '<span class="pago-badge" style="--pago-color:' + ((def && def.color) || '#777') + '"><span class="pago-siglas">' + ((def && def.corto) || '?') + '</span></span>' +
                 '<div class="pago-item-datos"><strong>' + tituloMetodo(m) + '</strong><span>' + resumenMetodo(m) + '</span></div>' +
                 '<button type="button" class="pago-quitar" aria-label="Quitar método">×</button>';
+            const cajaIcono = item.querySelector('.pago-badge');
+            if (cajaIcono && def) pintarLogoPago(cajaIcono, def);
             const quitar = item.querySelector('.pago-quitar');
             if (quitar) quitar.addEventListener('click', () => { metodosPago.splice(indice, 1); pintarListaPagos(); });
             pagoLista.appendChild(item);
@@ -494,7 +512,7 @@ const ICONOS_RED_PANEL = {
             b.type = 'button';
             b.className = 'pago-badge';
             b.style.setProperty('--pago-color', m.color);
-            b.textContent = m.corto;
+            pintarLogoPago(b, m);
             b.title = m.nombre;
             b.setAttribute('aria-label', 'Añadir ' + m.nombre);
             b.addEventListener('click', () => {

@@ -2390,3 +2390,22 @@
     line-height: 1;
     cursor: pointer;
 }
+
+/* Logo real dentro del círculo (si existe iconos/pagos/<id>.svg). */
+.pago-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+}
+
+.pago-item .pago-logo {
+    width: 20px;
+    height: 20px;
+}
+
+/* Con el logo dentro, las siglas no se ven. */
+.pago-badge .pago-logo + .pago-siglas,
+.pago-badge .pago-logo ~ .pago-siglas {
+    display: none;
+}
