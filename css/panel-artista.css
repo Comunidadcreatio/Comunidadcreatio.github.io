@@ -2603,3 +2603,57 @@ select.cuenta-item-valor {
 input.cuenta-item-valor[readonly] {
     cursor: default;
 }
+
+/* ==============================================
+   BLOQUES DEL PERFIL ALINEADOS (2026-10-20)
+   Todos los apartados de Mi perfil empiezan en el mismo punto: el título arriba (con su switch
+   a la derecha) y el contenido debajo. Antes la foto metía el título al lado de la imagen.
+   ============================================== */
+#perfil-content .cuenta-item-info {
+    gap: 0;
+}
+
+#perfil-content .cuenta-item-info h4 {
+    width: 100%;
+    min-height: 30px;
+    gap: 10px;
+}
+
+#perfil-content .cuenta-avatar-fila {
+    margin-top: 12px;
+    align-items: center;
+    gap: 16px;
+    /* Si los botones no caben al lado del avatar, bajan a la línea siguiente. */
+    flex-wrap: wrap;
+}
+
+#perfil-content .cuenta-avatar-fila .cuenta-item-actions {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+/* En móvil hay una regla que pone los botones al 100%: aquí van en su ancho natural. */
+#perfil-content .cuenta-avatar-fila .btn-cuenta-secundario {
+    width: auto;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+#perfil-content .cuenta-item-valor,
+#perfil-content .perfil-muni-select,
+#perfil-content .select-panel,
+#perfil-content .perfil-redes-lista,
+#perfil-content .cuenta-avatar-fila {
+    margin-left: 26px;
+}
+
+#perfil-content .cuenta-item-valor {
+    max-width: 330px;
+}
+
+#perfil-content .perfil-muni-select,
+#perfil-content .select-panel {
+    max-width: 330px;
+}

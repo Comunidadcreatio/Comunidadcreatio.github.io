@@ -148,6 +148,7 @@ function aplicarVisibilidadHeader(valor) {
     const avatar = document.getElementById('perfil-avatar-btn');
     if (avatar) avatar.hidden = !ver('foto');
     document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('municipio'); });
+    document.querySelectorAll('.perfil-nombre-real').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('nombre'); });
     document.querySelectorAll('.perfil-bio').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('bio'); });
     document.querySelectorAll('.perfil-redes').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('redes'); });
 }

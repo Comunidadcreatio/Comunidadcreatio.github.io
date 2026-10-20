@@ -222,7 +222,7 @@ export function setupMiCuenta() {
     // ============================================
     // VISIBILIDAD: qué bloques se enseñan en el perfil
     // ============================================
-    const VISIBILIDAD_DEFECTO = { foto: true, municipio: true, bio: true, redes: true };
+    const VISIBILIDAD_DEFECTO = { foto: true, nombre: true, municipio: true, bio: true, redes: true };
     /** @type {Record<string, boolean>} */
     let visibilidad = Object.assign({}, VISIBILIDAD_DEFECTO);
     const switchesVisibilidad = [...document.querySelectorAll('.perfil-switch')];
@@ -694,6 +694,7 @@ const ICONOS_RED_PANEL = {
             poner('perfil-bio-input', u.bio);
             actualizarContadorBio();
             poner('perfil-username-input', u.nombre_artista);
+            poner('perfil-nombre-real-input', u.nombre_real);
             const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
             if (rolSelect) rolSelect.value = u.rol || 'artista';
             visibilidad = normalizarVisibilidad(u.visibilidad);
