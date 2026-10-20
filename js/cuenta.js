@@ -129,6 +129,17 @@ export function setupMiCuenta() {
     const muniHidden = /** @type {HTMLInputElement | null} */ (document.getElementById('perfil-ciudad-input'));
     const muniNota = document.getElementById('perfil-ciudad-nota');
 
+    /**
+     * El acordeón recorta su contenido (overflow: hidden) para poder animarse; eso corta los
+     * desplegables. Al abrir uno se deja visible y al cerrarlo se vuelve a recortar.
+     * @param {HTMLElement | null} el
+     * @param {boolean} visible
+     */
+    const ajustarRecorteAcordeon = (el, visible) => {
+        const caja = el ? el.closest('.accordion-content') : null;
+        if (caja) /** @type {HTMLElement} */ (caja).style.overflow = visible ? 'visible' : '';
+    };
+
     /** Capital (lo que se guarda) -> municipio (lo que se muestra). */
     const municipioDeCapital = (capital) => {
         const mapa = /** @type {Record<string, string> | undefined} */ (/** @type {any} */ (window).MUNICIPIO_POR_PUEBLO);
@@ -136,6 +147,7 @@ export function setupMiCuenta() {
     };
 
     const cerrarMunicipios = () => {
+        ajustarRecorteAcordeon(muniDropdown, false);
         if (muniDropdown) muniDropdown.classList.remove('open');
         if (muniTrigger) muniTrigger.setAttribute('aria-expanded', 'false');
     };
@@ -185,6 +197,7 @@ export function setupMiCuenta() {
     if (muniTrigger && muniDropdown) {
         muniTrigger.addEventListener('click', () => {
             const abierto = muniDropdown.classList.toggle('open');
+            ajustarRecorteAcordeon(muniDropdown, abierto);
             muniTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
         });
         document.addEventListener('click', (ev) => {
@@ -273,6 +286,7 @@ const ICONOS_RED_PANEL = {
 
     /** Cierra el desplegable de redes. */
     const cerrarSelectRedes = () => {
+        ajustarRecorteAcordeon(redesSelectDropdown, false);
         if (redesSelectDropdown) redesSelectDropdown.classList.remove('open');
         if (redesSelectTrigger) redesSelectTrigger.setAttribute('aria-expanded', 'false');
     };
@@ -307,6 +321,7 @@ const ICONOS_RED_PANEL = {
     if (redesSelectTrigger && redesSelectDropdown) {
         redesSelectTrigger.addEventListener('click', () => {
             const abierto = redesSelectDropdown.classList.toggle('open');
+            ajustarRecorteAcordeon(redesSelectDropdown, abierto);
             redesSelectTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
         });
         document.addEventListener('click', (ev) => {
@@ -536,6 +551,7 @@ const ICONOS_RED_PANEL = {
 
     /** Cierra el desplegable de pagos. */
     const cerrarSelectPago = () => {
+        ajustarRecorteAcordeon(pagoSelectDropdown, false);
         if (pagoSelectDropdown) pagoSelectDropdown.classList.remove('open');
         if (pagoSelectTrigger) pagoSelectTrigger.setAttribute('aria-expanded', 'false');
     };
@@ -570,6 +586,7 @@ const ICONOS_RED_PANEL = {
     if (pagoSelectTrigger && pagoSelectDropdown) {
         pagoSelectTrigger.addEventListener('click', () => {
             const abierto = pagoSelectDropdown.classList.toggle('open');
+            ajustarRecorteAcordeon(pagoSelectDropdown, abierto);
             pagoSelectTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
         });
         document.addEventListener('click', (ev) => {
