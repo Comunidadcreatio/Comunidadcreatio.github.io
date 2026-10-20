@@ -1643,3 +1643,31 @@
 [data-theme="dark"] .perfil-tab-btn .tab-icono {
     filter: invert(1);
 }
+
+/* ==============================================
+   AJUSTES FINOS DEL PERFIL (2026-10-19)
+   - Bandera más pequeña (18x12) y SIN borde: el borde de 1 px se notaba como un filo oscuro.
+   - Icono de los contadores más pequeño (14 px) y más pegado al marcador (1 px).
+   - El bloque marcador+icono queda centrado sobre el nombre.
+   ============================================== */
+.perfil-bandera {
+    width: 18px;
+    height: 12px;
+    border: none;
+    border-radius: 2px;
+}
+
+.perfil-tab-btn .tab-top {
+    justify-content: center;
+    gap: 1px;
+}
+
+.perfil-tab-btn .tab-icono {
+    width: 14px;
+    height: 14px;
+}
+
+.perfil-tab-btn {
+    align-items: center;
+    text-align: center;
+}

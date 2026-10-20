@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=eda4028c5a');
+@import url('panel-artista.css?v=c88628f6e8');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
@@ -990,8 +990,10 @@
    porcentaje se resolvía como `auto`. */
 .toggle-nav-btn,
 .bottom-bar-center {
-    justify-content: flex-end;
-    padding-bottom: 5px;
+    /* Centrado vertical: cuando los botones llevaban nombre debajo se alineaban al fondo
+       (justify-content: flex-end + 5px). Sin nombres, eso dejaba mucho aire arriba. */
+    justify-content: center;
+    padding-bottom: 0;
     box-sizing: border-box;
 }
 
