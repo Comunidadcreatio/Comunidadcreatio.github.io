@@ -417,12 +417,17 @@ const ICONOS_RED_PANEL = {
             img.alt = '';
             img.addEventListener('load', () => {
                 caja.textContent = '';
+                // Con logo, el círculo se queda sin anillo ni color de marca.
+                caja.classList.add('con-logo');
                 caja.appendChild(img);
             });
             img.addEventListener('error', () => {
                 // Si no hay SVG, se prueba PNG; si tampoco, quedan las siglas.
                 if (ext === 'svg') intentar('png');
-                else caja.textContent = m.corto;
+                else {
+                    caja.classList.remove('con-logo');
+                    caja.textContent = m.corto;
+                }
             });
             img.src = 'iconos/pagos/' + m.id + '.' + ext;
         };

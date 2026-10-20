@@ -2409,3 +2409,34 @@
 .pago-badge .pago-logo ~ .pago-siglas {
     display: none;
 }
+
+/* ==============================================
+   LOGO RECORTADO EN CÍRCULO (2026-10-20)
+   Los PNG traen su propio fondo (blanco o negro) en las esquinas: se recortan en círculo y se
+   quita el anillo de color de marca para dejar solo el icono con su fondo.
+   ============================================== */
+.pago-badge.con-logo {
+    border: none;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+.pago-badge.con-logo:hover,
+.pago-badge.con-logo:focus-visible {
+    background: transparent;
+    transform: translateY(-1px);
+}
+
+.pago-badge.con-logo .pago-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.pago-item .pago-badge.con-logo {
+    width: 34px;
+    height: 34px;
+}
