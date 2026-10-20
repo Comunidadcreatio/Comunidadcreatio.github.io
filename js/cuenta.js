@@ -136,8 +136,13 @@ export function setupMiCuenta() {
      * @param {boolean} visible
      */
     const ajustarRecorteAcordeon = (el, visible) => {
-        const caja = el ? el.closest('.accordion-content') : null;
-        if (caja) /** @type {HTMLElement} */ (caja).style.overflow = visible ? 'visible' : '';
+        const caja = /** @type {HTMLElement | null} */ (el ? el.closest('.accordion-content') : null);
+        if (!caja) return;
+        if (visible) { caja.style.overflow = 'visible'; return; }
+        // Varios desplegables comparten acordeón: solo se vuelve a recortar si no queda
+        // ninguno abierto (si no, el cierre de uno deshacía la apertura de otro).
+        const otroAbierto = caja.querySelector('.custom-select-dropdown.open');
+        if (!otroAbierto) caja.style.overflow = '';
     };
 
     /** Capital (lo que se guarda) -> municipio (lo que se muestra). */
