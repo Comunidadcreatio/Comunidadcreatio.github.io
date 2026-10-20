@@ -181,7 +181,14 @@ for (let intento = 0; intento < 25; intento++) {
     dir = await leer(`(() => {
     const acc = document.getElementById('chat-accordion');
     const items = acc ? [...acc.querySelectorAll('.chat-pueblo')] : [];
-    const nombres = items.map((i) => (i.querySelector('.chat-pueblo-nombre') || {}).textContent || '');
+    // Desde 2026-10-19 la cabecera lleva el MUNICIPIO arriba y la CAPITAL debajo: el pueblo es
+    // la capital (es la clave de los datos), así que se lee esa cuando existe.
+    const nombres = items.map((i) => {
+        const capital = i.querySelector('.chat-pueblo-capital');
+        if (capital) return capital.textContent || '';
+        const nom = i.querySelector('.chat-pueblo-nombre');
+        return nom ? nom.textContent || '' : '';
+    });
     const primero = items[0];
     const img = primero ? primero.querySelector('.chat-pueblo-bandera') : null;
     const conUsers = items.find((i) => i.querySelector('.chat-user-row'));
