@@ -2812,3 +2812,32 @@ textarea:-webkit-autofill {
 #perfil-content .cuenta-item-valor {
     margin-top: 8px;
 }
+
+/* ==============================================
+   SWITCH EN LA FILA DEL CAMPO (2026-10-21)
+   El switch deja de ir en el título y se pone al lado del input/select, alineado con él.
+   ============================================== */
+#perfil-content .campo-fila {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+#perfil-content .campo-fila > *:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-top: 0;
+}
+
+#perfil-content .campo-fila > .perfil-switch {
+    flex: 0 0 auto;
+    margin: 0;
+    align-self: center;
+}
+
+/* El campo ya no necesita el margen de arriba: lo pone la fila. */
+#perfil-content .campo-fila .cuenta-item-valor {
+    margin-top: 0;
+}
