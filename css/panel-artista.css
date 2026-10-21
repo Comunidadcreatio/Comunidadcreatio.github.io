@@ -2841,3 +2841,25 @@ textarea:-webkit-autofill {
 #perfil-content .campo-fila .cuenta-item-valor {
     margin-top: 0;
 }
+
+/* ==============================================
+   ICONO EN LA FILA, A LA IZQUIERDA (2026-10-21)
+   La fila queda: [icono] [campo] [switch].
+   ============================================== */
+#perfil-content .campo-fila > svg.cuenta-titulo-icono {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    opacity: 0.85;
+}
+
+#perfil-content .campo-fila > *:not(.cuenta-titulo-icono):not(.perfil-switch) {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* El título queda solo con el texto: el icono ya va en la fila. */
+#perfil-content .cuenta-item-info h4 {
+    padding-left: 0;
+}
