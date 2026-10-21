@@ -2863,3 +2863,46 @@ textarea:-webkit-autofill {
 #perfil-content .cuenta-item-info h4 {
     padding-left: 0;
 }
+
+/* ==============================================
+   FOTO: TÍTULO CENTRADO Y ACCIONES DEBAJO (2026-10-21)
+   ============================================== */
+#perfil-content .perfil-foto-titulo {
+    text-align: center;
+    justify-content: center;
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px;
+}
+
+#perfil-content .perfil-foto-acciones {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 42px;
+    margin-top: 14px;
+}
+
+.perfil-foto-accion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    max-width: 120px;
+}
+
+#perfil-content .perfil-foto-accion .cuenta-avatar-accion {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+}
+
+.perfil-foto-accion-texto {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--color-text-muted, #666);
+}
