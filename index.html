@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.783';
+        var currentVer = '1.0.784';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=13e7c7bf26">
+    <link rel="stylesheet" href="css/style.css?v=ba70b8121e">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -884,16 +884,17 @@
                         </div>
                     </div>
 
-<div class="cuenta-item">
+                    <div class="cuenta-item">
                         <div class="cuenta-item-info">
-                            <h4>Municipio de origen</h4>
-                            <div class="campo-fila"><input type="hidden" id="perfil-ciudad-input" value="">
-                            <button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="municipio" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button></div>
-                            <div class="custom-select perfil-muni-select" id="perfil-ciudad-select">
-                                <button type="button" class="custom-select-trigger" id="perfil-ciudad-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="perfil-ciudad-dropdown">Selecciona tu municipio</button>
-                                <div class="custom-select-dropdown" id="perfil-ciudad-dropdown" role="listbox" aria-label="Municipio de origen"></div>
+                            <h4>Municipio de origen<span class="cuenta-item-nota" id="perfil-ciudad-nota"></span></h4>
+                            <input type="hidden" id="perfil-ciudad-input" value="">
+                            <div class="campo-fila">
+                                <div class="custom-select perfil-muni-select" id="perfil-ciudad-select">
+                                    <button type="button" class="custom-select-trigger" id="perfil-ciudad-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="perfil-ciudad-dropdown">Selecciona tu municipio</button>
+                                    <div class="custom-select-dropdown" id="perfil-ciudad-dropdown" role="listbox" aria-label="Municipio de origen"></div>
+                                </div>
+                                <button type="button" class="perfil-switch" role="switch" aria-checked="true" data-visibilidad="municipio" aria-label="Mostrar en el perfil"><span class="perfil-switch-bola"></span></button>
                             </div>
-                            <p class="cuenta-item-nota" id="perfil-ciudad-nota"></p>
                         </div>
                     </div>
 

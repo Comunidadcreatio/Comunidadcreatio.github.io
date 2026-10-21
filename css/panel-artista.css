@@ -2990,3 +2990,22 @@ textarea:-webkit-autofill {
 #mi-cuenta .perfil-muni-select .custom-select-trigger::after {
     content: none;
 }
+
+/* La nota del municipio va como subtítulo, igual que el contador de la biografía. */
+#perfil-content .cuenta-item-nota {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+    text-align: right;
+    white-space: nowrap;
+}
+
+#perfil-content .cuenta-item-nota.bloqueado {
+    color: #c0392b;
+}
+
+#perfil-content .campo-fila .perfil-muni-select {
+    margin-top: 0;
+    max-width: 100%;
+}
