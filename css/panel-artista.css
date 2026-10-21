@@ -2906,3 +2906,35 @@ textarea:-webkit-autofill {
     text-align: center;
     color: var(--color-text-muted, #666);
 }
+
+/* ==============================================
+   TITULOS Y RITMO COMO EL PASO 1 DE CAVENTS (2026-10-21)
+   Medido en el formulario real: etiqueta de 11 px, peso 700, gris #737373, 2 px debajo, y 16 px
+   entre apartados.
+   ============================================== */
+#perfil-content .cuenta-item-info h4 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #737373;
+    letter-spacing: normal;
+    text-transform: none;
+    margin: 0 0 2px;
+    min-height: 0;
+}
+
+#perfil-content .cuenta-item {
+    padding: 0;
+    margin-bottom: 16px;
+}
+
+#perfil-content .campo-fila {
+    margin-top: 0;
+}
+
+/* La foto mantiene su título centrado y algo de aire con el círculo. */
+#perfil-content .perfil-foto-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    color: #737373;
+    margin: 0 0 10px;
+}
