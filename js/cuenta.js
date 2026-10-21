@@ -308,9 +308,13 @@ const ICONOS_RED_PANEL = {
         const fila = document.createElement('div');
         fila.className = 'perfil-campo-red';
         fila.dataset.red = clave;
-        fila.innerHTML = '<span>' + def.etiqueta + '</span>' +
-            '<div class="perfil-campo-red-fila">' +
+        // Misma tarjeta que los métodos de cobro: icono en círculo, nombre, dato y la ×.
+        fila.innerHTML = '<div class="perfil-red-card">' +
+            '<span class="perfil-red-card-icono">' + (ICONOS_RED_PANEL[clave] || '') + '</span>' +
+            '<div class="perfil-red-card-datos">' +
+            '<span class="perfil-red-card-nombre">' + def.etiqueta + '</span>' +
             '<input type="text" maxlength="300" placeholder="' + def.placeholder + '" aria-label="' + def.etiqueta + '">' +
+            '</div>' +
             '<button type="button" class="perfil-red-quitar" aria-label="Quitar ' + def.etiqueta + '">×</button>' +
             '</div>';
         const input = fila.querySelector('input');
@@ -669,6 +673,47 @@ const ICONOS_RED_PANEL = {
         pintarListaPagos();
     };
 
+    // ============================================
+    // ROL: desplegable propio, se abre pero no cambia
+    // ============================================
+    const ROLES_TEXTO = { artista: 'Artista', comprador: 'Comprador', coleccionista: 'Coleccionista', curador: 'Curador', galeria: 'Galería' };
+    const rolTrigger = /** @type {HTMLButtonElement | null} */ (document.getElementById('perfil-rol-trigger'));
+    const rolDropdown = /** @type {HTMLElement | null} */ (document.getElementById('perfil-rol-dropdown'));
+
+    const cerrarRol = () => {
+        if (rolDropdown) rolDropdown.classList.remove('open');
+        if (rolTrigger) rolTrigger.setAttribute('aria-expanded', 'false');
+    };
+
+    /** Pinta el rol actual y las opciones (que se ven pero no se pueden elegir). */
+    const pintarRol = (rol) => {
+        const clave = ROLES_TEXTO[rol] ? rol : 'artista';
+        if (rolTrigger) rolTrigger.textContent = ROLES_TEXTO[clave];
+        if (!rolDropdown) return;
+        rolDropdown.textContent = '';
+        Object.entries(ROLES_TEXTO).forEach(([valor, texto]) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'custom-select-option' + (valor === clave ? ' selected' : '');
+            b.setAttribute('role', 'option');
+            b.setAttribute('aria-selected', valor === clave ? 'true' : 'false');
+            b.textContent = texto;
+            b.addEventListener('click', () => cerrarRol());
+            rolDropdown.appendChild(b);
+        });
+    };
+
+    if (rolTrigger && rolDropdown) {
+        rolTrigger.addEventListener('click', () => {
+            const abierto = rolDropdown.classList.toggle('open');
+            rolTrigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+        document.addEventListener('click', (ev) => {
+            const objetivo = /** @type {Node} */ (ev.target);
+            if (!rolTrigger.contains(objetivo) && !rolDropdown.contains(objetivo)) cerrarRol();
+        });
+    }
+
     const cargarPerfil = async () => {
         if (perfilCargado) return;
         perfilCargado = true;
@@ -704,15 +749,7 @@ const ICONOS_RED_PANEL = {
             poner('perfil-username-input', u.nombre_artista);
             poner('perfil-nombre-real-input', u.nombre_real);
             const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
-            if (rolSelect) {
-                const bloquearRol = () => {
-                    // Solo la opción elegida queda habilitada: se abre y se ve la lista, pero no cambia.
-                    [...rolSelect.options].forEach((op) => { op.disabled = op.value !== rolSelect.value; });
-                };
-                rolSelect.value = u.rol || 'artista';
-                bloquearRol();
-                rolSelect.addEventListener('change', bloquearRol);
-            }
+            pintarRol(u.rol || 'artista');
             visibilidad = normalizarVisibilidad(u.visibilidad);
             pintarSwitches();
             aplicarVisibilidad();
