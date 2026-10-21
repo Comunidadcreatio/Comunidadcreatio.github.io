@@ -222,7 +222,7 @@ export function setupMiCuenta() {
     // ============================================
     // VISIBILIDAD: qué bloques se enseñan en el perfil
     // ============================================
-    const VISIBILIDAD_DEFECTO = { foto: true, nombre: true, municipio: true, bio: true, redes: true };
+    const VISIBILIDAD_DEFECTO = { foto: true, usuario: true, rol: true, nombre: true, municipio: true, bio: true, redes: true };
     /** @type {Record<string, boolean>} */
     let visibilidad = Object.assign({}, VISIBILIDAD_DEFECTO);
     const switchesVisibilidad = [...document.querySelectorAll('.perfil-switch')];
@@ -251,6 +251,14 @@ export function setupMiCuenta() {
     const aplicarVisibilidad = () => {
         const avatar = document.getElementById('perfil-avatar-btn');
         if (avatar) avatar.hidden = !visibilidad.foto;
+        // El rol y el municipio se leen juntos pero se ocultan por separado: se esconden también
+        // el «de» (si falta alguno) y la línea entera cuando no queda ninguno de los dos.
+        document.querySelectorAll('.perfil-nombre-artista-seccion').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.usuario; });
+        document.querySelectorAll('.perfil-rol').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.rol; });
+        document.querySelectorAll('.perfil-ciudad').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.municipio; });
+        document.querySelectorAll('.perfil-bandera').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.municipio; });
+        document.querySelectorAll('.perfil-de').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.rol || !visibilidad.municipio; });
+        document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.rol && !visibilidad.municipio; });
         document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.municipio; });
         document.querySelectorAll('.perfil-bio').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.bio; });
         document.querySelectorAll('.perfil-redes').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !visibilidad.redes; });
@@ -696,7 +704,15 @@ const ICONOS_RED_PANEL = {
             poner('perfil-username-input', u.nombre_artista);
             poner('perfil-nombre-real-input', u.nombre_real);
             const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
-            if (rolSelect) rolSelect.value = u.rol || 'artista';
+            if (rolSelect) {
+                const bloquearRol = () => {
+                    // Solo la opción elegida queda habilitada: se abre y se ve la lista, pero no cambia.
+                    [...rolSelect.options].forEach((op) => { op.disabled = op.value !== rolSelect.value; });
+                };
+                rolSelect.value = u.rol || 'artista';
+                bloquearRol();
+                rolSelect.addEventListener('change', bloquearRol);
+            }
             visibilidad = normalizarVisibilidad(u.visibilidad);
             pintarSwitches();
             aplicarVisibilidad();

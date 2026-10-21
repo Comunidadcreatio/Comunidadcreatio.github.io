@@ -2657,3 +2657,71 @@ input.cuenta-item-valor[readonly] {
 #perfil-content .select-panel {
     max-width: 330px;
 }
+
+/* ==============================================
+   PANEL: ANCHOS, FOTO Y FOCO (2026-10-20)
+   ============================================== */
+/* Los campos llevan un margen a la izquierda para alinear con el título: el ancho se descuenta. */
+#perfil-content .cuenta-item-valor {
+    width: calc(100% - 26px);
+    max-width: calc(100% - 26px);
+}
+
+#perfil-content textarea.cuenta-item-valor {
+    box-sizing: border-box;
+}
+
+/* Foto: limpiar | avatar | editar, centrados. */
+#perfil-content .cuenta-avatar-fila {
+    justify-content: center;
+    gap: 18px;
+}
+
+#perfil-content .cuenta-avatar-preview {
+    width: 96px;
+    height: 96px;
+    flex: 0 0 96px;
+}
+
+.cuenta-avatar-accion {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-muted, #666);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cuenta-avatar-accion:hover,
+.cuenta-avatar-accion:focus-visible {
+    color: var(--color-text, #1a1a1a);
+    border-color: var(--color-text, #1a1a1a);
+}
+
+/* El «de» va aparte para poder ocultar rol y municipio por separado. */
+.perfil-rol-linea .perfil-de {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--color-text-muted, #666);
+}
+
+/* Ya no lo pone el ::before del municipio. */
+.perfil-rol-linea .perfil-ciudad::before {
+    content: none;
+}
+
+/* Y sin el amarillo de autocompletado. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: var(--color-text, #1a1a1a);
+    transition: background-color 9999s ease-in-out 0s;
+}

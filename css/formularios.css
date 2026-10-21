@@ -1465,8 +1465,8 @@ form,
 /* La opción marcada con el teclado se distingue también por el borde, porque el
    fondo solo no basta para quien no ve bien los contrastes suaves. */
 #obra-form .custom-select-option.resaltada {
-    outline: 2px solid var(--color-accent, #d9a441);
-    outline-offset: -2px;
+    outline: 1px solid var(--color-gray-400, #bdbdbd);
+    outline-offset: -1px;
 }
 
 [data-theme="dark"] #obra-form .custom-select-trigger {

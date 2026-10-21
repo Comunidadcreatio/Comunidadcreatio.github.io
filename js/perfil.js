@@ -147,7 +147,12 @@ function aplicarVisibilidadHeader(valor) {
     const ver = (clave) => !datos || datos[clave] === undefined || String(datos[clave]) !== '0';
     const avatar = document.getElementById('perfil-avatar-btn');
     if (avatar) avatar.hidden = !ver('foto');
-    document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('municipio'); });
+    document.querySelectorAll('.perfil-nombre-artista-seccion').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('usuario'); });
+    document.querySelectorAll('.perfil-rol').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('rol'); });
+    document.querySelectorAll('.perfil-ciudad').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('municipio'); });
+    document.querySelectorAll('.perfil-bandera').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('municipio'); });
+    document.querySelectorAll('.perfil-de').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('rol') || !ver('municipio'); });
+    document.querySelectorAll('.perfil-rol-linea').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('rol') && !ver('municipio'); });
     document.querySelectorAll('.perfil-nombre-real').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('nombre'); });
     document.querySelectorAll('.perfil-bio').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('bio'); });
     document.querySelectorAll('.perfil-redes').forEach((el) => { /** @type {HTMLElement} */ (el).hidden = !ver('redes'); });

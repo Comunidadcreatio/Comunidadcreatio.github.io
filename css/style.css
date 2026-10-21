@@ -32,13 +32,13 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=d3f6eb463a');
+@import url('panel-artista.css?v=9f6ff3455a');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
 
 /* 5. Formularios (registro y obra) — al final para que su @media móvil tenga prioridad de cascada */
-@import url('formularios.css?v=35790a52ac');
+@import url('formularios.css?v=f0851800d9');
 
 /* ==============================================
    CAPA `base`: estilos de ETIQUETA (inputs, selects, textareas, botones)
