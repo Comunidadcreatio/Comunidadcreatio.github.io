@@ -2771,3 +2771,44 @@ textarea:-webkit-autofill {
     cursor: not-allowed;
     opacity: 1;
 }
+
+/* ==============================================
+   TITULOS COMO CAVENTS, SIN DIVISORES (2026-10-21)
+   - Los títulos usan la etiqueta de Cavents (.form-group label): 14 px, 600, sin mayúsculas.
+   - Cada apartado deja de tener línea divisoria.
+   - Todo arranca en el mismo borde que el campo: se quita el margen de 26 px y los campos van
+     al 100 %, así el icono, el título y el input quedan en la misma columna y el switch cierra
+     a la derecha.
+   ============================================== */
+#perfil-content .cuenta-item-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: normal;
+    text-transform: none;
+    margin: 0;
+}
+
+#perfil-content .cuenta-item {
+    border-bottom: none;
+    padding: 16px 0;
+}
+
+#perfil-content .cuenta-item-valor,
+#perfil-content .perfil-muni-select,
+#perfil-content .select-panel,
+#perfil-content .perfil-redes-lista,
+#perfil-content .cuenta-avatar-fila {
+    margin-left: 0;
+}
+
+#perfil-content .cuenta-item-valor,
+#perfil-content .perfil-muni-select,
+#perfil-content .select-panel {
+    width: 100%;
+    max-width: 100%;
+}
+
+#perfil-content .cuenta-item-valor {
+    margin-top: 8px;
+}
