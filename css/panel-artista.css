@@ -3499,3 +3499,20 @@ textarea:-webkit-autofill {
 [data-theme="dark"] .perfil-color-popover .perfil-color-caja {
     background: #1c1c1c;
 }
+
+/* ==============================================
+   POPOVER SOBRE LA BARRA INFERIOR (2026-10-22)
+   El panel del color se apoya justo encima de la barra de navegación de abajo, a todo el ancho.
+   ============================================== */
+.perfil-color-popover {
+    top: auto;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+    background: transparent;
+}
+
+.perfil-color-popover .perfil-color-caja {
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.22);
+}
