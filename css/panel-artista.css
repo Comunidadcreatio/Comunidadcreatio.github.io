@@ -3665,3 +3665,19 @@ textarea:-webkit-autofill {
     box-sizing: border-box;
     border-radius: 50%;
 }
+
+/* ==============================================
+   BORDES NIVELADOS (2026-10-22)
+   El avatar del acordeón y el del perfil público llevan el MISMO grosor (6 px). El de 8 se veía
+   demasiado grueso y el de 2-3 demasiado fino.
+   ============================================== */
+#perfil-content .cuenta-avatar-preview {
+    border-width: 6px !important;
+}
+
+.perfil-avatar-img-seccion,
+#perfil-avatar-seccion {
+    border: 6px solid var(--perfil-avatar-color, #d9a441) !important;
+    box-sizing: border-box;
+    border-radius: 50%;
+}
