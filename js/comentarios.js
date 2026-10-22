@@ -420,8 +420,8 @@ function renderizarComentario(c, todosReplies) {
     const avatarHTML = c.autor_foto
         ? `<img src="${cloudinaryUrl(safeImgUrl(c.autor_foto), 96)}"
                 srcset="${srcsetCloudinary(safeImgUrl(c.autor_foto), [48, 96, 144])}"
-                sizes="44px" decoding="async" loading="lazy" class="comentario-avatar" alt="">`
-        : `<div class="comentario-avatar comentario-avatar-default">${inicial}</div>`;
+                sizes="44px" decoding="async" loading="lazy" class="comentario-avatar" style="--avatar-color:${c.autor_color || ""}" alt="">`
+        : `<div class="comentario-avatar comentario-avatar-default" style="--avatar-color:${c.autor_color || ""}">${inicial}</div>`;
 
     const fecha = timeAgoShort(c.created_at || c.fecha);
     const likes = c.likes_count || 0;

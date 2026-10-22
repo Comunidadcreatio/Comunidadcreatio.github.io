@@ -3,7 +3,7 @@
 import { API_BASE_URL, apiRequest } from './config.js?v=9fb3a38a38';
 import { artistaActual } from './auth.js?v=a90ece1c17';
 import { escapeHtml, debugLog, cloudinaryUrl, renderText, safeImgUrl, normalizarTexto, decodeHTMLEntities, decodificarObra, srcsetCloudinary } from './utils.js?v=7e1398d254';
-import { abrirComentarios } from './comentarios.js?v=42c339b8fc';
+import { abrirComentarios } from './comentarios.js?v=a3de49d7f9';
 import { bloquearFondo, liberarFondo, activarGuardiaGesto, desactivarGuardiaGesto } from './bloqueo-fondo.js?v=4464d46b67';
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 
