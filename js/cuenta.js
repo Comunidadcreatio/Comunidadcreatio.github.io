@@ -825,9 +825,7 @@ const ICONOS_RED_PANEL = {
             poner('perfil-nombre-real-input', u.nombre_real);
             const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
             pintarRol(u.rol || 'artista');
-            const yaTeníaColor = /^#[0-9a-f]{6}$/i.test(String(u.color_avatar || ''));
-            aplicarColorAvatar(u.color_avatar || colorAlAzar());
-            if (!yaTeníaColor) guardarColorAvatar();
+            // El color del avatar lo pinta el script en línea de index.html (una sola fuente de verdad).
             visibilidad = normalizarVisibilidad(u.visibilidad);
             pintarSwitches();
             aplicarVisibilidad();
