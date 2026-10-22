@@ -3777,3 +3777,11 @@ html body #perfil-content .cuenta-avatar-fila {
     right: 14px !important;
     bottom: 14px !important;
 }
+
+/* Punto de activo más grande (18px), en la misma posición. */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    width: 18px !important;
+    height: 18px !important;
+}
