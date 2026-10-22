@@ -127,10 +127,10 @@ function avatarHTML(p, clase) {
     const autor = decodeHTMLEntities((p && p.nombre_artista) || 'Artista');
     const inicial = autor.trim().charAt(0).toUpperCase() || '?';
     return (p && p.foto_artista)
-        ? `<img class="${clase}" src="${safeImgUrl(cloudinaryUrl(p.foto_artista, 96))}"
+        ? `<img class="${clase}" style="--avatar-color:${p.color_artista || p.autor_color || p.color_avatar || ''}" src="${safeImgUrl(cloudinaryUrl(p.foto_artista, 96))}"
                 srcset="${srcsetCloudinary(p.foto_artista, [48, 96, 144])}"
                 sizes="44px" decoding="async" loading="lazy" alt="">`
-        : `<span class="${clase} problog-card-avatar-def" style="--avatar-color:${p.autor_color || p.color_avatar || ''}">${escapeHtml(inicial)}</span>`;
+        : `<span class="${clase} problog-card-avatar-def" style="--avatar-color:${p.autor_color || p.color_avatar || p.color_artista || ''}">${escapeHtml(inicial)}</span>`;
 }
 
 // Iconos de las acciones propias (editar y eliminar).
