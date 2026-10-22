@@ -3685,12 +3685,22 @@ textarea:-webkit-autofill {
 /* ==============================================
    BORDE DE COLOR EN LOS AVATARES DE LAS PUBLICACIONES (2026-10-22)
    Las miniaturas de autor de Cavents, Problogs, comentarios, chat, búsqueda y galería llevan el
-   mismo borde del color elegido, más fino (3 px). Se excluyen los tres avatares del perfil, que
+   mismo borde del color elegido, más fino (2 px). Se excluyen los tres avatares del perfil, que
    tienen su propio grosor.
    ============================================== */
 img[class*="avatar"]:not(#perfil-avatar-preview):not(#perfil-avatar-mini):not(#perfil-avatar-seccion),
 [class*="avatar-default"]:not(#perfil-avatar-preview) {
-    border: 3px solid var(--perfil-avatar-color, #d9a441) !important;
+    border: 2px solid var(--perfil-avatar-color, #d9a441) !important;
     box-sizing: border-box;
     border-radius: 50%;
+}
+
+/* CERO HALO EN EL AVATAR DEL ACORDEON: cualquier sombra, filtro o contorno se anula aquí. */
+html body #perfil-content .cuenta-avatar-preview,
+html body #perfil-content .cuenta-avatar-preview * ,
+html body #perfil-content .cuenta-avatar-fila {
+    box-shadow: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+    -webkit-filter: none !important;
 }
