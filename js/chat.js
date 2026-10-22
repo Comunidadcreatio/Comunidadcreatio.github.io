@@ -7,7 +7,7 @@
 import { apiRequest, API_BASE_URL, getAuthToken } from './config.js?v=9fb3a38a38';
 import { artistaActual } from './auth.js?v=a90ece1c17';
 import { escapeHtml, debugLog, renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl, cuandoLibre } from './utils.js?v=7e1398d254';
-import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=97a51fa44e';
+import { encontrarSeccionActual, actualizarEstadoNavButtons, actualizarVisibilidadIconosHeader, actualizarModoFlecha, cambiarSeccion, isTransitioningNow } from './galeria-ui.js?v=e0e792730f';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 const POLL_MS = 12000;      // 12s entre polls
@@ -86,19 +86,19 @@ function estadoUsuarioHTML(u) {
     } else {
         estado = '<span class="chat-user-estado">Sin conexiones recientes</span>';
     }
-    return `<span class="chat-user-avatar-wrap">${avatarHTML(u.foto_perfil, u.nombre_artista)}${dot}</span>` +
+    return `<span class="chat-user-avatar-wrap">${avatarHTML(u.foto_perfil, u.nombre_artista, u.color_avatar)}${dot}</span>` +
         `<span class="chat-user-info"><span class="chat-user-nombre">${escapeHtml(u.nombre_artista)}</span>${estado}</span>` +
         '<span class="chat-user-flecha">›</span>';
 }
 
 // ---- Helpers de UI ----
-function avatarHTML(foto, nombre) {
+function avatarHTML(foto, nombre, color) {
     const inicial = (nombre || '?').charAt(0).toUpperCase();
     return foto
-        ? `<img class="chat-user-avatar" src="${cloudinaryUrl(safeImgUrl(foto), 96)}"
+        ? `<img class="chat-user-avatar" style="--avatar-color:${color || ''}" src="${cloudinaryUrl(safeImgUrl(foto), 96)}"
                  srcset="${srcsetCloudinary(safeImgUrl(foto), [48, 96, 144])}"
                  sizes="44px" decoding="async" loading="lazy" alt="">`
-        : `<span class="chat-user-avatar">${inicial}</span>`;
+        : `<span class="chat-user-avatar" style="--avatar-color:${color || ''}">${inicial}</span>`;
 }
 function formatHora(fecha) {
     if (!fecha) return '';
@@ -1204,7 +1204,7 @@ async function abrirSala(canal, titulo, fotoOtro, actividadOtro) {
     if (avatarEl) {
         if (canalEsPriv) {
             const online = esOnline({ ultima_actividad: canalOtroActividad });
-            avatarEl.innerHTML = `<span class="chat-sala-avatar-wrap">${avatarHTML(fotoOtro, titulo)}<span class="chat-user-dot ${online ? 'online' : ''}"></span></span>`;
+            avatarEl.innerHTML = `<span class="chat-sala-avatar-wrap">${avatarHTML(fotoOtro, titulo, '')}<span class="chat-user-dot ${online ? 'online' : ''}"></span></span>`;
         } else {
             avatarEl.innerHTML = avatarHTML(fotoOtro, titulo);
         }

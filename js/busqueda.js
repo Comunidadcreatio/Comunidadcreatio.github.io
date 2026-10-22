@@ -6,7 +6,7 @@
 import { apiRequest } from './config.js?v=9fb3a38a38';
 import { debounce, escapeHtml, debugLog, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=7e1398d254';
 import { showWarning, showError } from './notificaciones.js?v=a2dfb905a6';
-import { triggerRefreshGrid } from './galeria-ui.js?v=97a51fa44e';
+import { triggerRefreshGrid } from './galeria-ui.js?v=e0e792730f';
 
 /**
  * Configura el buscador de artistas.
@@ -133,10 +133,10 @@ export function setupBuscador(verPerfilUsuarioFn, mostrarResultadosBusquedaFn, a
 
             let avatarHTML = '';
             if (usuario.foto_perfil) {
-                avatarHTML = `<img src="${cloudinaryUrl(safeImgUrl(usuario.foto_perfil), 96)}" srcset="${srcsetCloudinary(safeImgUrl(usuario.foto_perfil), [48, 96, 144])}" sizes="44px" decoding="async" loading="lazy" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
+                avatarHTML = `<img style="--avatar-color:${usuario.color_avatar || ''}" src="${cloudinaryUrl(safeImgUrl(usuario.foto_perfil), 96)}" srcset="${srcsetCloudinary(safeImgUrl(usuario.foto_perfil), [48, 96, 144])}" sizes="44px" decoding="async" loading="lazy" alt="${escapeHtml(usuario.nombre_artista)}" class="search-result-avatar">`;
             } else {
                 const inicial = (usuario.nombre_artista || '?').charAt(0).toUpperCase();
-                avatarHTML = `<div class="search-result-avatar-placeholder">${escapeHtml(inicial)}</div>`;
+                avatarHTML = `<div class="search-result-avatar-placeholder" style="--avatar-color:${usuario.color_avatar || ''}">${escapeHtml(inicial)}</div>`;
             }
             const nombreReal = usuario.nombre_real ? `<div class="search-result-real-name">${escapeHtml(usuario.nombre_real)}</div>` : '';
 

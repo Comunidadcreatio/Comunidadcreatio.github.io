@@ -35,7 +35,7 @@
 import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9fb3a38a38';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=97a51fa44e';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=e0e792730f';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -130,7 +130,7 @@ function avatarHTML(p, clase) {
         ? `<img class="${clase}" src="${safeImgUrl(cloudinaryUrl(p.foto_artista, 96))}"
                 srcset="${srcsetCloudinary(p.foto_artista, [48, 96, 144])}"
                 sizes="44px" decoding="async" loading="lazy" alt="">`
-        : `<span class="${clase} problog-card-avatar-def">${escapeHtml(inicial)}</span>`;
+        : `<span class="${clase} problog-card-avatar-def" style="--avatar-color:${p.autor_color || ''}">${escapeHtml(inicial)}</span>`;
 }
 
 // Iconos de las acciones propias (editar y eliminar).
@@ -1294,7 +1294,7 @@ function comentarioHTML(c, respuestas) {
     const autor = c.autor_nombre || 'Artista';
     const inicial = autor.trim().charAt(0).toUpperCase() || '?';
     const avatar = c.autor_foto
-        ? `<img class="problog-comentario-avatar" src="${safeImgUrl(cloudinaryUrl(c.autor_foto, 96))}"
+        ? `<img class="problog-comentario-avatar" style="--avatar-color:${c.autor_color || ''}" src="${safeImgUrl(cloudinaryUrl(c.autor_foto, 96))}"
                 srcset="${srcsetCloudinary(c.autor_foto, [48, 96, 144])}"
                 sizes="44px" decoding="async" loading="lazy" alt="">`
         : `<span class="problog-comentario-avatar">${escapeHtml(inicial)}</span>`;
