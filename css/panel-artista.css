@@ -3558,3 +3558,42 @@ textarea:-webkit-autofill {
     box-shadow: none !important;
     background-color: transparent;
 }
+
+/* ==============================================
+   MAS GROSOR, NAV MAS GRANDE Y HALO (2026-10-22)
+   - El avatar grande del perfil lleva el borde más grueso.
+   - El círculo del nav crece un poco.
+   - Alrededor del borde de color hay un halo degradado: blanco en claro, negro en oscuro.
+   ============================================== */
+#perfil-content .cuenta-avatar-preview {
+    border-width: 6px;
+}
+
+#perfil-avatar-mini,
+.btn-perfil-circular .perfil-avatar-img {
+    width: 46px !important;
+    height: 46px !important;
+}
+
+.btn-perfil-circular {
+    width: 52px !important;
+    height: 52px !important;
+}
+
+#perfil-content .cuenta-avatar-preview,
+#perfil-avatar-mini,
+.btn-perfil-circular .perfil-avatar-img,
+.perfil-avatar-img-seccion {
+    box-shadow:
+        0 0 0 2px rgba(255, 255, 255, 0.55),
+        0 0 16px 7px rgba(255, 255, 255, 0.32) !important;
+}
+
+[data-theme="dark"] #perfil-content .cuenta-avatar-preview,
+[data-theme="dark"] #perfil-avatar-mini,
+[data-theme="dark"] .btn-perfil-circular .perfil-avatar-img,
+[data-theme="dark"] .perfil-avatar-img-seccion {
+    box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.55),
+        0 0 16px 7px rgba(0, 0, 0, 0.45) !important;
+}
