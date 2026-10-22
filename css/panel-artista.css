@@ -3434,3 +3434,68 @@ textarea:-webkit-autofill {
 [data-theme="dark"] .perfil-color-actual {
     color: #bdbdbd;
 }
+
+/* ==============================================
+   POPOVER PEGADO AL NAV, SIN OPACIDAD Y A SANGRE (2026-10-22)
+   - Se abre justo debajo de la barra superior, sin aire.
+   - Sin fondo oscuro: se ve el avatar cambiar en vivo.
+   - El espectro ocupa todo el ancho (sin aire a los lados).
+   ============================================== */
+.perfil-color-popover {
+    position: fixed;
+    top: calc(64px + var(--status-bar-height, 0px));
+    left: 0;
+    right: 0;
+    bottom: auto;
+    padding: 0;
+    background: transparent;
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+}
+
+.perfil-color-popover.hidden {
+    display: none;
+}
+
+.perfil-color-popover .perfil-color-caja {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: var(--color-white, #fff);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.perfil-color-popover .perfil-color-caja-titulo {
+    margin: 0;
+    padding: 10px 16px 8px;
+}
+
+.perfil-color-popover .perfil-espectro {
+    width: 100%;
+    height: 150px;
+    border-radius: 0;
+}
+
+.perfil-color-popover .perfil-color-pie {
+    padding: 10px 16px 12px;
+    margin-top: 0;
+}
+
+.perfil-color-popover .perfil-color-actual {
+    width: 110px;
+    padding: 6px 8px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 13px;
+    font-family: ui-monospace, monospace;
+    text-align: center;
+}
+
+[data-theme="dark"] .perfil-color-popover .perfil-color-caja {
+    background: #1c1c1c;
+}
