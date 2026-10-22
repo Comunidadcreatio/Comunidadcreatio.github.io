@@ -3737,3 +3737,11 @@ html body #perfil-content .cuenta-avatar-fila {
     border: 0 !important;
     box-shadow: none !important;
 }
+
+/* El punto de activo, un poco más adentro (arriba y a la izquierda) sobre el aro. */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: 3px !important;
+    bottom: 3px !important;
+}
