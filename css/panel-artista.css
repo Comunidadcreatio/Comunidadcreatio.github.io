@@ -3672,7 +3672,7 @@ textarea:-webkit-autofill {
    demasiado grueso y el de 2-3 demasiado fino.
    ============================================== */
 #perfil-content .cuenta-avatar-preview {
-    border-width: 6px !important;
+    border: 6px solid var(--perfil-avatar-color, #d9a441) !important;
 }
 
 .perfil-avatar-img-seccion,
@@ -3690,7 +3690,8 @@ textarea:-webkit-autofill {
    ============================================== */
 img[class*="avatar"]:not(#perfil-avatar-preview):not(#perfil-avatar-mini):not(#perfil-avatar-seccion),
 [class*="avatar-default"]:not(#perfil-avatar-preview) {
-    border: 2px solid var(--perfil-avatar-color, #d9a441) !important;
+    /* El color es de CADA usuario: se pinta solo si el elemento trae su propio --avatar-color. */
+    border: 2px solid var(--avatar-color, transparent) !important;
     box-sizing: border-box;
     border-radius: 50%;
 }

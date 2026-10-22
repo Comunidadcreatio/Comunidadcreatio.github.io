@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.821';
+        var currentVer = '1.0.822';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=26d8983cee">
+    <link rel="stylesheet" href="css/style.css?v=e6ab87811d">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1309,10 +1309,9 @@
     var color = leer() || '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
 
     var pintarAvatar = function (c) {
-        // En la raíz: así TODOS los avatares (nav, cabecera, panel) toman el mismo color.
-        document.documentElement.style.setProperty('--perfil-avatar-color', c);
         document.querySelectorAll('#perfil-avatar-preview, #perfil-avatar-seccion, #perfil-avatar-mini, .perfil-avatar-img, .perfil-avatar-img-seccion').forEach(function (el) {
             el.style.setProperty('--perfil-avatar-color', c);
+            el.style.setProperty('--avatar-color', c);
             el.style.borderColor = c;
         });
         if (hexInput && document.activeElement !== hexInput) hexInput.value = c;
