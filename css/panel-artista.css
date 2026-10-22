@@ -3540,3 +3540,21 @@ textarea:-webkit-autofill {
 .perfil-color-popover .perfil-color-actual.centrado {
     text-align: center;
 }
+
+/* ==============================================
+   AVATAR DEL NAV SIN ARO BLANCO Y NEGRO (2026-10-22)
+   El botón circular del nav traía su propio borde negro y fondo blanco: alrededor del avatar se
+   veían dos aros. Se deja SOLO el borde del color elegido, un poco más grueso.
+   ============================================== */
+.btn-perfil-circular {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.btn-perfil-circular .perfil-avatar-img,
+#perfil-avatar-mini {
+    border: 3px solid var(--perfil-avatar-color, #d9a441) !important;
+    box-shadow: none !important;
+    background-color: transparent;
+}
