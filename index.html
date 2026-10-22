@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.839';
+        var currentVer = '1.0.840';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=c37a21b9c4">
+    <link rel="stylesheet" href="css/style.css?v=ef270e492d">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1546,6 +1546,9 @@
     var pie = document.getElementById('mapa-pie');
     var actual = '';
 
+    // Posiciones de los municipios sobre el mapa (calculadas desde su latitud/longitud).
+    var PUNTOS_MAPA = [{"nombre":"San Cristóbal","capital":"San Cristóbal","x":30,"y":59},{"nombre":"Cárdenas","capital":"Táriba","x":30,"y":56.5},{"nombre":"Torbes","capital":"San Josecito","x":24.5,"y":60},{"nombre":"Sucre","capital":"Queniquea","x":45.5,"y":55},{"nombre":"Bolívar","capital":"San Antonio del Táchira","x":10,"y":55},{"nombre":"Pedro María Ureña","capital":"Ureña","x":10,"y":51.5},{"nombre":"Junín","capital":"Rubio","x":18.2,"y":62.5},{"nombre":"Ayacucho","capital":"Colón","x":40.9,"y":46},{"nombre":"Michelena","capital":"Michelena","x":36.4,"y":50},{"nombre":"Lobatera","capital":"Lobatera","x":31.8,"y":51},{"nombre":"Córdoba","capital":"Santa Ana","x":24.5,"y":48.5},{"nombre":"Andrés Bello","capital":"Cordero","x":33.6,"y":42.5},{"nombre":"Antonio Rómulo Costa","capital":"Las Mesas","x":40.9,"y":45},{"nombre":"Fernández Feo","capital":"San Rafael del Piñal","x":54.5,"y":70},{"nombre":"Francisco de Miranda","capital":"San José de Bolívar","x":63.6,"y":52.5},{"nombre":"García de Hevia","capital":"La Fría","x":50,"y":36.5},{"nombre":"Guásimos","capital":"Palmira","x":27.3,"y":55},{"nombre":"Independencia","capital":"Capacho Nuevo","x":31.8,"y":57.5},{"nombre":"Jáuregui","capital":"La Grita","x":54.5,"y":45},{"nombre":"José María Vargas","capital":"El Cobre","x":45.5,"y":45},{"nombre":"Libertad","capital":"Capacho Viejo","x":36.4,"y":56},{"nombre":"Libertador","capital":"Abejales","x":81.8,"y":65},{"nombre":"Panamericano","capital":"Coloncito","x":72.7,"y":42.5},{"nombre":"Rafael Urdaneta","capital":"Delicias","x":45.5,"y":60},{"nombre":"Samuel Darío Maldonado","capital":"La Tendida","x":59.1,"y":55},{"nombre":"San Judas Tadeo","capital":"San Judas Tadeo","x":77.3,"y":61.5},{"nombre":"Seboruco","capital":"Seboruco","x":45.5,"y":50},{"nombre":"Simón Rodríguez","capital":"San Simón","x":68.2,"y":48.5},{"nombre":"Uribante","capital":"Pregonero","x":86.4,"y":50}];
+
     if (sub) sub.textContent = MUNICIPIOS.length + ' municipios';
 
     var pintar = function () {
@@ -1565,6 +1568,31 @@
                 if (pie) pie.textContent = 'Seleccionaste ' + m.nombre + ' · ' + m.capital;
             });
             contenedor.appendChild(b);
+        });
+        pintarPuntos();
+    };
+
+    /** Pinta un punto por municipio encima de la imagen del mapa. */
+    var pintarPuntos = function () {
+        var caja = document.querySelector('.mapa-imagen-wrap');
+        if (!caja) return;
+        var viejos = caja.querySelectorAll('.mapa-punto');
+        viejos.forEach(function (v) { v.remove(); });
+        PUNTOS_MAPA.forEach(function (pt) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'mapa-punto' + (pt.nombre === actual ? ' activo' : '');
+            b.style.left = pt.x + '%';
+            b.style.top = pt.y + '%';
+            b.title = pt.nombre + ' · ' + pt.capital;
+            b.setAttribute('aria-label', pt.nombre);
+            b.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                actual = pt.nombre;
+                pintar();
+                if (pie) pie.textContent = 'Seleccionaste ' + pt.nombre + ' · ' + pt.capital;
+            });
+            caja.appendChild(b);
         });
     };
 

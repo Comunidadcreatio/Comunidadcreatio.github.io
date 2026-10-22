@@ -3952,3 +3952,32 @@ body.con-mapa-abierto {
 [data-theme="dark"] .mapa-imagen {
     filter: invert(1) hue-rotate(180deg);
 }
+
+/* ==============================================
+   PUNTOS SOBRE EL MAPA (2026-10-22)
+   Un punto por municipio, encima de la imagen del mapa.
+   ============================================== */
+.mapa-imagen-wrap {
+    position: relative;
+}
+
+.mapa-punto {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--perfil-avatar-color, #d9a441);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.mapa-punto.activo {
+    width: 20px;
+    height: 20px;
+    background: var(--color-ink, #111);
+    border-color: var(--perfil-avatar-color, #d9a441);
+}
