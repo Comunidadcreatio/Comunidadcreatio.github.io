@@ -1426,10 +1426,15 @@
     var abrir = function () {
         if (!popover) return;
         pintarAvatar(color);
-        // Se apoya en la barra inferior: se mide su alto real (cambia según el teléfono).
-        var botonNav = document.querySelector('.toggle-nav-btn');
-        var barra = botonNav && botonNav.parentElement;
-        if (barra) popover.style.bottom = Math.round(barra.getBoundingClientRect().height) + 'px';
+        // Se apoya justo ENCIMA DE LOS ICONOS de la barra inferior: se mide dónde empieza el
+        // primero de ellos, así queda pegado sin taparlos y sin depender del alto de la barra.
+        // La barra inferior es #toggle-panel: se apoya encima de ella, sin tapar sus iconos.
+        var barra = document.getElementById('toggle-panel');
+        if (barra) {
+            var rBarra = barra.getBoundingClientRect();
+            // Un pequeño colchón para no rozar los iconos de la barra.
+            popover.style.bottom = Math.max(0, Math.round(window.innerHeight - rBarra.top) + 10) + 'px';
+        }
         popover.classList.remove('hidden');
         colocarGoteroEnColor(color);
         document.body.classList.add('con-popover-color');
