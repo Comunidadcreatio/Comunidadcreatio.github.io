@@ -528,7 +528,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js?v=2f074e760b').then(m => m.setupMiCuenta());
+    import('./cuenta.js?v=0fc2536ec5').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {

@@ -3522,3 +3522,21 @@ textarea:-webkit-autofill {
     box-shadow: none !important;
     border-bottom: 1px solid var(--color-gray-200);
 }
+
+/* ==============================================
+   BORDE DEL AVATAR EN TODA LA APP (2026-10-22)
+   El color elegido se ve en todos los círculos del avatar (nav, cabecera del perfil y panel).
+   ============================================== */
+.perfil-avatar-img,
+.perfil-avatar-img-seccion,
+#perfil-avatar-mini {
+    border: 2px solid var(--perfil-avatar-color, #d9a441);
+    box-sizing: border-box;
+    border-radius: 50%;
+}
+
+/* El código del color, centrado. */
+#perfil-color-hex.centrado,
+.perfil-color-popover .perfil-color-actual.centrado {
+    text-align: center;
+}

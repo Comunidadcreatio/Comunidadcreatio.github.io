@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.809';
+        var currentVer = '1.0.810';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=43e616ba8c">
+    <link rel="stylesheet" href="css/style.css?v=e92890afd6">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1269,7 +1269,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=38d3325b69" type="module"></script>
+    <script src="js/main.js?v=aa9e715ed1" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
@@ -1285,7 +1285,7 @@
             <span class="perfil-gotero" id="perfil-gotero" aria-hidden="true"></span>
         </div>
         <div class="perfil-color-pie">
-            <input type="text" class="perfil-color-actual" id="perfil-color-hex" value="#d9a441" maxlength="7" spellcheck="false" aria-label="Código del color">
+            <input type="text" class="perfil-color-actual centrado" id="perfil-color-hex" value="#d9a441" maxlength="7" spellcheck="false" aria-label="Código del color">
         </div>
     </div>
 </div>
@@ -1309,7 +1309,7 @@
     var color = leer() || '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
 
     var pintarAvatar = function (c) {
-        document.querySelectorAll('#perfil-avatar-preview, #perfil-avatar-seccion').forEach(function (el) {
+        document.querySelectorAll('#perfil-avatar-preview, #perfil-avatar-seccion, #perfil-avatar-mini, .perfil-avatar-img, .perfil-avatar-img-seccion').forEach(function (el) {
             el.style.setProperty('--perfil-avatar-color', c);
             el.style.borderColor = c;
         });

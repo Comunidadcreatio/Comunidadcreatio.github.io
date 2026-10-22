@@ -914,9 +914,12 @@ const ICONOS_RED_PANEL = {
     pintarSelectPago();
     pintarSelectRedes();
 
-    const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
+    let guardandoPerfil = false;
+const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getElementById('btn-guardar-perfil'));
     if (btnGuardarPerfil) {
         btnGuardarPerfil.addEventListener('click', async () => {
+        if (guardandoPerfil) return;
+        guardandoPerfil = true;
             // El aviso se pinta en Mi perfil y en Monetización (se guardan juntos).
             const estados = ['perfil-estado', 'monetizacion-estado']
                 .map((id) => document.getElementById(id))
@@ -963,7 +966,6 @@ const ICONOS_RED_PANEL = {
                         if (avatarNav) /** @type {HTMLImageElement} */ (avatarNav).src = AVATAR_DEFECTO;
                         quitarFoto = false;
                     }
-                    decir('✅ Guardado.');
                     showSuccess('Perfil actualizado');
                 } else {
                     decir('❌ ' + ((res && res.error) || 'No se pudo guardar.'));
@@ -973,6 +975,7 @@ const ICONOS_RED_PANEL = {
             } finally {
                 btnGuardarPerfil.disabled = false;
                 btnGuardarPerfil.textContent = textoOriginal;
+        guardandoPerfil = false;
             }
         });
     }
