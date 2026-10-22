@@ -3721,3 +3721,19 @@ html body #perfil-content .cuenta-avatar-fila {
     box-shadow: none !important;
     z-index: 6 !important;
 }
+
+/* ==============================================
+   PUNTO DE ACTIVO SIN BORDE, SOBRE EL ARO (2026-10-22)
+   Sin borde (el amarillo era el color de respaldo del aro): el punto verde se apoya directamente
+   sobre el borde personalizable, en el extremo inferior derecho.
+   ============================================== */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
