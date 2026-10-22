@@ -2002,3 +2002,14 @@
 .toggle-label {
     font-size: 8px;
 }
+
+/* SIN ANILLO EN TODOS LOS CAMPOS (2026-10-21): el anillo de foco (tinta + aro ambar #ffd166)
+   salia en cada clic dentro de un campo o al abrir un desplegable. Se quita en todos los campos;
+   en botones y enlaces sigue puesto. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.custom-select-trigger:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
