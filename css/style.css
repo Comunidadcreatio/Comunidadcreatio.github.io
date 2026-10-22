@@ -83,6 +83,18 @@
         box-shadow: 0 0 0 6px #1a1a1a !important;
     }
 
+    /* SIN ANILLO EN CAMPOS (DENTRO DE LA CAPA) (2026-10-21)
+       Va aquí, dentro de @layer base y DESPUÉS del anillo, porque en las declaraciones
+       !important el orden de capas se invierte: una regla fuera de la capa NO le gana a la capa.
+       Ese era el motivo de que el anillo siguiera saliendo al tocar un campo. */
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    .custom-select-trigger:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
     /* EXCEPCION (2026-10-11, AMPLIADA 2026-10-16): sin anillo los CAMPOS DE TEXTO de los
        comentarios (Cavents y Problogs) y los de los formularios de ACCESO (login, registro y
        recuperar).
@@ -2012,4 +2024,9 @@ select:focus-visible,
 .custom-select-trigger:focus-visible {
     outline: none !important;
     box-shadow: none !important;
+}
+
+/* Sin el resaltado/destello que pinta el navegador al tocar (amarillo en Android). */
+input, textarea, select, button, a, label, [role="button"], [role="switch"] {
+    -webkit-tap-highlight-color: transparent;
 }
