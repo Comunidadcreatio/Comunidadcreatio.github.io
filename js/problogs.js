@@ -32,10 +32,10 @@
 // público, así que sin una lista propia una publicación guardada como borrador
 // quedaría imposible de encontrar y de editar.
 // ============================================================
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=2d9c27d59f';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=9fb3a38a38';
 import { renderText, escapeHtml, safeImgUrl, cloudinaryUrl, srcsetCloudinary, debugLog, decodeHTMLEntities, errorDeImagen, conTransicion, desplazarA, cuandoLibre } from './utils.js?v=7e1398d254';
 import { showSuccess, showError, showConfirm } from './notificaciones.js?v=a2dfb905a6';
-import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=158d568bac';
+import { abrirCrearDesdeIcono, volverDesdeIcono, toggleProblogs, registrarRefrescoProblogs } from './galeria-ui.js?v=cfaf7957c2';
 // Los comentarios de Problogs ya NO usan el cajón de Cavents: van dentro de la
 // publicación (ver el bloque de comentarios más abajo).
 import { registrarOverlay } from './overlays.js?v=b94e8d4301';
@@ -43,7 +43,7 @@ import { registrarOverlay } from './overlays.js?v=b94e8d4301';
 // mismo mecanismo que el cajón de comentarios.
 import { bloquearFondo, liberarFondo } from './bloqueo-fondo.js?v=4464d46b67';
 // Solo para firmar la vista previa con el nombre del artista.
-import { artistaActual } from './auth.js?v=69143cf91d';
+import { artistaActual } from './auth.js?v=a90ece1c17';
 
 // Anchos que se ofrecen en el `srcset` de las imagenes de Problogs. El navegador elige uno segun el
 // hueco (`sizes`) y la densidad de pantalla, asi que en un movil normal NO se baja el grande:

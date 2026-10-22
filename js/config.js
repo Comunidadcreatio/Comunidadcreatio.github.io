@@ -91,7 +91,8 @@ export async function apiRequest(endpoint, options = {}) {
     // responde 401 con su propio mensaje y hay que mostrarlo sin cerrar la sesión. Faltaba
     // cambiar-password (y confirmar-email), así que al fallar la contraseña actual se cerraba la
     // sesión y el usuario veía «Sesión expirada» (2026-10-21).
-    const ONCE_401_CON_MENSAJE = ['/api/artistas/login', '/eliminar-cuenta', '/cambiar-password', '/confirmar-email'];
+    // cambiar-email también responde 401 cuando la contraseña de confirmación es incorrecta.
+    const ONCE_401_CON_MENSAJE = ['/api/artistas/login', '/eliminar-cuenta', '/cambiar-password', '/cambiar-email'];
     if (res.status === 401 && !ONCE_401_CON_MENSAJE.some((ruta) => endpoint.endsWith(ruta))) {
         cerrarSesionLocal();
         throw new ApiError('Sesión expirada. Por favor inicia sesión nuevamente.', { status: 401, esSesion: true });

@@ -1,7 +1,7 @@
 // @ts-check
 // js/comentarios.js
 // Drawer de comentarios — se desliza desde la parte inferior.
-import { apiRequest, ARTISTA_KEY } from './config.js?v=2d9c27d59f';
+import { apiRequest, ARTISTA_KEY } from './config.js?v=9fb3a38a38';
 import { renderText, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=7e1398d254';
 // Bloqueo del scroll del fondo, COMPARTIDO con el modal de descripción: si los
 // dos estan abiertos a la vez, cerrar uno no debe descongelar el fondo.

@@ -3,10 +3,10 @@
 // Búsqueda de artistas en una sección (panel) que se abre desde el icono de la
 // lupa del header. Resultados en tiempo real con debounce.
 
-import { apiRequest } from './config.js?v=2d9c27d59f';
+import { apiRequest } from './config.js?v=9fb3a38a38';
 import { debounce, escapeHtml, debugLog, safeImgUrl, srcsetCloudinary, cloudinaryUrl } from './utils.js?v=7e1398d254';
 import { showWarning, showError } from './notificaciones.js?v=a2dfb905a6';
-import { triggerRefreshGrid } from './galeria-ui.js?v=158d568bac';
+import { triggerRefreshGrid } from './galeria-ui.js?v=cfaf7957c2';
 
 /**
  * Configura el buscador de artistas.

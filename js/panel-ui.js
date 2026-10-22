@@ -3,9 +3,9 @@
 // Panel del artista: CRUD, formulario de obra, previsualización de imágenes,
 // accordions del formulario y progress indicator.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=2d9c27d59f';
-import { token, artistaActual } from './auth.js?v=69143cf91d';
-import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=b1f67ddea7';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=9fb3a38a38';
+import { token, artistaActual } from './auth.js?v=a90ece1c17';
+import { cargarMisObras, guardarObra, eliminarObra } from './panel.js?v=f50bbd5ffe';
 import { showSuccess, showError, showWarning, showInfo, showConfirm, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
 import { decodeHTMLEntities, decodificarObra, errorDeImagen, escapeHtml, mostrarErrores, debugLog, cloudinaryUrl } from './utils.js?v=7e1398d254';
 

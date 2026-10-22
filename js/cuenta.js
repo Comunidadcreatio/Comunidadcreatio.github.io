@@ -3,8 +3,8 @@
 // Gestión de la sección "Mi Cuenta": cambiar email, cambiar contraseña,
 // eliminar cuenta y accordion de seguridad.
 
-import { ARTISTA_KEY, apiRequest } from './config.js?v=2d9c27d59f';
-import { token, artistaActual, logout } from './auth.js?v=69143cf91d';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=9fb3a38a38';
+import { token, artistaActual, logout } from './auth.js?v=a90ece1c17';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading } from './notificaciones.js?v=a2dfb905a6';
 import { debugLog, esEmailValido, esDominioDesechable } from './utils.js?v=7e1398d254';
 import { calcularFortalezaPassword, NIVEL_MIN_PASSWORD } from './password-strength.js?v=c634a73551';

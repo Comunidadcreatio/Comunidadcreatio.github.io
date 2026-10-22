@@ -28,7 +28,7 @@
 //
 //  3) TOPE DE ENTRADAS. Con la rotación esto ya no debería crecer, pero un tope
 //     explícito evita que un dispositivo que se salte un `activate` acumule basura.
-var CACHE_NAME = 'creatio-cache-v86';   // esta línea la reescribe bump-version.js en cada release
+var CACHE_NAME = 'creatio-cache-v87';   // esta línea la reescribe bump-version.js en cada release
 var CACHEABLE_PREFIXES = ['/js/', '/css/', '/iconos/'];
 // Tope de entradas de caché y cuánto se espera a la red antes de tirar de caché.
 var MAX_ENTRADAS = 80;
