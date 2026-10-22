@@ -3076,3 +3076,37 @@ textarea:-webkit-autofill {
 .perfil-red-card-datos input:focus {
     border-bottom-color: var(--color-text);
 }
+
+/* ==============================================
+   TODOS LOS ACORDEONES CON EL MISMO SISTEMA (2026-10-21)
+   Título de 11 px al 700 en gris, sin iconos, y el subtítulo a la derecha del título, igual que
+   en Mi perfil.
+   ============================================== */
+#mi-cuenta .cuenta-item-info h4 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #737373;
+    letter-spacing: normal;
+    text-transform: none;
+    margin: 0 0 4px;
+    min-height: 0;
+}
+
+#mi-cuenta .cuenta-item-nota,
+#mi-cuenta .cuenta-item-desc {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+    text-align: right;
+    line-height: 1.25;
+    margin: 0;
+    max-width: 58%;
+}
+
+#mi-cuenta .cuenta-item-nota.bloqueado {
+    color: #c0392b;
+}
