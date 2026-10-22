@@ -3681,3 +3681,16 @@ textarea:-webkit-autofill {
     box-sizing: border-box;
     border-radius: 50%;
 }
+
+/* ==============================================
+   BORDE DE COLOR EN LOS AVATARES DE LAS PUBLICACIONES (2026-10-22)
+   Las miniaturas de autor de Cavents, Problogs, comentarios, chat, búsqueda y galería llevan el
+   mismo borde del color elegido, más fino (4 px). Se excluyen los tres avatares del perfil, que
+   tienen su propio grosor.
+   ============================================== */
+img[class*="avatar"]:not(#perfil-avatar-preview):not(#perfil-avatar-mini):not(#perfil-avatar-seccion),
+[class*="avatar-default"]:not(#perfil-avatar-preview) {
+    border: 4px solid var(--perfil-avatar-color, #d9a441) !important;
+    box-sizing: border-box;
+    border-radius: 50%;
+}
