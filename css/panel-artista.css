@@ -3342,3 +3342,95 @@ textarea:-webkit-autofill {
     background: #1c1c1c;
     border-color: #333;
 }
+
+/* ==============================================
+   POPOVER DE COLOR CON ESPECTRO (2026-10-22)
+   Al pulsar «Cambiar color» se abre, centrado, un espectro completo: se arrastra el gotero y el
+   borde del avatar cambia en vivo.
+   ============================================== */
+.perfil-color-popover {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.perfil-color-popover.hidden {
+    display: none;
+}
+
+.perfil-color-caja {
+    width: min(92vw, 340px);
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-white, #fff);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+}
+
+.perfil-color-caja-titulo {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #737373;
+    text-align: center;
+}
+
+.perfil-espectro {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    touch-action: none;
+    cursor: crosshair;
+    background:
+        linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0) 50%, #000000 100%),
+        linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+}
+
+.perfil-gotero {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.35);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.perfil-color-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.perfil-color-actual {
+    font-size: 12px;
+    color: #737373;
+    font-family: ui-monospace, monospace;
+}
+
+.perfil-color-listo {
+    padding: 8px 18px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+[data-theme="dark"] .perfil-color-caja {
+    background: #1c1c1c;
+}
+
+[data-theme="dark"] .perfil-color-actual {
+    color: #bdbdbd;
+}

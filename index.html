@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.805';
+        var currentVer = '1.0.806';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=ecbf6199d8">
+    <link rel="stylesheet" href="css/style.css?v=2d389326f5">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -842,20 +842,13 @@
                                     <span class="perfil-foto-accion-texto">Elegir nueva foto</span>
                                 </div>
                                 <div class="perfil-foto-accion">
-                                    <details class="perfil-color-detalles">
-                                        <summary class="cuenta-avatar-accion" aria-label="Cambiar color" title="Cambiar color">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-                                        </summary>
-                                        <div class="perfil-color-panel" id="perfil-color-panel">
-                                            <span class="perfil-color-titulo">Color del borde del avatar</span>
-                                            <input type="color" id="color-avatar-input" value="#d9a441" aria-label="Color del borde del avatar">
-                                            <div class="perfil-color-muestras" id="perfil-color-muestras"></div>
-                                        </div>
-                                    </details>
+                                    <button type="button" id="btn-color-avatar" class="cuenta-avatar-accion" aria-label="Cambiar color" title="Cambiar color">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                                    </button>
                                     <span class="perfil-foto-accion-texto">Cambiar color</span>
                                 </div>
-                            </div>
                         </div>
+                    </div>
                     </div>
 
 <div class="cuenta-item">
@@ -1282,11 +1275,32 @@
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->
     <script src="js/pwa.js?v=dc5af6fee6" defer></script>
 
+
+
+<!-- Popover del color del avatar: espectro + gotero -->
+<div class="perfil-color-popover hidden" id="perfil-color-popover" role="dialog" aria-modal="true" aria-label="Elegir el color del borde del avatar">
+    <div class="perfil-color-caja">
+        <p class="perfil-color-caja-titulo">Color del borde</p>
+        <div class="perfil-espectro" id="perfil-espectro">
+            <span class="perfil-gotero" id="perfil-gotero" aria-hidden="true"></span>
+        </div>
+        <div class="perfil-color-pie">
+            <span class="perfil-color-actual" id="perfil-color-actual">#d9a441</span>
+            <button type="button" id="perfil-color-listo" class="perfil-color-listo">Listo</button>
+        </div>
+    </div>
+</div>
+
 <script>
-/* Color del borde del avatar. Va en línea a propósito: así funciona aunque el módulo de la
-   cuenta falle o quede cacheado. */
+/* Popover del color del avatar: espectro completo, gotero arrastrable y vista previa en vivo.
+   Va en línea a propósito: funciona aunque el módulo de la cuenta falle o quede cacheado. */
 (function () {
     var CLAVE = 'creatio_auth_token_persist';
+    var espectro = document.getElementById('perfil-espectro');
+    var gotero = document.getElementById('perfil-gotero');
+    var popover = document.getElementById('perfil-color-popover');
+    var etiqueta = document.getElementById('perfil-color-actual');
+
     var leer = function () {
         try {
             var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
@@ -1295,16 +1309,12 @@
     };
     var color = leer() || '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
 
-    var pintar = function (c) {
+    var pintarAvatar = function (c) {
         document.querySelectorAll('#perfil-avatar-preview, #perfil-avatar-seccion').forEach(function (el) {
             el.style.setProperty('--perfil-avatar-color', c);
             el.style.borderColor = c;
         });
-        var inp = document.getElementById('color-avatar-input');
-        if (inp && inp.value !== c) inp.value = c;
-        document.querySelectorAll('.perfil-color-muestra').forEach(function (m) {
-            m.classList.toggle('elegida', m.dataset.color === c);
-        });
+        if (etiqueta) etiqueta.textContent = c;
     };
 
     var guardar = function () {
@@ -1322,35 +1332,81 @@
         }).catch(function () { /* se queda en pantalla */ });
     };
 
-    var montar = function () {
-        pintar(color);
-        var inp = document.getElementById('color-avatar-input');
-        var muestras = document.getElementById('perfil-color-muestras');
-        if (inp && !inp.dataset.listo) {
-            inp.dataset.listo = '1';
-            inp.value = color;
-            inp.addEventListener('input', function () { color = inp.value; pintar(color); });
-            inp.addEventListener('change', guardar);
-        }
-        if (muestras && !muestras.dataset.listo) {
-            muestras.dataset.listo = '1';
-            ['#d9a441', '#2e7d6b', '#1f6feb', '#8e44ad', '#c0392b', '#16a085', '#e67e22', '#34495e'].forEach(function (c) {
-                var b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'perfil-color-muestra';
-                b.dataset.color = c;
-                b.style.background = c;
-                b.setAttribute('aria-label', 'Usar el color ' + c);
-                b.addEventListener('click', function () { color = c; pintar(c); guardar(); });
-                muestras.appendChild(b);
-            });
-        }
-        pintar(color);
+    // HSL -> #rrggbb (para pintar el borde con lo que toca el gotero).
+    var hslAHex = function (h, s, l) {
+        s /= 100; l /= 100;
+        var k = function (n) { return (n + h / 30) % 12; };
+        var a = s * Math.min(l, 1 - l);
+        var f = function (n) {
+            var v = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            return Math.round(255 * v).toString(16).padStart(2, '0');
+        };
+        return '#' + f(0) + f(8) + f(4);
     };
 
+    // Dónde está el gotero dentro del espectro.
+    var moverGotero = function (x, y) {
+        var r = espectro.getBoundingClientRect();
+        var px = Math.max(0, Math.min(r.width, x));
+        var py = Math.max(0, Math.min(r.height, y));
+        var h = (px / r.width) * 360;
+        var l = (1 - py / r.height) * 100;
+        color = hslAHex(h, 100, l);
+        if (gotero) {
+            gotero.style.left = px + 'px';
+            gotero.style.top = py + 'px';
+            gotero.style.background = color;
+        }
+        pintarAvatar(color);
+    };
+
+    var posicionDesdeEvento = function (ev) {
+        var r = espectro.getBoundingClientRect();
+        moverGotero(ev.clientX - r.left, ev.clientY - r.top);
+    };
+
+    if (espectro) {
+        espectro.addEventListener('pointerdown', function (ev) {
+            ev.preventDefault();
+            espectro.setPointerCapture(ev.pointerId);
+            posicionDesdeEvento(ev);
+        });
+        espectro.addEventListener('pointermove', function (ev) {
+            if (ev.buttons === 0 && ev.pointerType === 'mouse') return;
+            if (!espectro.hasPointerCapture || !espectro.hasPointerCapture(ev.pointerId)) return;
+            posicionDesdeEvento(ev);
+        });
+        espectro.addEventListener('pointerup', function () { guardar(); });
+        espectro.addEventListener('pointercancel', function () { guardar(); });
+    }
+
+    var abrir = function () {
+        if (!popover) return;
+        pintarAvatar(color);
+        popover.classList.remove('hidden');
+        document.body.classList.add('con-popover-color');
+    };
+    var cerrar = function () {
+        if (!popover) return;
+        popover.classList.add('hidden');
+        document.body.classList.remove('con-popover-color');
+        guardar();
+    };
+
+    document.addEventListener('click', function (ev) {
+        var objetivo = ev.target;
+        if (!objetivo || !objetivo.closest) return;
+        if (objetivo.closest('#btn-color-avatar')) { ev.preventDefault(); abrir(); return; }
+        if (objetivo.closest('#perfil-color-listo')) { cerrar(); return; }
+        if (objetivo === popover) { cerrar(); }
+    });
+
+    var montar = function () {
+        pintarAvatar(color);
+        if (popover) popover.classList.add('hidden');
+    };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar);
     else montar();
-    document.addEventListener('panel:abierto', montar);
 })();
 </script>
 </body>
