@@ -3217,3 +3217,14 @@ textarea:-webkit-autofill {
     color: var(--color-ink);
     border-color: var(--color-ink);
 }
+
+/* El aviso del formulario de eliminar cuenta, con el mismo tamaño que los demás subtítulos. */
+#mi-cuenta .cuenta-form .cuenta-form-info {
+    display: block;
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+    text-align: left;
+    line-height: 1.25;
+}

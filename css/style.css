@@ -32,7 +32,7 @@
 
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
 /* 3. Panel del artista (filtros, tabla, peligro, acciones) */
-@import url('panel-artista.css?v=00bfaa8973');
+@import url('panel-artista.css?v=853ecc0c60');
 
 /* 4. Modales (login, registro, restablecimiento, etc.) */
 @import url('modales.css?v=7c0627d4e2');
@@ -2024,4 +2024,24 @@ select:focus-visible,
 /* Sin el resaltado/destello que pinta el navegador al tocar (amarillo en Android). */
 input, textarea, select, button, a, label, [role="button"], [role="switch"] {
     -webkit-tap-highlight-color: transparent;
+}
+
+/* AVISOS SIEMPRE VISIBLES (2026-10-21): el contenedor de notificaciones quedaba en position
+   static (su regla vive en una capa y algo fuera de capa la anulaba), asi que el aviso se pintaba
+   al final del documento y no se veia. Se fija aqui, sin capas, y por encima de todo. */
+.notification-container {
+    position: fixed !important;
+    top: calc(64px + var(--status-bar-height, 24px) + 10px) !important;
+    right: 20px !important;
+    left: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    z-index: 2147483647 !important;
+    pointer-events: none;
+}
+
+.notification-container .notification {
+    pointer-events: auto;
 }
