@@ -417,7 +417,7 @@ function crearObraCard(obra) {
         ? `<img src="${cloudinaryUrl(safeImgUrl(fotoArtista), 120)}"
                  srcset="${srcsetCloudinary(safeImgUrl(fotoArtista), [40, 80, 120, 240])}"
                  sizes="36px" decoding="async" loading="lazy"
-                 alt="${nombreArtista}" style="--avatar-color:${obra.color_avatar || obra.autor_color || ''}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
+                 alt="${nombreArtista}" style="--avatar-color:${obra.color_artista || obra.color_avatar || ''}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
         : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
     const gridOverlayHTML = `
