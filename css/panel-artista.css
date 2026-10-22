@@ -3785,3 +3785,11 @@ html body #perfil-content .cuenta-avatar-fila {
     width: 18px !important;
     height: 18px !important;
 }
+
+/* El punto, 2px a la derecha (solo horizontal). */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: 12px !important;
+    bottom: 14px !important;
+}
