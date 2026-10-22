@@ -1426,6 +1426,10 @@
     var abrir = function () {
         if (!popover) return;
         pintarAvatar(color);
+        // Se apoya en la barra inferior: se mide su alto real (cambia según el teléfono).
+        var botonNav = document.querySelector('.toggle-nav-btn');
+        var barra = botonNav && botonNav.parentElement;
+        if (barra) popover.style.bottom = Math.round(barra.getBoundingClientRect().height) + 'px';
         popover.classList.remove('hidden');
         colocarGoteroEnColor(color);
         document.body.classList.add('con-popover-color');
