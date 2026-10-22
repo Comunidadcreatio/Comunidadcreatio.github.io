@@ -1194,3 +1194,24 @@ const ICONOS_RED_PANEL = {
         });
     }
 }
+
+// ============================================
+// LOS ERRORES DE LOS FORMULARIOS SALEN COMO AVISO
+// ============================================
+/** Convierte los mensajes que se escriben en los .cuenta-error en avisos (toast). */
+const vigilarErroresDeFormulario = () => {
+    document.querySelectorAll('#mi-cuenta .cuenta-error').forEach((el) => {
+        const nodo = /** @type {HTMLElement} */ (el);
+        if (nodo.dataset.vigilado === '1') return;
+        nodo.dataset.vigilado = '1';
+        new MutationObserver(() => {
+            const texto = (nodo.textContent || '').trim();
+            if (!texto) return;
+            nodo.textContent = '';
+            showError(texto.replace(/^❌\s*/, ''));
+        }).observe(nodo, { childList: true, characterData: true, subtree: true });
+    });
+};
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vigilarErroresDeFormulario);
+else vigilarErroresDeFormulario();
