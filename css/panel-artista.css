@@ -3635,3 +3635,16 @@ textarea:-webkit-autofill {
     filter: none !important;
     box-shadow: none !important;
 }
+
+/* Ni halo ni sombra en todo el bloque del avatar (botón del nav incluido). */
+.btn-perfil-circular,
+.btn-perfil-circular *,
+.perfil-avatar-img,
+.perfil-avatar-img-seccion,
+#perfil-avatar-mini,
+#perfil-avatar-preview,
+#perfil-avatar-seccion {
+    box-shadow: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+}
