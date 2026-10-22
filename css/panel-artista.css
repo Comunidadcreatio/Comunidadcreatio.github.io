@@ -3131,3 +3131,50 @@ textarea:-webkit-autofill {
     text-align: left;
     margin-top: 4px;
 }
+
+/* ==============================================
+   FORMULARIOS DE SEGURIDAD SIN RELLENO (2026-10-21)
+   Los formularios desplegables (cambiar correo, cambiar contraseña, eliminar cuenta) tenían fondo
+   gris, borde y caja en los campos. Se dejan transparentes y con la línea inferior, como el resto.
+   ============================================== */
+#mi-cuenta .cuenta-form {
+    margin-top: 12px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+#mi-cuenta .cuenta-form h5 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #737373;
+    margin: 0 0 8px;
+}
+
+#mi-cuenta .cuenta-form input {
+    width: 100%;
+    padding: 10px 0;
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-300);
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--color-text);
+    font-size: 15px;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+}
+
+#mi-cuenta .cuenta-form input:focus {
+    background: transparent;
+    border-bottom-color: var(--color-text);
+    box-shadow: none;
+    outline: none;
+}
+
+[data-theme="dark"] #mi-cuenta .cuenta-form input {
+    background: transparent;
+    background-color: transparent;
+}
