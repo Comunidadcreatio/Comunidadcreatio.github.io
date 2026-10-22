@@ -1213,5 +1213,27 @@ const vigilarErroresDeFormulario = () => {
     });
 };
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vigilarErroresDeFormulario);
-else vigilarErroresDeFormulario();
+// ============================================
+// SIN BURBUJA NATIVA: "Completa este campo" sale como aviso
+// ============================================
+/** Quita la validación del navegador y avisa con un toast si falta algún campo. */
+const vigilarCamposVacios = () => {
+    document.querySelectorAll('#mi-cuenta form.cuenta-form').forEach((form) => {
+        const f = /** @type {HTMLFormElement} */ (form);
+        if (f.dataset.sinBurbuja === '1') return;
+        f.dataset.sinBurbuja = '1';
+        f.setAttribute('novalidate', '');
+        f.addEventListener('submit', (ev) => {
+            const campos = /** @type {HTMLInputElement[]} */ ([...f.querySelectorAll('input[required]')]);
+            const vacio = campos.find((i) => !i.value.trim());
+            if (!vacio) return;
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            showError('Completa todos los campos.');
+            vacio.focus();
+        }, true);
+    });
+};
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { vigilarErroresDeFormulario(); vigilarCamposVacios(); });
+else { vigilarErroresDeFormulario(); vigilarCamposVacios(); }
