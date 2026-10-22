@@ -3307,3 +3307,38 @@ textarea:-webkit-autofill {
 .perfil-color-muestra.elegida {
     border-color: var(--color-ink);
 }
+
+/* ==============================================
+   PANEL DE COLOR CON DETAILS (2026-10-21)
+   Se abre con HTML (sin depender del módulo) y flota como un cuadro sobre el contenido.
+   ============================================== */
+#perfil-content .perfil-color-detalles > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+#perfil-content .perfil-color-detalles > summary::-webkit-details-marker,
+#perfil-content .perfil-color-detalles > summary::marker {
+    display: none;
+    content: '';
+}
+
+#perfil-content .perfil-color-detalles {
+    position: relative;
+}
+
+#perfil-content .perfil-color-detalles .perfil-color-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    min-width: 240px;
+    background: var(--color-white, #fff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] #perfil-content .perfil-color-detalles .perfil-color-panel {
+    background: #1c1c1c;
+    border-color: #333;
+}
