@@ -3228,3 +3228,82 @@ textarea:-webkit-autofill {
     text-align: left;
     line-height: 1.25;
 }
+
+/* ==============================================
+   AVATAR CON BORDE DE COLOR (2026-10-21)
+   - El círculo crece (120 px) y el título queda centrado con él.
+   - Lleva un borde de 4 px con el color elegido por el usuario (variable --perfil-avatar-color).
+   - Panel del gotero: input type=color + muestras rápidas.
+   ============================================== */
+#perfil-content .cuenta-item-info h4.perfil-foto-titulo {
+    display: block;
+    text-align: center;
+    justify-content: center;
+    margin: 0 0 12px;
+}
+
+#perfil-content .cuenta-avatar-preview {
+    width: 120px;
+    height: 120px;
+    border: 4px solid var(--perfil-avatar-color, #d9a441);
+    box-sizing: border-box;
+    background: var(--color-gray-100, #f5f5f5);
+}
+
+#perfil-content .cuenta-avatar-fila {
+    justify-content: center;
+}
+
+#perfil-content .perfil-color-panel {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#perfil-content .perfil-color-panel.hidden {
+    display: none;
+}
+
+.perfil-color-titulo {
+    font-size: 10px;
+    font-weight: 700;
+    color: #737373;
+    letter-spacing: 0.2px;
+}
+
+#color-avatar-input {
+    width: 100%;
+    max-width: 220px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.perfil-color-muestras {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.perfil-color-muestra {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    box-shadow: 0 0 0 1px var(--color-gray-300);
+    cursor: pointer;
+    padding: 0;
+}
+
+.perfil-color-muestra.elegida {
+    border-color: var(--color-ink);
+}

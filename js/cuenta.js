@@ -121,6 +121,81 @@ export function setupMiCuenta() {
     // Se pone a true al pulsar «Quitar foto» y se manda foto_perfil: '' al guardar.
     let quitarFoto = false;
 
+// ============================================
+// COLOR DEL BORDE DEL AVATAR
+// ============================================
+const COLORES_AVATAR = ['#d9a441', '#2e7d6b', '#1f6feb', '#8e44ad', '#c0392b', '#16a085', '#e67e22', '#34495e'];
+let colorAvatar = '';
+
+/** Un color al azar para quien todavía no tiene uno. */
+const colorAlAzar = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+
+/** Pinta el color en el avatar y en el gotero. */
+const aplicarColorAvatar = (color) => {
+    colorAvatar = (color && /^#[0-9a-f]{6}$/i.test(color)) ? color : colorAlAzar();
+    document.querySelectorAll('#perfil-avatar-preview, #perfil-avatar-seccion').forEach((el) => {
+        const nodo = /** @type {HTMLElement} */ (el);
+        nodo.style.setProperty('--perfil-avatar-color', colorAvatar);
+        nodo.style.borderColor = colorAvatar;
+    });
+    const input = /** @type {HTMLInputElement | null} */ (document.getElementById('color-avatar-input'));
+    if (input) input.value = colorAvatar;
+    document.querySelectorAll('.perfil-color-muestra').forEach((m) => {
+        m.classList.toggle('elegida', /** @type {HTMLElement} */ (m).dataset.color === colorAvatar);
+    });
+};
+
+/** Guarda el color en el perfil (no bloquea la vista si falla). */
+const guardarColorAvatar = async () => {
+    try {
+        await apiRequest('/api/artistas/color-avatar', {
+            method: 'PUT',
+            body: JSON.stringify({ color_avatar: colorAvatar })
+        });
+        const guardado = JSON.parse(localStorage.getItem('artistaData') || '{}');
+        guardado.color_avatar = colorAvatar;
+        localStorage.setItem('artistaData', JSON.stringify(guardado));
+    } catch (error) {
+        showWarning('El color se ve, pero no se pudo guardar. Revisa tu conexión.');
+    }
+};
+
+/** Botón, gotero y muestras. */
+const prepararSelectorDeColor = () => {
+    const boton = document.getElementById('btn-color-avatar');
+    const panel = document.getElementById('perfil-color-panel');
+    const input = /** @type {HTMLInputElement | null} */ (document.getElementById('color-avatar-input'));
+    const muestras = document.getElementById('perfil-color-muestras');
+
+    if (boton && panel) {
+        boton.addEventListener('click', () => {
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) input && input.focus();
+        });
+    }
+
+    if (muestras && !muestras.dataset.listo) {
+        muestras.dataset.listo = '1';
+        COLORES_AVATAR.forEach((color) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'perfil-color-muestra';
+            b.dataset.color = color;
+            b.style.background = color;
+            b.setAttribute('aria-label', 'Usar el color ' + color);
+            b.addEventListener('click', () => { aplicarColorAvatar(color); guardarColorAvatar(); });
+            muestras.appendChild(b);
+        });
+    }
+
+    if (input) {
+        input.addEventListener('input', () => aplicarColorAvatar(input.value));
+        input.addEventListener('change', () => guardarColorAvatar());
+    }
+    aplicarColorAvatar(colorAvatar || colorAlAzar());
+};
+
+
     // ============================================
     // MUNICIPIO DE ORIGEN (select con banderas)
     // ============================================
@@ -750,6 +825,9 @@ const ICONOS_RED_PANEL = {
             poner('perfil-nombre-real-input', u.nombre_real);
             const rolSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('perfil-rol-select'));
             pintarRol(u.rol || 'artista');
+            const yaTeníaColor = /^#[0-9a-f]{6}$/i.test(String(u.color_avatar || ''));
+            aplicarColorAvatar(u.color_avatar || colorAlAzar());
+            if (!yaTeníaColor) guardarColorAvatar();
             visibilidad = normalizarVisibilidad(u.visibilidad);
             pintarSwitches();
             aplicarVisibilidad();
