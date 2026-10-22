@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.837';
+        var currentVer = '1.0.838';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=091c13d26e">
+    <link rel="stylesheet" href="css/style.css?v=fc0302be60">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1479,6 +1479,125 @@
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar);
     else montar();
+})();
+</script>
+
+<!-- ============================================
+     MAPA DEL TÁCHIRA (simulador, pantalla completa)
+     Se abre al pulsar la bandera del municipio.
+     ============================================ -->
+<div class="mapa-tachira" id="mapa-tachira" role="dialog" aria-modal="true" aria-label="Mapa del estado Táchira" hidden>
+    <header class="mapa-cabecera">
+        <div class="mapa-cabecera-texto">
+            <span class="mapa-titulo">Estado Táchira</span>
+            <span class="mapa-subtitulo" id="mapa-subtitulo">29 municipios</span>
+        </div>
+        <button type="button" class="mapa-cerrar" id="mapa-cerrar" aria-label="Cerrar el mapa">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+    </header>
+    <div class="mapa-lienzo">
+        <div class="mapa-municipios" id="mapa-municipios"></div>
+    </div>
+    <p class="mapa-pie" id="mapa-pie">Toca un municipio para verlo resaltado</p>
+</div>
+
+<script>
+/* Simulador del mapa del Táchira. Va en línea para no depender de módulos. */
+(function () {
+    var MUNICIPIOS = [
+        { nombre: 'San Cristóbal', capital: 'San Cristóbal' },
+        { nombre: 'Cárdenas', capital: 'Táriba' },
+        { nombre: 'Torbes', capital: 'San Josecito' },
+        { nombre: 'Sucre', capital: 'Queniquea' },
+        { nombre: 'Bolívar', capital: 'San Antonio del Táchira' },
+        { nombre: 'Pedro María Ureña', capital: 'Ureña' },
+        { nombre: 'Junín', capital: 'Rubio' },
+        { nombre: 'Ayacucho', capital: 'Colón' },
+        { nombre: 'Michelena', capital: 'Michelena' },
+        { nombre: 'Lobatera', capital: 'Lobatera' },
+        { nombre: 'Córdoba', capital: 'Santa Ana' },
+        { nombre: 'Andrés Bello', capital: 'Cordero' },
+        { nombre: 'Antonio Rómulo Costa', capital: 'Las Mesas' },
+        { nombre: 'Fernández Feo', capital: 'San Rafael del Piñal' },
+        { nombre: 'Francisco de Miranda', capital: 'San José de Bolívar' },
+        { nombre: 'García de Hevia', capital: 'La Fría' },
+        { nombre: 'Guásimos', capital: 'Palmira' },
+        { nombre: 'Independencia', capital: 'Capacho Nuevo' },
+        { nombre: 'Jáuregui', capital: 'La Grita' },
+        { nombre: 'José María Vargas', capital: 'El Cobre' },
+        { nombre: 'Libertad', capital: 'Capacho Viejo' },
+        { nombre: 'Libertador', capital: 'Abejales' },
+        { nombre: 'Panamericano', capital: 'Coloncito' },
+        { nombre: 'Rafael Urdaneta', capital: 'Delicias' },
+        { nombre: 'Samuel Darío Maldonado', capital: 'La Tendida' },
+        { nombre: 'San Judas Tadeo', capital: 'San Judas Tadeo' },
+        { nombre: 'Seboruco', capital: 'Seboruco' },
+        { nombre: 'Simón Rodríguez', capital: 'San Simón' },
+        { nombre: 'Uribante', capital: 'Pregonero' }
+    ];
+
+    var modal = document.getElementById('mapa-tachira');
+    var contenedor = document.getElementById('mapa-municipios');
+    var sub = document.getElementById('mapa-subtitulo');
+    var pie = document.getElementById('mapa-pie');
+    var actual = '';
+
+    if (sub) sub.textContent = MUNICIPIOS.length + ' municipios';
+
+    var pintar = function () {
+        if (!contenedor) return;
+        contenedor.textContent = '';
+        MUNICIPIOS.forEach(function (m) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'mapa-municipio' + (m.nombre === actual ? ' activo' : '');
+            b.dataset.municipio = m.nombre;
+            b.innerHTML = '<span class="mapa-municipio-nombre"></span><span class="mapa-municipio-capital"></span>';
+            b.querySelector('.mapa-municipio-nombre').textContent = m.nombre;
+            b.querySelector('.mapa-municipio-capital').textContent = m.capital;
+            b.addEventListener('click', function () {
+                actual = m.nombre;
+                pintar();
+                if (pie) pie.textContent = 'Seleccionaste ' + m.nombre + ' · ' + m.capital;
+            });
+            contenedor.appendChild(b);
+        });
+    };
+
+    /** Sabe qué municipio está elegido en el perfil (por la capital guardada). */
+    var municipioDelPerfil = function () {
+        try {
+            var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
+            var ciudad = g.ciudad || '';
+            var hallado = MUNICIPIOS.find(function (m) { return m.capital === ciudad || m.nombre === ciudad; });
+            return hallado ? hallado.nombre : '';
+        } catch (e) { return ''; }
+    };
+
+    var abrir = function () {
+        if (!modal) return;
+        actual = municipioDelPerfil();
+        pintar();
+        if (pie) pie.textContent = actual ? 'Tu municipio: ' + actual : 'Toca un municipio para verlo resaltado';
+        modal.hidden = false;
+        document.body.classList.add('con-mapa-abierto');
+    };
+    var cerrar = function () {
+        if (!modal) return;
+        modal.hidden = true;
+        document.body.classList.remove('con-mapa-abierto');
+    };
+
+    document.addEventListener('click', function (ev) {
+        var obj = ev.target;
+        if (!obj || !obj.closest) return;
+        if (obj.closest('#mapa-cerrar')) { cerrar(); return; }
+        // La bandera del municipio (en el perfil público y en el desplegable del panel).
+        if (obj.closest('#perfil-bandera, .perfil-bandera')) { ev.preventDefault(); abrir(); }
+    });
+
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrar(); });
 })();
 </script>
 </body>
