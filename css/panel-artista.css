@@ -3516,3 +3516,9 @@ textarea:-webkit-autofill {
     border-radius: 14px 14px 0 0;
     box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.22);
 }
+
+/* Sin sombra hacia la barra: la sombra oscurecía el borde superior del nav y parecía que lo tapaba. */
+#perfil-color-popover .perfil-color-caja {
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--color-gray-200);
+}
