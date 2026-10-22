@@ -3920,3 +3920,35 @@ body.con-mapa-abierto {
 [data-theme="dark"] .mapa-tachira {
     background: #121212;
 }
+
+/* ==============================================
+   MAPA BASE DEL TACHIRA (2026-10-22)
+   El SVG del estado como fondo del simulador: ancho completo, sin deformar.
+   ============================================== */
+.mapa-imagen-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 14px;
+    padding: 8px;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 14px;
+    background: var(--color-gray-50, #fafafa);
+}
+
+.mapa-imagen {
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    max-height: 46vh;
+    object-fit: contain;
+    display: block;
+}
+
+[data-theme="dark"] .mapa-imagen-wrap {
+    background: #191919;
+    border-color: #2b2b2b;
+}
+
+[data-theme="dark"] .mapa-imagen {
+    filter: invert(1) hue-rotate(180deg);
+}

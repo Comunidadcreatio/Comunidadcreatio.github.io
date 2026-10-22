@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.838';
+        var currentVer = '1.0.839';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=fc0302be60">
+    <link rel="stylesheet" href="css/style.css?v=c37a21b9c4">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1497,6 +1497,9 @@
         </button>
     </header>
     <div class="mapa-lienzo">
+        <div class="mapa-imagen-wrap">
+            <img class="mapa-imagen" src="iconos/mapa/tachira.svg" alt="Mapa del estado Táchira por municipios" loading="lazy" decoding="async">
+        </div>
         <div class="mapa-municipios" id="mapa-municipios"></div>
     </div>
     <p class="mapa-pie" id="mapa-pie">Toca un municipio para verlo resaltado</p>
