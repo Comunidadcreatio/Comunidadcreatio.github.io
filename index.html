@@ -1286,7 +1286,6 @@
         </div>
         <div class="perfil-color-pie">
             <input type="text" class="perfil-color-actual" id="perfil-color-hex" value="#d9a441" maxlength="7" spellcheck="false" aria-label="Código del color">
-            <button type="button" id="perfil-color-listo" class="perfil-color-listo">Listo</button>
         </div>
     </div>
 </div>
@@ -1423,6 +1422,19 @@
         hexInput.addEventListener('click', function (ev) { ev.stopPropagation(); });
     }
 
+    /**
+     * Coloca el panel justo encima de la barra inferior. Si el teclado deja la barra fuera de la
+     * vista (el alto visible se reduce), se apoya en el borde visible para no dejar hueco.
+     */
+    var colocarPopover = function () {
+        if (!popover) return;
+        var barra = document.getElementById('toggle-panel');
+        var visible = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        if (!barra) { popover.style.bottom = '0px'; return; }
+        var topBarra = barra.getBoundingClientRect().top;
+        popover.style.bottom = ((topBarra >= visible - 1) ? 0 : Math.max(0, Math.round(visible - topBarra))) + 'px';
+    };
+
     var abrir = function () {
         if (!popover) return;
         pintarAvatar(color);
@@ -1434,9 +1446,16 @@
             var rBarra = barra.getBoundingClientRect();
             // Un pequeño colchón para no rozar los iconos de la barra.
             // A ras del borde superior de la barra (medido: 821 de 880 en 390x880).
-            popover.style.bottom = Math.max(0, Math.round(window.innerHeight - rBarra.top)) + 'px';
         }
         popover.classList.remove('hidden');
+        colocarPopover();
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', colocarPopover);
+            window.visualViewport.addEventListener('scroll', colocarPopover);
+        }
+        window.addEventListener('resize', colocarPopover);
+        setTimeout(colocarPopover, 250);
+        setTimeout(colocarPopover, 600);
         colocarGoteroEnColor(color);
         document.body.classList.add('con-popover-color');
     };
@@ -1451,8 +1470,10 @@
         var objetivo = ev.target;
         if (!objetivo || !objetivo.closest) return;
         if (objetivo.closest('#btn-color-avatar')) { ev.preventDefault(); abrir(); return; }
-        if (objetivo.closest('#perfil-color-listo')) { cerrar(); return; }
-        if (objetivo === popover) { cerrar(); }
+        // Cualquier toque fuera de la caja cierra el panel y guarda el color elegido.
+        if (popover && !popover.classList.contains('hidden') && !objetivo.closest('.perfil-color-caja')) {
+            cerrar();
+        }
     });
 
     var montar = function () {
