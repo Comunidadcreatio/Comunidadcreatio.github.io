@@ -3705,3 +3705,19 @@ html body #perfil-content .cuenta-avatar-fila {
     text-shadow: none !important;
     -webkit-filter: none !important;
 }
+
+/* ==============================================
+   PUNTO DE ACTIVO SOBRE EL BORDE (2026-10-22)
+   El punto verde se apoya en el extremo inferior derecho, justo sobre el borde de color.
+   ============================================== */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: -1px !important;
+    bottom: -1px !important;
+    width: 15px !important;
+    height: 15px !important;
+    border: 3px solid var(--perfil-avatar-color, #d9a441) !important;
+    box-shadow: none !important;
+    z-index: 6 !important;
+}
