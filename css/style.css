@@ -68,20 +68,15 @@
        `components`. Es de los pocos `!important` del proyecto que están justificados: sin
        él, el anillo desaparecería justo donde más hace falta. */
     :focus-visible {
-        /* DOS anillos: uno oscuro pegado al elemento y otro claro por fuera. Con uno solo
-           no basta, y lo encontró el verificador: un anillo negro sobre un botón negro daba
-           contraste 1 (invisible) y un anillo amarillo sobre un enlace amarillo, 1,3. Con
-           dos colores opuestos, sobre cualquier elemento y cualquier fondo hay uno de los
-           dos que se ve. */
-        outline: 3px solid var(--color-ink) !important;   /* anillo interior (oscuro) */
+        /* Anillo discreto: antes eran dos aros (tinta + amarillo #ffd166) y el amarillo se veía
+           como un rectángulo al tocar. Se deja una línea fina gris, que sigue indicando el foco
+           con teclado sin el recuadro amarillo. (2026-10-21) */
+        outline: 3px solid var(--color-gray-400, #bdbdbd) !important;
         outline-offset: 0 !important;
-        box-shadow: 0 0 0 6px #ffd166 !important; /* anillo exterior (claro) */
+        box-shadow: none !important;
     }
     /* En modo oscuro se intercambian: el interior claro y el exterior oscuro. */
-    [data-theme="dark"] :focus-visible {
-        outline-color: #ffd166 !important; /* color-a-mano: deliberado (color del anillo de foco: decision de diseno) */
-        box-shadow: 0 0 0 6px #1a1a1a !important;
-    }
+    
 
     /* SIN ANILLO EN CAMPOS (DENTRO DE LA CAPA) (2026-10-21)
        Va aquí, dentro de @layer base y DESPUÉS del anillo, porque en las declaraciones

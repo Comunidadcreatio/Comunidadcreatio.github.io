@@ -150,10 +150,13 @@ for (let i = 0; i < 8; i++) {
 check('se pudieron enfocar elementos con el teclado', conTeclado.length >= 4, conTeclado.length);
 check('TODOS los enfocados dibujan anillo visible', conTeclado.every((f) => f.visible === true),
     JSON.stringify(conTeclado.filter((f) => !f.visible).map((f) => f.tag)));
-check('el anillo es de 3px', conTeclado.every((f) => f.ancho === '3px'), JSON.stringify(conTeclado.map((f) => f.ancho)));
+// Los CAMPOS ya no dibujan anillo (se pidio quitarlo: salia en cada clic). En botones y enlaces
+// sigue puesto, y ahi tiene que ser de 3 px.
+check('el anillo es de 3px donde lo hay (los campos no lo dibujan)', conTeclado.every((f) => f.ancho === '3px' || f.ancho === '0px'), JSON.stringify(conTeclado.map((f) => f.tag + ':' + f.ancho)));
 // El anillo va pegado al elemento (offset 0) y por fuera lleva un SEGUNDO anillo de otro
 // color: eso es lo que hace que se vea sobre cualquier elemento y cualquier fondo.
-check('hay un SEGUNDO anillo por fuera (el doble anillo)', conTeclado.every((f) => f.sombra && f.sombra !== 'none'), JSON.stringify(conTeclado.map((f) => f.sombra)));
+// El aro amarillo exterior se quito a proposito (se veia como un rectangulo al tocar).
+check('el anillo es de un solo trazo (ya no hay aro amarillo por fuera)', conTeclado.every((f) => !f.sombra || f.sombra === 'none'), JSON.stringify(conTeclado.map((f) => f.sombra)));
 check('el anillo interior va pegado al elemento (offset 0)', conTeclado.every((f) => f.offset === '0px'), JSON.stringify(conTeclado.map((f) => f.offset)));
 const malContraste = conTeclado.filter((f) => f.contraste !== null && f.contraste < 3);
 check('el anillo contrasta con el fondo (mínimo 3:1 de la norma)', malContraste.length === 0,
