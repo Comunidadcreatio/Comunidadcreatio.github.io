@@ -3753,3 +3753,11 @@ html body #perfil-content .cuenta-avatar-fila {
     right: 6px !important;
     bottom: 6px !important;
 }
+
+/* El punto de activo, 10px más adentro sobre el aro. */
+.perfil-online-indicator,
+.perfil-online-indicator.online,
+.perfil-online-indicator.offline {
+    right: 10px !important;
+    bottom: 10px !important;
+}
