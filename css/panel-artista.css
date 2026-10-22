@@ -3178,3 +3178,42 @@ textarea:-webkit-autofill {
     background: transparent;
     background-color: transparent;
 }
+
+/* ==============================================
+   BOTONES DE LOS FORMULARIOS SIN RELLENO (2026-10-21)
+   Los botones Enviar/Confirmar/Guardar/Cancelar de los formularios de Seguridad iban rellenos.
+   Quedan como los demás del panel: solo borde, fondo transparente.
+   ============================================== */
+#mi-cuenta .cuenta-form .btn-cuenta-enviar,
+#mi-cuenta .cuenta-form .btn-cuenta-cancelar {
+    padding: 12px 20px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 8px;
+    background: transparent;
+    background-color: transparent;
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+#mi-cuenta .cuenta-form .btn-cuenta-enviar:hover,
+#mi-cuenta .cuenta-form .btn-cuenta-cancelar:hover {
+    background: transparent;
+    color: var(--color-text-muted, #666);
+    border-color: var(--color-gray-400, #bdbdbd);
+}
+
+#mi-cuenta .cuenta-form .btn-cuenta-cancelar {
+    border-color: var(--color-gray-300);
+    color: var(--color-text-muted, #666);
+}
+
+[data-theme="dark"] #mi-cuenta .cuenta-form .btn-cuenta-enviar,
+[data-theme="dark"] #mi-cuenta .cuenta-form .btn-cuenta-cancelar {
+    background: transparent;
+    background-color: transparent;
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+}
