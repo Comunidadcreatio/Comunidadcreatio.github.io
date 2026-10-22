@@ -417,7 +417,7 @@ function crearObraCard(obra) {
         ? `<img src="${cloudinaryUrl(safeImgUrl(fotoArtista), 120)}"
                  srcset="${srcsetCloudinary(safeImgUrl(fotoArtista), [40, 80, 120, 240])}"
                  sizes="36px" decoding="async" loading="lazy"
-                 alt="${nombreArtista}" style="--avatar-color:${obra.color_avatar || ''}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
+                 alt="${nombreArtista}" style="--avatar-color:${obra.color_avatar || obra.autor_color || ''}" class="obra-avatar-round obra-avatar-clickable" data-artista-id="${artistaUserId}">`
         : `<div class="obra-avatar-placeholder obra-avatar-clickable" data-artista-id="${artistaUserId}">${inicial}</div>`;
 
     const gridOverlayHTML = `
@@ -869,7 +869,7 @@ async function mostrarVistas(obraId, anchorEl) {
                 const avatarHTML = v.foto_perfil
                     ? `<img src="${cloudinaryUrl(safeImgUrl(v.foto_perfil), 120)}"
                            srcset="${srcsetCloudinary(safeImgUrl(v.foto_perfil), [40, 80, 120, 240])}"
-                           sizes="36px" decoding="async" loading="lazy" class="vistas-avatar" style="--avatar-color:${v.color_avatar || ''}">`
+                           sizes="36px" decoding="async" loading="lazy" class="vistas-avatar" style="--avatar-color:${v.color_avatar || v.autor_color || ''}">`
                     : `<div class="vistas-avatar vistas-avatar-default">${inicial}</div>`;
                 return `<div class="vistas-item">
                     ${avatarHTML}

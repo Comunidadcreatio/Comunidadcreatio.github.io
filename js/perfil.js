@@ -9,7 +9,7 @@ import { showError, showSuccess, showInfo, setButtonLoading } from './notificaci
 import { escapeHtml, debugLog, cloudinaryUrl, safeImgUrl, srcsetCloudinary, cuandoLibre } from './utils.js?v=7e1398d254';
 // Mismo tracking de vistas que la galería (mismo URL versionado → un solo
 // módulo en memoria; el hash lo mantiene scripts/bump-version.js)
-import { setupViewTracking } from './galeria.js?v=03d63db3bc';
+import { setupViewTracking } from './galeria.js?v=ff6a8d6f21';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 
 export const AVATAR_DEFAULT = 'iconos/avatar-default.svg';
@@ -519,7 +519,7 @@ export function mostrarResultadosBusqueda(usuarios, verPerfilUsuarioFn) {
                         ? `<img src="${safeImgUrl(cloudinaryUrl(usuario.foto_perfil, 96))}"
                                 srcset="${srcsetCloudinary(usuario.foto_perfil, [48, 96, 144])}"
                                 sizes="44px" decoding="async" loading="lazy" alt="${escapeHtml(usuario.nombre_artista)}">`
-                        : `<div class="avatar-placeholder" style="--avatar-color:${usuario.color_avatar || ''}">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
+                        : `<div class="avatar-placeholder" style="--avatar-color:${usuario.color_avatar || usuario.autor_color || ''}">${escapeHtml(usuario.nombre_artista.charAt(0).toUpperCase())}</div>`
                     }
                 </div>
                 <div class="resultado-info">
