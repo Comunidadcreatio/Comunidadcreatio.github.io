@@ -1,8 +1,8 @@
 // @ts-check
 // js/auth-logic.js - Lógica de autenticación para la página separada
 
-import { login, register } from './auth.js?v=8dbd042376';
-import { ARTISTA_KEY, apiRequest } from './config.js?v=7da631dcf6';
+import { login, register } from './auth.js?v=69143cf91d';
+import { ARTISTA_KEY, apiRequest } from './config.js?v=2d9c27d59f';
 import { showSuccess, showError, showWarning, showInfo, setButtonLoading, showConfirmChoice } from './notificaciones.js?v=a2dfb905a6';
 import { mostrarErrores, debounce, debugLog } from './utils.js?v=7e1398d254';
 import { setupDarkModeToggle } from './theme.js?v=f024ca3802'; // v67
@@ -10,7 +10,7 @@ import {
     biometriaDisponible, biometriaRegistrada, haySesionGuardada, obtenerIdentidadUsuario,
     guardarSesionEnDispositivo, borrarSesionGuardada,
     obtenerCredencialesRecordadas, desbloquearConBiometria, limpiarOlvidoExplicito
-} from './biometric-login.js?v=62ef679903';
+} from './biometric-login.js?v=511df5bf80';
 import { initCustomSelect } from './custom-select.js?v=6f849e0816';
 
 // ============================================

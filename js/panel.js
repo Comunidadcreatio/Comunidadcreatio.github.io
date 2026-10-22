@@ -1,7 +1,7 @@
 // @ts-check
 // js/panel.js
 // js/panel.js
-import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=7da631dcf6';
+import { API_BASE_URL, apiRequest, getAuthToken, cerrarSesionLocal } from './config.js?v=2d9c27d59f';
 import { debugLog } from './utils.js?v=7e1398d254';
 
 // Las escrituras van con fetch crudo porque llevan FormData (apiRequest fija

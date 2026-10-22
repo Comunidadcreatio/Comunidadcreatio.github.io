@@ -87,7 +87,12 @@ export async function apiRequest(endpoint, options = {}) {
     // NOTA: un 401 en el LOGIN significa credenciales INCORRECTAS (el backend responde con su
     // propio mensaje), no una sesión expirada: ese caso se deja pasar para que se muestre el
     // error real. Igual en eliminar-cuenta, donde el 401 es «contraseña incorrecta».
-    if (res.status === 401 && !endpoint.endsWith('/eliminar-cuenta') && !endpoint.endsWith('/api/artistas/login')) {
+    // Endpoints donde un 401 significa «contraseña incorrecta», NO sesión expirada: el backend
+    // responde 401 con su propio mensaje y hay que mostrarlo sin cerrar la sesión. Faltaba
+    // cambiar-password (y confirmar-email), así que al fallar la contraseña actual se cerraba la
+    // sesión y el usuario veía «Sesión expirada» (2026-10-21).
+    const ONCE_401_CON_MENSAJE = ['/api/artistas/login', '/eliminar-cuenta', '/cambiar-password', '/confirmar-email'];
+    if (res.status === 401 && !ONCE_401_CON_MENSAJE.some((ruta) => endpoint.endsWith(ruta))) {
         cerrarSesionLocal();
         throw new ApiError('Sesión expirada. Por favor inicia sesión nuevamente.', { status: 401, esSesion: true });
     }
