@@ -4121,3 +4121,36 @@ body.con-mapa-abierto {
 [data-theme="dark"] .mapa-etiqueta {
     stroke: #121212;
 }
+
+/* ==============================================
+   CONMUTADOR DEL MAPA: POR REGIÓN / DENSIDAD (2026-10-25)
+   ============================================== */
+.mapa-modos {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.mapa-modo {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mapa-modo.activo {
+    background: var(--perfil-avatar-color, #d9a441);
+    border-color: var(--perfil-avatar-color, #d9a441);
+    color: #fff;
+}
+
+[data-theme="dark"] .mapa-modo.activo {
+    color: #111;
+}

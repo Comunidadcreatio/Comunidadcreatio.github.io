@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.846';
+        var currentVer = '1.0.847';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=9cd5592b9a">
+    <link rel="stylesheet" href="css/style.css?v=3859f78200">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1498,6 +1498,10 @@
         </button>
     </header>
     <div class="mapa-lienzo">
+        <div class="mapa-modos" role="group" aria-label="Cómo ver el mapa">
+            <button type="button" class="mapa-modo activo" data-modo="region">Por región</button>
+            <button type="button" class="mapa-modo" data-modo="densidad">Densidad poblacional</button>
+        </div>
         <div class="mapa-svg-wrap">
             <svg class="mapa-svg" id="mapa-svg" viewBox="0 0 720 780" role="img" aria-label="Mapa del estado Táchira con sus municipios"></svg>
         </div>
@@ -1547,10 +1551,25 @@
         return d;
     };
 
+    var modo = 'region';
+    var maxDens = 1;
+
     var colorDe = function (m) {
-        var elegido = getComputedStyle(document.documentElement).getPropertyValue('--perfil-avatar-color').trim();
-        if (m.nombre === actual) return elegido || '#d9a441';
+        var elegido = getComputedStyle(document.documentElement).getPropertyValue('--perfil-avatar-color').trim() || '#d9a441';
+        if (m.nombre === actual) return elegido;
+        if (modo === 'densidad') return elegido;
         return COLORES_REGION[m.region] || '#7a7a7a';
+    };
+
+    /** Opacidad del relleno: por región es suave; por densidad crece con la densidad (raíz
+        cuadrada para que San Cristóbal no tape a los demás). */
+    var opacidadDe = function (m) {
+        if (m.nombre === actual) return '0.9';
+        if (modo === 'densidad') {
+            var d = m.area ? m.poblacion / m.area : 0;
+            return String(Math.round((0.10 + 0.80 * Math.sqrt(d / maxDens)) * 100) / 100);
+        }
+        return '0.18';
     };
 
     var pintarMapa = function () {
@@ -1563,7 +1582,7 @@
             p.setAttribute('d', d);
             p.setAttribute('class', 'mapa-poly' + (m.nombre === actual ? ' activo' : ''));
             p.setAttribute('fill', colorDe(m));
-            p.setAttribute('fill-opacity', m.nombre === actual ? '1' : '0.18');
+            p.setAttribute('fill-opacity', opacidadDe(m));
             p.setAttribute('stroke', colorDe(m));
             p.setAttribute('stroke-width', m.nombre === actual ? '2.4' : '0.9');
             p.setAttribute('stroke-linejoin', 'round');
@@ -1681,6 +1700,14 @@
         GEO = res[0] || {};
         DATOS = res[1] || [];
         if (sub) sub.textContent = DATOS.length + ' municipios';
+        maxDens = Math.max.apply(null, DATOS.map(function (m) { return m.area ? m.poblacion / m.area : 1; })) || 1;
+        document.querySelectorAll('.mapa-modo').forEach(function (b) {
+            b.addEventListener('click', function () {
+                modo = b.dataset.modo === 'densidad' ? 'densidad' : 'region';
+                document.querySelectorAll('.mapa-modo').forEach(function (o) { o.classList.toggle('activo', o === b); });
+                pintarMapa();
+            });
+        });
         if (!modal.hidden) { actual = actual || ''; pintarMapa(); pintarFicha(); pintarLista(); }
     }).catch(function () {
         if (pie) pie.textContent = 'No se pudo cargar el mapa';
