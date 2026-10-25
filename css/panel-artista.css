@@ -3997,3 +3997,26 @@ body.con-mapa-abierto {
 #perfil-usuario .perfil-avatar-btn:hover {
     transform: none;
 }
+
+/* ==============================================
+   MAPA EN LÍNEAS LIMPIAS (2026-10-25)
+   El SVG limpio: solo el contorno del estado y los límites de los municipios.
+   ============================================== */
+.mapa-imagen-wrap {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.mapa-imagen {
+    max-height: 52vh;
+}
+
+[data-theme="dark"] .mapa-imagen-wrap {
+    background: transparent;
+    border: none;
+}
+
+[data-theme="dark"] .mapa-imagen {
+    filter: invert(1);
+}
