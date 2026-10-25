@@ -4020,3 +4020,104 @@ body.con-mapa-abierto {
 [data-theme="dark"] .mapa-imagen {
     filter: invert(1);
 }
+
+/* ==============================================
+   MAPA REAL CON ESTILO CREATIO (2026-10-25)
+   Municipios como polígonos reales, relleno suave del color de su región, y el elegido con el
+   color del avatar del usuario. Sin sombras ni degradados: líneas finas, como el resto de la app.
+   ============================================== */
+.mapa-svg-wrap {
+    margin: 0 0 14px;
+}
+
+.mapa-svg {
+    width: 100%;
+    height: auto;
+    max-height: 46vh;
+    display: block;
+    touch-action: manipulation;
+}
+
+.mapa-poly {
+    cursor: pointer;
+    transition: fill-opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.mapa-poly:hover {
+    fill-opacity: 0.38;
+}
+
+.mapa-poly.activo {
+    fill-opacity: 0.9;
+}
+
+.mapa-etiqueta {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    fill: var(--color-text);
+    paint-order: stroke;
+    stroke: var(--color-bg, #fff);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+}
+
+.mapa-ficha {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px;
+    margin: 0 0 14px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 14px;
+}
+
+.mapa-ficha-region {
+    font-size: 10px;
+    font-weight: 700;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mapa-ficha-nombre {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.mapa-ficha-capital {
+    font-size: 11px;
+    color: var(--color-gray-400, #bdbdbd);
+}
+
+.mapa-ficha-datos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 8px 0 4px;
+}
+
+.mapa-ficha-datos span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+}
+
+.mapa-ficha-datos b {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.mapa-ficha-economia {
+    font-size: 11px;
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .mapa-etiqueta {
+    stroke: #121212;
+}

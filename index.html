@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.845';
+        var currentVer = '1.0.846';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=5b7c9837bc">
+    <link rel="stylesheet" href="css/style.css?v=9cd5592b9a">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1484,7 +1484,7 @@
 </script>
 
 <!-- ============================================
-     MAPA DEL TÁCHIRA (simulador, pantalla completa)
+     MAPA DEL TÁCHIRA (municipios reales, estilo Creatio)
      Se abre al pulsar la bandera del municipio.
      ============================================ -->
 <div class="mapa-tachira" id="mapa-tachira" role="dialog" aria-modal="true" aria-label="Mapa del estado Táchira" hidden>
@@ -1498,122 +1498,167 @@
         </button>
     </header>
     <div class="mapa-lienzo">
-        <div class="mapa-imagen-wrap">
-            <img class="mapa-imagen" src="iconos/mapa/tachira-lineas.svg" alt="Mapa del estado Táchira por municipios" loading="lazy" decoding="async">
+        <div class="mapa-svg-wrap">
+            <svg class="mapa-svg" id="mapa-svg" viewBox="0 0 720 780" role="img" aria-label="Mapa del estado Táchira con sus municipios"></svg>
         </div>
+        <div class="mapa-ficha" id="mapa-ficha" hidden></div>
         <div class="mapa-municipios" id="mapa-municipios"></div>
     </div>
-    <p class="mapa-pie" id="mapa-pie">Toca un municipio para verlo resaltado</p>
+    <p class="mapa-pie" id="mapa-pie">Toca un municipio en el mapa o en la lista</p>
 </div>
 
 <script>
-/* Simulador del mapa del Táchira. Va en línea para no depender de módulos. */
+/* Mapa del Táchira: polígonos reales (geoBoundaries) y datos de cada municipio.
+   Va en línea para no depender de módulos. */
 (function () {
-    var MUNICIPIOS = [
-        { nombre: 'San Cristóbal', capital: 'San Cristóbal' },
-        { nombre: 'Cárdenas', capital: 'Táriba' },
-        { nombre: 'Torbes', capital: 'San Josecito' },
-        { nombre: 'Sucre', capital: 'Queniquea' },
-        { nombre: 'Bolívar', capital: 'San Antonio del Táchira' },
-        { nombre: 'Pedro María Ureña', capital: 'Ureña' },
-        { nombre: 'Junín', capital: 'Rubio' },
-        { nombre: 'Ayacucho', capital: 'Colón' },
-        { nombre: 'Michelena', capital: 'Michelena' },
-        { nombre: 'Lobatera', capital: 'Lobatera' },
-        { nombre: 'Córdoba', capital: 'Santa Ana' },
-        { nombre: 'Andrés Bello', capital: 'Cordero' },
-        { nombre: 'Antonio Rómulo Costa', capital: 'Las Mesas' },
-        { nombre: 'Fernández Feo', capital: 'San Rafael del Piñal' },
-        { nombre: 'Francisco de Miranda', capital: 'San José de Bolívar' },
-        { nombre: 'García de Hevia', capital: 'La Fría' },
-        { nombre: 'Guásimos', capital: 'Palmira' },
-        { nombre: 'Independencia', capital: 'Capacho Nuevo' },
-        { nombre: 'Jáuregui', capital: 'La Grita' },
-        { nombre: 'José María Vargas', capital: 'El Cobre' },
-        { nombre: 'Libertad', capital: 'Capacho Viejo' },
-        { nombre: 'Libertador', capital: 'Abejales' },
-        { nombre: 'Panamericano', capital: 'Coloncito' },
-        { nombre: 'Rafael Urdaneta', capital: 'Delicias' },
-        { nombre: 'Samuel Darío Maldonado', capital: 'La Tendida' },
-        { nombre: 'San Judas Tadeo', capital: 'San Judas Tadeo' },
-        { nombre: 'Seboruco', capital: 'Seboruco' },
-        { nombre: 'Simón Rodríguez', capital: 'San Simón' },
-        { nombre: 'Uribante', capital: 'Pregonero' }
-    ];
+    var W = 720, H = 780;
+    var LON_MIN = -72.56, LON_MAX = -71.25, LAT_MIN = 7.3, LAT_MAX = 8.7;
+    var COLORES_REGION = {
+        'Metropolitana': '#d9a441',
+        'Andina': '#2e7d6b',
+        'Norte': '#1f6feb',
+        'Frontera': '#c0392b',
+        'Llanos': '#8e6f2e'
+    };
 
     var modal = document.getElementById('mapa-tachira');
-    var contenedor = document.getElementById('mapa-municipios');
+    var svg = document.getElementById('mapa-svg');
+    var ficha = document.getElementById('mapa-ficha');
+    var lista = document.getElementById('mapa-municipios');
     var sub = document.getElementById('mapa-subtitulo');
     var pie = document.getElementById('mapa-pie');
+
+    var DATOS = [];
+    var GEO = {};
     var actual = '';
 
-    // Posiciones de los municipios sobre el mapa (calculadas desde su latitud/longitud).
-    var PUNTOS_MAPA = [{"nombre":"San Cristóbal","capital":"San Cristóbal","x":30,"y":59},{"nombre":"Cárdenas","capital":"Táriba","x":30,"y":56.5},{"nombre":"Torbes","capital":"San Josecito","x":24.5,"y":60},{"nombre":"Sucre","capital":"Queniquea","x":45.5,"y":55},{"nombre":"Bolívar","capital":"San Antonio del Táchira","x":10,"y":55},{"nombre":"Pedro María Ureña","capital":"Ureña","x":10,"y":51.5},{"nombre":"Junín","capital":"Rubio","x":18.2,"y":62.5},{"nombre":"Ayacucho","capital":"Colón","x":40.9,"y":46},{"nombre":"Michelena","capital":"Michelena","x":36.4,"y":50},{"nombre":"Lobatera","capital":"Lobatera","x":31.8,"y":51},{"nombre":"Córdoba","capital":"Santa Ana","x":24.5,"y":48.5},{"nombre":"Andrés Bello","capital":"Cordero","x":33.6,"y":42.5},{"nombre":"Antonio Rómulo Costa","capital":"Las Mesas","x":40.9,"y":45},{"nombre":"Fernández Feo","capital":"San Rafael del Piñal","x":54.5,"y":70},{"nombre":"Francisco de Miranda","capital":"San José de Bolívar","x":63.6,"y":52.5},{"nombre":"García de Hevia","capital":"La Fría","x":50,"y":36.5},{"nombre":"Guásimos","capital":"Palmira","x":27.3,"y":55},{"nombre":"Independencia","capital":"Capacho Nuevo","x":31.8,"y":57.5},{"nombre":"Jáuregui","capital":"La Grita","x":54.5,"y":45},{"nombre":"José María Vargas","capital":"El Cobre","x":45.5,"y":45},{"nombre":"Libertad","capital":"Capacho Viejo","x":36.4,"y":56},{"nombre":"Libertador","capital":"Abejales","x":81.8,"y":65},{"nombre":"Panamericano","capital":"Coloncito","x":72.7,"y":42.5},{"nombre":"Rafael Urdaneta","capital":"Delicias","x":45.5,"y":60},{"nombre":"Samuel Darío Maldonado","capital":"La Tendida","x":59.1,"y":55},{"nombre":"San Judas Tadeo","capital":"San Judas Tadeo","x":77.3,"y":61.5},{"nombre":"Seboruco","capital":"Seboruco","x":45.5,"y":50},{"nombre":"Simón Rodríguez","capital":"San Simón","x":68.2,"y":48.5},{"nombre":"Uribante","capital":"Pregonero","x":86.4,"y":50}];
+    var px = function (lon) { return ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * W; };
+    var py = function (lat) { return ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * H; };
 
-    if (sub) sub.textContent = MUNICIPIOS.length + ' municipios';
+    /** Cada municipio del GeoJSON a una trayectoria SVG. */
+    var trayectoria = function (nombre) {
+        var polys = GEO[nombre] || [];
+        var d = '';
+        polys.forEach(function (poly) {
+            (poly || []).forEach(function (anillo) {
+                if (!anillo || !anillo.length) return;
+                d += 'M' + anillo.map(function (p) { return px(p[0]).toFixed(1) + ',' + py(p[1]).toFixed(1); }).join('L') + 'Z';
+            });
+        });
+        return d;
+    };
 
-    var pintar = function () {
-        if (!contenedor) return;
-        contenedor.textContent = '';
-        MUNICIPIOS.forEach(function (m) {
+    var colorDe = function (m) {
+        var elegido = getComputedStyle(document.documentElement).getPropertyValue('--perfil-avatar-color').trim();
+        if (m.nombre === actual) return elegido || '#d9a441';
+        return COLORES_REGION[m.region] || '#7a7a7a';
+    };
+
+    var pintarMapa = function () {
+        if (!svg) return;
+        svg.textContent = '';
+        DATOS.forEach(function (m) {
+            var d = trayectoria(m.nombre);
+            if (!d) return;
+            var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('d', d);
+            p.setAttribute('class', 'mapa-poly' + (m.nombre === actual ? ' activo' : ''));
+            p.setAttribute('fill', colorDe(m));
+            p.setAttribute('fill-opacity', m.nombre === actual ? '1' : '0.18');
+            p.setAttribute('stroke', colorDe(m));
+            p.setAttribute('stroke-width', m.nombre === actual ? '2.4' : '0.9');
+            p.setAttribute('stroke-linejoin', 'round');
+            p.setAttribute('tabindex', '0');
+            p.setAttribute('role', 'button');
+            p.setAttribute('aria-label', m.nombre);
+            p.addEventListener('click', function () { seleccionar(m.nombre); });
+            svg.appendChild(p);
+        });
+        // Capitales: un punto por municipio y etiqueta solo en el activo.
+        DATOS.forEach(function (m) {
+            var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            c.setAttribute('cx', px(m.lon).toFixed(1));
+            c.setAttribute('cy', py(m.lat).toFixed(1));
+            c.setAttribute('r', m.nombre === actual ? '5' : '3');
+            c.setAttribute('fill', m.nombre === actual ? '#ffffff' : colorDe(m));
+            c.setAttribute('stroke', m.nombre === actual ? colorDe(m) : '#ffffff');
+            c.setAttribute('stroke-width', m.nombre === actual ? '2.5' : '1');
+            c.setAttribute('pointer-events', 'none');
+            svg.appendChild(c);
+        });
+        var activo = DATOS.find(function (m) { return m.nombre === actual; });
+        if (activo) {
+            var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            txt.setAttribute('x', px(activo.lon).toFixed(1));
+            txt.setAttribute('y', (py(activo.lat) - 12).toFixed(1));
+            txt.setAttribute('text-anchor', 'middle');
+            txt.setAttribute('class', 'mapa-etiqueta');
+            txt.textContent = activo.capital;
+            svg.appendChild(txt);
+        }
+    };
+
+    var pintarFicha = function () {
+        if (!ficha) return;
+        var m = DATOS.find(function (x) { return x.nombre === actual; });
+        if (!m) { ficha.hidden = true; return; }
+        var dens = m.area ? Math.round(m.poblacion / m.area) : 0;
+        ficha.hidden = false;
+        ficha.innerHTML = '<span class="mapa-ficha-region"></span>' +
+            '<span class="mapa-ficha-nombre"></span>' +
+            '<span class="mapa-ficha-capital"></span>' +
+            '<div class="mapa-ficha-datos">' +
+            '<span>Población<b></b></span><span>Superficie<b></b></span>' +
+            '<span>Densidad<b></b></span><span>Altitud<b></b></span>' +
+            '</div>' +
+            '<span class="mapa-ficha-economia"></span>';
+        ficha.querySelector('.mapa-ficha-region').textContent = m.region;
+        ficha.querySelector('.mapa-ficha-nombre').textContent = m.nombre;
+        ficha.querySelector('.mapa-ficha-capital').textContent = 'Capital: ' + m.capital;
+        var vals = ficha.querySelectorAll('.mapa-ficha-datos b');
+        vals[0].textContent = m.poblacion.toLocaleString('es-VE');
+        vals[1].textContent = m.area + ' km²';
+        vals[2].textContent = dens.toLocaleString('es-VE') + ' hab/km²';
+        vals[3].textContent = m.altitud + ' m';
+        ficha.querySelector('.mapa-ficha-economia').textContent = m.economia;
+    };
+
+    var pintarLista = function () {
+        if (!lista) return;
+        lista.textContent = '';
+        DATOS.slice().sort(function (a, b) { return b.poblacion - a.poblacion; }).forEach(function (m) {
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'mapa-municipio' + (m.nombre === actual ? ' activo' : '');
-            b.dataset.municipio = m.nombre;
             b.innerHTML = '<span class="mapa-municipio-nombre"></span><span class="mapa-municipio-capital"></span>';
             b.querySelector('.mapa-municipio-nombre').textContent = m.nombre;
             b.querySelector('.mapa-municipio-capital').textContent = m.capital;
-            b.addEventListener('click', function () {
-                actual = m.nombre;
-                pintar();
-                if (pie) pie.textContent = 'Seleccionaste ' + m.nombre + ' · ' + m.capital;
-            });
-            contenedor.appendChild(b);
-        });
-        pintarPuntos();
-    };
-
-    /** Pinta un punto por municipio encima de la imagen del mapa. */
-    var pintarPuntos = function () {
-        var caja = document.querySelector('.mapa-imagen-wrap');
-        if (!caja) return;
-        var viejos = caja.querySelectorAll('.mapa-punto');
-        viejos.forEach(function (v) { v.remove(); });
-        PUNTOS_MAPA.forEach(function (pt) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'mapa-punto' + (pt.nombre === actual ? ' activo' : '');
-            b.style.left = pt.x + '%';
-            b.style.top = pt.y + '%';
-            b.title = pt.nombre + ' · ' + pt.capital;
-            b.setAttribute('aria-label', pt.nombre);
-            b.addEventListener('click', function (ev) {
-                ev.stopPropagation();
-                actual = pt.nombre;
-                pintar();
-                if (pie) pie.textContent = 'Seleccionaste ' + pt.nombre + ' · ' + pt.capital;
-            });
-            caja.appendChild(b);
+            b.addEventListener('click', function () { seleccionar(m.nombre); });
+            lista.appendChild(b);
         });
     };
 
-    /** Sabe qué municipio está elegido en el perfil (por la capital guardada). */
-    var municipioDelPerfil = function () {
-        try {
-            var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
-            var ciudad = g.ciudad || '';
-            var hallado = MUNICIPIOS.find(function (m) { return m.capital === ciudad || m.nombre === ciudad; });
-            return hallado ? hallado.nombre : '';
-        } catch (e) { return ''; }
+    var seleccionar = function (nombre) {
+        actual = nombre;
+        pintarMapa();
+        pintarFicha();
+        pintarLista();
+        var m = DATOS.find(function (x) { return x.nombre === nombre; });
+        if (pie && m) pie.textContent = m.nombre + ' · ' + m.capital;
     };
 
     var abrir = function () {
         if (!modal) return;
-        actual = municipioDelPerfil();
-        pintar();
-        if (pie) pie.textContent = actual ? 'Tu municipio: ' + actual : 'Toca un municipio para verlo resaltado';
+        var guardado = '';
+        try {
+            var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
+            guardado = g.ciudad || '';
+        } catch (e) { guardado = ''; }
+        var hallado = DATOS.find(function (m) { return m.capital === guardado || m.nombre === guardado; });
+        actual = hallado ? hallado.nombre : '';
         modal.hidden = false;
         document.body.classList.add('con-mapa-abierto');
+        if (DATOS.length) { pintarMapa(); pintarFicha(); pintarLista(); }
     };
     var cerrar = function () {
         if (!modal) return;
@@ -1625,12 +1670,24 @@
         var obj = ev.target;
         if (!obj || !obj.closest) return;
         if (obj.closest('#mapa-cerrar')) { cerrar(); return; }
-        // La bandera del municipio (en el perfil público y en el desplegable del panel).
         if (obj.closest('#perfil-bandera, .perfil-bandera')) { ev.preventDefault(); abrir(); }
     });
-
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrar(); });
+
+    // Datos: polígonos + fichas.
+    Promise.all([
+        fetch('iconos/mapa/tachira-geo.json').then(function (r) { return r.json(); }),
+        fetch('iconos/mapa/tachira-datos.json').then(function (r) { return r.json(); })
+    ]).then(function (res) {
+        GEO = res[0] || {};
+        DATOS = res[1] || [];
+        if (sub) sub.textContent = DATOS.length + ' municipios';
+        if (!modal.hidden) { actual = actual || ''; pintarMapa(); pintarFicha(); pintarLista(); }
+    }).catch(function () {
+        if (pie) pie.textContent = 'No se pudo cargar el mapa';
+    });
 })();
 </script>
+
 </body>
 </html>
