@@ -4226,3 +4226,9 @@ body.con-mapa-abierto {
     color: var(--color-text);
     text-align: right;
 }
+
+.mapa-ficha-fuente {
+    font-size: 9px;
+    color: var(--color-gray-400, #bdbdbd);
+    line-height: 1.3;
+}

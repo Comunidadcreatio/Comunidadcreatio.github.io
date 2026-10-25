@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.848';
+        var currentVer = '1.0.849';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=16c0548d6f">
+    <link rel="stylesheet" href="css/style.css?v=c373c991b5">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1668,7 +1668,8 @@
             '<span>Población<b></b></span><span>Superficie<b></b></span>' +
             '<span>Densidad<b></b></span><span>Altitud<b></b></span>' +
             '</div>' +
-            '<span class="mapa-ficha-economia"></span>';
+            '<span class="mapa-ficha-economia"></span>' +
+            '<span class="mapa-ficha-fuente">Población: proyección INE 2025 (base Censo 2011)</span>';
         ficha.querySelector('.mapa-ficha-region').textContent = m.region;
         ficha.querySelector('.mapa-ficha-nombre').textContent = m.nombre;
         ficha.querySelector('.mapa-ficha-capital').textContent = 'Capital: ' + m.capital;
