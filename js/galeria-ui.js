@@ -6,7 +6,7 @@
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a015b2940b';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=30c1ba1be6';
 import { artistaActual, token, esArtista } from './auth.js?v=a90ece1c17';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=fa914f6544';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=e3f956d33d';
 import { confirmarDescartarCambios } from './panel-ui.js?v=cec7f5e2d9';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 import { debugLog } from './utils.js?v=7e1398d254';
@@ -1219,6 +1219,10 @@ export function togglePerfil() {
     if (perfilUsuario.classList.contains('hidden') || viendoPerfilExterno) {
         perfilUsuario.dataset.viewing = 'own';
         actualizarPerfilUI();
+        // Los iconos del header se ponen en modo perfil: campana y hamburguesa, sin
+        // lupa. Hace falta explícitamente porque saliente y entrante son la misma
+        // sección y el cambio de sección no llega a aplicarlos.
+        actualizarVisibilidadIconosHeader(perfilUsuario);
         const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
         window.actualizarEstadisticas?.();
@@ -1228,6 +1232,21 @@ export function togglePerfil() {
         // Ya visible el perfil propio: REFRESCAR los datos (mismo patrón que la
         // lupa), nunca ocultar la sección al re-presionar el icono.
         actualizarPerfilUI();
+        actualizarVisibilidadIconosHeader(perfilUsuario);
         if (window.actualizarEstadisticas) window.actualizarEstadisticas?.();
     }
 }
+
+// ============================================
+// AL MOSTRARSE UN PERFIL, ICONOS DEL HEADER EN MODO PERFIL
+// ============================================
+// perfil.js muestra su sección directamente (para entrar a un perfil desde el
+// buscador), sin pasar por el cambio de sección, así que el header se quedaba en
+// modo buscador: con la lupa y sin campana ni hamburguesa. Con este aviso se
+// reaplican los iconos como en cualquier otra sección.
+document.addEventListener('perfil:mostrado', () => {
+    const perfilUsuario = /** @type {HTMLElement | null} */ (document.getElementById('perfil-usuario'));
+    if (!perfilUsuario || perfilUsuario.classList.contains('hidden')) return;
+    actualizarVisibilidadIconosHeader(perfilUsuario);
+    actualizarEstadoNavButtons();
+});

@@ -600,6 +600,12 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             }
             if (actualizarEstadoNavFn) actualizarEstadoNavFn();
 
+            // Esta sección se muestra aquí directamente (sin pasar por el cambio de
+            // sección normal), así que hay que avisar para que el header se ponga en
+            // modo perfil: campana y hamburguesa visibles, y fuera la lupa del
+            // buscador. Sin esto, al entrar desde el buscador se quedaba su header.
+            document.dispatchEvent(new CustomEvent('perfil:mostrado'));
+
             // Poblar datos del perfil
             const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
             const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
