@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.842';
+        var currentVer = '1.0.843';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=ef270e492d">
+    <link rel="stylesheet" href="css/style.css?v=002ca5cdeb">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -369,8 +369,9 @@
         <section id="perfil-usuario" class="hidden" aria-labelledby="perfil-usuario-title" role="region">
             <div class="perfil-seccion cuenta-seccion">
                 <div class="perfil-seccion-layout">
-                    <button type="button" id="perfil-avatar-btn" class="perfil-avatar-btn" aria-label="Cambiar foto de perfil">
-                        <span class="perfil-avatar-overlay">+</span>
+                    <!-- El avatar NO cambia la foto al pulsarlo: eso se hace ahora desde
+                         el acordeón de «Mi perfil», así que aquí es solo la imagen. -->
+                    <button type="button" id="perfil-avatar-btn" class="perfil-avatar-btn" aria-label="Foto de perfil" disabled tabindex="-1">
                         <img id="perfil-avatar-seccion" class="perfil-avatar-img-seccion" src="iconos/avatar-default.svg" alt="Foto de perfil">
                         <span class="perfil-online-indicator offline" id="perfil-online-indicator" aria-label="Estado: en línea" style="display: none;"></span>
                     </button>
@@ -1265,7 +1266,7 @@
 
     <!-- JS PRINCIPAL (type="module") - notificaciones.js se importa desde main.js -->
     <script src="js/ciudades.js?v=1ea2f83166"></script>
-    <script src="js/main.js?v=a0a388395e" type="module"></script>
+    <script src="js/main.js?v=16437198e5" type="module"></script>
     <!-- Detector de actualizaciones compartido -->
     <script src="js/version-check.js?v=d1d0df99c0"></script>
     <!-- Registro PWA (service worker) — el ?v= lo actualiza bump-version.js -->

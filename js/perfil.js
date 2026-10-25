@@ -632,10 +632,8 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             pintarRedesPerfil(usuario.redes);
             aplicarVisibilidadHeader(usuario.visibilidad);
 
-            const avatarOverlay = /** @type {HTMLElement | null} */ (document.querySelector('.perfil-avatar-overlay'));
-            if (avatarOverlay) {
-                avatarOverlay.style.display = 'none';
-            }
+            // El avatar no es pulsable (la foto se cambia en «Mi perfil»), pero en
+            // una visita ajena tampoco debe insinuarlo.
             if (avatarBtn) {
                 avatarBtn.style.pointerEvents = 'none';
                 avatarBtn.style.cursor = 'default';
@@ -721,10 +719,8 @@ export function setupPerfilInteracciones(togglePerfilFn, cerrarTodosLosPanelesFn
     };
     btn.addEventListener('click', abrirPerfil);
 
-    // Clic en el avatar abre el selector de archivos
-    document.getElementById('perfil-avatar-btn')?.addEventListener('click', () => {
-        document.getElementById('input-foto-perfil')?.click();
-    });
+    // El avatar del perfil ya NO abre el selector de foto: la foto se cambia
+    // desde el acordeón de «Mi perfil». El botón queda desactivado en el HTML.
 
     // Los datos de MI perfil se refrescan en cuanto la sección se muestra, sin
     // depender de quién la abra: hay varios caminos (el icono lateral, la lupa,

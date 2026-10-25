@@ -3981,3 +3981,19 @@ body.con-mapa-abierto {
     background: var(--color-ink, #111);
     border-color: var(--perfil-avatar-color, #d9a441);
 }
+
+/* ==============================================
+   EL AVATAR DEL PERFIL ES SOLO IMAGEN
+   --------------------------------------------------------------
+   Antes se podía pulsar para cambiar la foto desde ahí. Ahora eso se hace en el
+   acordeón de «Mi perfil», así que aquí no debe responder al ratón ni insinuar
+   que se puede pulsar (sin lupa de zoom, sin "+" y sin escala al pasar).
+   ============================================== */
+#perfil-usuario .perfil-avatar-btn {
+    pointer-events: none;
+    cursor: default;
+}
+
+#perfil-usuario .perfil-avatar-btn:hover {
+    transform: none;
+}

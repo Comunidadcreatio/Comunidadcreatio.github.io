@@ -6,7 +6,7 @@
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a015b2940b';
 import { renderEtiquetasCarrusel, resetEtiquetas } from './etiquetas.js?v=30c1ba1be6';
 import { artistaActual, token, esArtista } from './auth.js?v=a90ece1c17';
-import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=4b0fa0749c';
+import { actualizarPerfilUI, verPerfilUsuario, actualizarEstadisticas, activarTabCavents } from './perfil.js?v=fa914f6544';
 import { confirmarDescartarCambios } from './panel-ui.js?v=cec7f5e2d9';
 import { cerrarOverlaysFlotantes } from './overlays.js?v=b94e8d4301';
 import { debugLog } from './utils.js?v=7e1398d254';
@@ -1201,10 +1201,6 @@ export function toggleMiCuenta() {
         if (emailInput && artistaActual) {
             emailInput.value = artistaActual.email || artistaActual.correo || '';
         }
-        const avatarBtn = /** @type {HTMLImageElement} */ (document.getElementById('perfil-avatar-btn'));
-        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { /** @type {HTMLElement} */ (avatarOverlay).style.display = 'flex'; }
         switchSection(encontrarSeccionActual(), miCuenta);
     } else {
         switchSection(miCuenta, paginaBlanca);
@@ -1225,10 +1221,6 @@ export function togglePerfil() {
         actualizarPerfilUI();
         const btnPerfilSidebar = /** @type {HTMLButtonElement} */ (document.getElementById('btn-perfil-sidebar'));
         if (btnPerfilSidebar) btnPerfilSidebar.setAttribute('aria-expanded', 'true');
-        const avatarBtn = /** @type {HTMLImageElement} */ (document.getElementById('perfil-avatar-btn'));
-        const avatarOverlay = document.querySelector('.perfil-avatar-overlay');
-        if (avatarBtn) { avatarBtn.style.pointerEvents = 'auto'; avatarBtn.style.cursor = 'pointer'; }
-        if (avatarOverlay) { /** @type {HTMLElement} */ (avatarOverlay).style.display = 'flex'; }
         window.actualizarEstadisticas?.();
         activarTabCavents();
         switchSection(encontrarSeccionActual(), perfilUsuario);
