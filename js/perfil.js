@@ -617,8 +617,20 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
                 nombreArtista.textContent = usuario.nombre_artista || '';
             }
             if (ciudad) {
-                ciudad.textContent = usuario.ciudad || '';
+                ciudad.textContent = usuario.ciudad ? escapeHtml(municipioDe(usuario.ciudad)) : '';
             }
+
+            // El resto de lo que cada artista configura en su «Mi perfil»: rol,
+            // bandera del municipio, biografía, redes y visibilidad. Antes solo se
+            // cambiaban nombre, ciudad y avatar, así que estos campos se quedaban
+            // con los de MI perfil (mi bio y mi bandera salían en todos).
+            const rol = usuario.rol || 'artista';
+            document.querySelectorAll('.perfil-rol')
+                .forEach((el) => { el.textContent = etiquetaRol(rol); });
+            pintarBanderaPerfil(usuario.ciudad || '');
+            pintarBioPerfil(usuario.bio);
+            pintarRedesPerfil(usuario.redes);
+            aplicarVisibilidadHeader(usuario.visibilidad);
 
             const avatarOverlay = /** @type {HTMLElement | null} */ (document.querySelector('.perfil-avatar-overlay'));
             if (avatarOverlay) {
