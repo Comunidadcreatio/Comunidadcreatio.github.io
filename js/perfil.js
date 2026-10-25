@@ -242,14 +242,42 @@ export function guardarFotoPerfil(dataUrl) {
 // ============================================
 // ACTUALIZAR UI DEL PERFIL
 // ============================================
-// Refresca los datos de MI perfil desde el servidor: el nombre, la foto y los
-// tres contadores (Cavents / Problogs / Comcons). Sin esto, la cabecera se
-// quedaba con lo que hubiera en memoria y salían los valores por defecto
-// («Artista» y la «A» del avatar), con los contadores a 0.
-//
-// Se piden a /api/artistas/perfil (que trae los contadores). Si esa respuesta
-// viniera sin nombre o sin foto, se completa con el perfil público por id, que
-// es el mismo que alimenta el feed y ya trae ambos.
+/**
+ * Pinta el avatar GRANDE del perfil (foto y borde de color) para un artista dado.
+ *
+ * Tiene que fijar `srcset` además de `src`: el navegador da prioridad al `srcset`,
+ * así que si solo se cambia `src`, el avatar se queda con las imágenes del
+ * artista anterior. Ese era el fallo de abrir el perfil de otro y ver el tuyo.
+ * @param {string | null | undefined} foto
+ * @param {string | null | undefined} color
+ */
+function pintarAvatarPerfil(foto, color) {
+    const img = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
+    if (!img) return;
+    const src = foto || AVATAR_DEFAULT;
+    img.src = src;
+    img.sizes = '104px';
+    img.srcset = srcsetCloudinary(src, [104, 208, 312]);
+    if (color) {
+        img.style.setProperty('--perfil-avatar-color', color);
+        img.style.borderColor = color;
+    } else {
+        // Sin color propio: se quita el que hubiera para que valga el del CSS.
+        img.style.removeProperty('--perfil-avatar-color');
+        img.style.borderColor = '';
+    }
+}
+
+/**
+ * Refresca los datos de MI perfil desde el servidor: el nombre, la foto y los
+ * tres contadores (Cavents / Problogs / Comcons). Sin esto, la cabecera se
+ * quedaba con lo que hubiera en memoria y salían los valores por defecto
+ * («Artista» y la «A» del avatar), con los contadores a 0.
+ *
+ * Se piden a /api/artistas/perfil (que trae los contadores). Si esa respuesta
+ * viniera sin nombre o sin foto, se completa con el perfil público por id, que
+ * es el mismo que alimenta el feed y ya trae ambos.
+ */
 async function refrescarDatosPropios() {
     /** @type {Artista | null} */
 let datos = null;
@@ -284,8 +312,7 @@ let datos = null;
     // 208-312 px reales -> se veia pixelado. Cada uno con su `sizes` y sus anchos. (2026-10-18)
     const mini = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-mini'));
     if (mini) { mini.src = src; mini.sizes = '48px'; mini.srcset = srcsetCloudinary(src, [48, 96, 144]); }
-    const grande = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
-    if (grande) { grande.src = src; grande.sizes = '104px'; grande.srcset = srcsetCloudinary(src, [104, 208, 312]); }
+    pintarAvatarPerfil(datos.foto_perfil, datos.color_avatar);
     document.querySelectorAll('.perfil-avatar-img')
         .forEach((img) => { const el = /** @type {HTMLImageElement} */ (img); el.src = src; el.sizes = '48px'; el.srcset = srcsetCloudinary(src, [48, 96, 144]); });
     document.querySelectorAll('.perfil-avatar-img-seccion')
@@ -328,8 +355,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         // Mismo reparto que arriba: el mini a 48 y el grande (104 px CSS) con anchos mayores.
         const mini = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-mini'));
         if (mini) { mini.src = src; mini.sizes = '48px'; mini.srcset = srcsetCloudinary(src, [48, 96, 144]); }
-        const grande = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
-        if (grande) { grande.src = src; grande.sizes = '104px'; grande.srcset = srcsetCloudinary(src, [104, 208, 312]); }
+        pintarAvatarPerfil(src, artistaActual && artistaActual.color_avatar);
         const preview = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-preview'));
         if (preview) preview.src = src;
         const nombreArtista = (artistaActual && artistaActual.nombre_artista) || 'Artista';
@@ -575,15 +601,15 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
             if (actualizarEstadoNavFn) actualizarEstadoNavFn();
 
             // Poblar datos del perfil
-            const avatarImg = /** @type {HTMLImageElement | null} */ (document.getElementById('perfil-avatar-seccion'));
             const nombreReal = document.querySelector('.perfil-nombre-real-seccion');
             const nombreArtista = document.querySelector('.perfil-nombre-artista-seccion');
             const ciudad = document.querySelector('.perfil-ciudad');
             const avatarBtn = document.getElementById('perfil-avatar-btn');
 
-            if (avatarImg) {
-                avatarImg.src = usuario.foto_perfil || 'iconos/avatar-default.svg';
-            }
+            // Foto y borde de color de ESE artista. Se usa el helper porque hay que
+            // fijar también el `srcset`: si solo se cambia el `src`, el navegador
+            // sigue usando las imágenes del anterior y se veía el avatar propio.
+            pintarAvatarPerfil(usuario.foto_perfil, usuario.color_avatar);
             if (nombreReal) {
                 nombreReal.textContent = usuario.nombre_real || '';
             }
