@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.847';
+        var currentVer = '1.0.848';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=3859f78200">
+    <link rel="stylesheet" href="css/style.css?v=16c0548d6f">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1505,6 +1505,12 @@
         <div class="mapa-svg-wrap">
             <svg class="mapa-svg" id="mapa-svg" viewBox="0 0 720 780" role="img" aria-label="Mapa del estado Táchira con sus municipios"></svg>
         </div>
+        <div class="mapa-leyenda" id="mapa-leyenda"></div>
+        <div class="mapa-barra" id="mapa-barra" hidden>
+            <span class="mapa-barra-titulo">Peso poblacional en el estado</span>
+            <div class="mapa-barra-pista"><div class="mapa-barra-relleno" id="mapa-barra-relleno"></div></div>
+            <span class="mapa-barra-valor" id="mapa-barra-valor"></span>
+        </div>
         <div class="mapa-ficha" id="mapa-ficha" hidden></div>
     </div>
     <p class="mapa-pie" id="mapa-pie">Toca un municipio en el mapa</p>
@@ -1616,6 +1622,39 @@
         }
     };
 
+    var leyenda = document.getElementById('mapa-leyenda');
+    var barra = document.getElementById('mapa-barra');
+    var barraRelleno = document.getElementById('mapa-barra-relleno');
+    var barraValor = document.getElementById('mapa-barra-valor');
+
+    var totalPoblacion = 0;
+
+    /** Leyenda de regiones (modo región) o barra de peso poblacional (modo densidad). */
+    var pintarLeyendaYBarra = function () {
+        if (leyenda) {
+            leyenda.textContent = '';
+            if (modo === 'region') {
+                Object.keys(COLORES_REGION).forEach(function (nombre) {
+                    var d = document.createElement('span');
+                    d.className = 'mapa-leyenda-item';
+                    d.innerHTML = '<i></i><span></span>';
+                    d.querySelector('i').style.background = COLORES_REGION[nombre];
+                    d.querySelector('span').textContent = nombre;
+                    leyenda.appendChild(d);
+                });
+            }
+        }
+        if (barra) {
+            barra.hidden = modo !== 'densidad';
+            if (modo === 'densidad') {
+                var m = DATOS.find(function (x) { return x.nombre === actual; });
+                var pct = (m && totalPoblacion) ? (m.poblacion / totalPoblacion) * 100 : 0;
+                if (barraRelleno) barraRelleno.style.width = Math.max(2, Math.round(pct * 10) / 10) + '%';
+                if (barraValor) barraValor.textContent = pct ? pct.toFixed(1).replace('.', ',') + '%' : '—';
+            }
+        }
+    };
+
     var pintarFicha = function () {
         if (!ficha) return;
         var m = DATOS.find(function (x) { return x.nombre === actual; });
@@ -1661,6 +1700,7 @@
         pintarMapa();
         pintarFicha();
         pintarLista();
+        pintarLeyendaYBarra();
         var m = DATOS.find(function (x) { return x.nombre === nombre; });
         if (pie && m) pie.textContent = m.nombre + ' · ' + m.capital;
     };
@@ -1701,11 +1741,14 @@
         DATOS = res[1] || [];
         if (sub) sub.textContent = DATOS.length + ' municipios';
         maxDens = Math.max.apply(null, DATOS.map(function (m) { return m.area ? m.poblacion / m.area : 1; })) || 1;
+        totalPoblacion = DATOS.reduce(function (a, m) { return a + (m.poblacion || 0); }, 0);
+        pintarLeyendaYBarra();
         document.querySelectorAll('.mapa-modo').forEach(function (b) {
             b.addEventListener('click', function () {
                 modo = b.dataset.modo === 'densidad' ? 'densidad' : 'region';
                 document.querySelectorAll('.mapa-modo').forEach(function (o) { o.classList.toggle('activo', o === b); });
                 pintarMapa();
+                pintarLeyendaYBarra();
             });
         });
         if (!modal.hidden) { actual = actual || ''; pintarMapa(); pintarFicha(); pintarLista(); }

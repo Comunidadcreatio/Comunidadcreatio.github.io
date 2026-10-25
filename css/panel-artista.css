@@ -4154,3 +4154,75 @@ body.con-mapa-abierto {
 [data-theme="dark"] .mapa-modo.activo {
     color: #111;
 }
+
+/* ==============================================
+   LEYENDA Y BARRA DEL MAPA (2026-10-25)
+   Por región: leyenda con el color de cada región. Por densidad: barra del peso poblacional.
+   ============================================== */
+.mapa-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin: 0 0 14px;
+}
+
+.mapa-leyenda:empty {
+    display: none;
+}
+
+.mapa-leyenda-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.mapa-leyenda-item i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.mapa-barra {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 0 14px;
+}
+
+.mapa-barra[hidden] {
+    display: none;
+}
+
+.mapa-barra-titulo {
+    font-size: 10px;
+    font-weight: 700;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.mapa-barra-pista {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-gray-200, #ebebeb);
+    overflow: hidden;
+}
+
+.mapa-barra-relleno {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--perfil-avatar-color, #d9a441);
+    transition: width 0.25s ease;
+}
+
+.mapa-barra-valor {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: right;
+}
