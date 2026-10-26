@@ -4232,3 +4232,58 @@ body.con-mapa-abierto {
     color: var(--color-gray-400, #bdbdbd);
     line-height: 1.3;
 }
+
+/* ==============================================
+   MUNICIPIO EN LA ESQUINA Y ROL CENTRADO (2026-10-25)
+   El municipio (bandera + nombre) va a la esquina superior izquierda del perfil público, sin el
+   «de». El rol se queda en su línea, centrado y en negrita.
+   ============================================== */
+.perfil-seccion.cuenta-seccion {
+    position: relative;
+}
+
+.perfil-municipio-esquina {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text);
+    z-index: 3;
+}
+
+.perfil-municipio-esquina .perfil-bandera {
+    display: inline-flex;
+    align-items: center;
+}
+
+.perfil-municipio-esquina .perfil-bandera img {
+    width: 18px;
+    height: 13px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+}
+
+.perfil-municipio-esquina .perfil-ciudad-esquina {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.perfil-municipio-esquina .perfil-ciudad-esquina::before {
+    content: none;
+}
+
+/* El rol, centrado y en negrita. */
+.perfil-rol-linea {
+    justify-content: center;
+    width: 100%;
+}
+
+.perfil-rol-linea .perfil-rol {
+    font-weight: 700;
+}

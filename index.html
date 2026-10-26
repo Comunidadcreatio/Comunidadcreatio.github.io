@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.849';
+        var currentVer = '1.0.850';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=c373c991b5">
+    <link rel="stylesheet" href="css/style.css?v=fe31aa9e7b">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -368,6 +368,10 @@
         <!-- SECCIÓN PRIVADA: PERFIL DE USUARIO -->
         <section id="perfil-usuario" class="hidden" aria-labelledby="perfil-usuario-title" role="region">
             <div class="perfil-seccion cuenta-seccion">
+                            <span class="perfil-municipio-esquina">
+                                <span class="perfil-bandera perfil-bandera-esquina" hidden><img id="perfil-bandera-img" alt="" src=""></span>
+                                <span class="perfil-ciudad perfil-ciudad-esquina"></span>
+                            </span>
                 <div class="perfil-seccion-layout">
                     <!-- El avatar NO cambia la foto al pulsarlo: eso se hace ahora desde
                          el acordeón de «Mi perfil», así que aquí es solo la imagen. -->
@@ -382,8 +386,7 @@
                             <span class="perfil-nombre-artista perfil-nombre-artista-seccion"></span>
                             <span class="perfil-nombre-real perfil-nombre-real-seccion"></span>
                             <span class="perfil-rol-linea">
-                                <span class="perfil-rol"></span><span class="perfil-de">de</span><span class="perfil-ciudad"></span>
-                                <span class="perfil-bandera" hidden><img id="perfil-bandera-img" alt="" src=""></span>
+                                <span class="perfil-rol"></span>
                             </span>
                             <p class="perfil-bio" id="perfil-bio"></p>
                             <div class="perfil-redes" id="perfil-redes"></div>
