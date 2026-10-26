@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.850';
+        var currentVer = '1.0.851';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=fe31aa9e7b">
+    <link rel="stylesheet" href="css/style.css?v=018972816c">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -370,6 +370,7 @@
             <div class="perfil-seccion cuenta-seccion">
                             <span class="perfil-municipio-esquina">
                                 <span class="perfil-bandera perfil-bandera-esquina" hidden><img id="perfil-bandera-img" alt="" src=""></span>
+                                <svg class="perfil-pin-esquina" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 <span class="perfil-ciudad perfil-ciudad-esquina"></span>
                             </span>
                 <div class="perfil-seccion-layout">

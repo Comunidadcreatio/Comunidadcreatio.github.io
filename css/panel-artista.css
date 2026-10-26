@@ -4287,3 +4287,25 @@ body.con-mapa-abierto {
 .perfil-rol-linea .perfil-rol {
     font-weight: 700;
 }
+
+/* ==============================================
+   MUNICIPIO PEGADO A LA IZQUIERDA, BANDERA MÁS GRANDE Y PIN (2026-10-25)
+   ============================================== */
+.perfil-municipio-esquina {
+    left: 8px;
+    justify-content: flex-start;
+    gap: 7px;
+}
+
+.perfil-municipio-esquina .perfil-bandera img {
+    width: 24px;
+    height: 17px;
+    border-radius: 3px;
+}
+
+.perfil-pin-esquina {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    color: var(--color-text);
+}
