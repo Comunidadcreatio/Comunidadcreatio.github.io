@@ -4309,3 +4309,34 @@ body.con-mapa-abierto {
     flex: 0 0 14px;
     color: var(--color-text);
 }
+
+/* ==============================================
+   NOMBRE A LA IZQUIERDA Y BANDERA A LA DERECHA (2026-10-25)
+   La fila ocupa todo el ancho: pin + nombre pegados al borde izquierdo y la bandera al derecho.
+   ============================================== */
+.perfil-municipio-esquina {
+    left: 0;
+    right: 0;
+    padding: 0;
+    gap: 0;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.perfil-municipio-texto {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.perfil-municipio-esquina .perfil-ciudad-esquina {
+    font-weight: 400;
+}
+
+.perfil-municipio-esquina .perfil-pin-esquina {
+    margin: 0;
+}
+
+.perfil-municipio-esquina .perfil-bandera-esquina {
+    margin: 0;
+}
