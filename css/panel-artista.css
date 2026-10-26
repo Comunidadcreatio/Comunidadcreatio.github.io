@@ -4340,3 +4340,13 @@ body.con-mapa-abierto {
 .perfil-municipio-esquina .perfil-bandera-esquina {
     margin: 0;
 }
+
+/* ==============================================
+   HASTA LOS EXTREMOS DE LA PANTALLA (2026-10-25)
+   La sección del perfil está metida ~48 px a cada lado, así que la fila del municipio se saca
+   hasta el borde real de la pantalla con 50% - 50vw.
+   ============================================== */
+.perfil-municipio-esquina {
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+}
