@@ -4356,3 +4356,9 @@ body.con-mapa-abierto {
     left: calc(50% - 50vw + 3px);
     right: calc(50% - 50vw + 3px);
 }
+
+/* 7px de aire a los lados (3 anteriores + 4 más). */
+.perfil-municipio-esquina {
+    left: calc(50% - 50vw + 7px);
+    right: calc(50% - 50vw + 7px);
+}
