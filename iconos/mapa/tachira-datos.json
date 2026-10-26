@@ -47,13 +47,13 @@
 "lat": 7.85,
 "lon": -72.245,
 "poblacion": 50173,
-"area": 32.0,
+"area": 38.0,
 "altitud": 1030,
 "region": "Metropolitana",
 "economia": "Café, servicios",
 "poblacion_anio": 2025,
 "poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
-"area_fuente": "IGVSB (vía Wikipedia)"
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Andrés Bello",
@@ -271,13 +271,13 @@
 "lat": 8.174,
 "lon": -72.163,
 "poblacion": 11707,
-"area": 145.0,
+"area": 130.0,
 "altitud": 1100,
 "region": "Andina",
 "economia": "Café, ganadería",
 "poblacion_anio": 2025,
 "poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
-"area_fuente": "IGVSB (vía Wikipedia)"
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Simón Rodríguez",
