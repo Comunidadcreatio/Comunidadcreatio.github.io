@@ -1669,13 +1669,13 @@
             '<span>Densidad<b></b></span><span>Altitud<b></b></span>' +
             '</div>' +
             '<span class="mapa-ficha-economia"></span>' +
-            '<span class="mapa-ficha-fuente">Población: proyección INE 2025 (base Censo 2011)</span>';
+            '<span class="mapa-ficha-fuente">Población: proyección INE 2025 · Superficie: IGVSB / geometría del mapa</span>';
         ficha.querySelector('.mapa-ficha-region').textContent = m.region;
         ficha.querySelector('.mapa-ficha-nombre').textContent = m.nombre;
         ficha.querySelector('.mapa-ficha-capital').textContent = 'Capital: ' + m.capital;
         var vals = ficha.querySelectorAll('.mapa-ficha-datos b');
         vals[0].textContent = m.poblacion.toLocaleString('es-VE');
-        vals[1].textContent = m.area + ' km²';
+        vals[1].textContent = Math.round(m.area) + ' km²';
         vals[2].textContent = dens.toLocaleString('es-VE') + ' hab/km²';
         vals[3].textContent = m.altitud + ' m';
         ficha.querySelector('.mapa-ficha-economia').textContent = m.economia;

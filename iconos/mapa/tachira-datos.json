@@ -5,12 +5,13 @@
 "lat": 7.77,
 "lon": -72.22,
 "poblacion": 297045,
-"area": 236,
+"area": 251.9,
 "altitud": 825,
 "region": "Metropolitana",
 "economia": "Comercio, servicios, educación",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Cárdenas",
@@ -18,12 +19,13 @@
 "lat": 7.82,
 "lon": -72.215,
 "poblacion": 144381,
-"area": 211,
+"area": 267.0,
 "altitud": 900,
 "region": "Metropolitana",
 "economia": "Comercio, turismo religioso",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Torbes",
@@ -31,12 +33,13 @@
 "lat": 7.656,
 "lon": -72.164,
 "poblacion": 56605,
-"area": 75,
+"area": 123.7,
 "altitud": 1000,
 "region": "Metropolitana",
 "economia": "Agricultura, servicios",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Guásimos",
@@ -44,12 +47,13 @@
 "lat": 7.85,
 "lon": -72.245,
 "poblacion": 50173,
-"area": 95,
+"area": 38.0,
 "altitud": 1030,
 "region": "Metropolitana",
 "economia": "Café, servicios",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Andrés Bello",
@@ -57,12 +61,13 @@
 "lat": 7.88,
 "lon": -72.18,
 "poblacion": 22566,
-"area": 106,
+"area": 102.0,
 "altitud": 1450,
 "region": "Andina",
 "economia": "Hortalizas, floricultura",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Independencia",
@@ -70,12 +75,13 @@
 "lat": 7.81,
 "lon": -72.31,
 "poblacion": 41891,
-"area": 79,
+"area": 67.0,
 "altitud": 1300,
 "region": "Frontera",
 "economia": "Agricultura, comercio",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Libertad",
@@ -83,12 +89,13 @@
 "lat": 7.855,
 "lon": -72.335,
 "poblacion": 30507,
-"area": 64,
+"area": 142.0,
 "altitud": 1260,
 "region": "Frontera",
 "economia": "Café, caña de azúcar",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Bolívar",
@@ -96,12 +103,13 @@
 "lat": 7.81,
 "lon": -72.44,
 "poblacion": 68112,
-"area": 179,
+"area": 198.0,
 "altitud": 400,
 "region": "Frontera",
 "economia": "Comercio fronterizo, aduana",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Pedro María Ureña",
@@ -109,12 +117,13 @@
 "lat": 7.92,
 "lon": -72.45,
 "poblacion": 58507,
-"area": 165,
+"area": 184.0,
 "altitud": 340,
 "region": "Frontera",
 "economia": "Industria, comercio binacional",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Junín",
@@ -122,12 +131,13 @@
 "lat": 7.7,
 "lon": -72.36,
 "poblacion": 95391,
-"area": 347,
+"area": 326.0,
 "altitud": 830,
 "region": "Andina",
 "economia": "Café, comercio",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Córdoba",
@@ -135,12 +145,13 @@
 "lat": 7.64,
 "lon": -72.27,
 "poblacion": 36546,
-"area": 276,
+"area": 618.0,
 "altitud": 1100,
 "region": "Andina",
 "economia": "Café, ganadería",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Rafael Urdaneta",
@@ -148,12 +159,13 @@
 "lat": 7.57,
 "lon": -72.45,
 "poblacion": 6448,
-"area": 330,
+"area": 201.9,
 "altitud": 1300,
 "region": "Frontera",
 "economia": "Café, papa",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Fernández Feo",
@@ -161,12 +173,13 @@
 "lat": 7.5,
 "lon": -72,
 "poblacion": 50751,
-"area": 2147,
+"area": 1131.0,
 "altitud": 300,
 "region": "Llanos",
 "economia": "Ganadería, cacao, plátano",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Libertador",
@@ -174,12 +187,13 @@
 "lat": 7.611,
 "lon": -71.581,
 "poblacion": 24561,
-"area": 1430,
+"area": 1206.7,
 "altitud": 600,
 "region": "Llanos",
 "economia": "Ganadería, agricultura",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Uribante",
@@ -187,12 +201,13 @@
 "lat": 8,
 "lon": -71.77,
 "poblacion": 22316,
-"area": 1138,
+"area": 1593.9,
 "altitud": 1340,
 "region": "Andina",
 "economia": "Hidroelectricidad, papa, turismo",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Francisco de Miranda",
@@ -200,12 +215,13 @@
 "lat": 7.92,
 "lon": -71.96,
 "poblacion": 4517,
-"area": 207,
+"area": 280.0,
 "altitud": 1900,
 "region": "Andina",
 "economia": "Hortalizas, truchas",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Sucre",
@@ -213,12 +229,13 @@
 "lat": 7.92,
 "lon": -72.04,
 "poblacion": 8187,
-"area": 300,
+"area": 414.5,
 "altitud": 1950,
 "region": "Andina",
 "economia": "Agricultura de altura",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "José María Vargas",
@@ -226,12 +243,13 @@
 "lat": 8.03,
 "lon": -72.05,
 "poblacion": 11205,
-"area": 304,
+"area": 201.7,
 "altitud": 2200,
 "region": "Andina",
 "economia": "Papa, ajo, fresas",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Jáuregui",
@@ -239,12 +257,13 @@
 "lat": 8.13,
 "lon": -71.98,
 "poblacion": 46690,
-"area": 363,
+"area": 480.0,
 "altitud": 1450,
 "region": "Andina",
 "economia": "Hortalizas, turismo religioso",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Antonio Rómulo Costa",
@@ -252,12 +271,13 @@
 "lat": 8.174,
 "lon": -72.163,
 "poblacion": 11707,
-"area": 130,
+"area": 130.0,
 "altitud": 1100,
 "region": "Andina",
 "economia": "Café, ganadería",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Simón Rodríguez",
@@ -265,12 +285,13 @@
 "lat": 8.315,
 "lon": -71.864,
 "poblacion": 2744,
-"area": 215,
+"area": 66.3,
 "altitud": 2000,
 "region": "Andina",
 "economia": "Agricultura de páramo",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Seboruco",
@@ -278,12 +299,13 @@
 "lat": 8.15,
 "lon": -72.07,
 "poblacion": 11472,
-"area": 120,
+"area": 149.7,
 "altitud": 900,
 "region": "Andina",
 "economia": "Café, caña",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "San Judas Tadeo",
@@ -291,12 +313,13 @@
 "lat": 8.256,
 "lon": -72.043,
 "poblacion": 8201,
-"area": 133,
+"area": 261.0,
 "altitud": 650,
 "region": "Norte",
 "economia": "Café, cacao",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Michelena",
@@ -304,12 +327,13 @@
 "lat": 7.95,
 "lon": -72.24,
 "poblacion": 21278,
-"area": 130,
+"area": 144.8,
 "altitud": 1150,
 "region": "Andina",
 "economia": "Café, hortalizas",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Lobatera",
@@ -317,12 +341,13 @@
 "lat": 7.93,
 "lon": -72.3,
 "poblacion": 14400,
-"area": 213,
+"area": 221.2,
 "altitud": 900,
 "region": "Andina",
 "economia": "Ganadería, café",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Ayacucho",
@@ -330,12 +355,13 @@
 "lat": 8.03,
 "lon": -72.26,
 "poblacion": 64465,
-"area": 525,
+"area": 507.0,
 "altitud": 800,
 "region": "Norte",
 "economia": "Agricultura, comercio",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "García de Hevia",
@@ -343,12 +369,13 @@
 "lat": 8.22,
 "lon": -72.25,
 "poblacion": 54628,
-"area": 728,
+"area": 911.0,
 "altitud": 120,
 "region": "Norte",
 "economia": "Ganadería lechera, aeropuerto",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "IGVSB"
 },
 {
 "nombre": "Panamericano",
@@ -356,12 +383,13 @@
 "lat": 8.33,
 "lon": -72.08,
 "poblacion": 35229,
-"area": 517,
+"area": 327.9,
 "altitud": 100,
 "region": "Norte",
 "economia": "Ganadería, plátano",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 },
 {
 "nombre": "Samuel Darío Maldonado",
@@ -369,11 +397,12 @@
 "lat": 8.45,
 "lon": -71.93,
 "poblacion": 20703,
-"area": 545,
+"area": 553.7,
 "altitud": 80,
 "region": "Norte",
 "economia": "Ganadería, palma",
 "poblacion_anio": 2025,
-"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)"
+"poblacion_fuente": "Proyección INE 2025 (base Censo 2011)",
+"area_fuente": "calculada sobre la geometría"
 }
 ]
