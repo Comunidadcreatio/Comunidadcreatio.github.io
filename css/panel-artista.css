@@ -4375,3 +4375,10 @@ body.con-mapa-abierto {
 .perfil-rol-linea .perfil-rol {
     font-weight: 400;
 }
+
+/* Bandera del municipio bastante más grande. */
+.perfil-municipio-esquina .perfil-bandera img {
+    width: 34px;
+    height: 24px;
+    border-radius: 3px;
+}
