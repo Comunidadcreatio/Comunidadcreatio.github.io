@@ -4362,3 +4362,16 @@ body.con-mapa-abierto {
     left: calc(50% - 50vw + 7px);
     right: calc(50% - 50vw + 7px);
 }
+
+/* ==============================================
+   BANDERA MÁS GRANDE Y ROL REGULAR (2026-10-27)
+   ============================================== */
+.perfil-municipio-esquina .perfil-bandera img {
+    width: 28px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.perfil-rol-linea .perfil-rol {
+    font-weight: 400;
+}
