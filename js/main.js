@@ -29,13 +29,13 @@ import {
     actualizarPerfilUI, subirFotoPerfilServidor, guardarFotoPerfil,
     refrescarPerfilDesdeServidor, mostrarResultadosBusqueda,
     verPerfilUsuario, setupPerfilInteracciones
-} from './perfil.js?v=e3f956d33d';
+} from './perfil.js?v=ae0aefa37c';
 import {
     mostrarPaginaBlanca, actualizarEstadoNavButtons,
     toggleGaleria, togglePanel, toggleMiCuenta, togglePerfil, toggleExplorar,
     mostrarExplorar, showPanelSubView, toggleProblogs,
     abrirMiCuentaDesdeIcono, abrirCrearDesdeIcono, volverDesdeIcono, cambiarSeccion
-} from './galeria-ui.js?v=56c53a2da1';
+} from './galeria-ui.js?v=ce57f35966';
 import {
     setupFormChangeTracking,
     setupImagePreviews, limpiarFormularioCompleto,
@@ -43,8 +43,8 @@ import {
     limpiarFormularioConConfirmacion
 } from './panel-ui.js?v=cec7f5e2d9';
 import { cargarGaleria, mostrarGaleria } from './galeria.js?v=a015b2940b';
-import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=57bc900263';
-import { setupChat, refrescarChatNoLeidos } from './chat.js?v=da6006f37d';
+import { setupProblogs, abrirProblogDesdeNotificacion, volverDesdeLectura } from './problogs.js?v=0d1eaded63';
+import { setupChat, refrescarChatNoLeidos } from './chat.js?v=e0f70d7155';
 import { setupPush } from './push.js?v=f0e42363e2';
 // cuenta.js se carga lazy (13 KB) — solo cuando el usuario abre Mi Cuenta
 // busqueda.js se carga lazy (6 KB) — solo cuando el usuario usa el buscador
@@ -181,7 +181,7 @@ async function cargarNotificaciones() {
                 if (obraId) {
                     /** @type {HTMLElement} */ (document.getElementById('notif-dropdown')).classList.add('hidden');
                     // Mostrar galería
-                    const galeriaUI = await import('./galeria-ui.js?v=56c53a2da1');
+                    const galeriaUI = await import('./galeria-ui.js?v=ce57f35966');
                     const galeriaContainer = document.getElementById('galeria-container');
                     if (galeriaContainer) {
                         await galeriaUI.toggleGaleria(galeriaContainer);
@@ -320,7 +320,7 @@ function setupEvents() {
 
     // ----- Buscador de usuarios en tiempo real (lazy: 6 KB) -----
     // La lupa (nav) abre el buscador debajo del header y muestra Explorar.
-    import('./busqueda.js?v=0a38fb041f').then(m => {
+    import('./busqueda.js?v=b115460d40').then(m => {
         m.setupBuscador(
             (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons),
             (usuarios) => mostrarResultadosBusqueda(usuarios, (userId) => verPerfilUsuario(userId, verificarActividadLocal, actualizarEstadoNavButtons)),
@@ -447,7 +447,7 @@ function setupEvents() {
             gc.classList.remove('modo-grid');
             cargarGaleria(gc).then(obras => {
                 mostrarGaleria(obras, gc, null, (artistaId) => {
-                    import('./galeria-ui.js?v=56c53a2da1').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
+                    import('./galeria-ui.js?v=ce57f35966').then(m => m.verPerfilArtistaDesdeGaleria(artistaId));
                 });
                 setTimeout(() => {
                     const target = gc.querySelector(`.obra-card[data-obra-id="${obraId}"]`);
@@ -528,7 +528,7 @@ function setupEvents() {
     }
 
     // ----- Mi Cuenta (lazy: 13 KB) -----
-    import('./cuenta.js?v=797c90a579').then(m => m.setupMiCuenta());
+    import('./cuenta.js?v=12350c506a').then(m => m.setupMiCuenta());
 
     // ----- Cerrar modales -----
     document.querySelectorAll('.cerrar-modal').forEach(btn => {
@@ -637,7 +637,7 @@ init();
     if (!obraDeep) return;
     const abrir = async () => {
         try {
-            const galeriaUI = await import('./galeria-ui.js?v=56c53a2da1');
+            const galeriaUI = await import('./galeria-ui.js?v=ce57f35966');
             const galeriaContainer = document.getElementById('galeria-container');
             if (galeriaContainer) await galeriaUI.toggleGaleria(galeriaContainer);
             const intentarScroll = (intentos = 0) => {

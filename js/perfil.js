@@ -99,7 +99,7 @@ function enlaceDeRed(clave, valor) {
  * Pinta los iconos de las redes que el usuario haya rellenado, debajo de la biografía.
  * @param {any} redes  objeto o texto JSON con {instagram, x, whatsapp, correo, web}
  */
-function pintarRedesPerfil(redes) {
+function pintarRedesPerfil(redes, formato) {
     const caja = /** @type {HTMLElement | null} */ (document.getElementById('perfil-redes'));
     if (!caja) return;
     let datos = redes;
@@ -120,13 +120,25 @@ function pintarRedesPerfil(redes) {
         const url = enlaceDeRed(clave, valor);
         if (!url) continue;
         const a = document.createElement('a');
-        a.className = 'perfil-red';
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.setAttribute('aria-label', ETIQUETAS_RED[clave]);
-        a.title = ETIQUETAS_RED[clave];
-        a.innerHTML = ICONOS_RED[clave] || '';
+        if (formato === 'etiquetas') {
+            // Etiqueta: nombre de la red y el dato, para poder copiarlo.
+            a.className = 'perfil-red-etiqueta';
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.setAttribute('aria-label', ETIQUETAS_RED[clave] + ': ' + valor);
+            a.innerHTML = '<span class="perfil-red-etiqueta-nombre"></span><span class="perfil-red-etiqueta-valor"></span>';
+            /** @type {HTMLElement} */ (a.querySelector('.perfil-red-etiqueta-nombre')).textContent = ETIQUETAS_RED[clave];
+            /** @type {HTMLElement} */ (a.querySelector('.perfil-red-etiqueta-valor')).textContent = valor;
+        } else {
+            a.className = 'perfil-red';
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.setAttribute('aria-label', ETIQUETAS_RED[clave]);
+            a.title = ETIQUETAS_RED[clave];
+            a.innerHTML = ICONOS_RED[clave] || '';
+        }
         caja.appendChild(a);
         }
     }
@@ -134,7 +146,8 @@ function pintarRedesPerfil(redes) {
 
 // cuenta.js avisa cuando se guardan las redes desde Mi perfil, para repintar los iconos.
 document.addEventListener('perfil:redes', (ev) => {
-    pintarRedesPerfil(/** @type {CustomEvent} */ (ev).detail);
+    const detalle = /** @type {any} */ (/** @type {CustomEvent} */ (ev).detail) || {};
+            pintarRedesPerfil(detalle.redes, detalle.formato);
 });
 
 /**
@@ -324,7 +337,7 @@ let datos = null;
         .forEach((el) => { el.textContent = etiquetaRol(datos.rol || obtenerRolUsuario()); });
     pintarBanderaPerfil(datos.ciudad || '');
     pintarBioPerfil(datos.bio);
-    pintarRedesPerfil(datos.redes);
+    pintarRedesPerfil(datos.redes, datos.redes_formato);
     aplicarVisibilidadHeader(datos.visibilidad);
     if (datos.nombre_real) {
         document.querySelectorAll('.perfil-nombre-real')
@@ -370,7 +383,7 @@ export function actualizarPerfilUI(verificarActividadFn = null) {
         });
         pintarBanderaPerfil(ciudad);
         pintarBioPerfil(artistaActual && artistaActual.bio);
-        pintarRedesPerfil(artistaActual && artistaActual.redes);
+        pintarRedesPerfil(artistaActual && artistaActual.redes, artistaActual && artistaActual.redes_formato);
         aplicarVisibilidadHeader(artistaActual && artistaActual.visibilidad);
 
         // Y se piden los datos buenos al servidor (nombre, foto y contadores).
@@ -635,7 +648,7 @@ export async function verPerfilUsuario(userId, verificarActividadFn, actualizarE
                 .forEach((el) => { el.textContent = etiquetaRol(rol); });
             pintarBanderaPerfil(usuario.ciudad || '');
             pintarBioPerfil(usuario.bio);
-            pintarRedesPerfil(usuario.redes);
+            pintarRedesPerfil(usuario.redes, usuario.redes_formato);
             aplicarVisibilidadHeader(usuario.visibilidad);
 
             // El avatar no es pulsable (la foto se cambia en «Mi perfil»), pero en

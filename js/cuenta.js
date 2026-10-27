@@ -124,6 +124,25 @@ export function setupMiCuenta() {
 // ============================================
 // COLOR DEL BORDE DEL AVATAR
 // ============================================
+// Cómo se muestran las redes en el perfil público: 'iconos' o 'etiquetas'.
+let formatoRedesPerfil = 'iconos';
+
+/** Marca la opción activa del conmutador de formato. */
+const pintarFormatoRedes = () => {
+    document.querySelectorAll('.perfil-redes-formato-op').forEach((b) => {
+        const boton = /** @type {HTMLElement} */ (b);
+        boton.classList.toggle('activo', boton.dataset.formato === formatoRedesPerfil);
+    });
+};
+
+document.querySelectorAll('.perfil-redes-formato-op').forEach((b) => {
+    b.addEventListener('click', () => {
+        const boton = /** @type {HTMLElement} */ (b);
+        formatoRedesPerfil = boton.dataset.formato === 'etiquetas' ? 'etiquetas' : 'iconos';
+        pintarFormatoRedes();
+    });
+});
+
 const COLORES_AVATAR = ['#d9a441', '#2e7d6b', '#1f6feb', '#8e44ad', '#c0392b', '#16a085', '#e67e22', '#34495e'];
 let colorAvatar = '';
 
@@ -830,6 +849,8 @@ const ICONOS_RED_PANEL = {
             pintarSwitches();
             aplicarVisibilidad();
             const redes = parsear(u.redes);
+            formatoRedesPerfil = u.redes_formato === 'etiquetas' ? 'etiquetas' : 'iconos';
+            pintarFormatoRedes();
             pintarRedesGuardadas(redes);
             cargarMetodosPago(u.cobro);
         } catch (e) {
@@ -941,7 +962,7 @@ const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getEl
             try {
                 const res = await apiRequest('/api/artistas/perfil-datos', {
                     method: 'PUT',
-                    body: JSON.stringify({ ciudad, redes, cobro, bio, visibilidad, foto_perfil: quitarFoto ? '' : undefined })
+                    body: JSON.stringify({ ciudad, redes, cobro, bio, visibilidad, redes_formato: formatoRedesPerfil, foto_perfil: quitarFoto ? '' : undefined })
                 });
                 if (res && res.success) {
                     if (artistaActual) artistaActual.ciudad = ciudad;
@@ -952,7 +973,7 @@ const btnGuardarPerfil = /** @type {HTMLButtonElement | null} */ (document.getEl
                     document.querySelectorAll('.perfil-bio').forEach((el) => { el.textContent = bio; });
                     // Iconos de redes: se repintan con lo que se acaba de guardar (perfil.js escucha).
                     document.dispatchEvent(new CustomEvent('perfil:redes', {
-                        detail: { instagram: redes.instagram, facebook: redes.facebook, x: redes.x, telegram: redes.telegram, whatsapp: redes.whatsapp, correo: redes.correo, web: redes.web }
+                        detail: { redes: { instagram: redes.instagram, facebook: redes.facebook, x: redes.x, telegram: redes.telegram, whatsapp: redes.whatsapp, correo: redes.correo, web: redes.web }, formato: formatoRedesPerfil }
                     }));
                     if (artistaActual) artistaActual.redes = JSON.stringify(redes);
                     if (artistaActual) artistaActual.bio = bio;

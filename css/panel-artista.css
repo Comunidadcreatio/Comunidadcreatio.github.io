@@ -4410,3 +4410,54 @@ body.con-mapa-abierto {
     width: 28px;
     height: 20px;
 }
+
+/* ==============================================
+   REDES COMO ETIQUETAS (2026-10-27)
+   El dueño del perfil elige en Mi perfil si sus redes se ven como iconos o como etiquetas.
+   ============================================== */
+.perfil-redes-formato {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.perfil-redes-formato-op {
+    padding: 3px 9px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.perfil-redes-formato-op.activo {
+    background: var(--perfil-avatar-color, #d9a441);
+    border-color: var(--perfil-avatar-color, #d9a441);
+    color: #fff;
+}
+
+/* Etiquetas en el perfil público. */
+.perfil-red-etiqueta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.perfil-red-etiqueta-nombre {
+    font-weight: 700;
+}
+
+.perfil-red-etiqueta-valor {
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+}
