@@ -4398,3 +4398,15 @@ body.con-mapa-abierto {
     object-fit: cover;
     border-radius: 0;
 }
+
+/* Bandera y contenedor en 28 x 20: un punto intermedio. */
+.perfil-municipio-esquina .perfil-bandera-esquina {
+    width: 28px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.perfil-municipio-esquina .perfil-bandera-esquina img {
+    width: 28px;
+    height: 20px;
+}
