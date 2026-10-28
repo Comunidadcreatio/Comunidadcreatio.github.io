@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.865';
+        var currentVer = '1.0.867';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=6585726862">
+    <link rel="stylesheet" href="css/style.css?v=465dc937bb">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1686,9 +1686,8 @@
         cuerpo.innerHTML =
             '<img class="mapa-ficha-bandera" alt="">' +
             '<div class="mapa-ficha-textos">' +
-            '<span class="mapa-ficha-region"></span>' +
             '<span class="mapa-ficha-nombre"></span>' +
-            '<span class="mapa-ficha-capital"></span>' +
+            '<span class="mapa-ficha-meta"><span class="mapa-ficha-capital"></span><span class="mapa-ficha-sep">·</span><span class="mapa-ficha-region"></span></span>' +
             '</div>' +
             '<div class="mapa-ficha-datos">' +
             '<span><i>Población</i><b></b></span>' +
@@ -1701,12 +1700,12 @@
         bandera.src = banderaDe(m.nombre);
         bandera.alt = "Bandera de " + m.nombre;
         bandera.onerror = function () { bandera.style.display = "none"; };
-        cuerpo.querySelector(".mapa-ficha-region").textContent = m.region;
         cuerpo.querySelector(".mapa-ficha-nombre").textContent = m.nombre;
         cuerpo.querySelector(".mapa-ficha-capital").textContent = "Capital: " + m.capital;
+        cuerpo.querySelector(".mapa-ficha-region").textContent = m.region;
         var vals = cuerpo.querySelectorAll(".mapa-ficha-datos b");
         vals[0].textContent = m.poblacion.toLocaleString("es-VE");
-        vals[1].textContent = dens.toLocaleString("es-VE") + " hab/km²";
+        vals[1].textContent = dens.toLocaleString("es-VE");
         vals[2].textContent = Math.round(m.area) + " km²";
         vals[3].textContent = m.altitud + " m";
         cuerpo.querySelector(".mapa-ficha-economia").textContent = m.economia;

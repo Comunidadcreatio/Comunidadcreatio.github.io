@@ -4614,3 +4614,89 @@ body.con-mapa-abierto {
     justify-items: end;
     text-align: right;
 }
+
+/* ==============================================
+   FICHA DEL MAPA, OPCION A (2026-10-27)
+   Cabecera con bandera + nombre + capital/region, rejilla de 4 columnas y separadores finos.
+   ============================================== */
+.mapa-ficha-cuerpo {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: center;
+}
+
+.mapa-ficha-bandera {
+    width: 44px;
+    height: 31px;
+    grid-row: 1;
+}
+
+.mapa-ficha-textos {
+    grid-row: 1;
+    gap: 3px;
+}
+
+.mapa-ficha-nombre {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.mapa-ficha-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--color-gray-400, #bdbdbd);
+}
+
+.mapa-ficha-region {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+.mapa-ficha-datos {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-gray-200, #ebebeb);
+    justify-items: start;
+    text-align: left;
+}
+
+.mapa-ficha-datos b {
+    font-size: 14px;
+}
+
+.mapa-ficha-economia {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-gray-200, #ebebeb);
+    font-size: 11px;
+}
+
+@media (max-width: 360px) {
+    .mapa-ficha-datos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Filas explícitas: cabecera (1), datos (2), economía (3). */
+.mapa-ficha-cuerpo {
+    grid-template-rows: auto auto auto;
+}
+
+.mapa-ficha-datos {
+    grid-row: 2;
+}
+
+.mapa-ficha-economia {
+    grid-row: 3;
+}
