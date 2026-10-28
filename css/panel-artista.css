@@ -4461,3 +4461,84 @@ body.con-mapa-abierto {
     font-weight: 400;
     color: var(--color-gray-400, #bdbdbd);
 }
+
+/* ==============================================
+   FICHA DEL MAPA CON BANDERA Y DATOS EN PARALELO (2026-10-27)
+   Bandera a la izquierda, textos al lado y los cuatro datos en una fila.
+   ============================================== */
+.mapa-modos {
+    justify-content: center;
+    margin: 4px 0 12px;
+}
+
+.mapa-ficha {
+    gap: 12px;
+}
+
+.mapa-ficha-cuerpo {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 4px;
+    align-items: start;
+}
+
+.mapa-ficha-bandera {
+    width: 34px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--color-gray-200, #ebebeb);
+    grid-row: 1;
+}
+
+.mapa-ficha-textos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    grid-row: 1;
+}
+
+.mapa-ficha-datos {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 6px;
+}
+
+.mapa-ficha-datos span {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.mapa-ficha-datos i {
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+}
+
+.mapa-ficha-datos b {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.mapa-ficha-economia {
+    grid-column: 1 / -1;
+}
+
+.mapa-ficha .mapa-leyenda {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-gray-200, #ebebeb);
+}
+
+.mapa-ficha .mapa-barra {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-gray-200, #ebebeb);
+}

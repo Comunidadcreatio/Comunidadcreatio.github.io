@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.860';
+        var currentVer = '1.0.861';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=622c6ebbd8">
+    <link rel="stylesheet" href="css/style.css?v=ada27bbf3b">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1508,20 +1508,22 @@
         </button>
     </header>
     <div class="mapa-lienzo">
+        <div class="mapa-svg-wrap">
+            <svg class="mapa-svg" id="mapa-svg" viewBox="0 0 720 780" role="img" aria-label="Mapa del estado Táchira con sus municipios"></svg>
+        </div>
         <div class="mapa-modos" role="group" aria-label="Cómo ver el mapa">
             <button type="button" class="mapa-modo activo" data-modo="region">Por región</button>
             <button type="button" class="mapa-modo" data-modo="densidad">Densidad poblacional</button>
         </div>
-        <div class="mapa-svg-wrap">
-            <svg class="mapa-svg" id="mapa-svg" viewBox="0 0 720 780" role="img" aria-label="Mapa del estado Táchira con sus municipios"></svg>
+        <div class="mapa-ficha" id="mapa-ficha" hidden>
+            <div class="mapa-ficha-cuerpo" id="mapa-ficha-cuerpo"></div>
+            <div class="mapa-leyenda" id="mapa-leyenda"></div>
+            <div class="mapa-barra" id="mapa-barra" hidden>
+                <span class="mapa-barra-titulo">Peso poblacional en el estado</span>
+                <div class="mapa-barra-pista"><div class="mapa-barra-relleno" id="mapa-barra-relleno"></div></div>
+                <span class="mapa-barra-valor" id="mapa-barra-valor"></span>
+            </div>
         </div>
-        <div class="mapa-leyenda" id="mapa-leyenda"></div>
-        <div class="mapa-barra" id="mapa-barra" hidden>
-            <span class="mapa-barra-titulo">Peso poblacional en el estado</span>
-            <div class="mapa-barra-pista"><div class="mapa-barra-relleno" id="mapa-barra-relleno"></div></div>
-            <span class="mapa-barra-valor" id="mapa-barra-valor"></span>
-        </div>
-        <div class="mapa-ficha" id="mapa-ficha" hidden></div>
     </div>
     <p class="mapa-pie" id="mapa-pie">Toca un municipio en el mapa</p>
 </div>
@@ -1665,30 +1667,48 @@
         }
     };
 
+    /** Ruta de la bandera del municipio (los archivos van por nombre de municipio). */
+    var banderaDe = function (nombre) {
+        var limpio = nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        return "iconos/banderas/" + limpio + ".webp";
+    };
+
     var pintarFicha = function () {
         if (!ficha) return;
+        var cuerpo = document.getElementById("mapa-ficha-cuerpo");
         var m = DATOS.find(function (x) { return x.nombre === actual; });
         if (!m) { ficha.hidden = true; return; }
         var dens = m.area ? Math.round(m.poblacion / m.area) : 0;
         ficha.hidden = false;
-        ficha.innerHTML = '<span class="mapa-ficha-region"></span>' +
+        if (!cuerpo) return;
+        cuerpo.innerHTML =
+            '<img class="mapa-ficha-bandera" alt="">' +
+            '<div class="mapa-ficha-textos">' +
+            '<span class="mapa-ficha-region"></span>' +
             '<span class="mapa-ficha-nombre"></span>' +
             '<span class="mapa-ficha-capital"></span>' +
-            '<div class="mapa-ficha-datos">' +
-            '<span>Población<b></b></span><span>Superficie<b></b></span>' +
-            '<span>Densidad<b></b></span><span>Altitud<b></b></span>' +
             '</div>' +
-            '<span class="mapa-ficha-economia"></span>' +
-            '<span class="mapa-ficha-fuente">Población: proyección INE 2025 · Superficie: Wikipedia / IGVSB</span>';
-        ficha.querySelector('.mapa-ficha-region').textContent = m.region;
-        ficha.querySelector('.mapa-ficha-nombre').textContent = m.nombre;
-        ficha.querySelector('.mapa-ficha-capital').textContent = 'Capital: ' + m.capital;
-        var vals = ficha.querySelectorAll('.mapa-ficha-datos b');
-        vals[0].textContent = m.poblacion.toLocaleString('es-VE');
-        vals[1].textContent = Math.round(m.area) + ' km²';
-        vals[2].textContent = dens.toLocaleString('es-VE') + ' hab/km²';
-        vals[3].textContent = m.altitud + ' m';
-        ficha.querySelector('.mapa-ficha-economia').textContent = m.economia;
+            '<div class="mapa-ficha-datos">' +
+            '<span><i>Población</i><b></b></span>' +
+            '<span><i>Densidad</i><b></b></span>' +
+            '<span><i>Superficie</i><b></b></span>' +
+            '<span><i>Altitud</i><b></b></span>' +
+            '</div>' +
+            '<span class="mapa-ficha-economia"></span>';
+        var bandera = cuerpo.querySelector(".mapa-ficha-bandera");
+        bandera.src = banderaDe(m.nombre);
+        bandera.alt = "Bandera de " + m.nombre;
+        bandera.onerror = function () { bandera.style.display = "none"; };
+        cuerpo.querySelector(".mapa-ficha-region").textContent = m.region;
+        cuerpo.querySelector(".mapa-ficha-nombre").textContent = m.nombre;
+        cuerpo.querySelector(".mapa-ficha-capital").textContent = "Capital: " + m.capital;
+        var vals = cuerpo.querySelectorAll(".mapa-ficha-datos b");
+        vals[0].textContent = m.poblacion.toLocaleString("es-VE");
+        vals[1].textContent = dens.toLocaleString("es-VE") + " hab/km²";
+        vals[2].textContent = Math.round(m.area) + " km²";
+        vals[3].textContent = m.altitud + " m";
+        cuerpo.querySelector(".mapa-ficha-economia").textContent = m.economia;
     };
 
     var pintarLista = function () {
