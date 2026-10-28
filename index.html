@@ -1740,16 +1740,24 @@
 
     var abrir = function () {
         if (!modal) return;
-        var guardado = '';
-        try {
-            var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
-            guardado = g.ciudad || '';
-        } catch (e) { guardado = ''; }
-        var hallado = DATOS.find(function (m) { return m.capital === guardado || m.nombre === guardado; });
-        actual = hallado ? hallado.nombre : '';
         modal.hidden = false;
         document.body.classList.add('con-mapa-abierto');
-        if (DATOS.length) { pintarMapa(); pintarFicha(); pintarLista(); }
+        cargarDatos().then(function () {
+            if (modal.hidden) return;
+            if (!actual) {
+                var guardado = '';
+                try {
+                    var g = JSON.parse(localStorage.getItem('artistaData') || '{}');
+                    guardado = g.ciudad || '';
+                } catch (e) { guardado = ''; }
+                var hallado = DATOS.find(function (m) { return m.capital === guardado || m.nombre === guardado; });
+                actual = hallado ? hallado.nombre : '';
+            }
+            pintarMapa();
+            pintarFicha();
+            pintarLista();
+            pintarLeyendaYBarra();
+        });
     };
     var cerrar = function () {
         if (!modal) return;
@@ -1765,29 +1773,33 @@
     });
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrar(); });
 
-    // Datos: polígonos + fichas.
-    Promise.all([
-        fetch('iconos/mapa/tachira-geo.json').then(function (r) { return r.json(); }),
-        fetch('iconos/mapa/tachira-datos.json').then(function (r) { return r.json(); })
-    ]).then(function (res) {
-        GEO = res[0] || {};
-        DATOS = res[1] || [];
-        if (sub) sub.textContent = DATOS.length + ' municipios';
-        maxDens = Math.max.apply(null, DATOS.map(function (m) { return m.area ? m.poblacion / m.area : 1; })) || 1;
-        totalPoblacion = DATOS.reduce(function (a, m) { return a + (m.poblacion || 0); }, 0);
-        pintarLeyendaYBarra();
-        document.querySelectorAll('.mapa-modo').forEach(function (b) {
-            b.addEventListener('click', function () {
-                modo = b.dataset.modo === 'densidad' ? 'densidad' : 'region';
-                document.querySelectorAll('.mapa-modo').forEach(function (o) { o.classList.toggle('activo', o === b); });
-                pintarMapa();
-                pintarLeyendaYBarra();
+    // Datos: se cargan SOLO la primera vez que se abre el mapa (no al arrancar la app).
+    var cargando = null;
+    var cargarDatos = function () {
+        if (cargando) return cargando;
+        cargando = Promise.all([
+            fetch('iconos/mapa/tachira-geo.json').then(function (r) { return r.json(); }),
+            fetch('iconos/mapa/tachira-datos.json').then(function (r) { return r.json(); })
+        ]).then(function (res) {
+            GEO = res[0] || {};
+            DATOS = res[1] || [];
+            if (sub) sub.textContent = DATOS.length + ' municipios';
+            maxDens = Math.max.apply(null, DATOS.map(function (m) { return m.area ? m.poblacion / m.area : 1; })) || 1;
+            totalPoblacion = DATOS.reduce(function (a, m) { return a + (m.poblacion || 0); }, 0);
+            pintarLeyendaYBarra();
+            document.querySelectorAll('.mapa-modo').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    modo = b.dataset.modo === 'densidad' ? 'densidad' : 'region';
+                    document.querySelectorAll('.mapa-modo').forEach(function (o) { o.classList.toggle('activo', o === b); });
+                    pintarMapa();
+                    pintarLeyendaYBarra();
+                });
             });
+        }).catch(function () {
+            if (pie) pie.textContent = 'No se pudo cargar el mapa';
         });
-        if (!modal.hidden) { actual = actual || ''; pintarMapa(); pintarFicha(); pintarLista(); }
-    }).catch(function () {
-        if (pie) pie.textContent = 'No se pudo cargar el mapa';
-    });
+        return cargando;
+    };
 })();
 </script>
 
