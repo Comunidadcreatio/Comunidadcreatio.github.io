@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.867';
+        var currentVer = '1.0.868';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=465dc937bb">
+    <link rel="stylesheet" href="css/style.css?v=cd3c9f9668">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1695,7 +1695,7 @@
             '<span><i>Superficie</i><b></b></span>' +
             '<span><i>Altitud</i><b></b></span>' +
             '</div>' +
-            '<span class="mapa-ficha-economia"></span>';
+            '<span class="mapa-ficha-economia"><i>Economía</i><b></b></span>';
         var bandera = cuerpo.querySelector(".mapa-ficha-bandera");
         bandera.src = banderaDe(m.nombre);
         bandera.alt = "Bandera de " + m.nombre;
@@ -1705,10 +1705,10 @@
         cuerpo.querySelector(".mapa-ficha-region").textContent = m.region;
         var vals = cuerpo.querySelectorAll(".mapa-ficha-datos b");
         vals[0].textContent = m.poblacion.toLocaleString("es-VE");
-        vals[1].textContent = dens.toLocaleString("es-VE");
+        vals[1].innerHTML = dens.toLocaleString("es-VE") + '<small class="mapa-ficha-unidad">hab/km²</small>';
         vals[2].textContent = Math.round(m.area) + " km²";
         vals[3].textContent = m.altitud + " m";
-        cuerpo.querySelector(".mapa-ficha-economia").textContent = m.economia;
+        cuerpo.querySelector(".mapa-ficha-economia b").textContent = m.economia;
     };
 
     var pintarLista = function () {

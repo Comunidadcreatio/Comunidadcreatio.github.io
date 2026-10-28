@@ -4700,3 +4700,45 @@ body.con-mapa-abierto {
 .mapa-ficha-economia {
     grid-row: 3;
 }
+
+/* ==============================================
+   CENTRADO Y DETALLES DE LA FICHA (2026-10-27)
+   Cada dato centrado en su columna, unidad pequeña en la densidad y etiqueta en economía.
+   ============================================== */
+.mapa-ficha-datos {
+    justify-items: center;
+    text-align: center;
+}
+
+.mapa-ficha-datos i {
+    text-align: center;
+}
+
+.mapa-ficha-unidad {
+    display: block;
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+    margin-top: 1px;
+}
+
+.mapa-ficha-economia {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    text-align: center;
+}
+
+.mapa-ficha-economia i {
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--color-gray-400, #bdbdbd);
+}
+
+.mapa-ficha-economia b {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text);
+}
