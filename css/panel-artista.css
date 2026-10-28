@@ -4567,3 +4567,27 @@ body.con-mapa-abierto {
 .mapa-ficha-economia {
     margin-top: 6px;
 }
+
+/* El porcentaje del peso poblacional va ENCIMA de la barra, a la derecha del título. */
+.mapa-barra {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 8px;
+}
+
+.mapa-barra-titulo {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.mapa-barra-valor {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+}
+
+.mapa-barra-pista {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
