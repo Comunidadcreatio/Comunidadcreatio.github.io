@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.862';
+        var currentVer = '1.0.863';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=c82b5062c1">
+    <link rel="stylesheet" href="css/style.css?v=f3d995342a">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1600,10 +1600,11 @@
             p.setAttribute('d', d);
             p.setAttribute('class', 'mapa-poly' + (m.nombre === actual ? ' activo' : ''));
             var esActivo = m.nombre === actual;
-            // El municipio elegido no se rellena: solo se le pone el borde blanco.
-            p.setAttribute('fill', esActivo ? 'none' : colorDe(m));
-            p.setAttribute('fill-opacity', esActivo ? '0' : opacidadDe(m));
-            p.setAttribute('stroke', esActivo ? '#ffffff' : colorDe(m));
+            // El elegido conserva su relleno y cambia el borde: negro en claro, blanco en oscuro.
+            var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+            p.setAttribute('fill', colorDe(m));
+            p.setAttribute('fill-opacity', opacidadDe(m));
+            p.setAttribute('stroke', esActivo ? (oscuro ? '#ffffff' : '#000000') : colorDe(m));
             p.setAttribute('stroke-width', esActivo ? '2.6' : '0.9');
             p.setAttribute('stroke-linejoin', 'round');
             p.setAttribute('tabindex', '0');

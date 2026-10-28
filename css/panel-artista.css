@@ -4591,3 +4591,28 @@ body.con-mapa-abierto {
     grid-column: 1 / -1;
     grid-row: 2;
 }
+
+/* ==============================================
+   BANDERA CENTRADA Y DATOS ALINEADOS (2026-10-27)
+   La bandera crece y se centra con el bloque de textos; los cuatro datos se alinean a la
+   derecha para que la ficha quede equilibrada.
+   ============================================== */
+.mapa-ficha-cuerpo {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.mapa-ficha-bandera {
+    width: 44px;
+    height: 31px;
+    align-self: center;
+}
+
+.mapa-ficha-textos {
+    justify-content: center;
+}
+
+.mapa-ficha-datos {
+    justify-items: end;
+    text-align: right;
+}
