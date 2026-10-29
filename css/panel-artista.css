@@ -4785,3 +4785,12 @@ body.con-mapa-abierto {
 .mapa-lienzo {
     padding-top: calc(52px + env(safe-area-inset-top, 0px));
 }
+
+/* Sin barra inferior en el mapa (ni espacio reservado para ella). */
+.mapa-pie {
+    display: none;
+}
+
+.mapa-tachira {
+    padding-bottom: 0;
+}
