@@ -4742,3 +4742,17 @@ body.con-mapa-abierto {
     font-weight: 400;
     color: var(--color-text);
 }
+
+/* ==============================================
+   CABECERA DEL MAPA SIN RECTANGULO (2026-10-29)
+   El titulo y el subtitulo desaparecen y la X queda flotando, sin barra ni borde.
+   ============================================== */
+.mapa-cabecera {
+    border-bottom: none;
+    justify-content: flex-end;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 0;
+}
+
+.mapa-cabecera-texto {
+    display: none;
+}

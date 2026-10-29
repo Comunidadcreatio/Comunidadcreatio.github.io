@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.868';
+        var currentVer = '1.0.870';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=cd3c9f9668">
+    <link rel="stylesheet" href="css/style.css?v=b9ac09f729">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1616,23 +1616,14 @@
             var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             c.setAttribute('cx', px(m.lon).toFixed(1));
             c.setAttribute('cy', py(m.lat).toFixed(1));
-            c.setAttribute('r', m.nombre === actual ? '5' : '3');
-            c.setAttribute('fill', m.nombre === actual ? '#ffffff' : colorDe(m));
-            c.setAttribute('stroke', m.nombre === actual ? colorDe(m) : '#ffffff');
-            c.setAttribute('stroke-width', m.nombre === actual ? '2.5' : '1');
+            c.setAttribute('r', '3');
+            c.setAttribute('fill', colorDe(m));
+            c.setAttribute('stroke', '#ffffff');
+            c.setAttribute('stroke-width', '1');
             c.setAttribute('pointer-events', 'none');
             svg.appendChild(c);
         });
-        var activo = DATOS.find(function (m) { return m.nombre === actual; });
-        if (activo) {
-            var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            txt.setAttribute('x', px(activo.lon).toFixed(1));
-            txt.setAttribute('y', (py(activo.lat) - 12).toFixed(1));
-            txt.setAttribute('text-anchor', 'middle');
-            txt.setAttribute('class', 'mapa-etiqueta');
-            txt.textContent = activo.capital;
-            svg.appendChild(txt);
-        }
+        // Sin etiqueta con el nombre de la capital sobre el mapa.
     };
 
     var leyenda = document.getElementById('mapa-leyenda');
