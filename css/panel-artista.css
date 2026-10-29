@@ -4780,3 +4780,8 @@ body.con-mapa-abierto {
 .mapa-lienzo::-webkit-scrollbar {
     display: none;
 }
+
+/* Aire en la parte superior: el mapa no toca el borde y la X respira. */
+.mapa-lienzo {
+    padding-top: calc(52px + env(safe-area-inset-top, 0px));
+}
