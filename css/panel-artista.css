@@ -4800,3 +4800,26 @@ body.con-mapa-abierto {
     justify-content: center;
     text-align: center;
 }
+
+/* ==============================================
+   CONMUTADOR DEL MAPA CON CINCO MODOS (2026-10-29)
+   Con cinco opciones no caben: se desliza en horizontal.
+   ============================================== */
+.mapa-modos {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 2px 12px 10px;
+    margin: 4px 0 10px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mapa-modos::-webkit-scrollbar {
+    display: none;
+}
+
+.mapa-modo {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}

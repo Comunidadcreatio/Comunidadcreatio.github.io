@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.874';
+        var currentVer = '1.0.875';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=c4a22ca6ac">
+    <link rel="stylesheet" href="css/style.css?v=2b1631e46c">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1514,6 +1514,9 @@
         <div class="mapa-modos" role="group" aria-label="Cómo ver el mapa">
             <button type="button" class="mapa-modo activo" data-modo="region">Por región</button>
             <button type="button" class="mapa-modo" data-modo="densidad">Densidad poblacional</button>
+            <button type="button" class="mapa-modo" data-modo="artistas">Artistas</button>
+            <button type="button" class="mapa-modo" data-modo="arte">Arte por habitante</button>
+            <button type="button" class="mapa-modo" data-modo="altitud">Altitud</button>
         </div>
         <div class="mapa-ficha" id="mapa-ficha" hidden>
             <div class="mapa-ficha-cuerpo" id="mapa-ficha-cuerpo"></div>
@@ -1568,23 +1571,47 @@
         return d;
     };
 
+    // El backend público de la app (para los conteos del mapa).
+    var API_MAPA = 'https://backend-fundacion-atpe.onrender.com';
     var modo = 'region';
     var maxDens = 1;
 
     var colorDe = function (m) {
         var elegido = getComputedStyle(document.documentElement).getPropertyValue('--perfil-avatar-color').trim() || '#d9a441';
-        if (modo === 'densidad') return elegido;
+        if (modo !== 'region') return elegido;
         return COLORES_REGION[m.region] || '#7a7a7a';
+    };
+
+    /** Valor del municipio según el modo activo. */
+    var valorDe = function (m) {
+        if (modo === 'densidad') return m.area ? m.poblacion / m.area : 0;
+        if (modo === 'artistas') return ARTISTAS[m.nombre] || 0;
+        if (modo === 'arte') return m.poblacion ? (ARTISTAS[m.nombre] || 0) / (m.poblacion / 100000) : 0;
+        if (modo === 'altitud') return m.altitud || 0;
+        return 0;
+    };
+
+    var textoDe = function (v) {
+        if (modo === 'artistas') return Math.round(v) + (v === 1 ? ' artista' : ' artistas');
+        if (modo === 'arte') return String(Math.round(v * 10) / 10).replace('.', ',') + ' por 100 mil';
+        if (modo === 'altitud') return Math.round(v).toLocaleString('es-VE') + ' m';
+        return Math.round(v).toLocaleString('es-VE') + ' hab/km²';
+    };
+
+    /** Recalcula el máximo del modo activo (para las escalas de color). */
+    var actualizarEscala = function () {
+        if (!DATOS.length) return;
+        if (modo === 'region') { maxValor = 1; return; }
+        var vals = DATOS.map(valorDe);
+        maxValor = Math.max.apply(null, vals) || 1;
     };
 
     /** Opacidad del relleno: por región es suave; por densidad crece con la densidad (raíz
         cuadrada para que San Cristóbal no tape a los demás). */
     var opacidadDe = function (m) {
-        if (modo === 'densidad') {
-            var d = m.area ? m.poblacion / m.area : 0;
-            return String(Math.round((0.10 + 0.80 * Math.sqrt(d / maxDens)) * 100) / 100);
-        }
-        return '0.18';
+        if (modo === 'region') return '0.18';
+        var v = valorDe(m);
+        return String(Math.round((0.10 + 0.80 * Math.sqrt(v / (maxValor || 1))) * 100) / 100);
     };
 
     var pintarMapa = function () {
@@ -1638,8 +1665,18 @@
     var barraValor = document.getElementById('mapa-barra-valor');
 
     var totalPoblacion = 0;
+    // Artistas registrados por municipio (los trae el backend) y escala del modo activo.
+    var ARTISTAS = {};
+    var maxValor = 1;
 
     /** Leyenda de regiones (modo región) o barra de peso poblacional (modo densidad). */
+    var TITULOS_MODO = {
+        densidad: 'Peso poblacional en el estado',
+        artistas: 'Artistas registrados',
+        arte: 'Arte por habitante',
+        altitud: 'Altitud del municipio'
+    };
+
     var pintarLeyendaYBarra = function () {
         if (leyenda) {
             leyenda.textContent = '';
@@ -1654,15 +1691,17 @@
                 });
             }
         }
-        if (barra) {
-            barra.hidden = modo !== 'densidad';
-            if (modo === 'densidad') {
-                var m = DATOS.find(function (x) { return x.nombre === actual; });
-                var pct = (m && totalPoblacion) ? (m.poblacion / totalPoblacion) * 100 : 0;
-                if (barraRelleno) barraRelleno.style.width = Math.max(2, Math.round(pct * 10) / 10) + '%';
-                if (barraValor) barraValor.textContent = pct ? pct.toFixed(1).replace('.', ',') + '%' : '—';
-            }
-        }
+        if (!barra) return;
+        // Un solo tono: siempre barra. Regiones: su leyenda.
+        barra.hidden = modo === 'region';
+        if (modo === 'region') return;
+        var m = DATOS.find(function (x) { return x.nombre === actual; });
+        var titulo = barra.querySelector('.mapa-barra-titulo');
+        if (titulo) titulo.textContent = TITULOS_MODO[modo] || '';
+        var v = m ? valorDe(m) : 0;
+        var relleno = Math.max(2, Math.round((v / (maxValor || 1)) * 1000) / 10);
+        if (barraRelleno) barraRelleno.style.width = relleno + '%';
+        if (barraValor) barraValor.textContent = m ? textoDe(v) : '—';
     };
 
     /** Ruta de la bandera del municipio (los archivos van por nombre de municipio). */
@@ -1781,11 +1820,31 @@
             if (sub) sub.textContent = DATOS.length + ' municipios';
             maxDens = Math.max.apply(null, DATOS.map(function (m) { return m.area ? m.poblacion / m.area : 1; })) || 1;
             totalPoblacion = DATOS.reduce(function (a, m) { return a + (m.poblacion || 0); }, 0);
+            actualizarEscala();
+            // Artistas registrados por municipio: se piden aparte; si falla, el mapa sigue igual.
+            fetch(API_MAPA + '/api/artistas/mapa/artistas')
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (!j || !j.success) return;
+                    var porCapital = {};
+                    (j.porCiudad || []).forEach(function (c) {
+                        if (c && c.ciudad) porCapital[String(c.ciudad).trim().toLowerCase()] = Number(c.total) || 0;
+                    });
+                    DATOS.forEach(function (m) {
+                        var cap = String(m.capital).trim().toLowerCase();
+                        var nom = String(m.nombre).trim().toLowerCase();
+                        ARTISTAS[m.nombre] = porCapital[cap] || porCapital[nom] || 0;
+                    });
+                    actualizarEscala();
+                    if (!modal.hidden) { pintarMapa(); pintarFicha(); pintarLeyendaYBarra(); }
+                })
+                .catch(function () { /* sin conteos: el resto de modos sigue funcionando */ });
             pintarLeyendaYBarra();
             document.querySelectorAll('.mapa-modo').forEach(function (b) {
                 b.addEventListener('click', function () {
-                    modo = b.dataset.modo === 'densidad' ? 'densidad' : 'region';
+                    modo = b.dataset.modo || 'region';
                     document.querySelectorAll('.mapa-modo').forEach(function (o) { o.classList.toggle('activo', o === b); });
+                    actualizarEscala();
                     pintarMapa();
                     pintarLeyendaYBarra();
                 });
