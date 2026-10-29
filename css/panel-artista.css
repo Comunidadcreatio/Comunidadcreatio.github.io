@@ -4794,3 +4794,9 @@ body.con-mapa-abierto {
 .mapa-tachira {
     padding-bottom: 0;
 }
+
+/* La leyenda de regiones se centra en la ficha. */
+.mapa-ficha .mapa-leyenda {
+    justify-content: center;
+    text-align: center;
+}

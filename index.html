@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.873';
+        var currentVer = '1.0.874';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=a4245737c3">
+    <link rel="stylesheet" href="css/style.css?v=c4a22ca6ac">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1698,7 +1698,7 @@
         bandera.alt = "Bandera de " + m.nombre;
         bandera.onerror = function () { bandera.style.display = "none"; };
         cuerpo.querySelector(".mapa-ficha-nombre").textContent = m.nombre;
-        cuerpo.querySelector(".mapa-ficha-capital").textContent = "Capital: " + m.capital;
+        cuerpo.querySelector(".mapa-ficha-capital").textContent = m.capital;
         cuerpo.querySelector(".mapa-ficha-region").textContent = m.region;
         var vals = cuerpo.querySelectorAll(".mapa-ficha-datos b");
         vals[0].textContent = m.poblacion.toLocaleString("es-VE");
