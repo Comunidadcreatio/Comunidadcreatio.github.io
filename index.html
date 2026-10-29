@@ -18,7 +18,7 @@
     <!-- Detección de versión: fuerza recarga si hay nueva versión (para WebView mobile) -->
     <script>
     (function(){
-        var currentVer = '1.0.870';
+        var currentVer = '1.0.871';
         fetch('/version.json?t=' + Date.now())
             .then(function(r){ return r.json(); })
             .then(function(data){
@@ -78,7 +78,7 @@
                    connect-src 'self' https://backend-fundacion-atpe.onrender.com; 
                    frame-ancestors 'none';">
 
-    <link rel="stylesheet" href="css/style.css?v=b9ac09f729">
+    <link rel="stylesheet" href="css/style.css?v=9f45fb84d4">
     <link rel="stylesheet" href="css/notificaciones.css?v=19986e3f18">
     <link rel="stylesheet" href="css/search-results.css?v=59cb9ddffd">
     <link rel="stylesheet" href="css/problogs.css?v=2158590128">
@@ -1591,6 +1591,7 @@
     var pintarMapa = function () {
         if (!svg) return;
         svg.textContent = '';
+        var activoPath = null;
         DATOS.forEach(function (m) {
             var d = trayectoria(m.nombre);
             if (!d) return;
@@ -1609,8 +1610,14 @@
             p.setAttribute('role', 'button');
             p.setAttribute('aria-label', m.nombre);
             p.addEventListener('click', function () { seleccionar(m.nombre); });
+            if (esActivo) { activoPath = p; return; }
             svg.appendChild(p);
         });
+        // El elegido va el último: así su borde negro/blanco no lo tapa ningún vecino.
+        if (activoPath) {
+            activoPath.setAttribute('stroke-width', '3');
+            svg.appendChild(activoPath);
+        }
         // Capitales: un punto por municipio y etiqueta solo en el activo.
         DATOS.forEach(function (m) {
             var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
